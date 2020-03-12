@@ -130,6 +130,13 @@ test_that("collect() can retrieve all data types correctly", {
   # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes
   library(dplyr)
 
+  epoch_utime <- 0
+  epoch_sdate <- "from_unixtime(unix_timestamp('01-01-1970' , 'dd-MM-yyyy'))"
+  epoch_rdate <- as.Date("01-01-1970", "%d-%m-%Y") %>% as.character()
+  epoch_stime <- paste0("to_utc_timestamp(from_unixtime(", epoch_utime, "), 'UTC')")
+  epoch_rtime <- "1970-01-01"
+  epoch_atime <- as.character(as.POSIXct(epoch_utime, origin = "1970-01-01"))
+
   utime <- as.numeric(as.POSIXct("2010-01-01 01:01:10", origin = "1970-01-01", tz = "UTC"))
   sdate <- "from_unixtime(unix_timestamp('01-01-2010' , 'dd-MM-yyyy'))"
   rdate <- as.Date("01-01-2010", "%d-%m-%Y") %>% as.character()
@@ -140,20 +147,22 @@ test_that("collect() can retrieve all data types correctly", {
   arrow_compat <- using_arrow()
 
   hive_type <- tibble::frame_data(
-    ~stype,      ~svalue,      ~rtype,   ~rvalue,      ~atype,    ~avalue,
-    "tinyint",       "1",   "integer",       "1",   "integer",        "1",
-    "smallint",      "1",   "integer",       "1",   "integer",        "1",
-    "integer",       "1",   "integer",       "1",   "integer",        "1",
-    "bigint",        "1",   "numeric",       "1", "integer64",        "1",
-    "float",         "1",   "numeric",       "1",   "numeric",        "1",
-    "double",        "1",   "numeric",       "1",   "numeric",        "1",
-    "decimal",       "1",   "numeric",       "1",   "numeric",        "1",
-    "timestamp",   stime,   "POSIXct",     rtime,   "POSIXct",      atime,
-    "date",        sdate,      "Date",     rdate,      "Date",      rdate,
-    "string",          1, "character",       "1", "character",        "1",
-    "varchar(10)",     1, "character",       "1", "character",        "1",
-    "char(10)",        1, "character",       "1", "character",        "1",
-    "boolean",    "true",   "logical",    "TRUE",   "logical",     "TRUE",
+    ~stype,            ~svalue,      ~rtype,     ~rvalue,      ~atype,     ~avalue,
+    "tinyint",             "1",   "integer",         "1",   "integer",         "1",
+    "smallint",            "1",   "integer",         "1",   "integer",         "1",
+    "integer",             "1",   "integer",         "1",   "integer",         "1",
+    "bigint",              "1",   "numeric",         "1", "integer64",         "1",
+    "float",               "1",   "numeric",         "1",   "numeric",         "1",
+    "double",              "1",   "numeric",         "1",   "numeric",         "1",
+    "decimal",             "1",   "numeric",         "1",   "numeric",         "1",
+    "timestamp",   epoch_stime,   "POSIXct", epoch_rtime,   "POSIXct", epoch_atime,
+    "date",        epoch_sdate,      "Date", epoch_rdate,      "Date", epoch_rdate,
+    "timestamp",         stime,   "POSIXct",       rtime,   "POSIXct",       atime,
+    "date",              sdate,      "Date",       rdate,      "Date",       rdate,
+    "string",                1, "character",         "1", "character",         "1",
+    "varchar(10)",           1, "character",         "1", "character",         "1",
+    "char(10)",              1, "character",         "1", "character",         "1",
+    "boolean",          "true",   "logical",      "TRUE",   "logical",      "TRUE",
   )
 
   if (spark_version(sc) < "2.2.0") {
@@ -170,7 +179,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   spark_query <- hive_type %>%
     mutate(
-      query = paste0("cast(", svalue, " as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col")
+      query = paste0("cast(", svalue, " as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col", row_number())
     ) %>%
     pull(query) %>%
     paste(collapse = ", ") %>%

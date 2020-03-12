@@ -128,7 +128,11 @@ readType <- function(con) {
 }
 
 readDate <- function(con) {
-  as.Date(readString(con))
+  date_str <- readString(con)
+  if (date_str == "")
+    NA
+  else
+    as.Date(date_str)
 }
 
 readTime <- function(con, n = 1) {
@@ -136,13 +140,11 @@ readTime <- function(con, n = 1) {
     as.POSIXct(character(0))
   else {
     t <- readDouble(con, n)
-    timeNA <- as.POSIXct(0, origin = "1970-01-01", tz = "UTC")
 
     r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
     if (getOption("sparklyr.collect.datechars", FALSE))
       as.character(r)
     else {
-      r[r == timeNA] <- as.POSIXct(NA)
       r
     }
   }

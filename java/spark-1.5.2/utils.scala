@@ -246,8 +246,7 @@ object Utils {
 
   def collectImplTimestamp(local: Array[Row], idx: Integer) = {
     local.map{row => {
-      val el = row(idx)
-      if (el.isInstanceOf[java.sql.Timestamp]) el.asInstanceOf[java.sql.Timestamp] else new java.sql.Timestamp(0)
+      Try(row.getAs[java.sql.Timestamp](idx)).getOrElse(null)
     }}
   }
 
@@ -255,15 +254,14 @@ object Utils {
     local.map{row => {
       val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
       el.map(e =>
-        if (e.isInstanceOf[java.sql.Timestamp]) e.asInstanceOf[java.sql.Timestamp] else new java.sql.Timestamp(0)
+        Try(e.asInstanceOf[java.sql.Timestamp]).getOrElse(null)
       ).toArray
     }}
   }
 
   def collectImplDate(local: Array[Row], idx: Integer) = {
     local.map{row => {
-      val el = row(idx)
-      if (el.isInstanceOf[java.sql.Date]) el.asInstanceOf[java.sql.Date] else new java.sql.Date(0)
+      Try(row.getAs[java.sql.Date](idx)).getOrElse(null)
     }}
   }
 
@@ -271,7 +269,7 @@ object Utils {
     local.map{row => {
       val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
       el.map(e =>
-        if (e.isInstanceOf[java.sql.Date]) e.asInstanceOf[java.sql.Date] else new java.sql.Date(0)
+        Try(e.asInstanceOf[java.sql.Date]).getOrElse(null)
       ).toArray
     }}
   }
