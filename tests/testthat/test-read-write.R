@@ -1,9 +1,10 @@
 context("read-write")
 
 sc <- testthat_spark_connection()
+iris_table_name <- random_table_name("iris")
 
-skip_databricks_connect()
 test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
+  skip_databricks_connect()
   if (.Platform$OS.type == "windows")
     skip("CSV encoding is slightly different in windows")
 
@@ -22,6 +23,7 @@ test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
 })
 
 test_that("spark_read_json() can load data using column names", {
+  skip_databricks_connect()
   json <- file("test.json", "w+")
   cat("{\"Sepal_Length\":5.1,\"Species\":\"setosa\", \"Other\": { \"a\": 1, \"b\": \"x\"}}\n", file = json)
   cat("{\"Sepal_Length\":4.9,\"Species\":\"setosa\", \"Other\": { \"a\": 2, \"b\": \"y\"}}\n", file = json)
@@ -40,6 +42,7 @@ test_that("spark_read_json() can load data using column names", {
 })
 
 test_that("spark_read_json() can load data using column types", {
+  skip_databricks_connect()
   test_requires("dplyr")
 
   json <- file("test.json", "w+")
@@ -62,6 +65,7 @@ test_that("spark_read_json() can load data using column types", {
 })
 
 test_that("spark_read_csv() can read long decimals", {
+  skip_databricks_connect()
   csv <- file("test.csv", "w+")
   cat("decimal\n1\n12312312312312300000000000000", file = csv)
   close(csv)
@@ -78,6 +82,7 @@ test_that("spark_read_csv() can read long decimals", {
 })
 
 test_that("spark_read_text() and spark_write_text() read and write basic files", {
+  skip_databricks_connect()
   test_requires("dplyr")
 
   text_file <- file("test.txt", "w+")
@@ -114,20 +119,21 @@ test_that("spark_write_table() can append data", {
 
   iris_tbl <- testthat_tbl("iris")
 
-  spark_write_table(iris_tbl, "iris_append_tbl")
+  spark_write_table(iris_tbl, iris_table_name)
   expect_equal(
-    sdf_nrow(tbl(sc, "iris_append_tbl")),
+    sdf_nrow(tbl(sc, iris_table_name)),
     nrow(iris)
   )
 
-  spark_write_table(iris_tbl, "iris_append_tbl", mode = "append")
+  spark_write_table(iris_tbl, iris_table_name, mode = "append")
   expect_equal(
-    sdf_nrow(tbl(sc, "iris_append_tbl")),
+    sdf_nrow(tbl(sc, iris_table_name)),
     2 * nrow(iris)
   )
 })
 
 test_that("spark_write_table() can write data", {
+  skip_databricks_connect()
   if (spark_version(sc) < "2.0.0") skip("tables not supported before 2.0.0")
   test_requires("dplyr")
 
@@ -141,6 +147,7 @@ test_that("spark_write_table() can write data", {
 })
 
 test_that("spark_read_csv() can rename columns", {
+  skip_databricks_connect()
   csv <- file("test.csv", "w+")
   cat("a,b,c\n1,2,3", file = csv)
   close(csv)
@@ -156,6 +163,7 @@ test_that("spark_read_csv() can rename columns", {
 })
 
 test_that("spark_read_text() can read a whole file", {
+  skip_databricks_connect()
   test_requires("dplyr")
 
   text_file <- file("test.txt", "w+")
@@ -171,6 +179,7 @@ test_that("spark_read_text() can read a whole file", {
 })
 
 test_that("spark_read_csv() can read with no name", {
+  skip_databricks_connect()
   test_requires("dplyr")
 
   text_file <- file("test.csv", "w+")
@@ -185,6 +194,7 @@ test_that("spark_read_csv() can read with no name", {
 })
 
 test_that("spark_read_csv() can read with named character name", {
+  skip_databricks_connect()
   test_requires("dplyr")
 
   text_file <- file("test.csv", "w+")
@@ -197,6 +207,7 @@ test_that("spark_read_csv() can read with named character name", {
 
 
 test_that("spark_read_csv() can read column types", {
+  skip_databricks_connect()
   csv <- file("test.csv", "w+")
   cat("a,b,c\n1,2,3", file = csv)
   close(csv)
@@ -220,6 +231,7 @@ test_that("spark_read_csv() can read column types", {
 })
 
 test_that("spark_read_csv() can read verbatim column types", {
+  skip_databricks_connect()
   csv <- file("test.csv", "w+")
   cat("a,b,c\n1,2,3", file = csv)
   close(csv)
@@ -241,4 +253,8 @@ test_that("spark_read_csv() can read verbatim column types", {
     )
   )
 
+})
+
+teardown({
+  db_drop_table(iris_table_name)
 })
