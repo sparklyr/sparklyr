@@ -4,7 +4,6 @@ skip_databricks_connect()
 library(dplyr)
 
 test_that("naive_bayes.tidy() works", {
-  skip_on_spark_master()
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")

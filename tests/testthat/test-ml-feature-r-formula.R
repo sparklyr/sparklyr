@@ -17,7 +17,6 @@ test_that("ft_r_formula() param setting", {
 })
 
 test_that("r formula works as expected", {
-  skip_on_spark_master()
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   pipeline <- ml_pipeline(sc) %>%
