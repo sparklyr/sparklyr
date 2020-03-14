@@ -92,6 +92,10 @@ print.tbl_spark <- function(x, ...) {
   }
 
   rows <- getOption("tibble.print_min", getOption("dplyr.print_min", 10))
+  options <- list(...)
+  if ("n" %in% names(options)) {
+    rows <- max(rows, options$n)
+  }
 
   grps <- dbplyr::op_grps(x$ops)
   sort <- dbplyr::op_sort(x$ops) %>%
@@ -128,5 +132,5 @@ print.tbl_spark <- function(x, ...) {
   data <- tibble::as_tibble(as.data.frame(data))
   class(data) <- c("tbl_spark_print", class(data))
 
-  print(data)
+  print(data, ...)
 }
