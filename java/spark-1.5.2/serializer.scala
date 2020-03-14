@@ -362,15 +362,31 @@ class Serializer(tracker: JVMObjectTracker) {
   }
 
   def writeDate(out: DataOutputStream, value: Date): Unit = {
-    writeString(out, value.toString)
+    writeString(
+      out,
+      if (null == value)
+        ""
+      else
+        value.toString
+    )
   }
 
   def writeTime(out: DataOutputStream, value: Time): Unit = {
-    out.writeDouble(value.getTime.toDouble / 1000.0)
+    out.writeDouble(
+      if (null == value)
+        Double.NaN
+      else
+        value.getTime.toDouble / 1000.0
+    )
   }
 
   def writeTime(out: DataOutputStream, value: Timestamp): Unit = {
-    out.writeDouble((value.getTime / 1000).toDouble + value.getNanos.toDouble / 1e9)
+    out.writeDouble(
+      if (null == value)
+        Double.NaN
+      else
+        (value.getTime / 1000).toDouble + value.getNanos.toDouble / 1e9
+    )
   }
 
   def writeString(out: DataOutputStream, value: String): Unit = {
@@ -434,7 +450,10 @@ class Serializer(tracker: JVMObjectTracker) {
 
     value.foreach(v => writeTime(
       out,
-      timestampToUTC(v.getTime())
+      if (null == v)
+        null
+      else
+        timestampToUTC(v.getTime())
     ))
   }
 
