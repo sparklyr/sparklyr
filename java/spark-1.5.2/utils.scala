@@ -479,6 +479,7 @@ object Utils {
           case "double"  => if (Try(value.toDouble).isSuccess) value.toDouble else null
           case "logical" => if (Try(value.toBoolean).isSuccess) value.toBoolean else null
           case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null
+          case "date" => if (Try(new java.sql.Date(value.toLong * 86400000)).isSuccess) new java.sql.Date(value.toLong * 86400000) else null
           case _ => if (value == "NA") null else value
         }
       })
@@ -514,6 +515,7 @@ object Utils {
           case "double"    => if (Try(value.toDouble).isSuccess) value.toDouble else null
           case "logical"   => if (Try(value.toBoolean).isSuccess) value.toBoolean else null
           case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null
+          case "date" => if (Try(new java.sql.Date(value.toLong * 86400000)).isSuccess) new java.sql.Date(value.toLong * 86400000) else null
           case _ => if (value == "NA") null else value
         }
       })

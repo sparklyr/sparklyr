@@ -129,6 +129,8 @@ spark_data_translate_columns <- function(df) {
       "character"
     else if ("POSIXct" %in% class(e))
       "timestamp"
+    else if (inherits(e, "Date"))
+      "date"
     else
       typeof(e)
   })
