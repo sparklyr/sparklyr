@@ -264,6 +264,28 @@ test_that("collect() can retrieve NULL data types as NAs", {
   })
 })
 
+test_that("collect() can retrieve date types successfully", {
+  df <- data.frame(
+    date = c(
+      as.Date("1961-01-20"),
+      as.Date("1970-01-01"),
+      as.Date("1981-01-20"),
+      as.Date("2001-01-20")
+    ),
+    name = c(
+      "John F. Kennedy",
+      NA,
+      "Ronald Reagan",
+      "George W. Bush"
+    ),
+    stringsAsFactors = FALSE
+  )
+  expect_equal(
+    as.list(df),
+    as.list(df %>% sdf_copy_to(sc, ., overwrite = TRUE) %>% sdf_collect())
+  )
+})
+
 test_that("invoke() can roundtrip POSIXlt fields", {
   invoke_static(
     sc,
