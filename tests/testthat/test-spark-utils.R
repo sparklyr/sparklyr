@@ -1,6 +1,5 @@
 context("spark utils")
 
-skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("checkpoint directory getting/setting works", {
