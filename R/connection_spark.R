@@ -349,7 +349,8 @@ spark_connection_is_local <- function(sc) {
 }
 
 spark_master_is_local <- function(master) {
-  grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
+  grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE) ||
+  grepl("^sparklyr://localhost:[0-9]+/[0-9]+")
 }
 
 spark_connection_in_driver <- function(sc) {

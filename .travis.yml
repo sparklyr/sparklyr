@@ -148,7 +148,7 @@ script:
     if [[ $CODE_COVERAGE == "true" ]]; then
       Rscript ci/.travis.R --coverage
     else
-      Rscript ci/.travis.R --testthat
+      RUN_TESTS_IN_PARALLEL=true NUM_TEST_PROCS=16 Rscript ci/.travis.R --testthat
     fi
 
 after_failure:

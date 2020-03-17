@@ -128,11 +128,139 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                    )
 )
 
+# create sym-links for test-related dependencies
+populate_test_deps_dir_symlinks <- function(dest) {
+  test_deps_dir <- "test_deps"
+  test_deps <- list.files(test_deps_dir, all.files = TRUE, no.. = TRUE)
+  for (dep in test_deps) {
+    file.symlink(
+      from = normalizePath(file.path(test_deps_dir, dep)),
+      to = dest
+    )
+  }
+}
+
+# run the specified list of test cases
+run_tests <- function(test_cases_dir, test_cases, log_file = NULL) {
+  if (!identical(log_file, NULL)) {
+    fd <- file(log_file, open = "w")
+    sink(fd, type = c("output", "message"))
+    on.exit(close(fd))
+  }
+  test_dir <- file.path(tempdir(), uuid::UUIDgenerate())
+  testthat_dir <- file.path(test_dir, "testthat")
+  dir.create(testthat_dir, showWarnings = FALSE, recursive = TRUE)
+  populate_test_deps_dir_symlinks(dest = testthat_dir)
+  for (test_case in test_cases) {
+    file.symlink(
+      from = normalizePath(file.path(test_cases_dir, test_case)),
+      to = testthat_dir
+    )
+  }
+  setwd(test_dir)
+  test_check("sparklyr", filter = test_filter, reporter = "performance")
+}
+
+testthat_latest_spark <- function() {
+  if (!exists(".testthat_latest_spark", envir = .GlobalEnv))
+    assign(".testthat_latest_spark", "2.3.0", envir = .GlobalEnv)
+  get(".testthat_latest_spark", envir = .GlobalEnv)
+}
+
+testthat_shell_connection <- function() {
+  is_worker = exists(".testthat_is_worker", envir = .GlobalEnv)
+  connection_cache_key <- paste0(
+    ".testthat_",
+    ifelse(is_worker, "spark_worker", "spark"),
+    "_connection"
+  )
+  version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
+  master <- ifelse(
+    is_worker,
+    paste0("sparklyr://localhost:8880/",
+           get(".testthat_spark_connection", envir = .GlobalEnv)$sessionId
+    ),
+    "local"
+  )
+
+  if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
+    spark_disconnect_all()
+    Sys.sleep(3)
+    livy_service_stop()
+    remove(".testthat_livy_connection", envir = .GlobalEnv)
+  }
+
+  spark_installed <- spark_installed_versions()
+  if (!is.null(version) && version == "master") {
+    assign(".test_on_spark_master", TRUE, envir = .GlobalEnv)
+    spark_installed <- spark_installed[with(spark_installed, order(spark, decreasing = TRUE)), ]
+    version <- spark_installed[1,]$spark
+  }
+
+  if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
+    options(sparkinstall.verbose = TRUE)
+    spark_install(version)
+  }
+
+  stopifnot(nrow(spark_installed_versions()) > 0)
+
+  # generate connection if none yet exists
+  connected <- FALSE
+  if (exists(connection_cache_key, envir = .GlobalEnv)) {
+    sc <- get(connection_cache_key, envir = .GlobalEnv)
+    connected <- connection_is_open(sc)
+  }
+
+  if (Sys.getenv("INSTALL_WINUTILS") == "true") {
+    spark_install_winutils(version)
+  }
+
+  if (!connected) {
+    config <- spark_config()
+
+    options(sparklyr.sanitize.column.names.verbose = TRUE)
+    options(sparklyr.verbose = TRUE)
+    options(sparklyr.na.omit.verbose = TRUE)
+    options(sparklyr.na.action.verbose = TRUE)
+
+    config[["sparklyr.shell.driver-memory"]] <- "3G"
+    config[["sparklyr.apply.env.foo"]] <- "env-test"
+
+    sc <- spark_connect(master = master, method = "shell", version = version, config = config)
+    assign(connection_cache_key, sc, envir = .GlobalEnv)
+  }
+
+  # retrieve spark connection
+  get(connection_cache_key, envir = .GlobalEnv)
+}
+
+spark_install_winutils <- function(version) {
+  hadoop_version <- if (version < "2.0.0") "2.6" else "2.7"
+  spark_dir <- paste("spark-", version, "-bin-hadoop", hadoop_version, sep = "")
+  winutils_dir <- file.path(Sys.getenv("LOCALAPPDATA"), "spark", spark_dir, "tmp", "hadoop", "bin", fsep = "\\")
+
+  if (!dir.exists(winutils_dir)) {
+    message("Installing winutils...")
+
+    dir.create(winutils_dir, recursive = TRUE)
+    winutils_path <- file.path(winutils_dir, "winutils.exe", fsep = "\\")
+
+    download.file(
+      "https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/winutils.exe",
+      winutils_path,
+      mode = "wb"
+    )
+
+    message("Installed winutils in ", winutils_path)
+  }
+}
+
 if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   # enforce all configuration settings are described
   options(sparklyr.test.enforce.config = TRUE)
 
-  test_filter <- NULL
+  # TODO:
+  test_filter <- c("^ml-.*$")
 
   livy_version <- Sys.getenv("LIVY_VERSION")
   if (nchar(livy_version) > 0) {
@@ -147,7 +275,8 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     test_filter <- paste(livy_tests, collapse = "|")
   }
 
-  is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
+  arrow_version <- Sys.getenv("ARROW_VERSION")
+  is_arrow_devel <- identical(arrow_version, "devel")
   if (is_arrow_devel) {
     arrow_devel_tests <- c(
       "^dplyr$",
@@ -169,5 +298,36 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
 
   on.exit({ spark_disconnect_all() ; livy_service_stop() })
 
-  test_check("sparklyr", filter = test_filter, reporter = "performance")
+  test_cases_dir <- "test_cases"
+  test_cases <- list.files(path = test_cases_dir, pattern = "test-.*\\.R")
+
+  install.packages("uuid")
+  library(uuid)
+  if (identical(Sys.getenv("RUN_TESTS_IN_PARALLEL"), "true") &&
+      livy_version == "" &&
+      arrow_version == "" &&
+      Sys.getenv("TEST_DATABRICKS_CONNECT") != "true") {
+    # run tests in parallel
+    num_test_threads <- as.integer(Sys.getenv("NUM_TEST_PROCS", unset = 4))
+    gateway_ports <- 8080 + seq(0, num_test_threads - 1) * 10
+    install.packages("doParallel")
+    library(doParallel)
+    doParallel::registerDoParallel(cores = num_test_threads)
+    log_file <- function(test_case) {
+      # TODO: TODO:
+      # file.path(tempdir(), paste("test_", test_case, ".log", sep = ""))
+      file.path("/tmp", paste("test_", test_case, ".log", sep = ""))
+    }
+    # create the shell connection in parent env
+    testthat_shell_connection()
+    cwd <- getwd()
+    foreach (test_case = test_cases, .export = c(".GlobalEnv")) %dopar% {
+      assign(".testthat_is_worker", TRUE, envir = .GlobalEnv)
+      setwd(cwd)
+      run_tests(test_cases_dir, c(test_case), log_file = log_file(test_case))
+    }
+  } else {
+    # run test cases serially
+    run_tests(test_cases_dir, test_cases)
+  }
 }

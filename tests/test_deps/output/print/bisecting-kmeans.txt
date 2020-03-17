@@ -1,3 +1,7 @@
+ml_bisecting_kmeans() works properly with iris: warning: `invoke()` is deprecated as of rlang 0.4.0.
+Please use `exec()` or `eval(expr())`instead.
+This warning is displayed once per session. 
+ml_bisecting_kmeans() works properly: 17.8584725856781
 K-means clustering with 5 clusters
 
 Cluster centers:
