@@ -1,31 +1,7 @@
 library(sparklyr)
 library(dplyr)
 
-spark_install_winutils <- function(version) {
-  hadoop_version <- if (version < "2.0.0") "2.6" else "2.7"
-  spark_dir <- paste("spark-", version, "-bin-hadoop", hadoop_version, sep = "")
-  winutils_dir <- file.path(Sys.getenv("LOCALAPPDATA"), "spark", spark_dir, "tmp", "hadoop", "bin", fsep = "\\")
-
-  if (!dir.exists(winutils_dir)) {
-    message("Installing winutils...")
-
-    dir.create(winutils_dir, recursive = TRUE)
-    winutils_path <- file.path(winutils_dir, "winutils.exe", fsep = "\\")
-
-    download.file(
-      "https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/winutils.exe",
-      winutils_path,
-      mode = "wb"
-    )
-
-    message("Installed winutils in ", winutils_path)
-  }
-}
-
 testthat_spark_connection <- function() {
-  if (!exists(".testthat_latest_spark", envir = .GlobalEnv))
-    assign(".testthat_latest_spark", "2.3.0", envir = .GlobalEnv)
-
   livy_branch <- Sys.getenv("TRAVIS_PULL_REQUEST_BRANCH")
   if (nchar(livy_branch) > 0) {
     options(sparklyr.livy.branch = livy_branch)
@@ -40,62 +16,6 @@ testthat_spark_connection <- function() {
     testthat_shell_connection(method = "databricks")
   else
     testthat_shell_connection()
-}
-
-testthat_latest_spark <- function() get(".testthat_latest_spark", envir = .GlobalEnv)
-
-testthat_shell_connection <- function(method = "shell") {
-  version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
-
-  if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
-    spark_disconnect_all()
-    Sys.sleep(3)
-    livy_service_stop()
-    remove(".testthat_livy_connection", envir = .GlobalEnv)
-  }
-
-  spark_installed <- spark_installed_versions()
-  if (!is.null(version) && version == "master") {
-    assign(".test_on_spark_master", TRUE, envir = .GlobalEnv)
-    spark_installed <- spark_installed[with(spark_installed, order(spark, decreasing = TRUE)), ]
-    version <- spark_installed[1,]$spark
-  }
-
-  if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
-    options(sparkinstall.verbose = TRUE)
-    spark_install(version)
-  }
-
-  stopifnot(nrow(spark_installed_versions()) > 0)
-
-  # generate connection if none yet exists
-  connected <- FALSE
-  if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
-    sc <- get(".testthat_spark_connection", envir = .GlobalEnv)
-    connected <- connection_is_open(sc)
-  }
-
-  if (Sys.getenv("INSTALL_WINUTILS") == "true") {
-    spark_install_winutils(version)
-  }
-
-  if (!connected) {
-    config <- spark_config()
-
-    options(sparklyr.sanitize.column.names.verbose = TRUE)
-    options(sparklyr.verbose = TRUE)
-    options(sparklyr.na.omit.verbose = TRUE)
-    options(sparklyr.na.action.verbose = TRUE)
-
-    config[["sparklyr.shell.driver-memory"]] <- "3G"
-    config[["sparklyr.apply.env.foo"]] <- "env-test"
-
-    sc <- spark_connect(master = "local", method = method, version = version, config = config)
-    assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
-  }
-
-  # retrieve spark connection
-  get(".testthat_spark_connection", envir = .GlobalEnv)
 }
 
 testthat_tbl <- function(name, data = NULL, repartition = 0L) {
