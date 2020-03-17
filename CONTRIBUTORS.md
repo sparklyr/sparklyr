@@ -18,6 +18,9 @@
 | Javier Luraschi   |   RStudio    |       javier@rstudio.com        |   javierluraschi    |
 | Hossein Falaki    |  Databricks  |     hossein@databricks.com      |       falaki        |
 | Vipul Modi        |   Qubole     |       vipulm@qubole.com         |      vipul1409      |
+| Yitao Li          |   RStudio    |        yitao@rstudio.com        |        yl790        |
+| Lu Wang           |  Databricks  |     lu.wang@databricks.com      |     lu-wang-dl      |
+| Samuel Macedo     |    IFPE      | samuelmacedo@recife.ifpe.edu.br |   samuelmacedo83    |
 
 ## Maintainers
 
