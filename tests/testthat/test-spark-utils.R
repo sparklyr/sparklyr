@@ -1,11 +1,14 @@
 context("spark utils")
 
-skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("checkpoint directory getting/setting works", {
-  spark_set_checkpoint_dir(sc, "foobar")
-  expect_match(spark_get_checkpoint_dir(sc), "foobar")
+  if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true")
+    checkpoint_data_path <- paste("dbfs:/tmp/data/", "foobar", sep="")
+  else
+    checkpoint_data_path <- "foobar"
+  spark_set_checkpoint_dir(sc, checkpoint_data_path)
+  expect_match(spark_get_checkpoint_dir(sc), checkpoint_data_path)
 })
 
 test_that("jobj_class() works", {

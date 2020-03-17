@@ -386,3 +386,11 @@ skip_databricks_connect <- function() {
 random_table_name <- function(prefix) {
   paste0(prefix, paste0(floor(runif(10, 0, 10)), collapse = ""))
 }
+
+get_simple_data_path <- function(file_name) {
+  if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true")
+    sample_data_path <- paste("dbfs:/tmp/data/", file_name, sep="")
+  else
+    sample_data_path <- dir(getwd(), recursive = TRUE, pattern = file_name, full.names = TRUE)
+  sample_data_path
+}
