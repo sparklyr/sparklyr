@@ -260,7 +260,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   options(sparklyr.test.enforce.config = TRUE)
 
   # TODO:
-  test_filter <- c("^ml-.*$")
+  test_filter <- c("^barrier$|^serialization$|^invoke$|^copy-to$")
 
   livy_version <- Sys.getenv("LIVY_VERSION")
   if (nchar(livy_version) > 0) {
