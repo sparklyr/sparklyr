@@ -11,6 +11,9 @@ branches:
 cache:
   packages: true
 
+env:
+  R_REMOTES_UPGRADE=never
+
 warnings_are_errors: true
 
 r_github_packages:
