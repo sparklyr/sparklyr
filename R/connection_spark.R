@@ -274,6 +274,10 @@ spark_connect <- function(master,
     }
   }, onexit = TRUE)
 
+  if (method == "databricks-connect") {
+    spark_context(scon) %>% invoke("setLocalProperty", "spark.databricks.service.client.type", "sparklyr")
+  }
+
   # add to our internal list
   spark_connections_add(scon)
 
