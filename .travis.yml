@@ -2,7 +2,7 @@
 
 language: r
 dist: trusty
-sudo: false
+sudo: true
 
 branches:
   only:
@@ -128,6 +128,7 @@ matrix:
         - JAVA_VERSION=oraclejdk8
 
 before_install:
+  - sudo mount -t tmpfs tmpfs /tmp
   - if [[ ! -z "$JAVA_VERSION" ]]; then jdk_switcher use $JAVA_VERSION;  fi
   - |
     if [[ ! -z "$JAVA_URL" ]]; then

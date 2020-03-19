@@ -1,6 +1,10 @@
 library(sparklyr)
 library(dplyr)
 
+get_spark_warehouse_dir <- function() {
+  ifelse(.Platform$OS.type == "windows", Sys.getenv("TEMP"), "/tmp")
+}
+
 spark_install_winutils <- function(version) {
   hadoop_version <- if (version < "2.0.0") "2.6" else "2.7"
   spark_dir <- paste("spark-", version, "-bin-hadoop", hadoop_version, sep = "")
@@ -89,6 +93,7 @@ testthat_shell_connection <- function(method = "shell") {
 
     config[["sparklyr.shell.driver-memory"]] <- "3G"
     config[["sparklyr.apply.env.foo"]] <- "env-test"
+    config[["spark.sql.warehouse.dir"]] <- get_spark_warehouse_dir()
 
     sc <- spark_connect(master = "local", method = method, version = version, config = config)
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
@@ -240,7 +245,8 @@ testthat_livy_connection <- function() {
       config = list(
         sparklyr.verbose = TRUE,
         sparklyr.connect.timeout = 120,
-        sparklyr.log.invoke = "cat"
+        sparklyr.log.invoke = "cat",
+        spark.sql.warehouse.dir = get_spark_warehouse_dir()
       ),
       version = version,
       sources = TRUE
