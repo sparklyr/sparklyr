@@ -102,6 +102,12 @@ core_remove_jobj <- function(sc, id) {
 
 core_invoke_method <- function(sc, static, object, method, ...)
 {
+  # N.B.: the reference to `object` must be retained until after a value or exception is returned to us
+  # from the invoked method here (i.e., cannot have `object <- something_else` before that), because any
+  # re-assignment could cause the last reference to `object` to be destroyed and the underlying JVM object
+  # to be deleted from JVMObjectTracker before the actual invocation of the method could happen.
+  lockBinding("object", environment())
+
   if (is.null(sc))
     stop("The connection is no longer valid.")
 
@@ -139,10 +145,9 @@ core_invoke_method <- function(sc, static, object, method, ...)
   }
 
   # if the object is a jobj then get it's id
-  if (inherits(object, "spark_jobj"))
-    object <- object$id
+  objId <- ifelse(inherits(object, "spark_jobj"), object$id, object)
 
-  write_bin_args(backend, object, static, method, args)
+  write_bin_args(backend, objId, static, method, args)
 
   if (identical(object, "Handler") &&
       (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
@@ -184,12 +189,12 @@ core_invoke_method <- function(sc, static, object, method, ...)
     })
   }
 
-  object <- readObject(sc)
+  result_object <- readObject(sc)
 
   sc$state$status[[connection_name]] <- "ready"
   on.exit(NULL)
 
-  attach_connection(object, sc)
+  attach_connection(result_object, sc)
 }
 
 jobj_subclass.shell_backend <- function(con) {
