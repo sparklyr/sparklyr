@@ -42,17 +42,15 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
           serializer.writeObject(dos, args(0))
         case "rm" =>
           try {
-            val t = serializer.readObjectType(dis)
-            if (t != 'c') throw new IllegalArgumentException("object removal expects a string")
-            val objToRemove = serializer.readString(dis)
-            tracker.remove(objToRemove)
+            if (serializer.readObjectType(dis) != 'a' || serializer.readObjectType(dis) != 'c')
+              throw new IllegalArgumentException("object removal expects a string array")
+            val objsToRemove = serializer.readStringArr(dis)
+            for (obj <- objsToRemove) tracker.remove(obj)
             serializer.writeInt(dos, 0)
             serializer.writeObject(dos, null)
           } catch {
             case e: Exception =>
-              logger.logError(s"failed to remove $objId", e)
-              serializer.writeInt(dos, -1)
-              serializer.writeString(dos, s"Removing $objId failed: ${e.getMessage}")
+              logger.logError("failed to remove objects", e)
           }
         case "getHostContext" =>
           serializer.writeInt(dos, 0)

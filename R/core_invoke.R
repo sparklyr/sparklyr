@@ -96,8 +96,8 @@ core_invoke_socket_name <- function(sc) {
     "backend"
 }
 
-core_remove_jobj <- function(sc, id) {
-  core_invoke_method(sc, static = TRUE, "Handler", "rm", id)
+core_remove_jobjs <- function(sc, ids) {
+  core_invoke_method(sc, static = TRUE, "Handler", "rm", as.list(ids))
 }
 
 core_invoke_method <- function(sc, static, object, method, ...)
@@ -124,10 +124,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
   if (!identical(object, "Handler")) {
     objsToRemove <- ls(.toRemoveJobjs)
     if (length(objsToRemove) > 0) {
-      sapply(objsToRemove,
-             function(e) {
-               core_remove_jobj(sc, e)
-             })
+      core_remove_jobjs(sc, objsToRemove)
       rm(list = objsToRemove, envir = .toRemoveJobjs)
     }
   }
