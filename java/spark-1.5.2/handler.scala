@@ -8,6 +8,8 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.SimpleChannelInboundHandler
 
+import util.control.Breaks._
+
 @Sharable
 class BackendHandler(
   close: () => Unit,
@@ -30,30 +32,34 @@ class BackendHandler(
     val methodName = serializer.readString(dis)
     val numArgs = serializer.readInt(dis)
 
+    var needsReply: Boolean = true
     var reply: Array[Byte] = null
 
-    if (objId == "Handler") {
-      methodName match {
-        case "stopBackend" =>
-          serializer.writeInt(dos, 0)
-          serializer.writeType(dos, "void")
-          close()
+    breakable {
+      do {
+        objId match {
+          case"stopBackend" =>
+              serializer.writeInt(dos, 0)
+              serializer.writeType(dos, "void")
+              close()
 
-          reply = bos.toByteArray
-        case "terminateBackend" =>
-          serializer.writeInt(dos, 0)
-          serializer.writeType(dos, "void")
-          close()
+              reply = bos.toByteArray
+              break
+          case "terminateBackend" =>
+              serializer.writeInt(dos, 0)
+              serializer.writeType(dos, "void")
+              close()
 
-          System.exit(0)
-        case _ =>
-          reply = streamHandler.read(msg, null, logger, hostContext)
-      }
-    } else {
-      reply = streamHandler.read(msg, null, logger, hostContext)
+              System.exit(0)
+          case "rm" =>
+              needsReply = false
+          case _ =>
+        }
+        reply = streamHandler.read(msg, null, logger, hostContext)
+      } while (false)
     }
 
-    ctx.write(reply)
+    if (needsReply) ctx.write(reply)
   }
 
   override def channelReadComplete(ctx: ChannelHandlerContext): Unit = {
