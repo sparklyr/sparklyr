@@ -38,8 +38,9 @@ ft_one_hot_encoder.spark_connection <- function(x, input_cols = NULL, output_col
       x, "org.apache.spark.ml.feature.OneHotEncoder",
       input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]], uid = .args[["uid"]]
     ) %>%
-      invoke("setHandleInvalid", .args[["handle_invalid"]]) %>%
-      invoke("setDropLast", .args[["drop_last"]]) %>%
+      invoke("%>%",
+             list("setHandleInvalid", .args[["handle_invalid"]]),
+             list("setDropLast", .args[["drop_last"]])) %>%
       new_ml_one_hot_encoder()
   } else {
     if (length(.args[["input_cols"]]) > 1 || length(.args[["output_cols"]]) > 1) {

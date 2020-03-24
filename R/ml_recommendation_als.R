@@ -103,29 +103,35 @@ ml_als.spark_connection <- function(x, formula = NULL, rating_col = "rating", us
     validator_ml_als()
 
   jobj <- invoke_new(x, "org.apache.spark.ml.recommendation.ALS", uid) %>%
-    invoke("setRatingCol", .args[["rating_col"]]) %>%
-    invoke("setUserCol", .args[["user_col"]]) %>%
-    invoke("setItemCol", .args[["item_col"]]) %>%
-    invoke("setRank", .args[["rank"]]) %>%
-    invoke("setRegParam", .args[["reg_param"]]) %>%
-    invoke("setImplicitPrefs", .args[["implicit_prefs"]]) %>%
-    invoke("setAlpha", .args[["alpha"]]) %>%
-    invoke("setNonnegative", .args[["nonnegative"]]) %>%
-    invoke("setMaxIter", .args[["max_iter"]]) %>%
-    invoke("setNumUserBlocks", .args[["num_user_blocks"]]) %>%
-    invoke("setNumItemBlocks", .args[["num_item_blocks"]]) %>%
-    invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
-    jobj_set_param(
-      "setIntermediateStorageLevel", .args[["intermediate_storage_level"]],
-      "2.0.0", "MEMORY_AND_DISK"
-    ) %>%
-    jobj_set_param(
-      "setFinalStorageLevel", .args[["final_storage_level"]],
-      "2.0.0","MEMORY_AND_DISK"
-    ) %>%
-    jobj_set_param(
-      "setColdStartStrategy", .args[["cold_start_strategy"]],
-      "2.2.0", "nan"
+    (
+      function(obj) {
+        do.call(invoke,
+                c(obj, "%>%", Filter(function(x) !is.null(x),
+                                     list(
+                                          list("setRatingCol", .args[["rating_col"]]),
+                                          list("setUserCol", .args[["user_col"]]),
+                                          list("setItemCol", .args[["item_col"]]),
+                                          list("setRank", .args[["rank"]]),
+                                          list("setRegParam", .args[["reg_param"]]),
+                                          list("setImplicitPrefs", .args[["implicit_prefs"]]),
+                                          list("setAlpha", .args[["alpha"]]),
+                                          list("setNonnegative", .args[["nonnegative"]]),
+                                          list("setMaxIter", .args[["max_iter"]]),
+                                          list("setNumUserBlocks", .args[["num_user_blocks"]]),
+                                          list("setNumItemBlocks", .args[["num_item_blocks"]]),
+                                          list("setCheckpointInterval", .args[["checkpoint_interval"]]),
+                                          jobj_set_param_helper(
+                                            obj, "setIntermediateStorageLevel", .args[["intermediate_storage_level"]],
+                                            "2.0.0", "MEMORY_AND_DISK"),
+                                          jobj_set_param_helper(
+                                            obj, "setFinalStorageLevel", .args[["final_storage_level"]],
+                                            "2.0.0","MEMORY_AND_DISK"
+                                          ),
+                                          jobj_set_param_helper(
+                                            obj, "setColdStartStrategy", .args[["cold_start_strategy"]],
+                                            "2.2.0", "nan"
+                                          )))))
+      }
     )
 
   new_ml_als(jobj)

@@ -49,15 +49,20 @@ ft_chisq_selector.spark_connection <- function(x, features_col = "features", out
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.ChiSqSelector", output_col = .args[["output_col"]],
-    uid = .args[["uid"]]) %>%
-    jobj_set_param("setFdr", .args[["fdr"]], "2.2.0", 0.05) %>%
-    invoke("setFeaturesCol", .args[["features_col"]]) %>%
-    jobj_set_param("setFpr", .args[["fpr"]], "2.1.0", 0.05) %>%
-    jobj_set_param("setFwe", .args[["fwe"]], "2.2.0", 0.05) %>%
-    invoke("setLabelCol", .args[["label_col"]]) %>%
-    invoke("setNumTopFeatures", .args[["num_top_features"]]) %>%
-    jobj_set_param("setPercentile", .args[["percentile"]], "2.1.0", 0.1) %>%
-    jobj_set_param("setSelectorType", .args[["selector_type"]], "2.1.0", "numTopFeatures") %>%
+    uid = .args[["uid"]]) %>% (
+      function(obj) {
+        do.call(invoke,
+                c(obj, "%>%", Filter(function(x) !is.null(x),
+                                     list(
+                                          jobj_set_param_helper(obj, "setFdr", .args[["fdr"]], "2.2.0", 0.05),
+                                          list("setFeaturesCol", .args[["features_col"]]),
+                                          jobj_set_param_helper(obj, "setFpr", .args[["fpr"]], "2.1.0", 0.05),
+                                          jobj_set_param_helper(obj, "setFwe", .args[["fwe"]], "2.2.0", 0.05),
+                                          list("setLabelCol", .args[["label_col"]]),
+                                          list("setNumTopFeatures", .args[["num_top_features"]]),
+                                          jobj_set_param_helper(obj, "setPercentile", .args[["percentile"]], "2.1.0", 0.1),
+                                          jobj_set_param_helper(obj, "setSelectorType", .args[["selector_type"]], "2.1.0", "numTopFeatures")))))
+      }) %>%
     new_ml_chisq_selector()
 
   estimator

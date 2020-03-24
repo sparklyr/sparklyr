@@ -157,21 +157,26 @@ ml_lda.spark_connection <- function(x, formula = NULL, k = 10, max_iter = 20, do
 
   uid <- cast_string(uid)
 
-  jobj <- invoke_new(x, "org.apache.spark.ml.clustering.LDA", uid) %>%
-    invoke("setK", .args[["k"]]) %>%
-    invoke("setMaxIter", .args[["max_iter"]]) %>%
-    invoke("setSubsamplingRate", .args[["subsampling_rate"]]) %>%
-    invoke("setOptimizer", .args[["optimizer"]]) %>%
-    invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
-    jobj_set_param("setKeepLastCheckpoint", .args[["keep_last_checkpoint"]], "2.0.0", TRUE) %>%
-    invoke("setLearningDecay", .args[["learning_decay"]]) %>%
-    invoke("setLearningOffset", .args[["learning_offset"]]) %>%
-    invoke("setOptimizeDocConcentration", .args[["optimize_doc_concentration"]]) %>%
-    invoke("setFeaturesCol", .args[["features_col"]]) %>%
-    invoke("setTopicDistributionCol", .args[["topic_distribution_col"]]) %>%
-    jobj_set_param("setDocConcentration", .args[["doc_concentration"]]) %>%
-    jobj_set_param("setTopicConcentration", .args[["topic_concentration"]]) %>%
-    jobj_set_param("setSeed", .args[["seed"]])
+  jobj <- invoke_new(x, "org.apache.spark.ml.clustering.LDA", uid) %>% (
+    function(obj) {
+      do.call(invoke,
+              c(obj, "%>%", Filter(function(x) !is.null(x),
+                              list(
+                                   list("setK", .args[["k"]]),
+                                   list("setMaxIter", .args[["max_iter"]]),
+                                   list("setSubsamplingRate", .args[["subsampling_rate"]]),
+                                   list("setOptimizer", .args[["optimizer"]]),
+                                   list("setCheckpointInterval", .args[["checkpoint_interval"]]),
+                                   jobj_set_param_helper(obj, "setKeepLastCheckpoint", .args[["keep_last_checkpoint"]], "2.0.0", TRUE),
+                                   list("setLearningDecay", .args[["learning_decay"]]),
+                                   list("setLearningOffset", .args[["learning_offset"]]),
+                                   list("setOptimizeDocConcentration", .args[["optimize_doc_concentration"]]),
+                                   list("setFeaturesCol", .args[["features_col"]]),
+                                   list("setTopicDistributionCol", .args[["topic_distribution_col"]]),
+                                   jobj_set_param_helper(obj, "setDocConcentration", .args[["doc_concentration"]]),
+                                   jobj_set_param_helper(obj, "setTopicConcentration", .args[["topic_concentration"]]),
+                                   jobj_set_param_helper(obj, "setSeed", .args[["seed"]])))))
+  })
 
   new_ml_lda(jobj)
 }
