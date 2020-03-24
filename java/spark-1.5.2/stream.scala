@@ -46,8 +46,6 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
               throw new IllegalArgumentException("object removal expects a string array")
             val objsToRemove = serializer.readStringArr(dis)
             for (obj <- objsToRemove) tracker.remove(obj)
-            serializer.writeInt(dos, 0)
-            serializer.writeObject(dos, null)
           } catch {
             case e: Exception =>
               logger.logError("failed to remove objects", e)
