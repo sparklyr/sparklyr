@@ -42,8 +42,19 @@ ml_add_stage <- function(x, stage) {
 #'
 #' @export
 jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NULL) {
+  set_param_args <- jobj_set_param_helper(jobj, setter, value, min_version, default)
+  if (is.null(set_param_args))
+    # not setting any param
+    jobj
+  else
+    do.call(invoke, c(jobj, set_param_args))
+}
+
+# returns NULL if no setter should be called, otherwise returns a list of params
+# (aside from jobj itself) to be passed to `invoke`
+jobj_set_param_helper <- function(jobj, setter, value, min_version = NULL, default = NULL) {
   # if value is NULL, don't set
-  if (is.null(value)) return(jobj)
+  if (is.null(value)) return(NULL)
 
   if (!is.null(min_version)) {
     # if min_version specified, check Spark version
@@ -57,13 +68,13 @@ jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NU
         stop(paste0("Parameter `", deparse(substitute(value)),
                     "` is only available for Spark ", min_version, " and later."))
       } else {
-        # otherwise, return jobj untouched
-        return(jobj)
+        # otherwise, don't call the setter
+        return(NULL)
       }
     }
   }
 
-  invoke(jobj, setter, value)
+  list(setter, value)
 }
 
 
@@ -112,19 +123,25 @@ jobj_set_ml_params <- function(jobj, features_col, label_col, prediction_col,
                                probability_col, raw_prediction_col,
                                k, max_iter, seed, input_col, input_cols,
                                output_col, output_cols) {
-  jobj %>%
-    jobj_set_param("setFeaturesCol", features_col) %>%
-    jobj_set_param("setLabelCol", label_col) %>%
-    jobj_set_param("setPredictionCol", prediction_col) %>%
-    jobj_set_param("setProbabilityCol", probability_col) %>%
-    jobj_set_param("setRawPredictionCol", raw_prediction_col) %>%
-    jobj_set_param("setK", k) %>%
-    jobj_set_param("setMaxIter", max_iter) %>%
-    jobj_set_param("setSeed", seed) %>%
-    jobj_set_param("setInputCol", input_col) %>%
-    jobj_set_param("setInputCols", input_cols) %>%
-    jobj_set_param("setOutputCol", output_col) %>%
-    jobj_set_param("setOutputCols", output_cols)
+  params_to_set <- Filter(function(x) !is.null(x),
+                          list(
+                               jobj_set_param_helper(jobj, "setFeaturesCol", features_col),
+                               jobj_set_param_helper(jobj, "setLabelCol", label_col),
+                               jobj_set_param_helper(jobj, "setPredictionCol", prediction_col),
+                               jobj_set_param_helper(jobj, "setProbabilityCol", probability_col),
+                               jobj_set_param_helper(jobj, "setRawPredictionCol", raw_prediction_col),
+                               jobj_set_param_helper(jobj, "setK", k),
+                               jobj_set_param_helper(jobj, "setMaxIter", max_iter),
+                               jobj_set_param_helper(jobj, "setSeed", seed),
+                               jobj_set_param_helper(jobj, "setInputCol", input_col),
+                               jobj_set_param_helper(jobj, "setInputCols", input_cols),
+                               jobj_set_param_helper(jobj, "setOutputCol", output_col),
+                               jobj_set_param_helper(jobj, "setOutputCols", output_cols)))
+  if (length(params_to_set) > 0)
+    do.call(invoke, c(jobj, "%>%", params_to_set))
+  else
+    # no need to set any param
+    jobj
 }
 
 validate_args_transformer <- function(.args) {
@@ -205,14 +222,12 @@ ml_stages <- function(x, stages = NULL) {
 
 ml_column_metadata <- function(tbl, column) {
   sdf <- spark_dataframe(tbl)
-  sdf %>%
-    invoke("schema") %>%
-    invoke("apply", sdf %>%
-             invoke("schema") %>%
-             invoke("fieldIndex", column) %>%
-             cast_scalar_integer()) %>%
-    invoke("metadata") %>%
-    invoke("json") %>%
+  sdf_schema <- invoke(sdf, "schema")
+  field_index <- sdf_schema %>% invoke("fieldIndex", column) %>% cast_scalar_integer()
+  sdf_schema %>% invoke("%>%",
+                        list("apply", field_index),
+                        list("metadata"),
+                        list("json")) %>%
     jsonlite::fromJSON() %>%
     `[[`("ml_attr")
 }

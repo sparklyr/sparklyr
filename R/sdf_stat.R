@@ -13,7 +13,6 @@ sdf_crosstab <- function(x, col1, col2) {
 
   x %>%
     spark_dataframe() %>%
-    invoke("stat") %>%
-    invoke("crosstab", col1, col2) %>%
+    invoke("%>%", list("stat"), list("crosstab", col1, col2)) %>%
     sdf_register()
 }

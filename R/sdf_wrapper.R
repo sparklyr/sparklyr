@@ -276,8 +276,9 @@ sdf_pivot <- function(x, formula, fun.aggregate = "count") {
 
   # generate pivoted dataset
   grouped <- sdf %>%
-    invoke("groupBy", grouped_cols[[1]], as.list(grouped_cols[-1])) %>%
-    invoke("pivot", pivot_cols[[1]])
+    invoke("%>%",
+           list("groupBy", grouped_cols[[1]], as.list(grouped_cols[-1])),
+           list("pivot", pivot_cols[[1]]))
 
   # perform aggregation
   fun.aggregate <- fun.aggregate %||% "count"

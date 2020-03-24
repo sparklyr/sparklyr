@@ -56,8 +56,9 @@ ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col 
     x, "org.apache.spark.ml.feature.StandardScaler",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
-    invoke("setWithMean", .args[["with_mean"]]) %>%
-    invoke("setWithStd", .args[["with_std"]]) %>%
+    invoke("%>%",
+           list("setWithMean", .args[["with_mean"]]),
+           list("setWithStd", .args[["with_std"]])) %>%
     new_ml_standard_scaler()
 
   estimator

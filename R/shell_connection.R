@@ -568,16 +568,18 @@ shell_connection_config_defaults <- function() {
 initialize_connection.spark_shell_connection <- function(sc) {
   create_spark_config <- function() {
     # create the spark config
-    conf <- invoke_new(sc, "org.apache.spark.SparkConf")
-    conf <- invoke(conf, "setAppName", sc$app_name)
+    settings <- list(list("setAppName", sc$app_name))
 
     if (!spark_master_is_yarn_cluster(sc$master, sc$config) &&
         !spark_master_is_gateway(sc$master)) {
-      conf <- invoke(conf, "setMaster", sc$master)
+      settings <- c(settings, list(list("setMaster", sc$master)))
 
       if (!is.null(sc$spark_home))
-        conf <- invoke(conf, "setSparkHome", sc$spark_home)
+        settings <- c(settings, list(list("setSparkHome", sc$spark_home)))
     }
+    conf <- invoke_new(sc, "org.apache.spark.SparkConf") %>% (
+      function(obj) do.call(invoke, c(obj, "%>%", settings))
+    )
 
     context_config <- connection_config(sc, "spark.", c("spark.sql."))
     apply_config(conf, context_config, "set", "spark.")
