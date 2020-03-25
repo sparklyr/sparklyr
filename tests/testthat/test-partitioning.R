@@ -10,24 +10,34 @@ test_that("sdf_repartition works", {
 })
 
 test_that("sdf_reparition: partitioning by column works", {
-
-  skip_databricks_connect()
   test_requires_version("2.0.0", "partitioning by column requires spark 2.0+")
   iris_tbl <- testthat_tbl("iris")
-  expect_match(iris_tbl %>%
-                 sdf_repartition(partition_by = c("Species", "Petal_Width")) %>%
-                 sdf_query_plan() %>%
-                 dplyr::first() %>%
-                 gsub("#[0-9]+", "", ., perl = TRUE),
-               "RepartitionByExpression \\[Species, Petal_Width\\]"
+
+  if (is_testing_databricks_connect()) {
+    # DB Connect's optimized plans don't display much useful information when calling toString,
+    # so we use the analyzed plan instead
+    plan_type <- "analyzed"
+  } else {
+    plan_type <- "optimizedPlan"
+  }
+
+  expect_true(
+    any(grepl("RepartitionByExpression \\[Species, Petal_Width\\]",
+              iris_tbl %>%
+                sdf_repartition(partition_by = c("Species", "Petal_Width")) %>%
+                sdf_query_plan(plan_type) %>%
+                gsub("#[0-9]+", "", ., perl = TRUE))
+    )
   )
 
-  expect_equal(iris_tbl %>%
-                 sdf_repartition(5L, partition_by = c("Species", "Petal_Width")) %>%
-                 sdf_query_plan() %>%
-                 dplyr::first() %>%
-                 gsub("#[0-9]+", "", ., perl = TRUE),
-               "RepartitionByExpression [Species, Petal_Width], 5")
+  expect_true(
+    any(grepl("RepartitionByExpression \\[Species, Petal_Width\\], 5",
+              iris_tbl %>%
+                sdf_repartition(5L, partition_by = c("Species", "Petal_Width")) %>%
+                sdf_query_plan(plan_type) %>%
+                gsub("#[0-9]+", "", ., perl = TRUE))
+    )
+  )
 })
 
 test_that("'sdf_partition' -- 'partitions' argument should take numeric (#735)", {

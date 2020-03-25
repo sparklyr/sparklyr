@@ -158,11 +158,13 @@ check_tidy <- function(o, exp.row = NULL, exp.col = NULL, exp.names = NULL) {
   }
 }
 
-sdf_query_plan <- function(x) {
+sdf_query_plan <- function(x, plan_type=c("optimizedPlan", "analyzed")) {
+  plan_type <- match.arg(plan_type)
+
   x %>%
     spark_dataframe() %>%
     invoke("queryExecution") %>%
-    invoke("optimizedPlan") %>%
+    invoke(plan_type) %>%
     invoke("toString") %>%
     strsplit("\n") %>%
     unlist()
@@ -379,13 +381,17 @@ skip_on_spark_master <- function() {
   if (is_on_master) skip("Test skipped on spark master")
 }
 
+is_testing_databricks_connect <- function() {
+  Sys.getenv("TEST_DATABRICKS_CONNECT") == "true"
+}
+
 skip_unless_databricks_connect <- function() {
-  if (Sys.getenv("TEST_DATABRICKS_CONNECT") != "true")
+  if (!is_testing_databricks_connect())
     skip("Test only runs on Databricks Connect")
 }
 
 skip_databricks_connect <- function() {
-  if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true")
+  if (is_testing_databricks_connect())
     skip("Test is skipped on Databricks Connect")
 }
 
