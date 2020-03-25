@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /home/travis/R-bin/lib/R/include
+cd "$R_INCLUDE_DIR"
 sudo patch -l << '_PATCH_R_INTERNALS_H'
 *** Rinternals.h   2020-03-19 17:59:06.360000000 +0000
 --- Rinternals.h   2020-03-19 17:13:53.464000000 +0000

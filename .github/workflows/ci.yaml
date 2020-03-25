@@ -30,7 +30,7 @@ jobs:
         if: matrix.config.r == '3.2'
         run: |
           chmod +x ./ci/patch_r_internals_header_file.sh
-          "./ci/patch_r_internals_header_file.sh"
+          R_INCLUDE_DIR=/opt/R/3.2.5/lib/R/include "./ci/patch_r_internals_header_file.sh"
         shell: bash
       - name: Install dependencies
         env:
