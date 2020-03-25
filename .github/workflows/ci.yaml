@@ -25,6 +25,7 @@ jobs:
       - uses: r-lib/actions/setup-r@master
         with:
           r-version: ${{ matrix.config.r }}
+        continue-on-error: true
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))
