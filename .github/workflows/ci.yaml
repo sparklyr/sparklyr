@@ -30,7 +30,7 @@ jobs:
         run: |
           install.packages(c("remotes", "rcmdcheck"))
           remotes::install_deps(dependencies = TRUE)
-        shell: Rscript {0}
+        shell: R_REMOTES_NO_ERRORS_FROM_WARNINGS='true' Rscript {0}
       - name: Check
         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
         shell: Rscript {0}
