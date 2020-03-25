@@ -122,7 +122,7 @@ test_that("'sample_n' and 'sample_frac' work in nontrivial queries (#1299)", {
 })
 
 test_that("'sdf_broadcast' forces broadcast hash join", {
-  if (sc$method == "databricks-connect") {
+  if (is_testing_databricks_connect()) {
     # DB Connect's optimized plans don't display much useful information when calling toString,
     # so we use the analyzed plan instead
     plan_type <- "analyzed"
