@@ -16,9 +16,9 @@ jobs:
 
     strategy:
       fail-fast: false
-    matrix:
-      config:
-        - {r: '3.2', spark_version: '1.6.3', java_version: 'openjdk7'}
+      matrix:
+        config:
+          - {r: '3.2', spark_version: '1.6.3', java_version: 'openjdk7'}
 
     steps:
       - uses: actions/checkout@v2
