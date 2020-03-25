@@ -26,9 +26,16 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
         continue-on-error: true
+      - name: Conditionally patch R internals header file
+        if: matrix.r == '3.2'
+          run: |
+            chmod +x ./ci/patch_r_internals_header_file.sh
+            "./ci/patch_r_internals_header_file.sh"
+          shell: bash
       - name: Install dependencies
         env:
           R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+          _R_CHECK_FORCE_SUGGESTS_: false
         run: |
           install.packages(c("remotes", "rcmdcheck"))
           remotes::install_deps(dependencies = TRUE)
