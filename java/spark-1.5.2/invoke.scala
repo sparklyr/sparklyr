@@ -120,7 +120,7 @@ class Invoke {
 
   def invoke(
     cls: Class[_],
-    objId: String,
+    objId: String, // for logging purpose only
     obj: Object,
     methodName: String,
     args: Array[Object],

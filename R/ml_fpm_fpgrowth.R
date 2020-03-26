@@ -38,10 +38,11 @@ ml_fpgrowth.spark_connection <- function(x, items_col = "items", min_confidence 
 
   uid <- cast_string(uid)
   jobj <- invoke_new(x, "org.apache.spark.ml.fpm.FPGrowth", uid) %>%
-    invoke("setItemsCol", .args[["items_col"]]) %>%
-    invoke("setMinConfidence", .args[["min_confidence"]]) %>%
-    invoke("setMinSupport", .args[["min_support"]]) %>%
-    invoke("setPredictionCol", .args[["prediction_col"]])
+    invoke("%>%",
+           list("setItemsCol", .args[["items_col"]]),
+           list("setMinConfidence", .args[["min_confidence"]]),
+           list("setMinSupport", .args[["min_support"]]),
+           list("setPredictionCol", .args[["prediction_col"]]))
 
   new_ml_fpgrowth(jobj)
 }

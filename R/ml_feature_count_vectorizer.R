@@ -56,12 +56,17 @@ ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.CountVectorizer",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
-  ) %>%
-    jobj_set_param("setBinary", .args[["binary"]], "2.0.0", FALSE) %>%
-    invoke("setMinDF", .args[["min_df"]]) %>%
-    invoke("setMinTF", .args[["min_tf"]]) %>%
-    invoke("setVocabSize", .args[["vocab_size"]]) %>%
-    new_ml_count_vectorizer()
+  ) %>% (
+    function(obj) {
+      do.call(invoke,
+              c(obj, "%>%", Filter(function(x) !is.null(x),
+                                   list(
+                                        jobj_set_param_helper(obj, "setBinary", .args[["binary"]], "2.0.0", FALSE),
+                                        list("setMinDF", .args[["min_df"]]),
+                                        list("setMinTF", .args[["min_tf"]]),
+                                        list("setVocabSize", .args[["vocab_size"]])))))
+    }) %>%
+  new_ml_count_vectorizer()
 
   estimator
 }

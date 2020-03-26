@@ -437,8 +437,7 @@ sdf_repartition <- function(x, partitions = NULL, partition_by = NULL) {
 sdf_num_partitions <- function(x) {
   x %>%
     spark_dataframe() %>%
-    invoke("rdd") %>%
-    invoke("getNumPartitions")
+    invoke("%>%", list("rdd"), list("getNumPartitions"))
 }
 
 #' Coalesces a Spark DataFrame

@@ -77,15 +77,20 @@ ml_aft_survival_regression.spark_connection <- function(x, formula = NULL, censo
     x, "org.apache.spark.ml.regression.AFTSurvivalRegression", uid,
     features_col = .args[["features_col"]], label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]]
-  ) %>%
-    invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
-    invoke("setMaxIter", .args[["max_iter"]]) %>%
-    invoke("setTol", .args[["tol"]]) %>%
-    invoke("setCensorCol", .args[["censor_col"]]) %>%
-    invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
-    invoke("setQuantileProbabilities", .args[["quantile_probabilities"]]) %>%
-    jobj_set_param("setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2) %>%
-    jobj_set_param("setQuantilesCol", .args[["quantiles_col"]])
+  ) %>% (
+    function(obj) {
+      do.call(invoke,
+              c(obj, "%>%", Filter(function(x) !is.null(x),
+                                   list(
+                                        list("setFitIntercept", .args[["fit_intercept"]]),
+                                        list("setMaxIter", .args[["max_iter"]]),
+                                        list("setTol", .args[["tol"]]),
+                                        list("setCensorCol", .args[["censor_col"]]),
+                                        list("setFitIntercept", .args[["fit_intercept"]]),
+                                        list("setQuantileProbabilities", .args[["quantile_probabilities"]]),
+                                        jobj_set_param_helper(obj, "setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2),
+                                        jobj_set_param_helper(obj, "setQuantilesCol", .args[["quantiles_col"]])))))
+    })
 
   new_ml_aft_survival_regression(jobj)
 }
