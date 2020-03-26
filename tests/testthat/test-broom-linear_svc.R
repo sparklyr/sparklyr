@@ -1,6 +1,5 @@
 context("broom-linear_svc")
 
-skip_databricks_connect()
 test_that("linear_svc.tidy() works", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")

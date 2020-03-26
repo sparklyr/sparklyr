@@ -1,6 +1,5 @@
 context("broom-als")
 
-skip_databricks_connect()
 test_that("als.tidy() works", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")

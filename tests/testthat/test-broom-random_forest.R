@@ -1,6 +1,5 @@
 context("broom-random_forest")
 
-skip_databricks_connect()
 test_that("random_forest.tidy() works", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")

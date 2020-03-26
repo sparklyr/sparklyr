@@ -1,6 +1,5 @@
 context("column separation")
 
-skip_databricks_connect()
 test_requires("dplyr")
 test_requires("janeaustenr")
 
