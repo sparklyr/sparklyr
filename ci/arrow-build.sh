@@ -2,21 +2,26 @@ ARROW_VERSION=$1
 
 pushd ..
 
+TMP_DIR=/tmp
+BUILD_DIR="$TMP_DIR/apache-arrow-$ARROW_VERSION-build"
+
+cd "$TMP_DIR"
+
 sudo apt install -y -V cmake
 sudo apt install -y -V libboost-all-dev
 sudo apt install -y -V autoconf
 
 if [[ $ARROW_VERSION == "devel" ]]; then
   git clone https://github.com/apache/arrow
-  cd arrow/cpp
+  SRC_DIR="$TMP_DIR/arrow/cpp"
 else
   wget https://arrowlib.rstudio.com/dist/arrow/arrow-$ARROW_VERSION/apache-arrow-$ARROW_VERSION.tar.gz
   tar -xvzf apache-arrow-$ARROW_VERSION.tar.gz
-  cd apache-arrow-$ARROW_VERSION/cpp
+  SRC_DIR="$TMP_DIR/apache-arrow-$ARROW_VERSION/cpp"
 fi
 
-mkdir release
-cd release
+mkdir -p "${BUILD_DIR}"
+cd "${BUILD_DIR}"
 cmake -DARROW_BUILD_TESTS=FALSE \
       -DARROW_WITH_SNAPPY=FALSE \
       -DARROW_WITH_ZSTD=FALSE \
@@ -32,9 +37,9 @@ cmake -DARROW_BUILD_TESTS=FALSE \
       -DARROW_FILESYSTEM=ON \
       -DARROW_JSON=ON \
       -DARROW_PARQUET=ON \
-      ..
+      "$SRC_DIR"
 
-make arrow
+make -j 4 arrow
 sudo make install
 
 popd

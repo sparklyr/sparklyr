@@ -16,9 +16,10 @@ function try_download_latest_snapshot {
     wget --tries=3 ${spark_url}
 }
 
-mkdir -p "/home/travis/spark"
+SPARK_DIR="$HOME/spark"
 
-cd "/home/travis/spark"
+mkdir -p "$SPARK_DIR"
+cd "$SPARK_DIR"
 
 try_download_latest_snapshot
 tar -zxf "${spark_tarball}"
