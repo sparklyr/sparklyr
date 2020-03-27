@@ -122,13 +122,20 @@ test_that("'sample_n' and 'sample_frac' work in nontrivial queries (#1299)", {
 })
 
 test_that("'sdf_broadcast' forces broadcast hash join", {
-  skip_databricks_connect()
+  if (is_testing_databricks_connect()) {
+    # DB Connect's optimized plans don't display much useful information when calling toString,
+    # so we use the analyzed plan instead
+    plan_type <- "analyzed"
+  } else {
+    plan_type <- "optimizedPlan"
+  }
+
   query_plan <- df1_tbl %>%
     sdf_broadcast() %>%
     left_join(df2_tbl, by = "b") %>%
     spark_dataframe() %>%
     invoke("queryExecution") %>%
-    invoke("optimizedPlan") %>%
+    invoke(plan_type) %>%
     invoke("toString")
   expect_match(query_plan, "B|broadcast")
 })
