@@ -1,0 +1,165 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+name: CI
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: 'Spark 1.6.3 (R 3.2.5, openjdk7)'
+            r: '3.2.5'
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '1.6.3'
+              JAVA_VERSION: 'openjdk7'
+          - name: 'Spark 2.2.1 (R oldrel, oraclejdk8)'
+            r: '3.5.3' # oldrel
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '2.2.1'
+              JAVA_VERSION: 'oraclejdk8'
+          - name: 'Spark 2.3.2 (R release, oraclejdk8)'
+            r: '3.6.3' # release
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '2.3.2'
+              JAVA_VERSION: 'oraclejdk8'
+          - name: 'Spark 2.4.4 (R release, oraclejdk8)'
+            r: '3.6.3' # release
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '2.4.4'
+              JAVA_VERSION: 'oraclejdk8'
+              CODE_COVERAGE: 'true'
+          - name: 'Spark master (R release, oraclejdk8)'
+            r: '3.6.3' # release
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: 'master'
+              JAVA_VERSION: 'oraclejdk8'
+          - name: 'Spark master (R release, openjdk11)'
+            r: '3.6.3' # release
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: 'master'
+              JAVA_URL: 'https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_linux_hotspot_11.0.1_13.tar.gz'
+          - name: 'Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)'
+            r: '3.6.3' # release
+            env:
+              ARROW_ENABLED: 'false'
+              LIVY_VERSION: '0.5.0'
+              SPARK_VERSION: '2.3.0'
+              JAVA_VERSION: 'oraclejdk8'
+          # - name: 'Arrow 0.11.0 (ref = dc5df8f)'
+          #   r: '3.6.3' # release
+          #   env:
+          #     ARROW_ENABLED: 'true'
+          #     ARROW_BRANCH: 'dc5df8f'
+          #     JAVA_VERSION: 'oraclejdk8'
+          #     ARROW_SOURCE: 'install'
+          # - name: 'Arrow 0.13.0 (ref = apache-arrow-0.13.0)'
+          #   r: '3.6.3' # release
+          #   env:
+          #     ARROW_ENABLED: 'true'
+          #     ARROW_VERSION: '0.13.0'
+          #     ARROW_BRANCH: 'apache-arrow-0.13.0'
+          #     ARROW_SOURCE: 'install'
+          #     JAVA_VERSION: 'oraclejdk8'
+          - name: 'Arrow Devel (ref = '')'
+            r: '3.6.3' # release
+            env:
+              ARROW_ENABLED: 'true'
+              ARROW_VERSION: 'devel'
+              ARROW_SOURCE: 'build'
+              JAVA_HOME: '/usr/lib/jvm/java-8-openjdk-amd64/jre'
+              LD_LIBRARY_PATH: '/usr/local/lib'
+          - name: 'Deps Devel (tidyverse, r-lib, forge)'
+            r: '3.6.3' # release
+            env:
+              ARROW_ENABLED: 'false'
+              R_DEVEL_PACKAGES: 'true'
+    env:
+      ${{ matrix.env }}
+    steps:
+      - name: Mount tmpfs
+        run: sudo mount -t tmpfs tmpfs /tmp
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@master
+        with:
+          r-version: ${{ matrix.r }}
+      - name: Install Java
+        run: |
+          if [[ ! -z "$JAVA_VERSION" ]]; then
+            wget https://raw.githubusercontent.com/michaelklishin/jdk_switcher/master/jdk_switcher.sh
+            source ./jdk_switcher.sh use "$JAVA_VERSION";
+          fi
+
+          if [[ ! -z "$JAVA_URL" ]]; then
+            wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+            source ./install-jdk.sh --url $JAVA_URL
+          fi
+
+          echo $JAVA_HOME
+      - name: Cache Arrow build artifacts if necessary
+        id: cache-arrow-build-artifacts
+        if: runner.os != 'Windows' && env.ARROW_SOURCE == 'build'
+        uses: actions/cache@v1
+        with:
+          path:
+            /tmp/apache-arrow-${{ env.ARROW_VERSION }}-build
+          key: apache-arrow-${{ env.ARROW_VERSION }}-build
+      - name: Install Arrow if necessary
+        run: |
+          if [[ $ARROW_ENABLED == 'true' ]]; then
+            source "./ci/arrow-$ARROW_SOURCE.sh" "$ARROW_VERSION"
+          fi
+          if [[ $ARROW_VERSION == "devel" ]]; then
+            sudo DEBIAN_FRONTEND=noninteractive apt-get -y install openjdk-8-jre
+          fi
+      - name: Install Spark master if necessary
+        run: |
+          if [[ $SPARK_VERSION == 'master' ]]; then
+            source ./ci/spark-master-install.sh;
+          fi
+      - name: Patch R internals header file if necessary
+        if: matrix.r == '3.2.5'
+        run: |
+          R_INCLUDE_DIR=/opt/R/3.2.5/lib/R/include source ./ci/patch_r_internals_header_file.sh
+        shell: bash
+      - name: Cache R packages
+        if: runner.os != 'Windows'
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-${{ matrix.r }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('DESCRIPTION') }}
+          restore-keys: ${{ runner.os }}-r-${{ matrix.r }}-
+      - name: Install system dependencies
+        run: |
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libsodium23 libsodium-dev libwebp6 libwebp-dev libcurl4 libcurl4-openssl-dev libhiredis0.13 libhiredis-dev libudunits2-0 libudunits2-dev
+      - name: Install dependencies
+        run: source ./ci/install_r_dependencies.sh
+        continue-on-error: true
+      - name: Build
+        run: R CMD build .
+      - name: Check
+        env:
+          _R_CHECK_FORCE_SUGGESTS_: false
+        run: R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
+      - name: Run tests
+        run: |
+          export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
+          if [[ $ARROW_ENABLED == "true" ]]; then Rscript ci/.travis.R --arrow $ARROW_BRANCH; fi
+          if [[ $CODE_COVERAGE == "true" ]]; then
+            Rscript ci/.travis.R --coverage
+          else
+            Rscript ci/.travis.R --testthat
+          fi
