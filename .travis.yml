@@ -82,7 +82,7 @@ matrix:
         - ARROW_ENABLED="true"
         - ARROW_VERSION="0.13.0"
         - ARROW_BRANCH="apache-arrow-0.13.0"
-        - ARROW_SOURCE="install"
+        - ARROW_SOURCE="build"
         - JAVA_VERSION=oraclejdk8
     - name: "Arrow Devel (ref = '')"
       r: release

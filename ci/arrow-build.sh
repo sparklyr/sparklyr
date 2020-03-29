@@ -1,5 +1,12 @@
 ARROW_VERSION=$1
 
+curl https://dist.apache.org/repos/dist/dev/arrow/KEYS | sudo apt-key add -
+sudo tee /etc/apt/sources.list.d/apache-arrow.list <<APT_LINE
+deb [arch=amd64] https://dl.bintray.com/apache/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) main
+deb-src https://dl.bintray.com/apache/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/ $(lsb_release --codename --short) main
+APT_LINE
+sudo apt update
+
 pushd ..
 
 TMP_DIR=/tmp
@@ -10,12 +17,17 @@ cd "$TMP_DIR"
 sudo apt install -y -V cmake
 sudo apt install -y -V libboost-all-dev
 sudo apt install -y -V autoconf
+sudo apt-get build-dep libarrow-dev libarrow-glib-dev |:
 
 if [[ $ARROW_VERSION == "devel" ]]; then
   git clone https://github.com/apache/arrow
   SRC_DIR="$TMP_DIR/arrow/cpp"
 else
-  wget https://arrowlib.rstudio.com/dist/arrow/arrow-$ARROW_VERSION/apache-arrow-$ARROW_VERSION.tar.gz
+  if [[ $ARROW_VERSION == "0.13.0" ]]; then
+    wget http://archive.apache.org/dist/arrow/arrow-0.13.0/apache-arrow-0.13.0.tar.gz
+  else
+    wget https://arrowlib.rstudio.com/dist/arrow/arrow-$ARROW_VERSION/apache-arrow-$ARROW_VERSION.tar.gz
+  fi
   tar -xvzf apache-arrow-$ARROW_VERSION.tar.gz
   SRC_DIR="$TMP_DIR/apache-arrow-$ARROW_VERSION/cpp"
 fi
