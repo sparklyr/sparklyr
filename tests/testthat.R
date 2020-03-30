@@ -17,6 +17,7 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                      n_skip = 0,
                                      n_warn = 0,
                                      n_fail = 0,
+                                     failures = c(),
 
                                      start_context = function(context) {
                                        private$print_last_test()
@@ -35,6 +36,7 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
 
                                        if (is_error) {
                                          self$n_fail <- self$n_fail + 1
+                                         self$failures <- c(self$failures, paste0(test, " (Context: ", context, ")"))
                                        } else if (inherits(result, "expectation_skip")) {
                                          self$n_skip <- self$n_skip + 1
                                        } else if (inherits(result, "expectation_warning")) {
@@ -108,6 +110,9 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                        self$cat_line("Failed:   ", format(self$n_fail, width = 5))
                                        self$cat_line("Warnings: ", format(self$n_warn, width = 5))
                                        self$cat_line("Skipped:  ", format(self$n_skip, width = 5))
+                                       if (length(self$failures) > 0)
+                                         self$cat_line("Failures:  ",
+                                                       do.call(paste, as.list(c(self$failures, sep = "\n"))))
                                        cat("\n")
                                      }
                                    ),
