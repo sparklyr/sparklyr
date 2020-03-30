@@ -162,9 +162,9 @@ test_that("collect() can retrieve all data types correctly", {
     "date",        epoch_sdate,      "Date", epoch_rdate,      "Date", epoch_rdate,
     "timestamp",         stime,   "POSIXct",       rtime,   "POSIXct",       atime,
     "date",              sdate,      "Date",       rdate,      "Date",       rdate,
-    "string",                1, "character",         "1", "character",         "1",
-    "varchar(10)",           1, "character",         "1", "character",         "1",
-    "char(10)",              1, "character",         "1", "character",         "1",
+    "string",              "1", "character",         "1", "character",         "1",
+    "varchar(10)",         "1", "character",         "1", "character",         "1",
+    "char(10)",            "1", "character",         "1", "character",         "1",
     "boolean",          "true",   "logical",      "TRUE",   "logical",      "TRUE",
   )
 
