@@ -12,51 +12,51 @@ r_github_packages:
 
 matrix:
   include:
-    - name: "Spark 1.6.3 (R 3.2, openjdk7)"
-      r: 3.2
-      env:
-        - SPARK_VERSION="1.6.3"
-        - JAVA_VERSION=openjdk7
-    - name: "Spark 2.2.1 (R oldrel, oraclejdk8)"
-      r: oldrel
-      warnings_are_errors: true
-      env:
-        - SPARK_VERSION="2.2.1"
-        - JAVA_VERSION=oraclejdk8
-    - name: "Spark 2.3.2 (R release, oraclejdk8)"
-      r: release
-      warnings_are_errors: true
-      env:
-        - SPARK_VERSION="2.3.2"
-        - JAVA_VERSION=oraclejdk8
-    - name: "Spark 2.4.4 (R release, oraclejdk8)"
-      r: release
-      r_packages:
-        - glmnet
-      warnings_are_errors: true
-      env:
-        - SPARK_VERSION="2.4.4"
-        - JAVA_VERSION=oraclejdk8
-        - CODE_COVERAGE="true"
-    - name: "Spark master (R release, oraclejdk8)"
-      r: release
-      warnings_are_errors: true
-      env:
-        - SPARK_VERSION="master"
-        - JAVA_VERSION=oraclejdk8
-    - name: "Spark master (R release, openjdk11)"
-      r: release
-      warnings_are_errors: true
-      env:
-        - SPARK_VERSION="master"
-        - JAVA_URL="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_linux_hotspot_11.0.1_13.tar.gz"
-    - name: "Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)"
-      r: release
-      warnings_are_errors: true
-      env:
-        - LIVY_VERSION="0.5.0"
-        - SPARK_VERSION="2.3.0"
-        - JAVA_VERSION=oraclejdk8
+    # - name: "Spark 1.6.3 (R 3.2, openjdk7)"
+    #   r: 3.2
+    #   env:
+    #     - SPARK_VERSION="1.6.3"
+    #     - JAVA_VERSION=openjdk7
+    # - name: "Spark 2.2.1 (R oldrel, oraclejdk8)"
+    #   r: oldrel
+    #   warnings_are_errors: true
+    #   env:
+    #     - SPARK_VERSION="2.2.1"
+    #     - JAVA_VERSION=oraclejdk8
+    # - name: "Spark 2.3.2 (R release, oraclejdk8)"
+    #   r: release
+    #   warnings_are_errors: true
+    #   env:
+    #     - SPARK_VERSION="2.3.2"
+    #     - JAVA_VERSION=oraclejdk8
+    # - name: "Spark 2.4.4 (R release, oraclejdk8)"
+    #   r: release
+    #   r_packages:
+    #     - glmnet
+    #   warnings_are_errors: true
+    #   env:
+    #     - SPARK_VERSION="2.4.4"
+    #     - JAVA_VERSION=oraclejdk8
+    #     - CODE_COVERAGE="true"
+    # - name: "Spark master (R release, oraclejdk8)"
+    #   r: release
+    #   warnings_are_errors: true
+    #   env:
+    #     - SPARK_VERSION="master"
+    #     - JAVA_VERSION=oraclejdk8
+    # - name: "Spark master (R release, openjdk11)"
+    #   r: release
+    #   warnings_are_errors: true
+    #   env:
+    #     - SPARK_VERSION="master"
+    #     - JAVA_URL="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_linux_hotspot_11.0.1_13.tar.gz"
+    # - name: "Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)"
+    #   r: release
+    #   warnings_are_errors: true
+    #   env:
+    #     - LIVY_VERSION="0.5.0"
+    #     - SPARK_VERSION="2.3.0"
+    #     - JAVA_VERSION=oraclejdk8
     - name: "Arrow 0.11.0 (ref = 'dc5df8f')"
       r: release
       warnings_are_errors: true
@@ -84,54 +84,54 @@ matrix:
         - ARROW_BRANCH="apache-arrow-0.13.0"
         - ARROW_SOURCE="install"
         - JAVA_VERSION=oraclejdk8
-    - name: "Arrow Devel (ref = '')"
-      r: release
-      dist: xenial
-      sudo: true
-      warnings_are_errors: true
-      env:
-        - ARROW_ENABLED="true"
-        - ARROW_VERSION="devel"
-        - ARROW_SOURCE="build"
-        - JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
-        - LD_LIBRARY_PATH="/usr/local/lib"
-      addons:
-        apt:
-          packages:
-            - openjdk-8-jre
-    - name: "Deps Devel (tidyverse, r-lib, forge)"
-      warnings_are_errors: true
-      env: R_DEVEL_PACKAGES="true"
-      r_github_packages:
-        - tidyverse/dplyr
-        - tidyverse/dbplyr
-        - tidyverse/tibble
-        - r-lib/rlang
-        - rstudio/forge
-        - r-lib/ellipsis
-        - r-dbi/DBI
-  allow_failures:
-    - env: R_DEVEL_PACKAGES="true"
-    - r: release
-      dist: xenial
-      sudo: true
-      warnings_are_errors: true
-      env:
-        - ARROW_ENABLED="true"
-        - ARROW_VERSION="devel"
-        - ARROW_SOURCE="build"
-        - JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
-        - LD_LIBRARY_PATH="/usr/local/lib"
-      addons:
-        apt:
-          packages:
-            - openjdk-8-jre
-    - r: release
-      warnings_are_errors: true
-      env:
-        - LIVY_VERSION="0.5.0"
-        - SPARK_VERSION="2.3.0"
-        - JAVA_VERSION=oraclejdk8
+    # - name: "Arrow Devel (ref = '')"
+    #   r: release
+    #   dist: xenial
+    #   sudo: true
+    #   warnings_are_errors: true
+    #   env:
+    #     - ARROW_ENABLED="true"
+    #     - ARROW_VERSION="devel"
+    #     - ARROW_SOURCE="build"
+    #     - JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
+    #     - LD_LIBRARY_PATH="/usr/local/lib"
+    #   addons:
+    #     apt:
+    #       packages:
+    #         - openjdk-8-jre
+    # - name: "Deps Devel (tidyverse, r-lib, forge)"
+    #   warnings_are_errors: true
+    #   env: R_DEVEL_PACKAGES="true"
+    #   r_github_packages:
+    #     - tidyverse/dplyr
+    #     - tidyverse/dbplyr
+    #     - tidyverse/tibble
+    #     - r-lib/rlang
+    #     - rstudio/forge
+    #     - r-lib/ellipsis
+    #     - r-dbi/DBI
+  # allow_failures:
+  #   - env: R_DEVEL_PACKAGES="true"
+  #   - r: release
+  #     dist: xenial
+  #     sudo: true
+  #     warnings_are_errors: true
+  #     env:
+  #       - ARROW_ENABLED="true"
+  #       - ARROW_VERSION="devel"
+  #       - ARROW_SOURCE="build"
+  #       - JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
+  #       - LD_LIBRARY_PATH="/usr/local/lib"
+  #     addons:
+  #       apt:
+  #         packages:
+  #           - openjdk-8-jre
+  #   - r: release
+  #     warnings_are_errors: true
+  #     env:
+  #       - LIVY_VERSION="0.5.0"
+  #       - SPARK_VERSION="2.3.0"
+  #       - JAVA_VERSION=oraclejdk8
 
 before_install:
   - sudo mount -t tmpfs tmpfs /tmp
