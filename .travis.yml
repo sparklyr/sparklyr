@@ -1,168 +1,107 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
 language: r
 dist: trusty
 sudo: true
-
 cache:
   packages: true
-
 r_github_packages:
-  - gagolews/stringi@v1.4.2
-
+- gagolews/stringi@v1.4.2
 matrix:
   include:
-    - name: "Spark 1.6.3 (R 3.2, openjdk7)"
-      r: 3.2
-      env:
-        - SPARK_VERSION="1.6.3"
-        - JAVA_VERSION=openjdk7
-    - name: "Spark 2.2.1 (R oldrel, oraclejdk8)"
-      r: oldrel
-      warnings_are_errors: true
-      env:
-        - SPARK_VERSION="2.2.1"
-        - JAVA_VERSION=oraclejdk8
-    - name: "Spark 2.3.2 (R release, oraclejdk8)"
-      r: release
-      warnings_are_errors: true
-      env:
-        - SPARK_VERSION="2.3.2"
-        - JAVA_VERSION=oraclejdk8
-    - name: "Spark 2.4.4 (R release, oraclejdk8)"
-      r: release
-      r_packages:
-        - glmnet
-      warnings_are_errors: true
-      env:
-        - SPARK_VERSION="2.4.4"
-        - JAVA_VERSION=oraclejdk8
-        - CODE_COVERAGE="true"
-    - name: "Spark master (R release, oraclejdk8)"
-      r: release
-      warnings_are_errors: true
-      env:
-        - SPARK_VERSION="master"
-        - JAVA_VERSION=oraclejdk8
-    - name: "Spark master (R release, openjdk11)"
-      r: release
-      warnings_are_errors: true
-      env:
-        - SPARK_VERSION="master"
-        - JAVA_URL="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_linux_hotspot_11.0.1_13.tar.gz"
-    - name: "Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)"
-      r: release
-      warnings_are_errors: true
-      env:
-        - LIVY_VERSION="0.5.0"
-        - SPARK_VERSION="2.3.0"
-        - JAVA_VERSION=oraclejdk8
-    - name: "Arrow 0.11.0 (ref = 'dc5df8f')"
-      r: release
-      warnings_are_errors: true
-      env:
-        - ARROW_ENABLED="true"
-        - ARROW_BRANCH="dc5df8f"
-        - JAVA_VERSION=oraclejdk8
-      addons:
-        apt:
-          sources:
-            - sourceline: deb https://arrowlib.rstudio.com/ubuntu/ trusty universe
-              key_url: https://arrowlib.rstudio.com/ubuntu/red-data-tools-keyring.gpg
-          packages:
-            - apt-transport-https
-            - lsb-release
-            - libarrow-dev
-            - libarrow-glib-dev
-    - name: "Arrow 0.13.0 (ref = 'apache-arrow-0.13.0')"
-      r: release
-      sudo: true
-      warnings_are_errors: true
-      env:
-        - ARROW_ENABLED="true"
-        - ARROW_VERSION="0.13.0"
-        - ARROW_BRANCH="apache-arrow-0.13.0"
-        - ARROW_SOURCE="install"
-        - JAVA_VERSION=oraclejdk8
-    - name: "Arrow Devel (ref = '')"
-      r: release
-      dist: xenial
-      sudo: true
-      warnings_are_errors: true
-      env:
-        - ARROW_ENABLED="true"
-        - ARROW_VERSION="devel"
-        - ARROW_SOURCE="build"
-        - JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
-        - LD_LIBRARY_PATH="/usr/local/lib"
-      addons:
-        apt:
-          packages:
-            - openjdk-8-jre
-    - name: "Deps Devel (tidyverse, r-lib, forge)"
-      warnings_are_errors: true
-      env: R_DEVEL_PACKAGES="true"
-      r_github_packages:
-        - tidyverse/dplyr
-        - tidyverse/dbplyr
-        - tidyverse/tibble
-        - r-lib/rlang
-        - rstudio/forge
-        - r-lib/ellipsis
-        - r-dbi/DBI
+  - name: Arrow 0.11.0 (ref = 'dc5df8f')
+    r: release
+    warnings_are_errors: true
+    env:
+    - ARROW_ENABLED="true"
+    - ARROW_BRANCH="dc5df8f"
+    - JAVA_VERSION=oraclejdk8
+    - ARTIFACTS_PATHS=/home/travis
+    addons:
+      artifacts:
+        s3_region: "us-east-1"
+      apt:
+        sources:
+        - sourceline: deb https://arrowlib.rstudio.com/ubuntu/ trusty universe
+          key_url: https://arrowlib.rstudio.com/ubuntu/red-data-tools-keyring.gpg
+        packages:
+        - apt-transport-https
+        - lsb-release
+        - libarrow-dev
+        - libarrow-glib-dev
+  - name: Arrow 0.13.0 (ref = 'apache-arrow-0.13.0')
+    r: release
+    sudo: true
+    warnings_are_errors: true
+    env:
+    - ARROW_ENABLED="true"
+    - ARROW_VERSION="0.13.0"
+    - ARROW_BRANCH="apache-arrow-0.13.0"
+    - ARROW_SOURCE="install"
+    - JAVA_VERSION=oraclejdk8
+    - ARTIFACTS_PATHS=/home/travis
+    addons:
+      artifacts:
+        s3_region: "us-east-1"
   allow_failures:
-    - env: R_DEVEL_PACKAGES="true"
-    - r: release
-      dist: xenial
-      sudo: true
-      warnings_are_errors: true
-      env:
-        - ARROW_ENABLED="true"
-        - ARROW_VERSION="devel"
-        - ARROW_SOURCE="build"
-        - JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
-        - LD_LIBRARY_PATH="/usr/local/lib"
-      addons:
-        apt:
-          packages:
-            - openjdk-8-jre
-    - r: release
-      warnings_are_errors: true
-      env:
-        - LIVY_VERSION="0.5.0"
-        - SPARK_VERSION="2.3.0"
-        - JAVA_VERSION=oraclejdk8
-
+  - env: R_DEVEL_PACKAGES="true"
+  - r: release
+    dist: xenial
+    sudo: true
+    warnings_are_errors: true
+    env:
+    - ARROW_ENABLED="true"
+    - ARROW_VERSION="devel"
+    - ARROW_SOURCE="build"
+    - JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
+    - LD_LIBRARY_PATH="/usr/local/lib"
+    addons:
+      artifacts:
+        s3_region: "us-east-1"
+      apt:
+        packages:
+        - openjdk-8-jre
+  - r: release
+    warnings_are_errors: true
+    env:
+    - LIVY_VERSION="0.5.0"
+    - SPARK_VERSION="2.3.0"
+    - JAVA_VERSION=oraclejdk8
 before_install:
-  - sudo mount -t tmpfs tmpfs /tmp
-  - if [[ ! -z "$JAVA_VERSION" ]]; then jdk_switcher use $JAVA_VERSION;  fi
-  - |
-    if [[ ! -z "$JAVA_URL" ]]; then
-      wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
-      source install-jdk.sh --url $JAVA_URL
-    fi
-  - echo $JAVA_HOME
-  - if [[ ! -z "$ARROW_VERSION" ]]; then chmod +x ./ci/arrow-$ARROW_SOURCE.sh ; "./ci/arrow-$ARROW_SOURCE.sh" $ARROW_VERSION; fi
-  - if [[ $SPARK_VERSION == "master" ]]; then chmod +x ./ci/spark-master-install.sh ; "./ci/spark-master-install.sh"; fi
-  - if [[ $ARROW_ENABLED == "true" ]]; then Rscript ci/.travis.R --arrow $ARROW_BRANCH; fi
-  - |
-    if [[ $TRAVIS_R_VERSION =~ ^3\.2.* ]]; then
-      chmod +x ./ci/patch_r_internals_header_file.sh
-      R_INCLUDE_DIR=/home/travis/R-bin/lib/R/include "./ci/patch_r_internals_header_file.sh"
-    fi
-
+- sudo mount -t tmpfs tmpfs /tmp
+- if [[ ! -z "$JAVA_VERSION" ]]; then jdk_switcher use $JAVA_VERSION;  fi
+- |
+  if [[ ! -z "$JAVA_URL" ]]; then
+    wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+    source install-jdk.sh --url $JAVA_URL
+  fi
+- echo $JAVA_HOME
+- if [[ ! -z "$ARROW_VERSION" ]]; then chmod +x ./ci/arrow-$ARROW_SOURCE.sh ; "./ci/arrow-$ARROW_SOURCE.sh"
+  $ARROW_VERSION; fi
+- if [[ $SPARK_VERSION == "master" ]]; then chmod +x ./ci/spark-master-install.sh
+  ; "./ci/spark-master-install.sh"; fi
+- if [[ $ARROW_ENABLED == "true" ]]; then Rscript ci/.travis.R --arrow $ARROW_BRANCH;
+  fi
+- |
+  if [[ $TRAVIS_R_VERSION =~ ^3\.2.* ]]; then
+    chmod +x ./ci/patch_r_internals_header_file.sh
+    R_INCLUDE_DIR=/home/travis/R-bin/lib/R/include "./ci/patch_r_internals_header_file.sh"
+  fi
 script:
-  - |
-    R CMD build .
-    export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
-    R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
+- |
+  R CMD build .
+  export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
+  R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
 
-    if [[ $CODE_COVERAGE == "true" ]]; then
-      Rscript ci/.travis.R --coverage
-    else
-      Rscript ci/.travis.R --testthat
-    fi
-
+  if [[ $CODE_COVERAGE == "true" ]]; then
+    Rscript ci/.travis.R --coverage
+  else
+    Rscript ci/.travis.R --testthat
+  fi
 after_failure:
-  - |
-    grep -B 10 -A 20 ERROR /tmp/sparklyr.log
+- 'grep -B 10 -A 20 ERROR /tmp/sparklyr.log
+
+'
+env:
+  global:
+  - secure: Q8oyWf/2qlq8+DPgHjP3VlksxHW06R51wVDtJfdkJnzeQsnBZ0Cy800OT1M2WGZVfEy2yh0UknmK6/sRD/Tt/VgnnrdQGn7s68AiUQD0AEiqX44bTvXNozt2ezPtho7U5+HVKFP/LZ3mVFC7CLi+HWSVH0I91YMQdFu1AOyHfwIjqJZGVFv9rWcgkK4qbTFA2+yYzliWD/E/qA5dm56r7+xT6OEmBoPcWasGVRmq+gp9fKuYQ3pOsM9YG9nWR68omNiAYHPDdb8OBycw+1dgfx6zQXF9UeFl7l65f6LGbOQFV0pYXCYnsjPUzKfnUehGUW5PSaes38r6EbwsEQBvsYVuPTU/72teCKGYzADUrvKlgbDXmzB9LZndcdzSR6AcOS7BOHK6uE6LAsGqWX7U4YM+qW8eP8wpTeESzDr/5DVzGcysVqJxIUAEUzi7mrK/E9sqhiQFBfD2xqG81KIjAPIVDWyXCBgp+CmEDyjyy7ISURW7/Qb/R2W6Nm4YxrthsP9shAMo4ZqRypgypxSEhOALCdwoEnmzwWWu7m18UGP6bT4WqK1b0dBCICsiGJuN6/hodOtPrlmuqXVH2psKOcsbjSKFNn63i+S8NvbblkouF81T6XsXRD7aJ/rFtJ4ybAn3QtpGuDSInS9KDZRLfB3d2FuK66XOBL4SedrWgns=
+  - secure: FrJT7kv0V00Yker3E/9jXjn96z4pkWRxOKijKismSeowZrZObDB5cC/9/rwksH/9N6+V1Qac5EcK0uOTxqlpJs32JIjZ+iKwbzcLoskGg1C3KBDqRBnFZsHudcgM0uLMTD9PVMRyBorKtBYtwljA8N+r5U3ioNKh8zzJXe23tZSK/xTqrCvJ+7i5WQ7fr/S/PeKXLBLDC92cUKBFM7K+O1nzRBwplgsiSR+IhO/GIjGZZhXpFBKDewQmqlD0XbVhqorLsCvA2YjU71OzyJye2BYKhc7mMCkLRwfE7RX2qYesbZyzVLEqOxogGtYAnotB5EEBWNjE8qcJZ9Kb5UEg6N1ZTUEOow5GavNjsfEcOXiIvBKlljTgIjosIw07XKzfTq2veVc4nF7SmbTAd9IqgYjzeCs3+40khgeEWm6Bl7dstHP/Qkft2KDhHn4DO8gdXy9QqZrIgfw4vKygJCR/TnO0U808BamHSoqyvUmeWQuTaPLIcpN4OBdUycJ9qvf4iEwPgecpRpjGzK7Q6PHRmFJU5sD0Qe34uGckWWfslXyI1S9Hfxm8J86Ven2Mr/jSd4FxaYVJhhBd4lE+LvbdBP+9PGLmWveqIMIQ4t4X7sZ72InHcHgf/+A6763Dld8PgYG1Wc2d2H5LhQ2TTPIhHx62hDpqaNRXxrb7sA39ers=
+  - secure: c4wKh87Y4RGJE0Izfw8fQPRQmMbdsazeUqKABw8Jqna5/bR6SY79uQ93gzIwGDSYskZn2FM4SVco5X9xjgDtaWcq5/zUHLNM7nMqLc2TUBuNY/KJ9c+REGCAoOc6EGJoIvJO/ghvhrR43Ta+QhXyo46KGjUiCztNm2bdwu04k4p9YLhF+z3XUpxEai6T3UNTbe42P4KQwsrWCTCOpz6GfABnnfVSOnFfJostQS9n04GxPMLjlFhV9SksGfeD8P9tNLkWT4EXI7y0ICoqjIBaXlbG9ljlY08NjrXhmj5NbYT4yDD/9vBNBFnpA1r6x5wdrXL1x7HZkyBSx/H4Bu68waYHu4lbnQEJfUXzTaQfO72bvUtX5iAGzZWejmUvsShZSVY1qHpjV3WsVs7jCKDsaWtwWV5ELyClnQQTztihGUqbPUb0k/tBnwjwl+nfUbIDsND8bT9pTsTKTxh+hJuTYysPMKX1weVukiwOLDUDzQ2m7stTMDr5/GI/kXxyghyphOPZ6O3SxvEVmOMYXlkqtvZFXVwn7MXFsQJoEbdPKryciV2nzHlTVlrmYgxZGMy9uIYFmZPj+rln8UGBuIKPbi/NhcdYnX0/h7GHbSCAgQPdfjwFM+dzYttlmRhVPgGVcYGDt5Cu+QOMTdbLC4Nw/wWBkiyRmdmhMYagpvba0m0=
