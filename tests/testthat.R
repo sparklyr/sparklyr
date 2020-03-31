@@ -47,19 +47,21 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                        }
 
                                        if (print_message) {
-                                        cat(
-                                          paste0(test, ": ", private$expectation_type(result), ": ", result$message),
-                                          "\n"
-                                        )
-                                         if (is_error) {
-                                           cat(
-                                             paste(
-                                               "  callstack:\n    ",
-                                               paste0(utils::limitedLabels(result$call), collapse = "\n    "),
-                                               "\n"
-                                             )
-                                           )
-                                         }
+                                        try({
+                                          cat(
+                                            paste0(test, ": ", private$expectation_type(result), ": ", result$message),
+                                            "\n"
+                                          )
+                                          if (is_error) {
+                                            cat(
+                                              paste(
+                                                "  callstack:\n    ",
+                                                paste0(utils::limitedLabels(result$call), collapse = "\n    "),
+                                                "\n"
+                                              )
+                                            )
+                                          }
+                                        })
                                        }
 
                                        if (identical(self$last_test, test)) {
@@ -118,12 +120,13 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                    ),
                                    private = list(
                                      print_last_test = function() {
-                                       if (!is.na(self$last_test) &&
-                                           length(self$last_test) > 0 &&
-                                           length(self$last_test_time) > 0) {
-                                         cat(paste0(self$last_test, ": ", self$last_test_time, "\n"))
-                                       }
-
+                                       try({
+                                         if (!is.na(self$last_test) &&
+                                             length(self$last_test) > 0 &&
+                                             length(self$last_test_time) > 0) {
+                                           cat(paste0(self$last_test, ": ", self$last_test_time, "\n"))
+                                         }
+                                       })
                                        self$last_test <- NA_character_
                                      },
                                      expectation_type = function(exp) {
