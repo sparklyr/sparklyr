@@ -248,8 +248,7 @@ testthat_livy_connection <- function() {
         sparklyr.verbose = TRUE,
         sparklyr.connect.timeout = 120,
         sparklyr.log.invoke = "cat",
-        spark.sql.warehouse.dir = get_spark_warehouse_dir(),
-        sparklyr.livy.branch = "test/livy"
+        spark.sql.warehouse.dir = get_spark_warehouse_dir()
       ),
       version = version,
       sources = TRUE
