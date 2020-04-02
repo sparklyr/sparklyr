@@ -4,12 +4,21 @@
 \alias{ml_naive_bayes}
 \title{Spark ML -- Naive-Bayes}
 \usage{
-ml_naive_bayes(x, formula = NULL, model_type = "multinomial",
-  smoothing = 1, thresholds = NULL, weight_col = NULL,
-  features_col = "features", label_col = "label",
-  prediction_col = "prediction", probability_col = "probability",
+ml_naive_bayes(
+  x,
+  formula = NULL,
+  model_type = "multinomial",
+  smoothing = 1,
+  thresholds = NULL,
+  weight_col = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  uid = random_string("naive_bayes_"), ...)
+  uid = random_string("naive_bayes_"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -90,16 +99,17 @@ ml_multiclass_classification_evaluator(pred)
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
 
-Other ml algorithms: \code{\link{ml_aft_survival_regression}},
-  \code{\link{ml_decision_tree_classifier}},
-  \code{\link{ml_gbt_classifier}},
-  \code{\link{ml_generalized_linear_regression}},
-  \code{\link{ml_isotonic_regression}},
-  \code{\link{ml_linear_regression}},
-  \code{\link{ml_linear_svc}},
-  \code{\link{ml_logistic_regression}},
-  \code{\link{ml_multilayer_perceptron_classifier}},
-  \code{\link{ml_one_vs_rest}},
-  \code{\link{ml_random_forest_classifier}}
+Other ml algorithms: 
+\code{\link{ml_aft_survival_regression}()},
+\code{\link{ml_decision_tree_classifier}()},
+\code{\link{ml_gbt_classifier}()},
+\code{\link{ml_generalized_linear_regression}()},
+\code{\link{ml_isotonic_regression}()},
+\code{\link{ml_linear_regression}()},
+\code{\link{ml_linear_svc}()},
+\code{\link{ml_logistic_regression}()},
+\code{\link{ml_multilayer_perceptron_classifier}()},
+\code{\link{ml_one_vs_rest}()},
+\code{\link{ml_random_forest_classifier}()}
 }
 \concept{ml algorithms}

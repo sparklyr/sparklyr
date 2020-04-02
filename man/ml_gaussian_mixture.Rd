@@ -4,10 +4,19 @@
 \alias{ml_gaussian_mixture}
 \title{Spark ML -- Gaussian Mixture clustering.}
 \usage{
-ml_gaussian_mixture(x, formula = NULL, k = 2, max_iter = 100,
-  tol = 0.01, seed = NULL, features_col = "features",
-  prediction_col = "prediction", probability_col = "probability",
-  uid = random_string("gaussian_mixture_"), ...)
+ml_gaussian_mixture(
+  x,
+  formula = NULL,
+  k = 2,
+  max_iter = 100,
+  tol = 0.01,
+  seed = NULL,
+  features_col = "features",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  uid = random_string("gaussian_mixture_"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -71,7 +80,9 @@ ml_clustering_evaluator(pred)
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
 
-Other ml clustering algorithms: \code{\link{ml_bisecting_kmeans}},
-  \code{\link{ml_kmeans}}, \code{\link{ml_lda}}
+Other ml clustering algorithms: 
+\code{\link{ml_bisecting_kmeans}()},
+\code{\link{ml_kmeans}()},
+\code{\link{ml_lda}()}
 }
 \concept{ml clustering algorithms}

@@ -26,11 +26,9 @@
 
 \method{tidy}{ml_model_decision_tree_regression}(x, ...)
 
-\method{augment}{ml_model_decision_tree_classification}(x,
-  newdata = NULL, ...)
+\method{augment}{ml_model_decision_tree_classification}(x, newdata = NULL, ...)
 
-\method{augment}{ml_model_decision_tree_regression}(x, newdata = NULL,
-  ...)
+\method{augment}{ml_model_decision_tree_regression}(x, newdata = NULL, ...)
 
 \method{glance}{ml_model_decision_tree_classification}(x, ...)
 
@@ -40,11 +38,9 @@
 
 \method{tidy}{ml_model_random_forest_regression}(x, ...)
 
-\method{augment}{ml_model_random_forest_classification}(x,
-  newdata = NULL, ...)
+\method{augment}{ml_model_random_forest_classification}(x, newdata = NULL, ...)
 
-\method{augment}{ml_model_random_forest_regression}(x, newdata = NULL,
-  ...)
+\method{augment}{ml_model_random_forest_regression}(x, newdata = NULL, ...)
 
 \method{glance}{ml_model_random_forest_classification}(x, ...)
 

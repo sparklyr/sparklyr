@@ -4,8 +4,14 @@
 \alias{spark_write_orc}
 \title{Write a Spark DataFrame to a ORC file}
 \usage{
-spark_write_orc(x, path, mode = NULL, options = list(),
-  partition_by = NULL, ...)
+spark_write_orc(
+  x,
+  path,
+  mode = NULL,
+  options = list(),
+  partition_by = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -31,25 +37,26 @@ Serialize a Spark DataFrame to the
 \href{https://orc.apache.org/}{ORC} format.
 }
 \seealso{
-Other Spark serialization routines: \code{\link{spark_load_table}},
-  \code{\link{spark_read_csv}},
-  \code{\link{spark_read_delta}},
-  \code{\link{spark_read_jdbc}},
-  \code{\link{spark_read_json}},
-  \code{\link{spark_read_libsvm}},
-  \code{\link{spark_read_orc}},
-  \code{\link{spark_read_parquet}},
-  \code{\link{spark_read_source}},
-  \code{\link{spark_read_table}},
-  \code{\link{spark_read_text}},
-  \code{\link{spark_save_table}},
-  \code{\link{spark_write_csv}},
-  \code{\link{spark_write_delta}},
-  \code{\link{spark_write_jdbc}},
-  \code{\link{spark_write_json}},
-  \code{\link{spark_write_parquet}},
-  \code{\link{spark_write_source}},
-  \code{\link{spark_write_table}},
-  \code{\link{spark_write_text}}
+Other Spark serialization routines: 
+\code{\link{spark_load_table}()},
+\code{\link{spark_read_csv}()},
+\code{\link{spark_read_delta}()},
+\code{\link{spark_read_jdbc}()},
+\code{\link{spark_read_json}()},
+\code{\link{spark_read_libsvm}()},
+\code{\link{spark_read_orc}()},
+\code{\link{spark_read_parquet}()},
+\code{\link{spark_read_source}()},
+\code{\link{spark_read_table}()},
+\code{\link{spark_read_text}()},
+\code{\link{spark_save_table}()},
+\code{\link{spark_write_csv}()},
+\code{\link{spark_write_delta}()},
+\code{\link{spark_write_jdbc}()},
+\code{\link{spark_write_json}()},
+\code{\link{spark_write_parquet}()},
+\code{\link{spark_write_source}()},
+\code{\link{spark_write_table}()},
+\code{\link{spark_write_text}()}
 }
 \concept{Spark serialization routines}

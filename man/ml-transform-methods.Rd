@@ -23,8 +23,7 @@ ml_fit_and_transform(x, dataset, ...)
 
 ml_predict(x, dataset, ...)
 
-\method{ml_predict}{ml_model_classification}(x, dataset,
-  probability_prefix = "probability_", ...)
+\method{ml_predict}{ml_model_classification}(x, dataset, probability_prefix = "probability_", ...)
 }
 \arguments{
 \item{x}{A \code{ml_estimator}, \code{ml_transformer} (or a list thereof), or \code{ml_model} object.}

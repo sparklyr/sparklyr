@@ -4,8 +4,14 @@
 \alias{spark_dependency}
 \title{Define a Spark dependency}
 \usage{
-spark_dependency(jars = NULL, packages = NULL, initializer = NULL,
-  catalog = NULL, repositories = NULL, ...)
+spark_dependency(
+  jars = NULL,
+  packages = NULL,
+  initializer = NULL,
+  catalog = NULL,
+  repositories = NULL,
+  ...
+)
 }
 \arguments{
 \item{jars}{Character vector of full paths to JAR files.}

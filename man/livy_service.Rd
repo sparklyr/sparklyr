@@ -5,8 +5,13 @@
 \alias{livy_service_stop}
 \title{Start Livy}
 \usage{
-livy_service_start(version = NULL, spark_version = NULL, stdout = "",
-  stderr = "", ...)
+livy_service_start(
+  version = NULL,
+  spark_version = NULL,
+  stdout = "",
+  stderr = "",
+  ...
+)
 
 livy_service_stop()
 }

@@ -4,8 +4,7 @@
 \alias{stream_read_orc}
 \title{Read ORC Stream}
 \usage{
-stream_read_orc(sc, path, name = NULL, columns = NULL,
-  options = list(), ...)
+stream_read_orc(sc, path, name = NULL, columns = NULL, options = list(), ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -44,21 +43,22 @@ stream_stop(stream)
 
 }
 \seealso{
-Other Spark stream serialization: \code{\link{stream_read_csv}},
-  \code{\link{stream_read_delta}},
-  \code{\link{stream_read_json}},
-  \code{\link{stream_read_kafka}},
-  \code{\link{stream_read_parquet}},
-  \code{\link{stream_read_socket}},
-  \code{\link{stream_read_text}},
-  \code{\link{stream_write_console}},
-  \code{\link{stream_write_csv}},
-  \code{\link{stream_write_delta}},
-  \code{\link{stream_write_json}},
-  \code{\link{stream_write_kafka}},
-  \code{\link{stream_write_memory}},
-  \code{\link{stream_write_orc}},
-  \code{\link{stream_write_parquet}},
-  \code{\link{stream_write_text}}
+Other Spark stream serialization: 
+\code{\link{stream_read_csv}()},
+\code{\link{stream_read_delta}()},
+\code{\link{stream_read_json}()},
+\code{\link{stream_read_kafka}()},
+\code{\link{stream_read_parquet}()},
+\code{\link{stream_read_socket}()},
+\code{\link{stream_read_text}()},
+\code{\link{stream_write_console}()},
+\code{\link{stream_write_csv}()},
+\code{\link{stream_write_delta}()},
+\code{\link{stream_write_json}()},
+\code{\link{stream_write_kafka}()},
+\code{\link{stream_write_memory}()},
+\code{\link{stream_write_orc}()},
+\code{\link{stream_write_parquet}()},
+\code{\link{stream_write_text}()}
 }
 \concept{Spark stream serialization}

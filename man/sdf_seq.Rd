@@ -4,8 +4,14 @@
 \alias{sdf_seq}
 \title{Create DataFrame for Range}
 \usage{
-sdf_seq(sc, from = 1L, to = 1L, by = 1L, repartition = type,
-  type = c("integer", "integer64"))
+sdf_seq(
+  sc,
+  from = 1L,
+  to = 1L,
+  by = 1L,
+  repartition = type,
+  type = c("integer", "integer64")
+)
 }
 \arguments{
 \item{sc}{The associated Spark connection.}

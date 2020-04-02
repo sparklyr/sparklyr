@@ -4,10 +4,14 @@
 \alias{stream_write_kafka}
 \title{Write Kafka Stream}
 \usage{
-stream_write_kafka(x, mode = c("append", "complete", "update"),
+stream_write_kafka(
+  x,
+  mode = c("append", "complete", "update"),
   trigger = stream_trigger_interval(),
   checkpoint = file.path("checkpoints", random_string("")),
-  options = list(), ...)
+  options = list(),
+  ...
+)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -51,21 +55,22 @@ stream_stop(stream)
 
 }
 \seealso{
-Other Spark stream serialization: \code{\link{stream_read_csv}},
-  \code{\link{stream_read_delta}},
-  \code{\link{stream_read_json}},
-  \code{\link{stream_read_kafka}},
-  \code{\link{stream_read_orc}},
-  \code{\link{stream_read_parquet}},
-  \code{\link{stream_read_socket}},
-  \code{\link{stream_read_text}},
-  \code{\link{stream_write_console}},
-  \code{\link{stream_write_csv}},
-  \code{\link{stream_write_delta}},
-  \code{\link{stream_write_json}},
-  \code{\link{stream_write_memory}},
-  \code{\link{stream_write_orc}},
-  \code{\link{stream_write_parquet}},
-  \code{\link{stream_write_text}}
+Other Spark stream serialization: 
+\code{\link{stream_read_csv}()},
+\code{\link{stream_read_delta}()},
+\code{\link{stream_read_json}()},
+\code{\link{stream_read_kafka}()},
+\code{\link{stream_read_orc}()},
+\code{\link{stream_read_parquet}()},
+\code{\link{stream_read_socket}()},
+\code{\link{stream_read_text}()},
+\code{\link{stream_write_console}()},
+\code{\link{stream_write_csv}()},
+\code{\link{stream_write_delta}()},
+\code{\link{stream_write_json}()},
+\code{\link{stream_write_memory}()},
+\code{\link{stream_write_orc}()},
+\code{\link{stream_write_parquet}()},
+\code{\link{stream_write_text}()}
 }
 \concept{Spark stream serialization}

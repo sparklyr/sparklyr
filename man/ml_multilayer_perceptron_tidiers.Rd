@@ -9,8 +9,7 @@
 \usage{
 \method{tidy}{ml_model_multilayer_perceptron_classification}(x, ...)
 
-\method{augment}{ml_model_multilayer_perceptron_classification}(x,
-  newdata = NULL, ...)
+\method{augment}{ml_model_multilayer_perceptron_classification}(x, newdata = NULL, ...)
 
 \method{glance}{ml_model_multilayer_perceptron_classification}(x, ...)
 }

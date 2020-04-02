@@ -4,11 +4,23 @@
 \alias{spark_pipeline_stage}
 \title{Create a Pipeline Stage Object}
 \usage{
-spark_pipeline_stage(sc, class, uid, features_col = NULL,
-  label_col = NULL, prediction_col = NULL, probability_col = NULL,
-  raw_prediction_col = NULL, k = NULL, max_iter = NULL,
-  seed = NULL, input_col = NULL, input_cols = NULL,
-  output_col = NULL, output_cols = NULL)
+spark_pipeline_stage(
+  sc,
+  class,
+  uid,
+  features_col = NULL,
+  label_col = NULL,
+  prediction_col = NULL,
+  probability_col = NULL,
+  raw_prediction_col = NULL,
+  k = NULL,
+  max_iter = NULL,
+  seed = NULL,
+  input_col = NULL,
+  input_cols = NULL,
+  output_col = NULL,
+  output_cols = NULL
+)
 }
 \arguments{
 \item{sc}{A `spark_connection` object.}
@@ -36,15 +48,11 @@ reproducible across repeated calls.}
 
 \item{input_col}{The name of the input column.}
 
-\item{input_cols}{Names of input columns.}
+\item{input_cols}{Names of output columns.}
 
 \item{output_col}{The name of the output column.}
 
 \item{thresholds}{Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values > 0 excepting that at most one value may be 0. The class with largest value \code{p/t} is predicted, where \code{p} is the original probability of that class and \code{t} is the class's threshold.}
-
-\item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
-
-\item{input_cols}{Names of output columns.}
 }
 \description{
 Helper function to create pipeline stage objects with common parameter setters.

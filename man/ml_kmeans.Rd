@@ -5,10 +5,20 @@
 \alias{ml_compute_cost}
 \title{Spark ML -- K-Means Clustering}
 \usage{
-ml_kmeans(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-04,
-  init_steps = 2, init_mode = "k-means||", seed = NULL,
-  features_col = "features", prediction_col = "prediction",
-  uid = random_string("kmeans_"), ...)
+ml_kmeans(
+  x,
+  formula = NULL,
+  k = 2,
+  max_iter = 20,
+  tol = 1e-04,
+  init_steps = 2,
+  init_mode = "k-means||",
+  seed = NULL,
+  features_col = "features",
+  prediction_col = "prediction",
+  uid = random_string("kmeans_"),
+  ...
+)
 
 ml_compute_cost(model, dataset)
 }
@@ -83,7 +93,9 @@ ml_kmeans(iris_tbl, Species ~ .)
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
 
-Other ml clustering algorithms: \code{\link{ml_bisecting_kmeans}},
-  \code{\link{ml_gaussian_mixture}}, \code{\link{ml_lda}}
+Other ml clustering algorithms: 
+\code{\link{ml_bisecting_kmeans}()},
+\code{\link{ml_gaussian_mixture}()},
+\code{\link{ml_lda}()}
 }
 \concept{ml clustering algorithms}

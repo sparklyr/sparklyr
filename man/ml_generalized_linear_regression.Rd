@@ -4,13 +4,27 @@
 \alias{ml_generalized_linear_regression}
 \title{Spark ML -- Generalized Linear Regression}
 \usage{
-ml_generalized_linear_regression(x, formula = NULL,
-  family = "gaussian", link = NULL, fit_intercept = TRUE,
-  offset_col = NULL, link_power = NULL, link_prediction_col = NULL,
-  reg_param = 0, max_iter = 25, weight_col = NULL, solver = "irls",
-  tol = 1e-06, variance_power = 0, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
-  uid = random_string("generalized_linear_regression_"), ...)
+ml_generalized_linear_regression(
+  x,
+  formula = NULL,
+  family = "gaussian",
+  link = NULL,
+  fit_intercept = TRUE,
+  offset_col = NULL,
+  link_power = NULL,
+  link_prediction_col = NULL,
+  reg_param = 0,
+  max_iter = 25,
+  weight_col = NULL,
+  solver = "irls",
+  tol = 1e-06,
+  variance_power = 0,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("generalized_linear_regression_"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -126,16 +140,17 @@ family_link
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
 
-Other ml algorithms: \code{\link{ml_aft_survival_regression}},
-  \code{\link{ml_decision_tree_classifier}},
-  \code{\link{ml_gbt_classifier}},
-  \code{\link{ml_isotonic_regression}},
-  \code{\link{ml_linear_regression}},
-  \code{\link{ml_linear_svc}},
-  \code{\link{ml_logistic_regression}},
-  \code{\link{ml_multilayer_perceptron_classifier}},
-  \code{\link{ml_naive_bayes}},
-  \code{\link{ml_one_vs_rest}},
-  \code{\link{ml_random_forest_classifier}}
+Other ml algorithms: 
+\code{\link{ml_aft_survival_regression}()},
+\code{\link{ml_decision_tree_classifier}()},
+\code{\link{ml_gbt_classifier}()},
+\code{\link{ml_isotonic_regression}()},
+\code{\link{ml_linear_regression}()},
+\code{\link{ml_linear_svc}()},
+\code{\link{ml_logistic_regression}()},
+\code{\link{ml_multilayer_perceptron_classifier}()},
+\code{\link{ml_naive_bayes}()},
+\code{\link{ml_one_vs_rest}()},
+\code{\link{ml_random_forest_classifier}()}
 }
 \concept{ml algorithms}

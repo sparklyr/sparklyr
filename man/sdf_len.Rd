@@ -4,8 +4,7 @@
 \alias{sdf_len}
 \title{Create DataFrame for Length}
 \usage{
-sdf_len(sc, length, repartition = NULL, type = c("integer",
-  "integer64"))
+sdf_len(sc, length, repartition = NULL, type = c("integer", "integer64"))
 }
 \arguments{
 \item{sc}{The associated Spark connection.}

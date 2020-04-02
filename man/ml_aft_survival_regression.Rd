@@ -5,22 +5,41 @@
 \alias{ml_survival_regression}
 \title{Spark ML -- Survival Regression}
 \usage{
-ml_aft_survival_regression(x, formula = NULL, censor_col = "censor",
-  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95,
-  0.99), fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-  aggregation_depth = 2, quantiles_col = NULL,
-  features_col = "features", label_col = "label",
+ml_aft_survival_regression(
+  x,
+  formula = NULL,
+  censor_col = "censor",
+  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+  fit_intercept = TRUE,
+  max_iter = 100L,
+  tol = 1e-06,
+  aggregation_depth = 2,
+  quantiles_col = NULL,
+  features_col = "features",
+  label_col = "label",
   prediction_col = "prediction",
-  uid = random_string("aft_survival_regression_"), ...)
+  uid = random_string("aft_survival_regression_"),
+  ...
+)
 
-ml_survival_regression(x, formula = NULL, censor_col = "censor",
-  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95,
-  0.99), fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-  aggregation_depth = 2, quantiles_col = NULL,
-  features_col = "features", label_col = "label",
+ml_survival_regression(
+  x,
+  formula = NULL,
+  censor_col = "censor",
+  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+  fit_intercept = TRUE,
+  max_iter = 100L,
+  tol = 1e-06,
+  aggregation_depth = 2,
+  quantiles_col = NULL,
+  features_col = "features",
+  label_col = "label",
   prediction_col = "prediction",
-  uid = random_string("aft_survival_regression_"), response = NULL,
-  features = NULL, ...)
+  uid = random_string("aft_survival_regression_"),
+  response = NULL,
+  features = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -111,16 +130,17 @@ pred
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
 
-Other ml algorithms: \code{\link{ml_decision_tree_classifier}},
-  \code{\link{ml_gbt_classifier}},
-  \code{\link{ml_generalized_linear_regression}},
-  \code{\link{ml_isotonic_regression}},
-  \code{\link{ml_linear_regression}},
-  \code{\link{ml_linear_svc}},
-  \code{\link{ml_logistic_regression}},
-  \code{\link{ml_multilayer_perceptron_classifier}},
-  \code{\link{ml_naive_bayes}},
-  \code{\link{ml_one_vs_rest}},
-  \code{\link{ml_random_forest_classifier}}
+Other ml algorithms: 
+\code{\link{ml_decision_tree_classifier}()},
+\code{\link{ml_gbt_classifier}()},
+\code{\link{ml_generalized_linear_regression}()},
+\code{\link{ml_isotonic_regression}()},
+\code{\link{ml_linear_regression}()},
+\code{\link{ml_linear_svc}()},
+\code{\link{ml_logistic_regression}()},
+\code{\link{ml_multilayer_perceptron_classifier}()},
+\code{\link{ml_naive_bayes}()},
+\code{\link{ml_one_vs_rest}()},
+\code{\link{ml_random_forest_classifier}()}
 }
 \concept{ml algorithms}

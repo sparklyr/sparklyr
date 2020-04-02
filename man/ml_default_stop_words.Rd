@@ -4,9 +4,13 @@
 \alias{ml_default_stop_words}
 \title{Default stop words}
 \usage{
-ml_default_stop_words(sc, language = c("english", "danish", "dutch",
-  "finnish", "french", "german", "hungarian", "italian", "norwegian",
-  "portuguese", "russian", "spanish", "swedish", "turkish"), ...)
+ml_default_stop_words(
+  sc,
+  language = c("english", "danish", "dutch", "finnish", "french", "german",
+    "hungarian", "italian", "norwegian", "portuguese", "russian", "spanish", "swedish",
+    "turkish"),
+  ...
+)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}}
