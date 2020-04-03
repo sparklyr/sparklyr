@@ -12,10 +12,13 @@ new_ml_model_linear_regression <- function(pipeline_model, formula, dataset, lab
   coefficients <- model$coefficients
   names(coefficients) <- m$feature_names
 
-  m$coefficients <- if (ml_param(model, "fit_intercept"))
+  m$coefficients <- if (ml_param(model, "fit_intercept")){
     rlang::set_names(
       c(invoke(jobj, "intercept"), model$coefficients),
       c("(Intercept)", m$feature_names))
+  } else {
+    coefficients
+  }
 
   m$summary <- model$summary
 
