@@ -48,7 +48,7 @@ library(sparklyr)
 ```
 
 ```
-## Error in library(sparklyr): there is no package called 'sparklyr'
+
 ```
 
 ```r
@@ -56,7 +56,7 @@ sc <- spark_connect(master = "local")
 ```
 
 ```
-## Error in spark_connect(master = "local"): could not find function "spark_connect"
+
 ```
 
 The returned Spark connection (`sc`) provides a remote dplyr data source to the Spark cluster.
@@ -81,7 +81,7 @@ iris_tbl <- copy_to(sc, iris)
 ```
 
 ```
-## Error in copy_to(sc, iris): object 'sc' not found
+
 ```
 
 ```r
@@ -89,7 +89,7 @@ flights_tbl <- copy_to(sc, nycflights13::flights, "flights")
 ```
 
 ```
-## Error in copy_to(sc, nycflights13::flights, "flights"): object 'sc' not found
+
 ```
 
 ```r
@@ -97,7 +97,7 @@ batting_tbl <- copy_to(sc, Lahman::Batting, "batting")
 ```
 
 ```
-## Error in copy_to(sc, Lahman::Batting, "batting"): object 'sc' not found
+
 ```
 
 ```r
@@ -105,7 +105,7 @@ src_tbls(sc)
 ```
 
 ```
-## Error in src_tbls(sc): object 'sc' not found
+
 ```
 
 To start with here's a simple filtering example:
@@ -117,7 +117,7 @@ flights_tbl %>% filter(dep_delay == 2)
 ```
 
 ```
-## Error in eval(lhs, parent, parent): object 'flights_tbl' not found
+
 ```
 
 [Introduction to dplyr](https://CRAN.R-project.org/package=dplyr) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
@@ -132,7 +132,7 @@ delay <- flights_tbl %>%
 ```
 
 ```
-## Error in eval(lhs, parent, parent): object 'flights_tbl' not found
+
 ```
 
 ```r
@@ -141,7 +141,7 @@ library(ggplot2)
 ```
 
 ```
-## Error in library(ggplot2): there is no package called 'ggplot2'
+
 ```
 
 ```r
@@ -152,7 +152,7 @@ ggplot(delay, aes(dist, delay)) +
 ```
 
 ```
-## Error in ggplot(delay, aes(dist, delay)): could not find function "ggplot"
+
 ```
 
 
@@ -170,7 +170,7 @@ batting_tbl %>%
 ```
 
 ```
-## Error in eval(lhs, parent, parent): object 'batting_tbl' not found
+
 ```
 
 For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
@@ -186,7 +186,7 @@ iris_preview <- dbGetQuery(sc, "SELECT * FROM iris LIMIT 10")
 ```
 
 ```
-## Error in dbGetQuery(sc, "SELECT * FROM iris LIMIT 10"): object 'sc' not found
+
 ```
 
 ```r
@@ -194,7 +194,7 @@ iris_preview
 ```
 
 ```
-## Error in eval(expr, envir, enclos): object 'iris_preview' not found
+
 ```
 
 ## Machine Learning
@@ -210,7 +210,7 @@ mtcars_tbl <- copy_to(sc, mtcars)
 ```
 
 ```
-## Error in copy_to(sc, mtcars): object 'sc' not found
+
 ```
 
 ```r
@@ -222,7 +222,7 @@ partitions <- mtcars_tbl %>%
 ```
 
 ```
-## Error in eval(lhs, parent, parent): object 'mtcars_tbl' not found
+
 ```
 
 ```r
@@ -232,7 +232,7 @@ fit <- partitions$training %>%
 ```
 
 ```
-## Error in eval(lhs, parent, parent): object 'partitions' not found
+
 ```
 
 ```r
@@ -240,7 +240,7 @@ fit
 ```
 
 ```
-## Error in eval(expr, envir, enclos): object 'fit' not found
+
 ```
 
 For linear regression models produced by Spark, we can use `summary()` to learn a bit more about the quality of our fit, and the statistical significance of each of our predictors.
@@ -251,7 +251,7 @@ summary(fit)
 ```
 
 ```
-## Error in summary(fit): object 'fit' not found
+
 ```
 
 Spark machine learning supports a wide array of algorithms and feature transformations and as illustrated above it's easy to chain these functions together with dplyr pipelines. To learn more see the [machine learning](https://spark.rstudio.com/mlib/) section.
@@ -270,7 +270,7 @@ spark_write_csv(iris_tbl, temp_csv)
 ```
 
 ```
-## Error in spark_write_csv(iris_tbl, temp_csv): could not find function "spark_write_csv"
+
 ```
 
 ```r
@@ -278,7 +278,7 @@ iris_csv_tbl <- spark_read_csv(sc, "iris_csv", temp_csv)
 ```
 
 ```
-## Error in spark_read_csv(sc, "iris_csv", temp_csv): could not find function "spark_read_csv"
+
 ```
 
 ```r
@@ -286,7 +286,7 @@ spark_write_parquet(iris_tbl, temp_parquet)
 ```
 
 ```
-## Error in spark_write_parquet(iris_tbl, temp_parquet): could not find function "spark_write_parquet"
+
 ```
 
 ```r
@@ -294,7 +294,7 @@ iris_parquet_tbl <- spark_read_parquet(sc, "iris_parquet", temp_parquet)
 ```
 
 ```
-## Error in spark_read_parquet(sc, "iris_parquet", temp_parquet): could not find function "spark_read_parquet"
+
 ```
 
 ```r
@@ -302,7 +302,7 @@ spark_write_json(iris_tbl, temp_json)
 ```
 
 ```
-## Error in spark_write_json(iris_tbl, temp_json): could not find function "spark_write_json"
+
 ```
 
 ```r
@@ -310,7 +310,7 @@ iris_json_tbl <- spark_read_json(sc, "iris_json", temp_json)
 ```
 
 ```
-## Error in spark_read_json(sc, "iris_json", temp_json): could not find function "spark_read_json"
+
 ```
 
 ```r
@@ -318,7 +318,7 @@ src_tbls(sc)
 ```
 
 ```
-## Error in src_tbls(sc): object 'sc' not found
+
 ```
 
 
@@ -334,7 +334,7 @@ spark_apply(iris_tbl, function(data) {
 ```
 
 ```
-## Error in spark_apply(iris_tbl, function(data) {: could not find function "spark_apply"
+
 ```
 
 You can also group by columns to perform an operation over each group of rows and make use of any package within the closure:
@@ -350,7 +350,7 @@ spark_apply(
 ```
 
 ```
-## Error in spark_apply(iris_tbl, function(e) broom::tidy(lm(Petal_Width ~ : could not find function "spark_apply"
+
 ```
 
 ## Extensions
@@ -367,7 +367,7 @@ write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
 ```
 
 ```
-## Error in loadNamespace(name): there is no package called 'nycflights13'
+
 ```
 
 ```r
@@ -383,7 +383,7 @@ count_lines(sc, tempfile)
 ```
 
 ```
-## Error in spark_context(sc): could not find function "spark_context"
+
 ```
 
 
@@ -424,7 +424,7 @@ spark_log(sc, n = 10)
 ```
 
 ```
-## Error in spark_log(sc, n = 10): could not find function "spark_log"
+
 ```
 
 Finally, we disconnect from Spark:
@@ -435,7 +435,7 @@ Finally, we disconnect from Spark:
 ```
 
 ```
-## Error in spark_disconnect(sc): could not find function "spark_disconnect"
+
 ```
 
 ## RStudio IDE
@@ -548,7 +548,7 @@ livy_service_start()
 ```
 
 ```
-## Error in livy_service_start(): could not find function "livy_service_start"
+
 ```
 
 To connect, use the Livy service address as `master` and `method = "livy"` in `spark_connect`. Once connection completes, use `sparklyr` as usual, for instance:
@@ -559,7 +559,7 @@ sc <- spark_connect(master = "http://localhost:8998", method = "livy", version =
 ```
 
 ```
-## Error in spark_connect(master = "http://localhost:8998", method = "livy", : could not find function "spark_connect"
+
 ```
 
 ```r
@@ -567,7 +567,7 @@ copy_to(sc, iris)
 ```
 
 ```
-## Error in copy_to(sc, iris): object 'sc' not found
+
 ```
 
 ```r
@@ -575,7 +575,7 @@ spark_disconnect(sc)
 ```
 
 ```
-## Error in spark_disconnect(sc): could not find function "spark_disconnect"
+
 ```
 
 Once you are done using `livy` locally, you should stop this service with:
@@ -586,7 +586,7 @@ livy_service_stop()
 ```
 
 ```
-## Error in livy_service_stop(): could not find function "livy_service_stop"
+
 ```
 
 To connect to remote `livy` clusters that support basic authentication connect as:
@@ -620,7 +620,7 @@ $export SPARK_HOME=`databricks-connect get-spark-home`
 ```
 
 ```
-## Error in running command bash
+
 ```
 
 Now simply create a spark connection as follows
