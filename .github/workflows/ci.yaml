@@ -111,7 +111,7 @@ jobs:
           echo $JAVA_HOME
       - name: Cache Arrow build artifacts if necessary
         id: cache-arrow-build-artifacts
-        if: runner.os != 'Windows' && env.ARROW_SOURCE == 'build'
+        if: runner.os != 'Windows' && env.ARROW_SOURCE == 'build' && env.ARROW_VERSION != 'devel'
         uses: actions/cache@v1
         with:
           path:
