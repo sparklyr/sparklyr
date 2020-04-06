@@ -6,7 +6,7 @@ output:
     fig_height: 5
 ---
 
-[![Build Status](https://travis-ci.org/sparklyr/sparklyr.svg?branch=master)](https://travis-ci.org/sparklyr/sparklyr) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/qjosuhlp55nwv42y?svg=true)](https://ci.appveyor.com/project/javierluraschi71148/sparklyr) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) <a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a> [![codecov](https://codecov.io/gh/sparklyr/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/sparklyr/sparklyr) [![Join the chat at https://gitter.im/sparklyr/sparklyr](https://badges.gitter.im/sparklyr/sparklyr.svg)](https://gitter.im/sparklyr/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![Github workflow status](https://github.com/sparklyr/sparklyr/workflows/CI/badge.svg) [![Travis build Status](https://travis-ci.org/sparklyr/sparklyr.svg?branch=master)](https://travis-ci.org/sparklyr/sparklyr) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/qjosuhlp55nwv42y?svg=true)](https://ci.appveyor.com/project/javierluraschi71148/sparklyr) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) <a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a> [![codecov](https://codecov.io/gh/sparklyr/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/sparklyr/sparklyr) [![Join the chat at https://gitter.im/sparklyr/sparklyr](https://badges.gitter.im/sparklyr/sparklyr.svg)](https://gitter.im/sparklyr/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <img src="tools/readme/sparklyr-illustration.png" width="320" align="right" style="margin-left: 20px; margin-right: 20px"/>
 
@@ -45,7 +45,7 @@ devtools::install_github("sparklyr/sparklyr")
 
 ## Connecting to Spark
 
-You can connect to both local instances of Spark as well as remote Spark clusters. Here we'll connect to a local instance of Spark via the [spark_connect](https://spark.rstudio.com/reference/spark-connections/) function: 
+You can connect to both local instances of Spark as well as remote Spark clusters. Here we'll connect to a local instance of Spark via the [spark_connect](https://spark.rstudio.com/reference/spark-connections/) function:
 
 
 ```r
@@ -129,7 +129,7 @@ flights_tbl %>% filter(dep_delay == 2)
 
 
 ```r
-delay <- flights_tbl %>% 
+delay <- flights_tbl %>%
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
   filter(count > 20, dist < 2000, !is.na(delay)) %>%
@@ -204,7 +204,7 @@ iris_preview
 
 ## Machine Learning
 
-You can orchestrate machine learning algorithms in a Spark cluster via the [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) functions within **sparklyr**. These functions connect to a set of high-level APIs built on top of DataFrames that help you create and tune machine learning workflows. 
+You can orchestrate machine learning algorithms in a Spark cluster via the [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) functions within **sparklyr**. These functions connect to a set of high-level APIs built on top of DataFrames that help you create and tune machine learning workflows.
 
 Here's an example where we use [ml_linear_regression](https://spark.rstudio.com/reference/ml_linear_regression/) to fit a linear regression model. We'll use the built-in `mtcars` dataset, and see if we can predict a car's fuel consumption (`mpg`) based on its weight (`wt`), and the number of cylinders the engine contains (`cyl`). We'll assume in each case that the relationship between `mpg` and each of our features is linear.
 
@@ -366,7 +366,7 @@ Here's a simple example that wraps a Spark text file line counting function with
 
 
 ```r
-# write a CSV 
+# write a CSV
 tempfile <- tempfile(fileext = ".csv")
 write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
 ```
@@ -378,8 +378,8 @@ write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
 ```r
 # define an R interface to Spark line counting
 count_lines <- function(sc, path) {
-  spark_context(sc) %>% 
-    invoke("textFile", path, 1L) %>% 
+  spark_context(sc) %>%
+    invoke("textFile", path, 1L) %>%
       invoke("count")
 }
 
@@ -483,7 +483,7 @@ mtcars_tbl <- copy_to(sc, mtcars, "mtcars")
 
 mtcars_h2o <- as_h2o_frame(sc, mtcars_tbl, strict_version_check = FALSE)
 
-mtcars_glm <- h2o.glm(x = c("wt", "cyl"), 
+mtcars_glm <- h2o.glm(x = c("wt", "cyl"),
                       y = "mpg",
                       training_frame = mtcars_h2o,
                       lambda_search = TRUE)
@@ -496,9 +496,9 @@ mtcars_glm
 ```
 ## Model Details:
 ## ==============
-## 
+##
 ## H2ORegressionModel: glm
-## Model ID:  GLM_model_R_1527265202599_1 
+## Model ID:  GLM_model_R_1527265202599_1
 ## GLM Model: summary
 ##     family     link                              regularization
 ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -508,16 +508,16 @@ mtcars_glm
 ## 1                          2                           2
 ##   number_of_iterations                                training_frame
 ## 1                  100 frame_rdd_31_ad5c4e88ec97eb8ccedae9475ad34e02
-## 
+##
 ## Coefficients: glm coefficients
 ##       names coefficients standardized_coefficients
 ## 1 Intercept    38.941654                 20.090625
 ## 2       cyl    -1.468783                 -2.623132
 ## 3        wt    -3.034558                 -2.969186
-## 
+##
 ## H2ORegressionMetrics: glm
 ## ** Reported on training data. **
-## 
+##
 ## MSE:  6.017684
 ## RMSE:  2.453097
 ## MAE:  1.940985
@@ -604,7 +604,7 @@ spark_disconnect(sc)
 ```
 
 ## Connecting through Databricks Connect
-[Databricks Connect](https://docs.databricks.com/dev-tools/databricks-connect.html#databricks-connect) allows you to connect 
+[Databricks Connect](https://docs.databricks.com/dev-tools/databricks-connect.html#databricks-connect) allows you to connect
 sparklyr to a remote Databricks Cluster. You can install [Databricks Connect Python pakcage](https://pypi.org/project/databricks-connect/) and use it to submit Spark jobs written in sparklyr APIs and have them execute remotely on a Databricks cluster instead of in the local Spark session.
 
 To use sparklyr with Databricks Connect first launch a Cluster on Databricks. Then follow [these instructions](https://docs.databricks.com/dev-tools/databricks-connect.html#client-setup) to setup the client:
