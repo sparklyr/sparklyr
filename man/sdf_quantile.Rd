@@ -4,8 +4,12 @@
 \alias{sdf_quantile}
 \title{Compute (Approximate) Quantiles with a Spark DataFrame}
 \usage{
-sdf_quantile(x, column, probabilities = c(0, 0.25, 0.5, 0.75, 1),
-  relative.error = 1e-05)
+sdf_quantile(
+  x,
+  column,
+  probabilities = c(0, 0.25, 0.5, 0.75, 1),
+  relative.error = 1e-05
+)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}

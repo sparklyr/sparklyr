@@ -4,9 +4,15 @@
 \alias{spark_compilation_spec}
 \title{Define a Spark Compilation Specification}
 \usage{
-spark_compilation_spec(spark_version = NULL, spark_home = NULL,
-  scalac_path = NULL, scala_filter = NULL, jar_name = NULL,
-  jar_path = NULL, jar_dep = NULL)
+spark_compilation_spec(
+  spark_version = NULL,
+  spark_home = NULL,
+  scalac_path = NULL,
+  scala_filter = NULL,
+  jar_name = NULL,
+  jar_path = NULL,
+  jar_dep = NULL
+)
 }
 \arguments{
 \item{spark_version}{The Spark version to build against. This can

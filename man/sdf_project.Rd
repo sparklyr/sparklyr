@@ -4,8 +4,13 @@
 \alias{sdf_project}
 \title{Project features onto principal components}
 \usage{
-sdf_project(object, newdata, features = dimnames(object$pc)[[1]],
-  feature_prefix = NULL, ...)
+sdf_project(
+  object,
+  newdata,
+  features = dimnames(object$pc)[[1]],
+  feature_prefix = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{A Spark PCA model object}

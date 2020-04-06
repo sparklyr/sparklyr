@@ -5,9 +5,17 @@
 \alias{ml_vocabulary}
 \title{Feature Transformation -- CountVectorizer (Estimator)}
 \usage{
-ft_count_vectorizer(x, input_col = NULL, output_col = NULL,
-  binary = FALSE, min_df = 1, min_tf = 1, vocab_size = 2^18,
-  uid = random_string("count_vectorizer_"), ...)
+ft_count_vectorizer(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  binary = FALSE,
+  min_df = 1,
+  min_tf = 1,
+  vocab_size = 2^18,
+  uid = random_string("count_vectorizer_"),
+  ...
+)
 
 ml_vocabulary(model)
 }
@@ -76,31 +84,38 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
-Other feature transformers: \code{\link{ft_binarizer}},
-  \code{\link{ft_bucketizer}},
-  \code{\link{ft_chisq_selector}}, \code{\link{ft_dct}},
-  \code{\link{ft_elementwise_product}},
-  \code{\link{ft_feature_hasher}},
-  \code{\link{ft_hashing_tf}}, \code{\link{ft_idf}},
-  \code{\link{ft_imputer}},
-  \code{\link{ft_index_to_string}},
-  \code{\link{ft_interaction}}, \code{\link{ft_lsh}},
-  \code{\link{ft_max_abs_scaler}},
-  \code{\link{ft_min_max_scaler}}, \code{\link{ft_ngram}},
-  \code{\link{ft_normalizer}},
-  \code{\link{ft_one_hot_encoder_estimator}},
-  \code{\link{ft_one_hot_encoder}}, \code{\link{ft_pca}},
-  \code{\link{ft_polynomial_expansion}},
-  \code{\link{ft_quantile_discretizer}},
-  \code{\link{ft_r_formula}},
-  \code{\link{ft_regex_tokenizer}},
-  \code{\link{ft_sql_transformer}},
-  \code{\link{ft_standard_scaler}},
-  \code{\link{ft_stop_words_remover}},
-  \code{\link{ft_string_indexer}},
-  \code{\link{ft_tokenizer}},
-  \code{\link{ft_vector_assembler}},
-  \code{\link{ft_vector_indexer}},
-  \code{\link{ft_vector_slicer}}, \code{\link{ft_word2vec}}
+Other feature transformers: 
+\code{\link{ft_binarizer}()},
+\code{\link{ft_bucketizer}()},
+\code{\link{ft_chisq_selector}()},
+\code{\link{ft_dct}()},
+\code{\link{ft_elementwise_product}()},
+\code{\link{ft_feature_hasher}()},
+\code{\link{ft_hashing_tf}()},
+\code{\link{ft_idf}()},
+\code{\link{ft_imputer}()},
+\code{\link{ft_index_to_string}()},
+\code{\link{ft_interaction}()},
+\code{\link{ft_lsh}},
+\code{\link{ft_max_abs_scaler}()},
+\code{\link{ft_min_max_scaler}()},
+\code{\link{ft_ngram}()},
+\code{\link{ft_normalizer}()},
+\code{\link{ft_one_hot_encoder_estimator}()},
+\code{\link{ft_one_hot_encoder}()},
+\code{\link{ft_pca}()},
+\code{\link{ft_polynomial_expansion}()},
+\code{\link{ft_quantile_discretizer}()},
+\code{\link{ft_r_formula}()},
+\code{\link{ft_regex_tokenizer}()},
+\code{\link{ft_sql_transformer}()},
+\code{\link{ft_standard_scaler}()},
+\code{\link{ft_stop_words_remover}()},
+\code{\link{ft_string_indexer}()},
+\code{\link{ft_tokenizer}()},
+\code{\link{ft_vector_assembler}()},
+\code{\link{ft_vector_indexer}()},
+\code{\link{ft_vector_slicer}()},
+\code{\link{ft_word2vec}()}
 }
 \concept{feature transformers}

@@ -10,11 +10,21 @@
 \alias{spark_available_versions}
 \title{Find a given Spark installation by version.}
 \usage{
-spark_install_find(version = NULL, hadoop_version = NULL,
-  installed_only = TRUE, latest = FALSE, hint = FALSE)
+spark_install_find(
+  version = NULL,
+  hadoop_version = NULL,
+  installed_only = TRUE,
+  latest = FALSE,
+  hint = FALSE
+)
 
-spark_install(version = NULL, hadoop_version = NULL, reset = TRUE,
-  logging = "INFO", verbose = interactive())
+spark_install(
+  version = NULL,
+  hadoop_version = NULL,
+  reset = TRUE,
+  logging = "INFO",
+  verbose = interactive()
+)
 
 spark_uninstall(version, hadoop_version)
 
@@ -24,8 +34,11 @@ spark_install_tar(tarfile)
 
 spark_installed_versions()
 
-spark_available_versions(show_hadoop = FALSE, show_minor = FALSE,
-  show_future = FALSE)
+spark_available_versions(
+  show_hadoop = FALSE,
+  show_minor = FALSE,
+  show_future = FALSE
+)
 }
 \arguments{
 \item{version}{Version of Spark to install. See \code{spark_available_versions} for a list of supported versions}

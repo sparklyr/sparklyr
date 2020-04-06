@@ -13,15 +13,31 @@ ml_sub_models(model)
 
 ml_validation_metrics(model)
 
-ml_cross_validator(x, estimator = NULL, estimator_param_maps = NULL,
-  evaluator = NULL, num_folds = 3, collect_sub_models = FALSE,
-  parallelism = 1, seed = NULL,
-  uid = random_string("cross_validator_"), ...)
+ml_cross_validator(
+  x,
+  estimator = NULL,
+  estimator_param_maps = NULL,
+  evaluator = NULL,
+  num_folds = 3,
+  collect_sub_models = FALSE,
+  parallelism = 1,
+  seed = NULL,
+  uid = random_string("cross_validator_"),
+  ...
+)
 
-ml_train_validation_split(x, estimator = NULL,
-  estimator_param_maps = NULL, evaluator = NULL, train_ratio = 0.75,
-  collect_sub_models = FALSE, parallelism = 1, seed = NULL,
-  uid = random_string("train_validation_split_"), ...)
+ml_train_validation_split(
+  x,
+  estimator = NULL,
+  estimator_param_maps = NULL,
+  evaluator = NULL,
+  train_ratio = 0.75,
+  collect_sub_models = FALSE,
+  parallelism = 1,
+  seed = NULL,
+  uid = random_string("train_validation_split_"),
+  ...
+)
 }
 \arguments{
 \item{model}{A cross validation or train-validation-split model.}

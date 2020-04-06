@@ -4,9 +4,15 @@
 \alias{copy_to.spark_connection}
 \title{Copy an R Data Frame to Spark}
 \usage{
-\method{copy_to}{spark_connection}(dest, df,
-  name = spark_table_name(substitute(df)), overwrite = FALSE,
-  memory = TRUE, repartition = 0L, ...)
+\method{copy_to}{spark_connection}(
+  dest,
+  df,
+  name = spark_table_name(substitute(df)),
+  overwrite = FALSE,
+  memory = TRUE,
+  repartition = 0L,
+  ...
+)
 }
 \arguments{
 \item{dest}{A \code{spark_connection}.}

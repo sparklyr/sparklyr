@@ -8,8 +8,7 @@
 \alias{livy_home_dir}
 \title{Install Livy}
 \usage{
-livy_install(version = "0.6.0", spark_home = NULL,
-  spark_version = NULL)
+livy_install(version = "0.6.0", spark_home = NULL, spark_version = NULL)
 
 livy_available_versions()
 
@@ -20,7 +19,7 @@ livy_installed_versions()
 livy_home_dir(version = NULL)
 }
 \arguments{
-\item{version}{The version of \samp{livy} to be installed.}
+\item{version}{Version of Livy}
 
 \item{spark_home}{The path to a Spark installation. The downloaded and
 installed version of \samp{livy} will then be associated with this Spark
@@ -31,8 +30,6 @@ the value of \samp{spark_version} supplied.}
 the value is inferred based on the value of \samp{livy_version} supplied.
 A version of Spark known to be compatible with the requested version of
 \samp{livy} is chosen when possible.}
-
-\item{version}{Version of Livy}
 }
 \value{
 Path to LIVY_HOME (or \code{NULL} if the specified version
