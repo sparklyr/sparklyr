@@ -9,8 +9,7 @@
 \usage{
 \method{tidy}{ml_model_aft_survival_regression}(x, ...)
 
-\method{augment}{ml_model_aft_survival_regression}(x, newdata = NULL,
-  ...)
+\method{augment}{ml_model_aft_survival_regression}(x, newdata = NULL, ...)
 
 \method{glance}{ml_model_aft_survival_regression}(x, ...)
 }

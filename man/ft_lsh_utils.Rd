@@ -6,11 +6,21 @@
 \alias{ml_approx_similarity_join}
 \title{Utility functions for LSH models}
 \usage{
-ml_approx_nearest_neighbors(model, dataset, key, num_nearest_neighbors,
-  dist_col = "distCol")
+ml_approx_nearest_neighbors(
+  model,
+  dataset,
+  key,
+  num_nearest_neighbors,
+  dist_col = "distCol"
+)
 
-ml_approx_similarity_join(model, dataset_a, dataset_b, threshold,
-  dist_col = "distCol")
+ml_approx_similarity_join(
+  model,
+  dataset_a,
+  dataset_b,
+  threshold,
+  dist_col = "distCol"
+)
 }
 \arguments{
 \item{model}{A fitted LSH model, returned by either \code{ft_minhash_lsh()}

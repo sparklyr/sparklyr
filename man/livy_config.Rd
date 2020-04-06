@@ -4,9 +4,14 @@
 \alias{livy_config}
 \title{Create a Spark Configuration for Livy}
 \usage{
-livy_config(config = spark_config(), username = NULL,
-  password = NULL, negotiate = FALSE,
-  custom_headers = list(`X-Requested-By` = "sparklyr"), ...)
+livy_config(
+  config = spark_config(),
+  username = NULL,
+  password = NULL,
+  negotiate = FALSE,
+  custom_headers = list(`X-Requested-By` = "sparklyr"),
+  ...
+)
 }
 \arguments{
 \item{config}{Optional base configuration}

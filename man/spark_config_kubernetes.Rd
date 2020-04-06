@@ -4,11 +4,21 @@
 \alias{spark_config_kubernetes}
 \title{Kubernetes Configuration}
 \usage{
-spark_config_kubernetes(master, version = "2.3.2",
-  image = "spark:sparklyr", driver = random_string("sparklyr-"),
-  account = "spark", jars = "local:///opt/sparklyr", forward = TRUE,
-  executors = NULL, conf = NULL, timeout = 120, ports = c(8880,
-  8881, 4040), fix_config = identical(.Platform$OS.type, "windows"), ...)
+spark_config_kubernetes(
+  master,
+  version = "2.3.2",
+  image = "spark:sparklyr",
+  driver = random_string("sparklyr-"),
+  account = "spark",
+  jars = "local:///opt/sparklyr",
+  forward = TRUE,
+  executors = NULL,
+  conf = NULL,
+  timeout = 120,
+  ports = c(8880, 8881, 4040),
+  fix_config = identical(.Platform$OS.type, "windows"),
+  ...
+)
 }
 \arguments{
 \item{master}{Kubernetes url to connect to, found by running \code{kubectl cluster-info}.}

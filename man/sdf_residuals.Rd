@@ -7,8 +7,11 @@
 \alias{sdf_residuals}
 \title{Model Residuals}
 \usage{
-\method{sdf_residuals}{ml_model_generalized_linear_regression}(object,
-  type = c("deviance", "pearson", "working", "response"), ...)
+\method{sdf_residuals}{ml_model_generalized_linear_regression}(
+  object,
+  type = c("deviance", "pearson", "working", "response"),
+  ...
+)
 
 \method{sdf_residuals}{ml_model_linear_regression}(object, ...)
 

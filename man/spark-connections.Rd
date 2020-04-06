@@ -9,10 +9,17 @@
 \alias{spark_submit}
 \title{Manage Spark Connections}
 \usage{
-spark_connect(master, spark_home = Sys.getenv("SPARK_HOME"),
+spark_connect(
+  master,
+  spark_home = Sys.getenv("SPARK_HOME"),
   method = c("shell", "livy", "databricks", "test", "qubole"),
-  app_name = "sparklyr", version = NULL, config = spark_config(),
-  extensions = sparklyr::registered_extensions(), packages = NULL, ...)
+  app_name = "sparklyr",
+  version = NULL,
+  config = spark_config(),
+  extensions = sparklyr::registered_extensions(),
+  packages = NULL,
+  ...
+)
 
 spark_connection_is_open(sc)
 
@@ -20,9 +27,16 @@ spark_disconnect(sc, ...)
 
 spark_disconnect_all()
 
-spark_submit(master, file, spark_home = Sys.getenv("SPARK_HOME"),
-  app_name = "sparklyr", version = NULL, config = spark_config(),
-  extensions = sparklyr::registered_extensions(), ...)
+spark_submit(
+  master,
+  file,
+  spark_home = Sys.getenv("SPARK_HOME"),
+  app_name = "sparklyr",
+  version = NULL,
+  config = spark_config(),
+  extensions = sparklyr::registered_extensions(),
+  ...
+)
 }
 \arguments{
 \item{master}{Spark cluster url to connect to. Use \code{"local"} to

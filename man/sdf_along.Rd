@@ -4,8 +4,7 @@
 \alias{sdf_along}
 \title{Create DataFrame for along Object}
 \usage{
-sdf_along(sc, along, repartition = NULL, type = c("integer",
-  "integer64"))
+sdf_along(sc, along, repartition = NULL, type = c("integer", "integer64"))
 }
 \arguments{
 \item{sc}{The associated Spark connection.}

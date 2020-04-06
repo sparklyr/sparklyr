@@ -6,9 +6,15 @@
 \alias{ml_freq_itemsets}
 \title{Frequent Pattern Mining -- FPGrowth}
 \usage{
-ml_fpgrowth(x, items_col = "items", min_confidence = 0.8,
-  min_support = 0.3, prediction_col = "prediction",
-  uid = random_string("fpgrowth_"), ...)
+ml_fpgrowth(
+  x,
+  items_col = "items",
+  min_confidence = 0.8,
+  min_support = 0.3,
+  prediction_col = "prediction",
+  uid = random_string("fpgrowth_"),
+  ...
+)
 
 ml_association_rules(model)
 

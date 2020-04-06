@@ -4,10 +4,16 @@
 \alias{ml_one_vs_rest}
 \title{Spark ML -- OneVsRest}
 \usage{
-ml_one_vs_rest(x, formula = NULL, classifier = NULL,
-  features_col = "features", label_col = "label",
-  prediction_col = "prediction", uid = random_string("one_vs_rest_"),
-  ...)
+ml_one_vs_rest(
+  x,
+  formula = NULL,
+  classifier = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("one_vs_rest_"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -57,16 +63,17 @@ When \code{x} is a \code{tbl_spark} and \code{formula} (alternatively, \code{res
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
 
-Other ml algorithms: \code{\link{ml_aft_survival_regression}},
-  \code{\link{ml_decision_tree_classifier}},
-  \code{\link{ml_gbt_classifier}},
-  \code{\link{ml_generalized_linear_regression}},
-  \code{\link{ml_isotonic_regression}},
-  \code{\link{ml_linear_regression}},
-  \code{\link{ml_linear_svc}},
-  \code{\link{ml_logistic_regression}},
-  \code{\link{ml_multilayer_perceptron_classifier}},
-  \code{\link{ml_naive_bayes}},
-  \code{\link{ml_random_forest_classifier}}
+Other ml algorithms: 
+\code{\link{ml_aft_survival_regression}()},
+\code{\link{ml_decision_tree_classifier}()},
+\code{\link{ml_gbt_classifier}()},
+\code{\link{ml_generalized_linear_regression}()},
+\code{\link{ml_isotonic_regression}()},
+\code{\link{ml_linear_regression}()},
+\code{\link{ml_linear_svc}()},
+\code{\link{ml_logistic_regression}()},
+\code{\link{ml_multilayer_perceptron_classifier}()},
+\code{\link{ml_naive_bayes}()},
+\code{\link{ml_random_forest_classifier}()}
 }
 \concept{ml algorithms}

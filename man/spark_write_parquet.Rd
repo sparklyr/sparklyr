@@ -4,8 +4,14 @@
 \alias{spark_write_parquet}
 \title{Write a Spark DataFrame to a Parquet file}
 \usage{
-spark_write_parquet(x, path, mode = NULL, options = list(),
-  partition_by = NULL, ...)
+spark_write_parquet(
+  x,
+  path,
+  mode = NULL,
+  options = list(),
+  partition_by = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -31,25 +37,26 @@ Serialize a Spark DataFrame to the
 \href{https://parquet.apache.org/}{Parquet} format.
 }
 \seealso{
-Other Spark serialization routines: \code{\link{spark_load_table}},
-  \code{\link{spark_read_csv}},
-  \code{\link{spark_read_delta}},
-  \code{\link{spark_read_jdbc}},
-  \code{\link{spark_read_json}},
-  \code{\link{spark_read_libsvm}},
-  \code{\link{spark_read_orc}},
-  \code{\link{spark_read_parquet}},
-  \code{\link{spark_read_source}},
-  \code{\link{spark_read_table}},
-  \code{\link{spark_read_text}},
-  \code{\link{spark_save_table}},
-  \code{\link{spark_write_csv}},
-  \code{\link{spark_write_delta}},
-  \code{\link{spark_write_jdbc}},
-  \code{\link{spark_write_json}},
-  \code{\link{spark_write_orc}},
-  \code{\link{spark_write_source}},
-  \code{\link{spark_write_table}},
-  \code{\link{spark_write_text}}
+Other Spark serialization routines: 
+\code{\link{spark_load_table}()},
+\code{\link{spark_read_csv}()},
+\code{\link{spark_read_delta}()},
+\code{\link{spark_read_jdbc}()},
+\code{\link{spark_read_json}()},
+\code{\link{spark_read_libsvm}()},
+\code{\link{spark_read_orc}()},
+\code{\link{spark_read_parquet}()},
+\code{\link{spark_read_source}()},
+\code{\link{spark_read_table}()},
+\code{\link{spark_read_text}()},
+\code{\link{spark_save_table}()},
+\code{\link{spark_write_csv}()},
+\code{\link{spark_write_delta}()},
+\code{\link{spark_write_jdbc}()},
+\code{\link{spark_write_json}()},
+\code{\link{spark_write_orc}()},
+\code{\link{spark_write_source}()},
+\code{\link{spark_write_table}()},
+\code{\link{spark_write_text}()}
 }
 \concept{Spark serialization routines}
