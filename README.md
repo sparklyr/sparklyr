@@ -1,10 +1,5 @@
----
-title: "sparklyr: R interface for Apache Spark"
-output:
-  github_document:
-    fig_width: 9
-    fig_height: 5
----
+sparklyr: R interface for Apache Spark
+================
 
 ![Github workflow status](https://github.com/sparklyr/sparklyr/workflows/CI/badge.svg) [![Travis build Status](https://travis-ci.org/sparklyr/sparklyr.svg?branch=master)](https://travis-ci.org/sparklyr/sparklyr) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/qjosuhlp55nwv42y?svg=true)](https://ci.appveyor.com/project/javierluraschi71148/sparklyr) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) <a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a> [![codecov](https://codecov.io/gh/sparklyr/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/sparklyr/sparklyr) [![Join the chat at https://gitter.im/sparklyr/sparklyr](https://badges.gitter.im/sparklyr/sparklyr.svg)](https://gitter.im/sparklyr/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
