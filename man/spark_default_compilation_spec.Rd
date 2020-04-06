@@ -4,8 +4,10 @@
 \alias{spark_default_compilation_spec}
 \title{Default Compilation Specification for Spark Extensions}
 \usage{
-spark_default_compilation_spec(pkg = infer_active_package_name(),
-  locations = NULL)
+spark_default_compilation_spec(
+  pkg = infer_active_package_name(),
+  locations = NULL
+)
 }
 \arguments{
 \item{pkg}{The package containing Spark extensions to be compiled.}

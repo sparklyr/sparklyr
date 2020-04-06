@@ -13,30 +13,70 @@
 \alias{ml_construct_model_clustering}
 \title{Constructors for `ml_model` Objects}
 \usage{
-new_ml_model_prediction(pipeline_model, formula, dataset, label_col,
-  features_col, ..., class = character())
+new_ml_model_prediction(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col,
+  ...,
+  class = character()
+)
 
 new_ml_model(pipeline_model, formula, dataset, ..., class = character())
 
-new_ml_model_classification(pipeline_model, formula, dataset, label_col,
-  features_col, predicted_label_col, ..., class = character())
+new_ml_model_classification(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col,
+  predicted_label_col,
+  ...,
+  class = character()
+)
 
-new_ml_model_regression(pipeline_model, formula, dataset, label_col,
-  features_col, ..., class = character())
+new_ml_model_regression(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col,
+  ...,
+  class = character()
+)
 
-new_ml_model_clustering(pipeline_model, formula, dataset, features_col,
-  ..., class = character())
+new_ml_model_clustering(
+  pipeline_model,
+  formula,
+  dataset,
+  features_col,
+  ...,
+  class = character()
+)
 
-ml_supervised_pipeline(predictor, dataset, formula, features_col,
-  label_col)
+ml_supervised_pipeline(predictor, dataset, formula, features_col, label_col)
 
 ml_clustering_pipeline(predictor, dataset, formula, features_col)
 
-ml_construct_model_supervised(constructor, predictor, formula, dataset,
-  features_col, label_col, ...)
+ml_construct_model_supervised(
+  constructor,
+  predictor,
+  formula,
+  dataset,
+  features_col,
+  label_col,
+  ...
+)
 
-ml_construct_model_clustering(constructor, predictor, formula, dataset,
-  features_col, ...)
+ml_construct_model_clustering(
+  constructor,
+  predictor,
+  formula,
+  dataset,
+  features_col,
+  ...
+)
 }
 \arguments{
 \item{pipeline_model}{The pipeline model object returned by `ml_supervised_pipeline()`.}

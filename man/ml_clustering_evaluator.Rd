@@ -4,9 +4,14 @@
 \alias{ml_clustering_evaluator}
 \title{Spark ML - Clustering Evaluator}
 \usage{
-ml_clustering_evaluator(x, features_col = "features",
-  prediction_col = "prediction", metric_name = "silhouette",
-  uid = random_string("clustering_evaluator_"), ...)
+ml_clustering_evaluator(
+  x,
+  features_col = "features",
+  prediction_col = "prediction",
+  metric_name = "silhouette",
+  uid = random_string("clustering_evaluator_"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{spark_connection} object or a \code{tbl_spark} containing label and prediction columns. The latter should be the output of \code{\link{sdf_predict}}.}

@@ -4,8 +4,7 @@
 \alias{ml_standardize_formula}
 \title{Standardize Formula Input for `ml_model`}
 \usage{
-ml_standardize_formula(formula = NULL, response = NULL,
-  features = NULL)
+ml_standardize_formula(formula = NULL, response = NULL, features = NULL)
 }
 \arguments{
 \item{formula}{The `formula` argument.}

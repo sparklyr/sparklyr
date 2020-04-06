@@ -9,8 +9,13 @@
 \usage{
 ml_save(x, path, overwrite = FALSE, ...)
 
-\method{ml_save}{ml_model}(x, path, overwrite = FALSE,
-  type = c("pipeline_model", "pipeline"), ...)
+\method{ml_save}{ml_model}(
+  x,
+  path,
+  overwrite = FALSE,
+  type = c("pipeline_model", "pipeline"),
+  ...
+)
 
 ml_load(sc, path)
 }

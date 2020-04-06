@@ -4,11 +4,24 @@
 \alias{spark_read_csv}
 \title{Read a CSV file into a Spark DataFrame}
 \usage{
-spark_read_csv(sc, name = NULL, path = name, header = TRUE,
-  columns = NULL, infer_schema = is.null(columns), delimiter = ",",
-  quote = "\\"", escape = "\\\\", charset = "UTF-8",
-  null_value = NULL, options = list(), repartition = 0,
-  memory = TRUE, overwrite = TRUE, ...)
+spark_read_csv(
+  sc,
+  name = NULL,
+  path = name,
+  header = TRUE,
+  columns = NULL,
+  infer_schema = is.null(columns),
+  delimiter = ",",
+  quote = "\\"",
+  escape = "\\\\",
+  charset = "UTF-8",
+  null_value = NULL,
+  options = list(),
+  repartition = 0,
+  memory = TRUE,
+  overwrite = TRUE,
+  ...
+)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -74,25 +87,26 @@ When \code{header} is \code{FALSE}, the column names are generated with a
 \code{V} prefix; e.g. \code{V1, V2, ...}.
 }
 \seealso{
-Other Spark serialization routines: \code{\link{spark_load_table}},
-  \code{\link{spark_read_delta}},
-  \code{\link{spark_read_jdbc}},
-  \code{\link{spark_read_json}},
-  \code{\link{spark_read_libsvm}},
-  \code{\link{spark_read_orc}},
-  \code{\link{spark_read_parquet}},
-  \code{\link{spark_read_source}},
-  \code{\link{spark_read_table}},
-  \code{\link{spark_read_text}},
-  \code{\link{spark_save_table}},
-  \code{\link{spark_write_csv}},
-  \code{\link{spark_write_delta}},
-  \code{\link{spark_write_jdbc}},
-  \code{\link{spark_write_json}},
-  \code{\link{spark_write_orc}},
-  \code{\link{spark_write_parquet}},
-  \code{\link{spark_write_source}},
-  \code{\link{spark_write_table}},
-  \code{\link{spark_write_text}}
+Other Spark serialization routines: 
+\code{\link{spark_load_table}()},
+\code{\link{spark_read_delta}()},
+\code{\link{spark_read_jdbc}()},
+\code{\link{spark_read_json}()},
+\code{\link{spark_read_libsvm}()},
+\code{\link{spark_read_orc}()},
+\code{\link{spark_read_parquet}()},
+\code{\link{spark_read_source}()},
+\code{\link{spark_read_table}()},
+\code{\link{spark_read_text}()},
+\code{\link{spark_save_table}()},
+\code{\link{spark_write_csv}()},
+\code{\link{spark_write_delta}()},
+\code{\link{spark_write_jdbc}()},
+\code{\link{spark_write_json}()},
+\code{\link{spark_write_orc}()},
+\code{\link{spark_write_parquet}()},
+\code{\link{spark_write_source}()},
+\code{\link{spark_write_table}()},
+\code{\link{spark_write_text}()}
 }
 \concept{Spark serialization routines}

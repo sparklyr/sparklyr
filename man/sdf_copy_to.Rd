@@ -47,8 +47,10 @@ sdf_copy_to(sc, iris)
 
 }
 \seealso{
-Other Spark data frames: \code{\link{sdf_random_split}},
-  \code{\link{sdf_register}}, \code{\link{sdf_sample}},
-  \code{\link{sdf_sort}}
+Other Spark data frames: 
+\code{\link{sdf_random_split}()},
+\code{\link{sdf_register}()},
+\code{\link{sdf_sample}()},
+\code{\link{sdf_sort}()}
 }
 \concept{Spark data frames}
