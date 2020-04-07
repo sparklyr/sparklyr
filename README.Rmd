@@ -69,9 +69,9 @@ install.packages(c("nycflights13", "Lahman"))
 
 ```{r dplyr-copy, message=FALSE}
 library(dplyr)
-iris_tbl <- copy_to(sc, iris)
-flights_tbl <- copy_to(sc, nycflights13::flights, "flights")
-batting_tbl <- copy_to(sc, Lahman::Batting, "batting")
+iris_tbl <- copy_to(sc, iris, overwrite = TRUE)
+flights_tbl <- copy_to(sc, nycflights13::flights, "flights", overwrite = TRUE)
+batting_tbl <- copy_to(sc, Lahman::Batting, "batting", overwrite = TRUE)
 src_tbls(sc)
 ```
 
@@ -132,7 +132,7 @@ Here's an example where we use [ml_linear_regression](https://spark.rstudio.com/
 
 ```{r}
 # copy mtcars into spark
-mtcars_tbl <- copy_to(sc, mtcars)
+mtcars_tbl <- copy_to(sc, mtcars, overwrite = TRUE)
 
 # transform our data set, and then partition into 'training', 'test'
 partitions <- mtcars_tbl %>%
@@ -293,7 +293,7 @@ library(dplyr)
 library(h2o)
 
 sc <- spark_connect(master = "local", version = "2.3.2")
-mtcars_tbl <- copy_to(sc, mtcars, "mtcars")
+mtcars_tbl <- copy_to(sc, mtcars, "mtcars", overwrite = TRUE)
 
 mtcars_h2o <- as_h2o_frame(sc, mtcars_tbl, strict_version_check = FALSE)
 
@@ -366,7 +366,7 @@ To connect, use the Livy service address as `master` and `method = "livy"` in `s
 
 ```{r livy-connect}
 sc <- spark_connect(master = "http://localhost:8998", method = "livy", version = "2.4.0")
-copy_to(sc, iris)
+copy_to(sc, iris, overwrite = TRUE)
 
 spark_disconnect(sc)
 ```
@@ -401,14 +401,14 @@ To use sparklyr with Databricks Connect first launch a Cluster on Databricks. Th
 
 To configure `sparklyr` with Databricks Connect, set the following environment variables:
 ```{bash}
-$export SPARK_VERSION=2.4.4
-$export SPARK_HOME=`databricks-connect get-spark-home`
+export SPARK_VERSION=2.4.4
+export SPARK_HOME=`databricks-connect get-spark-home`
 ```
 
 Now simply create a spark connection as follows
 ```{r eval=FALSE}
 sc <- spark_connect(method = "databricks")
-copy_to(sc, iris)
+copy_to(sc, iris, overwrite = TRUE)
 ```
 
 ```{r eval=FALSE}
