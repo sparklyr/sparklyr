@@ -9,6 +9,21 @@ test_that("sdf_collect() works properly", {
   expect_equivalent(mtcars, mtcars_data)
 })
 
+test_that("sdf_collect() works with nested lists", {
+  if (spark_version(sc) < "2.4")
+    skip("nested list is only supported with Spark 2.4+")
+
+  df <- tibble::tibble(
+    a = list(c(1, 2, 3), c(4, 5), c(6)),
+    b = list(c("foo"), c("bar", "foobar"), c("a", "b", "c"))
+  )
+  sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
+  res <- sdf_collect(sdf)
+
+  expect_equivalent(df$a, res$a)
+  expect_equivalent(df$b, sapply(res$b, function(e) do.call(c, e)))
+})
+
 test_that("sdf_collect() supports callback", {
   if (spark_version(sc) < "2.0") skip("batch collection requires Spark 2.0")
 
