@@ -74,3 +74,27 @@ test_that("sdf_copy_to works for json serializer", {
     3
   )
 })
+
+test_that("sdf_copy_to can preserve list columns", {
+  if (!"sparklyr.nested" %in% installed.packages())
+    skip("sparklyr.nested not installed.")
+
+  if (spark_version(sc) < "2.4")
+    skip("preserving list columns is only supported with Spark 2.4+")
+
+  df <- tibble::tibble(
+    a = list(c(11.0, 111.0), c(22.0, 222.0), c(33.0, 333.0)),
+    b = list(list(c = 1, d = "a"), list(c = 2, d = "b"), list(c = 3, d = "c"))
+  )
+  sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
+  expect_equivalent(
+    c(sapply(sparklyr.nested::sdf_select(sdf, b.c) %>% sdf_collect(), c)),
+    c(list(1), list(2), list(3))
+  )
+  expect_equivalent(
+    c(sapply(sparklyr.nested::sdf_select(sdf, b.d) %>% sdf_collect(), c)),
+    list(list("a"), list("b"), list("c"))
+  )
+  res <- sdf_collect(sdf)
+  expect_equivalent(df$a, res$a)
+})
