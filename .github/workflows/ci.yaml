@@ -116,7 +116,7 @@ jobs:
         with:
           path:
             /tmp/apache-arrow-${{ env.ARROW_VERSION }}-build
-          key: apache-arrow-${{ env.ARROW_VERSION }}-build
+          key: sparklyr-apache-arrow-${{ env.ARROW_VERSION }}-build
       - name: Install Arrow if necessary
         run: |
           if [[ $ARROW_ENABLED == 'true' ]]; then
@@ -140,8 +140,8 @@ jobs:
         uses: actions/cache@master
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-r-${{ matrix.r }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('DESCRIPTION') }}
-          restore-keys: ${{ runner.os }}-r-${{ matrix.r }}-
+          key: sparklyr-${{ runner.os }}-r-${{ matrix.r }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('DESCRIPTION') }}
+          restore-keys: sparklyr-${{ runner.os }}-r-${{ matrix.r }}-${{ env.ARROW_ENABLED }}
       - name: Install system dependencies
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libsodium23 libsodium-dev libwebp6 libwebp-dev libcurl4 libcurl4-openssl-dev libhiredis0.13 libhiredis-dev libudunits2-0 libudunits2-dev
