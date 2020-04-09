@@ -620,6 +620,7 @@ initialize_connection.spark_shell_connection <- function(sc) {
       ) %>%
         invoke("config", conf) %>%
         apply_config(connection_config(sc, "spark.sql."), "config", "spark.sql.") %>%
+        invoke("enableHiveSupport") %>%
         invoke("getOrCreate")
 
       # Cache the session as the "hive context".

@@ -842,7 +842,7 @@ initialize_connection.livy_connection <- function(sc) {
         "org.apache.spark.sql.SparkSession",
         "builder"
       ) %>%
-        invoke("getOrCreate")
+        invoke("%>%", list("enableHiveSupport"), list("getOrCreate"))
     },
     error = function(e) {
       NULL
