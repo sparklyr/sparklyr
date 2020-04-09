@@ -112,7 +112,7 @@ jobs:
       - name: Cache Arrow build artifacts if necessary
         id: cache-arrow-build-artifacts
         if: runner.os != 'Windows' && env.ARROW_SOURCE == 'build' && env.ARROW_VERSION != 'devel'
-        uses: actions/cache@v1
+        uses: actions/cache@master
         with:
           path:
             /tmp/apache-arrow-${{ env.ARROW_VERSION }}-build
@@ -137,7 +137,7 @@ jobs:
         shell: bash
       - name: Cache R packages
         if: runner.os != 'Windows'
-        uses: actions/cache@v1
+        uses: actions/cache@master
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-r-${{ matrix.r }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('DESCRIPTION') }}
