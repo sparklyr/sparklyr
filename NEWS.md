@@ -40,8 +40,9 @@
 - Removal of unneeded objects from JVM object tracker no longer blocks
   subsequent JVM method invocations
 
-
 ### Misc
+
+- Support for installing Spark 3.0 Preview 2.
 
 - Emit more informative error message if network interface required for
   `spark_connect` is not up
