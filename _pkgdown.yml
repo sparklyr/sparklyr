@@ -247,6 +247,7 @@ reference:
     - spark_apply
     - spark_apply_bundle
     - spark_apply_log
+    - registerDoSpark
   - title: Livy
     contents:
     - livy_available_versions
