@@ -24,36 +24,38 @@ pipeline {
 
                     def createClusterJson = readJSON(text: createClusterOutput)
                     // No def makes it a global variable, accessible in other stages
-                    clusterId = createClusterJson["cluster_id"]
+                    // clusterId = createClusterJson["cluster_id"]
                 }
             }
         }
         stage("Set up Databricks Connect") {
             steps {
-                script {
-                    withCredentials([
-                        string(credentialsId: 'databricks-connect-api-token', variable: 'API_TOKEN'),
-                        string(credentialsId: 'databricks-workspace-url', variable: 'WORKSPACE_URL')
-                    ]) {
-                        def dbConnectParams = [
-                            host: WORKSPACE_URL,
-                            token: API_TOKEN,
-                            cluster_id: clusterId,
-                            port: "15001",
-                        ]
-                        def dbConnectParamsJson = JsonOutput.toJson(dbConnectParams)
-                        sh "echo '$dbConnectParamsJson' > ~/.databricks-connect"
+                // script {
+                //     withCredentials([
+                //         string(credentialsId: 'databricks-connect-api-token', variable: 'API_TOKEN'),
+                //         string(credentialsId: 'databricks-workspace-url', variable: 'WORKSPACE_URL')
+                //     ]) {
+                //         def dbConnectParams = [
+                //             host: WORKSPACE_URL,
+                //             token: API_TOKEN,
+                //             cluster_id: clusterId,
+                //             port: "15001",
+                //         ]
+                //         def dbConnectParamsJson = JsonOutput.toJson(dbConnectParams)
+                //         sh "echo '$dbConnectParamsJson' > ~/.databricks-connect"
 
-                        // Smoke test to check if databricks-connect is set up correctly
-                        sh "SPARK_HOME=${sparkHome} databricks-connect test"
-                    }
-                }
+                //         // Smoke test to check if databricks-connect is set up correctly
+                //         sh "SPARK_HOME=${sparkHome} databricks-connect test"
+                //     }
+                // }
+		sh "ECHO 'setting up Databricks Connect'"
             }
         }
         stage("Prepare the test data") {
             steps {
-                sh """dbfs mkdirs dbfs:/tmp/data"""
-                sh """dbfs cp -r --overwrite tests/testthat/data dbfs:/tmp/data"""
+                // sh """dbfs mkdirs dbfs:/tmp/data"""
+                // sh """dbfs cp -r --overwrite tests/testthat/data dbfs:/tmp/data"""
+                sh """echo 'Copied files'"""
             }
         }
         stage("Run tests") {
@@ -66,8 +68,12 @@ pipeline {
     }
     post {
         always {
-            sh "databricks clusters delete --cluster-id ${clusterId}"
-            sh """dbfs rm -r dbfs:/tmp/data"""
+            // sh "databricks clusters delete --cluster-id ${clusterId}"
+            // sh """dbfs rm -r dbfs:/tmp/data"""
+            if (env.CHANGE_ID) {
+                def comment = pullRequest.comment('DID NOT FAIL')
+            }
+
         }
         failure {
             script {
