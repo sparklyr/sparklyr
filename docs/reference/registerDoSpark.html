@@ -1,0 +1,59 @@
+---
+title: "Register a Prallel Backend"
+aliases:
+  - reference/sparklyr/latest/registerDoSpark.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    <li><a href="#value">Value</a></li>
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>Registers a parallel backend using the <code>foreach</code> package.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>registerDoSpark</span>(<span class='no'>spark_conn</span>, <span class='no'>...</span>)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>spark_conn</td>
+      <td><p>spark connection to use</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>additional options for sparklyr parallel backend
+(currently only the only valid option is nocompile = T, F)</p></td>
+    </tr>
+    </table>
+
+    <h2 id="value">Value</h2>
+
+    <p>None</p>
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+<span class='fu'>registerDoSpark</span>(<span class='no'>sc</span>, <span class='kw'>nocompile</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+}</div></code></pre></div>
+
+    </div>
+
+    </div>
+
+
+
+
