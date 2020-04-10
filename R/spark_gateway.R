@@ -1,3 +1,5 @@
+#' @include shell_connection.R
+
 master_is_gateway <- function(master) {
   length(grep("^(sparklyr://)?[^:]+:[0-9]+(/[0-9]+)?$", master)) > 0
 }

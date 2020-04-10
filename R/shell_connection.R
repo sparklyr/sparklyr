@@ -552,6 +552,17 @@ print_jobj.spark_shell_connection <- function(sc, jobj, ...) {
     info <- jobj_info(jobj)
     fmt <- "<jobj[%s]>\n  %s\n  %s\n"
     cat(sprintf(fmt, jobj$id, info$class, info$repr))
+    if (identical(info$class, "org.apache.spark.SparkContext")) {
+      spark_context_fmt <- "\n  appName: %s\n  master: %s\n  files: %s\n  jars:  %s\n"
+      quote_str <- function(str) paste0("'", str, "'")
+      cat(sprintf(
+        spark_context_fmt,
+        invoke(jobj, "appName"),
+        invoke(jobj, "master"),
+        invoke(jobj, "%>%", list("files"), list("mkString", " ")),
+        invoke(jobj, "%>%", list("jars"), list("mkString", " "))
+      ))
+    }
   } else {
     fmt <- "<jobj[%s]>\n  <detached>"
     cat(sprintf(fmt, jobj$id))
