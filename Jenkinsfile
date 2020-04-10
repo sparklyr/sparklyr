@@ -70,8 +70,10 @@ pipeline {
         always {
             // sh "databricks clusters delete --cluster-id ${clusterId}"
             // sh """dbfs rm -r dbfs:/tmp/data"""
-            if (env.CHANGE_ID) {
-                def comment = pullRequest.comment('DID NOT FAIL')
+            script {
+                if (env.CHANGE_ID) {
+                    def comment = pullRequest.comment('DID NOT FAIL')
+                }
             }
 
         }
