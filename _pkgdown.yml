@@ -235,7 +235,7 @@ reference:
     - register_extension
     - spark_compilation_spec
     - spark_default_compilation_spec
-    - spark_connection
+    - spark_connections
     - spark_context
     - spark_context_config
     - spark_dataframe
