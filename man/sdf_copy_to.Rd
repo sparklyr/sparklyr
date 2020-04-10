@@ -5,9 +5,9 @@
 \alias{sdf_import}
 \title{Copy an Object into Spark}
 \usage{
-sdf_copy_to(sc, x, name, memory, repartition, overwrite, ...)
+sdf_copy_to(sc, x, name, memory, repartition, overwrite, struct_columns, ...)
 
-sdf_import(x, sc, name, memory, repartition, overwrite, ...)
+sdf_import(x, sc, name, memory, repartition, overwrite, struct_columns, ...)
 }
 \arguments{
 \item{sc}{The associated Spark connection.}
@@ -24,6 +24,15 @@ partitioning.}
 
 \item{overwrite}{Boolean; overwrite a pre-existing table with the name \code{name}
 if one already exists?}
+
+\item{struct_columns}{(only supported with Spark 2.4.0 or higher) A list of
+columns from the source data frame that should be converted to Spark SQL
+StructType columns.
+The source columns can contain either json strings or nested lists.
+All rows within each source column should have identical schemas (because
+otherwise the conversion result will contain unexpected null values or
+missing values as Spark currently does not support schema discovery on
+individual rows within a struct column).}
 
 \item{...}{Optional arguments, passed to implementing methods.}
 }
@@ -47,8 +56,10 @@ sdf_copy_to(sc, iris)
 
 }
 \seealso{
-Other Spark data frames: \code{\link{sdf_random_split}},
-  \code{\link{sdf_register}}, \code{\link{sdf_sample}},
-  \code{\link{sdf_sort}}
+Other Spark data frames: 
+\code{\link{sdf_random_split}()},
+\code{\link{sdf_register}()},
+\code{\link{sdf_sample}()},
+\code{\link{sdf_sort}()}
 }
 \concept{Spark data frames}

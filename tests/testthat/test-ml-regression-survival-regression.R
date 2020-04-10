@@ -1,5 +1,6 @@
 context("ml regression - aft survival regression")
 
+skip_databricks_connect()
 test_that("ml_aft_survival_regression() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

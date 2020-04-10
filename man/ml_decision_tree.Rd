@@ -7,34 +7,73 @@
 \alias{ml_decision_tree_regressor}
 \title{Spark ML -- Decision Trees}
 \usage{
-ml_decision_tree_classifier(x, formula = NULL, max_depth = 5,
-  max_bins = 32, min_instances_per_node = 1, min_info_gain = 0,
-  impurity = "gini", seed = NULL, thresholds = NULL,
-  cache_node_ids = FALSE, checkpoint_interval = 10,
-  max_memory_in_mb = 256, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
+ml_decision_tree_classifier(
+  x,
+  formula = NULL,
+  max_depth = 5,
+  max_bins = 32,
+  min_instances_per_node = 1,
+  min_info_gain = 0,
+  impurity = "gini",
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10,
+  max_memory_in_mb = 256,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
   probability_col = "probability",
   raw_prediction_col = "rawPrediction",
-  uid = random_string("decision_tree_classifier_"), ...)
+  uid = random_string("decision_tree_classifier_"),
+  ...
+)
 
-ml_decision_tree(x, formula = NULL, type = c("auto", "regression",
-  "classification"), features_col = "features", label_col = "label",
-  prediction_col = "prediction", variance_col = NULL,
+ml_decision_tree(
+  x,
+  formula = NULL,
+  type = c("auto", "regression", "classification"),
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  variance_col = NULL,
   probability_col = "probability",
-  raw_prediction_col = "rawPrediction", checkpoint_interval = 10L,
-  impurity = "auto", max_bins = 32L, max_depth = 5L,
-  min_info_gain = 0, min_instances_per_node = 1L, seed = NULL,
-  thresholds = NULL, cache_node_ids = FALSE, max_memory_in_mb = 256L,
-  uid = random_string("decision_tree_"), response = NULL,
-  features = NULL, ...)
+  raw_prediction_col = "rawPrediction",
+  checkpoint_interval = 10L,
+  impurity = "auto",
+  max_bins = 32L,
+  max_depth = 5L,
+  min_info_gain = 0,
+  min_instances_per_node = 1L,
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256L,
+  uid = random_string("decision_tree_"),
+  response = NULL,
+  features = NULL,
+  ...
+)
 
-ml_decision_tree_regressor(x, formula = NULL, max_depth = 5,
-  max_bins = 32, min_instances_per_node = 1, min_info_gain = 0,
-  impurity = "variance", seed = NULL, cache_node_ids = FALSE,
-  checkpoint_interval = 10, max_memory_in_mb = 256,
-  variance_col = NULL, features_col = "features",
-  label_col = "label", prediction_col = "prediction",
-  uid = random_string("decision_tree_regressor_"), ...)
+ml_decision_tree_regressor(
+  x,
+  formula = NULL,
+  max_depth = 5,
+  max_bins = 32,
+  min_instances_per_node = 1,
+  min_info_gain = 0,
+  impurity = "variance",
+  seed = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10,
+  max_memory_in_mb = 256,
+  variance_col = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("decision_tree_regressor_"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -153,16 +192,17 @@ ml_multiclass_classification_evaluator(pred)
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
 
-Other ml algorithms: \code{\link{ml_aft_survival_regression}},
-  \code{\link{ml_gbt_classifier}},
-  \code{\link{ml_generalized_linear_regression}},
-  \code{\link{ml_isotonic_regression}},
-  \code{\link{ml_linear_regression}},
-  \code{\link{ml_linear_svc}},
-  \code{\link{ml_logistic_regression}},
-  \code{\link{ml_multilayer_perceptron_classifier}},
-  \code{\link{ml_naive_bayes}},
-  \code{\link{ml_one_vs_rest}},
-  \code{\link{ml_random_forest_classifier}}
+Other ml algorithms: 
+\code{\link{ml_aft_survival_regression}()},
+\code{\link{ml_gbt_classifier}()},
+\code{\link{ml_generalized_linear_regression}()},
+\code{\link{ml_isotonic_regression}()},
+\code{\link{ml_linear_regression}()},
+\code{\link{ml_linear_svc}()},
+\code{\link{ml_logistic_regression}()},
+\code{\link{ml_multilayer_perceptron_classifier}()},
+\code{\link{ml_naive_bayes}()},
+\code{\link{ml_one_vs_rest}()},
+\code{\link{ml_random_forest_classifier}()}
 }
 \concept{ml algorithms}

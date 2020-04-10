@@ -53,20 +53,25 @@ ml_random_forest_classifier.spark_connection <- function(x, formula = NULL, num_
     features_col = .args[["features_col"]], label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]], probability_col = .args[["probability_col"]],
     raw_prediction_col = .args[["raw_prediction_col"]]
-  ) %>%
-    invoke("setCheckpointInterval", .args[["checkpoint_interval"]]) %>%
-    invoke("setMaxBins", .args[["max_bins"]]) %>%
-    invoke("setMaxDepth", .args[["max_depth"]]) %>%
-    invoke("setMinInfoGain", .args[["min_info_gain"]]) %>%
-    invoke("setMinInstancesPerNode", .args[["min_instances_per_node"]]) %>%
-    invoke("setCacheNodeIds", .args[["cache_node_ids"]]) %>%
-    invoke("setMaxMemoryInMB", .args[["max_memory_in_mb"]]) %>%
-    invoke("setNumTrees", .args[["num_trees"]]) %>%
-    invoke("setSubsamplingRate", .args[["subsampling_rate"]]) %>%
-    invoke("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]]) %>%
-    invoke("setImpurity", .args[["impurity"]]) %>%
-    jobj_set_param("setThresholds", .args[["thresholds"]]) %>%
-    jobj_set_param("setSeed", .args[["seed"]])
+  ) %>% (
+    function(obj) {
+      do.call(invoke,
+              c(obj, "%>%", Filter(function(x) !is.null(x),
+                              list(
+                                   list("setCheckpointInterval", .args[["checkpoint_interval"]]),
+                                   list("setMaxBins", .args[["max_bins"]]),
+                                   list("setMaxDepth", .args[["max_depth"]]),
+                                   list("setMinInfoGain", .args[["min_info_gain"]]),
+                                   list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
+                                   list("setCacheNodeIds", .args[["cache_node_ids"]]),
+                                   list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
+                                   list("setNumTrees", .args[["num_trees"]]),
+                                   list("setSubsamplingRate", .args[["subsampling_rate"]]),
+                                   list("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]]),
+                                   list("setImpurity", .args[["impurity"]]),
+                                   jobj_set_param_helper(obj, "setThresholds", .args[["thresholds"]]),
+                                   jobj_set_param_helper(obj, "setSeed", .args[["seed"]])))))
+    })
 
   new_ml_random_forest_classifier(jobj)
 }

@@ -43,8 +43,7 @@ sdf_fast_bind_cols <- function(...) {
 sdf_debug_string <- function(x, print = TRUE) {
   debug_string <- x %>%
     spark_dataframe() %>%
-    invoke("rdd") %>%
-    invoke("toDebugString")
+    invoke("%>%", list("rdd"), list("toDebugString"))
 
   if (print)
     cat(debug_string)

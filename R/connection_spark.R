@@ -123,6 +123,7 @@ spark_connect <- function(master,
   # so if there is no GUID, then method = "databricks" must refer to Databricks Connect
   if (method == "databricks" && no_databricks_guid()) {
     method <- "databricks-connect"
+    master <- "local"
   }
   hadoop_version <- list(...)$hadoop_version
 
@@ -202,11 +203,8 @@ spark_connect <- function(master,
                                spark_master_is_yarn_cluster(master, config)),
                              extensions = extensions,
                              batch = NULL)
-    if (method == "qubole") {
-      scon$method <- "qubole"
-    }
-    if (method == "databricks-connect") {
-      scon$method <- "databricks-connect"
+    if (method != "shell") {
+      scon$method <- method
     }
   } else if (method == "livy") {
     scon <- livy_connection(master = master,
@@ -275,6 +273,10 @@ spark_connect <- function(master,
       Sys.sleep(1)
     }
   }, onexit = TRUE)
+
+  if (method == "databricks-connect") {
+    spark_context(scon) %>% invoke("setLocalProperty", "spark.databricks.service.client.type", "sparklyr")
+  }
 
   # add to our internal list
   spark_connections_add(scon)
@@ -347,7 +349,7 @@ spark_log_file <- function(sc) {
 
 # TRUE if the Spark Connection is a local install
 spark_connection_is_local <- function(sc) {
-  spark_master_is_local(sc$master)
+  spark_master_is_local(sc$master) && !identical(sc$method, "databricks-connect")
 }
 
 spark_master_is_local <- function(master) {

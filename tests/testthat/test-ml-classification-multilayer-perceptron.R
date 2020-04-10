@@ -1,5 +1,6 @@
 context("ml classification - multilayer perceptron")
 
+skip_databricks_connect()
 test_that("ml_multilayer_perceptron_classifier() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

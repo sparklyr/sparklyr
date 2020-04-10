@@ -1,5 +1,6 @@
 context("yarn ui")
 
+skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("'spark_connection_yarn_ui()' can build a default URL", {

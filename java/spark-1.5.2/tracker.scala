@@ -1,34 +1,34 @@
 package sparklyr
 
-import scala.collection.mutable.{Map, SynchronizedMap, HashMap}
+import java.util.NoSuchElementException
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import scala.language.existentials
 
 class JVMObjectTracker {
 
-  val objMap = new HashMap[String, Object] with
-                             SynchronizedMap[String, Object]
+  val objMap = new ConcurrentHashMap[String, Object]
 
-  var objCounter: Int = 0
-  val lock: AnyRef = new Object()
+  val objCounter = new AtomicInteger()
 
   def getObject(id: String): Object = {
-    objMap(id)
-  }
-
-  def get(id: String): Option[Object] = {
-    objMap.get(id)
-  }
-
-  def put(obj: Object): String = {
-    lock.synchronized {
-      val objId = objCounter.toString
-      objCounter = objCounter + 1
-      objMap.put(objId, obj)
-      objId
+    Option(objMap.get(id)) match {
+      case Some(obj) => obj
+      case None => throw new NoSuchElementException()
     }
   }
 
+  def get(id: String): Option[Object] = {
+    Option(objMap.get(id))
+  }
+
+  def put(obj: Object): String = {
+    val objId = objCounter.getAndAdd(1).toString
+    objMap.put(objId, obj)
+    objId
+  }
+
   def remove(id: String): Option[Object] = {
-    objMap.remove(id)
+    Option(objMap.remove(id))
   }
 }

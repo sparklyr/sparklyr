@@ -1,5 +1,6 @@
 context("broom-pca")
 
+skip_databricks_connect()
 test_that("pca.tidy() works", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")

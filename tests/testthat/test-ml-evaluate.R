@@ -1,5 +1,6 @@
 context("ml - evaluate")
 
+skip_databricks_connect()
 test_that("ml_evaluate() works for logistic regression", {
   test_requires_version("2.0.0", "multiclass logreg requires spark 2+")
   sc <- testthat_spark_connection()

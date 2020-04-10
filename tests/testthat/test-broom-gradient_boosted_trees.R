@@ -1,10 +1,17 @@
 context("broom-gradient_boosted_trees")
 
+skip_databricks_connect()
 test_that("gradient_boosted_trees.tidy() works", {
-  skip_on_spark_master()
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
+
+  get_importance <- function(tbl, feature_name) {
+    row <- tbl %>%
+      dplyr::filter(feature == feature_name) %>%
+      select(importance)
+    row[["importance"]]
+  }
 
   # for classification
   td1 <- iris_tbl %>%
@@ -14,7 +21,13 @@ test_that("gradient_boosted_trees.tidy() works", {
 
   check_tidy(td1, exp.row = 2,
              exp.names = c("feature", "importance"))
-  expect_equal(td1$importance, c(0.594, 0.406), tolerance = 0.05)
+  if (spark_version(sc) < "3.0.0") {
+    expect_equal(get_importance(tbl = td1, "Petal_Length"), 0.594, tolerance = 0.05)
+    expect_equal(get_importance(tbl = td1, "Sepal_Length"), 0.406, tolerance = 0.05)
+  } else {
+    expect_equal(get_importance(tbl = td1, "Petal_Length"), 0.819, tolerance = 0.05)
+    expect_equal(get_importance(tbl = td1, "Sepal_Length"), 0.181, tolerance = 0.05)
+  }
 
   # for regression
   td2 <- iris_tbl %>%
@@ -23,8 +36,13 @@ test_that("gradient_boosted_trees.tidy() works", {
 
   check_tidy(td2, exp.row = 2,
              exp.names = c("feature", "importance"))
-  expect_equal(td2$importance, c(0.607, 0.393), tolerance = 0.001)
-
+  if (spark_version(sc) < "3.0.0") {
+    expect_equal(get_importance(tbl = td2, "Petal_Length"), 0.607, tolerance = 0.001)
+    expect_equal(get_importance(tbl = td2, "Petal_Width"), 0.393, tolerance = 0.001)
+  } else {
+    expect_equal(get_importance(tbl = td2, "Petal_Length"), 0.798, tolerance = 0.001)
+    expect_equal(get_importance(tbl = td2, "Petal_Width"), 0.202, tolerance = 0.001)
+  }
 })
 
 test_that("gradient_boosted_trees.augment() works", {

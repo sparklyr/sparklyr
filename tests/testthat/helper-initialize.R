@@ -1,6 +1,10 @@
 library(sparklyr)
 library(dplyr)
 
+get_spark_warehouse_dir <- function() {
+  ifelse(.Platform$OS.type == "windows", Sys.getenv("TEMP"), "/tmp")
+}
+
 spark_install_winutils <- function(version) {
   hadoop_version <- if (version < "2.0.0") "2.6" else "2.7"
   spark_dir <- paste("spark-", version, "-bin-hadoop", hadoop_version, sep = "")
@@ -89,6 +93,7 @@ testthat_shell_connection <- function(method = "shell") {
 
     config[["sparklyr.shell.driver-memory"]] <- "3G"
     config[["sparklyr.apply.env.foo"]] <- "env-test"
+    config[["spark.sql.warehouse.dir"]] <- get_spark_warehouse_dir()
 
     sc <- spark_connect(master = "local", method = method, version = version, config = config)
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
@@ -153,11 +158,13 @@ check_tidy <- function(o, exp.row = NULL, exp.col = NULL, exp.names = NULL) {
   }
 }
 
-sdf_query_plan <- function(x) {
+sdf_query_plan <- function(x, plan_type=c("optimizedPlan", "analyzed")) {
+  plan_type <- match.arg(plan_type)
+
   x %>%
     spark_dataframe() %>%
     invoke("queryExecution") %>%
-    invoke("optimizedPlan") %>%
+    invoke(plan_type) %>%
     invoke("toString") %>%
     strsplit("\n") %>%
     unlist()
@@ -240,7 +247,8 @@ testthat_livy_connection <- function() {
       config = list(
         sparklyr.verbose = TRUE,
         sparklyr.connect.timeout = 120,
-        sparklyr.log.invoke = "cat"
+        sparklyr.log.invoke = "cat",
+        spark.sql.warehouse.dir = get_spark_warehouse_dir()
       ),
       version = version,
       sources = TRUE
@@ -373,7 +381,28 @@ skip_on_spark_master <- function() {
   if (is_on_master) skip("Test skipped on spark master")
 }
 
+is_testing_databricks_connect <- function() {
+  Sys.getenv("TEST_DATABRICKS_CONNECT") == "true"
+}
+
 skip_unless_databricks_connect <- function() {
-  if (Sys.getenv("TEST_DATABRICKS_CONNECT") != "true")
+  if (!is_testing_databricks_connect())
     skip("Test only runs on Databricks Connect")
+}
+
+skip_databricks_connect <- function() {
+  if (is_testing_databricks_connect())
+    skip("Test is skipped on Databricks Connect")
+}
+
+random_table_name <- function(prefix) {
+  paste0(prefix, paste0(floor(runif(10, 0, 10)), collapse = ""))
+}
+
+get_simple_data_path <- function(file_name) {
+  if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true")
+    sample_data_path <- paste("dbfs:/tmp/data/", file_name, sep="")
+  else
+    sample_data_path <- dir(getwd(), recursive = TRUE, pattern = file_name, full.names = TRUE)
+  sample_data_path
 }

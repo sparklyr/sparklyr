@@ -1,5 +1,6 @@
 context("ml feature one hot encoder")
 
+skip_databricks_connect()
 test_that("ft_one_hot_encoder() default params", {
   test_requires_version("3.0.0")
   sc <- testthat_spark_connection()

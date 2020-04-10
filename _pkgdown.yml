@@ -28,6 +28,7 @@ reference:
   - title: Spark Data
     contents:
     - spark_read_csv
+    - spark_read_delta
     - spark_read_jdbc
     - spark_read_json
     - spark_read_parquet
@@ -39,6 +40,7 @@ reference:
     - spark_write_orc
     - spark_write_text
     - spark_write_csv
+    - spark_write_delta
     - spark_write_jdbc
     - spark_write_json
     - spark_write_parquet
@@ -233,7 +235,7 @@ reference:
     - register_extension
     - spark_compilation_spec
     - spark_default_compilation_spec
-    - spark_connection
+    - spark_connections
     - spark_context
     - spark_context_config
     - spark_dataframe
@@ -247,6 +249,7 @@ reference:
     - spark_apply
     - spark_apply_bundle
     - spark_apply_log
+    - registerDoSpark
   - title: Livy
     contents:
     - livy_available_versions

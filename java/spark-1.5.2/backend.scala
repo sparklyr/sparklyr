@@ -2,12 +2,11 @@ package sparklyr
 
 import java.io.{DataInputStream, DataOutputStream}
 import java.io.{File, FileOutputStream, IOException, FileWriter}
-import java.net.{InetAddress, InetSocketAddress, ServerSocket, Socket}
+import java.net.{InetAddress, InetSocketAddress, NetworkInterface, ServerSocket, Socket}
 import java.util.concurrent.TimeUnit
 
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-import org.apache.spark.sql.hive.HiveContext
 
 import scala.util.Try
 
@@ -76,7 +75,6 @@ class Backend() {
   private[this] var batchFile: String = ""
 
   private[this] var sc: SparkContext = null
-  private[this] var hc: HiveContext = null
 
   private[this] var sessionsMap: Map[Int, Int] = Map()
 
@@ -323,6 +321,21 @@ class Backend() {
 
   def bind(): Unit = {
     logger.log("is waiting for sparklyr client to connect to port " + port)
+    try {
+      val interface = NetworkInterface.getByInetAddress(gatewayServerSocket.getInetAddress)
+      if (!interface.isUp) {
+        logger.logError("Network interface of gateway server socket (" +
+          interface.getName + ") is not up.\n\n'ifconfig " + interface.getName + " up' (or " +
+          "'netsh interface set interface name=" + interface.getName + " admin=enabled' or " +
+          "similar in Windows) must be run to bring up this network interface."
+        )
+        System.exit(1)
+      }
+    } catch {
+      // log exception as warning only
+      case e: Throwable =>
+        logger.logWarning("Failed to get network interface of gateway server socket" + e.getMessage())
+    }
     val gatewaySocket = gatewayServerSocket.accept()
 
     oneConnection = true

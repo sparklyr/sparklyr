@@ -42,17 +42,13 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
           serializer.writeObject(dos, args(0))
         case "rm" =>
           try {
-            val t = serializer.readObjectType(dis)
-            if (t != 'c') throw new IllegalArgumentException("object removal expects a string")
-            val objToRemove = serializer.readString(dis)
-            tracker.remove(objToRemove)
-            serializer.writeInt(dos, 0)
-            serializer.writeObject(dos, null)
+            if (serializer.readObjectType(dis) != 'a' || serializer.readObjectType(dis) != 'c')
+              throw new IllegalArgumentException("object removal expects a string array")
+            val objsToRemove = serializer.readStringArr(dis)
+            for (obj <- objsToRemove) tracker.remove(obj)
           } catch {
             case e: Exception =>
-              logger.logError(s"failed to remove $objId", e)
-              serializer.writeInt(dos, -1)
-              serializer.writeString(dos, s"Removing $objId failed: ${e.getMessage}")
+              logger.logError("failed to remove objects", e)
           }
         case "getHostContext" =>
           serializer.writeInt(dos, 0)
@@ -94,7 +90,7 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
     logger: Logger): Unit = {
       var obj: Object = null
       try {
-        val cls = if (isStatic) {
+        var cls = if (isStatic) {
           if (classMap != null && classMap.contains(objId)) {
             obj = classMap(objId)
             classMap(objId).getClass.asInstanceOf[Class[_]]
@@ -119,8 +115,26 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
         }
 
         val args = readArgs(numArgs, dis)
-        val res = invoke.invoke(cls, objId, obj, methodName, args, logger)
+        var res: AnyRef = null
 
+        if (methodName == "%>%") {
+          // attempt to invoke a chain of methods
+          res = obj
+          (0 until args.length).map { i =>
+            val arr = args(i).asInstanceOf[Array[Object]]
+            res = invoke.invoke(
+              cls,
+              objId,
+              /*obj=*/res,
+              /*methodName=*/arr(0).asInstanceOf[String],
+              /*args=*/arr.slice(1, arr.length).asInstanceOf[Array[Object]],
+              logger
+            )
+            if (i + 1 != args.length) cls = res.getClass
+          }
+        } else {
+          res = invoke.invoke(cls, objId, obj, methodName, args, logger)
+        }
         serializer.writeInt(dos, 0)
         serializer.writeObject(dos, res.asInstanceOf[AnyRef])
       } catch {

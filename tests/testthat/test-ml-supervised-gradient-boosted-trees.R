@@ -1,5 +1,6 @@
 context("ml supervised - gradient boosted trees")
 
+skip_databricks_connect()
 test_that("gbt runs successfully when all args specified", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")

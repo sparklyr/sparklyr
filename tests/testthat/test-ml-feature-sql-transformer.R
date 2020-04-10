@@ -1,5 +1,6 @@
 context("ml feature - sql transformer")
 
+skip_databricks_connect()
 test_that("ft_sql_transformer() param setting", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

@@ -1,9 +1,12 @@
 sparklyr: R interface for Apache Spark
 ================
 
-[![Build
+![Github workflow
+status](https://github.com/sparklyr/sparklyr/workflows/CI/badge.svg)
+[![Travis build
 Status](https://travis-ci.org/sparklyr/sparklyr.svg?branch=master)](https://travis-ci.org/sparklyr/sparklyr)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/qjosuhlp55nwv42y?svg=true)](https://ci.appveyor.com/project/javierluraschi71148/sparklyr)
+[![AppVeyor build
+status](https://ci.appveyor.com/api/projects/status/qjosuhlp55nwv42y?svg=true)](https://ci.appveyor.com/project/javierluraschi71148/sparklyr)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr)
 <a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a>
 [![codecov](https://codecov.io/gh/sparklyr/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/sparklyr/sparklyr)
@@ -91,9 +94,9 @@ install.packages(c("nycflights13", "Lahman"))
 
 ``` r
 library(dplyr)
-iris_tbl <- copy_to(sc, iris)
-flights_tbl <- copy_to(sc, nycflights13::flights, "flights")
-batting_tbl <- copy_to(sc, Lahman::Batting, "batting")
+iris_tbl <- copy_to(sc, iris, overwrite = TRUE)
+flights_tbl <- copy_to(sc, nycflights13::flights, "flights", overwrite = TRUE)
+batting_tbl <- copy_to(sc, Lahman::Batting, "batting", overwrite = TRUE)
 src_tbls(sc)
 ```
 
@@ -107,29 +110,28 @@ flights_tbl %>% filter(dep_delay == 2)
 ```
 
     ## # Source: spark<?> [?? x 19]
-    ##     year month   day dep_time sched_dep_time dep_delay arr_time
-    ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
-    ##  1  2013     1     1      517            515         2      830
-    ##  2  2013     1     1      542            540         2      923
-    ##  3  2013     1     1      702            700         2     1058
-    ##  4  2013     1     1      715            713         2      911
-    ##  5  2013     1     1      752            750         2     1025
-    ##  6  2013     1     1      917            915         2     1206
-    ##  7  2013     1     1      932            930         2     1219
-    ##  8  2013     1     1     1028           1026         2     1350
-    ##  9  2013     1     1     1042           1040         2     1325
-    ## 10  2013     1     1     1231           1229         2     1523
-    ## # … with more rows, and 12 more variables: sched_arr_time <int>,
-    ## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
-    ## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
-    ## #   minute <dbl>, time_hour <dttm>
+    ##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+    ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>          <int>
+    ##  1  2013     1     1      517            515         2      830            819
+    ##  2  2013     1     1      542            540         2      923            850
+    ##  3  2013     1     1      702            700         2     1058           1014
+    ##  4  2013     1     1      715            713         2      911            850
+    ##  5  2013     1     1      752            750         2     1025           1029
+    ##  6  2013     1     1      917            915         2     1206           1211
+    ##  7  2013     1     1      932            930         2     1219           1225
+    ##  8  2013     1     1     1028           1026         2     1350           1339
+    ##  9  2013     1     1     1042           1040         2     1325           1326
+    ## 10  2013     1     1     1231           1229         2     1523           1529
+    ## # … with more rows, and 11 more variables: arr_delay <dbl>, carrier <chr>,
+    ## #   flight <int>, tailnum <chr>, origin <chr>, dest <chr>, air_time <dbl>,
+    ## #   distance <dbl>, hour <dbl>, minute <dbl>, time_hour <dttm>
 
 [Introduction to dplyr](https://CRAN.R-project.org/package=dplyr)
 provides additional dplyr examples you can try. For example, consider
 the last example from the tutorial which plots data on flight delays:
 
 ``` r
-delay <- flights_tbl %>% 
+delay <- flights_tbl %>%
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
   filter(count > 20, dist < 2000, !is.na(delay)) %>%
@@ -167,14 +169,14 @@ batting_tbl %>%
     ##    <chr>      <int> <chr>  <int> <int> <int> <int>
     ##  1 aaronha01   1959 ML1      154   629   116   223
     ##  2 aaronha01   1963 ML1      161   631   121   201
-    ##  3 abadfe01    2012 HOU       37     7     0     1
-    ##  4 abbated01   1905 BSN      153   610    70   170
-    ##  5 abbated01   1904 BSN      154   579    76   148
-    ##  6 abbeych01   1894 WAS      129   523    95   164
-    ##  7 abbeych01   1895 WAS      133   516   102   142
-    ##  8 abbotji01   1999 MIL       20    21     0     2
-    ##  9 abnersh01   1992 CHA       97   208    21    58
-    ## 10 abnersh01   1990 SDN       91   184    17    45
+    ##  3 aaronto01   1962 ML1      141   334    54    77
+    ##  4 aaronto01   1968 ATL       98   283    21    69
+    ##  5 abadfe01    2012 HOU       37     7     0     1
+    ##  6 abbated01   1905 BSN      153   610    70   170
+    ##  7 abbated01   1904 BSN      154   579    76   148
+    ##  8 abbeych01   1894 WAS      129   523    95   164
+    ##  9 abbeych01   1895 WAS      133   516   102   142
+    ## 10 abbotda01   1890 TL2        3     7     0     1
     ## # … with more rows
 
 For additional documentation on using dplyr with Spark see the
@@ -226,7 +228,7 @@ between `mpg` and each of our features is linear.
 
 ``` r
 # copy mtcars into spark
-mtcars_tbl <- copy_to(sc, mtcars)
+mtcars_tbl <- copy_to(sc, mtcars, overwrite = TRUE)
 
 # transform our data set, and then partition into 'training', 'test'
 partitions <- mtcars_tbl %>%
@@ -241,9 +243,9 @@ fit
 ```
 
     ## Formula: mpg ~ wt + cyl
-    ## 
+    ##
     ## Coefficients:
-    ## (Intercept)          wt         cyl 
+    ## (Intercept)          wt         cyl
     ##   33.499452   -2.818463   -0.923187
 
 For linear regression models produced by Spark, we can use `summary()`
@@ -255,13 +257,13 @@ summary(fit)
 ```
 
     ## Deviance Residuals:
-    ##    Min     1Q Median     3Q    Max 
-    ## -1.752 -1.134 -0.499  1.296  2.282 
-    ## 
+    ##    Min     1Q Median     3Q    Max
+    ## -1.752 -1.134 -0.499  1.296  2.282
+    ##
     ## Coefficients:
-    ## (Intercept)          wt         cyl 
-    ##   33.499452   -2.818463   -0.923187 
-    ## 
+    ## (Intercept)          wt         cyl
+    ##   33.499452   -2.818463   -0.923187
+    ##
     ## R-Squared: 0.8274
     ## Root Mean Squared Error: 1.422
 
@@ -292,8 +294,8 @@ iris_json_tbl <- spark_read_json(sc, "iris_json", temp_json)
 src_tbls(sc)
 ```
 
-    ## [1] "batting"      "flights"      "iris"         "iris_csv"    
-    ## [5] "iris_json"    "iris_parquet" "mtcars"
+    ## [1] "batting"      "flights"      "iris"         "iris_csv"     "iris_json"
+    ## [6] "iris_parquet" "mtcars"
 
 ## Distributed R
 
@@ -310,16 +312,16 @@ spark_apply(iris_tbl, function(data) {
     ## # Source: spark<?> [?? x 4]
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1         6.49        4.89         2.79        1.59
-    ##  2         6.29        4.39         2.79        1.59
-    ##  3         6.09        4.59         2.69        1.59
-    ##  4         5.99        4.49         2.89        1.59
-    ##  5         6.39        4.99         2.79        1.59
-    ##  6         6.79        5.29         3.09        1.79
-    ##  7         5.99        4.79         2.79        1.69
-    ##  8         6.39        4.79         2.89        1.59
-    ##  9         5.79        4.29         2.79        1.59
-    ## 10         6.29        4.49         2.89        1.49
+    ##  1         6.54        4.94         2.84        1.64
+    ##  2         6.34        4.44         2.84        1.64
+    ##  3         6.14        4.64         2.74        1.64
+    ##  4         6.04        4.54         2.94        1.64
+    ##  5         6.44        5.04         2.84        1.64
+    ##  6         6.84        5.34         3.14        1.84
+    ##  7         6.04        4.84         2.84        1.74
+    ##  8         6.44        4.84         2.94        1.64
+    ##  9         5.84        4.34         2.84        1.64
+    ## 10         6.34        4.54         2.94        1.54
     ## # … with more rows
 
 You can also group by columns to perform an operation over each group of
@@ -337,12 +339,12 @@ spark_apply(
     ## # Source: spark<?> [?? x 6]
     ##   Species    term         estimate std.error statistic  p.value
     ##   <chr>      <chr>           <dbl>     <dbl>     <dbl>    <dbl>
-    ## 1 versicolor (Intercept)   -0.0843    0.161     -0.525 6.02e- 1
-    ## 2 versicolor Petal_Length   0.331     0.0375     8.83  1.27e-11
-    ## 3 virginica  (Intercept)    1.14      0.379      2.99  4.34e- 3
-    ## 4 virginica  Petal_Length   0.160     0.0680     2.36  2.25e- 2
-    ## 5 setosa     (Intercept)   -0.0482    0.122     -0.396 6.94e- 1
-    ## 6 setosa     Petal_Length   0.201     0.0826     2.44  1.86e- 2
+    ## 1 setosa     (Intercept)   -0.0482    0.122     -0.396 6.94e- 1
+    ## 2 setosa     Petal_Length   0.201     0.0826     2.44  1.86e- 2
+    ## 3 versicolor (Intercept)   -0.0843    0.161     -0.525 6.02e- 1
+    ## 4 versicolor Petal_Length   0.331     0.0375     8.83  1.27e-11
+    ## 5 virginica  (Intercept)    1.14      0.379      2.99  4.34e- 3
+    ## 6 virginica  Petal_Length   0.160     0.0680     2.36  2.25e- 2
 
 ## Extensions
 
@@ -356,14 +358,14 @@ Here’s a simple example that wraps a Spark text file line counting
 function with an R function:
 
 ``` r
-# write a CSV 
+# write a CSV
 tempfile <- tempfile(fileext = ".csv")
 write.csv(nycflights13::flights, tempfile, row.names = FALSE, na = "")
 
 # define an R interface to Spark line counting
 count_lines <- function(sc, path) {
-  spark_context(sc) %>% 
-    invoke("textFile", path, 1L) %>% 
+  spark_context(sc) %>%
+    invoke("textFile", path, 1L) %>%
       invoke("count")
 }
 
@@ -399,23 +401,22 @@ You can view the Spark web console using the `spark_web` function:
 spark_web(sc)
 ```
 
-You can show the log using the `spark_log`
-    function:
+You can show the log using the `spark_log` function:
 
 ``` r
 spark_log(sc, n = 10)
 ```
 
-    ## 19/12/09 12:42:58 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 70 (/var/folders/ks/wm_bx4cn70s6h0r5vgqpsldm0000gn/T//Rtmp5ypEuH/file1572146a43439.csv MapPartitionsRDD[336] at textFile at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
-    ## 19/12/09 12:42:58 INFO TaskSchedulerImpl: Adding task set 70.0 with 1 tasks
-    ## 19/12/09 12:42:58 INFO TaskSetManager: Starting task 0.0 in stage 70.0 (TID 94, localhost, executor driver, partition 0, PROCESS_LOCAL, 7946 bytes)
-    ## 19/12/09 12:42:58 INFO Executor: Running task 0.0 in stage 70.0 (TID 94)
-    ## 19/12/09 12:42:58 INFO HadoopRDD: Input split: file:/var/folders/ks/wm_bx4cn70s6h0r5vgqpsldm0000gn/T/Rtmp5ypEuH/file1572146a43439.csv:0+33313106
-    ## 19/12/09 12:42:58 INFO Executor: Finished task 0.0 in stage 70.0 (TID 94). 832 bytes result sent to driver
-    ## 19/12/09 12:42:58 INFO TaskSetManager: Finished task 0.0 in stage 70.0 (TID 94) in 181 ms on localhost (executor driver) (1/1)
-    ## 19/12/09 12:42:58 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool 
-    ## 19/12/09 12:42:58 INFO DAGScheduler: ResultStage 70 (count at NativeMethodAccessorImpl.java:0) finished in 0.187 s
-    ## 19/12/09 12:42:58 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.199992 s
+    ## 20/04/07 12:38:14 INFO ContextCleaner: Cleaned accumulator 1919
+    ## 20/04/07 12:38:14 INFO ContextCleaner: Cleaned accumulator 1980
+    ## 20/04/07 12:38:14 INFO ContextCleaner: Cleaned accumulator 1871
+    ## 20/04/07 12:38:14 INFO ContextCleaner: Cleaned accumulator 2079
+    ## 20/04/07 12:38:14 INFO ContextCleaner: Cleaned accumulator 1879
+    ## 20/04/07 12:38:14 INFO Executor: Finished task 0.0 in stage 70.0 (TID 78). 875 bytes result sent to driver
+    ## 20/04/07 12:38:14 INFO TaskSetManager: Finished task 0.0 in stage 70.0 (TID 78) in 322 ms on localhost (executor driver) (1/1)
+    ## 20/04/07 12:38:14 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool
+    ## 20/04/07 12:38:14 INFO DAGScheduler: ResultStage 70 (count at NativeMethodAccessorImpl.java:0) finished in 0.327 s
+    ## 20/04/07 12:38:14 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.331901 s
 
 Finally, we disconnect from Spark:
 
@@ -443,14 +444,12 @@ instances:
 
 Once you’ve connected to Spark you’ll be able to browse the tables
 contained within the Spark cluster and preview Spark DataFrames using
-the standard RStudio data
-viewer:
+the standard RStudio data viewer:
 
 <img src="tools/readme/spark-dataview.png" class="screenshot" width=639 />
 
 You can also connect to Spark through [Livy](http://livy.io) through a
-new connection
-dialog:
+new connection dialog:
 
 <img src="tools/readme/spark-connect-livy.png" class="screenshot" width=389 />
 
@@ -478,11 +477,11 @@ library(dplyr)
 library(h2o)
 
 sc <- spark_connect(master = "local", version = "2.3.2")
-mtcars_tbl <- copy_to(sc, mtcars, "mtcars")
+mtcars_tbl <- copy_to(sc, mtcars, "mtcars", overwrite = TRUE)
 
 mtcars_h2o <- as_h2o_frame(sc, mtcars_tbl, strict_version_check = FALSE)
 
-mtcars_glm <- h2o.glm(x = c("wt", "cyl"), 
+mtcars_glm <- h2o.glm(x = c("wt", "cyl"),
                       y = "mpg",
                       training_frame = mtcars_h2o,
                       lambda_search = TRUE)
@@ -494,9 +493,9 @@ mtcars_glm
 
     ## Model Details:
     ## ==============
-    ## 
+    ##
     ## H2ORegressionModel: glm
-    ## Model ID:  GLM_model_R_1527265202599_1 
+    ## Model ID:  GLM_model_R_1527265202599_1
     ## GLM Model: summary
     ##     family     link                              regularization
     ## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
@@ -506,16 +505,16 @@ mtcars_glm
     ## 1                          2                           2
     ##   number_of_iterations                                training_frame
     ## 1                  100 frame_rdd_31_ad5c4e88ec97eb8ccedae9475ad34e02
-    ## 
+    ##
     ## Coefficients: glm coefficients
     ##       names coefficients standardized_coefficients
     ## 1 Intercept    38.941654                 20.090625
     ## 2       cyl    -1.468783                 -2.623132
     ## 3        wt    -3.034558                 -2.969186
-    ## 
+    ##
     ## H2ORegressionMetrics: glm
     ## ** Reported on training data. **
-    ## 
+    ##
     ## MSE:  6.017684
     ## RMSE:  2.453097
     ## MAE:  1.940985
@@ -543,7 +542,7 @@ an existing service running Livy. Otherwise, to test `livy` in your
 local environment, you can install it and run it locally as follows:
 
 ``` r
-livy_install(version = "2.4.0")
+livy_install()
 ```
 
 ``` r
@@ -552,27 +551,26 @@ livy_service_start()
 
 To connect, use the Livy service address as `master` and `method =
 "livy"` in `spark_connect`. Once connection completes, use `sparklyr` as
-usual, for
-instance:
+usual, for instance:
 
 ``` r
 sc <- spark_connect(master = "http://localhost:8998", method = "livy", version = "2.4.0")
-copy_to(sc, iris)
+copy_to(sc, iris, overwrite = TRUE)
 ```
 
     ## # Source: spark<iris> [?? x 5]
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
-    ##           <dbl>       <dbl>        <dbl>       <dbl> <chr>  
-    ##  1          5.1         3.5          1.4         0.2 setosa 
-    ##  2          4.9         3            1.4         0.2 setosa 
-    ##  3          4.7         3.2          1.3         0.2 setosa 
-    ##  4          4.6         3.1          1.5         0.2 setosa 
-    ##  5          5           3.6          1.4         0.2 setosa 
-    ##  6          5.4         3.9          1.7         0.4 setosa 
-    ##  7          4.6         3.4          1.4         0.3 setosa 
-    ##  8          5           3.4          1.5         0.2 setosa 
-    ##  9          4.4         2.9          1.4         0.2 setosa 
-    ## 10          4.9         3.1          1.5         0.1 setosa 
+    ##           <dbl>       <dbl>        <dbl>       <dbl> <chr>
+    ##  1          5.1         3.5          1.4         0.2 setosa
+    ##  2          4.9         3            1.4         0.2 setosa
+    ##  3          4.7         3.2          1.3         0.2 setosa
+    ##  4          4.6         3.1          1.5         0.2 setosa
+    ##  5          5           3.6          1.4         0.2 setosa
+    ##  6          5.4         3.9          1.7         0.4 setosa
+    ##  7          4.6         3.4          1.4         0.3 setosa
+    ##  8          5           3.4          1.5         0.2 setosa
+    ##  9          4.4         2.9          1.4         0.2 setosa
+    ## 10          4.9         3.1          1.5         0.1 setosa
     ## # … with more rows
 
 ``` r
@@ -592,5 +590,50 @@ connect as:
 ``` r
 config <- livy_config(username="<username>", password="<password>")
 sc <- spark_connect(master = "<address>", method = "livy", config = config)
+spark_disconnect(sc)
+```
+
+## Connecting through Databricks Connect
+
+[Databricks
+Connect](https://docs.databricks.com/dev-tools/databricks-connect.html#databricks-connect)
+allows you to connect sparklyr to a remote Databricks Cluster. You can
+install [Databricks Connect Python
+pakcage](https://pypi.org/project/databricks-connect/) and use it to
+submit Spark jobs written in sparklyr APIs and have them execute
+remotely on a Databricks cluster instead of in the local Spark session.
+
+To use sparklyr with Databricks Connect first launch a Cluster on
+Databricks. Then follow [these
+instructions](https://docs.databricks.com/dev-tools/databricks-connect.html#client-setup)
+to setup the client:
+
+1.  Make sure pyspark is not installed
+2.  Install the latest version of Databricks Connect python package.
+3.  Run `databricks-connect configure` and provide the configuration
+    information
+      - Databricks account URL of the form
+        `ttps://<account>.cloud.databricks.com`.
+      - [User
+        token](https://docs.databricks.com/dev-tools/api/latest/authentication.html#token-management)
+      - Cluster ID
+      - Port (default port number is `15001`)
+
+To configure `sparklyr` with Databricks Connect, set the following
+environment variables:
+
+``` bash
+export SPARK_VERSION=2.4.4
+export SPARK_HOME=`databricks-connect get-spark-home`
+```
+
+Now simply create a spark connection as follows
+
+``` r
+sc <- spark_connect(method = "databricks")
+copy_to(sc, iris, overwrite = TRUE)
+```
+
+``` r
 spark_disconnect(sc)
 ```

@@ -11,7 +11,7 @@ pipeline {
                     def uuid = UUID.randomUUID().toString()
                     def clusterParams = [
                         cluster_name: "jenkins-${uuid}",
-                        spark_version: "6.2.x-scala2.11",
+                        spark_version: "6.3.x-scala2.11",
                         node_type_id: "i3.xlarge",
                         num_workers: 1,
                         autotermination_minutes: 10,
@@ -50,17 +50,23 @@ pipeline {
                 }
             }
         }
+        stage("Prepare the test data") {
+            steps {
+                sh """dbfs mkdirs dbfs:/tmp/data"""
+                sh """dbfs cp -r --overwrite tests/testthat/data dbfs:/tmp/data"""
+            }
+        }
         stage("Run tests") {
             steps {
                 sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)'"""
-                //sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)'"""
-                sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'stop("failed")'"""
+                sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)'"""
             }
         }
     }
     post {
         always {
             sh "databricks clusters delete --cluster-id ${clusterId}"
+            sh """dbfs rm -r dbfs:/tmp/data"""
         }
         failure {
             script {

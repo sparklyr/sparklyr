@@ -1,4 +1,5 @@
 context("binds")
+
 test_requires("dplyr")
 sc <- testthat_spark_connection()
 
@@ -171,7 +172,6 @@ test_that("'sdf_bind_rows' err for non-tbl_spark", {
 test_that("'sdf_bind_rows' handles column type upcasting (#804)", {
   # Need support for NaN ARROW-3615
   skip_on_arrow()
-  skip_on_spark_master()
 
   test_requires("dplyr")
 

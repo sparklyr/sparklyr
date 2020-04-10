@@ -1,5 +1,6 @@
 context("ml feature - word2vec")
 
+skip_databricks_connect()
 test_that("ft_word2vec() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()
@@ -42,7 +43,6 @@ test_that("ft_word2vec() returns result with correct length", {
 test_that("ml_find_synonyms works properly", {
   # NOTE: this test case is functionally identical to the one in
   # https://github.com/apache/spark/blob/87b93d32a6bfb0f2127019b97b3fc1d13e16a10b/mllib/src/test/scala/org/apache/spark/mllib/feature/Word2VecSuite.scala#L37
-  skip_on_spark_master()
   test_requires_version("2.0.0", "spark computation different in 1.6.x")
   sc <- testthat_spark_connection()
   sentence <- data.frame(sentence = do.call(paste, as.list(c(rep("a b", 100), rep("a c", 10)))))

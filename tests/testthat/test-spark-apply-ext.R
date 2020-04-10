@@ -1,4 +1,5 @@
 context("spark apply")
+
 test_requires("dplyr")
 sc <- testthat_spark_connection()
 
@@ -179,7 +180,6 @@ test_that("'spark_apply' can roundtrip Date-Time", {
 
 test_that("'spark_apply' supports grouped empty results", {
   skip_slow("takes too long to measure coverage")
-  skip_on_spark_master()
   process_data <- function(DF, exclude) {
     DF <- subset(DF, select = colnames(DF)[!colnames(DF) %in% exclude])
     DF[complete.cases(DF),]

@@ -1,5 +1,6 @@
 context("ml regression gbt regressor")
 
+skip_databricks_connect()
 test_that("ml_gbt_regressor() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

@@ -23,12 +23,13 @@ shell_connection <- function(master,
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
 
-  # TODO: @Loquats, @falaki consider moving method != "databricks-connect" check into spark_master_is_local
-  # for local mode we support SPARK_HOME via locally installed versions and version overrides SPARK_HOME
-  if (spark_master_is_local(master) && method != "databricks-connect") {
+  if (spark_master_is_local(master)) {
     if (!nzchar(spark_home) || !is.null(version)) {
       installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, hint = TRUE)
-      spark_home <- installInfo$sparkVersionDir
+      if (method != "databricks-connect") {
+        # Databricks Connect relies on set environment value of SPARK_HOME
+        spark_home <- installInfo$sparkVersionDir
+      }
 
       if (is.null(version) && interactive())
         message("* Using Spark: ", installInfo$sparkVersion)
@@ -551,6 +552,17 @@ print_jobj.spark_shell_connection <- function(sc, jobj, ...) {
     info <- jobj_info(jobj)
     fmt <- "<jobj[%s]>\n  %s\n  %s\n"
     cat(sprintf(fmt, jobj$id, info$class, info$repr))
+    if (identical(info$class, "org.apache.spark.SparkContext")) {
+      spark_context_fmt <- "\n  appName: %s\n  master: %s\n  files: %s\n  jars:  %s\n"
+      quote_str <- function(str) paste0("'", str, "'")
+      cat(sprintf(
+        spark_context_fmt,
+        invoke(jobj, "appName"),
+        invoke(jobj, "master"),
+        invoke(jobj, "%>%", list("files"), list("mkString", " ")),
+        invoke(jobj, "%>%", list("jars"), list("mkString", " "))
+      ))
+    }
   } else {
     fmt <- "<jobj[%s]>\n  <detached>"
     cat(sprintf(fmt, jobj$id))
@@ -565,65 +577,94 @@ shell_connection_config_defaults <- function() {
 
 #' @export
 initialize_connection.spark_shell_connection <- function(sc) {
+  create_spark_config <- function() {
+    # create the spark config
+    settings <- list(list("setAppName", sc$app_name))
+
+    if (!spark_master_is_yarn_cluster(sc$master, sc$config) &&
+        !spark_master_is_gateway(sc$master)) {
+      settings <- c(settings, list(list("setMaster", sc$master)))
+
+      if (!is.null(sc$spark_home))
+        settings <- c(settings, list(list("setSparkHome", sc$spark_home)))
+    }
+    conf <- invoke_new(sc, "org.apache.spark.SparkConf") %>% (
+      function(obj) do.call(invoke, c(obj, "%>%", settings))
+    )
+
+    context_config <- connection_config(sc, "spark.", c("spark.sql."))
+    apply_config(conf, context_config, "set", "spark.")
+
+    default_config <- shell_connection_config_defaults()
+    default_config_remove <- Filter(function(e) e %in% names(context_config), names(default_config))
+    default_config[default_config_remove] <- NULL
+    apply_config(conf, default_config, "set", "spark.")
+
+    conf
+  }
+
   # initialize and return the connection
   tryCatch({
     backend <- invoke_static(sc, "sparklyr.Shell", "getBackend")
     sc$state$spark_context <- invoke(backend, "getSparkContext")
 
+    # create the spark config
+    conf <- create_spark_config()
+
+    init_hive_ctx_for_spark_2_plus <- function() {
+      # For Spark 2.0+, we create a `SparkSession`.
+      session <- invoke_static(
+        sc,
+        "org.apache.spark.sql.SparkSession",
+        "builder"
+      ) %>%
+        invoke("config", conf) %>%
+        apply_config(connection_config(sc, "spark.sql."), "config", "spark.sql.") %>%
+        invoke("getOrCreate")
+
+      # Cache the session as the "hive context".
+      sc$state$hive_context <- session
+
+      # Set the `SparkContext`.
+      sc$state$spark_context <- sc$state$spark_context %||% invoke(session, "sparkContext")
+    }
+
     if (is.null(spark_context(sc))) {
-      # create the spark config
-      conf <- invoke_new(sc, "org.apache.spark.SparkConf")
-      conf <- invoke(conf, "setAppName", sc$app_name)
-
-      if (!spark_master_is_yarn_cluster(sc$master, sc$config) &&
-          !spark_master_is_gateway(sc$master)) {
-        conf <- invoke(conf, "setMaster", sc$master)
-
-        if (!is.null(sc$spark_home))
-          conf <- invoke(conf, "setSparkHome", sc$spark_home)
-      }
-
-      context_config <- connection_config(sc, "spark.", c("spark.sql."))
-      apply_config(conf, context_config, "set", "spark.")
-
-      default_config <- shell_connection_config_defaults()
-      default_config_remove <- Filter(function(e) e %in% names(context_config), names(default_config))
-      default_config[default_config_remove] <- NULL
-      apply_config(conf, default_config, "set", "spark.")
-
       # create the spark context and assign the connection to it
       # use spark home version since spark context is not yet initialized in shell connection
       # but spark_home might not be initialized in submit_batch while spark context is available
       if ((!identical(sc$home_version, NULL) && sc$home_version >= "2.0") ||
           (!identical(spark_context(sc), NULL) && spark_version(sc) >= "2.0")) {
-        # For Spark 2.0+, we create a `SparkSession`.
-        session <- invoke_static(
-          sc,
-          "org.apache.spark.sql.SparkSession",
-          "builder"
-        ) %>%
-          invoke("config", conf) %>%
-          apply_config(connection_config(sc, "spark.sql."), "config", "spark.sql.") %>%
-          invoke("getOrCreate")
-
-        # Cache the session as the "hive context".
-        sc$state$hive_context <- session
-
-        # Set the `SparkContext`.
-        sc$state$spark_context <- invoke(session, "sparkContext")
-      }
-      else {
+        init_hive_ctx_for_spark_2_plus()
+      } else {
         sc$state$spark_context <- invoke_static(
           sc,
           "org.apache.spark.SparkContext",
           "getOrCreate",
           conf
         )
+        # we might not be aware of the actual version of Spark that is running yet until now
+        actual_spark_version <- tryCatch(
+          invoke(sc$state$spark_context, "version"),
+          error = function(e) {
+            warning(paste(
+              "Failed to get version from SparkContext:",
+              e))
+            NULL
+          }
+        )
+        if (!identical(actual_spark_version, NULL) && actual_spark_version >= "2.0") {
+          init_hive_ctx_for_spark_2_plus()
+        }
       }
 
       invoke(backend, "setSparkContext", spark_context(sc))
+    } else if (is.null(sc$state$hive_context) && spark_version(sc) >= "2.0") {
+      init_hive_ctx_for_spark_2_plus()
     }
 
+    # If Spark version is 2.0.0 or above, hive_context should be initialized by now.
+    # So if that's not the case, then attempt to initialize it assuming Spark version is below 2.0.0
     sc$state$hive_context <- sc$state$hive_context %||% tryCatch(
       invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", sc$state$spark_context),
       error = function(e) {

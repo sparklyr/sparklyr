@@ -1,4 +1,5 @@
 context("dplyr stats")
+
 sc <- testthat_spark_connection()
 
 test_that("cor, cov, sd and var works as expected", {

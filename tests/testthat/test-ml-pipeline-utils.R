@@ -1,5 +1,6 @@
 context("ml pipeline utils")
 
+skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_that("ml_transform() fails on estimators", {

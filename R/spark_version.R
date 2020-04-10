@@ -129,7 +129,7 @@ spark_version_from_home <- function(spark_home, default = NULL) {
 }
 
 spark_version_latest <- function(version = NULL) {
-  versions <- spark_available_versions(show_minor = TRUE)$spark
+  versions <- spark_available_versions(show_minor = TRUE, show_future = TRUE)$spark
 
   if (is.null(version)) versions[length(versions)]
   else max(versions[grepl(version, versions, fixed = TRUE)])

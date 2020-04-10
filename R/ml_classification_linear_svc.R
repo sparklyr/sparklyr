@@ -73,16 +73,22 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
     x, "org.apache.spark.ml.classification.LinearSVC", uid,
     features_col = .args[["features_col"]], label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]]
-  ) %>%
-    invoke("setRawPredictionCol", .args[["raw_prediction_col"]]) %>%
-    invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
-    invoke("setRegParam", .args[["reg_param"]]) %>%
-    invoke("setMaxIter", .args[["max_iter"]]) %>%
-    invoke("setStandardization", .args[["standardization"]]) %>%
-    invoke("setTol", .args[["tol"]]) %>%
-    invoke("setAggregationDepth", .args[["aggregation_depth"]]) %>%
-    invoke("setThreshold", .args[["threshold"]]) %>%
-    jobj_set_param("setWeightCol", .args[["weight_col"]])
+  ) %>% (
+    function(obj) {
+      do.call(invoke,
+              c(obj, "%>%", Filter(function(x) !is.null(x),
+                                   list(
+                                        list("setRawPredictionCol", .args[["raw_prediction_col"]]),
+                                        list("setFitIntercept", .args[["fit_intercept"]]),
+                                        list("setRegParam", .args[["reg_param"]]),
+                                        list("setMaxIter", .args[["max_iter"]]),
+                                        list("setStandardization", .args[["standardization"]]),
+                                        list("setTol", .args[["tol"]]),
+                                        list("setAggregationDepth", .args[["aggregation_depth"]]),
+                                        list("setThreshold", .args[["threshold"]]),
+                                        jobj_set_param_helper(obj, "setWeightCol", .args[["weight_col"]])))))
+
+    })
 
   new_ml_linear_svc(jobj)
 }

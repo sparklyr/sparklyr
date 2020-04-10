@@ -11,7 +11,7 @@ test_that("sdf_describe() works properly", {
     select(Petal_Length, Species) %>%
     sdf_drop_duplicates()
 
-  expect_equal(sdf_nrow(s), 48)    
+  expect_equal(sdf_nrow(s), 48)
 
   s <- iris_tbl %>% sdf_drop_duplicates(c("Species"))
   expect_equal(sdf_nrow(s), 3)

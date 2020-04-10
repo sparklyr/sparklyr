@@ -4,10 +4,18 @@
 \alias{ml_bisecting_kmeans}
 \title{Spark ML -- Bisecting K-Means Clustering}
 \usage{
-ml_bisecting_kmeans(x, formula = NULL, k = 4, max_iter = 20,
-  seed = NULL, min_divisible_cluster_size = 1,
-  features_col = "features", prediction_col = "prediction",
-  uid = random_string("bisecting_bisecting_kmeans_"), ...)
+ml_bisecting_kmeans(
+  x,
+  formula = NULL,
+  k = 4,
+  max_iter = 20,
+  seed = NULL,
+  min_divisible_cluster_size = 1,
+  features_col = "features",
+  prediction_col = "prediction",
+  uid = random_string("bisecting_bisecting_kmeans_"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -72,7 +80,9 @@ iris_tbl \%>\%
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
 
-Other ml clustering algorithms: \code{\link{ml_gaussian_mixture}},
-  \code{\link{ml_kmeans}}, \code{\link{ml_lda}}
+Other ml clustering algorithms: 
+\code{\link{ml_gaussian_mixture}()},
+\code{\link{ml_kmeans}()},
+\code{\link{ml_lda}()}
 }
 \concept{ml clustering algorithms}

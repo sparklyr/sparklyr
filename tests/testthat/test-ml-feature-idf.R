@@ -1,5 +1,6 @@
 context("ml feature - idf")
 
+skip_databricks_connect()
 test_that("ft_idf() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()
@@ -19,7 +20,6 @@ test_that("ft_idf() param setting", {
 
 test_that("ft_idf() works properly", {
   test_requires_version("2.0.0", "hashing implementation changed in 2.0 -- https://issues.apache.org/jira/browse/SPARK-10574")
-  skip_on_spark_master()
   sc <- testthat_spark_connection()
   sentence_df <- data.frame(
     sentence = c("Hi I heard about Spark",
@@ -33,8 +33,18 @@ test_that("ft_idf() works properly", {
     pull(features) %>%
     first()
 
-  expect_equal(which(idf_1 != 0), c(1, 6, 10, 18))
-  expect_equal(idf_1[which(idf_1 != 0)],
-               c(0.693147180559945, 0.693147180559945, 0.287682072451781, 1.38629436111989
-  ), tol = 1e-4)
+  # hashing implementation changed in 3.0 -- https://issues.apache.org/jira/browse/SPARK-23469
+  expected_non_zero_idxes <- ifelse(
+    spark_version(sc) >= "3.0.0",
+    list(c(7, 9, 14, 17)),
+    list(c(1, 6, 10, 18))
+  )
+  expected_res <- ifelse(
+    spark_version(sc) >= "3.0.0",
+    list(c(0.287682072451781, 0.693147180559945, 0.287682072451781, 0.575364144903562)),
+    list(c(0.693147180559945, 0.693147180559945, 0.287682072451781, 1.38629436111989))
+  )
+
+  expect_equal(which(idf_1 != 0), expected_non_zero_idxes[[1]])
+  expect_equal(idf_1[which(idf_1 != 0)], expected_res[[1]], tol = 1e-4)
 })

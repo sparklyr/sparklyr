@@ -19,6 +19,14 @@
 #'   partitioning.
 #' @param overwrite Boolean; overwrite a pre-existing table with the name \code{name}
 #'   if one already exists?
+#' @param struct_columns (only supported with Spark 2.4.0 or higher) A list of
+#'   columns from the source data frame that should be converted to Spark SQL
+#'   StructType columns.
+#'   The source columns can contain either json strings or nested lists.
+#'   All rows within each source column should have identical schemas (because
+#'   otherwise the conversion result will contain unexpected null values or
+#'   missing values as Spark currently does not support schema discovery on
+#'   individual rows within a struct column).
 #' @param ... Optional arguments, passed to implementing methods.
 #'
 #' @family Spark data frames
@@ -36,6 +44,7 @@ sdf_copy_to <- function(sc,
                         memory,
                         repartition,
                         overwrite,
+                        struct_columns,
                         ...) {
   UseMethod("sdf_copy_to")
 }
@@ -47,9 +56,10 @@ sdf_copy_to.default <- function(sc,
                                 memory = TRUE,
                                 repartition = 0L,
                                 overwrite = FALSE,
+                                struct_columns = list(),
                                 ...
 ) {
-  sdf_import(x, sc, name, memory, repartition, overwrite, ...)
+  sdf_import(x, sc, name, memory, repartition, overwrite, struct_columns, ...)
 }
 
 #' @name sdf_copy_to
@@ -60,6 +70,7 @@ sdf_import <- function(x,
                        memory,
                        repartition,
                        overwrite,
+                       struct_columns,
                        ...) {
   UseMethod("sdf_import")
 }
@@ -81,6 +92,7 @@ sdf_import.default <- function(x,
                                memory = TRUE,
                                repartition = 0L,
                                overwrite = FALSE,
+                               struct_columns = list(),
                                ...)
 {
   if (overwrite)
@@ -90,7 +102,14 @@ sdf_import.default <- function(x,
 
   dots <- list(...)
   serializer <- dots$serializer
-  spark_data_copy(sc, x, name = name, repartition = repartition, serializer = serializer)
+  spark_data_copy(
+    sc,
+    x,
+    name = name,
+    repartition = repartition,
+    serializer = serializer,
+    struct_columns = struct_columns
+  )
 
   if (memory && !class(x)[[1]] %in% c("iterator", "list"))
     tbl_cache(sc, name)
@@ -437,8 +456,7 @@ sdf_repartition <- function(x, partitions = NULL, partition_by = NULL) {
 sdf_num_partitions <- function(x) {
   x %>%
     spark_dataframe() %>%
-    invoke("rdd") %>%
-    invoke("getNumPartitions")
+    invoke("%>%", list("rdd"), list("getNumPartitions"))
 }
 
 #' Coalesces a Spark DataFrame

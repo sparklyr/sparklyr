@@ -1,7 +1,7 @@
 context("broom-lda")
 
+skip_databricks_connect()
 test_that("lda.tidy() works", {
-  skip_on_spark_master()
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
 
@@ -20,8 +20,11 @@ test_that("lda.tidy() works", {
   check_tidy(td1, exp.row = 18, exp.col = 3,
              exp.names = c("topic", "term", "beta"))
 
+  # account for LDA method behavior change in Spark 3.0.0
   expect_equal(td1$beta[1:3],
-               c(0.8773, 0.9466, 1.2075),
+               ifelse(spark_version(sc) < "3.0.0",
+                      list(c(0.8773, 0.9466, 1.2075)),
+                      list(c(0.8790, 0.9478, 1.1515)))[[1]],
                tolerance = 0.001)
 })
 

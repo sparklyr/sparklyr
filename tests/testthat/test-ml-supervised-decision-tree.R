@@ -1,5 +1,6 @@
 context("ml supervised - decision tree")
 
+skip_databricks_connect()
 test_that("decision tree runs successfully when all args specified", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")

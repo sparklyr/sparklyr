@@ -28,11 +28,12 @@ class WorkerApply(
   private[this] var exception: Option[Exception] = None
   private[this] var backendPort: Int = 0
 
-  def workerSourceFile(rscript: Rscript): String = {
+  def workerSourceFile(rscript: Rscript, sessionId: Int): String = {
     val rsources = new Sources()
     val source = rsources.sources
 
-    val tempFile: File = new File(rscript.getScratchDir() + File.separator + "sparkworker.R")
+    val tempFile: File = new File(
+      rscript.getScratchDir() + File.separator + "sparkworker_" + sessionId.toString + ".R")
     val outStream: FileWriter = new FileWriter(tempFile)
     outStream.write(source)
     outStream.flush()
@@ -118,7 +119,7 @@ class WorkerApply(
           logger.log("is starting rscript")
 
           val rscript = new Rscript(logger)
-          val sourceFilePath: String = workerSourceFile(rscript)
+          val sourceFilePath: String = workerSourceFile(rscript, sessionId)
 
           rscript.init(
             List(

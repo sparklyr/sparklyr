@@ -1,4 +1,5 @@
 context("serialization")
+
 sc <- testthat_spark_connection()
 
 test_requires("nycflights13")
@@ -44,7 +45,6 @@ test_that("primitive values survive Spark roundtrips", {
 })
 
 test_that("NA values survive Spark roundtrips", {
-  skip_on_spark_master()
   n <- 10
   df <- data.frame(
     int = as.integer(1:n),
@@ -71,6 +71,7 @@ test_that("data.frames with '|' can be copied", {
 
 test_that("data.frames with many columns survive roundtrip", {
   skip_slow("takes too long to measure coverage")
+  skip_databricks_connect()
 
   n <- 1E3
   data <- as.data.frame(replicate(n, 1L, simplify = FALSE))
@@ -80,6 +81,7 @@ test_that("data.frames with many columns survive roundtrip", {
 })
 
 test_that("data.frames with many columns don't cause Java StackOverflows", {
+  skip_databricks_connect()
   version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
 
   n <- if (version >= "2.0.0") 500 else 5000
@@ -91,6 +93,7 @@ test_that("data.frames with many columns don't cause Java StackOverflows", {
 })
 
 test_that("'ml_predict()', 'predict()' return same results", {
+  skip_databricks_connect()
   test_requires("dplyr")
 
   model <- flights_tbl %>%
@@ -126,8 +129,16 @@ test_that("copy_to() succeeds when last column contains missing / empty values",
 })
 
 test_that("collect() can retrieve all data types correctly", {
+  skip_databricks_connect()
   # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes
   library(dplyr)
+
+  epoch_utime <- 0
+  epoch_sdate <- "from_unixtime(unix_timestamp('01-01-1970' , 'dd-MM-yyyy'))"
+  epoch_rdate <- as.Date("01-01-1970", "%d-%m-%Y") %>% as.character()
+  epoch_stime <- paste0("to_utc_timestamp(from_unixtime(", epoch_utime, "), 'UTC')")
+  epoch_rtime <- "1970-01-01"
+  epoch_atime <- as.character(as.POSIXct(epoch_utime, origin = "1970-01-01"))
 
   utime <- as.numeric(as.POSIXct("2010-01-01 01:01:10", origin = "1970-01-01", tz = "UTC"))
   sdate <- "from_unixtime(unix_timestamp('01-01-2010' , 'dd-MM-yyyy'))"
@@ -139,20 +150,22 @@ test_that("collect() can retrieve all data types correctly", {
   arrow_compat <- using_arrow()
 
   hive_type <- tibble::frame_data(
-    ~stype,      ~svalue,      ~rtype,   ~rvalue,      ~atype,    ~avalue,
-    "tinyint",       "1",   "integer",       "1",   "integer",        "1",
-    "smallint",      "1",   "integer",       "1",   "integer",        "1",
-    "integer",       "1",   "integer",       "1",   "integer",        "1",
-    "bigint",        "1",   "numeric",       "1", "integer64",        "1",
-    "float",         "1",   "numeric",       "1",   "numeric",        "1",
-    "double",        "1",   "numeric",       "1",   "numeric",        "1",
-    "decimal",       "1",   "numeric",       "1",   "numeric",        "1",
-    "timestamp",   stime,   "POSIXct",     rtime,   "POSIXct",      atime,
-    "date",        sdate,      "Date",     rdate,      "Date",      rdate,
-    "string",          1, "character",       "1", "character",        "1",
-    "varchar(10)",     1, "character",       "1", "character",        "1",
-    "char(10)",        1, "character",       "1", "character",        "1",
-    "boolean",    "true",   "logical",    "TRUE",   "logical",     "TRUE",
+    ~stype,            ~svalue,      ~rtype,     ~rvalue,      ~atype,     ~avalue,
+    "tinyint",             "1",   "integer",         "1",   "integer",         "1",
+    "smallint",            "1",   "integer",         "1",   "integer",         "1",
+    "integer",             "1",   "integer",         "1",   "integer",         "1",
+    "bigint",              "1",   "numeric",         "1", "integer64",         "1",
+    "float",               "1",   "numeric",         "1",   "numeric",         "1",
+    "double",              "1",   "numeric",         "1",   "numeric",         "1",
+    "decimal",             "1",   "numeric",         "1",   "numeric",         "1",
+    "timestamp",   epoch_stime,   "POSIXct", epoch_rtime,   "POSIXct", epoch_atime,
+    "date",        epoch_sdate,      "Date", epoch_rdate,      "Date", epoch_rdate,
+    "timestamp",         stime,   "POSIXct",       rtime,   "POSIXct",       atime,
+    "date",              sdate,      "Date",       rdate,      "Date",       rdate,
+    "string",              "1", "character",         "1", "character",         "1",
+    "varchar(10)",         "1", "character",         "1", "character",         "1",
+    "char(10)",            "1", "character",         "1", "character",         "1",
+    "boolean",          "true",   "logical",      "TRUE",   "logical",      "TRUE",
   )
 
   if (spark_version(sc) < "2.2.0") {
@@ -169,7 +182,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   spark_query <- hive_type %>%
     mutate(
-      query = paste0("cast(", svalue, " as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col")
+      query = paste0("cast(", svalue, " as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col", row_number())
     ) %>%
     pull(query) %>%
     paste(collapse = ", ") %>%
@@ -251,6 +264,28 @@ test_that("collect() can retrieve NULL data types as NAs", {
   })
 })
 
+test_that("collect() can retrieve date types successfully", {
+  df <- data.frame(
+    date = c(
+      as.Date("1961-01-20"),
+      as.Date("1970-01-01"),
+      as.Date("1981-01-20"),
+      as.Date("2001-01-20")
+    ),
+    name = c(
+      "John F. Kennedy",
+      NA,
+      "Ronald Reagan",
+      "George W. Bush"
+    ),
+    stringsAsFactors = FALSE
+  )
+  expect_equal(
+    as.list(df),
+    as.list(df %>% sdf_copy_to(sc, ., overwrite = TRUE) %>% sdf_collect())
+  )
+})
+
 test_that("invoke() can roundtrip POSIXlt fields", {
   invoke_static(
     sc,
@@ -326,7 +361,6 @@ test_that("collect() can retrieve specific dates without timezones", {
 })
 
 test_that("collect() can retrieve logical columns with NAs", {
-  skip_on_spark_master()
   expect_equal(
     logical_nas,
     logical_nas_tbl %>% dplyr::collect()
@@ -351,6 +385,7 @@ test_that("environments are sent to Scala Maps (#1058)", {
 })
 
 test_that("collect() can retrieve nested list efficiently", {
+  skip_databricks_connect()
   if (spark_version(sc) < "2.0.0") skip("performance improvement not available")
 
   temp_json <- tempfile(fileext = ".json")

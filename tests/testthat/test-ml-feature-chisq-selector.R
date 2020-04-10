@@ -1,5 +1,6 @@
 context("ml feature chisq selector")
 
+skip_databricks_connect()
 test_that("ft_chisq_selector() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()

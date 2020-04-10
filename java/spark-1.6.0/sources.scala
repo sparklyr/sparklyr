@@ -273,7 +273,11 @@ readType <- function(con) {
 }
 
 readDate <- function(con) {
-  as.Date(readString(con))
+  date_str <- readString(con)
+  if (date_str == "")
+    NA
+  else
+    as.Date(date_str)
 }
 
 readTime <- function(con, n = 1) {
@@ -281,13 +285,11 @@ readTime <- function(con, n = 1) {
     as.POSIXct(character(0))
   else {
     t <- readDouble(con, n)
-    timeNA <- as.POSIXct(0, origin = "1970-01-01", tz = "UTC")
 
     r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
     if (getOption("sparklyr.collect.datechars", FALSE))
       as.character(r)
     else {
-      r[r == timeNA] <- as.POSIXct(NA)
       r
     }
   }
@@ -599,12 +601,23 @@ core_invoke_socket_name <- function(sc) {
     "backend"
 }
 
-core_remove_jobj <- function(sc, id) {
-  core_invoke_method(sc, static = TRUE, "Handler", "rm", id)
+core_remove_jobjs <- function(sc, ids) {
+  core_invoke_method_impl(sc, static = TRUE, noreply = TRUE, "Handler", "rm", as.list(ids))
 }
 
 core_invoke_method <- function(sc, static, object, method, ...)
 {
+  core_invoke_method_impl(sc, static, noreply = FALSE, object, method, ...)
+}
+
+core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
+{
+  # N.B.: the reference to `object` must be retained until after a value or exception is returned to us
+  # from the invoked method here (i.e., cannot have `object <- something_else` before that), because any
+  # re-assignment could cause the last reference to `object` to be destroyed and the underlying JVM object
+  # to be deleted from JVMObjectTracker before the actual invocation of the method could happen.
+  lockBinding("object", environment())
+
   if (is.null(sc))
     stop("The connection is no longer valid.")
 
@@ -621,10 +634,7 @@ core_invoke_method <- function(sc, static, object, method, ...)
   if (!identical(object, "Handler")) {
     objsToRemove <- ls(.toRemoveJobjs)
     if (length(objsToRemove) > 0) {
-      sapply(objsToRemove,
-             function(e) {
-               core_remove_jobj(sc, e)
-             })
+      core_remove_jobjs(sc, objsToRemove)
       rm(list = objsToRemove, envir = .toRemoveJobjs)
     }
   }
@@ -642,10 +652,9 @@ core_invoke_method <- function(sc, static, object, method, ...)
   }
 
   # if the object is a jobj then get it's id
-  if (inherits(object, "spark_jobj"))
-    object <- object$id
+  objId <- ifelse(inherits(object, "spark_jobj"), object$id, object)
 
-  write_bin_args(backend, object, static, method, args)
+  write_bin_args(backend, objId, static, method, args)
 
   if (identical(object, "Handler") &&
       (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
@@ -653,46 +662,50 @@ core_invoke_method <- function(sc, static, object, method, ...)
     return(NULL)
   }
 
-  returnStatus <- readInt(sc)
+  result_object <- NULL
+  if (!noreply) {
+    # wait for a return status & result
+    returnStatus <- readInt(sc)
 
-  if (length(returnStatus) == 0) {
-    # read the spark log
-    msg <- core_read_spark_log_error(sc)
+    if (length(returnStatus) == 0) {
+      # read the spark log
+      msg <- core_read_spark_log_error(sc)
 
-    withr::with_options(list(
-      warning.length = 8000
-    ), {
-      stop(
-        "Unexpected state in sparklyr backend: ",
-        msg,
-        call. = FALSE)
-    })
+      withr::with_options(list(
+        warning.length = 8000
+      ), {
+        stop(
+          "Unexpected state in sparklyr backend: ",
+          msg,
+          call. = FALSE)
+      })
+    }
+
+    if (returnStatus != 0) {
+      # get error message from backend and report to R
+      msg <- readString(sc)
+      withr::with_options(list(
+        warning.length = 8000
+      ), {
+        if (nzchar(msg)) {
+          core_handle_known_errors(sc, msg)
+
+          stop(msg, call. = FALSE)
+        } else {
+          # read the spark log
+          msg <- core_read_spark_log_error(sc)
+          stop(msg, call. = FALSE)
+        }
+      })
+    }
+
+    result_object <- readObject(sc)
   }
-
-  if (returnStatus != 0) {
-    # get error message from backend and report to R
-    msg <- readString(sc)
-    withr::with_options(list(
-      warning.length = 8000
-    ), {
-      if (nzchar(msg)) {
-        core_handle_known_errors(sc, msg)
-
-        stop(msg, call. = FALSE)
-      } else {
-        # read the spark log
-        msg <- core_read_spark_log_error(sc)
-        stop(msg, call. = FALSE)
-      }
-    })
-  }
-
-  object <- readObject(sc)
 
   sc$state$status[[connection_name]] <- "ready"
   on.exit(NULL)
 
-  attach_connection(object, sc)
+  attach_connection(result_object, sc)
 }
 
 jobj_subclass.shell_backend <- function(con) {
@@ -1544,6 +1557,28 @@ worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
 # nocov end
 # nocov start
 
+connection_is_open.spark_worker_connection <- function(sc) {
+  bothOpen <- FALSE
+  if (!identical(sc, NULL)) {
+    tryCatch({
+      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
+    }, error = function(e) {
+    })
+  }
+  bothOpen
+}
+
+worker_connection <- function(x, ...) {
+  UseMethod("worker_connection")
+}
+
+worker_connection.spark_jobj <- function(x, ...) {
+  x$connection
+}
+
+# nocov end
+# nocov start
+
 spark_worker_connect <- function(
   sessionId,
   backendPort = 8880,
@@ -1602,28 +1637,6 @@ spark_worker_connect <- function(
   worker_log("created connection")
 
   sc
-}
-
-# nocov end
-# nocov start
-
-connection_is_open.spark_worker_connection <- function(sc) {
-  bothOpen <- FALSE
-  if (!identical(sc, NULL)) {
-    tryCatch({
-      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
-    }, error = function(e) {
-    })
-  }
-  bothOpen
-}
-
-worker_connection <- function(x, ...) {
-  UseMethod("worker_connection")
-}
-
-worker_connection.spark_jobj <- function(x, ...) {
-  x$connection
 }
 
 # nocov end

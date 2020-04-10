@@ -25,7 +25,7 @@ test_that("ml_naive_bayes() param setting", {
 test_that("ml_naive_bayes() works properly", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "accuracy metric support")
-  sample_data_path <- dir(getwd(), recursive = TRUE, pattern = "sample_libsvm_data.txt", full.names = TRUE)
+  sample_data_path <- get_simple_data_path("sample_libsvm_data.txt")
 
   sample_data <- spark_read_libsvm(sc, "sample_data",
                                    sample_data_path, overwrite = TRUE)
@@ -45,7 +45,6 @@ test_that("ml_naive_bayes() works properly", {
 })
 
 test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
-  skip_on_spark_master()
   sc <- testthat_spark_connection()
   test_requires("e1071", "mlbench")
 
@@ -75,7 +74,6 @@ test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
 })
 
 test_that("ml_naive_bayes() print outputs are correct", {
-  skip_on_spark_master()
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   m <- ml_naive_bayes(iris_tbl, Species ~ Petal_Width + Petal_Length)

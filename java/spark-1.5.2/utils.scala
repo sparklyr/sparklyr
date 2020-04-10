@@ -246,8 +246,7 @@ object Utils {
 
   def collectImplTimestamp(local: Array[Row], idx: Integer) = {
     local.map{row => {
-      val el = row(idx)
-      if (el.isInstanceOf[java.sql.Timestamp]) el.asInstanceOf[java.sql.Timestamp] else new java.sql.Timestamp(0)
+      Try(row.getAs[java.sql.Timestamp](idx)).getOrElse(null)
     }}
   }
 
@@ -255,15 +254,14 @@ object Utils {
     local.map{row => {
       val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
       el.map(e =>
-        if (e.isInstanceOf[java.sql.Timestamp]) e.asInstanceOf[java.sql.Timestamp] else new java.sql.Timestamp(0)
+        Try(e.asInstanceOf[java.sql.Timestamp]).getOrElse(null)
       ).toArray
     }}
   }
 
   def collectImplDate(local: Array[Row], idx: Integer) = {
     local.map{row => {
-      val el = row(idx)
-      if (el.isInstanceOf[java.sql.Date]) el.asInstanceOf[java.sql.Date] else new java.sql.Date(0)
+      Try(row.getAs[java.sql.Date](idx)).getOrElse(null)
     }}
   }
 
@@ -271,7 +269,7 @@ object Utils {
     local.map{row => {
       val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
       el.map(e =>
-        if (e.isInstanceOf[java.sql.Date]) e.asInstanceOf[java.sql.Date] else new java.sql.Date(0)
+        Try(e.asInstanceOf[java.sql.Date]).getOrElse(null)
       ).toArray
     }}
   }
@@ -477,11 +475,12 @@ object Utils {
         val value = r(idx)
 
         column match {
-          case "integer"  => if (Try(value.toInt).isSuccess) value.toInt else null.asInstanceOf[Int]
-          case "double"  => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
-          case "logical" => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
-          case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
-          case _ => if (value == "NA") null.asInstanceOf[String] else value
+          case "integer"  => if (Try(value.toInt).isSuccess) value.toInt else null
+          case "double"  => if (Try(value.toDouble).isSuccess) value.toDouble else null
+          case "logical" => if (Try(value.toBoolean).isSuccess) value.toBoolean else null
+          case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null
+          case "date" => if (Try(new java.sql.Date(value.toLong * 86400000)).isSuccess) new java.sql.Date(value.toLong * 86400000) else null
+          case _ => if (value == "NA") null else value
         }
       })
 
@@ -512,11 +511,12 @@ object Utils {
         val value = r(idx)
 
         column match {
-          case "integer"   => if (Try(value.toInt).isSuccess) value.toInt else null.asInstanceOf[Int]
-          case "double"    => if (Try(value.toDouble).isSuccess) value.toDouble else null.asInstanceOf[Double]
-          case "logical"   => if (Try(value.toBoolean).isSuccess) value.toBoolean else null.asInstanceOf[Boolean]
-          case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null.asInstanceOf[java.sql.Timestamp]
-          case _ => if (value == "NA") null.asInstanceOf[String] else value
+          case "integer"   => if (Try(value.toInt).isSuccess) value.toInt else null
+          case "double"    => if (Try(value.toDouble).isSuccess) value.toDouble else null
+          case "logical"   => if (Try(value.toBoolean).isSuccess) value.toBoolean else null
+          case "timestamp" => if (Try(new java.sql.Timestamp(value.toLong * 1000)).isSuccess) new java.sql.Timestamp(value.toLong * 1000) else null
+          case "date" => if (Try(new java.sql.Date(value.toLong * 86400000)).isSuccess) new java.sql.Date(value.toLong * 86400000) else null
+          case _ => if (value == "NA") null else value
         }
       })
 

@@ -1,5 +1,6 @@
 context("broom")
 
+skip_databricks_connect()
 test_that("tidy.{glm type models} works", {
   sc <- testthat_spark_connection()
   test_requires("broom")

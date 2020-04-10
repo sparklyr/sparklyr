@@ -1,4 +1,5 @@
 # nocov start
+#' @include shell_connection.R
 
 create_hive_context.livy_connection <- function(sc) {
   invoke_new(
@@ -572,7 +573,7 @@ livy_connection_jars <- function(config, version) {
 
     target_jar <- dir(system.file("java", package = "sparklyr"), pattern = paste0("sparklyr-", target_version))
 
-    livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "feature/sparklyr-1.1.0")
+    livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "feature/sparklyr-1.2.0")
 
     livy_jars <- list(paste0(
       "https://github.com/sparklyr/sparklyr/blob/",
@@ -728,16 +729,7 @@ livy_map_class <- function(sc, class) {
 }
 
 #' @export
-print_jobj.livy_connection <- function(sc, jobj, ...) {
-  if (connection_is_open(sc)) {
-    info <- jobj_info(jobj)
-    fmt <- "<jobj[%s]>\n  %s\n  %s\n"
-    cat(sprintf(fmt, jobj$id, info$class, info$repr))
-  } else {
-    fmt <- "<jobj[%s]>\n  <detached>"
-    cat(sprintf(fmt, jobj$id))
-  }
-}
+print_jobj.livy_connection <- print_jobj.spark_shell_connection
 
 #' @export
 invoke.livy_jobj <- function(jobj, method, ...) {

@@ -1,5 +1,6 @@
 context("ml feature count vectorizer")
 
+skip_databricks_connect()
 test_that("ft_count_vectorizer() default params", {
   test_requires_latest_spark()
   sc <- testthat_spark_connection()
