@@ -19,10 +19,16 @@ aliases:
 
     <p>Reduction of Multiclass Classification to Binary Classification. Performs reduction using one against all strategy. For a multiclass classification with k classes, train k models (one per class). Each example is scored against all k models and the model with highest score is picked to label the example.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_one_vs_rest</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>classifier</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
-  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"one_vs_rest_"</span>),
-  <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_one_vs_rest</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>classifier</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"one_vs_rest_"</span>),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -91,17 +97,18 @@ aliases:
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-classification-regression.html'>http://spark.apache.org/docs/latest/ml-classification-regression.html</a> for
   more information on the set of supervised learning algorithms.</p>
-<p>Other ml algorithms: <code><a href='ml_aft_survival_regression.html'>ml_aft_survival_regression</a></code>,
-  <code><a href='ml_decision_tree.html'>ml_decision_tree_classifier</a></code>,
-  <code><a href='ml_gradient_boosted_trees.html'>ml_gbt_classifier</a></code>,
-  <code><a href='ml_generalized_linear_regression.html'>ml_generalized_linear_regression</a></code>,
-  <code><a href='ml_isotonic_regression.html'>ml_isotonic_regression</a></code>,
-  <code><a href='ml_linear_regression.html'>ml_linear_regression</a></code>,
-  <code><a href='ml_linear_svc.html'>ml_linear_svc</a></code>,
-  <code><a href='ml_logistic_regression.html'>ml_logistic_regression</a></code>,
-  <code><a href='ml_multilayer_perceptron_classifier.html'>ml_multilayer_perceptron_classifier</a></code>,
-  <code><a href='ml_naive_bayes.html'>ml_naive_bayes</a></code>,
-  <code><a href='ml_random_forest.html'>ml_random_forest_classifier</a></code></p></div>
+<p>Other ml algorithms: 
+<code><a href='ml_aft_survival_regression.html'>ml_aft_survival_regression</a>()</code>,
+<code><a href='ml_decision_tree.html'>ml_decision_tree_classifier</a>()</code>,
+<code><a href='ml_gradient_boosted_trees.html'>ml_gbt_classifier</a>()</code>,
+<code><a href='ml_generalized_linear_regression.html'>ml_generalized_linear_regression</a>()</code>,
+<code><a href='ml_isotonic_regression.html'>ml_isotonic_regression</a>()</code>,
+<code><a href='ml_linear_regression.html'>ml_linear_regression</a>()</code>,
+<code><a href='ml_linear_svc.html'>ml_linear_svc</a>()</code>,
+<code><a href='ml_logistic_regression.html'>ml_logistic_regression</a>()</code>,
+<code><a href='ml_multilayer_perceptron_classifier.html'>ml_multilayer_perceptron_classifier</a>()</code>,
+<code><a href='ml_naive_bayes.html'>ml_naive_bayes</a>()</code>,
+<code><a href='ml_random_forest.html'>ml_random_forest_classifier</a>()</code></p></div>
 
 
     </div>

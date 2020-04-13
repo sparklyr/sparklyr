@@ -20,22 +20,41 @@ aliases:
 
     <p>Fit a parametric survival regression model named accelerated failure time (AFT) model (see <a href='https://en.wikipedia.org/wiki/Accelerated_failure_time_model'>Accelerated failure time model (Wikipedia)</a>) based on the Weibull distribution of the survival time.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_aft_survival_regression</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>censor_col</span> <span class='kw'>=</span> <span class='st'>"censor"</span>,
-  <span class='kw'>quantile_probabilities</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.01</span>, <span class='fl'>0.05</span>, <span class='fl'>0.1</span>, <span class='fl'>0.25</span>, <span class='fl'>0.5</span>, <span class='fl'>0.75</span>, <span class='fl'>0.9</span>, <span class='fl'>0.95</span>,
-  <span class='fl'>0.99</span>), <span class='kw'>fit_intercept</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100L</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>,
-  <span class='kw'>aggregation_depth</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>quantiles_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_aft_survival_regression</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>censor_col</span> <span class='kw'>=</span> <span class='st'>"censor"</span>,
+  <span class='kw'>quantile_probabilities</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.01</span>, <span class='fl'>0.05</span>, <span class='fl'>0.1</span>, <span class='fl'>0.25</span>, <span class='fl'>0.5</span>, <span class='fl'>0.75</span>, <span class='fl'>0.9</span>, <span class='fl'>0.95</span>, <span class='fl'>0.99</span>),
+  <span class='kw'>fit_intercept</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100L</span>,
+  <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>,
+  <span class='kw'>aggregation_depth</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>quantiles_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
   <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"aft_survival_regression_"</span>), <span class='no'>...</span>)
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"aft_survival_regression_"</span>),
+  <span class='no'>...</span>
+)
 
-<span class='fu'>ml_survival_regression</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>censor_col</span> <span class='kw'>=</span> <span class='st'>"censor"</span>,
-  <span class='kw'>quantile_probabilities</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.01</span>, <span class='fl'>0.05</span>, <span class='fl'>0.1</span>, <span class='fl'>0.25</span>, <span class='fl'>0.5</span>, <span class='fl'>0.75</span>, <span class='fl'>0.9</span>, <span class='fl'>0.95</span>,
-  <span class='fl'>0.99</span>), <span class='kw'>fit_intercept</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100L</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>,
-  <span class='kw'>aggregation_depth</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>quantiles_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
+<span class='fu'>ml_survival_regression</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>censor_col</span> <span class='kw'>=</span> <span class='st'>"censor"</span>,
+  <span class='kw'>quantile_probabilities</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.01</span>, <span class='fl'>0.05</span>, <span class='fl'>0.1</span>, <span class='fl'>0.25</span>, <span class='fl'>0.5</span>, <span class='fl'>0.75</span>, <span class='fl'>0.9</span>, <span class='fl'>0.95</span>, <span class='fl'>0.99</span>),
+  <span class='kw'>fit_intercept</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100L</span>,
+  <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>,
+  <span class='kw'>aggregation_depth</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>quantiles_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
   <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"aft_survival_regression_"</span>), <span class='kw'>response</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>features</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"aft_survival_regression_"</span>),
+  <span class='kw'>response</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -137,17 +156,18 @@ aliases:
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-classification-regression.html'>http://spark.apache.org/docs/latest/ml-classification-regression.html</a> for
   more information on the set of supervised learning algorithms.</p>
-<p>Other ml algorithms: <code><a href='ml_decision_tree.html'>ml_decision_tree_classifier</a></code>,
-  <code><a href='ml_gradient_boosted_trees.html'>ml_gbt_classifier</a></code>,
-  <code><a href='ml_generalized_linear_regression.html'>ml_generalized_linear_regression</a></code>,
-  <code><a href='ml_isotonic_regression.html'>ml_isotonic_regression</a></code>,
-  <code><a href='ml_linear_regression.html'>ml_linear_regression</a></code>,
-  <code><a href='ml_linear_svc.html'>ml_linear_svc</a></code>,
-  <code><a href='ml_logistic_regression.html'>ml_logistic_regression</a></code>,
-  <code><a href='ml_multilayer_perceptron_classifier.html'>ml_multilayer_perceptron_classifier</a></code>,
-  <code><a href='ml_naive_bayes.html'>ml_naive_bayes</a></code>,
-  <code><a href='ml_one_vs_rest.html'>ml_one_vs_rest</a></code>,
-  <code><a href='ml_random_forest.html'>ml_random_forest_classifier</a></code></p></div>
+<p>Other ml algorithms: 
+<code><a href='ml_decision_tree.html'>ml_decision_tree_classifier</a>()</code>,
+<code><a href='ml_gradient_boosted_trees.html'>ml_gbt_classifier</a>()</code>,
+<code><a href='ml_generalized_linear_regression.html'>ml_generalized_linear_regression</a>()</code>,
+<code><a href='ml_isotonic_regression.html'>ml_isotonic_regression</a>()</code>,
+<code><a href='ml_linear_regression.html'>ml_linear_regression</a>()</code>,
+<code><a href='ml_linear_svc.html'>ml_linear_svc</a>()</code>,
+<code><a href='ml_logistic_regression.html'>ml_logistic_regression</a>()</code>,
+<code><a href='ml_multilayer_perceptron_classifier.html'>ml_multilayer_perceptron_classifier</a>()</code>,
+<code><a href='ml_naive_bayes.html'>ml_naive_bayes</a>()</code>,
+<code><a href='ml_one_vs_rest.html'>ml_one_vs_rest</a>()</code>,
+<code><a href='ml_random_forest.html'>ml_random_forest_classifier</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {

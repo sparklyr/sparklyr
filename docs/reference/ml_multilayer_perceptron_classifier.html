@@ -20,22 +20,49 @@ aliases:
 
     <p>Classification model based on the Multilayer Perceptron. Each layer has sigmoid activation function, output layer has softmax.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_multilayer_perceptron_classifier</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>layers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>step_size</span> <span class='kw'>=</span> <span class='fl'>0.03</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>, <span class='kw'>block_size</span> <span class='kw'>=</span> <span class='fl'>128</span>,
-  <span class='kw'>solver</span> <span class='kw'>=</span> <span class='st'>"l-bfgs"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>initial_weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
-  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>,
-  <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='st'>"rawPrediction"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"multilayer_perceptron_classifier_"</span>), <span class='no'>...</span>)
-
-<span class='fu'>ml_multilayer_perceptron</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>layers</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>step_size</span> <span class='kw'>=</span> <span class='fl'>0.03</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>, <span class='kw'>block_size</span> <span class='kw'>=</span> <span class='fl'>128</span>,
-  <span class='kw'>solver</span> <span class='kw'>=</span> <span class='st'>"l-bfgs"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>initial_weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>, <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>,
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_multilayer_perceptron_classifier</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>layers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>step_size</span> <span class='kw'>=</span> <span class='fl'>0.03</span>,
+  <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>,
+  <span class='kw'>block_size</span> <span class='kw'>=</span> <span class='fl'>128</span>,
+  <span class='kw'>solver</span> <span class='kw'>=</span> <span class='st'>"l-bfgs"</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>initial_weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>,
   <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='st'>"rawPrediction"</span>,
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"multilayer_perceptron_classifier_"</span>),
-  <span class='kw'>response</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>features</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
+  <span class='no'>...</span>
+)
+
+<span class='fu'>ml_multilayer_perceptron</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>layers</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>step_size</span> <span class='kw'>=</span> <span class='fl'>0.03</span>,
+  <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>,
+  <span class='kw'>block_size</span> <span class='kw'>=</span> <span class='fl'>128</span>,
+  <span class='kw'>solver</span> <span class='kw'>=</span> <span class='st'>"l-bfgs"</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>initial_weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
+  <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>,
+  <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='st'>"rawPrediction"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"multilayer_perceptron_classifier_"</span>),
+  <span class='kw'>response</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -154,17 +181,18 @@ reproducible across repeated calls.</p></td>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-classification-regression.html'>http://spark.apache.org/docs/latest/ml-classification-regression.html</a> for
   more information on the set of supervised learning algorithms.</p>
-<p>Other ml algorithms: <code><a href='ml_aft_survival_regression.html'>ml_aft_survival_regression</a></code>,
-  <code><a href='ml_decision_tree.html'>ml_decision_tree_classifier</a></code>,
-  <code><a href='ml_gradient_boosted_trees.html'>ml_gbt_classifier</a></code>,
-  <code><a href='ml_generalized_linear_regression.html'>ml_generalized_linear_regression</a></code>,
-  <code><a href='ml_isotonic_regression.html'>ml_isotonic_regression</a></code>,
-  <code><a href='ml_linear_regression.html'>ml_linear_regression</a></code>,
-  <code><a href='ml_linear_svc.html'>ml_linear_svc</a></code>,
-  <code><a href='ml_logistic_regression.html'>ml_logistic_regression</a></code>,
-  <code><a href='ml_naive_bayes.html'>ml_naive_bayes</a></code>,
-  <code><a href='ml_one_vs_rest.html'>ml_one_vs_rest</a></code>,
-  <code><a href='ml_random_forest.html'>ml_random_forest_classifier</a></code></p></div>
+<p>Other ml algorithms: 
+<code><a href='ml_aft_survival_regression.html'>ml_aft_survival_regression</a>()</code>,
+<code><a href='ml_decision_tree.html'>ml_decision_tree_classifier</a>()</code>,
+<code><a href='ml_gradient_boosted_trees.html'>ml_gbt_classifier</a>()</code>,
+<code><a href='ml_generalized_linear_regression.html'>ml_generalized_linear_regression</a>()</code>,
+<code><a href='ml_isotonic_regression.html'>ml_isotonic_regression</a>()</code>,
+<code><a href='ml_linear_regression.html'>ml_linear_regression</a>()</code>,
+<code><a href='ml_linear_svc.html'>ml_linear_svc</a>()</code>,
+<code><a href='ml_logistic_regression.html'>ml_logistic_regression</a>()</code>,
+<code><a href='ml_naive_bayes.html'>ml_naive_bayes</a>()</code>,
+<code><a href='ml_one_vs_rest.html'>ml_one_vs_rest</a>()</code>,
+<code><a href='ml_random_forest.html'>ml_random_forest_classifier</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
