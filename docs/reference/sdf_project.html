@@ -17,8 +17,13 @@ aliases:
 
     <p>Project features onto principal components</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_project</span>(<span class='no'>object</span>, <span class='no'>newdata</span>, <span class='kw'>features</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/dimnames.html'>dimnames</a></span>(<span class='no'>object</span>$<span class='no'>pc</span>)<span class='kw'>[[</span><span class='fl'>1</span>]],
-  <span class='kw'>feature_prefix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_project</span>(
+  <span class='no'>object</span>,
+  <span class='no'>newdata</span>,
+  <span class='kw'>features</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/dimnames.html'>dimnames</a></span>(<span class='no'>object</span>$<span class='no'>pc</span>)<span class='kw'>[[</span><span class='fl'>1</span>]],
+  <span class='kw'>feature_prefix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">

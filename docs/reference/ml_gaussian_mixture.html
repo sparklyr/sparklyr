@@ -19,10 +19,19 @@ aliases:
 
     <p>This class performs expectation maximization for multivariate Gaussian Mixture Models (GMMs). A GMM represents a composite distribution of independent Gaussian distributions with associated "mixing" weights specifying each's contribution to the composite. Given a set of sample points, this class will maximize the log-likelihood for a mixture of k Gaussians, iterating until the log-likelihood changes by less than <code>tol</code>, or until it has reached the max number of iterations. While this process is generally guaranteed to converge, it is not guaranteed to find a global optimum.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_gaussian_mixture</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>0.01</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
-  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"gaussian_mixture_"</span>), <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_gaussian_mixture</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>0.01</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"gaussian_mixture_"</span>),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -101,8 +110,10 @@ reproducible across repeated calls.</p></td>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for
   more information on the set of clustering algorithms.</p>
-<p>Other ml clustering algorithms: <code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a></code>,
-  <code><a href='ml_kmeans.html'>ml_kmeans</a></code>, <code><a href='ml_lda.html'>ml_lda</a></code></p></div>
+<p>Other ml clustering algorithms: 
+<code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a>()</code>,
+<code><a href='ml_kmeans.html'>ml_kmeans</a>()</code>,
+<code><a href='ml_lda.html'>ml_lda</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {

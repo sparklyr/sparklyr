@@ -20,12 +20,21 @@ aliases:
 
     <p>Naive Bayes Classifiers. It supports Multinomial NB (see <a href='http://nlp.stanford.edu/IR-book/html/htmledition/naive-bayes-text-classification-1.html'>here</a>) which can handle finitely supported discrete data. For example, by converting documents into TF-IDF vectors, it can be used for document classification. By making every vector a binary (0/1) data, it can also be used as Bernoulli NB (see <a href='http://nlp.stanford.edu/IR-book/html/htmledition/the-bernoulli-model-1.html'>here</a>). The input feature values must be nonnegative.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_naive_bayes</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>model_type</span> <span class='kw'>=</span> <span class='st'>"multinomial"</span>,
-  <span class='kw'>smoothing</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>weight_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
-  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>,
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_naive_bayes</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>model_type</span> <span class='kw'>=</span> <span class='st'>"multinomial"</span>,
+  <span class='kw'>smoothing</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>thresholds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>weight_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"label"</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='st'>"probability"</span>,
   <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='st'>"rawPrediction"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"naive_bayes_"</span>), <span class='no'>...</span>)</code></pre></div>
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"naive_bayes_"</span>),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -115,17 +124,18 @@ and <code>"bernoulli"</code>. (default = <code>multinomial</code>)</p></td>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-classification-regression.html'>http://spark.apache.org/docs/latest/ml-classification-regression.html</a> for
   more information on the set of supervised learning algorithms.</p>
-<p>Other ml algorithms: <code><a href='ml_aft_survival_regression.html'>ml_aft_survival_regression</a></code>,
-  <code><a href='ml_decision_tree.html'>ml_decision_tree_classifier</a></code>,
-  <code><a href='ml_gradient_boosted_trees.html'>ml_gbt_classifier</a></code>,
-  <code><a href='ml_generalized_linear_regression.html'>ml_generalized_linear_regression</a></code>,
-  <code><a href='ml_isotonic_regression.html'>ml_isotonic_regression</a></code>,
-  <code><a href='ml_linear_regression.html'>ml_linear_regression</a></code>,
-  <code><a href='ml_linear_svc.html'>ml_linear_svc</a></code>,
-  <code><a href='ml_logistic_regression.html'>ml_logistic_regression</a></code>,
-  <code><a href='ml_multilayer_perceptron_classifier.html'>ml_multilayer_perceptron_classifier</a></code>,
-  <code><a href='ml_one_vs_rest.html'>ml_one_vs_rest</a></code>,
-  <code><a href='ml_random_forest.html'>ml_random_forest_classifier</a></code></p></div>
+<p>Other ml algorithms: 
+<code><a href='ml_aft_survival_regression.html'>ml_aft_survival_regression</a>()</code>,
+<code><a href='ml_decision_tree.html'>ml_decision_tree_classifier</a>()</code>,
+<code><a href='ml_gradient_boosted_trees.html'>ml_gbt_classifier</a>()</code>,
+<code><a href='ml_generalized_linear_regression.html'>ml_generalized_linear_regression</a>()</code>,
+<code><a href='ml_isotonic_regression.html'>ml_isotonic_regression</a>()</code>,
+<code><a href='ml_linear_regression.html'>ml_linear_regression</a>()</code>,
+<code><a href='ml_linear_svc.html'>ml_linear_svc</a>()</code>,
+<code><a href='ml_logistic_regression.html'>ml_logistic_regression</a>()</code>,
+<code><a href='ml_multilayer_perceptron_classifier.html'>ml_multilayer_perceptron_classifier</a>()</code>,
+<code><a href='ml_one_vs_rest.html'>ml_one_vs_rest</a>()</code>,
+<code><a href='ml_random_forest.html'>ml_random_forest_classifier</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {

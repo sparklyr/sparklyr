@@ -18,10 +18,17 @@ aliases:
 
     <p>These routines allow you to manage your connections to Spark.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_connect</span>(<span class='no'>master</span>, <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span>(<span class='st'>"SPARK_HOME"</span>),
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_connect</span>(
+  <span class='no'>master</span>,
+  <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span>(<span class='st'>"SPARK_HOME"</span>),
   <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"shell"</span>, <span class='st'>"livy"</span>, <span class='st'>"databricks"</span>, <span class='st'>"test"</span>, <span class='st'>"qubole"</span>),
-  <span class='kw'>app_name</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(),
-  <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sparklyr/man/register_extension.html'>registered_extensions</a></span>(), <span class='no'>...</span>)
+  <span class='kw'>app_name</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>,
+  <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(),
+  <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='register_extension.html'>registered_extensions</a></span>(),
+  <span class='kw'>packages</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)
 
 <span class='fu'>spark_connection_is_open</span>(<span class='no'>sc</span>)
 
@@ -29,9 +36,16 @@ aliases:
 
 <span class='fu'>spark_disconnect_all</span>()
 
-<span class='fu'>spark_submit</span>(<span class='no'>master</span>, <span class='no'>file</span>, <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span>(<span class='st'>"SPARK_HOME"</span>),
-  <span class='kw'>app_name</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(),
-  <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sparklyr/man/register_extension.html'>registered_extensions</a></span>(), <span class='no'>...</span>)</code></pre></div>
+<span class='fu'>spark_submit</span>(
+  <span class='no'>master</span>,
+  <span class='no'>file</span>,
+  <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span>(<span class='st'>"SPARK_HOME"</span>),
+  <span class='kw'>app_name</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>,
+  <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(),
+  <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='register_extension.html'>registered_extensions</a></span>(),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -79,9 +93,18 @@ connections, optional otherwise.</p></td>
     </tr>
     <tr>
       <td>extensions</td>
-      <td><p>Extension packages to enable for this connection. By
+      <td><p>Extension R packages to enable for this connection. By
 default, all packages enabled through the use of
 <code><a href='register_extension.html'>sparklyr::register_extension</a></code> will be passed here.</p></td>
+    </tr>
+    <tr>
+      <td>packages</td>
+      <td><p>A list of Spark packages to load. For example, <code>"delta"</code> or
+<code>"kafka"</code> to enable Delta Lake or Kafka. Also supports full versions like
+<code>"io.delta:delta-core_2.11:0.4.0"</code>. This is similar to adding packages into the
+<code>sparklyr.shell.packages</code> configuration option. Notice that the <code>version</code>
+parameter is used to choose the correect package, otherwise assumes the latest version
+is being used.</p></td>
     </tr>
     <tr>
       <td>...</td>
@@ -99,10 +122,8 @@ default, all packages enabled through the use of
 
     <h2 id="details">Details</h2>
 
-    <p>When using <code>method = "livy"</code>, it is recommended to specify <code>version</code>
-parameter to improve performance by using precompiled code rather than uploading
-sources. By default, jars are downloaded from GitHub but the path to the correct
-<code>sparklyr</code> JAR can also be specified through the <code>livy.jars</code> setting.</p>
+    <p>When using <code>method = "livy"</code>, jars are downloaded from GitHub but the path
+to a local <code>sparklyr</code> JAR can also be specified through the <code>livy.jars</code> setting.</p>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>

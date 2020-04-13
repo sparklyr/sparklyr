@@ -18,9 +18,14 @@ aliases:
 
     <p>Create a Spark Configuration for Livy</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>livy_config</span>(<span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(), <span class='kw'>username</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>password</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>negotiate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>custom_headers</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>`X-Requested-By`</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>), <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>livy_config</span>(
+  <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(),
+  <span class='kw'>username</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>password</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>negotiate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>custom_headers</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>`X-Requested-By`</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -66,7 +71,7 @@ for Livy. For instance, <code>username</code> and <code>password</code>
 define the basic authentication settings for a Livy session.</p>
 <p>The default value of <code>"custom_headers"</code> is set to <code><a href='https://rdrr.io/r/base/list.html'>list("X-Requested-By" = "sparklyr")</a></code>
 in order to facilitate connection to Livy servers with CSRF protection enabled.</p>
-<p>Additional parameters for Livy sessions are:</p><dl class='dl-horizontal'>
+<p>Additional parameters for Livy sessions are:</p><dl'>
   <dt><code>proxy_user</code></dt><dd><p>User to impersonate when starting the session</p></dd>
   <dt><code>jars</code></dt><dd><p>jars to be used in this session</p></dd>
   <dt><code>py_files</code></dt><dd><p>Python files to be used in this session</p></dd>

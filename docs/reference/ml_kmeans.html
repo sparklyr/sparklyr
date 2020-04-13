@@ -20,10 +20,20 @@ aliases:
     <p>K-means clustering with support for k-means|| initialization proposed by Bahmani et al.
   Using `ml_kmeans()` with the formula interface requires Spark 2.0+.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_kmeans</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>,
-  <span class='kw'>init_steps</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>init_mode</span> <span class='kw'>=</span> <span class='st'>"k-means||"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"kmeans_"</span>), <span class='no'>...</span>)
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_kmeans</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>,
+  <span class='kw'>init_steps</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>init_mode</span> <span class='kw'>=</span> <span class='st'>"k-means||"</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"kmeans_"</span>),
+  <span class='no'>...</span>
+)
 
 <span class='fu'>ml_compute_cost</span>(<span class='no'>model</span>, <span class='no'>dataset</span>)</code></pre></div>
 
@@ -119,8 +129,10 @@ reproducible across repeated calls.</p></td>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for
   more information on the set of clustering algorithms.</p>
-<p>Other ml clustering algorithms: <code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a></code>,
-  <code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a></code>, <code><a href='ml_lda.html'>ml_lda</a></code></p></div>
+<p>Other ml clustering algorithms: 
+<code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a>()</code>,
+<code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a>()</code>,
+<code><a href='ml_lda.html'>ml_lda</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {

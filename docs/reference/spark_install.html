@@ -18,11 +18,21 @@ aliases:
     <p>Install versions of Spark for use with local Spark connections
   (i.e. <code>spark_connect(master = "local"</code>)</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_install_find</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>hadoop_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>installed_only</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>latest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>hint</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_install_find</span>(
+  <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>hadoop_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>installed_only</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>latest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>hint</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
 
-<span class='fu'>spark_install</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>hadoop_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reset</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>logging</span> <span class='kw'>=</span> <span class='st'>"INFO"</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>())
+<span class='fu'>spark_install</span>(
+  <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>hadoop_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>reset</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>logging</span> <span class='kw'>=</span> <span class='st'>"INFO"</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()
+)
 
 <span class='fu'>spark_uninstall</span>(<span class='no'>version</span>, <span class='no'>hadoop_version</span>)
 
@@ -32,7 +42,11 @@ aliases:
 
 <span class='fu'>spark_installed_versions</span>()
 
-<span class='fu'>spark_available_versions</span>(<span class='kw'>show_hadoop</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>show_minor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</code></pre></div>
+<span class='fu'>spark_available_versions</span>(
+  <span class='kw'>show_hadoop</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>show_minor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>show_future</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -86,6 +100,10 @@ reference spark and hadoop versions respectively.</p></td>
     <tr>
       <td>show_minor</td>
       <td><p>Show minor Spark versions?</p></td>
+    </tr>
+    <tr>
+      <td>show_future</td>
+      <td><p>Should future versions which have not been released be shown?</p></td>
     </tr>
     </table>
 
