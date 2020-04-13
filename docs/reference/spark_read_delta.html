@@ -17,9 +17,18 @@ aliases:
 
     <p>Read from Delta Lake into a Spark DataFrame.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_read_delta</span>(<span class='no'>sc</span>, <span class='no'>path</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>timestamp</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>options</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>repartition</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>memory</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_read_delta</span>(
+  <span class='no'>sc</span>,
+  <span class='no'>path</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>timestamp</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>options</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>repartition</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>memory</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -78,26 +87,27 @@ already exists?</p></td>
 
     <h2 id="see-also">See also</h2>
 
-    <div class='dont-index'><p>Other Spark serialization routines: <code><a href='spark_load_table.html'>spark_load_table</a></code>,
-  <code><a href='spark_read_csv.html'>spark_read_csv</a></code>,
-  <code><a href='spark_read_jdbc.html'>spark_read_jdbc</a></code>,
-  <code><a href='spark_read_json.html'>spark_read_json</a></code>,
-  <code><a href='spark_read_libsvm.html'>spark_read_libsvm</a></code>,
-  <code><a href='spark_read_orc.html'>spark_read_orc</a></code>,
-  <code><a href='spark_read_parquet.html'>spark_read_parquet</a></code>,
-  <code><a href='spark_read_source.html'>spark_read_source</a></code>,
-  <code><a href='spark_read_table.html'>spark_read_table</a></code>,
-  <code><a href='spark_read_text.html'>spark_read_text</a></code>,
-  <code><a href='spark_save_table.html'>spark_save_table</a></code>,
-  <code><a href='spark_write_csv.html'>spark_write_csv</a></code>,
-  <code><a href='spark_write_delta.html'>spark_write_delta</a></code>,
-  <code><a href='spark_write_jdbc.html'>spark_write_jdbc</a></code>,
-  <code><a href='spark_write_json.html'>spark_write_json</a></code>,
-  <code><a href='spark_write_orc.html'>spark_write_orc</a></code>,
-  <code><a href='spark_write_parquet.html'>spark_write_parquet</a></code>,
-  <code><a href='spark_write_source.html'>spark_write_source</a></code>,
-  <code><a href='spark_write_table.html'>spark_write_table</a></code>,
-  <code><a href='spark_write_text.html'>spark_write_text</a></code></p></div>
+    <div class='dont-index'><p>Other Spark serialization routines: 
+<code><a href='spark_load_table.html'>spark_load_table</a>()</code>,
+<code><a href='spark_read_csv.html'>spark_read_csv</a>()</code>,
+<code><a href='spark_read_jdbc.html'>spark_read_jdbc</a>()</code>,
+<code><a href='spark_read_json.html'>spark_read_json</a>()</code>,
+<code><a href='spark_read_libsvm.html'>spark_read_libsvm</a>()</code>,
+<code><a href='spark_read_orc.html'>spark_read_orc</a>()</code>,
+<code><a href='spark_read_parquet.html'>spark_read_parquet</a>()</code>,
+<code><a href='spark_read_source.html'>spark_read_source</a>()</code>,
+<code><a href='spark_read_table.html'>spark_read_table</a>()</code>,
+<code><a href='spark_read_text.html'>spark_read_text</a>()</code>,
+<code><a href='spark_save_table.html'>spark_save_table</a>()</code>,
+<code><a href='spark_write_csv.html'>spark_write_csv</a>()</code>,
+<code><a href='spark_write_delta.html'>spark_write_delta</a>()</code>,
+<code><a href='spark_write_jdbc.html'>spark_write_jdbc</a>()</code>,
+<code><a href='spark_write_json.html'>spark_write_json</a>()</code>,
+<code><a href='spark_write_orc.html'>spark_write_orc</a>()</code>,
+<code><a href='spark_write_parquet.html'>spark_write_parquet</a>()</code>,
+<code><a href='spark_write_source.html'>spark_write_source</a>()</code>,
+<code><a href='spark_write_table.html'>spark_write_table</a>()</code>,
+<code><a href='spark_write_text.html'>spark_write_text</a>()</code></p></div>
 
 
     </div>

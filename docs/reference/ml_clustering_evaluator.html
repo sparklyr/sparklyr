@@ -22,9 +22,14 @@ aliases:
     points in a cluster are close to the other points in the same cluster and far from the
     points of the other clusters.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_clustering_evaluator</span>(<span class='no'>x</span>, <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
-  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='kw'>metric_name</span> <span class='kw'>=</span> <span class='st'>"silhouette"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"clustering_evaluator_"</span>), <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_clustering_evaluator</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>metric_name</span> <span class='kw'>=</span> <span class='st'>"silhouette"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"clustering_evaluator_"</span>),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">

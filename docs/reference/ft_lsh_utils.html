@@ -16,11 +16,21 @@ aliases:
 
     <p>Utility functions for LSH models</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_approx_nearest_neighbors</span>(<span class='no'>model</span>, <span class='no'>dataset</span>, <span class='no'>key</span>, <span class='no'>num_nearest_neighbors</span>,
-  <span class='kw'>dist_col</span> <span class='kw'>=</span> <span class='st'>"distCol"</span>)
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_approx_nearest_neighbors</span>(
+  <span class='no'>model</span>,
+  <span class='no'>dataset</span>,
+  <span class='no'>key</span>,
+  <span class='no'>num_nearest_neighbors</span>,
+  <span class='kw'>dist_col</span> <span class='kw'>=</span> <span class='st'>"distCol"</span>
+)
 
-<span class='fu'>ml_approx_similarity_join</span>(<span class='no'>model</span>, <span class='no'>dataset_a</span>, <span class='no'>dataset_b</span>, <span class='no'>threshold</span>,
-  <span class='kw'>dist_col</span> <span class='kw'>=</span> <span class='st'>"distCol"</span>)</code></pre></div>
+<span class='fu'>ml_approx_similarity_join</span>(
+  <span class='no'>model</span>,
+  <span class='no'>dataset_a</span>,
+  <span class='no'>dataset_b</span>,
+  <span class='no'>threshold</span>,
+  <span class='kw'>dist_col</span> <span class='kw'>=</span> <span class='st'>"distCol"</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">

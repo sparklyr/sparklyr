@@ -16,9 +16,15 @@ aliases:
 
     <p>A parallel FP-growth algorithm to mine frequent itemsets.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_fpgrowth</span>(<span class='no'>x</span>, <span class='kw'>items_col</span> <span class='kw'>=</span> <span class='st'>"items"</span>, <span class='kw'>min_confidence</span> <span class='kw'>=</span> <span class='fl'>0.8</span>,
-  <span class='kw'>min_support</span> <span class='kw'>=</span> <span class='fl'>0.3</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"fpgrowth_"</span>), <span class='no'>...</span>)
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_fpgrowth</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>items_col</span> <span class='kw'>=</span> <span class='st'>"items"</span>,
+  <span class='kw'>min_confidence</span> <span class='kw'>=</span> <span class='fl'>0.8</span>,
+  <span class='kw'>min_support</span> <span class='kw'>=</span> <span class='fl'>0.3</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"fpgrowth_"</span>),
+  <span class='no'>...</span>
+)
 
 <span class='fu'>ml_association_rules</span>(<span class='no'>model</span>)
 

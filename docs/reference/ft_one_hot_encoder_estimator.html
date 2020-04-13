@@ -26,9 +26,15 @@ aliases:
   vector entries sum up to one, and hence linearly dependent. So
   an input value of 4.0 maps to [0.0, 0.0, 0.0, 0.0].</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_one_hot_encoder_estimator</span>(<span class='no'>x</span>, <span class='kw'>input_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>output_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>handle_invalid</span> <span class='kw'>=</span> <span class='st'>"error"</span>, <span class='kw'>drop_last</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"one_hot_encoder_estimator_"</span>), <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_one_hot_encoder_estimator</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>input_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>output_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>handle_invalid</span> <span class='kw'>=</span> <span class='st'>"error"</span>,
+  <span class='kw'>drop_last</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"one_hot_encoder_estimator_"</span>),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -93,32 +99,39 @@ aliases:
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
   more information on the set of transformations available for DataFrame
   columns in Spark.</p>
-<p>Other feature transformers: <code><a href='ft_binarizer.html'>ft_binarizer</a></code>,
-  <code><a href='ft_bucketizer.html'>ft_bucketizer</a></code>,
-  <code><a href='ft_chisq_selector.html'>ft_chisq_selector</a></code>,
-  <code><a href='ft_count_vectorizer.html'>ft_count_vectorizer</a></code>, <code><a href='ft_dct.html'>ft_dct</a></code>,
-  <code><a href='ft_elementwise_product.html'>ft_elementwise_product</a></code>,
-  <code><a href='ft_feature_hasher.html'>ft_feature_hasher</a></code>,
-  <code><a href='ft_hashing_tf.html'>ft_hashing_tf</a></code>, <code><a href='ft_idf.html'>ft_idf</a></code>,
-  <code><a href='ft_imputer.html'>ft_imputer</a></code>,
-  <code><a href='ft_index_to_string.html'>ft_index_to_string</a></code>,
-  <code><a href='ft_interaction.html'>ft_interaction</a></code>, <code><a href='ft_lsh.html'>ft_lsh</a></code>,
-  <code><a href='ft_max_abs_scaler.html'>ft_max_abs_scaler</a></code>,
-  <code><a href='ft_min_max_scaler.html'>ft_min_max_scaler</a></code>, <code><a href='ft_ngram.html'>ft_ngram</a></code>,
-  <code><a href='ft_normalizer.html'>ft_normalizer</a></code>,
-  <code><a href='ft_one_hot_encoder.html'>ft_one_hot_encoder</a></code>, <code><a href='ft_pca.html'>ft_pca</a></code>,
-  <code><a href='ft_polynomial_expansion.html'>ft_polynomial_expansion</a></code>,
-  <code><a href='ft_quantile_discretizer.html'>ft_quantile_discretizer</a></code>,
-  <code><a href='ft_r_formula.html'>ft_r_formula</a></code>,
-  <code><a href='ft_regex_tokenizer.html'>ft_regex_tokenizer</a></code>,
-  <code><a href='sql-transformer.html'>ft_sql_transformer</a></code>,
-  <code><a href='ft_standard_scaler.html'>ft_standard_scaler</a></code>,
-  <code><a href='ft_stop_words_remover.html'>ft_stop_words_remover</a></code>,
-  <code><a href='ft_string_indexer.html'>ft_string_indexer</a></code>,
-  <code><a href='ft_tokenizer.html'>ft_tokenizer</a></code>,
-  <code><a href='ft_vector_assembler.html'>ft_vector_assembler</a></code>,
-  <code><a href='ft_vector_indexer.html'>ft_vector_indexer</a></code>,
-  <code><a href='ft_vector_slicer.html'>ft_vector_slicer</a></code>, <code><a href='ft_word2vec.html'>ft_word2vec</a></code></p></div>
+<p>Other feature transformers: 
+<code><a href='ft_binarizer.html'>ft_binarizer</a>()</code>,
+<code><a href='ft_bucketizer.html'>ft_bucketizer</a>()</code>,
+<code><a href='ft_chisq_selector.html'>ft_chisq_selector</a>()</code>,
+<code><a href='ft_count_vectorizer.html'>ft_count_vectorizer</a>()</code>,
+<code><a href='ft_dct.html'>ft_dct</a>()</code>,
+<code><a href='ft_elementwise_product.html'>ft_elementwise_product</a>()</code>,
+<code><a href='ft_feature_hasher.html'>ft_feature_hasher</a>()</code>,
+<code><a href='ft_hashing_tf.html'>ft_hashing_tf</a>()</code>,
+<code><a href='ft_idf.html'>ft_idf</a>()</code>,
+<code><a href='ft_imputer.html'>ft_imputer</a>()</code>,
+<code><a href='ft_index_to_string.html'>ft_index_to_string</a>()</code>,
+<code><a href='ft_interaction.html'>ft_interaction</a>()</code>,
+<code><a href='ft_lsh.html'>ft_lsh</a></code>,
+<code><a href='ft_max_abs_scaler.html'>ft_max_abs_scaler</a>()</code>,
+<code><a href='ft_min_max_scaler.html'>ft_min_max_scaler</a>()</code>,
+<code><a href='ft_ngram.html'>ft_ngram</a>()</code>,
+<code><a href='ft_normalizer.html'>ft_normalizer</a>()</code>,
+<code><a href='ft_one_hot_encoder.html'>ft_one_hot_encoder</a>()</code>,
+<code><a href='ft_pca.html'>ft_pca</a>()</code>,
+<code><a href='ft_polynomial_expansion.html'>ft_polynomial_expansion</a>()</code>,
+<code><a href='ft_quantile_discretizer.html'>ft_quantile_discretizer</a>()</code>,
+<code><a href='ft_r_formula.html'>ft_r_formula</a>()</code>,
+<code><a href='ft_regex_tokenizer.html'>ft_regex_tokenizer</a>()</code>,
+<code><a href='sql-transformer.html'>ft_sql_transformer</a>()</code>,
+<code><a href='ft_standard_scaler.html'>ft_standard_scaler</a>()</code>,
+<code><a href='ft_stop_words_remover.html'>ft_stop_words_remover</a>()</code>,
+<code><a href='ft_string_indexer.html'>ft_string_indexer</a>()</code>,
+<code><a href='ft_tokenizer.html'>ft_tokenizer</a>()</code>,
+<code><a href='ft_vector_assembler.html'>ft_vector_assembler</a>()</code>,
+<code><a href='ft_vector_indexer.html'>ft_vector_indexer</a>()</code>,
+<code><a href='ft_vector_slicer.html'>ft_vector_slicer</a>()</code>,
+<code><a href='ft_word2vec.html'>ft_word2vec</a>()</code></p></div>
 
 
     </div>

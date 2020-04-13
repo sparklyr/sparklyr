@@ -20,8 +20,7 @@ aliases:
 <p>Find the LIVY_HOME directory for a given version of Livy that
 was previously installed using <code>livy_install</code>.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>livy_install</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"0.5.0"</span>, <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>spark_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>livy_install</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"0.6.0"</span>, <span class='kw'>spark_home</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>spark_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='fu'>livy_available_versions</span>()
 
@@ -41,7 +40,7 @@ was previously installed using <code>livy_install</code>.</p>
 
     <tr>
       <td>version</td>
-      <td><p>The version of <samp>livy</samp> to be installed.</p></td>
+      <td><p>Version of Livy</p></td>
     </tr>
     <tr>
       <td>spark_home</td>
@@ -56,10 +55,6 @@ the value of <samp>spark_version</samp> supplied.</p></td>
 the value is inferred based on the value of <samp>livy_version</samp> supplied.
 A version of Spark known to be compatible with the requested version of
 <samp>livy</samp> is chosen when possible.</p></td>
-    </tr>
-    <tr>
-      <td>version</td>
-      <td><p>Version of Livy</p></td>
     </tr>
     </table>
 

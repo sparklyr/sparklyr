@@ -18,9 +18,15 @@ aliases:
 
     <p>Writes a Spark dataframe stream into a JSON stream.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_write_json</span>(<span class='no'>x</span>, <span class='no'>path</span>, <span class='kw'>mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"append"</span>, <span class='st'>"complete"</span>, <span class='st'>"update"</span>),
-  <span class='kw'>trigger</span> <span class='kw'>=</span> <span class='fu'><a href='stream_trigger_interval.html'>stream_trigger_interval</a></span>(), <span class='kw'>checkpoint</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>path</span>,
-  <span class='st'>"checkpoints"</span>, <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>""</span>)), <span class='kw'>options</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_write_json</span>(
+  <span class='no'>x</span>,
+  <span class='no'>path</span>,
+  <span class='kw'>mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"append"</span>, <span class='st'>"complete"</span>, <span class='st'>"update"</span>),
+  <span class='kw'>trigger</span> <span class='kw'>=</span> <span class='fu'><a href='stream_trigger_interval.html'>stream_trigger_interval</a></span>(),
+  <span class='kw'>checkpoint</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>path</span>, <span class='st'>"checkpoints"</span>, <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>""</span>)),
+  <span class='kw'>options</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -67,20 +73,23 @@ information to guarantee end-to-end fault-tolerance.</p></td>
 
     <h2 id="see-also">See also</h2>
 
-    <div class='dont-index'><p>Other Spark stream serialization: <code><a href='stream_read_csv.html'>stream_read_csv</a></code>,
-  <code><a href='stream_read_json.html'>stream_read_json</a></code>,
-  <code><a href='stream_read_kafka.html'>stream_read_kafka</a></code>,
-  <code><a href='stream_read_orc.html'>stream_read_orc</a></code>,
-  <code><a href='stream_read_parquet.html'>stream_read_parquet</a></code>,
-  <code><a href='stream_read_scoket.html'>stream_read_scoket</a></code>,
-  <code><a href='stream_read_text.html'>stream_read_text</a></code>,
-  <code><a href='stream_write_console.html'>stream_write_console</a></code>,
-  <code><a href='stream_write_csv.html'>stream_write_csv</a></code>,
-  <code><a href='stream_write_kafka.html'>stream_write_kafka</a></code>,
-  <code><a href='stream_write_memory.html'>stream_write_memory</a></code>,
-  <code><a href='stream_write_orc.html'>stream_write_orc</a></code>,
-  <code><a href='stream_write_parquet.html'>stream_write_parquet</a></code>,
-  <code><a href='stream_write_text.html'>stream_write_text</a></code></p></div>
+    <div class='dont-index'><p>Other Spark stream serialization: 
+<code><a href='stream_read_csv.html'>stream_read_csv</a>()</code>,
+<code><a href='stream_read_delta.html'>stream_read_delta</a>()</code>,
+<code><a href='stream_read_json.html'>stream_read_json</a>()</code>,
+<code><a href='stream_read_kafka.html'>stream_read_kafka</a>()</code>,
+<code><a href='stream_read_orc.html'>stream_read_orc</a>()</code>,
+<code><a href='stream_read_parquet.html'>stream_read_parquet</a>()</code>,
+<code><a href='stream_read_socket.html'>stream_read_socket</a>()</code>,
+<code><a href='stream_read_text.html'>stream_read_text</a>()</code>,
+<code><a href='stream_write_console.html'>stream_write_console</a>()</code>,
+<code><a href='stream_write_csv.html'>stream_write_csv</a>()</code>,
+<code><a href='stream_write_delta.html'>stream_write_delta</a>()</code>,
+<code><a href='stream_write_kafka.html'>stream_write_kafka</a>()</code>,
+<code><a href='stream_write_memory.html'>stream_write_memory</a>()</code>,
+<code><a href='stream_write_orc.html'>stream_write_orc</a>()</code>,
+<code><a href='stream_write_parquet.html'>stream_write_parquet</a>()</code>,
+<code><a href='stream_write_text.html'>stream_write_text</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -88,7 +97,7 @@ information to guarantee end-to-end fault-tolerance.</p></td>
 <span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
 
 <span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span>(<span class='st'>"json-in"</span>)
-<span class='kw pkg'>jsonlite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/jsonlite/man/read_json.html'>write_json</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>2</span>), <span class='kw'>b</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>10</span>,<span class='fl'>20</span>)), <span class='st'>"json-in/data.json"</span>)
+<span class='kw pkg'>jsonlite</span><span class='kw ns'>::</span><span class='fu'><a href='https://jeroen.cran.dev/jsonlite/reference/read_json.html'>write_json</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>2</span>), <span class='kw'>b</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>10</span>,<span class='fl'>20</span>)), <span class='st'>"json-in/data.json"</span>)
 
 <span class='no'>json_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"file://"</span>, <span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>getwd</a></span>(), <span class='st'>"json-in"</span>)
 

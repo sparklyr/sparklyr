@@ -22,11 +22,14 @@ aliases:
     <p>Partition a Spark DataFrame into multiple groups. This routine is useful
 for splitting a DataFrame into, for example, training and test datasets.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_random_split</span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='no'>.Machine</span>$<span class='no'>integer.max</span>, <span class='fl'>1</span>))
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_random_split</span>(
+  <span class='no'>x</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='no'>.Machine</span>$<span class='no'>integer.max</span>, <span class='fl'>1</span>)
+)
 
-<span class='fu'>sdf_partition</span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='no'>.Machine</span>$<span class='no'>integer.max</span>, <span class='fl'>1</span>))</code></pre></div>
+<span class='fu'>sdf_partition</span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='no'>.Machine</span>$<span class='no'>integer.max</span>, <span class='fl'>1</span>))</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -84,9 +87,11 @@ the <span style="R">R</span> level, these operations will only be executed when 
 <code><a href='collect.html'>collect()</a></code> the table.</p>
     <h2 id="see-also">See also</h2>
 
-    <div class='dont-index'><p>Other Spark data frames: <code><a href='sdf_copy_to.html'>sdf_copy_to</a></code>,
-  <code><a href='sdf_register.html'>sdf_register</a></code>, <code><a href='sdf_sample.html'>sdf_sample</a></code>,
-  <code><a href='sdf_sort.html'>sdf_sort</a></code></p></div>
+    <div class='dont-index'><p>Other Spark data frames: 
+<code><a href='sdf_copy_to.html'>sdf_copy_to</a>()</code>,
+<code><a href='sdf_register.html'>sdf_register</a>()</code>,
+<code><a href='sdf_sample.html'>sdf_sample</a>()</code>,
+<code><a href='sdf_sort.html'>sdf_sort</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
