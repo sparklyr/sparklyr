@@ -18,9 +18,18 @@ aliases:
 
     <p>Applies an R function to a Spark object (typically, a Spark DataFrame).</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_apply</span>(<span class='no'>x</span>, <span class='no'>f</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>memory</span> <span class='kw'>=</span> !<span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span>(<span class='no'>name</span>),
-  <span class='kw'>group_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>packages</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>context</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_apply</span>(
+  <span class='no'>x</span>,
+  <span class='no'>f</span>,
+  <span class='kw'>columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>memory</span> <span class='kw'>=</span> !<span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span>(<span class='no'>name</span>),
+  <span class='kw'>group_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>packages</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>context</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>barrier</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -91,6 +100,10 @@ specify the column types. The sample size is configurable using the
       <td><p>Optional table name while registering the resulting data frame.</p></td>
     </tr>
     <tr>
+      <td>barrier</td>
+      <td><p>Optional to support Barrier Execution Mode in the scheduler.</p></td>
+    </tr>
+    <tr>
       <td>...</td>
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
@@ -113,11 +126,15 @@ without <code>--vanilla</code> use <code>sparklyr.apply.options.vanilla</code> s
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>sparklyr</span>)
-<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local[3]"</span>)
 
 <span class='co'># creates an Spark data frame with 10 elements then multiply times 10 in R</span>
 <span class='fu'><a href='sdf_len.html'>sdf_len</a></span>(<span class='no'>sc</span>, <span class='fl'>10</span>) <span class='kw'>%&gt;%</span> <span class='fu'>spark_apply</span>(<span class='kw'>function</span>(<span class='no'>df</span>) <span class='no'>df</span> * <span class='fl'>10</span>)
 
+<span class='co'># using barrier mode</span>
+<span class='fu'><a href='sdf_len.html'>sdf_len</a></span>(<span class='no'>sc</span>, <span class='fl'>3</span>, <span class='kw'>repartition</span> <span class='kw'>=</span> <span class='fl'>3</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'>spark_apply</span>(<span class='no'>nrow</span>, <span class='kw'>barrier</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>id</span> <span class='kw'>=</span> <span class='st'>"integer"</span>)) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='collect.html'>collect</a></span>()
 }</div></code></pre></div>
 
     </div>

@@ -17,30 +17,70 @@ aliases:
     <p>Functions for developers writing extensions for Spark ML. These functions are constructors
   for `ml_model` objects that are returned when using the formula interface.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>new_ml_model_prediction</span>(<span class='no'>pipeline_model</span>, <span class='no'>formula</span>, <span class='no'>dataset</span>, <span class='no'>label_col</span>,
-  <span class='no'>features_col</span>, <span class='no'>...</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>new_ml_model_prediction</span>(
+  <span class='no'>pipeline_model</span>,
+  <span class='no'>formula</span>,
+  <span class='no'>dataset</span>,
+  <span class='no'>label_col</span>,
+  <span class='no'>features_col</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>()
+)
 
 <span class='fu'>new_ml_model</span>(<span class='no'>pipeline_model</span>, <span class='no'>formula</span>, <span class='no'>dataset</span>, <span class='no'>...</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())
 
-<span class='fu'>new_ml_model_classification</span>(<span class='no'>pipeline_model</span>, <span class='no'>formula</span>, <span class='no'>dataset</span>, <span class='no'>label_col</span>,
-  <span class='no'>features_col</span>, <span class='no'>predicted_label_col</span>, <span class='no'>...</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())
+<span class='fu'>new_ml_model_classification</span>(
+  <span class='no'>pipeline_model</span>,
+  <span class='no'>formula</span>,
+  <span class='no'>dataset</span>,
+  <span class='no'>label_col</span>,
+  <span class='no'>features_col</span>,
+  <span class='no'>predicted_label_col</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>()
+)
 
-<span class='fu'>new_ml_model_regression</span>(<span class='no'>pipeline_model</span>, <span class='no'>formula</span>, <span class='no'>dataset</span>, <span class='no'>label_col</span>,
-  <span class='no'>features_col</span>, <span class='no'>...</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())
+<span class='fu'>new_ml_model_regression</span>(
+  <span class='no'>pipeline_model</span>,
+  <span class='no'>formula</span>,
+  <span class='no'>dataset</span>,
+  <span class='no'>label_col</span>,
+  <span class='no'>features_col</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>()
+)
 
-<span class='fu'>new_ml_model_clustering</span>(<span class='no'>pipeline_model</span>, <span class='no'>formula</span>, <span class='no'>dataset</span>, <span class='no'>features_col</span>,
-  <span class='no'>...</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())
+<span class='fu'>new_ml_model_clustering</span>(
+  <span class='no'>pipeline_model</span>,
+  <span class='no'>formula</span>,
+  <span class='no'>dataset</span>,
+  <span class='no'>features_col</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>()
+)
 
-<span class='fu'>ml_supervised_pipeline</span>(<span class='no'>predictor</span>, <span class='no'>dataset</span>, <span class='no'>formula</span>, <span class='no'>features_col</span>,
-  <span class='no'>label_col</span>)
+<span class='fu'>ml_supervised_pipeline</span>(<span class='no'>predictor</span>, <span class='no'>dataset</span>, <span class='no'>formula</span>, <span class='no'>features_col</span>, <span class='no'>label_col</span>)
 
 <span class='fu'>ml_clustering_pipeline</span>(<span class='no'>predictor</span>, <span class='no'>dataset</span>, <span class='no'>formula</span>, <span class='no'>features_col</span>)
 
-<span class='fu'>ml_construct_model_supervised</span>(<span class='no'>constructor</span>, <span class='no'>predictor</span>, <span class='no'>formula</span>, <span class='no'>dataset</span>,
-  <span class='no'>features_col</span>, <span class='no'>label_col</span>, <span class='no'>...</span>)
+<span class='fu'>ml_construct_model_supervised</span>(
+  <span class='no'>constructor</span>,
+  <span class='no'>predictor</span>,
+  <span class='no'>formula</span>,
+  <span class='no'>dataset</span>,
+  <span class='no'>features_col</span>,
+  <span class='no'>label_col</span>,
+  <span class='no'>...</span>
+)
 
-<span class='fu'>ml_construct_model_clustering</span>(<span class='no'>constructor</span>, <span class='no'>predictor</span>, <span class='no'>formula</span>, <span class='no'>dataset</span>,
-  <span class='no'>features_col</span>, <span class='no'>...</span>)</code></pre></div>
+<span class='fu'>ml_construct_model_clustering</span>(
+  <span class='no'>constructor</span>,
+  <span class='no'>predictor</span>,
+  <span class='no'>formula</span>,
+  <span class='no'>dataset</span>,
+  <span class='no'>features_col</span>,
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">

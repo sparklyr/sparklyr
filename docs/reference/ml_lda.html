@@ -21,15 +21,26 @@ aliases:
 
     <p>Latent Dirichlet Allocation (LDA), a topic model designed for text documents.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_lda</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20</span>,
-  <span class='kw'>doc_concentration</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>topic_concentration</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>subsampling_rate</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>optimizer</span> <span class='kw'>=</span> <span class='st'>"online"</span>,
-  <span class='kw'>checkpoint_interval</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>keep_last_checkpoint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>learning_decay</span> <span class='kw'>=</span> <span class='fl'>0.51</span>, <span class='kw'>learning_offset</span> <span class='kw'>=</span> <span class='fl'>1024</span>,
-  <span class='kw'>optimize_doc_concentration</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_lda</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>doc_concentration</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>topic_concentration</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>subsampling_rate</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
+  <span class='kw'>optimizer</span> <span class='kw'>=</span> <span class='st'>"online"</span>,
+  <span class='kw'>checkpoint_interval</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>keep_last_checkpoint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>learning_decay</span> <span class='kw'>=</span> <span class='fl'>0.51</span>,
+  <span class='kw'>learning_offset</span> <span class='kw'>=</span> <span class='fl'>1024</span>,
+  <span class='kw'>optimize_doc_concentration</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
   <span class='kw'>topic_distribution_col</span> <span class='kw'>=</span> <span class='st'>"topicDistribution"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"lda_"</span>), <span class='no'>...</span>)
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"lda_"</span>),
+  <span class='no'>...</span>
+)
 
 <span class='fu'>ml_describe_topics</span>(<span class='no'>model</span>, <span class='kw'>max_terms_per_topic</span> <span class='kw'>=</span> <span class='fl'>10</span>)
 
@@ -219,9 +230,10 @@ reproducible across repeated calls.</p></td>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for
   more information on the set of clustering algorithms.</p>
-<p>Other ml clustering algorithms: <code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a></code>,
-  <code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a></code>,
-  <code><a href='ml_kmeans.html'>ml_kmeans</a></code></p></div>
+<p>Other ml clustering algorithms: 
+<code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a>()</code>,
+<code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a>()</code>,
+<code><a href='ml_kmeans.html'>ml_kmeans</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -230,7 +242,7 @@ reproducible across repeated calls.</p></td>
 <span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>)
 
 <span class='no'>lines_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sdf_copy_to.html'>sdf_copy_to</a></span>(<span class='no'>sc</span>,
-  <span class='fu'><a href='https://rdrr.io/pkg/janeaustenr/man/austen_books.html'>austen_books</a></span>()[<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>:<span class='fl'>30</span>), ],
+  <span class='fu'>austen_books</span>()[<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>:<span class='fl'>30</span>), ],
   <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"lines_tbl"</span>,
   <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )

@@ -20,9 +20,9 @@ aliases:
     <p>Copy an object into Spark, and return an <span style="R">R</span> object wrapping the
 copied object (typically, a Spark DataFrame).</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_copy_to</span>(<span class='no'>sc</span>, <span class='no'>x</span>, <span class='no'>name</span>, <span class='no'>memory</span>, <span class='no'>repartition</span>, <span class='no'>overwrite</span>, <span class='no'>...</span>)
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_copy_to</span>(<span class='no'>sc</span>, <span class='no'>x</span>, <span class='no'>name</span>, <span class='no'>memory</span>, <span class='no'>repartition</span>, <span class='no'>overwrite</span>, <span class='no'>struct_columns</span>, <span class='no'>...</span>)
 
-<span class='fu'>sdf_import</span>(<span class='no'>x</span>, <span class='no'>sc</span>, <span class='no'>name</span>, <span class='no'>memory</span>, <span class='no'>repartition</span>, <span class='no'>overwrite</span>, <span class='no'>...</span>)</code></pre></div>
+<span class='fu'>sdf_import</span>(<span class='no'>x</span>, <span class='no'>sc</span>, <span class='no'>name</span>, <span class='no'>memory</span>, <span class='no'>repartition</span>, <span class='no'>overwrite</span>, <span class='no'>struct_columns</span>, <span class='no'>...</span>)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -60,6 +60,17 @@ partitioning.</p></td>
 if one already exists?</p></td>
     </tr>
     <tr>
+      <td>struct_columns</td>
+      <td><p>(only supported with Spark 2.4.0 or higher) A list of
+columns from the source data frame that should be converted to Spark SQL
+StructType columns.
+The source columns can contain either json strings or nested lists.
+All rows within each source column should have identical schemas (because
+otherwise the conversion result will contain unexpected null values or
+missing values as Spark currently does not support schema discovery on
+individual rows within a struct column).</p></td>
+    </tr>
+    <tr>
       <td>...</td>
       <td><p>Optional arguments, passed to implementing methods.</p></td>
     </tr>
@@ -76,9 +87,11 @@ if one already exists?</p></td>
 implementing the associated method on <code>sdf_import</code>.</p>
     <h2 id="see-also">See also</h2>
 
-    <div class='dont-index'><p>Other Spark data frames: <code><a href='sdf_random_split.html'>sdf_random_split</a></code>,
-  <code><a href='sdf_register.html'>sdf_register</a></code>, <code><a href='sdf_sample.html'>sdf_sample</a></code>,
-  <code><a href='sdf_sort.html'>sdf_sort</a></code></p></div>
+    <div class='dont-index'><p>Other Spark data frames: 
+<code><a href='sdf_random_split.html'>sdf_random_split</a>()</code>,
+<code><a href='sdf_register.html'>sdf_register</a>()</code>,
+<code><a href='sdf_sample.html'>sdf_sample</a>()</code>,
+<code><a href='sdf_sort.html'>sdf_sort</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>

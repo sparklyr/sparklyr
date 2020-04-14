@@ -18,11 +18,21 @@ aliases:
 of <code><a href='spark_config.html'>spark_config()</a></code>, exposes common properties to set in Kubernetes
 clusters.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_config_kubernetes</span>(<span class='no'>master</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"2.3.2"</span>,
-  <span class='kw'>image</span> <span class='kw'>=</span> <span class='st'>"spark:sparklyr"</span>, <span class='kw'>driver</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"sparklyr-"</span>),
-  <span class='kw'>account</span> <span class='kw'>=</span> <span class='st'>"spark"</span>, <span class='kw'>jars</span> <span class='kw'>=</span> <span class='st'>"local:///opt/sparklyr"</span>, <span class='kw'>forward</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>executors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>conf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>120</span>, <span class='kw'>ports</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>8880</span>,
-  <span class='fl'>8881</span>, <span class='fl'>4040</span>), <span class='kw'>fix_config</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>.Platform</span>$<span class='no'>OS.type</span>, <span class='st'>"windows"</span>), <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_config_kubernetes</span>(
+  <span class='no'>master</span>,
+  <span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"2.3.2"</span>,
+  <span class='kw'>image</span> <span class='kw'>=</span> <span class='st'>"spark:sparklyr"</span>,
+  <span class='kw'>driver</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"sparklyr-"</span>),
+  <span class='kw'>account</span> <span class='kw'>=</span> <span class='st'>"spark"</span>,
+  <span class='kw'>jars</span> <span class='kw'>=</span> <span class='st'>"local:///opt/sparklyr"</span>,
+  <span class='kw'>forward</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>executors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>conf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>120</span>,
+  <span class='kw'>ports</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>8880</span>, <span class='fl'>8881</span>, <span class='fl'>4040</span>),
+  <span class='kw'>fix_config</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>.Platform</span>$<span class='no'>OS.type</span>, <span class='st'>"windows"</span>),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">

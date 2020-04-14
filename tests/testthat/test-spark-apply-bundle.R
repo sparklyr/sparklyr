@@ -3,7 +3,7 @@ context("spark apply bundle")
 sc <- testthat_spark_connection()
 
 test_that("'spark_apply_bundle' can `worker_spark_apply_unbundle`", {
-  bundlePath <- spark_apply_bundle(packages = c("ggplot2", "purrr"))
+  bundlePath <- spark_apply_bundle()
   unbundlePath <- worker_spark_apply_unbundle(bundlePath, tempdir(), "package")
 
   unlink(bundlePath, recursive = TRUE)

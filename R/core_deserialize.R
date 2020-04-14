@@ -76,6 +76,7 @@ readTypedObject <- function(con, type) {
           "f" = readFastStringArray(con),
           "n" = NULL,
           "j" = getJobj(con, readString(con)),
+          "J" = rjson::fromJSON(readString(con)),
           stop(paste("Unsupported type for deserialization", type)))
 }
 
