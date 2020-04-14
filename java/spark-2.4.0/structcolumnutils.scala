@@ -19,11 +19,12 @@ object StructColumnUtils {
       import sparkSession.implicits._
       df.select(
         df.columns.map(x => {
+          val col_name_quoted = "`" + x + "`"
           if (json_columns.contains(x)) {
            val schema = schema_of_json(lit(df.select(x).as[String].first))
-           from_json(col(x), schema).as(x)
+           from_json(col(col_name_quoted), schema).as(x)
           } else {
-            col(x)
+            col(col_name_quoted)
           }
         }):_*
       )
