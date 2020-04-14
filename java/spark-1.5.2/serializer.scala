@@ -209,6 +209,7 @@ class Serializer(tracker: JVMObjectTracker) {
       case "map"       => dos.writeByte('e')
       case "jobj"      => dos.writeByte('j')
       case "strarray"  => dos.writeByte('f')
+      case "json"      => dos.writeByte('J')
       case _ => throw new IllegalArgumentException(s"Invalid type $typeStr")
     }
   }
@@ -274,6 +275,9 @@ class Serializer(tracker: JVMObjectTracker) {
         case v: java.sql.Timestamp =>
           writeType(dos, "time")
           writeTime(dos, v)
+        case v: StructTypeAsJSON =>
+          writeType(dos, "json")
+          writeString(dos, v.json)
         case v: org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema =>
           writeType(dos, "list")
           writeInt(dos, v.length)
