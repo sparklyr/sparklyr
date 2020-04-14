@@ -243,9 +243,9 @@ fit
 ```
 
     ## Formula: mpg ~ wt + cyl
-    ## 
+    ##
     ## Coefficients:
-    ## (Intercept)          wt         cyl 
+    ## (Intercept)          wt         cyl
     ##   33.499452   -2.818463   -0.923187
 
 For linear regression models produced by Spark, we can use `summary()`
@@ -257,13 +257,13 @@ summary(fit)
 ```
 
     ## Deviance Residuals:
-    ##    Min     1Q Median     3Q    Max 
-    ## -1.752 -1.134 -0.499  1.296  2.282 
-    ## 
+    ##    Min     1Q Median     3Q    Max
+    ## -1.752 -1.134 -0.499  1.296  2.282
+    ##
     ## Coefficients:
-    ## (Intercept)          wt         cyl 
-    ##   33.499452   -2.818463   -0.923187 
-    ## 
+    ## (Intercept)          wt         cyl
+    ##   33.499452   -2.818463   -0.923187
+    ##
     ## R-Squared: 0.8274
     ## Root Mean Squared Error: 1.422
 
@@ -294,7 +294,7 @@ iris_json_tbl <- spark_read_json(sc, "iris_json", temp_json)
 src_tbls(sc)
 ```
 
-    ## [1] "batting"      "flights"      "iris"         "iris_csv"     "iris_json"   
+    ## [1] "batting"      "flights"      "iris"         "iris_csv"     "iris_json"
     ## [6] "iris_parquet" "mtcars"
 
 ## Distributed R
@@ -414,7 +414,7 @@ spark_log(sc, n = 10)
     ## 20/04/15 11:49:57 INFO HadoopRDD: Input split: file:/tmp/Rtmp3NF2Jb/filece955cc88fe.csv:0+33313106
     ## 20/04/15 11:49:57 INFO Executor: Finished task 0.0 in stage 70.0 (TID 78). 832 bytes result sent to driver
     ## 20/04/15 11:49:57 INFO TaskSetManager: Finished task 0.0 in stage 70.0 (TID 78) in 196 ms on localhost (executor driver) (1/1)
-    ## 20/04/15 11:49:57 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool 
+    ## 20/04/15 11:49:57 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool
     ## 20/04/15 11:49:57 INFO DAGScheduler: ResultStage 70 (count at NativeMethodAccessorImpl.java:0) finished in 0.200 s
     ## 20/04/15 11:49:57 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.204883 s
 
@@ -560,17 +560,17 @@ copy_to(sc, iris, overwrite = TRUE)
 
     ## # Source: spark<iris> [?? x 5]
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
-    ##           <dbl>       <dbl>        <dbl>       <dbl> <chr>  
-    ##  1          5.1         3.5          1.4         0.2 setosa 
-    ##  2          4.9         3            1.4         0.2 setosa 
-    ##  3          4.7         3.2          1.3         0.2 setosa 
-    ##  4          4.6         3.1          1.5         0.2 setosa 
-    ##  5          5           3.6          1.4         0.2 setosa 
-    ##  6          5.4         3.9          1.7         0.4 setosa 
-    ##  7          4.6         3.4          1.4         0.3 setosa 
-    ##  8          5           3.4          1.5         0.2 setosa 
-    ##  9          4.4         2.9          1.4         0.2 setosa 
-    ## 10          4.9         3.1          1.5         0.1 setosa 
+    ##           <dbl>       <dbl>        <dbl>       <dbl> <chr>
+    ##  1          5.1         3.5          1.4         0.2 setosa
+    ##  2          4.9         3            1.4         0.2 setosa
+    ##  3          4.7         3.2          1.3         0.2 setosa
+    ##  4          4.6         3.1          1.5         0.2 setosa
+    ##  5          5           3.6          1.4         0.2 setosa
+    ##  6          5.4         3.9          1.7         0.4 setosa
+    ##  7          4.6         3.4          1.4         0.3 setosa
+    ##  8          5           3.4          1.5         0.2 setosa
+    ##  9          4.4         2.9          1.4         0.2 setosa
+    ## 10          4.9         3.1          1.5         0.1 setosa
     ## # … with more rows
 
 ``` r
@@ -618,14 +618,6 @@ to setup the client:
         token](https://docs.databricks.com/dev-tools/api/latest/authentication.html#token-management)
       - Cluster ID
       - Port (default port number is `15001`)
-
-To configure `sparklyr` with Databricks Connect, set the following
-environment variables:
-
-``` bash
-export SPARK_VERSION=2.4.4
-export SPARK_HOME=`databricks-connect get-spark-home`
-```
 
 Now simply create a spark connection as follows
 

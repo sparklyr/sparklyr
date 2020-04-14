@@ -402,7 +402,6 @@ To use sparklyr with Databricks Connect first launch a Cluster on Databricks. Th
 To configure `sparklyr` with Databricks Connect, set the following environment variables:
 ```{bash, eval=FALSE}
 export SPARK_VERSION=2.4.4
-export SPARK_HOME=`databricks-connect get-spark-home`
 ```
 
 Now simply create a spark connection as follows
