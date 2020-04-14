@@ -400,16 +400,20 @@ To use sparklyr with Databricks Connect first launch a Cluster on Databricks. Th
     * Port (default port number is `15001`)
 
 To configure `sparklyr` with Databricks Connect, set the following environment variables:
-```{bash}
+```{bash, eval=FALSE}
 export SPARK_VERSION=2.4.4
 export SPARK_HOME=`databricks-connect get-spark-home`
 ```
 
 Now simply create a spark connection as follows
-```{r eval=FALSE}
-sc <- spark_connect(method = "databricks")
+```{r, eval=FALSE}
+spark_home <- system("databricks-connect get-spark-home")
+sc <- spark_connect(method = "databricks",
+                    spark_home = spark_home)
 copy_to(sc, iris, overwrite = TRUE)
 ```
+
+<img src="tools/readme/databricks-connect.png" class="screenshot" width=750 />
 
 ```{r eval=FALSE}
 spark_disconnect(sc)

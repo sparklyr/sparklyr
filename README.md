@@ -243,9 +243,9 @@ fit
 ```
 
     ## Formula: mpg ~ wt + cyl
-    ##
+    ## 
     ## Coefficients:
-    ## (Intercept)          wt         cyl
+    ## (Intercept)          wt         cyl 
     ##   33.499452   -2.818463   -0.923187
 
 For linear regression models produced by Spark, we can use `summary()`
@@ -257,13 +257,13 @@ summary(fit)
 ```
 
     ## Deviance Residuals:
-    ##    Min     1Q Median     3Q    Max
-    ## -1.752 -1.134 -0.499  1.296  2.282
-    ##
+    ##    Min     1Q Median     3Q    Max 
+    ## -1.752 -1.134 -0.499  1.296  2.282 
+    ## 
     ## Coefficients:
-    ## (Intercept)          wt         cyl
-    ##   33.499452   -2.818463   -0.923187
-    ##
+    ## (Intercept)          wt         cyl 
+    ##   33.499452   -2.818463   -0.923187 
+    ## 
     ## R-Squared: 0.8274
     ## Root Mean Squared Error: 1.422
 
@@ -294,7 +294,7 @@ iris_json_tbl <- spark_read_json(sc, "iris_json", temp_json)
 src_tbls(sc)
 ```
 
-    ## [1] "batting"      "flights"      "iris"         "iris_csv"     "iris_json"
+    ## [1] "batting"      "flights"      "iris"         "iris_csv"     "iris_json"   
     ## [6] "iris_parquet" "mtcars"
 
 ## Distributed R
@@ -312,16 +312,16 @@ spark_apply(iris_tbl, function(data) {
     ## # Source: spark<?> [?? x 4]
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width
     ##           <dbl>       <dbl>        <dbl>       <dbl>
-    ##  1         6.54        4.94         2.84        1.64
-    ##  2         6.34        4.44         2.84        1.64
-    ##  3         6.14        4.64         2.74        1.64
-    ##  4         6.04        4.54         2.94        1.64
-    ##  5         6.44        5.04         2.84        1.64
-    ##  6         6.84        5.34         3.14        1.84
-    ##  7         6.04        4.84         2.84        1.74
-    ##  8         6.44        4.84         2.94        1.64
-    ##  9         5.84        4.34         2.84        1.64
-    ## 10         6.34        4.54         2.94        1.54
+    ##  1         8.80        7.20         5.10        3.90
+    ##  2         8.60        6.70         5.10        3.90
+    ##  3         8.40        6.90         5.00        3.90
+    ##  4         8.30        6.80         5.20        3.90
+    ##  5         8.70        7.30         5.10        3.90
+    ##  6         9.10        7.60         5.40        4.10
+    ##  7         8.30        7.10         5.10        4.00
+    ##  8         8.70        7.10         5.20        3.90
+    ##  9         8.10        6.60         5.10        3.90
+    ## 10         8.60        6.80         5.20        3.80
     ## # … with more rows
 
 You can also group by columns to perform an operation over each group of
@@ -407,16 +407,16 @@ You can show the log using the `spark_log` function:
 spark_log(sc, n = 10)
 ```
 
-    ## 20/04/07 12:38:14 INFO ContextCleaner: Cleaned accumulator 1919
-    ## 20/04/07 12:38:14 INFO ContextCleaner: Cleaned accumulator 1980
-    ## 20/04/07 12:38:14 INFO ContextCleaner: Cleaned accumulator 1871
-    ## 20/04/07 12:38:14 INFO ContextCleaner: Cleaned accumulator 2079
-    ## 20/04/07 12:38:14 INFO ContextCleaner: Cleaned accumulator 1879
-    ## 20/04/07 12:38:14 INFO Executor: Finished task 0.0 in stage 70.0 (TID 78). 875 bytes result sent to driver
-    ## 20/04/07 12:38:14 INFO TaskSetManager: Finished task 0.0 in stage 70.0 (TID 78) in 322 ms on localhost (executor driver) (1/1)
-    ## 20/04/07 12:38:14 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool
-    ## 20/04/07 12:38:14 INFO DAGScheduler: ResultStage 70 (count at NativeMethodAccessorImpl.java:0) finished in 0.327 s
-    ## 20/04/07 12:38:14 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.331901 s
+    ## 20/04/15 11:49:57 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 70 (/tmp/Rtmp3NF2Jb/filece955cc88fe.csv MapPartitionsRDD[336] at textFile at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
+    ## 20/04/15 11:49:57 INFO TaskSchedulerImpl: Adding task set 70.0 with 1 tasks
+    ## 20/04/15 11:49:57 INFO TaskSetManager: Starting task 0.0 in stage 70.0 (TID 78, localhost, executor driver, partition 0, PROCESS_LOCAL, 7900 bytes)
+    ## 20/04/15 11:49:57 INFO Executor: Running task 0.0 in stage 70.0 (TID 78)
+    ## 20/04/15 11:49:57 INFO HadoopRDD: Input split: file:/tmp/Rtmp3NF2Jb/filece955cc88fe.csv:0+33313106
+    ## 20/04/15 11:49:57 INFO Executor: Finished task 0.0 in stage 70.0 (TID 78). 832 bytes result sent to driver
+    ## 20/04/15 11:49:57 INFO TaskSetManager: Finished task 0.0 in stage 70.0 (TID 78) in 196 ms on localhost (executor driver) (1/1)
+    ## 20/04/15 11:49:57 INFO TaskSchedulerImpl: Removed TaskSet 70.0, whose tasks have all completed, from pool 
+    ## 20/04/15 11:49:57 INFO DAGScheduler: ResultStage 70 (count at NativeMethodAccessorImpl.java:0) finished in 0.200 s
+    ## 20/04/15 11:49:57 INFO DAGScheduler: Job 47 finished: count at NativeMethodAccessorImpl.java:0, took 0.204883 s
 
 Finally, we disconnect from Spark:
 
@@ -560,17 +560,17 @@ copy_to(sc, iris, overwrite = TRUE)
 
     ## # Source: spark<iris> [?? x 5]
     ##    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
-    ##           <dbl>       <dbl>        <dbl>       <dbl> <chr>
-    ##  1          5.1         3.5          1.4         0.2 setosa
-    ##  2          4.9         3            1.4         0.2 setosa
-    ##  3          4.7         3.2          1.3         0.2 setosa
-    ##  4          4.6         3.1          1.5         0.2 setosa
-    ##  5          5           3.6          1.4         0.2 setosa
-    ##  6          5.4         3.9          1.7         0.4 setosa
-    ##  7          4.6         3.4          1.4         0.3 setosa
-    ##  8          5           3.4          1.5         0.2 setosa
-    ##  9          4.4         2.9          1.4         0.2 setosa
-    ## 10          4.9         3.1          1.5         0.1 setosa
+    ##           <dbl>       <dbl>        <dbl>       <dbl> <chr>  
+    ##  1          5.1         3.5          1.4         0.2 setosa 
+    ##  2          4.9         3            1.4         0.2 setosa 
+    ##  3          4.7         3.2          1.3         0.2 setosa 
+    ##  4          4.6         3.1          1.5         0.2 setosa 
+    ##  5          5           3.6          1.4         0.2 setosa 
+    ##  6          5.4         3.9          1.7         0.4 setosa 
+    ##  7          4.6         3.4          1.4         0.3 setosa 
+    ##  8          5           3.4          1.5         0.2 setosa 
+    ##  9          4.4         2.9          1.4         0.2 setosa 
+    ## 10          4.9         3.1          1.5         0.1 setosa 
     ## # … with more rows
 
 ``` r
@@ -630,9 +630,13 @@ export SPARK_HOME=`databricks-connect get-spark-home`
 Now simply create a spark connection as follows
 
 ``` r
-sc <- spark_connect(method = "databricks")
+spark_home <- system("databricks-connect get-spark-home")
+sc <- spark_connect(method = "databricks",
+                    spark_home = spark_home)
 copy_to(sc, iris, overwrite = TRUE)
 ```
+
+<img src="tools/readme/databricks-connect.png" class="screenshot" width=750 />
 
 ``` r
 spark_disconnect(sc)
