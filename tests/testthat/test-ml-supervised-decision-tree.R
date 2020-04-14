@@ -77,7 +77,13 @@ test_that("error for bad impurity specification", {
 test_that("ml_decision_tree print outputs are correct", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
-  if (spark_version(sc) >= "2.4") {
+  if (spark_version(sc) >= "3.0.0") {
+    expect_output_file(
+      print(ml_decision_tree(iris_tbl, Species ~ Petal_Length + Sepal_Width,
+                             seed = 24, uid = "dt1")),
+      output_file("print/decision-tree-spark-3.0.0.txt")
+    )
+  } else if (spark_version(sc) >= "2.4") {
     expect_output_file(
       print(ml_decision_tree(iris_tbl, Species ~ Petal_Length + Sepal_Width,
                              seed = 24, uid = "dt1")),
