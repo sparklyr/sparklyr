@@ -19,7 +19,7 @@ test_that("spark_submit() can submit batch jobs", {
     }
   )
 
-  retries <- 30
+  retries <- 60
   while (!dir.exists("batch.csv") && retries > 0) {
     Sys.sleep(1)
     retries <- retries - 1
