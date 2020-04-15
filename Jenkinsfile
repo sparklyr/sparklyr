@@ -45,7 +45,7 @@ pipeline {
                         sh "echo '$dbConnectParamsJson' > ~/.databricks-connect"
 
                         // Smoke test to check if databricks-connect is set up correctly
-                        sh "SPARK_HOME=${sparkHome} databricks-connect test"
+                        sh "SPARK_HOME=${sparkHome} databricks-connect test > log.txt 2>&1"
                     }
                 }
             }
@@ -54,14 +54,15 @@ pipeline {
             steps {
                 sh """dbfs mkdirs dbfs:/tmp/data"""
                 sh """dbfs cp -r --overwrite tests/testthat/data dbfs:/tmp/data"""
-                sh """echo 'Copied files'"""
+                sh """echo 'Copied test files to DBFS'"""
             }
         }
         stage("Run tests") {
             steps {
+                 sh """echo 'Installing dependencies'"""
+                 sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)'"""
                  sh """echo 'Running Tests'"""
-                // sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)'"""
-                // sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)' >> log.txt"""
+                 sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)' >> log.txt 2>&1"""
             }
         }
     }
@@ -69,11 +70,8 @@ pipeline {
         always {
             sh "databricks clusters delete --cluster-id ${clusterId}"
             sh """dbfs rm -r dbfs:/tmp/data"""
-	    // sh """find ${JENKINS_HOME}/ """
-	    // sh """find ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log > log.txt"""
-            sh """ls ${JENKINS_HOME}/jobs/sparklyr/branches/${JOB_NAME}/builds/${BUILD_NUMBER}/log """
-            sh """cp ${JENKINS_HOME}/jobs/sparklyr/branches/${JOB_NAME}/builds/${BUILD_NUMBER}/log logs.txt"""
-            s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: env.BUILD_TAG)
+            def s3Path = 'logs/' + env.BUILD_TAG + '/' + UUID.randomUUID().toString() + '.txt'
+            s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: s3Path)
             script {
                 if (env.CHANGE_ID) {
                     def comment = pullRequest.comment('Databricks Connect tests succeeded.')
