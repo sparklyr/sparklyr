@@ -1,6 +1,7 @@
 import groovy.json.JsonOutput
 
 def sparkHome = "/usr/lib/python3.7/site-packages/pyspark"
+def s3Path = 'logs/' + env.BUILD_TAG + '/' + UUID.randomUUID().toString() + '.txt'
 
 pipeline {
     agent any
@@ -70,7 +71,6 @@ pipeline {
         always {
             sh "databricks clusters delete --cluster-id ${clusterId}"
             sh """dbfs rm -r dbfs:/tmp/data"""
-            def s3Path = 'logs/' + env.BUILD_TAG + '/' + UUID.randomUUID().toString() + '.txt'
             s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: s3Path)
             script {
                 if (env.CHANGE_ID) {
