@@ -47,7 +47,7 @@ pipeline {
                         sh "echo '$dbConnectParamsJson' > ~/.databricks-connect"
 
                         // Smoke test to check if databricks-connect is set up correctly
-                        sh "SPARK_HOME=${sparkHome} databricks-connect test > log.txt 2>&1"
+                        sh "SPARK_HOME=${sparkHome} databricks-connect test  2>&1 | tee -a log.txt"
                     }
                 }
             }
@@ -64,7 +64,7 @@ pipeline {
                  sh """echo 'Installing dependencies'"""
                  sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)'"""
                  sh """echo 'Running Tests'"""
-                 sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)' >> log.txt 2>&1"""
+                 sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)' 2>&1 | tee -a log.txt"""
             }
         }
     }
@@ -72,7 +72,7 @@ pipeline {
         always {
             sh "databricks clusters delete --cluster-id ${clusterId}"
             sh """dbfs rm -r dbfs:/tmp/data"""
-            s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: s3Path)
+            s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: s3Path, contentEncoding: `UTF-8`, contentType: 'text/plain')
             script {
                 if (env.CHANGE_ID) {
                     def comment = pullRequest.comment('Databricks Connect tests succeeded. View logs [here](' + s3Url + ').')
