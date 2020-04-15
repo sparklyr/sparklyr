@@ -87,13 +87,13 @@ test_that("sdf_copy_to can preserve list columns", {
     b = list(list(c = 1, d = "a"), list(c = 2, d = "b"), list(c = 3, d = "c"))
   )
   sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
-  expect_equivalent(
+  expect_equal(
     c(sapply(sparklyr.nested::sdf_select(sdf, b.c) %>% sdf_collect(), c)),
-    c(list(1), list(2), list(3))
+    c(1, 2, 3)
   )
-  expect_equivalent(
+  expect_equal(
     c(sapply(sparklyr.nested::sdf_select(sdf, b.d) %>% sdf_collect(), c)),
-    list(list("a"), list("b"), list("c"))
+    c("a", "b", "c")
   )
   res <- sdf_collect(sdf)
   expect_equivalent(df$a, res$a)

@@ -19,10 +19,14 @@ aliases:
 
     <p>Writes a Spark dataframe stream into an kafka stream.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_write_kafka</span>(<span class='no'>x</span>, <span class='kw'>mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"append"</span>, <span class='st'>"complete"</span>, <span class='st'>"update"</span>),
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_write_kafka</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"append"</span>, <span class='st'>"complete"</span>, <span class='st'>"update"</span>),
   <span class='kw'>trigger</span> <span class='kw'>=</span> <span class='fu'><a href='stream_trigger_interval.html'>stream_trigger_interval</a></span>(),
   <span class='kw'>checkpoint</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"checkpoints"</span>, <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>""</span>)),
-  <span class='kw'>options</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='no'>...</span>)</code></pre></div>
+  <span class='kw'>options</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -65,34 +69,32 @@ information to guarantee end-to-end fault-tolerance.</p></td>
     <h2 id="details">Details</h2>
 
     <p>Please note that Kafka requires installing the appropriate
- package by conneting with a config setting where <code>sparklyr.shell.packages</code>
- is set to, for Spark 2.3.2, <code>"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"</code>.</p>
+ package by setting the <code>packages</code> parameter to <code>"kafka"</code> in <code><a href='spark-connections.html'>spark_connect()</a></code></p>
     <h2 id="see-also">See also</h2>
 
-    <div class='dont-index'><p>Other Spark stream serialization: <code><a href='stream_read_csv.html'>stream_read_csv</a></code>,
-  <code><a href='stream_read_json.html'>stream_read_json</a></code>,
-  <code><a href='stream_read_kafka.html'>stream_read_kafka</a></code>,
-  <code><a href='stream_read_orc.html'>stream_read_orc</a></code>,
-  <code><a href='stream_read_parquet.html'>stream_read_parquet</a></code>,
-  <code><a href='stream_read_scoket.html'>stream_read_scoket</a></code>,
-  <code><a href='stream_read_text.html'>stream_read_text</a></code>,
-  <code><a href='stream_write_console.html'>stream_write_console</a></code>,
-  <code><a href='stream_write_csv.html'>stream_write_csv</a></code>,
-  <code><a href='stream_write_json.html'>stream_write_json</a></code>,
-  <code><a href='stream_write_memory.html'>stream_write_memory</a></code>,
-  <code><a href='stream_write_orc.html'>stream_write_orc</a></code>,
-  <code><a href='stream_write_parquet.html'>stream_write_parquet</a></code>,
-  <code><a href='stream_write_text.html'>stream_write_text</a></code></p></div>
+    <div class='dont-index'><p>Other Spark stream serialization: 
+<code><a href='stream_read_csv.html'>stream_read_csv</a>()</code>,
+<code><a href='stream_read_delta.html'>stream_read_delta</a>()</code>,
+<code><a href='stream_read_json.html'>stream_read_json</a>()</code>,
+<code><a href='stream_read_kafka.html'>stream_read_kafka</a>()</code>,
+<code><a href='stream_read_orc.html'>stream_read_orc</a>()</code>,
+<code><a href='stream_read_parquet.html'>stream_read_parquet</a>()</code>,
+<code><a href='stream_read_socket.html'>stream_read_socket</a>()</code>,
+<code><a href='stream_read_text.html'>stream_read_text</a>()</code>,
+<code><a href='stream_write_console.html'>stream_write_console</a>()</code>,
+<code><a href='stream_write_csv.html'>stream_write_csv</a>()</code>,
+<code><a href='stream_write_delta.html'>stream_write_delta</a>()</code>,
+<code><a href='stream_write_json.html'>stream_write_json</a>()</code>,
+<code><a href='stream_write_memory.html'>stream_write_memory</a>()</code>,
+<code><a href='stream_write_orc.html'>stream_write_orc</a>()</code>,
+<code><a href='stream_write_parquet.html'>stream_write_parquet</a>()</code>,
+<code><a href='stream_write_text.html'>stream_write_text</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 
-<span class='no'>config</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>()
-
-<span class='co'># The following package is dependent to Spark version, for Spark 2.3.2:</span>
-<span class='no'>config</span>$<span class='no'>sparklyr.shell.packages</span> <span class='kw'>&lt;-</span> <span class='st'>"org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.2"</span>
-
-<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>, <span class='kw'>config</span> <span class='kw'>=</span> <span class='no'>config</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>sparklyr</span>)
+<span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"2.3"</span>, <span class='kw'>packages</span> <span class='kw'>=</span> <span class='st'>"kafka"</span>)
 
 <span class='no'>read_options</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>kafka.bootstrap.servers</span> <span class='kw'>=</span> <span class='st'>"localhost:9092"</span>, <span class='kw'>subscribe</span> <span class='kw'>=</span> <span class='st'>"topic1"</span>)
 <span class='no'>write_options</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>kafka.bootstrap.servers</span> <span class='kw'>=</span> <span class='st'>"localhost:9092"</span>, <span class='kw'>topic</span> <span class='kw'>=</span> <span class='st'>"topic2"</span>)

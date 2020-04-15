@@ -16,11 +16,23 @@ aliases:
 
     <p>Helper function to create pipeline stage objects with common parameter setters.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_pipeline_stage</span>(<span class='no'>sc</span>, <span class='no'>class</span>, <span class='no'>uid</span>, <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>input_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>input_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>output_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>output_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_pipeline_stage</span>(
+  <span class='no'>sc</span>,
+  <span class='no'>class</span>,
+  <span class='no'>uid</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>probability_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>raw_prediction_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>k</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>input_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>input_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>output_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>output_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -81,7 +93,7 @@ reproducible across repeated calls.</p></td>
     </tr>
     <tr>
       <td>input_cols</td>
-      <td><p>Names of input columns.</p></td>
+      <td><p>Names of output columns.</p></td>
     </tr>
     <tr>
       <td>output_col</td>
@@ -90,14 +102,6 @@ reproducible across repeated calls.</p></td>
     <tr>
       <td>thresholds</td>
       <td><p>Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values &gt; 0 excepting that at most one value may be 0. The class with largest value <code>p/t</code> is predicted, where <code>p</code> is the original probability of that class and <code>t</code> is the class's threshold.</p></td>
-    </tr>
-    <tr>
-      <td>features_col</td>
-      <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
-    </tr>
-    <tr>
-      <td>input_cols</td>
-      <td><p>Names of output columns.</p></td>
     </tr>
     </table>
 

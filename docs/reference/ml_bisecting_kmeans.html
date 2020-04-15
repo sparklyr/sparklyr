@@ -19,10 +19,18 @@ aliases:
 
     <p>A bisecting k-means algorithm based on the paper "A comparison of document clustering techniques" by Steinbach, Karypis, and Kumar, with modification to fit Spark. The algorithm starts from a single cluster that contains all points. Iteratively it finds divisible clusters on the bottom level and bisects each of them using k-means, until there are k leaf clusters in total or no leaf clusters are divisible. The bisecting steps of clusters on the same level are grouped together to increase parallelism. If bisecting all divisible clusters on the bottom level would result more than k leaf clusters, larger clusters get higher priority.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_bisecting_kmeans</span>(<span class='no'>x</span>, <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20</span>,
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>min_divisible_cluster_size</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>, <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"bisecting_bisecting_kmeans_"</span>), <span class='no'>...</span>)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_bisecting_kmeans</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>formula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>4</span>,
+  <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>min_divisible_cluster_size</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>features_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>,
+  <span class='kw'>prediction_col</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"bisecting_bisecting_kmeans_"</span>),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
@@ -97,8 +105,10 @@ reproducible across repeated calls.</p></td>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for
   more information on the set of clustering algorithms.</p>
-<p>Other ml clustering algorithms: <code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a></code>,
-  <code><a href='ml_kmeans.html'>ml_kmeans</a></code>, <code><a href='ml_lda.html'>ml_lda</a></code></p></div>
+<p>Other ml clustering algorithms: 
+<code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a>()</code>,
+<code><a href='ml_kmeans.html'>ml_kmeans</a>()</code>,
+<code><a href='ml_lda.html'>ml_lda</a>()</code></p></div>
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
