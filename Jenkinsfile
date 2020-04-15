@@ -72,7 +72,7 @@ pipeline {
         always {
             sh "databricks clusters delete --cluster-id ${clusterId}"
             sh """dbfs rm -r dbfs:/tmp/data"""
-            s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: s3Path, contentEncoding: 'UTF-8', contentType: 'text/plain')
+            s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: s3Path, contentType: 'text/plain; charset=utf-8')
             script {
                 if (env.CHANGE_ID) {
                     def comment = pullRequest.comment('Databricks Connect tests succeeded. View logs [here](' + s3Url + ').')
