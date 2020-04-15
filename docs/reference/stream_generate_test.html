@@ -17,9 +17,13 @@ aliases:
 
     <p>Generates a local test stream, useful when testing streams locally.</p>
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_generate_test</span>(<span class='kw'>df</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>:<span class='fl'>1000</span>), <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"source"</span>,
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>stream_generate_test</span>(
+  <span class='kw'>df</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>:<span class='fl'>1000</span>),
+  <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"source"</span>,
   <span class='kw'>distribution</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>(<span class='fl'>10</span> + <span class='fl'>1e+05</span> * <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>dbinom</a></span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='fl'>20</span>, <span class='fl'>0.5</span>)),
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>1</span>)</code></pre></div>
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>1</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">

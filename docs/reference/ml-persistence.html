@@ -20,8 +20,13 @@ aliases:
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_save</span>(<span class='no'>x</span>, <span class='no'>path</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for ml_model</span>
-<span class='fu'>ml_save</span>(<span class='no'>x</span>, <span class='no'>path</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pipeline_model"</span>, <span class='st'>"pipeline"</span>), <span class='no'>...</span>)
+<span class='fu'>ml_save</span>(
+  <span class='no'>x</span>,
+  <span class='no'>path</span>,
+  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pipeline_model"</span>, <span class='st'>"pipeline"</span>),
+  <span class='no'>...</span>
+)
 
 <span class='fu'>ml_load</span>(<span class='no'>sc</span>, <span class='no'>path</span>)</code></pre></div>
 

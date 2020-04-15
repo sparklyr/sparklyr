@@ -23,15 +23,31 @@ aliases:
 
 <span class='fu'>ml_validation_metrics</span>(<span class='no'>model</span>)
 
-<span class='fu'>ml_cross_validator</span>(<span class='no'>x</span>, <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>estimator_param_maps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>evaluator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>num_folds</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>collect_sub_models</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>parallelism</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"cross_validator_"</span>), <span class='no'>...</span>)
+<span class='fu'>ml_cross_validator</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>estimator_param_maps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>evaluator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>num_folds</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>collect_sub_models</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>parallelism</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"cross_validator_"</span>),
+  <span class='no'>...</span>
+)
 
-<span class='fu'>ml_train_validation_split</span>(<span class='no'>x</span>, <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>estimator_param_maps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>evaluator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>train_ratio</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
-  <span class='kw'>collect_sub_models</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>parallelism</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"train_validation_split_"</span>), <span class='no'>...</span>)</code></pre></div>
+<span class='fu'>ml_train_validation_split</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>estimator_param_maps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>evaluator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>train_ratio</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
+  <span class='kw'>collect_sub_models</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>parallelism</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"train_validation_split_"</span>),
+  <span class='no'>...</span>
+)</code></pre></div>
 
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">

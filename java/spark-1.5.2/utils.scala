@@ -14,7 +14,6 @@ import org.apache.spark.{SparkEnv, SparkException}
 import scala.util.Try
 
 object Utils {
-
   /**
    * Utilities for collecting columns / Datasets back to R
    */
@@ -244,6 +243,16 @@ object Utils {
     }}
   }
 
+  def collectImplJSON(local: Array[Row], idx: Integer) = {
+    local.map{row => {
+      val el = row(idx)
+      el match {
+        case _: String => new StructTypeAsJSON(el.asInstanceOf[String])
+        case _ => collectImplDefault(local, idx)
+      }
+    }}
+  }
+
   def collectImplTimestamp(local: Array[Row], idx: Integer) = {
     local.map{row => {
       Try(row.getAs[java.sql.Timestamp](idx)).getOrElse(null)
@@ -300,6 +309,7 @@ object Utils {
 
       case ReDecimalType(_)       => collectImplDecimal(local, idx)
       case ReVectorType(_)        => collectImplVector(local, idx)
+      case StructTypeAsJSON.DType => collectImplJSON(local, idx)
 
       case "ArrayType(BooleanType,true)"           => collectImplBooleanArrArr(local, idx)
       case "ArrayType(IntegerType,true)"           => collectImplIntegerArrArr(local, idx)
@@ -338,8 +348,10 @@ object Utils {
   }
 
   def collect(df: DataFrame, separator: String): Array[_] = {
-    val local : Array[Row] = df.collect()
-    val dtypes = df.dtypes
+    val columns = df.columns
+    val (transformed_df, dtypes) = DFCollectionUtils.prepareDataFrameForCollection(df)
+    val local = transformed_df.collect
+
     collectArray(local, dtypes, separator)
   }
 
