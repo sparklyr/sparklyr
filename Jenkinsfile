@@ -2,6 +2,7 @@ import groovy.json.JsonOutput
 
 def sparkHome = "/usr/lib/python3.7/site-packages/pyspark"
 def s3Path = 'logs/' + env.BUILD_TAG + '/' + UUID.randomUUID().toString() + '.txt'
+def s3Url = 'https://sparklyr-jenkins.s3.amazonaws.com/' + s3Path
 
 pipeline {
     agent any
@@ -74,7 +75,7 @@ pipeline {
             s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: s3Path)
             script {
                 if (env.CHANGE_ID) {
-                    def comment = pullRequest.comment('Databricks Connect tests succeeded.')
+                    def comment = pullRequest.comment('Databricks Connect tests succeeded. View logs [here](' + s3Url + ').')
                 }
             }
 
@@ -83,7 +84,7 @@ pipeline {
             script {
                 // CHANGE_ID is set only for pull requests, so it is safe to access the pullRequest global variable
                 if (env.CHANGE_ID) {
-                    def comment = pullRequest.comment('Databricks Connect tests failed')
+                    def comment = pullRequest.comment('Databricks Connect tests failed. View logs [here](' + s3Url + ').')
                 }
             }
         }
