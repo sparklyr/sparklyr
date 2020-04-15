@@ -1,6 +1,8 @@
 import groovy.json.JsonOutput
 
 def sparkHome = "/usr/lib/python3.7/site-packages/pyspark"
+def s3Path = 'logs/' + env.BUILD_TAG + '/' + UUID.randomUUID().toString() + '.txt'
+def s3Url = 'https://sparklyr-jenkins.s3.amazonaws.com/' + s3Path
 
 pipeline {
     agent any
@@ -45,28 +47,42 @@ pipeline {
                         sh "echo '$dbConnectParamsJson' > ~/.databricks-connect"
 
                         // Smoke test to check if databricks-connect is set up correctly
-                        sh "SPARK_HOME=${sparkHome} databricks-connect test"
+                        sh "SPARK_HOME=${sparkHome} databricks-connect test  2>&1 | tee log.txt"
                     }
                 }
             }
         }
         stage("Prepare the test data") {
             steps {
-                sh """dbfs mkdirs dbfs:/tmp/data"""
-                sh """dbfs cp -r --overwrite tests/testthat/data dbfs:/tmp/data"""
+                sh """dbfs mkdirs dbfs:/tmp/data 2>&1 | tee -a log.txt"""
+                sh """dbfs cp -r --overwrite tests/testthat/data dbfs:/tmp/data 2>&1 | tee -a log.txt"""
             }
         }
         stage("Run tests") {
             steps {
-                sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)'"""
-                sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)'"""
+                sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)' 2>&1 | tee -a log.txt"""
+                sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)'  2>&1 | tee -a log.txt"""
             }
         }
     }
     post {
         always {
-            sh "databricks clusters delete --cluster-id ${clusterId}"
-	    sh """dbfs rm -r dbfs:/tmp/data"""
+            sh "databricks clusters delete --cluster-id ${clusterId} 2>&1 | tee -a log.txt "
+            sh """dbfs rm -r dbfs:/tmp/data  2>&1 | tee -a log.txt"""
+            s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: s3Path, contentType: 'text/plain; charset=utf-8')
+            script {
+                if (env.CHANGE_ID) {
+                    def comment = pullRequest.comment('Databricks Connect tests succeeded. View logs [here](' + s3Url + ').')
+                }
+            }
+        }
+        failure {
+            script {
+                // CHANGE_ID is set only for pull requests, so it is safe to access the pullRequest global variable
+                if (env.CHANGE_ID) {
+                    def comment = pullRequest.comment('Databricks Connect tests failed. View logs [here](' + s3Url + ').')
+                }
+            }
         }
     }
 }

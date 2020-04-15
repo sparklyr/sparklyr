@@ -44,18 +44,9 @@ test_that("sdf_collect() works with structs inside arrays", {
   if (spark_version(sc) < "2.3")
     skip("deserializing Spark StructType into named list is only supported in Spark 2.3+")
 
-  json <- file("test.json", "w+")
-  cat(paste0("{",
-             "\"text\":\"t e x t\",",
-             "\"sentences\":[",
-             "{\"type\":\"document1\",\"begin\":0,\"end\":58,\"result\":\"French\",\"metadata\":{\"sentence\":1,\"embeddings\":[1,2,3]}},",
-             "{\"type\":\"document2\",\"begin\":59,\"end\":118,\"result\":\"English\",\"metadata\":{\"sentence\":2,\"embeddings\":[4,5,6]}}",
-             "]",
-             "}"),
-      file = json)
-  close(json)
+  jsonFilePath <- get_simple_data_path("struct-inside-arrays.json")
 
-  sentences <- spark_read_json(sc, name = "sentences", path = "test.json", overwrite = TRUE)
+  sentences <- spark_read_json(sc, name = "sentences", path = jsonFilePath, overwrite = TRUE)
   sentences_local <- sdf_collect(sentences)
 
   expect_equal(sentences_local$text, c("t e x t"))
@@ -73,8 +64,6 @@ test_that("sdf_collect() works with structs inside arrays", {
            type = "document2")
   )
   expect_equal(sentences_local$sentences, list(expected))
-
-  file.remove("test.json")
 })
 
 test_that("sdf_collect() works with structs inside nested arrays", {
@@ -83,18 +72,9 @@ test_that("sdf_collect() works with structs inside nested arrays", {
   if (spark_version(sc) < "2.4")
     skip("to_json on nested arrays is only supported in Spark 2.4+")
 
-  json <- file("test.json", "w+")
-  cat(paste0("{",
-             "\"text\":\"t e x t\",",
-             "\"sentences\":[",
-             "[{\"type\":\"document1\",\"begin\":0,\"end\":58,\"result\":\"French\",\"metadata\":{\"sentence\":1,\"embeddings\":[1,2,3]}}],",
-             "[{\"type\":\"document2\",\"begin\":59,\"end\":118,\"result\":\"English\",\"metadata\":{\"sentence\":2,\"embeddings\":[4,5,6]}}]",
-             "]",
-             "}"),
-      file = json)
-  close(json)
+  jsonFilePath <- get_simple_data_path("struct-inside-nested-arrays.json")
 
-  sentences <- spark_read_json(sc, name = "sentences", path = "test.json", overwrite = TRUE)
+  sentences <- spark_read_json(sc, name = "sentences", path = jsonFilePath, overwrite = TRUE)
   sentences_local <- sdf_collect(sentences)
 
   expect_equal(sentences_local$text, c("t e x t"))
@@ -112,8 +92,6 @@ test_that("sdf_collect() works with structs inside nested arrays", {
            type = "document2"))
   )
   expect_equal(sentences_local$sentences, list(expected))
-
-  file.remove("test.json")
 })
 
 test_that("sdf_collect() supports callback", {
