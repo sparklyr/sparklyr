@@ -26,14 +26,26 @@ spec <- Filter(
   sparklyr::spark_default_compilation_spec()
 )
 
-# compile spark preview
+# Anticpating Spark 3.0 switch to Scala 2.12 we include 2.12 jar for Spark 2.4 as well.
+if ("2.4.0" %in% targets) {
+  spec[[length(spec) + 1]] <- spark_compilation_spec(
+      spark_version = "2.4.0",
+      scalac_path = find_scalac("2.12"),
+      jar_name = "sparklyr-2.4.0-2.12.jar",
+      jar_path = NULL,
+      scala_filter = sparklyr:::make_version_filter("2.4.0")
+  )
+}
+
+# compiling spark preview
 spec[[length(spec) + 1]] <- spark_compilation_spec(
     spark_version = "3.0.0-preview",
     scalac_path = find_scalac("2.12"),
     jar_name = "sparklyr-3.0.0-preview-2.12.jar",
     jar_path = NULL,
     scala_filter = sparklyr:::make_version_filter("3.0.0")
-  )
+)
+
 
 sparklyr::compile_package_jars(spec = spec)
 
