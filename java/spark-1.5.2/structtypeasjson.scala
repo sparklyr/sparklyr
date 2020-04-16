@@ -1,7 +1,7 @@
 package sparklyr
 
 object StructTypeAsJSON {
-  final val ReStructType = """(StructType\(.*\))""".r
+  final val ReStructType = """(StructType\(.*\)|ArrayType\(.*StructType\(.*\).*\))""".r
   final val DType: String = "SparklyrStructTypeAsJSON"
 }
 

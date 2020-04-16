@@ -40,6 +40,60 @@ test_that("sdf_collect() works with nested named lists", {
     expect_equivalent(lapply(df[[col]], as.list), res[[col]])
 })
 
+test_that("sdf_collect() works with structs inside arrays", {
+  if (spark_version(sc) < "2.3")
+    skip("deserializing Spark StructType into named list is only supported in Spark 2.3+")
+
+  jsonFilePath <- get_simple_data_path("struct-inside-arrays.json")
+
+  sentences <- spark_read_json(sc, name = "sentences", path = jsonFilePath, overwrite = TRUE)
+  sentences_local <- sdf_collect(sentences)
+
+  expect_equal(sentences_local$text, c("t e x t"))
+
+  expected <- list(
+      list(begin = 0,
+           end = 58,
+           metadata = list(embeddings = c(1, 2, 3), sentence = 1),
+           result = "French",
+           type = "document1"),
+      list(begin = 59,
+           end = 118,
+           metadata = list(embeddings = c(4, 5, 6), sentence = 2),
+           result = "English",
+           type = "document2")
+  )
+  expect_equal(sentences_local$sentences, list(expected))
+})
+
+test_that("sdf_collect() works with structs inside nested arrays", {
+  if (spark_version(sc) < "2.3")
+    skip("deserializing Spark StructType into named list is only supported in Spark 2.3+")
+  if (spark_version(sc) < "2.4")
+    skip("to_json on nested arrays is only supported in Spark 2.4+")
+
+  jsonFilePath <- get_simple_data_path("struct-inside-nested-arrays.json")
+
+  sentences <- spark_read_json(sc, name = "sentences", path = jsonFilePath, overwrite = TRUE)
+  sentences_local <- sdf_collect(sentences)
+
+  expect_equal(sentences_local$text, c("t e x t"))
+
+  expected <- list(
+      list(list(begin = 0,
+           end = 58,
+           metadata = list(embeddings = c(1, 2, 3), sentence = 1),
+           result = "French",
+           type = "document1")),
+      list(list(begin = 59,
+           end = 118,
+           metadata = list(embeddings = c(4, 5, 6), sentence = 2),
+           result = "English",
+           type = "document2"))
+  )
+  expect_equal(sentences_local$sentences, list(expected))
+})
+
 test_that("sdf_collect() supports callback", {
   if (spark_version(sc) < "2.0") skip("batch collection requires Spark 2.0")
 
