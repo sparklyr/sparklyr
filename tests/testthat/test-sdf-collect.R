@@ -44,7 +44,7 @@ test_that("sdf_collect() works with structs inside arrays", {
   if (spark_version(sc) < "2.3")
     skip("deserializing Spark StructType into named list is only supported in Spark 2.3+")
 
-  jsonFilePath <- get_simple_data_path("struct-inside-arrays.json")
+  jsonFilePath <- get_sample_data_path("struct-inside-arrays.json")
 
   sentences <- spark_read_json(sc, name = "sentences", path = jsonFilePath, overwrite = TRUE)
   sentences_local <- sdf_collect(sentences)
@@ -72,7 +72,7 @@ test_that("sdf_collect() works with structs inside nested arrays", {
   if (spark_version(sc) < "2.4")
     skip("to_json on nested arrays is only supported in Spark 2.4+")
 
-  jsonFilePath <- get_simple_data_path("struct-inside-nested-arrays.json")
+  jsonFilePath <- get_sample_data_path("struct-inside-nested-arrays.json")
 
   sentences <- spark_read_json(sc, name = "sentences", path = jsonFilePath, overwrite = TRUE)
   sentences_local <- sdf_collect(sentences)

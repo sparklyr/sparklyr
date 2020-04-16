@@ -20,7 +20,7 @@ test_that("ft_standard_scaler() param setting", {
 
 test_that("ft_standard_scaler() works properly", {
   sc <- testthat_spark_connection()
-  sample_data_path <- get_simple_data_path("sample_libsvm_data.txt")
+  sample_data_path <- get_sample_data_path("sample_libsvm_data.txt")
   sample_data <- spark_read_libsvm(sc, "sample_data",
                                    sample_data_path, overwrite = TRUE)
   scaler <- ft_standard_scaler(
