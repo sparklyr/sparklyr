@@ -3,6 +3,7 @@
 ^\.travis\.yml$
 ^\.codecov\.yml$
 ^README\.Rmd$
+^README\.html$
 ^README_files$
 ^README_images$
 ^configure$
@@ -35,6 +36,7 @@
 ^appveyor.yml$
 ^checkpoints$
 ^ci$
+^tests/testthat/test-copy-to.R$
 ^tests/testthat/test-extension-nested.R$
 ^CODE_OF_CONDUCT.md$
 ^CONTRIBUTORS.md$
