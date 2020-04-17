@@ -400,9 +400,11 @@ random_table_name <- function(prefix) {
 }
 
 get_sample_data_path <- function(file_name) {
-  if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true")
-    sample_data_path <- paste("dbfs:/tmp/data/", file_name, sep="")
-  else
+  if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true") {
+    sanitized_name <- gsub("[\\|$]", "", file_name)
+    sample_data_path <- paste("dbfs:/tmp/data/", sanitized_name, sep="")
+  } else {
     sample_data_path <- dir(getwd(), recursive = TRUE, pattern = file_name, full.names = TRUE)
+  }
   sample_data_path
 }
