@@ -16,7 +16,7 @@ Authors@R: c(
     person(family = "RStudio", role = c("cph")),
     person(family = "The Apache Software Foundation", role = c("aut", "cph"))
     )
-Maintainer: Javier Luraschi <javier@rstudio.com>
+Maintainer: Yitao Li <yitao@rstudio.com>
 Description: R interface to Apache Spark, a fast and general engine for big data
     processing, see <http://spark.apache.org>. This package supports connecting to
     local and remote Apache Spark clusters, provides a 'dplyr' compatible back-end,
