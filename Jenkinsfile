@@ -1,5 +1,7 @@
 import groovy.json.JsonOutput
 
+def bash(String cmd) { sh("#/usr/bin/env bash\nset -euo pipefail\n${cmd}") }
+
 def sparkHome = "/usr/lib/python3.7/site-packages/pyspark"
 def s3Path = 'logs/' + env.BUILD_TAG + '/' + UUID.randomUUID().toString() + '.txt'
 def s3Url = 'https://sparklyr-jenkins.s3.amazonaws.com/' + s3Path
@@ -44,31 +46,33 @@ pipeline {
                             port: "15001",
                         ]
                         def dbConnectParamsJson = JsonOutput.toJson(dbConnectParams)
-                        sh "echo '$dbConnectParamsJson' > ~/.databricks-connect"
+                        bash "echo '$dbConnectParamsJson' > ~/.databricks-connect"
 
                         // Smoke test to check if databricks-connect is set up correctly
-                        sh "SPARK_HOME=${sparkHome} databricks-connect test  2>&1 | tee log.txt"
+                        bash "SPARK_HOME=${sparkHome} databricks-connect test  2>&1 | tee log.txt"
                     }
                 }
             }
         }
         stage("Prepare the test data") {
             steps {
-                sh """dbfs mkdirs dbfs:/tmp/data 2>&1 | tee -a log.txt"""
-                sh """dbfs cp -r --overwrite tests/testthat/data dbfs:/tmp/data 2>&1 | tee -a log.txt"""
+                bash """dbfs mkdirs dbfs:/tmp/data 2>&1 | tee -a log.txt"""
+                bash """dbfs cp -r --overwrite tests/testthat/data dbfs:/tmp/data 2>&1 | tee -a log.txt"""
+                // Listing files to avoid S3 consistency issues 
+                bash """dbfs ls dbfs:/tmp/data 2>&1 | tee -a log.txt"""
             }
         }
         stage("Run tests") {
             steps {
-                sh """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)' 2>&1 | tee -a log.txt"""
-                sh """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)'  2>&1 | tee -a log.txt"""
+                bash """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)' 2>&1 | tee -a log.txt"""
+                bash """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)'  2>&1 | tee -a log.txt"""
             }
         }
     }
     post {
         always {
-            sh "databricks clusters delete --cluster-id ${clusterId} 2>&1 | tee -a log.txt "
-            sh """dbfs rm -r dbfs:/tmp/data  2>&1 | tee -a log.txt"""
+            bash "databricks clusters delete --cluster-id ${clusterId} 2>&1 | tee -a log.txt "
+            bash """dbfs rm -r dbfs:/tmp/data  2>&1 | tee -a log.txt"""
             s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: s3Path, contentType: 'text/plain; charset=utf-8')
             script {
                 if (env.CHANGE_ID) {
