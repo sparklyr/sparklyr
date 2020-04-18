@@ -38,12 +38,10 @@ glance.ml_model_pca <- function(x, ...) {
   names(explained_variance) <- purrr::map_chr(names(explained_variance),
                  function(e) paste0("explained_variance_", e))
 
-  k <- x$k
+  k <- c("k" = x$k)
 
   c(k, explained_variance) %>%
-    t() %>%
-    dplyr::as_tibble() %>%
-    dplyr::rename(k = !!"V1")
-
+    as.list() %>%
+    dplyr::as_tibble()
 }
 
