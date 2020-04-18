@@ -15,10 +15,10 @@ tidy.ml_model_lda <- function(x,
 
   term <- ml_vocabulary(x)
   topics_matrix <- x$model$topics_matrix() %>%
-    dplyr::as_tibble()
+    dplyr::as_tibble(.name_repair = "unique")
 
   k <- x$model$param_map$k
-  names(topics_matrix) <- 0:(k - 1)
+  names(topics_matrix) <- as.character(0:(k - 1))
 
   dplyr::bind_cols(term = term, topics_matrix) %>%
     tidyr::gather(!!"topic", beta, -term, convert = TRUE) %>%
