@@ -85,7 +85,7 @@ test_that("we can separate struct columns (#690)", {
     to = as.Date("2017-01-01"),
     by = "1 day")
 
-  date_sdf <- copy_to(sc, tibble::data_frame(event_date = as.character(date_seq)),
+  date_sdf <- copy_to(sc, tibble(event_date = as.character(date_seq)),
                       overwrite = TRUE)
 
   sliding_window_sdf <- date_sdf %>%

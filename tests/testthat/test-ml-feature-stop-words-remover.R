@@ -24,8 +24,8 @@ test_that("ft_stop_words_remover() param setting", {
 test_that("ft_stop_words_remover() works", {
   test_requires_version("2.0.0", "loadDefaultStopWords requires Spark 2.0+")
   sc <- testthat_spark_connection()
-  df <- data_frame(id = c(0, 1),
-                   raw = c("I saw the red balloon", "Mary had a little lamb"))
+  df <- tibble(id = c(0, 1),
+               raw = c("I saw the red balloon", "Mary had a little lamb"))
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
   expect_identical(

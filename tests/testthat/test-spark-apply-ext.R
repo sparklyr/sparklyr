@@ -212,7 +212,7 @@ test_that("'spark_apply' can use anonymous functions", {
   skip_slow("takes too long to measure coverage")
   expect_equal(
     sdf_len(sc, 3) %>% spark_apply(~ .x + 1) %>% collect(),
-    data_frame(id = c(2, 3, 4))
+    tibble(id = c(2, 3, 4))
   )
 })
 

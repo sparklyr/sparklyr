@@ -67,5 +67,6 @@ glance.ml_model_multilayer_perceptron_classification <- function(x, ...) {
   c(input_units = input,
     hidden,
     output_units = output) %>%
-    dplyr::data_frame_()
+    as.list() %>%
+    dplyr::as_tibble()
 }

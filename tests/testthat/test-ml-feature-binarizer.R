@@ -18,7 +18,7 @@ test_that("ft_binarizer() param setting", {
 
 test_that("ft_binarizer.tbl_spark() works", {
   sc <- testthat_spark_connection()
-  df <- data_frame(id = 0:2L, feature = c(0.1, 0.8, 0.2))
+  df <- tibble(id = 0:2L, feature = c(0.1, 0.8, 0.2))
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
   expect_equal(
     df_tbl %>%

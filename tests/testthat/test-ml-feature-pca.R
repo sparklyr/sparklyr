@@ -14,14 +14,14 @@ test_that("ft_pca() param setting", {
 
 test_that("ft_pca() works", {
   sc <- testthat_spark_connection()
-  mat <- data_frame(
+  mat <- dplyr::tibble(
     V1 = c(0, 2, 4),
     V2 = c(1, 0, 0),
     V3 = c(0, 3, 0),
     V4 = c(7, 4, 6),
     V5 = c(0, 5, 7))
 
-  s <- data_frame(
+  s <- dplyr::tibble(
     PC1 = c(1.6485728230883807, -4.645104331781534, -6.428880535676489),
     PC2 = c(-4.013282700516296, -1.1167972663619026, -5.337951427775355),
     PC3 = c(-5.524543751369388, -5.524543751369387, -5.524543751369389)

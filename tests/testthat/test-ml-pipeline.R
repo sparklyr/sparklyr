@@ -3,7 +3,7 @@ context("ml pipeline")
 skip_databricks_connect()
 sc <- testthat_spark_connection()
 
-training <- dplyr::data_frame(
+training <- dplyr::tibble(
   id = 0:3L,
   text = c("a b c d e spark",
            "b d",
@@ -14,7 +14,7 @@ training <- dplyr::data_frame(
 
 training_tbl <- testthat_tbl("training")
 
-test <- dplyr::data_frame(
+test <- dplyr::tibble(
   id = 4:7L,
   text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
 )

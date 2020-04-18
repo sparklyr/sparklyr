@@ -23,7 +23,7 @@ test_that("ft_regex_tokenizer() param setting", {
 
 test_that("ft_regex_tokenizer() works", {
   sc <- testthat_spark_connection()
-  sentence_df <- data_frame(
+  sentence_df <- tibble(
     id = c(0, 1, 2),
     sentence = c("Hi I heard about Spark",
                  "I wish Java could use case classes",
