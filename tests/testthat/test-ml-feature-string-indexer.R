@@ -32,7 +32,7 @@ test_that("ft_string_indexer() param setting", {
 
 test_that("ft_string_indexer() works", {
   sc <- testthat_spark_connection()
-  df <- dplyr::data_frame(string = c("foo", "bar", "foo", "foo"))
+  df <- dplyr::tibble(string = c("foo", "bar", "foo", "foo"))
   df_tbl <- dplyr::copy_to(sc, df, overwrite = TRUE)
 
   indexer <- ft_string_indexer(sc, "string", "indexed") %>%

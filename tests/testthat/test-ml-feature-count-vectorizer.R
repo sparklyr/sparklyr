@@ -24,7 +24,7 @@ test_that("ft_count_vectorizer() param setting", {
 test_that("ft_count_vectorizer() works", {
   test_requires_version("2.0.0", "features require Spark 2.0+")
   sc <- testthat_spark_connection()
-  df <- data_frame(text = c("a b c", "a a a b b c"))
+  df <- tibble(text = c("a b c", "a a a b b c"))
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
   counts <- df_tbl %>%

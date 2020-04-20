@@ -5,9 +5,9 @@ sc <- testthat_spark_connection()
 test_that("regex relational operators work", {
   test_requires("dplyr")
 
-  hello <- data_frame(hello = c("hello my friend",
-                                "hello my dog",
-                                "hello my cat"))
+  hello <- tibble(hello = c("hello my friend",
+                            "hello my dog",
+                            "hello my cat"))
   hello_tbl <- testthat_tbl("hello")
 
   expect_equal(hello_tbl %>%
@@ -17,7 +17,7 @@ test_that("regex relational operators work", {
                  filter(grepl("cat", hello))
   )
 
-  products <- data_frame(
+  products <- tibble(
     product_id = 1:3,
     product_description = c("fruit", "Fruit", "milk"))
 

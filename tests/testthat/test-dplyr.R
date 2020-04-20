@@ -5,8 +5,8 @@ sc <- testthat_spark_connection()
 iris_tbl <- testthat_tbl("iris")
 test_requires("dplyr")
 
-df1 <- data_frame(a = 1:3, b = letters[1:3])
-df2 <- data_frame(b = letters[1:3], c = letters[24:26])
+df1 <- tibble(a = 1:3, b = letters[1:3])
+df2 <- tibble(b = letters[1:3], c = letters[24:26])
 
 df1_tbl <- testthat_tbl("df1")
 df2_tbl <- testthat_tbl("df2")
