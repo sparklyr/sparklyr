@@ -144,14 +144,15 @@ test_that("spark_read_csv() can rename columns", {
 })
 
 test_that("spark_read_text() can read a whole file", {
-  skip_databricks_connect()
   test_requires("dplyr")
 
-  text_file <- file("test.txt", "w+")
-  cat("1\n2\n3", file = text_file)
-  close(text_file)
-
-  whole_tbl <- spark_read_text(sc, "whole", normalizePath("test.txt"), overwrite = T, whole = TRUE)
+  whole_tbl <- spark_read_text(
+    sc,
+    "whole",
+    get_sample_data_path("spark-read-text-can-read-a-whole-file.txt"),
+    overwrite = T,
+    whole = TRUE
+  )
 
   expect_equal(
     whole_tbl %>% collect() %>% nrow(),
@@ -160,43 +161,36 @@ test_that("spark_read_text() can read a whole file", {
 })
 
 test_that("spark_read_csv() can read with no name", {
-  skip_databricks_connect()
   test_requires("dplyr")
 
-  text_file <- file("test.csv", "w+")
-  cat("a\n1\n2\n3", file = text_file)
-  close(text_file)
-
-  expect_equal(colnames(spark_read_csv(sc, "test.csv")), "a")
-
-  expect_equal(colnames(spark_read_csv(sc, "test", "test.csv")), "a")
-
-  expect_equal(colnames(spark_read_csv(sc, path = "test.csv")), "a")
+  csvPath <- get_sample_data_path(
+    "spark-read-csv-can-read-with-no-name.txt"
+  )
+  expect_equal(colnames(spark_read_csv(sc, csvPath)), "a")
+  expect_equal(colnames(spark_read_csv(sc, "test", csvPath)), "a")
+  expect_equal(colnames(spark_read_csv(sc, path = csvPath)), "a")
 })
 
 test_that("spark_read_csv() can read with named character name", {
-  skip_databricks_connect()
   test_requires("dplyr")
 
-  text_file <- file("test.csv", "w+")
-  cat("a\n1\n2\n3", file = text_file)
-  close(text_file)
+  csvPath <- get_sample_data_path(
+    "spark-read-csv-can-read-with-named-character-name.txt"
+  )
 
   name <- c(name = "testname")
-  expect_equal(colnames(spark_read_csv(sc, name, "test.csv")), "a")
+  expect_equal(colnames(spark_read_csv(sc, name, csvPath)), "a")
 })
 
 
 test_that("spark_read_csv() can read column types", {
-  skip_databricks_connect()
-  csv <- file("test.csv", "w+")
-  cat("a,b,c\n1,2,3", file = csv)
-  close(csv)
-
+  csvPath <- get_sample_data_path(
+    "spark-read-csv-can-read-column-types.txt"
+  )
   df_schema <- spark_read_csv(
     sc,
     name = "test_columns",
-    path = "test.csv",
+    path = csvPath,
     columns = c(a = "byte", b = "integer", c = "double")
   ) %>%
     sdf_schema()
@@ -212,15 +206,13 @@ test_that("spark_read_csv() can read column types", {
 })
 
 test_that("spark_read_csv() can read verbatim column types", {
-  skip_databricks_connect()
-  csv <- file("test.csv", "w+")
-  cat("a,b,c\n1,2,3", file = csv)
-  close(csv)
-
+  csvPath <- get_sample_data_path(
+    "spark-read-csv-can-read-verbatim-column-types.csv"
+  )
   df_schema <- spark_read_csv(
     sc,
     name = "test_columns",
-    path = "test.csv",
+    path = csvPath,
     columns = c(a = "ByteType", b = "IntegerType", c = "DoubleType")
   ) %>%
     sdf_schema()
