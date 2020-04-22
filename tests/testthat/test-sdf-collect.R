@@ -9,6 +9,20 @@ test_that("sdf_collect() works properly", {
   expect_equivalent(mtcars, mtcars_data)
 })
 
+test_that("sdf_collect() works properly with impl = \"row-wise-iter\"", {
+  mtcars_tbl <- testthat_tbl("mtcars")
+  mtcars_data <- sdf_collect(mtcars_tbl, impl = "row-wise-iter")
+
+  expect_equivalent(mtcars, mtcars_data)
+})
+
+test_that("sdf_collect() works properly with impl = \"column-wise\"", {
+  mtcars_tbl <- testthat_tbl("mtcars")
+  mtcars_data <- sdf_collect(mtcars_tbl, impl = "column-wise")
+
+  expect_equivalent(mtcars, mtcars_data)
+})
+
 test_that("sdf_collect() works with nested lists", {
   if (spark_version(sc) < "2.4")
     skip("serializing nested list into Spark StructType is only supported in Spark 2.4+")
@@ -100,15 +114,20 @@ test_that("sdf_collect() supports callback", {
   batch_count <- 0
   row_count <- 0
 
-  sdf_len(sc, 10, repartition = 2) %>%
-    sdf_collect(callback = function(df) {
+  df <- tibble(id = seq(1, 10), val = lapply(seq(1, 10), function(x) list(a = x, b = as.character(x))))
+  sdf <- sdf_copy_to(sc, df, repartition = 2, overwrite = TRUE)
+
+  collected <- list()
+  sdf %>%
+    sdf_collect(callback = function(batch_df) {
       batch_count <<- batch_count + 1
-      row_count <<- row_count + nrow(df)
+      row_count <<- row_count + nrow(batch_df)
+      collected <<- append(collected, batch_df$val)
     })
 
   expect_equal(
     batch_count,
-    ifelse("arrow" %in% .packages(), 2, 1)
+    1
   )
 
   expect_equal(
@@ -116,14 +135,45 @@ test_that("sdf_collect() supports callback", {
     10
   )
 
-  last_idx <- 0
+  if (spark_version(sc) >= "2.4") {
+    expect_equal(
+      collected,
+      df$val
+    )
+  }
+
+  if (spark_version(sc) >= "2.4") {
+    collected <- list()
+    sdf %>%
+      sdf_collect(callback = function(batch_df, idx) {
+        collected <<- append(collected, batch_df$val)
+      })
+
+    expect_equal(
+      collected,
+      df$val
+    )
+  }
+
+  sdf_len_batch_count <- 0
   sdf_len(sc, 10, repartition = 2) %>%
-    sdf_collect(callback = function(df, idx) {
-      last_idx <<- idx
+    sdf_collect(callback = function(df) {
+      sdf_len_batch_count <<- sdf_len_batch_count + 1
     })
 
   expect_equal(
-    last_idx,
+    sdf_len_batch_count,
+    ifelse("arrow" %in% .packages(), 2, 1)
+  )
+
+  sdf_len_last_idx <- 0
+  sdf_len(sc, 10, repartition = 2) %>%
+    sdf_collect(callback = function(df, idx) {
+      sdf_len_last_idx <<- idx
+    })
+
+  expect_equal(
+    sdf_len_last_idx,
     ifelse("arrow" %in% .packages(), 2, 1)
   )
 })
