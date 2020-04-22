@@ -15,7 +15,7 @@ pipeline {
                     def uuid = UUID.randomUUID().toString()
                     def clusterParams = [
                         cluster_name: "jenkins-${uuid}",
-                        spark_version: "6.3.x-scala2.11",
+                        spark_version: "6.4.x-scala2.11",
                         node_type_id: "i3.xlarge",
                         num_workers: 1,
                         autotermination_minutes: 10,
