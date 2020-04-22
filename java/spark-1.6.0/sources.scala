@@ -231,6 +231,10 @@ readString <- function(con) {
 
   if (stringLen > 0) {
     raw <- read_bin(con, raw(), stringLen, endian = "big")
+    if (is.element("00", raw)) {
+     warning("Input contains embedded nuls, removing.")
+     raw <- raw[raw != "00"]
+    }
     string <- rawToChar(raw)
   }
 
