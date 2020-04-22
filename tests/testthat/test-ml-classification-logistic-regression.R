@@ -38,7 +38,7 @@ test_that("ml_logistic_regression() param setting", {
 test_that("ml_logistic_regression.tbl_spark() works properly", {
   sc <- testthat_spark_connection()
 
-  training <- data_frame(
+  training <- tibble(
     id = 0:3L,
     text = c("a b c d e spark",
              "b d",
@@ -46,7 +46,7 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
              "hadoop mapreduce"),
     label = c(1, 0, 1, 0)
   )
-  test <- data_frame(
+  test <- tibble(
     id = 4:7L,
     text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
   )

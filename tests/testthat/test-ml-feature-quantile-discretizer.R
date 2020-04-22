@@ -31,7 +31,7 @@ test_that("ft_quantile_discretizer() param setting", {
 
 test_that("ft_quantile_discretizer works", {
   sc <- testthat_spark_connection()
-  df <- data_frame(
+  df <- tibble(
     id = 0:4L,
     hour = c(18, 19, 8, 5, 2)
   )
@@ -47,7 +47,7 @@ test_that("ft_quantile_discretizer works", {
 test_that("ft_quantile_discretizer works on multiple columns", {
   test_requires_version("2.3.0", comment = "multiple columns support requires spark 2.3+")
   sc <- testthat_spark_connection()
-  df <- data_frame(
+  df <- tibble(
     id = 0:4L,
     hour = c(18, 19, 8, 5, 2),
     hour2 = c(5, 2, 12, 6, 1)

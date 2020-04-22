@@ -36,8 +36,8 @@
 ^appveyor.yml$
 ^checkpoints$
 ^ci$
-^tests/testthat/test-copy-to.R$
-^tests/testthat/test-extension-nested.R$
+^tests/
+^logs/
 ^CODE_OF_CONDUCT.md$
 ^CONTRIBUTORS.md$
 ^ROADMAP.md$

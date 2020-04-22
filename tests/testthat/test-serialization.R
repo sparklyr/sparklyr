@@ -7,7 +7,7 @@ test_requires("nycflights13")
 flights_small <- flights %>% dplyr::sample_n(10000)
 flights_tbl <- testthat_tbl("flights_small")
 
-logical_nas <- data_frame(bools = c(T, NA, F))
+logical_nas <- tibble(bools = c(T, NA, F))
 logical_nas_tbl <- testthat_tbl("logical_nas")
 
 ensure_round_trip <- function(sc, data) {
@@ -85,7 +85,7 @@ test_that("data.frames with many columns don't cause Java StackOverflows", {
   version <- Sys.getenv("SPARK_VERSION", unset = "2.2.0")
 
   n <- if (version >= "2.0.0") 500 else 5000
-  df <- matrix(0, ncol = n, nrow = 2) %>% as_tibble()
+  df <- matrix(0, ncol = n, nrow = 2) %>% as_tibble(.name_repair = "unique")
   sdf <- copy_to(sc, df, overwrite = TRUE)
 
   # the above failed with a Java StackOverflow with older versions of sparklyr
@@ -149,7 +149,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   arrow_compat <- using_arrow()
 
-  hive_type <- tibble::frame_data(
+  hive_type <- tibble::tribble(
     ~stype,            ~svalue,      ~rtype,     ~rvalue,      ~atype,     ~avalue,
     "tinyint",             "1",   "integer",         "1",   "integer",         "1",
     "smallint",            "1",   "integer",         "1",   "integer",         "1",
@@ -210,7 +210,7 @@ test_that("collect() can retrieve all data types correctly", {
 test_that("collect() can retrieve NULL data types as NAs", {
   library(dplyr)
 
-  hive_type <- tibble::frame_data(
+  hive_type <- tibble::tribble(
         ~stype,        ~rtype,        ~atype,
      "tinyint",     "integer",         "raw",
     "smallint",     "integer",     "integer",
@@ -336,9 +336,7 @@ test_that("collect() can retrieve as.POSIXct fields with timezones", {
 test_that("collect() can retrieve specific dates without timezones", {
   data_tbl <- sdf_copy_to(
     sc,
-    data_frame(
-      t = c(1419126103)
-    )
+    tibble(t = c(1419126103))
   )
 
   expect_equal(

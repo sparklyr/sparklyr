@@ -46,9 +46,8 @@ new_ml_model <- function(pipeline_model, formula, dataset, ..., class = characte
   predictor <- stages[[length(stages)]]
 
   # for pipeline, fix data prep transformation but use the un-fitted estimator predictor
-  pipeline <- stages %>%
-    head(-1) %>%
-    rlang::invoke(ml_pipeline, ., uid = ml_uid(pipeline_model)) %>%
+  pipeline <- stages %>% head(-1)
+  pipeline <- rlang::exec(ml_pipeline, !!!pipeline, uid = ml_uid(pipeline_model)) %>%
     ml_add_stage(predictor)
 
   # workaround for https://issues.apache.org/jira/browse/SPARK-19953

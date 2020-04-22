@@ -4,7 +4,7 @@ skip_databricks_connect()
 sc <- testthat_spark_connection()
 
 test_requires("dplyr")
-training <- data_frame(
+training <- tibble(
   id = 0:3L,
   text = c("a b c d e spark",
            "b d",
@@ -15,7 +15,7 @@ training <- data_frame(
 
 training_tbl <- testthat_tbl("training")
 
-test <- data_frame(
+test <- tibble(
   id = 4:7L,
   text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
 )

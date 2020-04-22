@@ -19,8 +19,8 @@ test_that("cor, cov, sd and var works as expected", {
     mutate(
       cor = cor(x, y),
       cov = cov(x, y),
-      sd = sd(x),
-      var = var(x)
+      sd = sd(x, na.rm = TRUE),
+      var = var(x, na.rm = TRUE)
     ) %>%
     collect() %>%
     as.data.frame()
@@ -50,8 +50,8 @@ test_that("cor, cov, sd and var works as expected over groups", {
     mutate(
       cor = cor(x, y),
       cov = cov(x, y),
-      sd = sd(x),
-      var = var(x)
+      sd = sd(x, na.rm = TRUE),
+      var = var(x, na.rm = TRUE)
     ) %>%
     arrange(id, x, y) %>%
     collect() %>%
