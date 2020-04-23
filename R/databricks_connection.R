@@ -68,6 +68,11 @@ new_databricks_connection <- function(scon, guid) {
   session <- invoke_static(sc, r_driver_local, "getDriver", guid) %>%
     invoke("sqlContext") %>%
     invoke("sparkSession")
+  # Apply user-specified fs.azure.* config values
+  fs.azure.prefix <- "fs.azure."
+  fs.azure.configs <- connection_config(sc, fs.azure.prefix)
+  conf <- invoke(session, "conf")
+  apply_config(conf, fs.azure.configs, "set", fs.azure.prefix)
   # This is called hive_context but for spark > 2.0, it should actually be a spark session
   sc$state$hive_context <- session
   sc
