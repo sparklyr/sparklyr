@@ -60,7 +60,7 @@ pipeline {
                 bash """dbfs mkdirs dbfs:/tmp/data 2>&1 | tee -a log.txt"""
                 bash """dbfs cp -r --overwrite tests/testthat/data ${dbfsPath} 2>&1 | tee -a log.txt"""
                 // Listing files to avoid S3 consistency issues 
-                bash """dbfs ls dbfs:/tmp/data 2>&1 | tee -a log.txt"""
+                bash """dbfs ls ${dbfsPath} 2>&1 | tee -a log.txt"""
             }
         }
         stage("Run tests") {
@@ -79,14 +79,14 @@ pipeline {
         success {
             script {
                 if (env.CHANGE_ID) {
-                    def comment = pullRequest.comment('Databricks Connect tests succeeded. View logs [here](' + s3Url + ').')
+                    pullRequest.comment('Databricks Connect tests succeeded. View logs [here](' + s3Url + ').')
                 }
             }
         }
         failure {
             script {
                 if (env.CHANGE_ID) {
-                    def comment = pullRequest.comment('Databricks Connect tests failed. View logs [here](' + s3Url + ').')
+                    pullRequest.comment('Databricks Connect tests failed. View logs [here](' + s3Url + ').')
                 }
             }
         }
