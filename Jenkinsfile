@@ -75,6 +75,8 @@ pipeline {
             bash "databricks clusters delete --cluster-id ${clusterId} 2>&1 | tee -a log.txt "
             bash """dbfs rm -r ${dbfsPath}  2>&1 | tee -a log.txt"""
             s3Upload(file: 'log.txt', bucket:'sparklyr-jenkins', path: s3Path, contentType: 'text/plain; charset=utf-8')
+        }
+        success {
             script {
                 if (env.CHANGE_ID) {
                     def comment = pullRequest.comment('Databricks Connect tests succeeded. View logs [here](' + s3Url + ').')
@@ -83,7 +85,6 @@ pipeline {
         }
         failure {
             script {
-                // CHANGE_ID is set only for pull requests, so it is safe to access the pullRequest global variable
                 if (env.CHANGE_ID) {
                     def comment = pullRequest.comment('Databricks Connect tests failed. View logs [here](' + s3Url + ').')
                 }
