@@ -11,7 +11,7 @@ def s3Url = 'https://sparklyr-jenkins.s3.amazonaws.com/' + s3Path
 pipeline {
     agent any
     stages {
-        stage("Create Databricks cluster") {
+        stage("Launching Databricks cluster") {
             steps {
                 script {
                     def clusterParams = [
@@ -33,7 +33,7 @@ pipeline {
                 }
             }
         }
-        stage("Set up Databricks Connect") {
+        stage("Setting up Databricks Connect") {
             steps {
                 script {
                     withCredentials([
@@ -55,15 +55,15 @@ pipeline {
                 }
             }
         }
-        stage("Prepare the test data") {
+        stage("Copying test data to DBFS") {
             steps {
-                bash """dbfs mkdirs dbfs:/tmp/data 2>&1 | tee -a log.txt"""
+                bash """dbfs mkdirs ${dbfsPath} 2>&1 | tee -a log.txt"""
                 bash """dbfs cp -r --overwrite tests/testthat/data ${dbfsPath} 2>&1 | tee -a log.txt"""
                 // Listing files to avoid S3 consistency issues 
                 bash """dbfs ls ${dbfsPath} 2>&1 | tee -a log.txt"""
             }
         }
-        stage("Run tests") {
+        stage("Running tests") {
             steps {
                 bash """R --vanilla --slave -e 'devtools::install(".", dependencies=TRUE)' 2>&1 | tee -a log.txt"""
                 bash """SPARK_VERSION=2.4.4 SPARK_HOME=${sparkHome} TEST_DATABRICKS_CONNECT=true DBFS_DATA_PATH=${dbfsPath} R --vanilla --slave -e 'devtools::test(stop_on_failure = TRUE)'  2>&1 | tee -a log.txt"""
