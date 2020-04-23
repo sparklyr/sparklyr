@@ -403,7 +403,7 @@ random_table_name <- function(prefix) {
 get_sample_data_path <- function(file_name) {
   if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true") {
     sanitized_name <- gsub("[\\|$]", "", file_name)
-    sample_data_path <- paste("dbfs:/tmp/data/", sanitized_name, sep="")
+    sample_data_path <- paste0(Sys.getenv("TEST_DATABRICKS_CONNECT"), "/", sanitized_name)
   } else {
     sample_data_path <- dir(getwd(), recursive = TRUE, pattern = file_name, full.names = TRUE)
   }
