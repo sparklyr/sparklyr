@@ -12,7 +12,7 @@ RUN apk add --repository http://dl-cdn.alpinelinux.org/alpine/v3.10/main python3
 # intall databricks-cli
 RUN pip3 install databricks-cli
 #install db-connect
-RUN pip3 install -U databricks-connect==6.3.1
+RUN pip3 install -U databricks-connect==6.4.1
 
 # install R
 RUN apk add --repository http://dl-cdn.alpinelinux.org/alpine/v3.10/community --repository http://dl-cdn.alpinelinux.org/alpine/v3.10/main R==3.6.0-r1 R-dev==3.6.0-r1 --update-cache

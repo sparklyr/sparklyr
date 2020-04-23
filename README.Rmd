@@ -387,14 +387,14 @@ spark_disconnect(sc)
 
 ## Connecting through Databricks Connect
 [Databricks Connect](https://docs.databricks.com/dev-tools/databricks-connect.html#databricks-connect) allows you to connect
-sparklyr to a remote Databricks Cluster. You can install [Databricks Connect Python pakcage](https://pypi.org/project/databricks-connect/) and use it to submit Spark jobs written in sparklyr APIs and have them execute remotely on a Databricks cluster instead of in the local Spark session.
+sparklyr to a remote Databricks Cluster. You can install [Databricks Connect python package](https://pypi.org/project/databricks-connect/) and use it to submit Spark jobs written in sparklyr APIs and have them execute remotely on a Databricks cluster instead of in the local Spark session.
 
 To use sparklyr with Databricks Connect first launch a Cluster on Databricks. Then follow [these instructions](https://docs.databricks.com/dev-tools/databricks-connect.html#client-setup) to setup the client:
 
 1. Make sure pyspark is not installed
-2. Install the latest version of Databricks Connect python package.
+2. Install the Databricks Connect python package. The latest supported version is 6.4.1.
 3. Run `databricks-connect configure` and provide the configuration information
-    * Databricks account URL of the form `ttps://<account>.cloud.databricks.com`.
+    * Databricks account URL of the form `https://<account>.cloud.databricks.com`.
     * [User token](https://docs.databricks.com/dev-tools/api/latest/authentication.html#token-management)
     * Cluster ID
     * Port (default port number is `15001`)
