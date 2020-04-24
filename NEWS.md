@@ -1,3 +1,9 @@
+# Sparklyr 1.2.0.9000
+
+### Serialization
+
+- Support to collect objectts of type `SeqWrapper` (#2441)
+
 # Sparklyr 1.2.0
 
 ### Distributed R
