@@ -30,7 +30,7 @@ testthat_spark_connection <- function() {
   if (!exists(".testthat_latest_spark", envir = .GlobalEnv))
     assign(".testthat_latest_spark", "2.3.0", envir = .GlobalEnv)
 
-  livy_branch <- Sys.getenv("TRAVIS_PULL_REQUEST_BRANCH")
+  livy_branch <- Sys.getenv("SPARKLYR_LIVY_BRANCH")
   if (nchar(livy_branch) > 0) {
     options(sparklyr.livy.branch = livy_branch)
   }
