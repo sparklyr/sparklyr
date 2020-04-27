@@ -54,7 +54,7 @@ The object returned depends on the class of \code{x}.
 Implements the transforms required for fitting a dataset against an R model
   formula. Currently we support a limited subset of the R operators,
   including \code{~}, \code{.}, \code{:}, \code{+}, and \code{-}. Also see the R formula docs here:
-  \url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/formula}
+  \url{http://stat.ethz.ch/R-manual/R-patched/library/stats/html/formula.html}
 }
 \details{
 The basic operators in the formula are:
@@ -93,7 +93,7 @@ See \url{http://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
-Other feature transformers:
+Other feature transformers: 
 \code{\link{ft_binarizer}()},
 \code{\link{ft_bucketizer}()},
 \code{\link{ft_chisq_selector}()},

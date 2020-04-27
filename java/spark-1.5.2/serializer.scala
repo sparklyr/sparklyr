@@ -231,8 +231,8 @@ class Serializer(tracker: JVMObjectTracker) {
     } else {
       val value = if (obj.isInstanceOf[WrappedArray[_]]) {
         obj.asInstanceOf[WrappedArray[_]].toArray
-      } else if (obj.isInstanceOf[scala.collection.convert.Wrappers$SeqWrapper]) {
-        obj.asInstanceOf[scala.collection.convert.Wrappers$SeqWrapper].toArray
+      } else if (obj.isInstanceOf[scala.collection.convert.Wrappers.SeqWrapper[_]]) {
+        obj.asInstanceOf[scala.collection.convert.Wrappers.SeqWrapper[_]].toArray
       } else {
         obj
       }

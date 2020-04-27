@@ -89,11 +89,21 @@ sdf_read_column <- function(x, column) {
 #' Collects a Spark dataframe into R.
 #'
 #' @param object Spark dataframe to collect
+#' @param impl Which implementation to use while collecting Spark dataframe
+#'        - row-wise: fetch the entire dataframe into memory and then process it row-by-row
+#'        - row-wise-iter: iterate through the dataframe using RDD local iterator, processing one row at
+#'                         a time (hence reducing memory footprint)
+#'        - column-wise: fetch the entire dataframe into memory and then process it column-by-column
+#'        NOTE: (1) this will not apply to streaming or arrow use cases (2) this parameter will only affect
+#'        implementation detail, and will not affect result of `sdf_collect`, and should only be set if
+#'        performance profiling indicates any particular choice will be significantly better than the default
+#'        choice ("row-wise")
 #' @param ... Additional options.
 #'
 #' @export
-sdf_collect <- function(object, ...) {
+sdf_collect <- function(object, impl = c("row-wise", "row-wise-iter", "column-wise"), ...) {
   args <- list(...)
+  impl <- match.arg(impl)
   sc <- spark_connection(object)
 
   if (sdf_is_streaming(object))
@@ -101,7 +111,7 @@ sdf_collect <- function(object, ...) {
   else if (arrow_enabled(sc, object) && !identical(args$arrow, FALSE))
     arrow_collect(object, ...)
   else
-    sdf_collect_static(object, ...)
+    sdf_collect_static(object, impl, ...)
 }
 
 sdf_collect_data_frame <- function(sdf, collected) {
@@ -151,7 +161,7 @@ sdf_collect_data_frame <- function(sdf, collected) {
 
 # Read a Spark Dataset into R.
 #' @importFrom dplyr as_tibble
-sdf_collect_static <- function(object, ...) {
+sdf_collect_static <- function(object, impl, ...) {
   args <- list(...)
   sc <- spark_connection(object)
   sdf <- spark_dataframe(object)
@@ -166,11 +176,22 @@ sdf_collect_static <- function(object, ...) {
   collected <- if (spark_version(sc) > "2.0.0") {
     if (!identical(args$callback, NULL)) {
       batch_size <- spark_config_value(sc$config, "sparklyr.collect.batch", as.integer(10^5L))
+      ctx <- invoke_static(sc, "sparklyr.DFCollectionUtils", "prepareDataFrameForCollection", sdf)
+      sdf <- invoke(ctx, "_1")
+      dtypes <- invoke(ctx, "_2")
       sdf_iter <- invoke(sdf, "toLocalIterator")
 
       iter <- 1
       while (invoke(sdf_iter, "hasNext")) {
-        raw_df <- invoke_static(sc, "sparklyr.Utils", "collectIter", invoke(sdf_iter, "underlying"), batch_size, sdf, separator$regexp)
+        raw_df <- invoke_static(
+          sc,
+          "sparklyr.Utils",
+          "collectIter",
+          invoke(sdf_iter, "underlying"),
+          dtypes,
+          batch_size,
+          separator$regexp
+        )
         df <- sdf_collect_data_frame(sdf, raw_df)
         cb <- args$callback
         if (is.language(cb)) cb <- rlang::as_closure(cb)
@@ -180,9 +201,15 @@ sdf_collect_static <- function(object, ...) {
       }
 
       NULL
-    }
-    else {
-      invoke_static(sc, "sparklyr.Utils", "collect", sdf, separator$regexp)
+    } else {
+      invoke_static(
+        sc,
+        "sparklyr.Utils",
+        "collect",
+        sdf,
+        separator$regexp,
+        impl
+      )
     }
   } else {
     if (!identical(args$callback, NULL)) stop("Parameter 'callback' requires Spark 2.0+")
@@ -192,7 +219,14 @@ sdf_collect_static <- function(object, ...) {
     chunks <- split_chunks(columns, as.integer(chunk_size))
     pieces <- lapply(chunks, function(chunk) {
       subset <- sdf %>% invoke("selectExpr", as.list(chunk))
-      invoke_static(sc, "sparklyr.Utils", "collect", subset, separator$regexp)
+      invoke_static(
+        sc,
+        "sparklyr.Utils",
+        "collect",
+        subset,
+        separator$regexp,
+        impl
+      )
     })
     do.call(c, pieces)
   }
