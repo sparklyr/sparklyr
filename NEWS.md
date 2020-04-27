@@ -22,6 +22,9 @@
 - Fixed the issue of date or timestamp values representing the UNIX epoch
   (1970-01-01) being deserialized incorrectly into NAs
 
+- Better support for querying and deserializing Spark SQL struct columns when
+  working with Spark 2.4 or above
+
 ### Connection
 
 - Add support for Databricks Connect
