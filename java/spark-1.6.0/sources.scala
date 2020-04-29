@@ -1013,7 +1013,8 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
          `data.frame` = writeList(con, object),
-         stop("Unsupported type '", type, "' for serialization"))
+         spark_apply_binary_result = writeList(con, object),
+         stop("Unsupported type '", serdeType, "' for serialization"))
 }
 
 writeVoid <- function(con) {
@@ -1070,6 +1071,7 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
+                 spark_apply_binary_result = "l",
                  stop("Unsupported type '", type, "' for serialization"))
   writeBin(charToRaw(type), con)
 }
@@ -1151,6 +1153,7 @@ worker_config_serialize <- function(config) {
     if (isTRUE(config$profile)) "TRUE" else "FALSE",
     if (isTRUE(config$schema)) "TRUE" else "FALSE",
     if (isTRUE(config$arrow)) "TRUE" else "FALSE",
+    if (isTRUE(config$fetch_result_as_sdf)) "TRUE" else "FALSE",
     sep = ";"
   )
 }
@@ -1164,7 +1167,8 @@ worker_config_deserialize <- function(raw) {
     sparklyr.gateway.address = parts[[3]],
     profile = as.logical(parts[[4]]),
     schema = as.logical(parts[[5]]),
-    arrow = as.logical(parts[[6]])
+    arrow = as.logical(parts[[6]]),
+    fetch_result_as_sdf = as.logical(parts[[7]])
   )
 }
 # nocov start
@@ -1221,7 +1225,7 @@ spark_worker_init_packages <- function(sc, context) {
   }
 }
 
-spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by, barrier_map) {
+spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by, barrier_map, fetch_result_as_sdf) {
   if (nrow(df) == 0) {
     worker_log("found that source has no rows to be proceesed")
     return(NULL)
@@ -1250,13 +1254,17 @@ spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by, b
   on.exit(options(stringsAsFactors = as_factors))
   options(stringsAsFactors = F)
 
+  if (identical(fetch_result_as_sdf, FALSE)) {
+    result <- lapply(result, function(x) serialize(x, NULL))
+    class(result) <- c("spark_apply_binary_result", class(result))
+    result <- tibble::tibble(spark_apply_binary_result = result)
+  }
+
   if (!"data.frame" %in% class(result)) {
     worker_log("data.frame expected but ", class(result), " found")
 
     result <- as.data.frame(result)
   }
-
-  if (!is.data.frame(result)) stop("Result from closure is not a data.frame")
 
   result
 }
@@ -1371,7 +1379,14 @@ spark_worker_apply_arrow <- function(sc, config) {
     if (!is.null(df)) {
       colnames(df) <- columnNames[1: length(colnames(df))]
 
-      result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by, barrier_map)
+      result <- spark_worker_execute_closure(
+                  closure,
+                  df,
+                  funcContext,
+                  grouped_by,
+                  barrier_map,
+                  config$fetch_result_as_sdf
+                )
 
       result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
@@ -1490,7 +1505,14 @@ spark_worker_apply <- function(sc, config) {
 
     colnames(df) <- columnNames[1: length(colnames(df))]
 
-    result <- spark_worker_execute_closure(closure, df, funcContext, grouped_by, barrier_map)
+    result <- spark_worker_execute_closure(
+                closure,
+                df,
+                funcContext,
+                grouped_by,
+                barrier_map,
+                config$fetch_result_as_sdf
+              )
 
     result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 

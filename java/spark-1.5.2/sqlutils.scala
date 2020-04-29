@@ -52,6 +52,7 @@ object SQLUtils {
       case "timestamp" => TimestampType
       case "Date" => DateType
       case "date" => DateType
+      case "spark_apply_binary_result" => ArrayType(BinaryType)
       case RegexArray(elemType) =>
         ArrayType(getSQLDataType(elemType))
       case RegexMap(keyType, valueType) =>

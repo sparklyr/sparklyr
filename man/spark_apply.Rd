@@ -14,6 +14,7 @@ spark_apply(
   context = NULL,
   name = NULL,
   barrier = NULL,
+  fetch_result_as_sdf = TRUE,
   ...
 )
 }
@@ -68,6 +69,19 @@ specify the column types. The sample size is configurable using the
 \item{name}{Optional table name while registering the resulting data frame.}
 
 \item{barrier}{Optional to support Barrier Execution Mode in the scheduler.}
+
+\item{fetch_result_as_sdf}{Whether to return the transformed results in a Spark
+  Dataframe (defaults to \code{TRUE}). When set to \code{FALSE}, results will be
+  returned as a list of R objects instead.
+
+  NOTE: \code{fetch_result_as_sdf} must be set to \code{FALSE} when the transformation
+  function being applied is returning R objects that cannot be stored in a Spark
+  Dataframe (e.g., complex numbers or any other R data type that does not have an
+  equivalent representation among Spark SQL data types).
+
+  NOTE: when \code{fetch_result_as_sdf} is set to \code{FALSE}, object returned from the
+  transformation function also must be serializable by the \code{base::serialize}
+  function in R.}
 
 \item{...}{Optional arguments; currently unused.}
 }

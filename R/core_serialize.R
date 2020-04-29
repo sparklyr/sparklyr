@@ -73,7 +73,8 @@ writeObject <- function(con, object, writeType = TRUE) {
          POSIXct = writeTime(con, object),
          factor = writeFactor(con, object),
          `data.frame` = writeList(con, object),
-         stop("Unsupported type '", type, "' for serialization"))
+         spark_apply_binary_result = writeList(con, object),
+         stop("Unsupported type '", serdeType, "' for serialization"))
 }
 
 writeVoid <- function(con) {
@@ -130,6 +131,7 @@ writeType <- function(con, class) {
                  POSIXct = "t",
                  factor = "c",
                  `data.frame` = "l",
+                 spark_apply_binary_result = "l",
                  stop("Unsupported type '", type, "' for serialization"))
   writeBin(charToRaw(type), con)
 }

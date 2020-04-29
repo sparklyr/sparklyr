@@ -32,14 +32,22 @@ spark_apply_packages_is_bundle <- function(packages) {
   is.character(packages) && length(packages) == 1 && grepl("\\.tar$", packages)
 }
 
-spark_apply_worker_config <- function(sc, debug, profile, schema = FALSE, arrow = FALSE) {
+spark_apply_worker_config <- function(
+  sc,
+  debug,
+  profile,
+  schema = FALSE,
+  arrow = FALSE,
+  fetch_result_as_sdf = TRUE
+) {
   worker_config_serialize(
     c(
       list(
         debug = isTRUE(debug),
         profile = isTRUE(profile),
         schema = isTRUE(schema),
-        arrow =isTRUE(arrow)
+        arrow =isTRUE(arrow),
+        fetch_result_as_sdf = isTRUE(fetch_result_as_sdf)
       ),
       sc$config
     )
@@ -109,6 +117,18 @@ spark_apply_colum_types <- function(sdf) {
 #' @param context Optional object to be serialized and passed back to \code{f()}.
 #' @param name Optional table name while registering the resulting data frame.
 #' @param barrier Optional to support Barrier Execution Mode in the scheduler.
+#' @param fetch_result_as_sdf Whether to return the transformed results in a Spark
+#'   Dataframe (defaults to \code{TRUE}). When set to \code{FALSE}, results will be
+#'   returned as a list of R objects instead.
+#'
+#'   NOTE: \code{fetch_result_as_sdf} must be set to \code{FALSE} when the transformation
+#'   function being applied is returning R objects that cannot be stored in a Spark
+#'   Dataframe (e.g., complex numbers or any other R data type that does not have an
+#'   equivalent representation among Spark SQL data types).
+#'
+#'   NOTE: when \code{fetch_result_as_sdf} is set to \code{FALSE}, object returned from the
+#'   transformation function also must be serializable by the \code{base::serialize}
+#'   function in R.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @section Configuration:
@@ -147,16 +167,23 @@ spark_apply <- function(x,
                         context = NULL,
                         name = NULL,
                         barrier = NULL,
+                        fetch_result_as_sdf = TRUE,
                         ...) {
   memory <- force(memory)
   args <- list(...)
-  # If columns is of the form c("col_name1", "col_name2", ...)
-  # then leave it as-is
-  # Otherwise if it is of the form c(col_name1 = "col_type1", ...)
-  # or list(col_name1 = "col_type1", ...), etc, then make sure it gets coerced
-  # into a list instead of a character vector with names
-  if (!identical(names(columns), NULL)) {
-    columns <- as.list(columns)
+  if (identical(fetch_result_as_sdf, FALSE)) {
+    # If we are fetching R objects returned from the transformation function in their serialized form,
+    # then the result will contain a single binary column
+    columns <- list(spark_apply_binary_result = "spark_apply_binary_result")
+  } else {
+    # If columns is of the form c("col_name1", "col_name2", ...)
+    # then leave it as-is
+    # Otherwise if it is of the form c(col_name1 = "col_type1", ...)
+    # or list(col_name1 = "col_type1", ...), etc, then make sure it gets coerced
+    # into a list instead of a character vector with names
+    if (!identical(names(columns), NULL)) {
+      columns <- as.list(columns)
+    }
   }
   assert_that(is.function(f) || is.raw(f) || is.language(f))
   if (is.language(f)) f <- rlang::as_closure(f)
@@ -194,6 +221,12 @@ spark_apply <- function(x,
   time_zone <- ""
   records_per_batch <- NULL
   arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
+  if (identical(fetch_result_as_sdf, FALSE) &&
+      identical(arrow, TRUE) &&
+      tryCatch(packageVersion("arrow"), error = function(e) "") < "0.17") {
+    warning("Disabling arrow due to its potential incompatibility with fetch_result_as_sdf = FALSE")
+    arrow <- FALSE
+  }
   if (arrow) {
     time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
     records_per_batch <- as.integer(spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||% 10000)
@@ -333,7 +366,12 @@ spark_apply <- function(x,
         rdd_base,
         closure,
         as.list(sdf_columns),
-        spark_apply_worker_config(sc, args$debug, args$profile),
+        spark_apply_worker_config(
+          sc,
+          args$debug,
+          args$profile,
+          fetch_result_as_sdf = fetch_result_as_sdf
+        ),
         as.integer(worker_port),
         as.list(group_by),
         closure_rlang,
@@ -350,7 +388,12 @@ spark_apply <- function(x,
         "computeRdd",
         rdd_base,
         closure,
-        spark_apply_worker_config(sc, args$debug, args$profile),
+        spark_apply_worker_config(
+          sc,
+          args$debug,
+          args$profile,
+          fetch_result_as_sdf = fetch_result_as_sdf
+        ),
         as.integer(worker_port),
         as.list(sdf_columns),
         as.list(group_by),
@@ -387,7 +430,14 @@ spark_apply <- function(x,
         sdf_limit,
         columns_schema,
         closure,
-        spark_apply_worker_config(sc, args$debug, args$profile, schema = TRUE, arrow = arrow),
+        spark_apply_worker_config(
+          sc,
+          args$debug,
+          args$profile,
+          schema = TRUE,
+          arrow = arrow,
+          fetch_result_as_sdf = fetch_result_as_sdf
+        ),
         as.integer(worker_port),
         as.list(sdf_columns),
         as.list(group_by),
@@ -427,7 +477,13 @@ spark_apply <- function(x,
       sdf,
       schema,
       closure,
-      spark_apply_worker_config(sc, args$debug, args$profile, arrow = arrow),
+      spark_apply_worker_config(
+        sc,
+        args$debug,
+        args$profile,
+        arrow = arrow,
+        fetch_result_as_sdf = fetch_result_as_sdf
+      ),
       as.integer(worker_port),
       as.list(sdf_columns),
       as.list(group_by),
@@ -451,7 +507,14 @@ spark_apply <- function(x,
     if (memory && !identical(args$rdd, TRUE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
 
   }
-  registered
+
+  if (identical(fetch_result_as_sdf, FALSE))
+    registered %>% sdf_collect() %>% (
+      function(x)
+        lapply(x$spark_apply_binary_result, function(res) unserialize(res[[1]]))
+    )
+  else
+    registered
 }
 
 spark_apply_rlang_serialize <- function() {
