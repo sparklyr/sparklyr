@@ -41,7 +41,8 @@ test_that("ml_fpgrowth() works properly", {
   expect_identical(
     fp_model %>%
       ml_transform(df_tbl) %>%
-      pull(prediction),
+      pull(prediction) %>%
+      lapply(as.list),
     list(list(), list(), list("5"))
   )
 })

@@ -32,7 +32,8 @@ test_that("ft_stop_words_remover() works", {
     df_tbl %>%
       ft_tokenizer("raw", "words") %>%
       ft_stop_words_remover("words", "filtered") %>%
-      pull(filtered),
+      pull(filtered) %>%
+      lapply(as.list),
     list(list("saw", "red", "balloon"), list("mary", "little", "lamb"))
   )
 
@@ -40,7 +41,8 @@ test_that("ft_stop_words_remover() works", {
     df_tbl %>%
       ft_tokenizer("raw", "words") %>%
       ft_stop_words_remover("words", "filtered", stop_words = list("I", "Mary", "lamb")) %>%
-      pull(filtered),
+      pull(filtered) %>%
+      lapply(as.list),
     list(list("saw", "the", "red", "balloon"), list("had", "a", "little"))
   )
 
