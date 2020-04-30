@@ -210,6 +210,7 @@ class Serializer(tracker: JVMObjectTracker) {
       case "jobj"      => dos.writeByte('j')
       case "strarray"  => dos.writeByte('f')
       case "json"      => dos.writeByte('J')
+      case "sparkapplybinaryresult" => dos.writeByte('$')
       case _ => throw new IllegalArgumentException(s"Invalid type $typeStr")
     }
   }
