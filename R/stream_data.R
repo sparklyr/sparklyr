@@ -1,3 +1,5 @@
+#' @include spark_data_build_types.R
+
 stream_read_generic_type <- function(sc,
                                      path,
                                      type,

@@ -1,3 +1,33 @@
+spark_apply_packages <- function(packages) {
+  db <- Sys.getenv("sparklyr.apply.packagesdb")
+  if (nchar(db) == 0) {
+    if (!exists("availablePackagesChache", envir = .globals)) {
+      db <- tryCatch({
+        available.packages()
+      }, error = function(e) {
+        warning(
+          "Failed to run 'available.packages()', using offline connection? ",
+          "See '?spark_apply' for details."
+        )
+        NULL
+      })
+
+      assign("availablePackagesChache", db, envir = .globals)
+    }
+    else {
+      db <- get("availablePackagesChache", envir = .globals)
+    }
+  }
+
+  if (is.null(db)) {
+    TRUE
+  } else {
+    deps <- tools::package_dependencies(packages, db = db, recursive = TRUE)
+    names(deps) <- NULL
+    unique(c(unlist(deps), packages))
+  }
+}
+
 spark_apply_bundle_path <- function() {
   file.path(tempdir(), "packages")
 }
@@ -69,4 +99,38 @@ spark_apply_bundle <- function(packages = TRUE, base_path = getwd(), session_id 
   }
 
   packagesTar
+}
+
+spark_apply_packages_is_bundle <- function(packages) {
+  is.character(packages) && length(packages) == 1 && grepl("\\.tar$", packages)
+}
+
+get_spark_apply_bundle_path <- function(sc, packages) {
+  bundle_path <- ""
+  if (spark_apply_packages_is_bundle(packages)) {
+    bundle_path <- packages
+  }
+  else if (isTRUE(packages) || is.character(packages)) {
+    bundle_base <- spark_apply_bundle_path()
+    bundle_path <- spark_apply_bundle_file(packages, bundle_base, sc$sessionId)
+    if (!file.exists(bundle_path)) {
+      bundle_path <- spark_apply_bundle(packages, bundle_base, sc$sessionId)
+    }
+
+    if (!is.null(bundle_path)) {
+      bundle_was_added <- file.exists(
+        invoke_static(
+          sc,
+          "org.apache.spark.SparkFiles",
+          "get",
+          basename(bundle_path))
+      )
+
+      if (!bundle_was_added) {
+        spark_context(sc) %>% invoke("addFile", bundle_path)
+      }
+    }
+  }
+
+  bundle_path
 }
