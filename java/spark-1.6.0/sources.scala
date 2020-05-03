@@ -1584,28 +1584,6 @@ worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
 # nocov end
 # nocov start
 
-connection_is_open.spark_worker_connection <- function(sc) {
-  bothOpen <- FALSE
-  if (!identical(sc, NULL)) {
-    tryCatch({
-      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
-    }, error = function(e) {
-    })
-  }
-  bothOpen
-}
-
-worker_connection <- function(x, ...) {
-  UseMethod("worker_connection")
-}
-
-worker_connection.spark_jobj <- function(x, ...) {
-  x$connection
-}
-
-# nocov end
-# nocov start
-
 spark_worker_connect <- function(
   sessionId,
   backendPort = 8880,
@@ -1664,6 +1642,28 @@ spark_worker_connect <- function(
   worker_log("created connection")
 
   sc
+}
+
+# nocov end
+# nocov start
+
+connection_is_open.spark_worker_connection <- function(sc) {
+  bothOpen <- FALSE
+  if (!identical(sc, NULL)) {
+    tryCatch({
+      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
+    }, error = function(e) {
+    })
+  }
+  bothOpen
+}
+
+worker_connection <- function(x, ...) {
+  UseMethod("worker_connection")
+}
+
+worker_connection.spark_jobj <- function(x, ...) {
+  x$connection
 }
 
 # nocov end
