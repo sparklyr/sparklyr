@@ -1,3 +1,5 @@
+#' @include spark_data_build_types.R
+
 arrow_enabled <- function(sc, object) {
   enabled <- spark_config_value(sc, "sparklyr.arrow", "package:arrow" %in% search())
   if (!enabled) {

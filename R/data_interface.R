@@ -1,3 +1,6 @@
+#' @include spark_apply_bundle.R
+#' @include spark_schema_from_rdd.R
+
 # This function handles backward compatibility to support
 # unnamed datasets while not breaking sparklyr 0.9 param
 # signature. Returns a c(name, path) tuple.
@@ -990,4 +993,103 @@ spark_read_delta <- function(sc,
                     repartition = repartition,
                     memory = memory,
                     overwrite = overwrite)
+}
+
+#' Read file(s) into a Spark DataFrame using a custom reader
+#'
+#' Run a custom R function on Spark workers to ingest data from one or more files
+#' into a Spark DataFrame, assuming all files follow the same schema.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param paths A character vector of one or more file URIs (e.g.,
+#'   c("hdfs://localhost:9000/file.txt", "hdfs://localhost:9000/file2.txt"))
+#' @param reader A self-contained R function that takes a single file URI as
+#'   argument and returns the data read from that file as a data frame.
+#' @param columns a named list of column names and column types of the resulting
+#'   data frame (e.g., list(column_1 = "integer", column_2 = "character")), or a
+#'   list of column names only if column types should be inferred from the data
+#'   (e.g., list("column_1", "column_2"), or NULL if column types should be
+#'   inferred and resulting data frame can have arbitrary column names
+#' @param packages A list of R packages to distribute to Spark workers
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read <- function(sc,
+                       paths,
+                       reader,
+                       columns,
+                       packages = TRUE,
+                       ...) {
+  assert_that(is.function(reader) || is.language(reader))
+
+  args <- list(...)
+  paths <- lapply(paths, as.list)
+  if (!identical(names(columns), NULL)) {
+    # If columns is of the form c("col_name1", "col_name2", ...)
+    # then leave it as-is
+    # Otherwise if it is of the form c(col_name1 = "col_type1", ...)
+    # or list(col_name1 = "col_type1", ...), etc, then make sure it gets coerced
+    columns <- as.list(columns)
+  }
+
+  rdd_base <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "createDataFrame",
+    spark_context(sc),
+    paths,
+    as.integer(length(paths))
+  )
+
+  if (is.language(reader)) f <- rlang::as_closure(reader)
+  reader <- serialize(reader, NULL)
+  worker_impl <- function(df, rdr) {
+    rdr <- unserialize(rdr)
+    do.call(rbind, lapply(df$path, function(path) rdr(path)))
+  }
+  worker_impl <- serialize(worker_impl, NULL)
+
+  worker_port <- as.integer(
+    spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
+  )
+
+  # disable package distribution for local connections
+  if (spark_master_is_local(sc$master)) packages <- FALSE
+
+  bundle_path <- get_spark_apply_bundle_path(sc, packages)
+
+  serialized_worker_context <- serialize(
+    list(column_types = list("character"), user_context = reader), NULL
+  )
+
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.WorkerHelper",
+    "computeRdd",
+    rdd_base,
+    worker_impl,
+    spark_apply_worker_config(
+      sc,
+      args$debug,
+      args$profile
+    ),
+    as.integer(worker_port),
+    list("path"),
+    list(),
+    raw(),
+    bundle_path,
+    new.env(),
+    as.integer(60),
+    serialized_worker_context,
+    new.env()
+  )
+  rdd <- invoke(rdd, "cache")
+  schema <- spark_schema_from_rdd(sc, rdd, columns)
+  sdf <- invoke(hive_context(sc), "createDataFrame", rdd, schema) %>%
+    sdf_register(
+      name = paste0("sdf_", gsub("-", "_", uuid::UUIDgenerate()))
+    )
+
+  sdf
 }

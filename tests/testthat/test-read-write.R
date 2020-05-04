@@ -243,6 +243,49 @@ test_that("spark_read_csv() can read if embedded nuls present", {
   )
 })
 
+test_that("spark_read() works as expected", {
+  paths <- c(
+    "hdfs://localhost:9000/1/a/b",
+    "hdfs://localhost:9000/2",
+    "hdfs://localhost:9000/c/d/e",
+    "hdfs://localhost:9000/f",
+    "hdfs://localhost:9000/3/4/5"
+  )
+  reader <- function(path) {
+    data.frame(md5 = digest::digest(path, algo = "md5"), length = nchar(path))
+  }
+
+  expected_md5s <- sapply(
+    paths, function(x) digest::digest(x, algo = "md5")
+  )
+  names(expected_md5s) <- NULL
+
+  expected_lengths <- sapply(paths, function(x) nchar(x))
+  names(expected_lengths) <- NULL
+
+  for (columns in list(
+    c("md5", "length"),
+    list("md5", "length"),
+    list(md5 = "character", length = "integer")
+  )) {
+    sdf <- spark_read(
+      sc,
+      paths,
+      reader,
+      packages = c("digest"),
+      columns = c("md5", "length")
+    )
+    expect_equal(
+      sdf_collect(sdf),
+      data.frame(
+        md5 = expected_md5s,
+        length = expected_lengths,
+        stringsAsFactors = FALSE
+      )
+    )
+  }
+})
+
 teardown({
   db_drop_table(iris_table_name)
 })

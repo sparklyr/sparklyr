@@ -1,3 +1,5 @@
+#' @include spark_data_build_types.R
+
 spark_csv_embedded_namespace <- function() {
   "com.databricks.spark.csv"
 }

@@ -1,3 +1,5 @@
+#' @include spark_data_build_types.R
+
 # nocov start
 
 spark_schema_from_rdd <- function(sc, rdd, column_names) {
