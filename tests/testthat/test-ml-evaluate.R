@@ -158,3 +158,36 @@ test_that("ml_evaluate() works for generalized linear regression", {
     NA
   )
 })
+
+test_that("ml_evaluate() works for kmeans", {
+  test_requires_version("2.3.0", "ml_model_clustering requires spark 2.3+")
+
+  iris_tbl <- testthat_tbl("iris")
+  kmeans_silhouette <- ml_kmeans(iris_tbl, Species ~ .) %>%
+     ml_evaluate(iris_tbl)
+
+  expect_equal(names(kmeans_silhouette), "Silhouette")
+  expect_equal(kmeans_silhouette$Silhouette, 0.85, tolerance = 0.001)
+})
+
+test_that("ml_evaluate() works for bisecting kmeans", {
+  test_requires_version("2.3.0", "bisecting kmeans requires spark 2.3+")
+
+  iris_tbl <- testthat_tbl("iris")
+  bi_kmeans_silhouette <- ml_bisecting_kmeans(iris_tbl, Species ~ .) %>%
+    ml_evaluate(iris_tbl)
+
+  expect_equal(names(bi_kmeans_silhouette), "Silhouette")
+  expect_equal(bi_kmeans_silhouette$Silhouette, 0.517, tolerance = 0.001)
+})
+
+test_that("ml_evaluate() works for gaussian mixtures model", {
+  test_requires_version("2.3.0", "gaussian mixtures model requires spark 2.3+")
+
+  iris_tbl <- testthat_tbl("iris")
+  gmm_silhouette <- ml_gaussian_mixture(iris_tbl, Species ~ .) %>%
+    ml_evaluate(iris_tbl)
+
+  expect_equal(names(gmm_silhouette), "Silhouette")
+  expect_equal(gmm_silhouette$Silhouette, 0.477, tolerance = 0.001)
+})

@@ -4,6 +4,21 @@
 #'
 #' @param x An ML model object or an evaluator object.
 #' @param dataset The dataset to be validate the model on.
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
+#'
+#' ml_gaussian_mixture(iris_tbl, Species ~ .) %>%
+#'   ml_evaluate(iris_tbl)
+#'
+#' ml_kmeans(iris_tbl, Species ~ .) %>%
+#'   ml_evaluate(iris_tbl)
+#'
+#' ml_bisecting_kmeans(iris_tbl, Species ~ .) %>%
+#'   ml_evaluate(iris_tbl)
+#' }
+#'
 #' @export
 ml_evaluate <- function(x, dataset) {
   UseMethod("ml_evaluate")
@@ -57,6 +72,30 @@ ml_evaluate.ml_generalized_linear_regression_model <- function(x, dataset) {
   fit_intercept <- ml_param(x, "fit_intercept")
   evaluate_ml_transformer(x, dataset) %>%
     new_ml_generalized_linear_regression_summary(fit_intercept = fit_intercept)
+}
+
+#' @rdname ml_evaluate
+#' @export
+ml_evaluate.ml_model_clustering <- function(x, dataset) {
+  if(inherits(x, "ml_model_lda")){
+    stop("`ml_evaluate()` is not supported for `ml_model_lda`.", call. = FALSE)
+  }
+
+  sc <- spark_connection(x$model)
+
+  if(spark_version(sc) >= "2.3.0"){
+    prediction <- x %>%
+      spark_jobj() %>%
+      invoke("transform", spark_dataframe(dataset))
+
+    silhouette <- sc %>%
+      invoke_new("org.apache.spark.ml.evaluation.ClusteringEvaluator") %>%
+      invoke("evaluate", prediction)
+
+    dplyr::tibble(Silhouette = silhouette)
+  } else{
+    stop("Silhouette is only available for spark 2.3.0 or greater.")
+  }
 }
 
 evaluate_ml_model <- function(x, dataset) {
