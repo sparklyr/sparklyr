@@ -94,7 +94,7 @@ ml_evaluate.ml_model_clustering <- function(x, dataset) {
 
     dplyr::tibble(Silhouette = silhouette)
   } else{
-    warning("Silhouette is only available for spark 2.3.0 or greater.")
+    stop("Silhouette is only available for spark 2.3.0 or greater.")
   }
 }
 
