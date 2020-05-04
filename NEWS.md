@@ -4,6 +4,10 @@
 
 - Support to collect objectts of type `SeqWrapper` (#2441)
 
+### Distributed R
+
+- Support for `partition` when using barrier execution in `spark_apply` (#2454)
+
 # Sparklyr 1.2.0
 
 ### Distributed R
