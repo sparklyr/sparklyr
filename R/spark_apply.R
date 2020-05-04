@@ -370,6 +370,7 @@ spark_apply <- function(x,
           sc,
           args$debug,
           args$profile,
+          arrow = arrow,
           fetch_result_as_sdf = fetch_result_as_sdf
         ),
         as.integer(worker_port),
@@ -392,6 +393,7 @@ spark_apply <- function(x,
           sc,
           args$debug,
           args$profile,
+          arrow = arrow,
           fetch_result_as_sdf = fetch_result_as_sdf
         ),
         as.integer(worker_port),
@@ -509,7 +511,7 @@ spark_apply <- function(x,
   }
 
   if (identical(fetch_result_as_sdf, FALSE))
-    registered %>% sdf_collect() %>% (
+    registered %>% sdf_collect(arrow = arrow) %>% (
       function(x)
         lapply(x$spark_apply_binary_result, function(res) unserialize(res[[1]]))
     )

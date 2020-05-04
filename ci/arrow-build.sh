@@ -7,22 +7,21 @@ BUILD_DIR="$TMP_DIR/apache-arrow-$ARROW_VERSION-build"
 
 cd "$TMP_DIR"
 
-sudo apt install -y -V cmake
-sudo apt install -y -V libboost-all-dev
-sudo apt install -y -V autoconf
+sudo apt install -y -V autoconf automake cmake bison flex libboost-all-dev libevent-dev libssl-dev libtool pkg-config
 
 if [[ $ARROW_VERSION == "devel" ]]; then
   git clone https://github.com/apache/arrow
   SRC_DIR="$TMP_DIR/arrow/cpp"
 else
-  wget https://arrowlib.rstudio.com/dist/arrow/arrow-$ARROW_VERSION/apache-arrow-$ARROW_VERSION.tar.gz
+  wget https://archive.apache.org/dist/arrow/arrow-$ARROW_VERSION/apache-arrow-$ARROW_VERSION.tar.gz
   tar -xvzf apache-arrow-$ARROW_VERSION.tar.gz
   SRC_DIR="$TMP_DIR/apache-arrow-$ARROW_VERSION/cpp"
 fi
 
 mkdir -p "${BUILD_DIR}"
 cd "${BUILD_DIR}"
-cmake -DARROW_BUILD_TESTS=FALSE \
+cmake -DCMAKE_BUILD_TYPE=release \
+      -DARROW_BUILD_TESTS=FALSE \
       -DARROW_WITH_SNAPPY=FALSE \
       -DARROW_WITH_ZSTD=FALSE \
       -DARROW_WITH_LZ4=FALSE \

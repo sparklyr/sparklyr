@@ -60,21 +60,30 @@ jobs:
               SPARK_VERSION: '2.3.0'
               JAVA_VERSION: 'oraclejdk8'
               SPARKLYR_LIVY_BRANCH: 'test/livy'
-          # - name: 'Arrow 0.11.0 (ref = dc5df8f)'
-          #   r: '3.6.3' # release
-          #   env:
-          #     ARROW_ENABLED: 'true'
-          #     ARROW_BRANCH: 'dc5df8f'
-          #     JAVA_VERSION: 'oraclejdk8'
-          #     ARROW_SOURCE: 'install'
-          # - name: 'Arrow 0.13.0 (ref = apache-arrow-0.13.0)'
-          #   r: '3.6.3' # release
-          #   env:
-          #     ARROW_ENABLED: 'true'
-          #     ARROW_VERSION: '0.13.0'
-          #     ARROW_BRANCH: 'apache-arrow-0.13.0'
-          #     ARROW_SOURCE: 'install'
-          #     JAVA_VERSION: 'oraclejdk8'
+          - name: 'Arrow 0.13.0 (ref = apache-arrow-0.13.0)'
+            r: '3.6.3' # release
+            env:
+              ARROW_ENABLED: 'true'
+              ARROW_VERSION: '0.13.0'
+              ARROW_BRANCH: 'apache-arrow-0.13.0'
+              ARROW_SOURCE: 'build'
+              JAVA_VERSION: 'oraclejdk8'
+          - name: 'Arrow 0.15.1 (ref = apache-arrow-0.15.1)'
+            r: '3.6.3' # release
+            env:
+              ARROW_ENABLED: 'true'
+              ARROW_VERSION: '0.15.1'
+              ARROW_BRANCH: 'apache-arrow-0.15.1'
+              ARROW_SOURCE: 'build'
+              JAVA_VERSION: 'oraclejdk8'
+          - name: 'Arrow 0.16.0 (ref = apache-arrow-0.16.0)'
+            r: '3.6.3' # release
+            env:
+              ARROW_ENABLED: 'true'
+              ARROW_VERSION: '0.16.0'
+              ARROW_BRANCH: 'apache-arrow-0.16.0'
+              ARROW_SOURCE: 'build'
+              JAVA_VERSION: 'oraclejdk8'
           - name: 'Arrow Devel (ref = '')'
             r: '3.6.3' # release
             env:
