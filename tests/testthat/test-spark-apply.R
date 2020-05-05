@@ -89,3 +89,28 @@ test_that("'spark_apply' works with fetch_result_as_sdf = FALSE", {
   )
   expect_equal(expected, actual)
 })
+
+test_that("'spark_apply' supports partition index as parameter", {
+  expect_equal(
+    sdf_len(sc, 10, repartition = 5) %>%
+      spark_apply(
+        function(df, ctx, partition_index) {
+          library(dplyr)
+          library(magrittr)
+
+          df <- df %>% mutate(ctx = ctx[[1]]$ctx, partition_index = partition_index)
+          df
+        },
+        context = list(list(ctx = "ctx")),
+        partition_index_param = "partition_index",
+        columns = c("id", "ctx", "partition_index")
+      ) %>%
+      sdf_collect(),
+    data.frame(
+      id = seq(1, 10),
+      ctx = replicate(10, "ctx"),
+      partition_index = c(sapply(seq(0, 4), function(x) c(x, x))),
+      stringsAsFactors = FALSE
+    )
+  )
+})

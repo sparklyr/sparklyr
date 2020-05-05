@@ -15,6 +15,7 @@ spark_apply(
   name = NULL,
   barrier = NULL,
   fetch_result_as_sdf = TRUE,
+  partition_index_param = "",
   ...
 )
 }
@@ -77,7 +78,11 @@ specify the column types. The sample size is configurable using the
   NOTE: \code{fetch_result_as_sdf} must be set to \code{FALSE} when the transformation
   function being applied is returning R objects that cannot be stored in a Spark
   Dataframe (e.g., complex numbers or any other R data type that does not have an
-  equivalent representation among Spark SQL data types).
+  equivalent representation among Spark SQL data types).}
+
+\item{partition_index_param}{Optional if non-empty, then \code{f} also receives
+  the index of the partition being processed as a named argument with this name, in
+  addition to all positional argument(s) it will receive
 
   NOTE: when \code{fetch_result_as_sdf} is set to \code{FALSE}, object returned from the
   transformation function also must be serializable by the \code{base::serialize}

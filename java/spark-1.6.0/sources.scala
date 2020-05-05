@@ -1225,7 +1225,15 @@ spark_worker_init_packages <- function(sc, context) {
   }
 }
 
-spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by, barrier_map, fetch_result_as_sdf) {
+spark_worker_execute_closure <- function(
+  closure,
+  df,
+  funcContext,
+  grouped_by,
+  barrier_map,
+  fetch_result_as_sdf,
+  partition_index
+) {
   if (nrow(df) == 0) {
     worker_log("found that source has no rows to be proceesed")
     return(NULL)
@@ -1239,12 +1247,19 @@ spark_worker_execute_closure <- function(closure, df, funcContext, grouped_by, b
   }
 
   closure_params <- length(formals(closure))
+  has_partition_index_param <- (
+    !is.null(funcContext$partition_index_param) &&
+    nchar(funcContext$partition_index_param) > 0
+  )
+  if (has_partition_index_param) closure_params <- closure_params - 1
   closure_args <- c(
     list(df),
     if (!is.null(funcContext$user_context)) list(funcContext$user_context) else NULL,
     lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]]),
     barrier_arg
   )[0:closure_params]
+  if (has_partition_index_param)
+    closure_args[[funcContext$partition_index_param]] <- partition_index
 
   worker_log("computing closure")
   result <- do.call(closure, closure_args)
@@ -1342,6 +1357,7 @@ spark_worker_apply_arrow <- function(sc, config) {
   time_zone <- worker_invoke(context, "getTimeZoneId")
   options_map <- worker_invoke(context, "getOptions")
   barrier_map <- as.list(worker_invoke(context, "getBarrier"))
+  partition_index <- worker_invoke(context, "getPartitionIndex")
 
   if (grouped) {
     record_batch_raw_groups <- worker_invoke(context, "getSourceArray")
@@ -1385,7 +1401,8 @@ spark_worker_apply_arrow <- function(sc, config) {
                   funcContext,
                   grouped_by,
                   barrier_map,
-                  config$fetch_result_as_sdf
+                  config$fetch_result_as_sdf,
+                  partition_index
                 )
 
       result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
@@ -1468,6 +1485,7 @@ spark_worker_apply <- function(sc, config) {
 
   columnNames <- worker_invoke(context, "getColumns")
   barrier_map <- as.list(worker_invoke(context, "getBarrier"))
+  partition_index <- worker_invoke(context, "getPartitionIndex")
 
   if (!grouped) groups <- list(list(groups))
 
@@ -1511,7 +1529,8 @@ spark_worker_apply <- function(sc, config) {
                 funcContext,
                 grouped_by,
                 barrier_map,
-                config$fetch_result_as_sdf
+                config$fetch_result_as_sdf,
+                partition_index
               )
 
     result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
@@ -1584,6 +1603,28 @@ worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
 # nocov end
 # nocov start
 
+connection_is_open.spark_worker_connection <- function(sc) {
+  bothOpen <- FALSE
+  if (!identical(sc, NULL)) {
+    tryCatch({
+      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
+    }, error = function(e) {
+    })
+  }
+  bothOpen
+}
+
+worker_connection <- function(x, ...) {
+  UseMethod("worker_connection")
+}
+
+worker_connection.spark_jobj <- function(x, ...) {
+  x$connection
+}
+
+# nocov end
+# nocov start
+
 spark_worker_connect <- function(
   sessionId,
   backendPort = 8880,
@@ -1642,28 +1683,6 @@ spark_worker_connect <- function(
   worker_log("created connection")
 
   sc
-}
-
-# nocov end
-# nocov start
-
-connection_is_open.spark_worker_connection <- function(sc) {
-  bothOpen <- FALSE
-  if (!identical(sc, NULL)) {
-    tryCatch({
-      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
-    }, error = function(e) {
-    })
-  }
-  bothOpen
-}
-
-worker_connection <- function(x, ...) {
-  UseMethod("worker_connection")
-}
-
-worker_connection.spark_jobj <- function(x, ...) {
-  x$connection
 }
 
 # nocov end

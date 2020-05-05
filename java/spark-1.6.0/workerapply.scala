@@ -22,7 +22,8 @@ class WorkerApply(
   options: Map[String, String],
   timeZoneId: String,
   schema: StructType,
-  genBarrierMap: () => Map[String, Any]
+  genBarrierMap: () => Map[String, Any],
+  genPartitionIndex: () => Int
   ) extends java.io.Serializable {
 
   private[this] var exception: Option[Exception] = None
@@ -62,7 +63,8 @@ class WorkerApply(
       timeZoneId,
       schema,
       options,
-      genBarrierMap()
+      genBarrierMap(),
+      genPartitionIndex()
     )
 
     val tracker = new JVMObjectTracker()
