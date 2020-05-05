@@ -152,7 +152,7 @@ sdf_register.list <- function(x, name = NULL) {
 #' @export
 #' @importFrom dplyr tbl
 sdf_register.spark_jobj <- function(x, name = NULL) {
-  name <- name %||% random_string("sparklyr_tmp_")
+  name <- name %||% paste0("sparklyr_tmp_", gsub("-", "_", uuid::UUIDgenerate()))
   sc <- spark_connection(x)
 
   if (spark_version(sc) < "2.0.0")

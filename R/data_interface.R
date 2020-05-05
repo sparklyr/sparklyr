@@ -1087,9 +1087,62 @@ spark_read <- function(sc,
   rdd <- invoke(rdd, "cache")
   schema <- spark_schema_from_rdd(sc, rdd, columns)
   sdf <- invoke(hive_context(sc), "createDataFrame", rdd, schema) %>%
-    sdf_register(
-      name = paste0("sdf_", gsub("-", "_", uuid::UUIDgenerate()))
-    )
+    sdf_register()
 
   sdf
+}
+
+#' Write Spark DataFrame to file using a custom writer
+#'
+#' Run a custom R function on Spark worker to write a Spark DataFrame
+#' into file(s)
+#'
+#' @export
+spark_write <- function(x,
+                        writer,
+                        paths,
+                        packages = NULL) {
+  UseMethod("spark_write")
+}
+
+#' @export
+spark_write.tbl_spark <- function(x,
+                                  writer,
+                                  paths,
+                                  packages = NULL) {
+  if (length(paths) == 0)
+    stop("'paths' must contain at least 1 path")
+
+  assert_that(is.function(writer) || is.language(writer))
+
+  paths <- spark_normalize_path(paths)
+  dst_num_partitions <- length(paths)
+  src_num_partitions <- sdf_num_partitions(x)
+
+  if (!identical(src_num_partitions, dst_num_partitions))
+    x <- sdf_repartition(x, dst_num_partitions)
+
+  spark_apply(
+    x,
+    function(df, ctx, partition_index) {
+      # Spark partition index is 0-based
+      res <- ctx$writer(df, ctx$paths[[partition_index + 1]])
+      res
+    },
+    context = list(writer = writer, paths = as.list(paths)),
+    packages = packages,
+    fetch_results_as_sdf = FALSE,
+    partition_index_param = "partition_index"
+  )
+}
+
+#' @export
+spark_write.spark_jobj <- function(x,
+                                   writer,
+                                   paths,
+                                   packages = NULL) {
+  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  x %>%
+    sdf_register() %>%
+    spark_write(writer, paths, packages, fetch_results_as_sdf)
 }
