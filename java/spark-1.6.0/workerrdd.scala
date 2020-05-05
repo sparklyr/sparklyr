@@ -38,7 +38,8 @@ class WorkerRDD(
       options: Map[String, String],
       "",
       StructType(Nil),
-      () => Map()
+      () => Map(),
+      () => { split.index }
     )
 
     return workerApply.apply(firstParent.iterator(split, task))

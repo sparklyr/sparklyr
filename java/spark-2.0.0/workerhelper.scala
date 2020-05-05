@@ -5,6 +5,7 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
+import org.apache.spark.TaskContext
 
 import scala.collection.JavaConversions._
 
@@ -107,7 +108,8 @@ object WorkerHelper {
         optionsImmMap,
         timeZoneId,
         sourceSchema,
-        () => Map()
+        () => Map(),
+        () => { TaskContext.getPartitionId() }
       )
 
       workerApply.apply(rows)
