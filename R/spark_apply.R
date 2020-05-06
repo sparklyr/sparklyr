@@ -94,6 +94,9 @@ spark_apply_colum_types <- function(sdf) {
 #'   function being applied is returning R objects that cannot be stored in a Spark
 #'   Dataframe (e.g., complex numbers or any other R data type that does not have an
 #'   equivalent representation among Spark SQL data types).
+#' @param partition_index_param Optional if non-empty, then \code{f} also receives
+#'   the index of the partition being processed as a named argument with this name, in
+#'   addition to all positional argument(s) it will receive
 #'
 #'   NOTE: when \code{fetch_result_as_sdf} is set to \code{FALSE}, object returned from the
 #'   transformation function also must be serializable by the \code{base::serialize}
@@ -137,7 +140,11 @@ spark_apply <- function(x,
                         name = NULL,
                         barrier = NULL,
                         fetch_result_as_sdf = TRUE,
+                        partition_index_param = "",
                         ...) {
+  if (!is.character(partition_index_param))
+    stop("Expected 'partition_index_param' to be a string.")
+
   memory <- force(memory)
   args <- list(...)
   if (identical(fetch_result_as_sdf, FALSE)) {
@@ -244,9 +251,10 @@ spark_apply <- function(x,
   # disable package distribution for livy connections and no package spec
   if (identical(tolower(sc$method), "livy") && identical(packages, TRUE)) packages <- FALSE
 
-  # inject column types to context
+  # inject column types and partition_index_param to context
   context <- list(
     column_types = spark_apply_colum_types(x),
+    partition_index_param = partition_index_param,
     user_context = context
   )
 

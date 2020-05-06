@@ -67,7 +67,6 @@ object RDDBarrier {
       connectionTimeout: Int,
       context: Array[Byte],
       optionsImmMap: Map[String, String]): sparklyr.WorkerApply = {
-
     val workerApply: WorkerApply = new WorkerApply(
       closure: Array[Byte],
       columns: Array[String],
@@ -84,7 +83,8 @@ object RDDBarrier {
       org.apache.spark.sql.types.StructType(Nil),
       () => Map(
         "address" -> BarrierTaskContext.get().getTaskInfos().map(e => e.address),
-        "partition" -> BarrierTaskContext.get().partitionId())
+        "partition" -> BarrierTaskContext.get().partitionId()),
+      () => { BarrierTaskContext.get().partitionId() }
     )
 
     workerApply

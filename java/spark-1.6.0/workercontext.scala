@@ -18,7 +18,8 @@ class WorkerContext(
   timeZoneId: String,
   schema: StructType,
   options: Map[String, String],
-  barrier: Map[String, Any]) {
+  barrier: Map[String, Any],
+  partitionIndex: Int) {
 
   private var result: Array[Row] = Array[Row]()
   private var sourceArray: Option[Array[Row]] = None
@@ -103,5 +104,9 @@ class WorkerContext(
 
   def getBarrier() : Map[String, Any] = {
     barrier
+  }
+
+  def getPartitionIndex() : Int = {
+    partitionIndex
   }
 }
