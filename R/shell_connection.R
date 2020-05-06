@@ -667,7 +667,12 @@ initialize_connection.spark_shell_connection <- function(sc) {
     # If Spark version is 2.0.0 or above, hive_context should be initialized by now.
     # So if that's not the case, then attempt to initialize it assuming Spark version is below 2.0.0
     sc$state$hive_context <- sc$state$hive_context %||% tryCatch(
-      invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", sc$state$spark_context),
+      # invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", sc$state$spark_context),
+      {
+        # TODO: create an option to disable Hive integration
+        cat("instantiating org.apache.spark.sql.SQLContext")
+        invoke_new(sc, "org.apache.spark.sql.SQLContext", sc$state$spark_context)
+      },
       error = function(e) {
         warning(e$message)
         warning("Failed to create Hive context, falling back to SQL. Some operations, ",
