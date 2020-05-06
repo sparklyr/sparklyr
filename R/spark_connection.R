@@ -226,6 +226,23 @@ print.spark_web_url <- function(x, ...) {
   utils::browseURL(x)
 }
 
+#' Retrieve the Spark connection's SQL catalog implementation property
+#'
+#' @param sc \code{spark_connection}
+#'
+#' @return spark.sql.catalogImplementation property from the connection's
+#'  runtime configuration
+#'
+#' @export
+get_spark_sql_catalog_implementation <- function(sc) {
+  invoke(
+    hive_context(sc),
+    "%>%",
+    list("conf"),
+    list("get", "spark.sql.catalogImplementation")
+  )
+}
+
 initialize_connection <- function(sc) {
   UseMethod("initialize_connection")
 }

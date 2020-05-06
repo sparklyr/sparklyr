@@ -231,6 +231,11 @@ spark_connect <- function(master,
     stop("Unsupported connection method '", method, "'")
   }
 
+  scon$state$hive_support_enabled <- spark_config_value(
+    config,
+    name = "sparklyr.connect.enablehivesupport",
+    default = TRUE
+  )
   scon <- initialize_connection(scon)
 
   # initialize extensions

@@ -613,15 +613,18 @@ initialize_connection.spark_shell_connection <- function(sc) {
 
     init_hive_ctx_for_spark_2_plus <- function() {
       # For Spark 2.0+, we create a `SparkSession`.
-      session <- invoke_static(
+      session_builder <- invoke_static(
         sc,
         "org.apache.spark.sql.SparkSession",
         "builder"
       ) %>%
         invoke("config", conf) %>%
-        apply_config(connection_config(sc, "spark.sql."), "config", "spark.sql.") %>%
-        invoke("enableHiveSupport") %>%
-        invoke("getOrCreate")
+        apply_config(connection_config(sc, "spark.sql."), "config", "spark.sql.")
+
+      if (identical(sc$state$hive_support_enabled, TRUE))
+        invoke(session_builder, "enableHiveSupport")
+
+      session <- session_builder %>% invoke("getOrCreate")
 
       # Cache the session as the "hive context".
       sc$state$hive_context <- session
@@ -667,12 +670,15 @@ initialize_connection.spark_shell_connection <- function(sc) {
     # If Spark version is 2.0.0 or above, hive_context should be initialized by now.
     # So if that's not the case, then attempt to initialize it assuming Spark version is below 2.0.0
     sc$state$hive_context <- sc$state$hive_context %||% tryCatch(
-      # invoke_new(sc, "org.apache.spark.sql.hive.HiveContext", sc$state$spark_context),
-      {
-        # TODO: create an option to disable Hive integration
-        cat("instantiating org.apache.spark.sql.SQLContext")
-        invoke_new(sc, "org.apache.spark.sql.SQLContext", sc$state$spark_context)
-      },
+      invoke_new(
+        sc,
+        if (identical(sc$state$hive_support_enabled, TRUE))
+          "org.apache.spark.sql.hive.HiveContext"
+        else
+          "org.apache.spark.sql.SQLContext"
+        ,
+        sc$state$spark_context
+      ),
       error = function(e) {
         warning(e$message)
         warning("Failed to create Hive context, falling back to SQL. Some operations, ",
