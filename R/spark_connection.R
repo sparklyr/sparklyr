@@ -235,6 +235,12 @@ print.spark_web_url <- function(x, ...) {
 #'
 #' @export
 get_spark_sql_catalog_implementation <- function(sc) {
+  if (spark_version(sc) < "2.0.0")
+    stop(
+      "get_spark_sql_catalog_implementation is only supported for Spark 2.0.0+",
+      call. = FALSE
+    )
+
   invoke(
     hive_context(sc),
     "%>%",

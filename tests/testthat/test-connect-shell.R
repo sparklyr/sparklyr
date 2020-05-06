@@ -73,8 +73,12 @@ test_that("'spark_inspect' can enumerate information from the context", {
 })
 
 test_that("'spark_connect' can allow Hive support to be disabled", {
+  version <- spark_version(sc)
+
+  if (version >= "2.0.0")
+    expect_equal(get_spark_sql_catalog_implementation(sc), "hive")
+
   # hive support is enabled by default
-  expect_equal(get_spark_sql_catalog_implementation(sc), "hive")
   expect_equal(sc$state$hive_support_enabled, TRUE)
 
   # create another connection with hive support disabled
@@ -85,7 +89,10 @@ test_that("'spark_connect' can allow Hive support to be disabled", {
     app_name = "sparklyr_hive_support_disabled",
     config = config
   )
-  expect_equal(get_spark_sql_catalog_implementation(sc2), "in-memory")
+
+  if (version >= "2.0.0")
+    expect_equal(get_spark_sql_catalog_implementation(sc2), "in-memory")
+
   expect_equal(sc2$state$hive_support_enabled, FALSE)
   spark_disconnect(sc2)
 
@@ -96,7 +103,10 @@ test_that("'spark_connect' can allow Hive support to be disabled", {
     app_name = "sparklyr_hive_support_enabled",
     config = config
   )
-  expect_equal(get_spark_sql_catalog_implementation(sc2), "hive")
+
+  if (version >= "2.0.0")
+    expect_equal(get_spark_sql_catalog_implementation(sc2), "hive")
+
   expect_equal(sc2$state$hive_support_enabled, TRUE)
   spark_disconnect(sc2)
 
