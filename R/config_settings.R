@@ -19,6 +19,7 @@ spark_config_settings <- function() {
     sparklyr.connect.cores.local = "Number of cores to use in spark_connect(master = \"local\"), defaults to parallel::detectCores().",
     sparklyr.connect.csv.embedded = "Regular expression to match against versions of Spark that require package extension to support CSVs.",
     sparklyr.connect.csv.scala11 = "Use Scala 2.11 jars when using embedded CSV jars in Spark 1.6.X.",
+    sparklyr.connect.enablehivesupport = "Whether to enable Hive integration with Spark (default: true)",
     sparklyr.connect.jars = "Additional JARs to include while submitting application to Spark.",
     sparklyr.connect.master = "The cluster master as spark_connect() master parameter, notice that the 'spark.master' setting is usually preferred.",
     sparklyr.connect.packages = "Spark packages to include when connecting to Spark.",
