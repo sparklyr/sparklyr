@@ -286,6 +286,46 @@ test_that("spark_read() works as expected", {
   }
 })
 
+test_that("spark_write() works as expected", {
+  test_requires_version("2.4.0")
+
+  iris_tbl <- testthat_tbl("iris")
+
+  writer <- function(df, path) {
+    list(list(df = df, path = path))
+  }
+
+  verify_spark_write_result <- function(res, expected_paths) {
+    sort_df <- function(df) df[do.call(order, as.list(df)),]
+
+    actual <- do.call(rbind, lapply(res, function(e) e$df)) %>% sort_df()
+
+    expected <- iris
+    expected$Species <- as.character(expected$Species)
+    expected <- sort_df(expected)
+    colnames(expected) <- lapply(colnames(expected), function(x) gsub("\\.", "_", x))
+
+    expect_equal(colnames(actual), colnames(expected))
+    for (col in colnames(actual))
+      expect_equal(actual[[col]], expected[[col]])
+
+    expect_equal(lapply(res, function(e) e$path), as.list(expected_paths))
+  }
+
+  multiple_paths <- lapply(seq(5), function(x) paste0("hdfs://file_", x))
+  single_path <- "hdfs://iris"
+
+  for (paths in list(list(multiple_paths), list(single_path)))
+    verify_spark_write_result(
+      res = spark_write(
+        iris_tbl,
+        writer = writer,
+        paths = paths[[1]]
+      ),
+      expected_paths = as.list(paths[[1]])
+    )
+})
+
 teardown({
   db_drop_table(iris_table_name)
 })
