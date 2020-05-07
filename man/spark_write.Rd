@@ -6,7 +6,54 @@
 \usage{
 spark_write(x, writer, paths, packages = NULL)
 }
+\arguments{
+\item{x}{A Spark Dataframe to be saved into file(s)}
+
+\item{writer}{A writer function with the signature function(partition, path)
+where \code{partition} is a R dataframe containing all rows from one partition
+of the original Spark Dataframe \code{x} and path is a string specifying the
+file to write \code{partition} to}
+
+\item{paths}{A single destination path or a list of destination paths, each one
+specifying a location for a partition from \code{x} to be written to. If
+number of partition(s) in \code{x} is not equal to \code{length(paths)} then
+\code{x} will be re-partitioned to contain \code{length(paths)} partition(s)}
+
+\item{packages}{Boolean to distribute \code{.libPaths()} packages to each node,
+a list of packages to distribute, or a package bundle created with}
+}
 \description{
 Run a custom R function on Spark worker to write a Spark DataFrame
 into file(s)
+}
+\examples{
+\dontrun{
+
+library(sparklyr)
+
+sc <- spark_connect(master = "local[3]")
+
+# copy some test data into a Spark Dataframe
+sdf <- sdf_copy_to(sc, iris, overwrite = TRUE)
+
+# create a writer function
+writer <- function(df, path) {
+  write.csv(df, path)
+}
+
+spark_write(
+  sdf,
+  writer,
+  # re-partition sdf into 3 partitions and write them to 3 separate files
+  paths = list("file:///tmp/file1", "file:///tmp/file2", "file:///tmp/file3"),
+)
+
+spark_write(
+  sdf,
+  writer,
+  # save all rows into a single file
+  paths = list("file:///tmp/all_rows")
+)
+}
+
 }
