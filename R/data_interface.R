@@ -1167,12 +1167,11 @@ spark_write.tbl_spark <- function(x,
     x,
     function(df, ctx, partition_index) {
       # Spark partition index is 0-based
-      res <- ctx$writer(df, ctx$paths[[partition_index + 1]])
-      res
+      ctx$writer(df, ctx$paths[[partition_index + 1]])
     },
     context = list(writer = writer, paths = as.list(paths)),
     packages = packages,
-    fetch_results_as_sdf = FALSE,
+    fetch_result_as_sdf = FALSE,
     partition_index_param = "partition_index"
   )
 }
@@ -1185,5 +1184,5 @@ spark_write.spark_jobj <- function(x,
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   x %>%
     sdf_register() %>%
-    spark_write(writer, paths, packages, fetch_results_as_sdf)
+    spark_write(writer, paths, packages)
 }
