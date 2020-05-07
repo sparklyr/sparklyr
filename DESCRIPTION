@@ -104,6 +104,7 @@ Collate:
     'dbi_spark_transactions.R'
     'do_spark.R'
     'dplyr_do.R'
+    'dplyr_hof.R'
     'dplyr_spark.R'
     'dplyr_spark_connection.R'
     'dplyr_spark_data.R'
