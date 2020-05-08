@@ -2,13 +2,12 @@ package sparklyr
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.SparkSession
 
 object StructColumnUtils {
   def parseJsonColumns(
-    df: DataFrame,
+    df: Dataset[Row],
     json_columns: Array[String]
-  ): DataFrame = {
+  ): Dataset[Row] = {
     // parse JSON strings of any column of df listed in json_columns, converting
     // them into Spark SQL StructTypes, assuming all JSON strings follow the same
     // schema

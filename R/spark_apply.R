@@ -15,8 +15,9 @@ spark_apply_worker_config <- function(
         debug = isTRUE(debug),
         profile = isTRUE(profile),
         schema = isTRUE(schema),
-        arrow =isTRUE(arrow),
-        fetch_result_as_sdf = isTRUE(fetch_result_as_sdf)
+        arrow = isTRUE(arrow),
+        fetch_result_as_sdf = isTRUE(fetch_result_as_sdf),
+        spark_version = spark_version(sc)
       ),
       sc$config
     )
@@ -369,12 +370,14 @@ spark_apply <- function(x,
     transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
   }
   else {
+    json_cols <- c()
     if (identical(columns, NULL) || is.character(columns)) {
       columns_schema <- spark_data_build_types(
         sc,
         list(
           names = "character",
-          types = "character"
+          types = "character",
+          json_cols = "character"
         )
       )
 
@@ -413,6 +416,7 @@ spark_apply <- function(x,
 
       columns_infer <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
       names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
+      json_cols <- array(strsplit(columns_query[1, ]$json_cols, split = "\\|")[[1]])
 
       if (is.character(columns)) {
         names(columns_infer)[seq_along(columns)] <- columns
@@ -451,6 +455,16 @@ spark_apply <- function(x,
       spark_session(sc),
       time_zone
     )
+
+    if (spark_version(sc) >= "2.4.0" && !is.na(json_cols) && length(json_cols) > 0) {
+      transformed <- invoke_static(
+        sc,
+        "sparklyr.StructColumnUtils",
+        "parseJsonColumns",
+        transformed,
+        json_cols
+      )
+    }
   }
 
   if (identical(barrier, TRUE)){

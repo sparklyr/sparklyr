@@ -1029,7 +1029,7 @@ writeJobj <- function(con, value) {
 }
 
 writeString <- function(con, value) {
-  utfVal <- enc2utf8(value)
+  utfVal <- enc2utf8(as.character(value))
   writeInt(con, as.integer(nchar(utfVal, type = "bytes") + 1))
   writeBin(utfVal, con, endian = "big", useBytes = TRUE)
 }
@@ -1072,7 +1072,7 @@ writeType <- function(con, class) {
                  factor = "c",
                  `data.frame` = "l",
                  spark_apply_binary_result = "l",
-                 stop("Unsupported type '", type, "' for serialization"))
+                 stop("Unsupported type '", class, "' for serialization"))
   writeBin(charToRaw(type), con)
 }
 
@@ -1154,6 +1154,7 @@ worker_config_serialize <- function(config) {
     if (isTRUE(config$schema)) "TRUE" else "FALSE",
     if (isTRUE(config$arrow)) "TRUE" else "FALSE",
     if (isTRUE(config$fetch_result_as_sdf)) "TRUE" else "FALSE",
+    config$spark_version,
     sep = ";"
   )
 }
@@ -1168,7 +1169,8 @@ worker_config_deserialize <- function(raw) {
     profile = as.logical(parts[[4]]),
     schema = as.logical(parts[[5]]),
     arrow = as.logical(parts[[6]]),
-    fetch_result_as_sdf = as.logical(parts[[7]])
+    fetch_result_as_sdf = as.logical(parts[[7]]),
+    spark_version = parts[[8]]
   )
 }
 # nocov start
@@ -1292,14 +1294,48 @@ spark_worker_clean_factors <- function(result) {
   result
 }
 
-spark_worker_apply_maybe_schema <- function(result, config) {
-  firstClass <- function(e) class(e)[[1]]
+spark_worker_maybe_serialize_list_cols_as_json <- function(config, result) {
+  if (identical(config$fetch_result_as_sdf, TRUE) &&
+      config$spark_version >= "2.4.0" &&
+      any(sapply(result, is.list))) {
+    result <- do.call(tibble::tibble,
+      lapply(
+        result,
+        function(x) {
+          if (is.list(x)) {
+            x <- sapply(x, function(e) rjson::toJSON(e))
+            class(x) <- c(class(x), "list_col_as_json")
+          }
+          x
+        }
+      )
+    )
+  }
 
+  result
+}
+
+spark_worker_apply_maybe_schema <- function(config, result) {
   if (identical(config$schema, TRUE)) {
     worker_log("updating schema")
+
+    col_names <- colnames(result)
+    types <- list()
+    json_cols <- list()
+
+    for (i in seq_along(result)) {
+      if ("list_col_as_json" %in% class(result[[i]])) {
+        json_cols <- append(json_cols, col_names[[i]])
+        types <- append(types, "character")
+      } else {
+        types <- append(types, class(result[[i]])[[1]])
+      }
+    }
+
     result <- data.frame(
-      names = paste(names(result), collapse = "|"),
-      types = paste(lapply(result, firstClass), collapse = "|"),
+      names = paste(col_names, collapse = "|"),
+      types = paste(types, collapse = "|"),
+      json_cols = paste(json_cols, collapse = "|"),
       stringsAsFactors = F
     )
   }
@@ -1409,7 +1445,9 @@ spark_worker_apply_arrow <- function(sc, config) {
 
       result <- spark_worker_clean_factors(result)
 
-      result <- spark_worker_apply_maybe_schema(result, config)
+      result <- spark_worker_maybe_serialize_list_cols_as_json(config, result)
+
+      result <- spark_worker_apply_maybe_schema(config, result)
     }
 
     if (!is.null(result)) {
@@ -1537,7 +1575,9 @@ spark_worker_apply <- function(sc, config) {
 
     result <- spark_worker_clean_factors(result)
 
-    result <- spark_worker_apply_maybe_schema(result, config)
+    result <- spark_worker_maybe_serialize_list_cols_as_json(config, result)
+
+    result <- spark_worker_apply_maybe_schema(config, result)
 
     all_results <- rbind(all_results, result)
   }
