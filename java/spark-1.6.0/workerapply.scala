@@ -30,8 +30,7 @@ class WorkerApply(
   private[this] var backendPort: Int = 0
 
   def workerSourceFile(rscript: Rscript, sessionId: Int): String = {
-    val rsources = new Sources()
-    val source = rsources.sources
+    val source = Sources.sources
 
     val tempFile: File = new File(
       rscript.getScratchDir() + File.separator + "sparkworker_" + sessionId.toString + ".R")

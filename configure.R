@@ -19,7 +19,7 @@ print(targets)
 
 library(sparklyr)
 
-sparklyr:::spark_compile_embedded_sources()
+sparklyr:::spark_gen_embedded_sources()
 
 spec <- Filter(
   function(e) e$spark_version %in% targets,

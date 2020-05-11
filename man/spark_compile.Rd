@@ -10,7 +10,8 @@ spark_compile(
   filter = NULL,
   scalac = NULL,
   jar = NULL,
-  jar_dep = NULL
+  jar_dep = NULL,
+  embedded_srcs = "embedded_sources.R"
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ compilation of \code{scala} files.}
 generating of the resulting \code{jar}.}
 
 \item{jar_dep}{An optional list of additional \code{jar} dependencies.}
+
+\item{embedded_srcs}{Embedded source file(s) under \code{<R package root>/java} to
+be included in the root of the resulting jar file as resources}
 
 \item{name}{The name to assign to the target \code{jar}.}
 }
