@@ -22,6 +22,8 @@ list of column names only if column types should be inferred from the data
 inferred and resulting data frame can have arbitrary column names}
 
 \item{packages}{A list of R packages to distribute to Spark workers}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 Run a custom R function on Spark workers to ingest data from one or more files
