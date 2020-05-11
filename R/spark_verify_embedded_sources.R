@@ -12,20 +12,21 @@ spark_verify_embedded_sources <- function() {
   pkg_root <- normalizePath(".")
   on.exit(setwd(pkg_root))
 
-  sparklyr_jars <- normalizePath(
-    dir("inst/java", full.names = TRUE, pattern = "sparklyr-.+\\.jar")
-  )
+  sparklyr_jars <- list_sparklyr_jars()
 
   for (sparklyr_jar in sparklyr_jars) {
     wd <- tempdir()
     ensure_directory(wd)
     setwd(wd)
 
-    system2("jar", args = c( "xf", sparklyr_jar, "sparklyr/embedded_sources.R"))
+    system2(
+      "jar",
+      args = c("xf", sparklyr_jar, file.path("sparklyr", "embedded_sources.R"))
+    )
     embedded_srcs <- dir(file.path(".", "sparklyr"), "^embedded_sources\\.R$")
 
     if (length(embedded_srcs) > 0) {
-      message("verifying embedded sources from '", sparklyr_jar, "'...")
+      message("verifying embedded sources from '", sparklyr_jar, "'")
       stopifnot(identical(expected_content, readLines(file.path(".", "sparklyr", embedded_srcs[[1]]))))
     } else {
       message("no embedded source found within '", sparklyr_jar, "'")

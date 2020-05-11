@@ -251,6 +251,7 @@ Collate:
     'spark_home.R'
     'spark_invoke.R'
     'spark_submit.R'
+    'spark_update_embedded_sources.R'
     'spark_utils.R'
     'utils.R'
     'spark_verify_embedded_sources.R'

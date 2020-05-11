@@ -462,3 +462,18 @@ make_version_filter <- function(version_upper) {
     }, files)
   }
 }
+
+#' list all sparklyr-*.jar files that have been built
+list_sparklyr_jars <- function() {
+  pkg_root <- rprojroot::find_package_root_file()
+
+  sparklyr_jars <- normalizePath(
+    dir(
+      file.path(pkg_root, "inst", "java"),
+      full.names = TRUE,
+      pattern = "sparklyr-.+\\.jar"
+    )
+  )
+
+  sparklyr_jars
+}
