@@ -114,3 +114,44 @@ test_that("'spark_apply' supports partition index as parameter", {
     )
   )
 })
+
+test_that("'spark_apply' supports nested lists as return type", {
+  test_requires_version("2.4.0")
+
+  df <- data.frame(
+    json = c(
+      "[{\"name\":\"Alice\",\"id\":1}, {\"name\":\"Bob\",\"id\":2}]",
+      "[{\"name\":\"Carlos\",\"id\":3}, {\"name\":\"David\",\"id\":4}]",
+      "[{\"name\":\"Eddie\",\"id\":5}, {\"name\":\"Frank\",\"id\":6}]"
+    )
+  )
+  actual <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
+    spark_apply(
+      function(df)
+        tibble::tibble(
+          person = lapply(
+            df$json,
+            function(x) rjson::fromJSON(x)
+          )
+        )
+    ) %>%
+    sdf_collect()
+  expected <- list(
+    list(
+      list(id = 1, name = "Alice"),
+      list(id = 2, name = "Bob")
+    ),
+    list(
+      list(id = 3,name = "Carlos"),
+      list(id = 4,name = "David")
+    ),
+    list(
+      list(id = 5, name = "Eddie"),
+      list(id = 6, name = "Frank")
+    )
+  )
+  expect_equal(nrow(actual), 3)
+  expect_equal(ncol(actual), 1)
+  expect_equal(colnames(actual), "person")
+  expect_equal(actual$person, expected)
+})

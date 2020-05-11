@@ -89,7 +89,7 @@ writeJobj <- function(con, value) {
 }
 
 writeString <- function(con, value) {
-  utfVal <- enc2utf8(value)
+  utfVal <- enc2utf8(as.character(value))
   writeInt(con, as.integer(nchar(utfVal, type = "bytes") + 1))
   writeBin(utfVal, con, endian = "big", useBytes = TRUE)
 }
@@ -132,7 +132,7 @@ writeType <- function(con, class) {
                  factor = "c",
                  `data.frame` = "l",
                  spark_apply_binary_result = "l",
-                 stop("Unsupported type '", type, "' for serialization"))
+                 stop("Unsupported type '", class, "' for serialization"))
   writeBin(charToRaw(type), con)
 }
 
