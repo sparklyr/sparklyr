@@ -151,6 +151,19 @@ spark_config_packages <- function(config, packages, version) {
     config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, "io.delta:delta-core_2.11:0.4.0")
   }
 
+  if ("avro" %in% packages) {
+    packages <- packages[-which(packages == "avro")]
+
+    if (version < "2.4.0") stop("AVRO requires Spark 2.4.0 or newer")
+
+    scala_version <- if (version >= "3.0.0") "2.12" else "2.11"
+
+    config$sparklyr.shell.packages <- c(
+      config$sparklyr.shell.packages,
+      paste0("org.apache.spark:spark-avro_", scala_version, ":", version)
+    )
+  }
+
   if (!is.null(packages)) {
     config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, packages)
   }
