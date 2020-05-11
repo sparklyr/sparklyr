@@ -28,6 +28,8 @@ if (length(args) == 0) {
   else {
     devtools::install_github( "apache/arrow", subdir = "r")
   }
-} else {
+} else if (args[[1]] == "--verify-embedded-srcs") {
+  sparklyr:::spark_verify_embedded_sources()
+}else {
   stop("Unsupported arguments")
 }
