@@ -4,7 +4,7 @@
 \alias{hof_aggregate}
 \title{dplyr wrapper for \code{aggregate(array<T>, A, function<A, T, A>[, function<A, R>]): R}}
 \usage{
-hof_aggregate(x, dest_col, expr, start, merge, ...)
+hof_aggregate(x, dest_col, expr, start, merge, finish = NULL, ...)
 }
 \arguments{
 \item{x}{The Spark data frame to run aggregation on}
@@ -17,9 +17,9 @@ hof_aggregate(x, dest_col, expr, start, merge, ...)
 
 \item{merge}{The aggregation function}
 
-\item{...}{Additional params to dplyr::mutate}
-
 \item{finish}{Optional param specifying a transformation to apply on the final value of the aggregation}
+
+\item{...}{Additional params to dplyr::mutate}
 }
 \description{
 dplyr wrapper for \code{aggregate(array<T>, A, function<A, T, A>[, function<A, R>]): R}

@@ -129,15 +129,10 @@ hof_filter <- function(x, dest_col, expr, func, ...) {
 #' @param ... Additional params to dplyr::mutate
 #'
 #' @export
-hof_aggregate <- function(x, dest_col, expr, start, merge, ...) {
+hof_aggregate <- function(x, dest_col, expr, start, merge, finish = NULL, ...) {
   validate_lambda(merge)
   args <- list(...)
-  finish <- NULL
-  if ("finish" %in% names(args)) {
-    finish <- args$finish
-    if (!identical(finish, NULL)) validate_lambda(finish)
-    args <- args[!names(args) %in% "finish"]
-  }
+  if (!identical(finish, NULL)) validate_lambda(finish)
   sql <- do.call(paste, as.list(c(
     "AGGREGATE(",
     as.character(dbplyr::translate_sql(!! rlang::enexpr(expr))),
