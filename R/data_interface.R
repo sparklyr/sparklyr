@@ -1010,6 +1010,7 @@ spark_read_delta <- function(sc,
 #'   (e.g., list("column_1", "column_2"), or NULL if column types should be
 #'   inferred and resulting data frame can have arbitrary column names
 #' @param packages A list of R packages to distribute to Spark workers
+#' @param ... Optional arguments; currently unused.
 #'
 #' @family Spark serialization routines
 #'
