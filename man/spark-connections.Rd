@@ -71,7 +71,7 @@ default, all packages enabled through the use of
 \code{"kafka"} to enable Delta Lake or Kafka. Also supports full versions like
 \code{"io.delta:delta-core_2.11:0.4.0"}. This is similar to adding packages into the
 \code{sparklyr.shell.packages} configuration option. Notice that the \code{version}
-parameter is used to choose the correect package, otherwise assumes the latest version
+parameter is used to choose the correct package, otherwise assumes the latest version
 is being used.}
 
 \item{...}{Optional arguments; currently unused.}
