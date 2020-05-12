@@ -1,0 +1,34 @@
+daysUntilStale: 60
+daysUntilClose: 7
+exemptLabels:
+  - better-engineering
+  - bug
+  - connection
+  - data
+  - dbi
+  - distributed r
+  - dplyr
+  - extensions
+  - featurerequest
+  - high-pri
+  - in-progress
+  - install
+  - low-pri
+  - mid-pri
+  - ml
+  - rstudio
+  - scala-interop
+  - serialization
+  - spark settings
+  - spark-2.3
+  - spark-2.4
+  - spark-3.0
+  - streaming
+  - tech-debt
+  - tests
+  - tidyr
+  - wishlist
+  - yarn cluster
+exemptProjects: false
+exemptAssignees: true
+limitPerRun: 30
