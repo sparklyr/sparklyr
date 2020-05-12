@@ -116,6 +116,7 @@ test_that("'spark_apply' supports partition index as parameter", {
 })
 
 test_that("'spark_apply' supports nested lists as return type", {
+  skip_databricks_connect()
   test_requires_version("2.4.0")
 
   df <- data.frame(
