@@ -3,6 +3,7 @@ package sparklyr
 import java.io.{DataInputStream, DataOutputStream}
 import java.io.{File, FileOutputStream, IOException, FileWriter}
 import java.net.{InetAddress, InetSocketAddress, NetworkInterface, ServerSocket, Socket}
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.TimeUnit
 
 import org.apache.spark.SparkConf
@@ -64,7 +65,7 @@ class Backend() {
 
   private[this] var hostContext: String = null
 
-  private[this] var isRunning: Boolean = true
+  private[this] val isRunning: AtomicBoolean = new AtomicBoolean(true)
   private[this] var isRegistered: Boolean = false
   private[this] var gatewayPort: Int = 0
 
@@ -281,7 +282,7 @@ class Backend() {
       }
 
       initMonitor()
-      while(isRunning) {
+      while (isRunning.get) {
         bind()
       }
     } catch {
@@ -415,7 +416,7 @@ class Backend() {
                   // workers should always terminate but without exceptions
                   if (isWorker) {
                     logger.log("is terminating backend")
-                    isRunning = false
+                    isRunning.set(false)
                     gatewayServerSocket.close()
                   }
                 }
@@ -527,7 +528,7 @@ class Backend() {
     }
 
     if (!isService || isWorker) {
-      isRunning = false
+      isRunning.set(false)
     }
   }
 
