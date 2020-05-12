@@ -27,7 +27,13 @@ spark_verify_embedded_sources <- function() {
 
     if (length(embedded_srcs) > 0) {
       message("verifying embedded sources from '", sparklyr_jar, "'")
-      stopifnot(identical(expected_content, readLines(file.path(".", "sparklyr", embedded_srcs[[1]]))))
+      if (!identical(
+        trimws(expected_content, which = "right"),
+        trimws(readLines(file.path(".", "sparklyr", embedded_srcs[[1]])), which = "right")
+      )) {
+        print(readLines(file.path(".", "sparklyr", embedded_srcs[[1]])))
+        stop("Failed to verify embedded sources!")
+      }
     } else {
       message("no embedded source found within '", sparklyr_jar, "'")
     }
