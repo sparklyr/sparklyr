@@ -98,6 +98,22 @@ ml_evaluate.ml_model_clustering <- function(x, dataset) {
   }
 }
 
+#' @rdname ml_evaluate
+#' @export
+ml_evaluate.ml_model_classification <- function(x, dataset) {
+  sc <- spark_connection(x$model)
+
+  prediction <- x %>%
+    spark_jobj() %>%
+    invoke("transform", spark_dataframe(dataset))
+
+  accuracy <- sc %>%
+    invoke_new("org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator") %>%
+    invoke("evaluate", prediction)
+
+  dplyr::tibble(Accuracy = accuracy)
+}
+
 evaluate_ml_model <- function(x, dataset) {
   dataset <- x$pipeline_model %>%
     ml_stage(1) %>%
