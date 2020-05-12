@@ -38,7 +38,7 @@ class BackendHandler(
     breakable {
       do {
         objId match {
-          case"stopBackend" =>
+          case "stopBackend" =>
               serializer.writeInt(dos, 0)
               serializer.writeType(dos, "void")
               close()
