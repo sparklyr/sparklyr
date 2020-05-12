@@ -1,6 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.travis\.yml$
 ^\.codecov\.yml$
 ^README\.Rmd$
 ^README\.html$
@@ -29,7 +28,6 @@
 ^vignettes/
 ^logs$
 ^build_mapping_tables\.R$
-^\.travis\.R$
 ^blogdown/
 ^_blogdown.yml$
 ^config.toml$

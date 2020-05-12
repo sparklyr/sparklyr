@@ -167,9 +167,9 @@ jobs:
       - name: Run tests
         run: |
           export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
-          if [[ $ARROW_ENABLED == "true" ]]; then Rscript ci/.travis.R --arrow $ARROW_BRANCH; fi
+          if [[ $ARROW_ENABLED == "true" ]]; then Rscript ci/.ci.R --arrow $ARROW_BRANCH; fi
           if [[ $CODE_COVERAGE == "true" ]]; then
-            Rscript ci/.travis.R --coverage
+            Rscript ci/.ci.R --coverage
           else
-            Rscript ci/.travis.R --testthat
+            Rscript ci/.ci.R --testthat
           fi
