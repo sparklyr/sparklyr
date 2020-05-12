@@ -2,16 +2,15 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if (length(args) == 0) {
   stop("Missing arguments")
-} else if (args[[1]] == "--testthat") {
+} else if (args[[1]] == "--install_pkgs") {
   if (package_version(paste(R.Version()$major, R.Version()$minor, sep = ".")) >= "3.3") {
     install.packages("sparklyr.nested")
   }
-
   parent_dir <- dir(".", full.names = TRUE)
   sparklyr_package <- parent_dir[grepl("sparklyr_", parent_dir)]
   install.packages(sparklyr_package, repos = NULL, type = "source")
-
-  on.exit(setwd(".."))
+} else if (args[[1]] == "--testthat") {
+  on.exit(setwd(normalizePath("..")))
   setwd("tests")
   source("testthat.R")
 } else if (args[[1]] == "--coverage") {
@@ -29,6 +28,9 @@ if (length(args) == 0) {
     devtools::install_github( "apache/arrow", subdir = "r")
   }
 } else if (args[[1]] == "--verify-embedded-srcs") {
+  install.packages("diffobj")
+  install.packages("stringr")
+
   sparklyr:::spark_verify_embedded_sources()
 }else {
   stop("Unsupported arguments")

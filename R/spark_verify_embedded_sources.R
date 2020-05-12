@@ -4,9 +4,8 @@
 #' @include utils.R
 
 spark_verify_embedded_sources <- function() {
-  output <- tempfile(pattern = 'spark_embedded_sources_', fileext = ".R")
-  spark_gen_embedded_sources(output = output)
-  expected_content <- readLines(output)
+  expected <- tempfile(pattern = 'spark_embedded_sources_', fileext = ".R")
+  spark_gen_embedded_sources(output = expected)
   jar <- find_jar() %||% path_program("jar", fmt = "Unable to locate '%s' binary")
 
   pkg_root <- normalizePath(".")
@@ -27,7 +26,15 @@ spark_verify_embedded_sources <- function() {
 
     if (length(embedded_srcs) > 0) {
       message("verifying embedded sources from '", sparklyr_jar, "'")
-      stopifnot(identical(expected_content, readLines(file.path(".", "sparklyr", embedded_srcs[[1]]))))
+      actual <- file.path(".", "sparklyr", embedded_srcs[[1]])
+      diff <- diffobj::diffFile(expected, actual)
+      if (any(diff)) {
+        print(diff)
+        stop(c(
+          "Embedded sources from '", sparklyr_jar, "' is not up-to-date!\n\n",
+          "Please run 'Rscript update_embedded_sources.R' to fix this error."
+        ))
+      }
     } else {
       message("no embedded source found within '", sparklyr_jar, "'")
     }

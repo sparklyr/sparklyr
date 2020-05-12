@@ -164,6 +164,10 @@ jobs:
         env:
           _R_CHECK_FORCE_SUGGESTS_: false
         run: R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
+      - name: Install sparklyr and other required package(s) from source
+        run: Rscript ci/.ci.R --install_pkgs
+      - name: Verify embedded R sources in sparklyr-*.jar
+        run: Rscript ci/.ci.R --verify-embedded-srcs
       - name: Run tests
         run: |
           export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
