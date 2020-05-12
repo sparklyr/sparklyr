@@ -9,6 +9,7 @@
 \alias{ml_evaluate.ml_model_generalized_linear_regression}
 \alias{ml_evaluate.ml_generalized_linear_regression_model}
 \alias{ml_evaluate.ml_model_clustering}
+\alias{ml_evaluate.ml_model_classification}
 \alias{ml_evaluate.ml_evaluator}
 \title{Evaluate the Model on a Validation Set}
 \usage{
@@ -27,6 +28,8 @@ ml_evaluate(x, dataset)
 \method{ml_evaluate}{ml_generalized_linear_regression_model}(x, dataset)
 
 \method{ml_evaluate}{ml_model_clustering}(x, dataset)
+
+\method{ml_evaluate}{ml_model_classification}(x, dataset)
 
 \method{ml_evaluate}{ml_evaluator}(x, dataset)
 }

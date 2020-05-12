@@ -191,3 +191,71 @@ test_that("ml_evaluate() works for gaussian mixtures model", {
   expect_equal(names(gmm_silhouette), "Silhouette")
   expect_equal(gmm_silhouette$Silhouette, 0.477, tolerance = 0.001)
 })
+
+test_that("ml_evaluate() works for naive bayes model", {
+
+  iris_tbl <- testthat_tbl("iris")
+  nb_acc <- ml_naive_bayes(iris_tbl, Species ~ .) %>%
+    ml_evaluate(iris_tbl)
+
+  expect_equal(names(nb_acc), "Accuracy")
+  expect_equal(nb_acc$Accuracy, 0.953, tolerance = 0.001)
+})
+
+test_that("ml_evaluate() works for random forest model", {
+
+  iris_tbl <- testthat_tbl("iris")
+  rf_acc <- ml_random_forest(iris_tbl, Species ~ .) %>%
+    ml_evaluate(iris_tbl)
+
+  expect_equal(names(rf_acc), "Accuracy")
+  expect_equal(rf_acc$Accuracy, 1)
+})
+
+test_that("ml_evaluate() works for decision tree model", {
+
+  iris_tbl <- testthat_tbl("iris")
+  dt_acc <- ml_decision_tree(iris_tbl, Species ~ .) %>%
+    ml_evaluate(iris_tbl)
+
+  expect_equal(names(dt_acc), "Accuracy")
+  expect_equal(dt_acc$Accuracy, 1)
+})
+
+test_that("ml_evaluate() works for mlp model", {
+
+  iris_tbl <- testthat_tbl("iris")
+  mlp_acc <- ml_multilayer_perceptron_classifier(iris_tbl, Species ~ ., layers = c(4,3,3)) %>%
+    ml_evaluate(iris_tbl)
+
+  expect_equal(names(mlp_acc), "Accuracy")
+  expect_equal(mlp_acc$Accuracy, 0.987, tolerance = 0.001)
+})
+
+test_that("ml_evaluate() works for gbt model", {
+
+  iris_tbl <- testthat_tbl("iris")
+
+  # gbt only supports binary classification
+  iris_tbl<- iris_tbl %>% dplyr::filter(Species != "setosa")
+
+  gbt_acc <- ml_gradient_boosted_trees(iris_tbl, Species ~ .) %>%
+    ml_evaluate(iris_tbl)
+
+  expect_equal(names(gbt_acc), "Accuracy")
+  expect_equal(gbt_acc$Accuracy, 1)
+})
+
+test_that("ml_evaluate() works for svc model", {
+
+  iris_tbl <- testthat_tbl("iris")
+
+  # gbt only supports binary classification
+  iris_tbl<- iris_tbl %>% dplyr::filter(Species != "setosa")
+
+  svc_acc <- ml_linear_svc(iris_tbl, Species ~ .) %>%
+    ml_evaluate(iris_tbl)
+
+  expect_equal(names(svc_acc), "Accuracy")
+  expect_equal(svc_acc$Accuracy, 0.95, tolerance = 0.01)
+})
