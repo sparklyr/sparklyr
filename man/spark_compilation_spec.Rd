@@ -11,7 +11,8 @@ spark_compilation_spec(
   scala_filter = NULL,
   jar_name = NULL,
   jar_path = NULL,
-  jar_dep = NULL
+  jar_dep = NULL,
+  embedded_srcs = "embedded_sources.R"
 )
 }
 \arguments{
@@ -39,6 +40,9 @@ certain versions of Spark.}
 during compilation of your Spark extension.}
 
 \item{jar_dep}{An optional list of additional \code{jar} dependencies.}
+
+\item{embedded_srcs}{Embedded source file(s) under \code{<R package root>/java} to
+be included in the root of the resulting jar file as resources}
 }
 \description{
 For use with \code{\link{compile_package_jars}}. The Spark compilation
