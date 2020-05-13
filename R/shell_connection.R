@@ -463,6 +463,9 @@ spark_disconnect.spark_shell_connection <- function(sc, ...) {
 
 # Stop the Spark R Shell
 stop_shell <- function(sc, terminate = FALSE) {
+  backend <- invoke_static(sc, "sparklyr.Shell", "getBackend")
+  backend_port <- invoke(backend, "getPort")
+
   terminationMode <- if (terminate == TRUE) "terminateBackend" else "stopBackend"
 
   # use monitoring connection to terminate
@@ -475,6 +478,26 @@ stop_shell <- function(sc, terminate = FALSE) {
 
   close(sc$backend)
   close(sc$gateway)
+
+  wait_for_backend_shutdown(port = backend_port, timeout = 10)
+}
+
+# Wait for backend to stop accepting connections
+wait_for_backend_shutdown <- function(port, timeout) {
+  for (t in seq(timeout)) {
+    conn <- tryCatch(
+      suppressWarnings(socketConnection(port = port, server = FALSE)), error = function(e) NULL
+    )
+    if (identical(conn, NULL)) return(TRUE)
+    close(conn)
+    Sys.sleep(1)
+  }
+  warning(
+    "Failed to wait for backend to stop accepting new connection after ",
+    timeout,
+    " seconds"
+  )
+  return(FALSE)
 }
 
 #' @export
