@@ -8,6 +8,7 @@ iris_tbl <- testthat_tbl("iris")
 test_that("'spark_connect' can create a secondary connection", {
   sc2 <- spark_connect(master = "local", app_name = "other")
   spark_disconnect(sc2)
+  Sys.sleep(5)
 
   succeed()
 })
@@ -19,6 +20,7 @@ test_that("`spark_connect()` returns invisibly", {
     capture.output(spark_disconnect(sc2)),
     character(0)
   )
+  Sys.sleep(5)
 })
 
 test_that("'spark_connect' can provide a 'spark_log'", {
@@ -95,6 +97,7 @@ test_that("'spark_connect' can allow Hive support to be disabled", {
 
   expect_equal(sc2$state$hive_support_enabled, FALSE)
   spark_disconnect(sc2)
+  Sys.sleep(5)
 
   # re-create another connection with hive support explicitly enabled
   config$sparklyr.connect.enablehivesupport <- TRUE
@@ -109,6 +112,7 @@ test_that("'spark_connect' can allow Hive support to be disabled", {
 
   expect_equal(sc2$state$hive_support_enabled, TRUE)
   spark_disconnect(sc2)
+  Sys.sleep(5)
 
   succeed()
 })
