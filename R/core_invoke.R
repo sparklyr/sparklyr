@@ -153,7 +153,7 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
 
   if (identical(object, "Handler") &&
       (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
-    # by the time we read response, backend might be already down.
+    readInt(sc)
     return(NULL)
   }
 
