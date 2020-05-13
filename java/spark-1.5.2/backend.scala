@@ -83,7 +83,7 @@ class Backend() {
 
   private[this] var logger: Logger = new Logger("Session", 0);
 
-  private[this] var oneConnection: Boolean = false;
+  private[this] var oneConnection: AtomicBoolean = new AtomicBoolean(false);
 
   private[this] var defaultTracker: Option[JVMObjectTracker] = None
 
@@ -299,7 +299,7 @@ class Backend() {
     new Thread("starting init monitor thread") {
       override def run(): Unit = {
         Thread.sleep(connectionTimeout * 1000)
-        if (!oneConnection && !isService) {
+        if (!oneConnection.get && !isService) {
           val hostAddress: String = try {
             " to " + InetAddress.getLocalHost.getHostAddress.toString + "/" + getPort()
           } catch {
@@ -339,7 +339,7 @@ class Backend() {
     }
     val gatewaySocket = gatewayServerSocket.accept()
 
-    oneConnection = true
+    oneConnection.set(true)
 
     logger.log("accepted connection")
     val buf = new Array[Byte](1024)
@@ -529,6 +529,7 @@ class Backend() {
 
     if (!isService || isWorker) {
       isRunning.set(false)
+      gatewayServerSocket.close()
     }
   }
 
