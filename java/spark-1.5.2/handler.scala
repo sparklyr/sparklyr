@@ -1,6 +1,7 @@
 package sparklyr
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.util.concurrent.TimeUnit
 
 import scala.language.existentials
 
@@ -40,10 +41,10 @@ class BackendHandler(
         objId match {
           case "stopBackend" =>
               serializer.writeInt(dos, 0)
-              serializer.writeType(dos, "void")
-              close()
+              needsReply = false
 
-              reply = bos.toByteArray
+              ctx.writeAndFlush(bos.toByteArray).awaitUninterruptibly(10, TimeUnit.SECONDS)
+              close()
               break
           case "terminateBackend" =>
               serializer.writeInt(dos, 0)
