@@ -229,7 +229,7 @@ test_that("ml_evaluate() works for mlp model", {
     ml_evaluate(iris_tbl)
 
   expect_equal(names(mlp_acc), "Accuracy")
-  expect_equal(mlp_acc$Accuracy, 0.987, tolerance = 0.001)
+  expect_true(mlp_acc$Accuracy >= 0.98)
 })
 
 test_that("ml_evaluate() works for gbt model", {
@@ -247,6 +247,7 @@ test_that("ml_evaluate() works for gbt model", {
 })
 
 test_that("ml_evaluate() works for svc model", {
+  test_requires_version("2.2.0")
 
   iris_tbl <- testthat_tbl("iris")
 
