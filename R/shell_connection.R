@@ -138,6 +138,9 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
       )
     )
   })
+
+  print("\nLocal stack trace:\n")
+  print(sys.calls())
 }
 
 # Start the Spark R Shell
@@ -357,7 +360,7 @@ start_shell <- function(master,
     gatewayPort <- as.integer(spark_config_value_retries(config, "sparklyr.gateway.port", "8880", gatewayConfigRetries))
     gatewayAddress <- spark_config_value_retries(config, "sparklyr.gateway.address", "localhost", gatewayConfigRetries)
 
-    tryCatch({
+    withCallingHandlers({
       # connect and wait for the service to start
       gatewayInfo <- spark_connect_gateway(gatewayAddress,
                                            gatewayPort,
@@ -395,7 +398,7 @@ start_shell <- function(master,
   # batch connections only use the shell to submit an application, not to connect.
   if (identical(batch, TRUE)) return(NULL)
 
-  tryCatch({
+  withCallingHandlers({
     interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
 
     backend <- socketConnection(host = gatewayAddress,
@@ -604,7 +607,7 @@ initialize_connection.spark_shell_connection <- function(sc) {
   }
 
   # initialize and return the connection
-  tryCatch({
+  withCallingHandlers({
     backend <- invoke_static(sc, "sparklyr.Shell", "getBackend")
     sc$state$spark_context <- invoke(backend, "getSparkContext")
 
