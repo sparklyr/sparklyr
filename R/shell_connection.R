@@ -101,7 +101,7 @@ spark_session_random <- function() {
   floor(openssl::rand_num(1) * 100000)
 }
 
-abort_shell <- function(message, spark_submit_path, shell_args, output_file, error_file) {
+abort_shell <- function(message, spark_submit_path, shell_args, output_file, error_file, stack_trace = NULL) {
   withr::with_options(list(
     warning.length = 8000
   ), {
@@ -138,6 +138,9 @@ abort_shell <- function(message, spark_submit_path, shell_args, output_file, err
       )
     )
   })
+  if (!identical(stack_trace, NULL)) {
+    print(stack_trace)
+  }
 }
 
 # Start the Spark R Shell
@@ -387,7 +390,8 @@ start_shell <- function(master,
         spark_submit_path,
         shell_args,
         output_file,
-        error_file
+        error_file,
+        stack_trace = sys.calls()
       )
     })
   }
@@ -421,7 +425,8 @@ start_shell <- function(master,
       spark_submit_path,
       shell_args,
       output_file,
-      error_file
+      error_file,
+      stack_trace = sys.calls()
     )
   })
 
@@ -722,7 +727,8 @@ initialize_connection.spark_shell_connection <- function(sc) {
       spark_submit_path = NULL,
       shell_args = NULL,
       output_file = sc$output_file,
-      error_file = NULL
+      error_file = NULL,
+      stack_trace = sys.calls()
     )
   })
 }
