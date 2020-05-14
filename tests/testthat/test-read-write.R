@@ -331,7 +331,7 @@ test_that("spark_read_avro() works as expected", {
 
   sc2 <- spark_connect(
     master = "local",
-    version = Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark()),
+    version = invoke(spark_context(sc), "version"),
     app_name = "avro",
     packages = "avro"
   )
