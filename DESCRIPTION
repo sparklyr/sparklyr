@@ -77,6 +77,7 @@ Suggests:
 Collate:
     'spark_data_build_types.R'
     'arrow_data.R'
+    'avro_utils.R'
     'config_settings.R'
     'config_spark.R'
     'connection_instances.R'
