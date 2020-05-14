@@ -231,7 +231,7 @@ test_that("spark_read_csv() can read verbatim column types", {
 test_that("spark_read_csv() can read if embedded nuls present", {
   skip_on_arrow()
 
-  fpath <- get_sample_data_path("with_embedded_nul\\.csv$")
+  fpath <- get_sample_data_path("with_embedded_nul.csv")
   df <- spark_read_csv(sc, name = "test_embedded_nul", path = fpath)
   expect_equal(
     suppressWarnings(df %>% collect()),
@@ -331,7 +331,8 @@ test_that("spark_read_avro() works as expected", {
 
   sc2 <- spark_connect(
     master = "local",
-    version = spark_version(sc),
+    version = Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark()),
+    app_name = "avro",
     packages = "avro"
   )
   on.exit(spark_disconnect(sc2))
