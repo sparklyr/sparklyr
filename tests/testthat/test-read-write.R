@@ -326,6 +326,34 @@ test_that("spark_write() works as expected", {
     )
 })
 
+test_that("spark_read_avro() works as expected", {
+  test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
+
+  sc2 <- spark_connect(
+    master = "local",
+    version = spark_version(sc),
+    packages = "avro"
+  )
+  on.exit(spark_disconnect(sc2))
+
+  actual <- spark_read_avro(
+    sc2,
+    path = get_sample_data_path("test_spark_read.avro")
+  ) %>%
+    sdf_collect()
+
+  expected <- tibble::tibble(
+    a = c(1, NaN, 3, 4, NaN),
+    b = c(-2L, 0L, 1L, 3L, 6L),
+    c = c("ab", "cde", "zzzz", "", "fghi")
+  )
+
+  expect_equal(colnames(expected), colnames(actual))
+
+  for (col in colnames(expected))
+    expect_equal(expected[[col]], actual[[col]])
+})
+
 teardown({
   db_drop_table(iris_table_name)
 })

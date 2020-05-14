@@ -1019,7 +1019,7 @@ spark_read_avro <- function(sc,
   if (!spark_avro_pkg %in% sc$config$`sparklyr.shell.packages`)
     stop("Avro support must be enabled with ",
          "`spark_connect(..., packages = c(\"avro\", <other package(s)>))` ",
-         " or by including '", spark_avro_pkg, "' for spark version ",
+         " or by explicitly including '", spark_avro_pkg, "' for Spark version ",
          spark_version(sc), " in list of packages")
 
   options <- list()
