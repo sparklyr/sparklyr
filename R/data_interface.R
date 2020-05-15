@@ -444,7 +444,8 @@ spark_data_write_generic <- function(df,
                                      mode = NULL,
                                      writeOptions = list(),
                                      partition_by = NULL,
-                                     is_jdbc = FALSE) {
+                                     is_jdbc = FALSE,
+                                     save_args = list()) {
   options <- invoke(df, "write")
 
   options <- spark_data_apply_mode(options, mode)
@@ -473,7 +474,7 @@ spark_data_write_generic <- function(df,
   else {
     options <- invoke(options, fileMethod, path)
     # Need to call save explicitly in case of generic 'format'
-    if(fileMethod == "format") invoke(options, "save")
+    if (fileMethod == "format") do.call(invoke, c(options, "save", save_args))
   }
 
   invisible(TRUE)
@@ -749,7 +750,7 @@ spark_write_source.tbl_spark <- function(x,
                                          partition_by = NULL,
                                          ...) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, source, "format", mode, options, partition_by)
+  spark_data_write_generic(sqlResult, source, "format", mode, options, partition_by, ...)
 }
 
 #' @export
@@ -760,7 +761,7 @@ spark_write_source.spark_jobj <- function(x,
                                           partition_by = NULL,
                                           ...) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_data_write_generic(x, source, "format", mode, options, partition_by)
+  spark_data_write_generic(x, source, "format", mode, options, partition_by, ...)
 }
 
 #' Read a Text file into a Spark DataFrame
@@ -995,6 +996,17 @@ spark_read_delta <- function(sc,
                     overwrite = overwrite)
 }
 
+validate_spark_avro_pkg_version <- function(sc) {
+  # get the full Spark version including possible suffixes such as "-preview"
+  full_spark_version <- invoke(spark_context(sc), "version")
+  spark_avro_pkg <- spark_avro_package_name(full_spark_version)
+  if (!spark_avro_pkg %in% sc$config$`sparklyr.shell.packages`)
+    stop("Avro support must be enabled with ",
+         "`spark_connect(..., version = <version>, packages = c(\"avro\", <other package(s)>), ...)` ",
+         " or by explicitly including '", spark_avro_pkg, "' for Spark version ",
+         full_spark_version, " in list of packages")
+}
+
 #' Read Apache Avro data into a Spark DataFrame.
 #'
 #' Read Apache Avro data into a Spark DataFrame.
@@ -1020,14 +1032,7 @@ spark_read_avro <- function(sc,
                             repartition = 0,
                             memory = TRUE,
                             overwrite = TRUE) {
-  # get the full Spark version including possible suffixes such as "-preview"
-  full_spark_version <- invoke(spark_context(sc), "version")
-  spark_avro_pkg <- spark_avro_package_name(full_spark_version)
-  if (!spark_avro_pkg %in% sc$config$`sparklyr.shell.packages`)
-    stop("Avro support must be enabled with ",
-         "`spark_connect(..., version = <version>, packages = c(\"avro\", <other package(s)>), ...)` ",
-         " or by explicitly including '", spark_avro_pkg, "' for Spark version ",
-         full_spark_version, " in list of packages")
+  validate_spark_avro_pkg_version(sc)
 
   options <- list()
   if (!is.null(avro_schema)) {
@@ -1046,6 +1051,53 @@ spark_read_avro <- function(sc,
                     repartition = repartition,
                     memory = memory,
                     overwrite = overwrite)
+}
+
+#' Serialize a Spark DataFrame into Apache Avro format
+#'
+#' Serialize a Spark DataFrame into Apache Avro format.
+#' Notice this functionality requires the Spark connection \code{sc} to be instantiated with either
+#' an explicitly specified Spark version (i.e.,
+#' \code{spark_connect(..., version = <version>, packages = c("avro", <other package(s)>), ...)})
+#' or a specific version of Spark avro package to use (e.g.,
+#' \code{spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0-preview2", <other package(s)>), ...)}).
+#'
+#' @inheritParams spark_write_csv
+#" @param avro_schema Optional Avro schema in JSON format
+#' @param record_name Optional top level record name in write result (default: "topLevelRecord")
+#' @param record_namespace Record namespace in write result (default: "")
+#' @param compression Compression codec to use (default: "snappy")
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_write_avro <- function(x,
+                             path,
+                             avro_schema = NULL,
+                             record_name = "topLevelRecord",
+                             record_namespace = "",
+                             compression = "snappy",
+                             partition_by = NULL) {
+  validate_spark_avro_pkg_version(sc)
+
+  options <- list()
+  if (!is.null(avro_schema)) {
+    if (!is.character(avro_schema))
+      stop("Expect Avro schema to be a JSON string")
+
+    options$avroSchema <- avro_schema
+  }
+  options$recordName <- record_name
+  options$recordNamespace <- record_namespace
+  options$compression <- compression
+
+  spark_write_source(
+    x,
+    "avro",
+    options = options,
+    partition_by = partition_by,
+    save_args = list(path)
+  )
 }
 
 #' Read file(s) into a Spark DataFrame using a custom reader
