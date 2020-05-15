@@ -329,11 +329,15 @@ test_that("spark_write() works as expected", {
 test_that("spark_read_avro() works as expected", {
   test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
 
-  actual <- spark_read_avro(
-    sc,
-    path = get_sample_data_path("test_spark_read.avro")
-  ) %>%
-    sdf_collect()
+  schema <- list(
+    type = "record",
+    name = "topLevelRecord",
+    fields = list(
+      list(name = "a", type = list("double", "null")),
+      list(name = "b", type = list("int", "null")),
+      list(name = "c", type = list("string", "null"))
+    )
+  )
 
   expected <- tibble::tibble(
     a = c(1, NaN, 3, 4, NaN),
@@ -341,10 +345,19 @@ test_that("spark_read_avro() works as expected", {
     c = c("ab", "cde", "zzzz", "", "fghi")
   )
 
-  expect_equal(colnames(expected), colnames(actual))
+  for (avro_schema in list(NULL, rjson::toJSON(schema))) {
+    actual <- spark_read_avro(
+      sc,
+      path = get_sample_data_path("test_spark_read.avro"),
+      avro_schema = avro_schema
+    ) %>%
+      sdf_collect()
 
-  for (col in colnames(expected))
-    expect_equal(expected[[col]], actual[[col]])
+    expect_equal(colnames(expected), colnames(actual))
+
+    for (col in colnames(expected))
+      expect_equal(expected[[col]], actual[[col]])
+  }
 })
 
 teardown({
