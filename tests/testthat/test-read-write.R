@@ -329,16 +329,8 @@ test_that("spark_write() works as expected", {
 test_that("spark_read_avro() works as expected", {
   test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
 
-  sc2 <- spark_connect(
-    master = "local",
-    version = invoke(spark_context(sc), "version"),
-    app_name = "avro",
-    packages = "avro"
-  )
-  on.exit(spark_disconnect(sc2))
-
   actual <- spark_read_avro(
-    sc2,
+    sc,
     path = get_sample_data_path("test_spark_read.avro")
   ) %>%
     sdf_collect()
