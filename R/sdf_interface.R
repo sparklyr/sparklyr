@@ -533,9 +533,13 @@ transform_sdf <- function(x, cols, fn) {
   transformed_cols <- lapply(
     all_cols,
     function(col) {
-      col_obj <- invoke_new(sc, "org.apache.spark.sql.Column", col)
+      col_obj <- invoke_new(
+        spark_connection(x),
+        "org.apache.spark.sql.Column",
+        col
+      )
       if (col %in% cols)
-        fn(col_obj)
+        fn(col, col_obj) %>% invoke("as", col)
       else
         col_obj
     }
@@ -548,6 +552,7 @@ transform_sdf <- function(x, cols, fn) {
 #'
 #' @param x An object coercible to a Spark DataFrame
 #' @param cols Subset of Columns to convert into avro format
+#'
 #' @export
 sdf_to_avro <- function(x, cols = colnames(x)) {
   validate_cols(x, cols)
@@ -557,8 +562,13 @@ sdf_to_avro <- function(x, cols = colnames(x)) {
   transform_sdf(
     x,
     cols,
-    function(col) {
-      invoke_static(sc, "org.apache.spark.sql.avro", "to_avro", col)
+    function(col, col_obj) {
+      invoke_static(
+        spark_connection(x),
+        "org.apache.spark.sql.avro",
+        "to_avro",
+        col_obj
+      )
     }
   )
 }
@@ -566,18 +576,30 @@ sdf_to_avro <- function(x, cols = colnames(x)) {
 #' Convert column(s) from avro format
 #'
 #' @param x An object coercible to a Spark DataFrame
-#' @param cols Subset of Columns to convert from avro format
+#' @param cols Named list of columns to transform from Avro format plus a valid Avro
+#'   schema string for each column, where column names are keys and column schema strings
+#'   are values (e.g.,
+#'   \code{c(example_primitive_col = "string",
+#'   example_complex_col = "{\"type\":\"record\",\"name\":\"person\",\"fields\":[
+#'   {\"name\":\"person_name\",\"type\":\"string\"}, {\"name\":\"person_id\",\"type\":\"long\"}]}")}
+#'
 #' @export
-sdf_from_avro <- function(x, cols = colnames(x)) {
-  validate_cols(x, cols)
+sdf_from_avro <- function(x, cols) {
+  validate_cols(x, names(cols))
   validate_spark_avro_pkg_version(spark_connection(x))
 
-  cols <- cast_character_list(cols, allow_null = TRUE)
   transform_sdf(
     x,
-    cols,
-    function(col) {
-      invoke_static(sc, "org.apache.spark.sql.avro", "from_avro", col)
+    names(cols),
+    function(col, col_obj) {
+      col_schema <- cols[[col]]
+      invoke_static(
+        spark_connection(x),
+        "org.apache.spark.sql.avro",
+        "from_avro",
+        col_obj,
+        col_schema
+      )
     }
   )
 }
