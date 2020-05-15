@@ -1,3 +1,6 @@
+#' @include avro_utils.R
+NULL
+
 #' Copy an Object into Spark
 #'
 #' Copy an object into Spark, and return an \R object wrapping the
@@ -478,18 +481,23 @@ sdf_coalesce <- function(x, partitions) {
     sdf_register()
 }
 
+validate_cols <- function(x, cols) {
+  present <- cols %in% colnames(x)
+  if (any(!present)) {
+    msg <- paste0("The following columns are not in the data frame: ",
+                  paste0(cols[which(!present)], collapse = ", "))
+    stop(msg)
+  }
+}
+
 #' Compute summary statistics for columns of a data frame
 #'
 #' @param x An object coercible to a Spark DataFrame
 #' @param cols Columns to compute statistics for, given as a character vector
 #' @export
 sdf_describe <- function(x, cols = colnames(x)) {
-  in_df <- cols %in% colnames(x)
-  if (any(!in_df)) {
-    msg <- paste0("The following columns are not in the data frame: ",
-                  paste0(cols[which(!in_df)], collapse = ", "))
-    stop(msg)
-  }
+  validate_cols(x, cols)
+
   cols <- cast_character_list(cols)
 
   x %>%
@@ -504,13 +512,7 @@ sdf_describe <- function(x, cols = colnames(x)) {
 #' @param cols Subset of Columns to consider, given as a character vector
 #' @export
 sdf_drop_duplicates <- function(x, cols = NULL) {
-  in_df <- cols %in% colnames(x)
-
-  if (any(!in_df)) {
-    msg <- paste0("The following columns are not in the data frame: ",
-                  paste0(cols[which(!in_df)], collapse = ", "))
-    stop(msg)
-  }
+  validate_cols(x, cols)
 
   cols <- cast_character_list(cols, allow_null=TRUE)
   sdf <- spark_dataframe(x)
@@ -522,4 +524,60 @@ sdf_drop_duplicates <- function(x, cols = NULL) {
   }
 
   sdf_register(sdf_deduplicated)
+}
+
+#' transform a subset of column(s) in a Spark Dataframe
+transform_sdf <- function(x, cols, fn) {
+  all_cols <- colnames(x)
+  sdf <- spark_dataframe(x)
+  transformed_cols <- lapply(
+    all_cols,
+    function(col) {
+      col_obj <- invoke_new(sc, "org.apache.spark.sql.Column", col)
+      if (col %in% cols)
+        fn(col_obj)
+      else
+        col_obj
+    }
+  )
+
+  invoke(sdf, "select", transformed_cols) %>% sdf_register()
+}
+
+#' Convert column(s) to avro format
+#'
+#' @param x An object coercible to a Spark DataFrame
+#' @param cols Subset of Columns to convert into avro format
+#' @export
+sdf_to_avro <- function(x, cols = colnames(x)) {
+  validate_cols(x, cols)
+  validate_spark_avro_pkg_version(spark_connection(x))
+
+  cols <- cast_character_list(cols, allow_null = TRUE)
+  transform_sdf(
+    x,
+    cols,
+    function(col) {
+      invoke_static(sc, "org.apache.spark.sql.avro", "to_avro", col)
+    }
+  )
+}
+
+#' Convert column(s) from avro format
+#'
+#' @param x An object coercible to a Spark DataFrame
+#' @param cols Subset of Columns to convert from avro format
+#' @export
+sdf_from_avro <- function(x, cols = colnames(x)) {
+  validate_cols(x, cols)
+  validate_spark_avro_pkg_version(spark_connection(x))
+
+  cols <- cast_character_list(cols, allow_null = TRUE)
+  transform_sdf(
+    x,
+    cols,
+    function(col) {
+      invoke_static(sc, "org.apache.spark.sql.avro", "from_avro", col)
+    }
+  )
 }
