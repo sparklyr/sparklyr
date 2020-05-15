@@ -231,7 +231,7 @@ test_that("spark_read_csv() can read verbatim column types", {
 test_that("spark_read_csv() can read if embedded nuls present", {
   skip_on_arrow()
 
-  fpath <- get_sample_data_path("with_embedded_nul\\.csv$")
+  fpath <- get_sample_data_path("with_embedded_nul.csv")
   df <- spark_read_csv(sc, name = "test_embedded_nul", path = fpath)
   expect_equal(
     suppressWarnings(df %>% collect()),
@@ -324,6 +324,41 @@ test_that("spark_write() works as expected", {
       ),
       expected_paths = as.list(paths[[1]])
     )
+})
+
+test_that("spark_read_avro() works as expected", {
+  test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
+  skip_databricks_connect()
+
+  schema <- list(
+    type = "record",
+    name = "topLevelRecord",
+    fields = list(
+      list(name = "a", type = list("double", "null")),
+      list(name = "b", type = list("int", "null")),
+      list(name = "c", type = list("string", "null"))
+    )
+  )
+
+  expected <- tibble::tibble(
+    a = c(1, NaN, 3, 4, NaN),
+    b = c(-2L, 0L, 1L, 3L, 6L),
+    c = c("ab", "cde", "zzzz", "", "fghi")
+  )
+
+  for (avro_schema in list(NULL, rjson::toJSON(schema))) {
+    actual <- spark_read_avro(
+      sc,
+      path = get_sample_data_path("test_spark_read.avro"),
+      avro_schema = avro_schema
+    ) %>%
+      sdf_collect()
+
+    expect_equal(colnames(expected), colnames(actual))
+
+    for (col in colnames(expected))
+      expect_equal(expected[[col]], actual[[col]])
+  }
 })
 
 teardown({

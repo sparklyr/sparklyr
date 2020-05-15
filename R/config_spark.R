@@ -1,5 +1,11 @@
 #' Read Spark Configuration
 #'
+#' Read Spark Configuration
+#'
+#' @include avro_utils.R
+
+#' Read Spark Configuration
+#'
 #' @export
 #' @param file Name of the configuration file
 #' @param use_default TRUE to use the built-in defaults provided in this package
@@ -149,6 +155,15 @@ spark_config_packages <- function(config, packages, version) {
     if (version < "2.4.2") stop("Delta Lake requires Spark 2.4.2 or newer")
 
     config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, "io.delta:delta-core_2.11:0.4.0")
+  }
+
+  if ("avro" %in% packages) {
+    packages <- packages[-which(packages == "avro")]
+
+    config$sparklyr.shell.packages <- c(
+      config$sparklyr.shell.packages,
+      spark_avro_package_name(version)
+    )
   }
 
   if (!is.null(packages)) {

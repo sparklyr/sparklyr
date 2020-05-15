@@ -95,7 +95,15 @@ testthat_shell_connection <- function(method = "shell") {
     config[["sparklyr.apply.env.foo"]] <- "env-test"
     config[["spark.sql.warehouse.dir"]] <- get_spark_warehouse_dir()
 
-    sc <- spark_connect(master = "local", method = method, version = version, config = config)
+    packages <- if (version >= "2.4.0") "avro" else NULL
+
+    sc <- spark_connect(
+      master = "local",
+      method = method,
+      version = version,
+      config = config,
+      packages = packages
+    )
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
   }
 
@@ -402,10 +410,10 @@ random_table_name <- function(prefix) {
 
 get_sample_data_path <- function(file_name) {
   if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true") {
-    sanitized_name <- gsub("[\\|$]", "", file_name)
-    sample_data_path <- paste0(Sys.getenv("DBFS_DATA_PATH"), "/", sanitized_name)
+    sample_data_path <- paste0(Sys.getenv("DBFS_DATA_PATH"), "/", file_name)
   } else {
-    sample_data_path <- dir(getwd(), recursive = TRUE, pattern = file_name, full.names = TRUE)
+    sample_data_path <- file.path(normalizePath(getwd()), "data", file_name)
   }
+
   sample_data_path
 }

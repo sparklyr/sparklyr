@@ -1,3 +1,4 @@
+#' @include avro_utils.R
 #' @include spark_apply.R
 
 # This function handles backward compatibility to support
@@ -988,6 +989,59 @@ spark_read_delta <- function(sc,
                     name = name,
                     path = path,
                     source = "delta",
+                    options = options,
+                    repartition = repartition,
+                    memory = memory,
+                    overwrite = overwrite)
+}
+
+#' Read Apache Avro data into a Spark DataFrame.
+#'
+#' Read Apache Avro data into a Spark DataFrame.
+#' Notice this functionality requires the Spark connection \code{sc} to be instantiated with either
+#' an explicitly specified Spark version (i.e.,
+#' \code{spark_connect(..., version = <version>, packages = c("avro", <other package(s)>), ...)})
+#' or a specific version of Spark avro package to use (e.g.,
+#' \code{spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0-preview2", <other package(s)>), ...)}).
+#'
+#' @inheritParams spark_read_csv
+#' @param avro_schema Optional Avro schema in JSON format
+#' @param ignore_extension If enabled, all files with and without .avro extension
+#'   are loaded (default: \code{TRUE})
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_avro <- function(sc,
+                            name = NULL,
+                            path = name,
+                            avro_schema = NULL,
+                            ignore_extension = TRUE,
+                            repartition = 0,
+                            memory = TRUE,
+                            overwrite = TRUE) {
+  # get the full Spark version including possible suffixes such as "-preview"
+  full_spark_version <- invoke(spark_context(sc), "version")
+  spark_avro_pkg <- spark_avro_package_name(full_spark_version)
+  if (!spark_avro_pkg %in% sc$config$`sparklyr.shell.packages`)
+    stop("Avro support must be enabled with ",
+         "`spark_connect(..., version = <version>, packages = c(\"avro\", <other package(s)>), ...)` ",
+         " or by explicitly including '", spark_avro_pkg, "' for Spark version ",
+         full_spark_version, " in list of packages")
+
+  options <- list()
+  if (!is.null(avro_schema)) {
+    if (!is.character(avro_schema))
+      stop("Expect Avro schema to be a JSON string")
+
+    options$avroSchema <- avro_schema
+  }
+  options$ignoreExtension <- ignore_extension
+
+  spark_read_source(sc,
+                    name = name,
+                    path = path,
+                    source = "avro",
                     options = options,
                     repartition = repartition,
                     memory = memory,

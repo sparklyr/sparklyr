@@ -32,6 +32,7 @@ into a Spark DataFrame, assuming all files follow the same schema.
 \seealso{
 Other Spark serialization routines: 
 \code{\link{spark_load_table}()},
+\code{\link{spark_read_avro}()},
 \code{\link{spark_read_csv}()},
 \code{\link{spark_read_delta}()},
 \code{\link{spark_read_jdbc}()},

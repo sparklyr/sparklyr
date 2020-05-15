@@ -42,6 +42,7 @@ Reads from a Spark Table into a Spark DataFrame.
 \seealso{
 Other Spark serialization routines: 
 \code{\link{spark_load_table}()},
+\code{\link{spark_read_avro}()},
 \code{\link{spark_read_csv}()},
 \code{\link{spark_read_delta}()},
 \code{\link{spark_read_jdbc}()},
