@@ -10,7 +10,8 @@ spark_write_avro(
   avro_schema = NULL,
   record_name = "topLevelRecord",
   record_namespace = "",
-  compression = "snappy"
+  compression = "snappy",
+  partition_by = NULL
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \item{record_namespace}{Record namespace in write result (default: "")}
 
 \item{compression}{Compression codec to use (default: "snappy")}
+
+\item{partition_by}{A \code{character} vector. Partitions the output by the given columns on the file system.}
 }
 \description{
 Serialize a Spark DataFrame into Apache Avro format.
