@@ -69,6 +69,7 @@ Other Spark serialization routines:
 \code{\link{spark_read_text}()},
 \code{\link{spark_read}()},
 \code{\link{spark_save_table}()},
+\code{\link{spark_write_avro}()},
 \code{\link{spark_write_delta}()},
 \code{\link{spark_write_jdbc}()},
 \code{\link{spark_write_json}()},
