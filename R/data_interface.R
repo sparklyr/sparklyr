@@ -1078,7 +1078,7 @@ spark_write_avro <- function(x,
                              record_namespace = "",
                              compression = "snappy",
                              partition_by = NULL) {
-  validate_spark_avro_pkg_version(sc)
+  validate_spark_avro_pkg_version(spark_connection(x))
 
   options <- list()
   if (!is.null(avro_schema)) {

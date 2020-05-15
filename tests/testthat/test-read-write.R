@@ -326,19 +326,19 @@ test_that("spark_write() works as expected", {
     )
 })
 
+test_avro_schema <- rjson::toJSON(list(
+  type = "record",
+  name = "topLevelRecord",
+  fields = list(
+    list(name = "a", type = list("double", "null")),
+    list(name = "b", type = list("int", "null")),
+    list(name = "c", type = list("string", "null"))
+  )
+))
+
 test_that("spark_read_avro() works as expected", {
   test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
   skip_databricks_connect()
-
-  schema <- list(
-    type = "record",
-    name = "topLevelRecord",
-    fields = list(
-      list(name = "a", type = list("double", "null")),
-      list(name = "b", type = list("int", "null")),
-      list(name = "c", type = list("string", "null"))
-    )
-  )
 
   expected <- tibble::tibble(
     a = c(1, NaN, 3, 4, NaN),
@@ -346,7 +346,7 @@ test_that("spark_read_avro() works as expected", {
     c = c("ab", "cde", "zzzz", "", "fghi")
   )
 
-  for (avro_schema in list(NULL, rjson::toJSON(schema))) {
+  for (avro_schema in list(NULL, test_avro_schema)) {
     actual <- spark_read_avro(
       sc,
       path = get_sample_data_path("test_spark_read.avro"),
@@ -358,6 +358,29 @@ test_that("spark_read_avro() works as expected", {
 
     for (col in colnames(expected))
       expect_equal(expected[[col]], actual[[col]])
+  }
+})
+
+test_that("spark_write_avro() works as expected", {
+  test_requires_version("2.4.0", "spark_write_avro() requires Spark 2.4+")
+  skip_databricks_connect()
+
+  df <- tibble::tibble(
+    a = c(1, NaN, 3, 4, NaN),
+    b = c(-2L, 0L, 1L, 3L, 6L),
+    c = c("ab", "cde", "zzzz", "", "fghi")
+  )
+  sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
+
+  for (avro_schema in list(NULL, test_avro_schema)) {
+    path <- tempfile(pattern = "test_spark_write_avro_", fileext = ".avro")
+    spark_write_avro(sdf, path = path, avro_schema = avro_schema)
+    actual <- spark_read_avro(sc, path = path) %>% sdf_collect()
+
+    expect_equal(colnames(df), colnames(actual))
+
+    for (col in colnames(df))
+      expect_equal(df[[col]], actual[[col]])
   }
 })
 
