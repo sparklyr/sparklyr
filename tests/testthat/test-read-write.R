@@ -328,6 +328,7 @@ test_that("spark_write() works as expected", {
 
 test_that("spark_read_avro() works as expected", {
   test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
+  skip_databricks_connect()
 
   schema <- list(
     type = "record",
