@@ -156,7 +156,10 @@ start_shell <- function(master,
                         shell_args = NULL,
                         service = FALSE,
                         remote = FALSE,
-                        batch = NULL) {
+                        batch = NULL,
+                        gateway_connect_attempts = 5,
+                        gateway_connect_retry_interval_s = 0.25,
+                        gateway_connect_retry_interval_multiplier = 2) {
 
   gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
   gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
@@ -360,39 +363,49 @@ start_shell <- function(master,
     gatewayPort <- as.integer(spark_config_value_retries(config, "sparklyr.gateway.port", "8880", gatewayConfigRetries))
     gatewayAddress <- spark_config_value_retries(config, "sparklyr.gateway.address", "localhost", gatewayConfigRetries)
 
-    withCallingHandlers({
-      # connect and wait for the service to start
-      gatewayInfo <- spark_connect_gateway(gatewayAddress,
-                                           gatewayPort,
-                                           sessionId,
-                                           config = config,
-                                           isStarting = TRUE)
-    }, error = function(e) {
-      abort_shell(
-        paste(
-          "Failed while connecting to sparklyr to port (",
-          gatewayPort,
-          if (spark_master_is_yarn_cluster(master, config)) {
-            paste0(
-              ") and address (",
-              gatewayAddress
-            )
-          }
-          else {
-            ""
-          },
-          ") for sessionid (",
-          sessionId,
-          "): ",
-          e$message,
-          sep = ""
-        ),
-        spark_submit_path,
-        shell_args,
-        output_file,
-        error_file
-      )
-    })
+    while (gateway_connect_attempts > 0) {
+      gateway_connect_attempts <- gateway_connect_attempts - 1
+      withCallingHandlers({
+        # connect and wait for the service to start
+        gatewayInfo <- spark_connect_gateway(gatewayAddress,
+                                             gatewayPort,
+                                             sessionId,
+                                             config = config,
+                                             isStarting = TRUE)
+        break
+      }, error = function(e) {
+        if (gateway_connect_attempts > 0) {
+          Sys.sleep(gateway_connect_retry_interval_s)
+          gateway_connect_retry_interval_s <-
+            gateway_connect_retry_interval_s * gateway_connect_retry_interval_multiplier
+        } else {
+          abort_shell(
+            paste(
+              "Failed while connecting to sparklyr to port (",
+              gatewayPort,
+              if (spark_master_is_yarn_cluster(master, config)) {
+                paste0(
+                  ") and address (",
+                  gatewayAddress
+                )
+              }
+              else {
+                ""
+              },
+              ") for sessionid (",
+              sessionId,
+              "): ",
+              e$message,
+              sep = ""
+            ),
+            spark_submit_path,
+            shell_args,
+            output_file,
+            error_file
+          )
+        }
+      })
+    }
   }
 
   # batch connections only use the shell to submit an application, not to connect.
