@@ -159,10 +159,13 @@ jobs:
         run: source ./ci/install_r_dependencies.sh
         continue-on-error: true
       - name: Build
+        env:
+          WARNINGS_ARE_ERRORS: 1
         run: R CMD build .
       - name: Check
         env:
           _R_CHECK_FORCE_SUGGESTS_: false
+          WARNINGS_ARE_ERRORS: 1
         run: R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
       - name: Install sparklyr and other required package(s) from source
         run: Rscript ci/.ci.R --install_pkgs
