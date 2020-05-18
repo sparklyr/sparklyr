@@ -4,6 +4,7 @@ sc <- testthat_spark_connection()
 
 test_that("to_avro and from_avro work properly", {
   test_requires_version("2.4.0")
+  skip_databricks_connect()
 
   df <- tibble::tibble(
     student = list(
