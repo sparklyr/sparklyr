@@ -6,6 +6,15 @@
 \usage{
 transform_sdf(x, cols, fn)
 }
+\arguments{
+\item{x}{An object coercible to a Spark DataFrame}
+
+\item{cols}{Subset of columns to apply transformation to}
+
+\item{fn}{Transformation function taking column name as the 1st parameter, the
+corresponding \code{org.apache.spark.sql.Column} object as the 2nd parameter,
+and returning a transformed \code{org.apache.spark.sql.Column} object}
+}
 \description{
 transform a subset of column(s) in a Spark Dataframe
 }

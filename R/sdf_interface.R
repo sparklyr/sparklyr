@@ -527,6 +527,12 @@ sdf_drop_duplicates <- function(x, cols = NULL) {
 }
 
 #' transform a subset of column(s) in a Spark Dataframe
+#'
+#' @param x An object coercible to a Spark DataFrame
+#' @param cols Subset of columns to apply transformation to
+#' @param fn Transformation function taking column name as the 1st parameter, the
+#'  corresponding \code{org.apache.spark.sql.Column} object as the 2nd parameter,
+#'  and returning a transformed \code{org.apache.spark.sql.Column} object
 transform_sdf <- function(x, cols, fn) {
   all_cols <- colnames(x)
   sdf <- spark_dataframe(x)
