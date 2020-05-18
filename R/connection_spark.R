@@ -114,6 +114,8 @@ spark_connect <- function(master,
                           config = spark_config(),
                           extensions = sparklyr::registered_extensions(),
                           packages = NULL,
+                          conn_attempts = 4,
+                          conn_retry_interval_s = 0.5,
                           ...)
 {
   # validate method
@@ -183,60 +185,92 @@ spark_connect <- function(master,
   if (spark_master_is_gateway(master))
     method <- "gateway"
 
+  scon <- NULL
+  conn_impl <- NULL
+  conn_params <- NULL
   # spark-shell (local install of spark)
   if (method == "shell" || method == "qubole" || method == "databricks-connect") {
-    scon <- shell_connection(master = master,
-                             spark_home = spark_home,
-                             method = method,
-                             app_name = app_name,
-                             version = version,
-                             hadoop_version = hadoop_version,
-                             shell_args = shell_args,
-                             config = config,
-                             service = spark_config_value(
-                               config,
-                               "sparklyr.gateway.service",
-                               FALSE),
-                             remote = spark_config_value(
-                               config,
-                               "sparklyr.gateway.remote",
-                               spark_master_is_yarn_cluster(master, config)),
-                             extensions = extensions,
-                             batch = NULL)
-    if (method != "shell") {
-      scon$method <- method
-    }
+    conn_impl <- shell_connection
+    conn_params <- list(master = master,
+                    spark_home = spark_home,
+                    method = method,
+                    app_name = app_name,
+                    version = version,
+                    hadoop_version = hadoop_version,
+                    shell_args = shell_args,
+                    config = config,
+                    service = spark_config_value(
+                      config,
+                      "sparklyr.gateway.service",
+                      FALSE),
+                    remote = spark_config_value(
+                      config,
+                      "sparklyr.gateway.remote",
+                      spark_master_is_yarn_cluster(master, config)),
+                    extensions = extensions,
+                    batch = NULL)
   } else if (method == "livy") {
-    scon <- livy_connection(master = master,
-                            config = config,
-                            app_name,
-                            version,
-                            hadoop_version ,
-                            extensions)
+    conn_impl <- livy_connection
+    conn_params <- list(master = master,
+                        config = config,
+                        app_name,
+                        version,
+                        hadoop_version ,
+                        extensions)
   } else if (method == "gateway") {
-    scon <- gateway_connection(master = master, config = config)
+    conn_impl <- gateway_connection
+    conn_params <- list(master = master, config = config)
   } else if (method == "databricks") {
-    scon <- databricks_connection(config = config,
-                                  extensions)
+    conn_impl <- databricks_connection
+    conn_params <- list(config = config, extensions)
   } else if (method == "test") {
-    scon <- test_connection(master = master,
-                            config = config,
-                            app_name,
-                            version,
-                            hadoop_version ,
-                            extensions)
+    conn_impl <- test_connection
+    conn_params <- list(master = master,
+                        config = config,
+                        app_name,
+                        version,
+                        hadoop_version,
+                        extensions)
   } else {
-    # other methods
-
     stop("Unsupported connection method '", method, "'")
   }
 
-  scon$state$hive_support_enabled <- spark_config_value(
-    config,
-    name = "sparklyr.connect.enablehivesupport",
-    default = TRUE
-  )
-  scon <- initialize_connection(scon)
+  for (attempt in seq(conn_attempts)) {
+    withCallingHandlers(
+      {
+        scon <- do.call(conn_impl, conn_params)
+
+        if (method == "shell" || method == "qubole" || method == "databricks-connect") {
+          if (method != "shell") {
+            scon$method <- method
+          }
+        }
+
+        scon$state$hive_support_enabled <- spark_config_value(
+          config,
+          name = "sparklyr.connect.enablehivesupport",
+          default = TRUE
+        )
+        scon <- initialize_connection(scon)
+
+        scon
+      },
+      error = function(e) {
+        if (attempt < conn_attempts) {
+          warning(
+            "Failed to establish Spark connection:",
+            e,
+            "\n",
+            sys.calls(),
+            "\nRetrying..."
+          )
+          Sys.sleep(conn_retry_interval_s)
+        }else {
+          stop("Unable to establish Spark connection:", e)
+        }
+      }
+    )
+  }
 
   # initialize extensions
   if (length(scon$extensions) > 0) {
