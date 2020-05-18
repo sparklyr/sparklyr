@@ -8,6 +8,9 @@ spark_avro_package_name <- function(spark_version) {
 
   if (spark_version < "2.4.0") stop("Avro requires Spark 2.4.0 or newer")
 
+  # temporary workaround for databricks connect use case
+  if (identical(spark_version, "2.4.6-SNAPSHOT")) spark_version <- "2.4.5"
+
   scala_version <- if (spark_version >= "3.0.0") "2.12" else "2.11"
   paste0(
     "org.apache.spark:spark-avro_",
@@ -18,12 +21,17 @@ spark_avro_package_name <- function(spark_version) {
 }
 
 validate_spark_avro_pkg_version <- function(sc) {
-  # get the full Spark version including possible suffixes such as "-preview"
-  full_spark_version <- invoke(spark_context(sc), "version")
-  spark_avro_pkg <- spark_avro_package_name(full_spark_version)
-  if (!spark_avro_pkg %in% sc$config$`sparklyr.shell.packages`)
-    stop("Avro support must be enabled with ",
-         "`spark_connect(..., version = <version>, packages = c(\"avro\", <other package(s)>), ...)` ",
-         " or by explicitly including '", spark_avro_pkg, "' for Spark version ",
-         full_spark_version, " in list of packages")
+  if ("databricks_connection" %in% class(sc)) {
+    # skip this validation for databricks connection for now
+    invisible(NULL)
+  } else {
+    # get the full Spark version including possible suffixes such as "-preview"
+    full_spark_version <- invoke(spark_context(sc), "version")
+    spark_avro_pkg <- spark_avro_package_name(full_spark_version)
+    if (!spark_avro_pkg %in% sc$config$`sparklyr.shell.packages`)
+      stop("Avro support must be enabled with ",
+           "`spark_connect(..., version = <version>, packages = c(\"avro\", <other package(s)>), ...)` ",
+           " or by explicitly including '", spark_avro_pkg, "' for Spark version ",
+           full_spark_version, " in list of packages")
+  }
 }
