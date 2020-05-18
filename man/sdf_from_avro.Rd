@@ -4,12 +4,17 @@
 \alias{sdf_from_avro}
 \title{Convert column(s) from avro format}
 \usage{
-sdf_from_avro(x, cols = colnames(x))
+sdf_from_avro(x, cols)
 }
 \arguments{
 \item{x}{An object coercible to a Spark DataFrame}
 
-\item{cols}{Subset of Columns to convert from avro format}
+\item{cols}{Named list of columns to transform from Avro format plus a valid Avro
+schema string for each column, where column names are keys and column schema strings
+are values (e.g.,
+\code{c(example_primitive_col = "string",
+example_complex_col = "{\"type\":\"record\",\"name\":\"person\",\"fields\":[
+{\"name\":\"person_name\",\"type\":\"string\"}, {\"name\":\"person_id\",\"type\":\"long\"}]}")}}
 }
 \description{
 Convert column(s) from avro format

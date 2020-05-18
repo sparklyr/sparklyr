@@ -1052,7 +1052,7 @@ spark_read_avro <- function(sc,
 #' \code{spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0-preview2", <other package(s)>), ...)}).
 #'
 #' @inheritParams spark_write_csv
-#" @param avro_schema Optional Avro schema in JSON format
+#' @param avro_schema Optional Avro schema in JSON format
 #' @param record_name Optional top level record name in write result (default: "topLevelRecord")
 #' @param record_namespace Record namespace in write result (default: "")
 #' @param compression Compression codec to use (default: "snappy")

@@ -20,6 +20,8 @@ spark_write_avro(
 \item{path}{The path to the file. Needs to be accessible from the cluster.
 Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 
+\item{avro_schema}{Optional Avro schema in JSON format}
+
 \item{record_name}{Optional top level record name in write result (default: "topLevelRecord")}
 
 \item{record_namespace}{Record namespace in write result (default: "")}
