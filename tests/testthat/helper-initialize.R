@@ -94,6 +94,7 @@ testthat_shell_connection <- function(method = "shell") {
     config[["sparklyr.shell.driver-memory"]] <- "3G"
     config[["sparklyr.apply.env.foo"]] <- "env-test"
     config[["spark.sql.warehouse.dir"]] <- get_spark_warehouse_dir()
+    config[["sparklyr.log.invoke"]] <- TRUE
 
     packages <- if (version >= "2.4.0") "avro" else NULL
 

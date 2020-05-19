@@ -173,10 +173,14 @@ jobs:
         run: Rscript ci/.ci.R --verify-embedded-srcs
       - name: Run tests
         run: |
-          export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
+          export SPARKLYR_LOG_FILE=~/sparklyr.log
           if [[ $ARROW_ENABLED == "true" ]]; then Rscript ci/.ci.R --arrow $ARROW_BRANCH; fi
           if [[ $CODE_COVERAGE == "true" ]]; then
             Rscript ci/.ci.R --coverage
           else
             Rscript ci/.ci.R --testthat
           fi
+      - name: Make sparklyr.log file available for debugging test failure
+        if: ${{ failure() }}
+        run: |
+          cat ~/sparklyr.log

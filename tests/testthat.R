@@ -100,6 +100,13 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                          dplyr::mutate(time = format(time, digits = "3", scientific = F)) %>%
                                          dplyr::pull()
 
+                                       if (self$n_fail > 0) {
+                                         cat("\n")
+                                         cat("--- Spark log:  ----\n\n")
+                                         cat(sparklyr::spark_log(get(".testthat_spark_connection", envir = .GlobalEnv)))
+                                         cat("\n")
+                                       }
+
                                        cat("\n")
                                        cat("--- Performance Summary  ----\n\n")
                                        print(as.data.frame(summary), row.names = FALSE)

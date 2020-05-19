@@ -29,6 +29,8 @@ class JVMObjectTracker {
   }
 
   def remove(id: String): Option[Object] = {
+    val logger = new Logger("Tracker", 0)
+    logger.log("removing " + id)
     Option(objMap.remove(id))
   }
 }
