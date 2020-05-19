@@ -84,6 +84,7 @@ jobj_create <- function(con, objId) {
   # finalizers for environments or external references pointers.
   obj <- structure(new.env(parent = emptyenv()), class = c("spark_jobj", jobj_subclass(con)))
   obj$id <- objId
+  lockEnvironment(obj, bindings = TRUE)
 
   # Register a finalizer to remove the Java object when this reference
   # is garbage collected in R
