@@ -26,4 +26,4 @@
 
 | Name              |   Company    |           Email           | GitHub ID           |
 | ----------------- | :----------: | :-----------------------: | ------------------- |
-| Javier Luraschi   |   RStudio    |    javiere@rstudio.com    |   javierluraschi    |
+| Javier Luraschi   |   RStudio    |    javier@rstudio.com     |   javierluraschi    |
