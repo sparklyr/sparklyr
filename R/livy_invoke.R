@@ -43,9 +43,9 @@ livy_invoke_deserialize <- function(sc, base64) {
     })
   }
 
-  class(rc) <- c(class(rc), "livy_backend")
+  conn <- structure(list(rc = rc, state = sc$state), class = c("livy_backend"))
 
-  object <- readObject(rc)
+  object <- readObject(conn)
   close(rc)
 
   attach_connection(object, sc)

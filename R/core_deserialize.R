@@ -54,6 +54,10 @@ read_bin.spark_worker_connection <- function(con, what, n, endian = NULL) {
   read_bin_wait(con, what, n, endian)
 }
 
+read_bin.livy_backend <- function(con, what, n, endian = NULL) {
+  read_bin.default(con$rc, what, n, endian)
+}
+
 readObject <- function(con) {
   # Read type first
   type <- readType(con)

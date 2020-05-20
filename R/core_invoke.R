@@ -127,10 +127,11 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
   connection_name <- core_invoke_socket_name(sc)
 
   if (!identical(object, "Handler")) {
-    objsToRemove <- ls(.toRemoveJobjs)
+    toRemoveJobjs <- sc$state$toRemoveJobjs
+    objsToRemove <- ls(toRemoveJobjs)
     if (length(objsToRemove) > 0) {
       core_remove_jobjs(sc, objsToRemove)
-      rm(list = objsToRemove, envir = .toRemoveJobjs)
+      rm(list = objsToRemove, envir = toRemoveJobjs)
     }
   }
 

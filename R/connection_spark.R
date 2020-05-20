@@ -231,6 +231,12 @@ spark_connect <- function(master,
     stop("Unsupported connection method '", method, "'")
   }
 
+  # Maintain a reference count of Java object references
+  # This allows us to GC the java object when it is safe
+  scon$state$validJobjs <- new.env(parent = emptyenv())
+  # List of object ids to be removed
+  scon$state$toRemoveJobjs <- new.env(parent = emptyenv())
+
   scon$state$hive_support_enabled <- spark_config_value(
     config,
     name = "sparklyr.connect.enablehivesupport",

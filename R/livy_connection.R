@@ -830,7 +830,7 @@ livy_load_scala_sources <- function(sc) {
 
 #' @export
 initialize_connection.livy_connection <- function(sc) {
-  tryCatch({
+  withCallingHandlers({
 
     if (spark_config_value(sc$config, "sparklyr.livy.sources", TRUE)) {
       livy_load_scala_sources(sc)
@@ -878,7 +878,11 @@ initialize_connection.livy_connection <- function(sc) {
 
     sc
   }, error = function(err) {
-    stop("Failed to initialize livy connection: ", err$message)
+    stop("Failed to initialize livy connection: ",
+         err$message,
+         "\n\ncallstack:\n",
+         paste(sys.calls(), collapse = "\n")
+    )
   })
 }
 

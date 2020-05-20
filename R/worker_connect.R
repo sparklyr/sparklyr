@@ -48,12 +48,15 @@ spark_worker_connect <- function(
     method = "shell",
     app_name = NULL,
     config = NULL,
+    state = new.env(),
     # spark_shell_connection
     spark_home = NULL,
     backend = backend,
     gateway = gatewayInfo$gateway,
     output_file = NULL
   ))
+  sc$state$validJobjs <- new.env(parent = emptyenv())
+  sc$state$toRemoveJobjs <- new.env(parent = emptyenv())
 
   worker_log("created connection")
 
