@@ -1,4 +1,4 @@
-# Changing this file requires running configure.R to rebuild sources and jars.
+# Changing this file requires running update_embedded_sources.R to rebuild sources and jars.
 
 # Someday this setting may depend on the Spark version
 arrow_env_vars <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
