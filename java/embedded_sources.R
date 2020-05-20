@@ -19,7 +19,9 @@ arrow_write_record_batch <- function(df) {
       x
     })
 
-    return(write_to_raw(df, format = "stream"))
+    return(withr::with_envvar(arrow_env_vars, {
+      write_to_raw(df, format = "stream")
+    }))
   }
 
   record_batch <- get_arrow_function("record_batch")
