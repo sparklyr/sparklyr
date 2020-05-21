@@ -296,6 +296,7 @@ test_that("invoke() can roundtrip POSIXlt fields", {
       as.POSIXlt(Sys.time(), "GMT")
     )
   )
+  succeed()
 })
 
 test_that("invoke() can roundtrip collect fields", {
@@ -308,6 +309,7 @@ test_that("invoke() can roundtrip collect fields", {
       as.POSIXlt(Sys.time(), "GMT")
     )
   )
+  succeed()
 })
 
 test_that("collect() can retrieve as.POSIXct fields with timezones", {

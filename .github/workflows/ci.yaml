@@ -150,11 +150,11 @@ jobs:
         uses: actions/cache@master
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: sparklyr-${{ runner.os }}-r-${{ matrix.r }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('DESCRIPTION') }}
-          restore-keys: sparklyr-${{ runner.os }}-r-${{ matrix.r }}-${{ env.ARROW_ENABLED }}
+          key: sparklyr-${{ runner.os }}-r-${{ matrix.r }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('DESCRIPTION') }}-${{ hashFiles('ci/install_r_dependencies.sh') }}
+          restore-keys: sparklyr-${{ runner.os }}-r-${{ matrix.r }}
       - name: Install system dependencies
         run: |
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libsodium23 libsodium-dev libwebp6 libwebp-dev libcurl4 libcurl4-openssl-dev libhiredis0.13 libhiredis-dev libudunits2-0 libudunits2-dev
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libsodium23 libsodium-dev libwebp6 libwebp-dev libcurl4 libcurl4-gnutls-dev libhiredis0.13 libhiredis-dev libudunits2-0 libudunits2-dev libraptor2-dev librasqal3-dev librdf0-dev
       - name: Install dependencies
         run: source ./ci/install_r_dependencies.sh
         continue-on-error: true

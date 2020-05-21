@@ -2,7 +2,7 @@ args <- commandArgs(trailingOnly=TRUE)
 
 ensure_pkgs <- function(pkgs) {
   for (pkg in pkgs)
-    if (!require(pkg))
+    if (!require(pkg, character.only = TRUE))
       install.packages(pkg)
 }
 
