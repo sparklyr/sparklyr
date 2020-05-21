@@ -4,7 +4,9 @@ export MAKEFLAGS="-j$(($(nproc) + 1))"
 
 TEST_DEPS="broom \
            diffobj \
+           e1071 \
            foreach \
+           glmnet \
            ggplot2 \
            iterators \
            janeaustenr \
