@@ -1,6 +1,7 @@
 context("Spark SQL higher-order function wrappers for dplyr")
 
 test_requires("dplyr")
+
 sc <- testthat_spark_connection()
 test_tbl <- testthat_tbl(
   name = "hof_test_data",
@@ -19,6 +20,7 @@ expect_data_equal <- function(actual, expected) {
 
 test_that("'hof_transform' creating a new column", {
   test_requires_version("2.4.0")
+
   sq <- test_tbl %>%
     hof_transform(dest_col = z, expr = x, func = x %->% (x * x)) %>%
     sdf_collect()
@@ -36,6 +38,7 @@ test_that("'hof_transform' creating a new column", {
 
 test_that("'hof_transform' overwriting an existing column", {
   test_requires_version("2.4.0")
+
   sq <- test_tbl %>%
     hof_transform(dest_col = x, expr = x, func = x %->% (x * x)) %>%
     sdf_collect()
@@ -52,6 +55,7 @@ test_that("'hof_transform' overwriting an existing column", {
 
 test_that("'hof_transform' works with array(...) expression", {
   test_requires_version("2.4.0")
+
   sq <- test_tbl %>%
     hof_transform(dest_col = v, expr = array(v - 9, v - 8), func = x %->% (x * x)) %>%
     sdf_collect()
@@ -68,6 +72,7 @@ test_that("'hof_transform' works with array(...) expression", {
 
 test_that("'hof_filter' creating a new column", {
   test_requires_version("2.4.0")
+
   filtered <- test_tbl %>%
     hof_filter(dest_col = mod_3_is_0_or_1, expr = x, func = x %->% (x %% 3 != 2)) %>%
     sdf_collect()
@@ -85,6 +90,7 @@ test_that("'hof_filter' creating a new column", {
 
 test_that("'hof_filter' overwriting an existing column", {
   test_requires_version("2.4.0")
+
   filtered <- test_tbl %>%
     hof_filter(dest_col = x, expr = x, func = x %->% (x %% 3 != 2)) %>%
     sdf_collect()
@@ -101,6 +107,7 @@ test_that("'hof_filter' overwriting an existing column", {
 
 test_that("'hof_filter' works with array(...) expression", {
   test_requires_version("2.4.0")
+
   filtered <- test_tbl %>%
     hof_filter(dest_col = v, expr = array(8, v - 1, v + 1), func = x %->% (x %% 3 == 2)) %>%
     sdf_collect()
@@ -117,6 +124,7 @@ test_that("'hof_filter' works with array(...) expression", {
 
 test_that("'hof_aggregate' creating a new column", {
   test_requires_version("2.4.0")
+
   agg <- test_tbl %>%
     hof_aggregate(
       dest_col = sum,
@@ -139,6 +147,7 @@ test_that("'hof_aggregate' creating a new column", {
 
 test_that("'hof_aggregate' overwriting an existing column", {
   test_requires_version("2.4.0")
+
   agg <- test_tbl %>%
     hof_aggregate(
       dest_col = x,
@@ -160,6 +169,7 @@ test_that("'hof_aggregate' overwriting an existing column", {
 
 test_that("'hof_aggregate' works with array(...) expression", {
   test_requires_version("2.4.0")
+
   agg <- test_tbl %>%
     hof_aggregate(
       dest_col = sum,
@@ -182,6 +192,7 @@ test_that("'hof_aggregate' works with array(...) expression", {
 
 test_that("'hof_aggregate' applies 'finish' transformation correctly", {
   test_requires_version("2.4.0")
+
   agg <- test_tbl %>%
     hof_aggregate(
       dest_col = x,
@@ -204,6 +215,7 @@ test_that("'hof_aggregate' applies 'finish' transformation correctly", {
 
 test_that("'hof_exists' creating a new column", {
   test_requires_version("2.4.0")
+
   res <- test_tbl %>%
     hof_exists(
       dest_col = found,
@@ -225,6 +237,7 @@ test_that("'hof_exists' creating a new column", {
 
 test_that("'hof_exists' overwriting an existing column", {
   test_requires_version("2.4.0")
+
   res <- test_tbl %>%
     hof_exists(
       dest_col = x,
@@ -245,6 +258,7 @@ test_that("'hof_exists' overwriting an existing column", {
 
 test_that("'hof_exists' works with array(...) expression", {
   test_requires_version("2.4.0")
+
   res <- test_tbl %>%
     hof_exists(
       dest_col = x,
@@ -299,6 +313,7 @@ test_that("'hof_exists' works with array(...) expression", {
 
 test_that("'hof_zip_with' creating a new column", {
   test_requires_version("2.4.0")
+
   res <- test_tbl %>%
     hof_zip_with(
       dest_col = product,
@@ -321,6 +336,7 @@ test_that("'hof_zip_with' creating a new column", {
 
 test_that("'hof_zip_with' overwriting an existing column", {
   test_requires_version("2.4.0")
+
   res <- test_tbl %>%
     hof_zip_with(
       dest_col = x,
@@ -342,6 +358,7 @@ test_that("'hof_zip_with' overwriting an existing column", {
 
 test_that("'hof_zip_with' works with array(...) expression", {
   test_requires_version("2.4.0")
+
   res <- test_tbl %>%
     hof_zip_with(
       dest_col = x,
@@ -357,6 +374,30 @@ test_that("'hof_zip_with' works with array(...) expression", {
       v = c(11, 12),
       x = list(c(6, 11, 55, 68), c(6, 12, 60, 68)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8))
+    )
+  )
+})
+
+test_that("accessing struct field inside lambda expression", {
+  test_requires_version("2.4.0")
+
+  res <- test_tbl %>%
+    dplyr::mutate(array_of_structs = array(struct(v), named_struct("v", -1))) %>%
+    hof_transform(
+      dest_col = w,
+      expr = array_of_structs,
+      func = s %->% (s$v)
+    ) %>%
+    sdf_collect()
+
+  expect_data_equal(
+    res,
+    tibble::tibble(
+      v = c(11, 12),
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      array_of_structs = list(list(list(v = 11), list(v = -1)), list(list(v = 12), list(v = -1))),
+      w = list(c(11, -1), c(12, -1)),
     )
   )
 })
