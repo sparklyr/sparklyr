@@ -175,7 +175,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     get("library")("arrow")
   }
 
-  on.exit({ spark_disconnect_all() ; livy_service_stop() })
+  on.exit({ spark_disconnect_all() ; tryCatch(livy_service_stop(), error = function(e) {}) })
 
   test_check("sparklyr", filter = test_filter, reporter = "performance")
 }
