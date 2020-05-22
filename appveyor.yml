@@ -33,7 +33,7 @@ build_script:
   - travis-tool.sh install_deps
 
 test_script:
-  - Rscript ci/.ci.R --testthat
+  - Rscript -e "install.packages(\".\", repo = NULL, type = \"source\")" && Rscript ci/.ci.R --testthat
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
