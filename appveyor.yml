@@ -33,7 +33,7 @@ build_script:
   - travis-tool.sh install_deps
 
 test_script:
-  - travis-tool.sh run_tests && NOT_CRAN='true' Rscript ci/.ci.R --testthat
+  - Rscript ci/.ci.R --testthat
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
