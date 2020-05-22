@@ -48,6 +48,14 @@ print_jobj <- function(sc, jobj, ...) {
   UseMethod("print_jobj")
 }
 
+create_jobj_envs <- function(sc) {
+  # Maintain a reference count of Java object references
+  # This allows us to GC the java object when it is safe
+  sc$state$validJobjs <- new.env(parent = emptyenv())
+  # List of object ids to be removed
+  sc$state$toRemoveJobjs <- new.env(parent = emptyenv())
+}
+
 # Check if jobj points to a valid external JVM object
 isValidJobj <- function(jobj) {
   exists("connection", jobj) && exists(jobj$id, jobj$connection$state$validJobjs)

@@ -62,6 +62,9 @@ new_databricks_connection <- function(scon, guid) {
     scon,
     class = "databricks_connection"
   )
+
+  create_jobj_envs(sc)
+
   # In databricks, sparklyr should use the SqlContext associated with the RDriverLocal instance for
   # this guid.
   r_driver_local <- "com.databricks.backend.daemon.driver.RDriverLocal"
