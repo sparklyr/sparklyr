@@ -386,6 +386,8 @@ test_that("environments are sent to Scala Maps (#1058)", {
 
 test_that("collect() can retrieve nested list efficiently", {
   skip_databricks_connect()
+  skip_on_windows()
+
   if (spark_version(sc) < "2.0.0") skip("performance improvement not available")
 
   temp_json <- tempfile(fileext = ".json")
