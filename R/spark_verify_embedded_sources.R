@@ -32,7 +32,10 @@ spark_verify_embedded_sources <- function() {
         print(diff)
         stop(c(
           "Embedded sources from '", sparklyr_jar, "' is not up-to-date!\n\n",
-          "Please run 'Rscript update_embedded_sources.R' to fix this error."
+          "Please run 'Rscript update_embedded_sources.R' to fix this error ",
+          "(also see ",
+          "https://github.com/sparklyr/sparklyr/wiki/Development#updating-embedded-sources",
+          " for mode detail)"
         ))
       }
     } else {
