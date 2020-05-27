@@ -1,5 +1,32 @@
 #' @include spark_data_build_types.R
 
+spark_serialize <- function(sc, df, columns, repartition) {
+  structType <- spark_data_build_types(sc, columns)
+
+  # Map date and time columns as standard doubles
+  df <- as.data.frame(lapply(df, function(e) {
+    if (inherits(e, "POSIXt") || inherits(e, "Date"))
+      sapply(e, function(t) {
+        class(t) <- NULL
+        t
+      })
+    else
+      e
+  }), optional = TRUE)
+
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "createDataFrameFromColumnArr",
+    spark_context(sc),
+    lapply(colnames(df), function(x) as.list(df[[x]])),
+    columns,
+    as.integer(if (repartition <= 0) 1 else repartition)
+  )
+
+  invoke(hive_context(sc), "createDataFrame", rdd, structType)
+}
+
 spark_serialize_csv_file <- function(sc, df, columns, repartition) {
 
   # generate a CSV file from the associated data frame
@@ -224,16 +251,13 @@ spark_data_copy <- function(
                   ifelse(
                     arrow_enabled(sc, df),
                     "arrow",
-                    ifelse(
-                      spark_connection_in_driver(sc),
-                      "csv_file_scala",
-                      getOption("sparklyr.copy.serializer", "csv_string")
-                    )
+                    getOption("sparklyr.copy.serializer", "default")
                   ),
                   serializer
                 )
 
   serializers <- list(
+    "default" = spark_serialize,
     "csv_file" = spark_serialize_csv_file,
     "csv_string" = spark_serialize_csv_string,
     "csv_file_scala" = spark_serialize_csv_scala,

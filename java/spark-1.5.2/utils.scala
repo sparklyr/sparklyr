@@ -241,6 +241,35 @@ object Utils {
     sc.parallelize(data, partitions)
   }
 
+  def createDataFrameFromColumnArr(
+    sc: SparkContext,
+    columnArr: Array[_],
+    columns: Array[String],
+    partitions: Int
+  ): RDD[Row] = {
+    if (columnArr.isEmpty) {
+      sc.emptyRDD
+    } else {
+      val numCols: Int = columnArr.size
+      val numRows: Int = columnArr(0).asInstanceOf[Array[_]].size
+      val data = (0 until numRows).map(rowIdx => {
+        org.apache.spark.sql.Row.fromSeq(
+          (0 until numCols).map(colIdx => {
+            val column = columns(colIdx)
+            val value = columnArr(colIdx).asInstanceOf[Array[_]](rowIdx)
+
+            column match {
+              case "timestamp" => Try(new java.sql.Timestamp(value.asInstanceOf[Long] * 1000)).getOrElse(null)
+              case "date" => Try(new java.sql.Date(value.asInstanceOf[Long] * 86400000)).getOrElse(null)
+              case _ => if (value == "NA") null else value
+            }
+          })
+        )
+      })
+      sc.parallelize(data, partitions)
+    }
+  }
+
   def createDataFrameFromText(
     sc: SparkContext,
     rows: Array[String],
