@@ -252,9 +252,9 @@ object Utils {
     } else {
       val numCols: Int = columnArr.size
       val numRows: Int = columnArr(0).asInstanceOf[Array[_]].size
-      val data = (0 until numRows).map(rowIdx => {
+      val data = (0 until numRows).par.map(rowIdx => {
         org.apache.spark.sql.Row.fromSeq(
-          (0 until numCols).map(colIdx => {
+          (0 until numCols).par.map(colIdx => {
             val column = columns(colIdx)
             val value = columnArr(colIdx).asInstanceOf[Array[_]](rowIdx)
 
@@ -263,9 +263,9 @@ object Utils {
               case "date" => Try(new java.sql.Date(value.asInstanceOf[Long] * 86400000)).getOrElse(null)
               case _ => if (value == "NA") null else value
             }
-          })
+          }).seq
         )
-      })
+      }).seq
       sc.parallelize(data, partitions)
     }
   }
