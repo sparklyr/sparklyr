@@ -292,6 +292,6 @@ ml_recommend <- function(model, type = c("items", "users"), n = 1) {
   (switch(type,
           items = model$recommend_for_all_users,
           users = model$recommend_for_all_items))(n) %>%
-    mutate(recommendations = explode(!!as.name("recommendations"))) %>%
+    dplyr::mutate(recommendations = explode(!!as.name("recommendations"))) %>%
     sdf_separate_column("recommendations")
 }
