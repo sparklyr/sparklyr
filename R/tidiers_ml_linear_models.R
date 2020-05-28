@@ -100,9 +100,9 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   # instead of calling the MLlib API.
   if (type.residuals == "working") {
     predictions <- ml_predict(x, newdata) %>%
-      rename(fitted = !!rlang::sym("prediction"))
+      dplyr::rename(fitted = !!rlang::sym("prediction"))
     return(predictions %>%
-             mutate(resid = `-`(!!sym(x$response), !!sym("fitted")))
+             dplyr::mutate(resid = `-`(!!sym(x$response), !!sym("fitted")))
     )
   }
 
@@ -112,8 +112,8 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   residuals <- sdf_residuals(x, type = type.residuals)
   ml_predict(x, newdata = residuals) %>%
     # Two calls to 'rename': https://github.com/sparklyr/sparklyr/issues/678
-    rename(fitted = !!"prediction") %>%
-    rename(resid = !!"residuals")
+    dplyr::rename(fitted = !!"prediction") %>%
+    dplyr::rename(resid = !!"residuals")
 }
 
 #' @rdname ml_glm_tidiers
