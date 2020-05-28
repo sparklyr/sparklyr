@@ -33,6 +33,42 @@ pipeline {
                 }
             }
         }
+        stage("Test sparklyr on Databricks cluster (not Databricks Connect)") {
+            steps {
+                script {
+                    def repo = sh(script: "git remote get-url origin | cut -d/ -f 4,5", returnStdout: true).trim()
+                    print("REPO: " + repo)
+
+                    def sha = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                    print("SHA: " + sha)
+
+                    def output = sh(script: "databricks jobs run-now --job-id 1 --notebook-params '{\"Github repo\": \"${repo}\", \"Commit ref\": \"${sha}\"}'", returnStdout: true)
+                    def runId = readJSON(text: output)["run_id"]
+
+                    // This job takes 2-5 minutes on both successful and failed runs
+                    def timeout = 600;
+                    def sleepDuration = 15;
+                    def jobState;
+                    for(int seconds = 0; seconds < timeout; seconds += sleepDuration) {
+                        def jobInfo = sh(script: "databricks runs get --run-id ${runId}", returnStdout: true)
+                        jobState = readJSON(text: jobInfo)["state"]
+                        print(jobState)
+                        if (jobState["life_cycle_state"] == "TERMINATED") {
+                            break;
+                        }
+                        sleep(sleepDuration)
+                    }
+
+                    if (jobState["result_state"] != "SUCCESS") {
+                        // Fail this stage but continue running other stages
+                        // https://stackoverflow.com/questions/45021622/how-to-continue-past-a-failing-stage-in-jenkins-declarative-pipeline-syntax
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            sh "exit 1"
+                        }
+                    }
+                }
+            }
+        }
         stage("Setting up Databricks Connect") {
             steps {
                 script {
