@@ -19,10 +19,6 @@ arrow_write_record_batch <- function(df, spark_version_number = NULL) {
         x
       })
       arrow::write_to_raw(df, format = "stream")
-    } else if (packageVersion("arrow") < "0.12") {
-      arrow::write_record_batch(arrow::record_batch(df), raw())
-    } else if (packageVersion("arrow") <= "0.13") {
-      arrow::write_arrow(arrow::record_batch(df), raw())
     } else {
       arrow::write_arrow(arrow::record_batch(!!!df), raw())
     }
@@ -30,30 +26,13 @@ arrow_write_record_batch <- function(df, spark_version_number = NULL) {
 }
 
 arrow_record_stream_reader <- function(stream) {
-  if (packageVersion("arrow") < "0.12") {
-    record_batch_stream_reader <- arrow::record_batch_stream_reader
-  } else {
-    record_batch_stream_reader <- arrow::RecordBatchStreamReader
-  }
-
-  if (packageVersion("arrow") > "0.14") {
-    record_batch_stream_reader <- record_batch_stream_reader$create
-  }
-  record_batch_stream_reader(stream)
+  arrow::RecordBatchStreamReader$create(stream)
 }
 
 arrow_read_record_batch <- function(reader) {
-  if (packageVersion("arrow") < "0.12") {
-    arrow::read_record_batch(reader)
-  } else {
-    reader$read_next_batch()
-  }
+  reader$read_next_batch()
 }
 
 arrow_as_tibble <- function(record) {
-  if (packageVersion("arrow") <= "0.13") {
-    arrow::as_tibble(record)
-  } else {
-    arrow::as.data.frame(record)
-  }
+  arrow::as.data.frame(record)
 }

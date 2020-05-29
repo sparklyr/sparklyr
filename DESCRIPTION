@@ -58,7 +58,7 @@ Imports:
     xml2,
     ellipsis (>= 0.1.0)
 Suggests:
-    arrow,
+    arrow (>= 0.14.0),
     broom,
     diffobj,
     foreach,
