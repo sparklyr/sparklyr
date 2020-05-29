@@ -48,22 +48,24 @@ print_jobj <- function(sc, jobj, ...) {
   UseMethod("print_jobj")
 }
 
-create_jobj_envs <- function(sc) {
-  # Maintain a reference count of Java object references
-  # This allows us to GC the java object when it is safe
-  sc$state$validJobjs <- new.env(parent = emptyenv())
-  # List of object ids to be removed
-  sc$state$toRemoveJobjs <- new.env(parent = emptyenv())
+get_valid_jobjs <- function(con) {
+  con$state$validJobjs <- con$state$validJobjs %||% new.env(parent = emptyenv())
+  con$state$validJobjs
+}
+
+get_to_remove_jobjs <- function(con) {
+  con$state$toRemoveJobjs <- con$state$toRemoveJobjs %||% new.env(parent = emptyenv())
+  con$state$toRemoveJobjs
 }
 
 # Check if jobj points to a valid external JVM object
 isValidJobj <- function(jobj) {
-  exists("connection", jobj) && exists(jobj$id, jobj$connection$state$validJobjs)
+  exists("connection", jobj) && exists(jobj$id, get_valid_jobs(jobj$connection))
 }
 
 getJobj <- function(con, objId) {
   newObj <- jobj_create(con, objId)
-  validJobjs <- con$state$validJobjs
+  validJobjs <- get_valid_jobjs(con)
   validJobjs[[objId]] <- get0(objId, validJobjs, ifnotfound = 0) + 1
 
   newObj
@@ -133,7 +135,7 @@ jobj_inspect <- function(jobj) {
 cleanup.jobj <- function(jobj) {
   if (isValidJobj(jobj)) {
     objId <- jobj$id
-    validJobjs <- jobj$connection$state$validJobjs
+    validJobjs <- get_valid_jobjs(jobj$connection)
     validJobjs[[objId]] <- validJobjs[[objId]] - 1
 
     if (validJobjs[[objId]] == 0) {
@@ -141,7 +143,7 @@ cleanup.jobj <- function(jobj) {
       # NOTE: We cannot call removeJObject here as the finalizer may be run
       # in the middle of another RPC. Thus we queue up this object Id to be removed
       # and then run all the removeJObject when the next RPC is called.
-      jobj$connection$state$toRemoveJobjs[[objId]] <- 1
+      get_to_remove_jobjs(jobj$connection)[[objId]] <- 1
     }
   }
 }
@@ -149,11 +151,11 @@ cleanup.jobj <- function(jobj) {
 clear_jobjs <- function() {
   scons <- spark_connection_find()
   for (scon in scons) {
-    validJobjs <- scons$state$validJobjs
+    validJobjs <- get_valid_jobjs(scons)
     valid <- ls(validJobjs)
     rm(list = valid, envir = validJobjs)
 
-    toRemoveJobjs <- scons$state$toRemoveJobjs
+    toRemoveJobjs <- get_to_remove_jobjs(scons)
     removeList <- ls(toRemoveJobjs)
     rm(list = removeList, envir = toRemoveJobjs)
   }

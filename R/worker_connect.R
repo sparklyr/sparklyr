@@ -56,8 +56,6 @@ spark_worker_connect <- function(
     output_file = NULL
   ))
 
-  create_jobj_envs(sc)
-
   worker_log("created connection")
 
   sc

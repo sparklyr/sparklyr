@@ -231,11 +231,6 @@ spark_connect <- function(master,
     stop("Unsupported connection method '", method, "'")
   }
 
-  if (method != "databricks") {
-    # For Databricks connections, jobj envs are created already in databricks_connection(...)
-    create_jobj_envs(scon)
-  }
-
   scon$state$hive_support_enabled <- spark_config_value(
     config,
     name = "sparklyr.connect.enablehivesupport",
