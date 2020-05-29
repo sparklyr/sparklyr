@@ -280,7 +280,7 @@ spark_worker_apply_arrow <- function(sc, config) {
         schema_output <- spark_worker_build_types(context, lapply(result, class))
       }
 
-      raw_batch <- arrow_write_record_batch(result)
+      raw_batch <- arrow_write_record_batch(result, spark_version(sc))
 
       all_batches[[length(all_batches) + 1]] <- raw_batch
       total_rows <- total_rows + nrow(result)

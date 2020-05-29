@@ -85,7 +85,7 @@ arrow_copy_to <- function(sc, df, parallelism)
   }
 
   # serialize to arrow
-  bytes <- arrow_write_record_batch(df)
+  bytes <- arrow_write_record_batch(df, spark_version(sc))
 
   # create batches data frame
   batches <- list(bytes)
