@@ -230,7 +230,7 @@ test_that("spark_read_csv() can read verbatim column types", {
 })
 
 test_that("spark_read_csv() can read if embedded nuls present", {
-  skip_on_arrow()
+  skip_on_arrow() # ARROW-6582
 
   fpath <- get_sample_data_path("with_embedded_nul.csv")
   df <- spark_read_csv(sc, name = "test_embedded_nul", path = fpath)
