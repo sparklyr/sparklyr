@@ -33,14 +33,14 @@ pipeline {
                 }
             }
         }
-        stage("Test sparklyr on Databricks cluster (not Databricks Connect)") {
+        stage("Test sparklyr in Databricks notebooks (not Databricks Connect)") {
             steps {
                 script {
                     def repo = sh(script: "git remote get-url origin | cut -d/ -f 4,5", returnStdout: true).trim()
-                    print("REPO: " + repo)
+                    bash "echo ${repo} | tee -a log.txt"
 
                     def sha = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                    print("SHA: " + sha)
+                    bash "echo ${sha} | tee -a log.txt"
 
                     def output = sh(script: "databricks jobs run-now --job-id 1 --notebook-params '{\"Github repo\": \"${repo}\", \"Commit ref\": \"${sha}\"}'", returnStdout: true)
                     def runId = readJSON(text: output)["run_id"]
@@ -52,7 +52,7 @@ pipeline {
                     for(int seconds = 0; seconds < timeout; seconds += sleepDuration) {
                         def jobInfo = sh(script: "databricks runs get --run-id ${runId}", returnStdout: true)
                         jobState = readJSON(text: jobInfo)["state"]
-                        print(jobState)
+                        bash "echo ${jobState} | tee -a log.txt"
                         if (jobState["life_cycle_state"] == "TERMINATED") {
                             break;
                         }
@@ -63,6 +63,8 @@ pipeline {
                         // Fail this stage but continue running other stages
                         // https://stackoverflow.com/questions/45021622/how-to-continue-past-a-failing-stage-in-jenkins-declarative-pipeline-syntax
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            // TODO: better error message
+                            bash "echo 'Stage failed' | tee -a log.txt"
                             sh "exit 1"
                         }
                     }
@@ -86,7 +88,7 @@ pipeline {
                         bash "echo '$dbConnectParamsJson' > ~/.databricks-connect"
 
                         // Smoke test to check if databricks-connect is set up correctly
-                        bash "SPARK_HOME=${sparkHome} databricks-connect test  2>&1 | tee log.txt"
+                        bash "SPARK_HOME=${sparkHome} databricks-connect test  2>&1 | tee -a log.txt"
                     }
                 }
             }
