@@ -60,7 +60,7 @@ get_to_remove_jobjs <- function(con) {
 
 # Check if jobj points to a valid external JVM object
 isValidJobj <- function(jobj) {
-  exists("connection", jobj) && exists(jobj$id, get_valid_jobs(jobj$connection))
+  exists("connection", jobj) && exists(jobj$id, get_valid_jobjs(jobj$connection))
 }
 
 getJobj <- function(con, objId) {
