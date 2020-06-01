@@ -143,7 +143,8 @@ cleanup.jobj <- function(jobj) {
       # NOTE: We cannot call removeJObject here as the finalizer may be run
       # in the middle of another RPC. Thus we queue up this object Id to be removed
       # and then run all the removeJObject when the next RPC is called.
-      get_to_remove_jobjs(jobj$connection)[[objId]] <- 1
+      toRemoveJobjs <- get_to_remove_jobjs(jobj$connection)
+      toRemoveJobjs[[objId]] <- 1
     }
   }
 }
