@@ -59,11 +59,17 @@ pipeline {
                         sleep(sleepDuration)
                     }
 
-                    if (jobState["result_state"] != "SUCCESS") {
+                    def outputRaw = sh(script: "databricks runs get-output --run-id ${runId}", returnStdout: true)
+                    def output = readJSON(outputRaw)["notebook_output"]["result"]
+
+                    print(output)
+                    File logFile = new File("log.txt")
+                    file.append(output)
+
+                    if (jobState["result_state"] != "SUCCESS" || !output.startsWith("NOTEBOOK TEST PASS")) {
                         // Fail this stage but continue running other stages
                         // https://stackoverflow.com/questions/45021622/how-to-continue-past-a-failing-stage-in-jenkins-declarative-pipeline-syntax
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            // TODO: better error message
                             bash "echo 'Stage failed' | tee -a log.txt"
                             sh "exit 1"
                         }
