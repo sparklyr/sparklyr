@@ -11,6 +11,9 @@ spark_update_embedded_sources <- function(jars_to_skip = c()) {
   ensure_directory(srcs_dir)
   srcs <- file.path(srcs_dir, "embedded_sources.R")
   spark_gen_embedded_sources(output = srcs)
+  # also update <repository root>/java/embedded_sources.R to avoid potential
+  # confusion
+  file.copy(from = srcs, to = file.path(pkg_root, "java"), overwrite = TRUE)
 
   sparklyr_jars <- list_sparklyr_jars()
 
