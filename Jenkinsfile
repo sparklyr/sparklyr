@@ -59,12 +59,12 @@ pipeline {
                         sleep(sleepDuration)
                     }
 
-                    def outputRaw = sh(script: "databricks runs get-output --run-id ${runId}", returnStdout: true)
-                    def output = readJSON(outputRaw)["notebook_output"]["result"]
+                    def notebookOutputRaw = sh(script: "databricks runs get-output --run-id ${runId}", returnStdout: true)
+                    def notebookOutput = readJSON(outputRaw)["notebook_output"]["result"]
 
-                    print(output)
+                    print(notebookOutput)
                     File logFile = new File("log.txt")
-                    file.append(output)
+                    file.append(notebookOutput)
 
                     if (jobState["result_state"] != "SUCCESS" || !output.startsWith("NOTEBOOK TEST PASS")) {
                         // Fail this stage but continue running other stages
