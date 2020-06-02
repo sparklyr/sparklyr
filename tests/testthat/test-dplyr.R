@@ -23,7 +23,7 @@ test_that("the implementation of 'mutate' functions as expected", {
 test_that("the implementation of 'filter' functions as expected", {
   test_requires("dplyr")
 
-  expect_equal(
+  expect_equivalent(
     iris_tbl %>%
       filter(Sepal_Length == 5.1) %>%
       filter(Sepal_Width == 3.5) %>%

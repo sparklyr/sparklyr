@@ -1,4 +1,4 @@
-context("spark apply")
+context("spark-apply")
 
 test_requires("dplyr")
 sc <- testthat_spark_connection()
