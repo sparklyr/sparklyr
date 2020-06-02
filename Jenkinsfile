@@ -64,7 +64,7 @@ pipeline {
 
                     bash "databricks runs get-output --run-id ${runId} | tee -a log.txt"
 
-                    if (jobState["result_state"] != "SUCCESS" || !output.startsWith("NOTEBOOK TEST PASS")) {
+                    if (jobState["result_state"] != "SUCCESS" || !notebookOutput.startsWith("NOTEBOOK TEST PASS")) {
                         // Fail this stage but continue running other stages
                         // https://stackoverflow.com/questions/45021622/how-to-continue-past-a-failing-stage-in-jenkins-declarative-pipeline-syntax
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
