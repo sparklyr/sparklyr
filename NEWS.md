@@ -1,3 +1,70 @@
+# Sparklyr 1.3.0
+
+### Spark ML
+
+- `ml_evaluate()` methods are implemented for ML clustering and classification models
+
+### Distributed R
+
+- Created helper methods to integrate Spark SQL higher-order functions with
+  `dplyr::mutate`
+
+- Implemented option to pass partition index as a named parameter to `spark_apply()`
+  transform function
+
+- Enabled transform function of `spark_apply()` to return nested lists
+
+- Added option to return R objects instead of Spark data frame rows from transform
+  function of `spark_apply`
+
+- `sdf_collect()` now supports fetching Spark data frame row-by-row rather than
+  column-by-column, and fetching rows using iterator instead of collecting all
+  rows into memory
+
+### Connection
+
+- Hive integration can now be disabled by configuration in `spark_connect()` (#2465)
+
+- A JVM object reference counting bug affecting secondary Spark connections was fixed
+  (#2515)
+
+### Serialization
+
+- The new `arrow::write_to_raw()` functionality will be used if available in arrow-
+  enabled Spark connections
+
+- For arrow version 0.17 or above, sparklyr will ensure POSIXt columns have timezone
+  set before being serialized by arrow (columns without timezone will assume
+  `Sys.timezone()`)
+
+- Embedded nul bytes are removed from strings when reading strings from Spark to R
+  (#2250)
+
+- `spark_read()` method is implemented to allow user-defined R functions to be run
+  on Spark workers to import data into a Spark data frame
+
+- `spark_write()` method is implemented allow user-defined functions to be run on
+  Spark workers to export data from a Spark data frame
+
+- Avro functionalities such as `spark_read_avro()`, `spark_write_avro()`,
+  `sdf_from_avro()`, and `sdf_to_avro()` are implemented and can be optionally
+  enabled with `spark_connect(..., package = "avro")`
+
+### Misc
+
+- Fixed warnings for deprecated functions (#2431)
+
+- More test cases enabled for Databricks Connect
+
+- Embedded R sources are now included as resources rather than as a Scala string
+  literal in `sparklyr-*.jar` files, so that they can be updated without
+  re-compilation of Scala source files
+
+- A mechanism is created to verify embedded sources in `sparklyr-*.jar` files
+  are in-sync with current R source files and this verification is now part of
+  the Github CI workflow for `sparklyr`
+
+
 # Sparklyr 1.2.0.9000
 
 ### Serialization
