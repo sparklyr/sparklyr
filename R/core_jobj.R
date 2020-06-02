@@ -49,12 +49,16 @@ print_jobj <- function(sc, jobj, ...) {
 }
 
 get_valid_jobjs <- function(con) {
-  con$state$validJobjs <- con$state$validJobjs %||% new.env(parent = emptyenv())
+  if (is.null(con$state$validJobjs)) {
+    con$state$validJobjs <- new.env(parent = emptyenv())
+  }
   con$state$validJobjs
 }
 
 get_to_remove_jobjs <- function(con) {
-  con$state$toRemoveJobjs <- con$state$toRemoveJobjs %||% new.env(parent = emptyenv())
+  if (is.null(con$state$toRemoveJobjs)) {
+    con$state$toRemoveJobjs <- new.env(parent = emptyenv())
+  }
   con$state$toRemoveJobjs
 }
 
