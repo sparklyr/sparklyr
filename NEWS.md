@@ -28,6 +28,8 @@
 - A JVM object reference counting bug affecting secondary Spark connections was fixed
   (#2515)
 
+- Revised JObj envs initialization for Databricks connections (#2533)
+
 ### Serialization
 
 - The new `arrow::write_to_raw()` functionality will be used if available in arrow-
