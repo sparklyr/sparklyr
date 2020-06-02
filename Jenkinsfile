@@ -60,7 +60,7 @@ pipeline {
                     }
 
                     def notebookOutputRaw = sh(script: "databricks runs get-output --run-id ${runId}", returnStdout: true)
-                    def notebookOutput = readJSON(outputRaw)["notebook_output"]["result"]
+                    def notebookOutput = readJSON(text: notebookOutputRaw)["notebook_output"]["result"]
 
                     print(notebookOutput)
                     File logFile = new File("log.txt")
