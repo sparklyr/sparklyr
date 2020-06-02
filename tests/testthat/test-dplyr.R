@@ -14,7 +14,7 @@ df2_tbl <- testthat_tbl("df2")
 test_that("the implementation of 'mutate' functions as expected", {
   test_requires("dplyr")
 
-  expect_equal(
+  expect_equivalent(
     iris %>% mutate(x = Species) %>% tbl_vars() %>% length(),
     iris_tbl %>% mutate(x = Species) %>% collect() %>% tbl_vars() %>% length()
   )
@@ -23,7 +23,7 @@ test_that("the implementation of 'mutate' functions as expected", {
 test_that("the implementation of 'filter' functions as expected", {
   test_requires("dplyr")
 
-  expect_equal(
+  expect_equivalent(
     iris_tbl %>%
       filter(Sepal_Length == 5.1) %>%
       filter(Sepal_Width == 3.5) %>%
@@ -73,11 +73,9 @@ test_that("'left_join' does not use 'using' clause", {
 test_that("the implementation of 'left_join' functions as expected", {
   test_requires("dplyr")
 
-  expect_true(
-    all.equal(
-      left_join(df1, df2),
-      left_join(df1_tbl, df2_tbl) %>% collect()
-    )
+  expect_equivalent(
+    left_join(df1, df2),
+    left_join(df1_tbl, df2_tbl) %>% collect()
   )
 })
 

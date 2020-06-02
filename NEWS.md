@@ -29,6 +29,11 @@
 - Better support for querying and deserializing Spark SQL struct columns when
   working with Spark 2.4 or above
 
+- Add support in `copy_to()` for columns with nested lists (#2247).
+
+- Significantly improve `collect()` performance for columns with nested
+  lists (#2252).
+
 ### Connection
 
 - Add support for Databricks Connect
@@ -53,6 +58,8 @@
 - Removal of unneeded objects from JVM object tracker no longer blocks
   subsequent JVM method invocations
 
+- Add support for JDK11 for Spark 3 preview.
+
 ### Misc
 
 - Support for installing Spark 3.0 Preview 2.
@@ -68,19 +75,6 @@
   exported by mistake)
 
 - Fixed a bug in `summary()` of `ml_linear_regression`
-
-# Sparklyr 1.1.0.9001
-
-### Connection
-
-- Add support for JDK11 for Spark 3 preview.
-
-### Data
-
-- Add support in `copy_to()` for columns with nested lists (#2247).
-
-- Significantly improve `collect()` performance for columns with nested
-  lists (#2252).
 
 # Sparklyr 1.1.0
 

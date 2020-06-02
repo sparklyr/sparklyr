@@ -18,8 +18,10 @@ tidy.ml_model_naive_bayes <- function(x,
   pi <- as.data.frame(x$pi) %>%
     dplyr::rename(.pi = !!"x$pi")
 
-  dplyr::bind_cols(theta, pi)
+  res <- dplyr::bind_cols(theta, pi)
+  rownames(res) <- seq(nrow(res))
 
+  res
 }
 
 #' @rdname ml_naive_bayes_tidiers

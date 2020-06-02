@@ -3,6 +3,8 @@ context("barrier")
 skip_databricks_connect()
 test_that("barrier-spark_apply works", {
   test_requires_version("2.4.0")
+  skip_on_windows()
+
   sc <- testthat_spark_connection()
 
   address <- sdf_len(sc, 1, repartition = 1) %>%

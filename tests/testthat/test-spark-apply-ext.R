@@ -1,4 +1,4 @@
-context("spark apply")
+context("spark-apply-ext")
 
 test_requires("dplyr")
 sc <- testthat_spark_connection()
@@ -12,37 +12,45 @@ colnas <- data.frame(c1 = c("A", "B"), c2 = c(NA, NA))
 colnas_tbl <- testthat_tbl("colnas")
 
 test_that("'spark_apply' can filter columns", {
-  expect_equal(
+  expect_equivalent(
     iris_tbl %>% spark_apply(function(e) e[1:1]) %>% collect(),
     iris_tbl %>% select(Sepal_Length) %>% collect()
   )
 })
 
 test_that("'spark_apply' can add columns", {
-  expect_equal(
+  expect_equivalent(
     iris_tbl %>% spark_apply(function(e) cbind(e, 1), names = c(colnames(iris_tbl), "new")) %>% collect(),
     iris_tbl %>% mutate(new = 1) %>% collect()
   )
 })
 
 test_that("'spark_apply' can concatenate", {
-  expect_equal(
+  expect_equivalent(
     iris_tbl %>% spark_apply(function(e) apply(e, 1, paste, collapse = " "), names = "s") %>% collect(),
     iris_tbl %>% transmute(s = paste(Sepal_Length, Sepal_Width, Petal_Length, Petal_Width, Species)) %>% collect()
   )
 })
 
 test_that("'spark_apply' can filter", {
-  expect_equal(
+  expect_equivalent(
     iris_tbl %>% spark_apply(function(e) e[e$Species == "setosa",]) %>% collect(),
     iris_tbl %>% filter(Species == "setosa") %>% collect()
   )
 })
 
 test_that("'spark_apply' works with 'sdf_repartition'", {
-  expect_equal(
-    iris_tbl %>% sdf_repartition(2L) %>% spark_apply(function(e) e) %>% collect(),
-    iris_tbl %>% collect()
+  id <- random_string("id")
+  expect_equivalent(
+    iris_tbl %>%
+      sdf_with_sequential_id(id) %>%
+      sdf_repartition(2L) %>%
+      spark_apply(function(e) e) %>%
+      collect() %>%
+      arrange(!!rlang::sym(id)),
+    iris_tbl %>%
+      sdf_with_sequential_id(id) %>%
+      collect()
   )
 })
 
@@ -192,7 +200,7 @@ test_that("'spark_apply' supports grouped empty results", {
     stringsAsFactors = FALSE
   )
 
-  data_spark <- sdf_copy_to(sc, data, "grp_data", memory = TRUE)
+  data_spark <- sdf_copy_to(sc, data, "grp_data", memory = TRUE, overwrite = TRUE)
 
   collected <- data_spark %>% spark_apply(
     process_data,
@@ -202,9 +210,12 @@ test_that("'spark_apply' supports grouped empty results", {
     context = {exclude <- "grp"}
   ) %>% collect()
 
-  expect_equal(
-    collected,
-    data %>% group_by(grp) %>% do(process_data(., exclude = "grp"))
+  expect_equivalent(
+    collected %>% arrange(x1),
+    data %>%
+      group_by(grp) %>%
+      do(process_data(., exclude = "grp")) %>%
+      arrange(x1)
   )
 })
 
@@ -220,18 +231,19 @@ test_that("'spark_apply' can apply function with 'NA's column", {
   skip_slow("takes too long to measure coverage")
   if (spark_version(sc) < "2.0.0") skip("automatic column types supported in Spark 2.0+")
 
-  expect_equal(
+  expect_equivalent(
     colnas_tbl %>% mutate(c2 = as.integer(c2)) %>% spark_apply(~ class(.x[[2]])) %>% pull(),
     "integer"
   )
 
-  expect_equal(
+  expect_equivalent(
     colnas_tbl %>%
       mutate(c2 = as.integer(c2)) %>%
       spark_apply(~ dplyr::mutate(.x, c1 = tolower(c1))) %>%
       collect(),
     colnas_tbl %>%
       mutate(c2 = as.integer(c2)) %>%
-      mutate(c1 = tolower(c1))
+      mutate(c1 = tolower(c1)) %>%
+      collect()
   )
 })

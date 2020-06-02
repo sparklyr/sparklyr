@@ -366,6 +366,11 @@ skip_on_arrow <- function() {
   if (r_arrow) skip("Test unsupported in Apache Arrow")
 }
 
+skip_on_windows <- function() {
+  if (identical(.Platform$OS.type, "windows"))
+    skip("Test will be skipped on Windows")
+}
+
 skip_covr <- function(message) {
   is_covr <- identical(Sys.getenv("CODE_COVERAGE"), "true")
   if (is_covr) skip(message)
