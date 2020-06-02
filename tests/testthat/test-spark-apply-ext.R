@@ -40,9 +40,17 @@ test_that("'spark_apply' can filter", {
 })
 
 test_that("'spark_apply' works with 'sdf_repartition'", {
+  id <- random_string("id")
   expect_equivalent(
-    iris_tbl %>% sdf_repartition(2L) %>% spark_apply(function(e) e) %>% collect(),
-    iris_tbl %>% collect()
+    iris_tbl %>%
+      sdf_with_sequential_id(id) %>%
+      sdf_repartition(2L) %>%
+      spark_apply(function(e) e) %>%
+      collect() %>%
+      arrange(!!rlang::sym(id)),
+    iris_tbl %>%
+      sdf_with_sequential_id(id) %>%
+      collect()
   )
 })
 
@@ -192,7 +200,7 @@ test_that("'spark_apply' supports grouped empty results", {
     stringsAsFactors = FALSE
   )
 
-  data_spark <- sdf_copy_to(sc, data, "grp_data", memory = TRUE)
+  data_spark <- sdf_copy_to(sc, data, "grp_data", memory = TRUE, overwrite = TRUE)
 
   collected <- data_spark %>% spark_apply(
     process_data,
@@ -203,8 +211,11 @@ test_that("'spark_apply' supports grouped empty results", {
   ) %>% collect()
 
   expect_equivalent(
-    collected,
-    data %>% group_by(grp) %>% do(process_data(., exclude = "grp"))
+    collected %>% arrange(x1),
+    data %>%
+      group_by(grp) %>%
+      do(process_data(., exclude = "grp")) %>%
+      arrange(x1)
   )
 })
 

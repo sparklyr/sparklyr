@@ -91,7 +91,7 @@ test_that("'spark_apply' works with fetch_result_as_sdf = FALSE", {
 })
 
 test_that("'spark_apply' supports partition index as parameter", {
-  expect_equal(
+  expect_equivalent(
     sdf_len(sc, 10, repartition = 5) %>%
       spark_apply(
         function(df, ctx, partition_index) {
