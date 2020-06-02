@@ -15,17 +15,17 @@ test_that("'sdf_with_sequential_id' works independent of number of partitions", 
   df1a_1part_tbl <- testthat_tbl("df1a_1part", data = df1a, repartition = 1L)
   df1a_10part_tbl <- testthat_tbl("df1a_10part", data = df1a, repartition = 10L)
 
-  expect_equal(
+  expect_equivalent(
     df1a_tbl %>% sdf_with_sequential_id() %>% collect(),
     df1a %>% mutate(id = row_number() %>% as.numeric())
   )
 
-  expect_equal(
+  expect_equivalent(
     df1a_1part_tbl %>% sdf_with_sequential_id() %>% collect(),
     df1a %>% mutate(id = row_number() %>% as.numeric())
   )
 
-  expect_equal(
+  expect_equivalent(
     df1a_10part_tbl %>% sdf_with_sequential_id() %>% collect(),
     df1a %>% mutate(id = row_number() %>% as.numeric())
   )
@@ -34,9 +34,9 @@ test_that("'sdf_with_sequential_id' works independent of number of partitions", 
 test_that("'sdf_with_sequential_id' -- 'from' argument works as expected", {
   df1a_tbl <- testthat_tbl("df1a")
 
-  expect_equal(df1a_tbl %>% sdf_with_sequential_id(from = 0L) %>% collect(),
+  expect_equivalent(df1a_tbl %>% sdf_with_sequential_id(from = 0L) %>% collect(),
                df1a %>% mutate(id = row_number() - 1.0))
-  expect_equal(df1a_tbl %>% sdf_with_sequential_id(from = -1L) %>% collect(),
+  expect_equivalent(df1a_tbl %>% sdf_with_sequential_id(from = -1L) %>% collect(),
                df1a %>% mutate(id = row_number() - 2.0))
 })
 
@@ -58,9 +58,9 @@ test_that("'cbind' works as expected", {
   df2a_tbl <- testthat_tbl("df2a")
   df3a_tbl <- testthat_tbl("df3a")
 
-  expect_equal(cbind(df1a_tbl, df2a_tbl) %>% collect(),
+  expect_equivalent(cbind(df1a_tbl, df2a_tbl) %>% collect(),
                cbind(df1a, df2a))
-  expect_equal(cbind(df1a_10part_tbl, df2a_tbl) %>% collect(),
+  expect_equivalent(cbind(df1a_10part_tbl, df2a_tbl) %>% collect(),
                cbind(df1a, df2a))
   expect_error(cbind(df1a_tbl, df3a_tbl),
                "All inputs must have the same number of rows.")
@@ -73,7 +73,7 @@ test_that("'sdf_bind_cols' agrees with 'cbind'", {
   df2a_tbl <- testthat_tbl("df2a")
   df3a_tbl <- testthat_tbl("df3a")
 
-  expect_equal(sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect(),
+  expect_equivalent(sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect(),
                cbind(df1a_tbl, df2a_tbl) %>% collect())
   expect_error(sdf_bind_cols(df1a_tbl, df3a_tbl),
                "All inputs must have the same number of rows.")
@@ -83,7 +83,7 @@ test_that("'sdf_bind_cols' handles lists", {
   df1a_tbl <- testthat_tbl("df1a")
   df2a_tbl <- testthat_tbl("df2a")
 
-  expect_equal(sdf_bind_cols(list(df1a_tbl, df2a_tbl)) %>% collect(),
+  expect_equivalent(sdf_bind_cols(list(df1a_tbl, df2a_tbl)) %>% collect(),
                sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect())
 })
 
@@ -91,7 +91,7 @@ test_that("'sdf_bind_cols' ignores NULL", {
   df1a_tbl <- testthat_tbl("df1a")
   df2a_tbl <- testthat_tbl("df2a")
 
-  expect_equal(sdf_bind_cols(df1a_tbl, df2a_tbl, NULL) %>% collect(),
+  expect_equivalent(sdf_bind_cols(df1a_tbl, df2a_tbl, NULL) %>% collect(),
                sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect())
 })
 
@@ -101,7 +101,7 @@ test_that("'sdf_bind_cols' supports programming", {
   df3a_tbl <- testthat_tbl("df3a")
 
   fn <- function(...) sdf_bind_cols(...)
-  expect_equal(sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect(),
+  expect_equivalent(sdf_bind_cols(df1a_tbl, df2a_tbl) %>% collect(),
                fn(df1a_tbl, df2a_tbl) %>% collect())
   expect_error(fn(df1a_tbl, df3a_tbl),
                "All inputs must have the same number of rows.")
@@ -126,7 +126,7 @@ test_that("'rbind.tbl_spark' agrees with local result ", {
   df1a_tbl <- testthat_tbl("df1a")
   df4a_tbl <- testthat_tbl("df4a")
 
-  expect_equal(rbind(df1a_tbl, df4a_tbl) %>% collect(),
+  expect_equivalent(rbind(df1a_tbl, df4a_tbl) %>% collect(),
                rbind(df1a, df4a))
 })
 
@@ -134,11 +134,11 @@ test_that("'sdf_bind_rows' agrees with local result", {
   df1a_tbl <- testthat_tbl("df1a")
   df4a_tbl <- testthat_tbl("df4a")
 
-  expect_equal(sdf_bind_rows(df1a_tbl, df4a_tbl) %>% collect(),
+  expect_equivalent(sdf_bind_rows(df1a_tbl, df4a_tbl) %>% collect(),
                bind_rows(df1a, df4a))
-  expect_equal(sdf_bind_rows(df1a_tbl, select(df4a_tbl, -a)) %>% collect(),
+  expect_equivalent(sdf_bind_rows(df1a_tbl, select(df4a_tbl, -a)) %>% collect(),
                bind_rows(df1a, select(df4a, -a)))
-  expect_equal(sdf_bind_rows(df1a_tbl, select(df4a_tbl, -b)) %>% collect(),
+  expect_equivalent(sdf_bind_rows(df1a_tbl, select(df4a_tbl, -b)) %>% collect(),
                bind_rows(df1a, select(df4a, -b)))
 })
 
@@ -146,11 +146,11 @@ test_that("'sdf_bind_rows' -- 'id' argument works as expected", {
   df1a_tbl <- testthat_tbl("df1a")
   df4a_tbl <- testthat_tbl("df4a")
 
-  expect_equal(sdf_bind_rows(df1a_tbl, df4a_tbl, id = "source") %>% collect(),
+  expect_equivalent(sdf_bind_rows(df1a_tbl, df4a_tbl, id = "source") %>% collect(),
                bind_rows(df1a, df4a, .id = "source"))
-  expect_equal(sdf_bind_rows(x = df1a_tbl, y = df4a_tbl, id = "source") %>% collect(),
+  expect_equivalent(sdf_bind_rows(x = df1a_tbl, y = df4a_tbl, id = "source") %>% collect(),
                bind_rows(x = df1a, y = df4a, .id = "source"))
-  expect_equal(sdf_bind_rows(x = df1a_tbl, df4a_tbl, id = "source") %>% collect(),
+  expect_equivalent(sdf_bind_rows(x = df1a_tbl, df4a_tbl, id = "source") %>% collect(),
                bind_rows(x = df1a, df4a, .id = "source"))
 })
 
@@ -158,7 +158,7 @@ test_that("'sdf_bind_rows' ignores NULL", {
   df1a_tbl <- testthat_tbl("df1a")
   df4a_tbl <- testthat_tbl("df4a")
 
-  expect_equal(sdf_bind_rows(list(df1a_tbl, NULL, df4a_tbl)) %>% collect(),
+  expect_equivalent(sdf_bind_rows(list(df1a_tbl, NULL, df4a_tbl)) %>% collect(),
                sdf_bind_rows(list(df1a_tbl, df4a_tbl)) %>% collect())
 })
 
@@ -184,11 +184,11 @@ test_that("'sdf_bind_rows' handles column type upcasting (#804)", {
   df5a_tbl <- testthat_tbl("df5a")
   df6a_tbl <- testthat_tbl("df6a")
 
-  expect_equal(bind_rows(df5a, df6a),
+  expect_equivalent(bind_rows(df5a, df6a),
                sdf_bind_rows(df5a_tbl, df6a_tbl) %>%
                  collect())
 
-  expect_equal(bind_rows(df6a, df5a),
+  expect_equivalent(bind_rows(df6a, df5a),
                sdf_bind_rows(df6a_tbl, df5a_tbl) %>%
                  collect())
 })

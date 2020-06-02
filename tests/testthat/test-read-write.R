@@ -122,9 +122,10 @@ test_that("spark_write_table() can write data", {
 
   df <- copy_to(sc, data.frame(id = 1L))
 
-  spark_write_table(df, "test_write_table_new")
+  tbl <- random_string("test_write_table_new")
+  spark_write_table(df, tbl)
 
-  append_table <- tbl(sc, "test_write_table_new")
+  append_table <- tbl(sc, tbl)
 
   expect_equal(sdf_nrow(append_table), 1)
 })
@@ -233,7 +234,7 @@ test_that("spark_read_csv() can read if embedded nuls present", {
 
   fpath <- get_sample_data_path("with_embedded_nul.csv")
   df <- spark_read_csv(sc, name = "test_embedded_nul", path = fpath)
-  expect_equal(
+  expect_equivalent(
     suppressWarnings(df %>% collect()),
     data.frame(test = "teststring", stringsAsFactors = FALSE)
   )
@@ -275,7 +276,7 @@ test_that("spark_read() works as expected", {
       packages = c("digest"),
       columns = c("md5", "length")
     )
-    expect_equal(
+    expect_equivalent(
       sdf_collect(sdf),
       data.frame(
         md5 = expected_md5s,
