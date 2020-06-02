@@ -62,9 +62,7 @@ pipeline {
                     def notebookOutputRaw = sh(script: "databricks runs get-output --run-id ${runId}", returnStdout: true)
                     def notebookOutput = readJSON(text: notebookOutputRaw)["notebook_output"]["result"]
 
-                    print(notebookOutput)
-                    File logFile = new File("log.txt")
-                    file.append(notebookOutput)
+                    bash "databricks runs get-output --run-id ${runId} | tee -a log.txt"
 
                     if (jobState["result_state"] != "SUCCESS" || !output.startsWith("NOTEBOOK TEST PASS")) {
                         // Fail this stage but continue running other stages
