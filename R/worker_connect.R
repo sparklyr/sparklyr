@@ -55,8 +55,6 @@ spark_worker_connect <- function(
     gateway = gatewayInfo$gateway,
     output_file = NULL
   ))
-  sc$state$validJobjs <- new.env(parent = emptyenv())
-  sc$state$toRemoveJobjs <- new.env(parent = emptyenv())
 
   worker_log("created connection")
 
