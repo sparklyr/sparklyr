@@ -197,6 +197,10 @@ read_bin.spark_worker_connection <- function(con, what, n, endian = NULL) {
   read_bin_wait(con, what, n, endian)
 }
 
+read_bin.livy_backend <- function(con, what, n, endian = NULL) {
+  read_bin.default(con$rc, what, n, endian)
+}
+
 readObject <- function(con) {
   # Read type first
   type <- readType(con)
@@ -246,8 +250,10 @@ readFastStringArray <- function(con) {
 }
 
 readDateArray <- function(con, n = 1) {
-  r <- readTime(con, n)
-  if (getOption("sparklyr.collect.datechars", FALSE)) r else as.Date(r)
+  if (n == 0)
+    as.Date(NA)
+  else
+    do.call(c, lapply(seq(n), function(x) readDate(con)))
 }
 
 readInt <- function(con, n = 1) {
@@ -277,10 +283,12 @@ readType <- function(con) {
 
 readDate <- function(con) {
   date_str <- readString(con)
-  if (date_str == "")
-    NA
+  if (is.null(date_str) || identical(date_str, ""))
+    as.Date(NA)
+  else if (getOption("sparklyr.collect.datechars", FALSE))
+    date_str
   else
-    as.Date(date_str)
+    as.Date(date_str, tz = "UTC")
 }
 
 readTime <- function(con, n = 1) {
@@ -635,10 +643,11 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
   connection_name <- core_invoke_socket_name(sc)
 
   if (!identical(object, "Handler")) {
-    objsToRemove <- ls(.toRemoveJobjs)
+    toRemoveJobjs <- get_to_remove_jobjs(sc)
+    objsToRemove <- ls(toRemoveJobjs)
     if (length(objsToRemove) > 0) {
       core_remove_jobjs(sc, objsToRemove)
-      rm(list = objsToRemove, envir = .toRemoveJobjs)
+      rm(list = objsToRemove, envir = toRemoveJobjs)
     }
   }
 
@@ -808,26 +817,30 @@ print_jobj <- function(sc, jobj, ...) {
   UseMethod("print_jobj")
 }
 
+get_valid_jobjs <- function(con) {
+  if (is.null(con$state$validJobjs)) {
+    con$state$validJobjs <- new.env(parent = emptyenv())
+  }
+  con$state$validJobjs
+}
 
-# Maintain a reference count of Java object references
-# This allows us to GC the java object when it is safe
-.validJobjs <- new.env(parent = emptyenv())
+get_to_remove_jobjs <- function(con) {
+  if (is.null(con$state$toRemoveJobjs)) {
+    con$state$toRemoveJobjs <- new.env(parent = emptyenv())
+  }
+  con$state$toRemoveJobjs
+}
 
-# List of object ids to be removed
-.toRemoveJobjs <- new.env(parent = emptyenv())
-
-# Check if jobj was created with the current SparkContext
+# Check if jobj points to a valid external JVM object
 isValidJobj <- function(jobj) {
-  TRUE
+  exists("connection", jobj) && exists(jobj$id, get_valid_jobjs(jobj$connection))
 }
 
 getJobj <- function(con, objId) {
   newObj <- jobj_create(con, objId)
-  if (exists(objId, .validJobjs)) {
-    .validJobjs[[objId]] <- .validJobjs[[objId]] + 1
-  } else {
-    .validJobjs[[objId]] <- 1
-  }
+  validJobjs <- get_valid_jobjs(con)
+  validJobjs[[objId]] <- get0(objId, validJobjs, ifnotfound = 0) + 1
+
   newObj
 }
 
@@ -895,27 +908,31 @@ jobj_inspect <- function(jobj) {
 cleanup.jobj <- function(jobj) {
   if (isValidJobj(jobj)) {
     objId <- jobj$id
-    # If we don't know anything about this jobj, ignore it
-    if (exists(objId, envir = .validJobjs)) {
-      .validJobjs[[objId]] <- .validJobjs[[objId]] - 1
+    validJobjs <- get_valid_jobjs(jobj$connection)
+    validJobjs[[objId]] <- validJobjs[[objId]] - 1
 
-      if (.validJobjs[[objId]] == 0) {
-        rm(list = objId, envir = .validJobjs)
-        # NOTE: We cannot call removeJObject here as the finalizer may be run
-        # in the middle of another RPC. Thus we queue up this object Id to be removed
-        # and then run all the removeJObject when the next RPC is called.
-        .toRemoveJobjs[[objId]] <- 1
-      }
+    if (validJobjs[[objId]] == 0) {
+      rm(list = objId, envir = validJobjs)
+      # NOTE: We cannot call removeJObject here as the finalizer may be run
+      # in the middle of another RPC. Thus we queue up this object Id to be removed
+      # and then run all the removeJObject when the next RPC is called.
+      toRemoveJobjs <- get_to_remove_jobjs(jobj$connection)
+      toRemoveJobjs[[objId]] <- 1
     }
   }
 }
 
 clear_jobjs <- function() {
-  valid <- ls(.validJobjs)
-  rm(list = valid, envir = .validJobjs)
+  scons <- spark_connection_find()
+  for (scon in scons) {
+    validJobjs <- get_valid_jobjs(scons)
+    valid <- ls(validJobjs)
+    rm(list = valid, envir = validJobjs)
 
-  removeList <- ls(.toRemoveJobjs)
-  rm(list = removeList, envir = .toRemoveJobjs)
+    toRemoveJobjs <- get_to_remove_jobjs(scons)
+    removeList <- ls(toRemoveJobjs)
+    rm(list = removeList, envir = toRemoveJobjs)
+  }
 }
 
 attach_connection <- function(jobj, connection) {
@@ -1689,6 +1706,7 @@ spark_worker_connect <- function(
     method = "shell",
     app_name = NULL,
     config = NULL,
+    state = new.env(),
     # spark_shell_connection
     spark_home = NULL,
     backend = backend,

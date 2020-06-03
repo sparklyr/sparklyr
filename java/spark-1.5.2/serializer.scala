@@ -3,7 +3,9 @@ package sparklyr
 import java.io.{DataInputStream, DataOutputStream}
 import java.nio.charset.StandardCharsets
 import java.sql.{Date, Time, Timestamp}
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.TimeZone
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.WrappedArray
@@ -373,8 +375,11 @@ class Serializer(tracker: JVMObjectTracker) {
       out,
       if (null == value)
         ""
-      else
-        value.toString
+      else {
+        val fmt = new SimpleDateFormat("yyyy-MM-dd")
+        fmt.setTimeZone(TimeZone.getTimeZone("UTC"))
+        fmt.format(value)
+      }
     )
   }
 
@@ -437,31 +442,11 @@ class Serializer(tracker: JVMObjectTracker) {
     value.foreach(v => writeTime(out, v))
   }
 
-  def timestampToUTC(millis: Long): Timestamp = {
-    millis match {
-      case 0 => new java.sql.Timestamp(0)
-      case _ => new java.sql.Timestamp(
-        millis +
-        Calendar.getInstance.get(Calendar.ZONE_OFFSET) +
-        Calendar.getInstance.get(Calendar.DST_OFFSET)
-      )
-    }
-  }
-
   def writeDateArr(out: DataOutputStream, value: Array[java.sql.Date]): Unit = {
     writeType(out, "date")
     out.writeInt(value.length)
 
-    // Dates are created in the local JVM time zone, so we need to convert to UTC here
-    // See: https://docs.oracle.com/javase/7/docs/api/java/util/Date.html#getTimezoneOffset()
-
-    value.foreach(v => writeTime(
-      out,
-      if (null == v)
-        null
-      else
-        timestampToUTC(v.getTime())
-    ))
+    value.foreach(v => writeDate(out, v))
   }
 
   def writeStringArr(out: DataOutputStream, value: Array[String]): Unit = {

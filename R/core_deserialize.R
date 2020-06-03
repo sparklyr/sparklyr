@@ -107,8 +107,10 @@ readFastStringArray <- function(con) {
 }
 
 readDateArray <- function(con, n = 1) {
-  r <- readTime(con, n)
-  if (getOption("sparklyr.collect.datechars", FALSE)) r else as.Date(r)
+  if (n == 0)
+    as.Date(NA)
+  else
+    do.call(c, lapply(seq(n), function(x) readDate(con)))
 }
 
 readInt <- function(con, n = 1) {
@@ -138,10 +140,12 @@ readType <- function(con) {
 
 readDate <- function(con) {
   date_str <- readString(con)
-  if (date_str == "")
-    NA
+  if (is.null(date_str) || identical(date_str, ""))
+    as.Date(NA)
+  else if (getOption("sparklyr.collect.datechars", FALSE))
+    date_str
   else
-    as.Date(date_str)
+    as.Date(date_str, tz = "UTC")
 }
 
 readTime <- function(con, n = 1) {
