@@ -3,6 +3,7 @@
 #' These methods implement dplyr grammars for Apache Spark higher order functions
 #'
 #' @name dplyr_hof
+#' @include utils.R
 NULL
 
 # throw an error if f is not a valid lambda expression
@@ -14,8 +15,19 @@ validate_lambda <- function(f) {
 }
 
 translate_formula <- function(f) {
-  params_sql <- paste0("(", paste0(all.vars(f), collapse = ", "), ")")
-  body_sql <- dbplyr::translate_sql_(f[[2]], con = dbplyr::simulate_dbi())
+  var_x <- as.name(random_string("x_"))
+  var_y <- as.name(random_string("y_"))
+  # renamning variables because Spark SQL cannot handle lambda variable name
+  # starting with '.'
+  f <- do.call(substitute, list(f, list(.x = var_x, .y = var_y)))
+  vars <- all.vars(f)
+  params_sql <- (
+    if (length(vars) > 1)
+      paste0("(", paste0(vars, collapse = ", "), ")")
+    else
+      as.character(vars)
+  )
+  body_sql <- dbplyr::translate_sql_(list(f[[2]]), con = dbplyr::simulate_dbi())
   lambda <- dbplyr::sql(paste(params_sql, "->", body_sql))
 
   lambda
@@ -178,7 +190,7 @@ hof_aggregate <- function(x, dest_col, expr, start, merge, finish = NULL, ...) {
 #'
 #' @export
 hof_exists <- function(x, dest_col, expr, pred, ...) {
-  validate_lambda(pred)
+  pred <- process_lambda(pred)
   sql <- paste(
     "EXISTS(",
     as.character(dbplyr::translate_sql(!! rlang::enexpr(expr))),
@@ -201,7 +213,7 @@ hof_exists <- function(x, dest_col, expr, pred, ...) {
 #'
 #' @export
 hof_zip_with <- function(x, dest_col, left, right, func, ...) {
-  validate_lambda(func)
+  func <- process_lambda(func)
   sql <- paste(
     "ZIP_WITH(",
     as.character(dbplyr::translate_sql(!! rlang::enexpr(left))),
