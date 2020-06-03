@@ -263,6 +263,29 @@ test_that("'hof_aggregate' works with formula", {
   )
 })
 
+test_that("'hof_aggregate' can apply formula as 'finish' transformation", {
+  test_requires_version("2.4.0")
+
+  agg <- test_tbl %>%
+    hof_aggregate(
+      dest_col = x,
+      expr = x,
+      start = v,
+      merge = ~ .x + .y,
+      finish = ~ .x * .x
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    agg,
+    tibble::tibble(
+      v = c(11, 12),
+      x = c(676, 2704),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8))
+    )
+  )
+})
+
 test_that("'hof_exists' creating a new column", {
   test_requires_version("2.4.0")
 
