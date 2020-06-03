@@ -33,6 +33,48 @@ pipeline {
                 }
             }
         }
+        stage("Test sparklyr in Databricks notebooks (not Databricks Connect)") {
+            steps {
+                script {
+                    def repo = sh(script: "git remote get-url origin | cut -d/ -f 4,5", returnStdout: true).trim()
+                    bash "echo ${repo} | tee -a log.txt"
+
+                    def sha = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                    bash "echo ${sha} | tee -a log.txt"
+
+                    def output = sh(script: "databricks jobs run-now --job-id 1 --notebook-params '{\"Github repo\": \"${repo}\", \"Commit ref\": \"${sha}\"}'", returnStdout: true)
+                    def runId = readJSON(text: output)["run_id"]
+
+                    // This job takes 2-5 minutes on both successful and failed runs
+                    def timeout = 600;
+                    def sleepDuration = 15;
+                    def jobState;
+                    for(int seconds = 0; seconds < timeout; seconds += sleepDuration) {
+                        def jobInfo = sh(script: "databricks runs get --run-id ${runId}", returnStdout: true)
+                        jobState = readJSON(text: jobInfo)["state"]
+                        bash "echo ${jobState} | tee -a log.txt"
+                        if (jobState["life_cycle_state"] == "TERMINATED") {
+                            break;
+                        }
+                        sleep(sleepDuration)
+                    }
+
+                    def notebookOutputRaw = sh(script: "databricks runs get-output --run-id ${runId}", returnStdout: true)
+                    def notebookOutput = readJSON(text: notebookOutputRaw)["notebook_output"]["result"]
+
+                    bash "databricks runs get-output --run-id ${runId} | tee -a log.txt"
+
+                    if (jobState["result_state"] != "SUCCESS" || !notebookOutput.startsWith("NOTEBOOK TEST PASS")) {
+                        // Fail this stage but continue running other stages
+                        // https://stackoverflow.com/questions/45021622/how-to-continue-past-a-failing-stage-in-jenkins-declarative-pipeline-syntax
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            bash "echo 'Stage failed' | tee -a log.txt"
+                            sh "exit 1"
+                        }
+                    }
+                }
+            }
+        }
         stage("Setting up Databricks Connect") {
             steps {
                 script {
@@ -50,7 +92,7 @@ pipeline {
                         bash "echo '$dbConnectParamsJson' > ~/.databricks-connect"
 
                         // Smoke test to check if databricks-connect is set up correctly
-                        bash "SPARK_HOME=${sparkHome} databricks-connect test  2>&1 | tee log.txt"
+                        bash "SPARK_HOME=${sparkHome} databricks-connect test  2>&1 | tee -a log.txt"
                     }
                 }
             }
