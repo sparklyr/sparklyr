@@ -5,10 +5,28 @@
 #' @name dplyr_hof
 NULL
 
-# throw an error if func is not a valid lambda expression
-validate_lambda <- function(func) {
-  if (! "spark_sql_lambda" %in% class(func))
-    stop("Expected 'func' to be a lambda expression (e.g., 'a %->% (a + 1)' or '.(a, b) %->% (a + b + 1)').")
+# throw an error if f is not a valid lambda expression
+validate_lambda <- function(f) {
+  if (! "spark_sql_lambda" %in% class(f) && ! "formula" %in% class(f))
+    stop("Expected 'f' to be a lambda expression (e.g., 'a %->% (a + 1)' or ",
+         "'.(a, b) %->% (a + b + 1)') or a formula (e.g., '~ .x + 1' or ",
+         "'~ .x + .y + 1').")
+}
+
+translate_formula <- function(f) {
+  params_sql <- paste0("(", paste0(all.vars(f), collapse = ", "), ")")
+  body_sql <- dbplyr::translate_sql_(f[[2]], con = dbplyr::simulate_dbi())
+  lambda <- dbplyr::sql(paste(params_sql, "->", body_sql))
+
+  lambda
+}
+
+process_lambda <- function(f) {
+  validate_lambda(f)
+  if ("formula" %in% class(f))
+    f <- translate_formula(f)
+  else
+    f
 }
 
 #' Infix operator for composing a lambda expression
@@ -84,7 +102,7 @@ do.mutate <- function(x, dest_col_name, sql, ...) {
 #'
 #' @export
 hof_transform <- function(x, dest_col, expr, func, ...) {
-  validate_lambda(func)
+  func <- process_lambda(func)
   sql <- paste(
     "TRANSFORM(",
     as.character(dbplyr::translate_sql(!! rlang::enexpr(expr))),
@@ -106,7 +124,7 @@ hof_transform <- function(x, dest_col, expr, func, ...) {
 #'
 #' @export
 hof_filter <- function(x, dest_col, expr, func, ...) {
-  validate_lambda(func)
+  func <- process_lambda(func)
   sql <- paste(
     "FILTER(",
     as.character(dbplyr::translate_sql(!! rlang::enexpr(expr))),
@@ -130,9 +148,9 @@ hof_filter <- function(x, dest_col, expr, func, ...) {
 #'
 #' @export
 hof_aggregate <- function(x, dest_col, expr, start, merge, finish = NULL, ...) {
-  validate_lambda(merge)
+  merge <- process_lambda(merge)
   args <- list(...)
-  if (!identical(finish, NULL)) validate_lambda(finish)
+  if (!identical(finish, NULL)) finish <- process_lambda(finish)
   sql <- do.call(paste, as.list(c(
     "AGGREGATE(",
     as.character(dbplyr::translate_sql(!! rlang::enexpr(expr))),
