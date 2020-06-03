@@ -174,6 +174,10 @@ jobs:
       - name: Run tests
         run: |
           export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
+
+          sudo timedatectl set-timezone America/Los_Angeles
+          export TZ='America/Los_Angeles'
+
           if [[ $ARROW_ENABLED == "true" ]]; then Rscript ci/.ci.R --arrow $ARROW_BRANCH; fi
           if [[ $CODE_COVERAGE == "true" ]]; then
             Rscript ci/.ci.R --coverage

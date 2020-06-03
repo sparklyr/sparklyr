@@ -282,7 +282,10 @@ test_that("collect() can retrieve date types successfully", {
   )
   expect_equal(
     as.list(df),
-    as.list(df %>% sdf_copy_to(sc, ., overwrite = TRUE) %>% sdf_collect())
+    as.list(df %>% sdf_copy_to(sc, ., overwrite = TRUE) %>% sdf_collect()),
+    # conversion between non-UTC and UTC may create some small floating point
+    # rounding error due to Date being handled as floating point numbers in R
+    tolerance = 0.001
   )
 })
 
@@ -342,21 +345,31 @@ test_that("collect() can retrieve specific dates without timezones", {
   )
 
   expect_equal(
-    data_tbl %>%
-      mutate(date_alt = from_utc_timestamp(timestamp(t) ,'UTC')) %>%
-      pull(date_alt),
-    as.POSIXct("2014-12-21 01:41:43 UTC", tz = "UTC")
+    as.double(
+      data_tbl %>%
+        mutate(date_alt = from_utc_timestamp(timestamp(t) ,'UTC')) %>%
+        pull(date_alt)
+    ),
+    as.double(as.POSIXct("2014-12-21 01:41:43 UTC", tz = "UTC")),
+    tolerance = 0.1,
+    scale = 1
   )
 
   expect_equal(
-    data_tbl %>%
-      mutate(date_alt = to_date(from_utc_timestamp(timestamp(t) ,'UTC'))) %>%
-      pull(date_alt),
-    as.Date(
+    as.double(
       data_tbl %>%
-        mutate(date_alt = as.character(to_date(from_utc_timestamp(timestamp(t) ,'UTC')))) %>%
+        mutate(date_alt = to_date(from_utc_timestamp(timestamp(t) ,'UTC'))) %>%
         pull(date_alt)
-    )
+    ),
+    as.double(
+      as.Date(
+        data_tbl %>%
+          mutate(date_alt = as.character(to_date(from_utc_timestamp(timestamp(t) ,'UTC')))) %>%
+          pull(date_alt)
+      )
+    ),
+    tolerance = 0.1,
+    scale = 1
   )
 })
 
