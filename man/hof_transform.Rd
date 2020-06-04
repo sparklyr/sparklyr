@@ -2,23 +2,36 @@
 % Please edit documentation in R/dplyr_hof.R
 \name{hof_transform}
 \alias{hof_transform}
-\title{dplyr wrapper for \code{transform(array<T>, function<T, U>): array<U>} and
-\code{transform(array<T>, function<T, Int, U>): array<U>} in Spark SQL}
+\title{Transform Array Column}
 \usage{
-hof_transform(x, dest_col, expr, func, ...)
+hof_transform(x, func, expr = NULL, dest_col = NULL, ...)
 }
 \arguments{
 \item{x}{The Spark data frame to transform}
 
-\item{dest_col}{Column to store the transformed result}
-
-\item{expr}{The array being transformed (could be any SQL expression evaluating to an array)}
-
 \item{func}{The transformation to apply}
+
+\item{expr}{The array being transformed, could be any SQL expression evaluating to an array
+(default: the last column of the Spark data frame)}
+
+\item{dest_col}{Column to store the transformed result (default: expr)}
 
 \item{...}{Additional params to dplyr::mutate}
 }
 \description{
-dplyr wrapper for \code{transform(array<T>, function<T, U>): array<U>} and
-\code{transform(array<T>, function<T, Int, U>): array<U>} in Spark SQL
+Apply an element-wise transformation function to an array column
+(this is essentially a dplyr wrapper for the
+\code{transform(array<T>, function<T, U>): array<U>} and the
+\code{transform(array<T>, function<T, Int, U>): array<U>} built-in Spark SQL functions)
+}
+\examples{
+\dontrun{
+
+library(sparklyr)
+sc <- spark_connect(master = "local[3]")
+# applies the (x -> x * x) transformation to elements of all arrays
+copy_to(sc, tibble::tibble(arr = list(1:5, 21:25))) \%>\%
+  hof_transform(~ .x * .x)
+}
+
 }

@@ -2,21 +2,24 @@
 % Please edit documentation in R/dplyr_hof.R
 \name{hof_exists}
 \alias{hof_exists}
-\title{dplyr wrapper for \code{exists(array<T>, function<T, Boolean>): Boolean}}
+\title{Determine Whether Some Element Exists in an Array Column}
 \usage{
-hof_exists(x, dest_col, expr, pred, ...)
+hof_exists(x, pred, expr = NULL, dest_col = NULL, ...)
 }
 \arguments{
 \item{x}{The Spark data frame to search}
 
-\item{dest_col}{Column to store the search result}
+\item{pred}{A boolean predicate}
 
 \item{expr}{The array being searched (could be any SQL expression evaluating to an array)}
 
-\item{pred}{A boolean predicate}
+\item{dest_col}{Column to store the search result}
 
 \item{...}{Additional params to dplyr::mutate}
 }
 \description{
-dplyr wrapper for \code{exists(array<T>, function<T, Boolean>): Boolean}
+Determines whether an element satisfying the given predicate exists in each array from
+an array column
+(this is essentially a dplyr wrapper for the
+\code{exists(array<T>, function<T, Boolean>): Boolean} built-in Spark SQL function)
 }
