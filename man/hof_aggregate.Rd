@@ -2,15 +2,15 @@
 % Please edit documentation in R/dplyr_hof.R
 \name{hof_aggregate}
 \alias{hof_aggregate}
-\title{dplyr wrapper for \code{aggregate(array<T>, A, function<A, T, A>[, function<A, R>]): R}}
+\title{Apply Aggregate Function to Array Column}
 \usage{
 hof_aggregate(
   x,
   start,
   merge,
   finish = NULL,
-  expr = tail(colnames(x), 1),
-  dest_col = expr,
+  expr = NULL,
+  dest_col = NULL,
   ...
 )
 }
@@ -23,12 +23,32 @@ hof_aggregate(
 
 \item{finish}{Optional param specifying a transformation to apply on the final value of the aggregation}
 
-\item{expr}{The array being aggregated (could be any SQL expression evaluating to an array)}
+\item{expr}{The array being aggregated, could be any SQL expression evaluating to an array
+(default: the last column of the Spark data frame)}
 
-\item{dest_col}{Column to store the aggregated result}
+\item{dest_col}{Column to store the aggregated result (default: expr)}
 
 \item{...}{Additional params to dplyr::mutate}
 }
 \description{
-dplyr wrapper for \code{aggregate(array<T>, A, function<A, T, A>[, function<A, R>]): R}
+Apply an element-wise aggregation function to an array column
+(this is essentially a dplyr wrapper for the
+\code{aggregate(array<T>, A, function<A, T, A>[, function<A, R>]): R}
+built-in Spark SQL functions)
+}
+\examples{
+\dontrun{
+
+library(sparklyr)
+sc <- spark_connect(master = "local[3]")
+# concatenates all numbers of each array in `array_column` and add parentheses
+# around the resulting string
+copy_to(sc, tibble::tibble(array_column = list(1:5, 21:25))) \%>\%
+  hof_aggregate(
+    start = "",
+    merge = ~ CONCAT(.y, .x),
+    finish = ~ CONCAT("(", .x, ")")
+  )
+}
+
 }
