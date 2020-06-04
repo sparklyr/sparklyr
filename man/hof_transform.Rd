@@ -5,16 +5,16 @@
 \title{dplyr wrapper for \code{transform(array<T>, function<T, U>): array<U>} and
 \code{transform(array<T>, function<T, Int, U>): array<U>} in Spark SQL}
 \usage{
-hof_transform(x, dest_col, expr, func, ...)
+hof_transform(x, func, expr = tail(colnames(x), 1), dest_col = expr, ...)
 }
 \arguments{
 \item{x}{The Spark data frame to transform}
 
-\item{dest_col}{Column to store the transformed result}
+\item{func}{The transformation to apply}
 
 \item{expr}{The array being transformed (could be any SQL expression evaluating to an array)}
 
-\item{func}{The transformation to apply}
+\item{dest_col}{Column to store the transformed result}
 
 \item{...}{Additional params to dplyr::mutate}
 }

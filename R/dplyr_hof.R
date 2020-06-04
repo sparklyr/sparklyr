@@ -107,13 +107,13 @@ do.mutate <- function(x, dest_col_name, sql, ...) {
 #' \code{transform(array<T>, function<T, Int, U>): array<U>} in Spark SQL
 #'
 #' @param x The Spark data frame to transform
-#' @param dest_col Column to store the transformed result
-#' @param expr The array being transformed (could be any SQL expression evaluating to an array)
 #' @param func The transformation to apply
+#' @param expr The array being transformed (could be any SQL expression evaluating to an array)
+#' @param dest_col Column to store the transformed result
 #' @param ... Additional params to dplyr::mutate
 #'
 #' @export
-hof_transform <- function(x, dest_col, expr, func, ...) {
+hof_transform <- function(x, func, expr = tail(colnames(x), 1), dest_col = expr, ...) {
   func <- process_lambda(func)
   sql <- paste(
     "TRANSFORM(",
@@ -129,13 +129,13 @@ hof_transform <- function(x, dest_col, expr, func, ...) {
 #' dplyr wrapper for \code{filter(array<T>, function<T, Boolean>): array<T>} in Spark SQL
 #'
 #' @param x The Spark data frame to filter
-#' @param dest_col Column to store the filtered result
-#' @param expr The array being filtered (could be any SQL expression evaluating to an array)
 #' @param func The filtering function
+#' @param expr The array being filtered (could be any SQL expression evaluating to an array)
+#' @param dest_col Column to store the filtered result
 #' @param ... Additional params to dplyr::mutate
 #'
 #' @export
-hof_filter <- function(x, dest_col, expr, func, ...) {
+hof_filter <- function(x, func, expr = tail(colnames(x), 1), dest_col = expr, ...) {
   func <- process_lambda(func)
   sql <- paste(
     "FILTER(",
@@ -151,15 +151,23 @@ hof_filter <- function(x, dest_col, expr, func, ...) {
 #' dplyr wrapper for \code{aggregate(array<T>, A, function<A, T, A>[, function<A, R>]): R}
 #'
 #' @param x The Spark data frame to run aggregation on
-#' @param dest_col Column to store the aggregated result
-#' @param expr The array being aggregated (could be any SQL expression evaluating to an array)
 #' @param start The starting value of the aggregation
 #' @param merge The aggregation function
 #' @param finish Optional param specifying a transformation to apply on the final value of the aggregation
+#' @param expr The array being aggregated (could be any SQL expression evaluating to an array)
+#' @param dest_col Column to store the aggregated result
 #' @param ... Additional params to dplyr::mutate
 #'
 #' @export
-hof_aggregate <- function(x, dest_col, expr, start, merge, finish = NULL, ...) {
+hof_aggregate <- function(
+  x,
+  start,
+  merge,
+  finish = NULL,
+  expr = tail(colnames(x), 1),
+  dest_col = expr,
+  ...
+) {
   merge <- process_lambda(merge)
   args <- list(...)
   if (!identical(finish, NULL)) finish <- process_lambda(finish)
@@ -183,13 +191,13 @@ hof_aggregate <- function(x, dest_col, expr, start, merge, finish = NULL, ...) {
 #' dplyr wrapper for \code{exists(array<T>, function<T, Boolean>): Boolean}
 #'
 #' @param x The Spark data frame to search
-#' @param dest_col Column to store the search result
-#' @param expr The array being searched (could be any SQL expression evaluating to an array)
 #' @param pred A boolean predicate
+#' @param expr The array being searched (could be any SQL expression evaluating to an array)
+#' @param dest_col Column to store the search result
 #' @param ... Additional params to dplyr::mutate
 #'
 #' @export
-hof_exists <- function(x, dest_col, expr, pred, ...) {
+hof_exists <- function(x, pred, expr = tail(colnames(x), 1), dest_col = expr, ...) {
   pred <- process_lambda(pred)
   sql <- paste(
     "EXISTS(",
@@ -205,14 +213,21 @@ hof_exists <- function(x, dest_col, expr, pred, ...) {
 #' dplyr wrapper for \code{zip_with(array<T>, array<U>, function<T, U, R>): array<R>}
 #'
 #' @param x The Spark data frame to process
+#' @param func Element-wise merge function to be applied
 #' @param dest_col Column to store the query result
 #' @param left Any expression evaluating to an array
 #' @param right Any expression evaluating to an array
-#' @param func Element-wise merge function to be applied
 #' @param ... Additional params to dplyr::mutate
 #'
 #' @export
-hof_zip_with <- function(x, dest_col, left, right, func, ...) {
+hof_zip_with <- function(
+  x,
+  func,
+  dest_col = tail(colnames(x), 1),
+  left = dest_col,
+  right = dest_col,
+  ...
+) {
   func <- process_lambda(func)
   sql <- paste(
     "ZIP_WITH(",

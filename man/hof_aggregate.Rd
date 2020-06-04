@@ -4,20 +4,28 @@
 \alias{hof_aggregate}
 \title{dplyr wrapper for \code{aggregate(array<T>, A, function<A, T, A>[, function<A, R>]): R}}
 \usage{
-hof_aggregate(x, dest_col, expr, start, merge, finish = NULL, ...)
+hof_aggregate(
+  x,
+  start,
+  merge,
+  finish = NULL,
+  expr = tail(colnames(x), 1),
+  dest_col = expr,
+  ...
+)
 }
 \arguments{
 \item{x}{The Spark data frame to run aggregation on}
-
-\item{dest_col}{Column to store the aggregated result}
-
-\item{expr}{The array being aggregated (could be any SQL expression evaluating to an array)}
 
 \item{start}{The starting value of the aggregation}
 
 \item{merge}{The aggregation function}
 
 \item{finish}{Optional param specifying a transformation to apply on the final value of the aggregation}
+
+\item{expr}{The array being aggregated (could be any SQL expression evaluating to an array)}
+
+\item{dest_col}{Column to store the aggregated result}
 
 \item{...}{Additional params to dplyr::mutate}
 }

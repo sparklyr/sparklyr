@@ -4,16 +4,16 @@
 \alias{hof_filter}
 \title{dplyr wrapper for \code{filter(array<T>, function<T, Boolean>): array<T>} in Spark SQL}
 \usage{
-hof_filter(x, dest_col, expr, func, ...)
+hof_filter(x, func, expr = tail(colnames(x), 1), dest_col = expr, ...)
 }
 \arguments{
 \item{x}{The Spark data frame to filter}
 
-\item{dest_col}{Column to store the filtered result}
+\item{func}{The filtering function}
 
 \item{expr}{The array being filtered (could be any SQL expression evaluating to an array)}
 
-\item{func}{The filtering function}
+\item{dest_col}{Column to store the filtered result}
 
 \item{...}{Additional params to dplyr::mutate}
 }

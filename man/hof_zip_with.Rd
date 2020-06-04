@@ -4,18 +4,25 @@
 \alias{hof_zip_with}
 \title{dplyr wrapper for \code{zip_with(array<T>, array<U>, function<T, U, R>): array<R>}}
 \usage{
-hof_zip_with(x, dest_col, left, right, func, ...)
+hof_zip_with(
+  x,
+  func,
+  dest_col = tail(colnames(x), 1),
+  left = dest_col,
+  right = dest_col,
+  ...
+)
 }
 \arguments{
 \item{x}{The Spark data frame to process}
+
+\item{func}{Element-wise merge function to be applied}
 
 \item{dest_col}{Column to store the query result}
 
 \item{left}{Any expression evaluating to an array}
 
 \item{right}{Any expression evaluating to an array}
-
-\item{func}{Element-wise merge function to be applied}
 
 \item{...}{Additional params to dplyr::mutate}
 }

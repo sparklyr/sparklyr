@@ -4,16 +4,16 @@
 \alias{hof_exists}
 \title{dplyr wrapper for \code{exists(array<T>, function<T, Boolean>): Boolean}}
 \usage{
-hof_exists(x, dest_col, expr, pred, ...)
+hof_exists(x, pred, expr = tail(colnames(x), 1), dest_col = expr, ...)
 }
 \arguments{
 \item{x}{The Spark data frame to search}
 
-\item{dest_col}{Column to store the search result}
+\item{pred}{A boolean predicate}
 
 \item{expr}{The array being searched (could be any SQL expression evaluating to an array)}
 
-\item{pred}{A boolean predicate}
+\item{dest_col}{Column to store the search result}
 
 \item{...}{Additional params to dplyr::mutate}
 }
