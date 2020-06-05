@@ -24,7 +24,10 @@ a list of packages to distribute, or a package bundle created with}
 }
 \description{
 Run a custom R function on Spark worker to write a Spark DataFrame
-into file(s)
+into file(s). If Spark's speculative execution feature is enabled (i.e.,
+`spark.speculation` is true), then each write task may be executed more than
+once and the user-defined writer function will need to ensure no concurrent
+writes happen to the same file path (e.g., by appending UUID to each file name).
 }
 \examples{
 \dontrun{
