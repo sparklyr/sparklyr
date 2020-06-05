@@ -29,6 +29,26 @@ inferred and resulting data frame can have arbitrary column names}
 Run a custom R function on Spark workers to ingest data from one or more files
 into a Spark DataFrame, assuming all files follow the same schema.
 }
+\examples{
+\dontrun{
+
+library(sparklyr)
+sc <- spark_connect(
+  master = "yarn",
+  spark_home = "~/spark/spark-2.4.5-bin-hadoop2.7"
+)
+
+# This is a contrived example to show reader tasks will be distributed across
+# all Spark worker nodes
+spark_read(
+  sc,
+  rep("/dev/null", 10),
+  reader = function(path) system("hostname", intern = TRUE),
+  columns = c(hostname = "string")
+) \%>\% sdf_collect()
+}
+
+}
 \seealso{
 Other Spark serialization routines: 
 \code{\link{spark_load_table}()},

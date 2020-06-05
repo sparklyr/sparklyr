@@ -1107,6 +1107,25 @@ spark_write_avro <- function(x,
 #' @param packages A list of R packages to distribute to Spark workers
 #' @param ... Optional arguments; currently unused.
 #'
+#' @examples
+#' \dontrun{
+#'
+#' library(sparklyr)
+#' sc <- spark_connect(
+#'   master = "yarn",
+#'   spark_home = "~/spark/spark-2.4.5-bin-hadoop2.7"
+#' )
+#'
+#' # This is a contrived example to show reader tasks will be distributed across
+#' # all Spark worker nodes
+#' spark_read(
+#'   sc,
+#'   rep("/dev/null", 10),
+#'   reader = function(path) system("hostname", intern = TRUE),
+#'   columns = c(hostname = "string")
+#' ) %>% sdf_collect()
+#' }
+#'
 #' @family Spark serialization routines
 #'
 #' @export
