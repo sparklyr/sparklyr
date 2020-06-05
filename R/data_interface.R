@@ -1209,7 +1209,10 @@ spark_read <- function(sc,
 #' Write Spark DataFrame to file using a custom writer
 #'
 #' Run a custom R function on Spark worker to write a Spark DataFrame
-#' into file(s)
+#' into file(s). If Spark's speculative execution feature is enabled (i.e.,
+#' `spark.speculation` is true), then each write task may be executed more than
+#' once and the user-defined writer function will need to ensure no concurrent
+#' writes happen to the same file path (e.g., by appending UUID to each file name).
 #'
 #' @param x A Spark Dataframe to be saved into file(s)
 #' @param writer A writer function with the signature function(partition, path)
