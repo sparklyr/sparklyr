@@ -75,8 +75,7 @@ registerDoSpark <- function(spark_conn, ...) {
     # internal function to process spark data frames
     .process_spark_items <- function(...) {
       # load necessary packages
-      for (p in obj$packages)
-        library(p, character.only=TRUE)
+      for (p in obj$packages) library(p, character.only=TRUE)
 
       f <- function(item) {
         enclos <- envir
@@ -95,19 +94,19 @@ registerDoSpark <- function(spark_conn, ...) {
         }
         # `enclos` now contains a snapshot of all external variables and functions
         # needed for evaluating `expr`
-	tryCatch(
-         {
+        tryCatch(
+          {
             res <- eval(
               expr,
               envir = as.list(.decode_item(item$encoded)),
               enclos = enclos
             )
             .encode_item(res)
-	  },
-	  error = function(ex) {
+          },
+          error = function(ex) {
             .encode_item(ex)
-	  }
-	)
+          }
+        )
       }
       encoded_res <- sdf_collect(spark_items %>% spark_apply(f, ...))[[1]]
       lapply(encoded_res, .decode_item)
