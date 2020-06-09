@@ -3,7 +3,8 @@
 arrow_write_record_batch <- function(df, spark_version_number = NULL) {
   arrow_env_vars <- list()
   if (!is.null(spark_version_number) && spark_version_number < "3.0") {
-    arrow_env_vars <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
+    # Spark < 3 uses an old version of Arrow, so send data in the legacy format
+    arrow_env_vars$ARROW_PRE_0_15_IPC_FORMAT <- 1
   }
 
   withr::with_envvar(arrow_env_vars, {
@@ -29,10 +30,6 @@ arrow_record_stream_reader <- function(stream) {
   arrow::RecordBatchStreamReader$create(stream)
 }
 
-arrow_read_record_batch <- function(reader) {
-  reader$read_next_batch()
-}
+arrow_read_record_batch <- function(reader) reader$read_next_batch()
 
-arrow_as_tibble <- function(record) {
-  arrow::as.data.frame(record)
-}
+arrow_as_tibble <- function(record) as.data.frame(record)

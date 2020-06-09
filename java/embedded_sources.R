@@ -3,7 +3,8 @@
 arrow_write_record_batch <- function(df, spark_version_number = NULL) {
   arrow_env_vars <- list()
   if (!is.null(spark_version_number) && spark_version_number < "3.0") {
-    arrow_env_vars <- list(ARROW_PRE_0_15_IPC_FORMAT = 1)
+    # Spark < 3 uses an old version of Arrow, so send data in the legacy format
+    arrow_env_vars$ARROW_PRE_0_15_IPC_FORMAT <- 1
   }
 
   withr::with_envvar(arrow_env_vars, {
@@ -29,13 +30,9 @@ arrow_record_stream_reader <- function(stream) {
   arrow::RecordBatchStreamReader$create(stream)
 }
 
-arrow_read_record_batch <- function(reader) {
-  reader$read_next_batch()
-}
+arrow_read_record_batch <- function(reader) reader$read_next_batch()
 
-arrow_as_tibble <- function(record) {
-  arrow::as.data.frame(record)
-}
+arrow_as_tibble <- function(record) as.data.frame(record)
 #' A helper function to retrieve values from \code{spark_config()}
 #'
 #' @param config The configuration list from \code{spark_config()}
@@ -1232,7 +1229,7 @@ spark_worker_execute_closure <- function(
 
   as_factors <- getOption("stringsAsFactors")
   on.exit(options(stringsAsFactors = as_factors))
-  options(stringsAsFactors = F)
+  options(stringsAsFactors = FALSE)
 
   if (identical(fetch_result_as_sdf, FALSE)) {
     result <- lapply(result, function(x) serialize(x, NULL))
@@ -1299,7 +1296,7 @@ spark_worker_apply_maybe_schema <- function(config, result) {
       names = paste(col_names, collapse = "|"),
       types = paste(types, collapse = "|"),
       json_cols = paste(json_cols, collapse = "|"),
-      stringsAsFactors = F
+      stringsAsFactors = FALSE
     )
   }
 
@@ -1417,8 +1414,7 @@ spark_worker_apply_arrow <- function(sc, config) {
       if (is.null(schema_output)) {
         schema_output <- spark_worker_build_types(context, lapply(result, class))
       }
-
-      raw_batch <- arrow_write_record_batch(result, spark_version(sc))
+      raw_batch <- arrow_write_record_batch(result, config$spark_version)
 
       all_batches[[length(all_batches) + 1]] <- raw_batch
       total_rows <- total_rows + nrow(result)
