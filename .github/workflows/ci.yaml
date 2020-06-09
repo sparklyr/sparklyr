@@ -146,3 +146,11 @@ jobs:
           else
             Rscript ci/.ci.R --testthat
           fi
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: Worker logs
+          path: /tmp/sparklyr.log
+      - name: Dump worker logs on failure
+        if: failure()
+        run: cat /tmp/sparklyr.log
