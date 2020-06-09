@@ -42,7 +42,7 @@
 - Embedded nul bytes are removed from strings when reading strings from Spark to R
   (#2250)
 
-- `spark_read()` method is implemented to allow user-defined R functions to be run
+- New `spark_read()` method to allow user-defined R functions to be run
   on Spark workers to import data into a Spark data frame
 
 - `spark_write()` method is implemented allow user-defined functions to be run on
