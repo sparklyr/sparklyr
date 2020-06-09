@@ -166,7 +166,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
       "^read-write$",
       "^sdf-collect$",
       "^serialization$",
-      "^spark-apply.",
+      "^spark-apply.*",
       "^ml-clustering.*kmeans$"
     )
 

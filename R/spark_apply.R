@@ -199,8 +199,7 @@ spark_apply <- function(x,
   records_per_batch <- NULL
   arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
   if (identical(fetch_result_as_sdf, FALSE) &&
-      identical(arrow, TRUE) &&
-      tryCatch(packageVersion("arrow"), error = function(e) "") < "0.17") {
+      identical(arrow, TRUE)) {
     warning("Disabling arrow due to its potential incompatibility with fetch_result_as_sdf = FALSE")
     arrow <- FALSE
   }
