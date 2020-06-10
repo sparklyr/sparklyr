@@ -30,16 +30,6 @@ arrow_enabled_object.spark_jobj <- function(object) {
     unsupported_expr <- ".Vector|ArrayType|StructType"
   }
 
-  if (packageVersion("arrow") >= "0.12" && packageVersion("arrow") < "0.13") {
-    # Workaround for ARROW-4565
-    unsupported_expr <- paste0(unsupported_expr, "|DecimalType")
-  }
-
-  if (packageVersion("arrow") < "0.12") {
-    # Workaround for ARROW-3741
-    unsupported_expr <- paste0(unsupported_expr, "|FloatType|ShortType")
-  }
-
   unsupported <- object %>%
     sdf_schema() %>%
     Filter(function(x) grepl(unsupported_expr, x$type), .)
@@ -85,7 +75,7 @@ arrow_copy_to <- function(sc, df, parallelism)
   }
 
   # serialize to arrow
-  bytes <- arrow_write_record_batch(df)
+  bytes <- arrow_write_record_batch(df, spark_version(sc))
 
   # create batches data frame
   batches <- list(bytes)

@@ -172,14 +172,6 @@ test_that("collect() can retrieve all data types correctly", {
     hive_type <- hive_type %>% filter(stype != "integer")
   }
 
-  if ("arrow" %in% installed.packages() && packageVersion("arrow") < "0.12.0") {
-    hive_type <- hive_type %>% filter(stype != "smallint", stype != "float")
-  }
-
-  if ("arrow" %in% installed.packages() && packageVersion("arrow") <= "0.13.0") {
-    hive_type <- hive_type %>% filter(stype != "tinyint")
-  }
-
   spark_query <- hive_type %>%
     mutate(
       query = paste0("cast(", svalue, " as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col", row_number())
@@ -229,11 +221,6 @@ test_that("collect() can retrieve NULL data types as NAs", {
   if (using_arrow()) {
     # Disable while tracking fix for ARROW-3794
     hive_type <- hive_type %>% filter(stype != "tinyint")
-
-    if (packageVersion("arrow") < "0.12.0") {
-      # Disable while tracking fix for ARROW-3795
-      hive_type <- hive_type %>% filter(stype != "bigint")
-    }
   }
 
   if (spark_version(sc) < "2.2.0") {
@@ -316,9 +303,6 @@ test_that("invoke() can roundtrip collect fields", {
 })
 
 test_that("collect() can retrieve as.POSIXct fields with timezones", {
-  # Disabled in arrow while #1737 is investigated
-  skip_on_arrow()
-
   tz_entries <- list(
     as.POSIXct("2018-01-01", tz = "UTC"),
     as.POSIXct("2018-01-01", tz = "GMT"),

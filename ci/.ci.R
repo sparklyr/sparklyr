@@ -24,15 +24,6 @@ if (length(args) == 0) {
 
   devtools::install_github("javierluraschi/covr", ref = "feature/no-batch")
   covr::codecov(type = "none", code = "setwd('tests'); source('testthat.R')", batch = FALSE)
-} else if (args[[1]] == "--arrow") {
-  ensure_pkgs("devtools")
-
-  if (length(args) >= 2) {
-    devtools::install_github("apache/arrow", subdir = "r", ref = args[2])
-  }
-  else {
-    devtools::install_github("apache/arrow", subdir = "r")
-  }
 } else if (args[[1]] == "--verify-embedded-srcs") {
   ensure_pkgs(c("diffobj", "stringr"))
 

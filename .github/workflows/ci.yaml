@@ -60,38 +60,17 @@ jobs:
               SPARK_VERSION: '2.3.0'
               JAVA_VERSION: 'oraclejdk8'
               SPARKLYR_LIVY_BRANCH: 'test/livy'
-          - name: 'Arrow 0.13.0 (ref = apache-arrow-0.13.0)'
+          - name: 'Arrow (release)'
             r: 'release'
             env:
               ARROW_ENABLED: 'true'
-              ARROW_VERSION: '0.13.0'
-              ARROW_BRANCH: 'apache-arrow-0.13.0'
-              ARROW_SOURCE: 'build'
               JAVA_VERSION: 'oraclejdk8'
-          - name: 'Arrow 0.15.1 (ref = apache-arrow-0.15.1)'
-            r: 'release'
-            env:
-              ARROW_ENABLED: 'true'
-              ARROW_VERSION: '0.15.1'
-              ARROW_BRANCH: 'apache-arrow-0.15.1'
-              ARROW_SOURCE: 'build'
-              JAVA_VERSION: 'oraclejdk8'
-          - name: 'Arrow 0.16.0 (ref = apache-arrow-0.16.0)'
-            r: 'release'
-            env:
-              ARROW_ENABLED: 'true'
-              ARROW_VERSION: '0.16.0'
-              ARROW_BRANCH: 'apache-arrow-0.16.0'
-              ARROW_SOURCE: 'build'
-              JAVA_VERSION: 'oraclejdk8'
-          - name: 'Arrow Devel (ref = '')'
+          - name: 'Arrow (nightly)'
             r: 'release'
             env:
               ARROW_ENABLED: 'true'
               ARROW_VERSION: 'devel'
-              ARROW_SOURCE: 'build'
-              JAVA_HOME: '/usr/lib/jvm/java-8-openjdk-amd64/jre'
-              LD_LIBRARY_PATH: '/usr/local/lib'
+              JAVA_VERSION: 'oraclejdk8'
           - name: 'Deps Devel (tidyverse, r-lib, forge)'
             r: 'release'
             env:
@@ -119,22 +98,6 @@ jobs:
           fi
 
           echo $JAVA_HOME
-      - name: Cache Arrow build artifacts if necessary
-        id: cache-arrow-build-artifacts
-        if: runner.os != 'Windows' && env.ARROW_SOURCE == 'build' && env.ARROW_VERSION != 'devel'
-        uses: actions/cache@master
-        with:
-          path:
-            /tmp/apache-arrow-${{ env.ARROW_VERSION }}-build
-          key: sparklyr-apache-arrow-${{ env.ARROW_VERSION }}-build
-      - name: Install Arrow if necessary
-        run: |
-          if [[ $ARROW_ENABLED == 'true' ]]; then
-            source "./ci/arrow-$ARROW_SOURCE.sh" "$ARROW_VERSION"
-          fi
-          if [[ $ARROW_VERSION == "devel" ]]; then
-            sudo DEBIAN_FRONTEND=noninteractive apt-get -y install openjdk-8-jre
-          fi
       - name: Install Spark master if necessary
         run: |
           if [[ $SPARK_VERSION == 'master' ]]; then
@@ -178,9 +141,16 @@ jobs:
           sudo timedatectl set-timezone America/Los_Angeles
           export TZ='America/Los_Angeles'
 
-          if [[ $ARROW_ENABLED == "true" ]]; then Rscript ci/.ci.R --arrow $ARROW_BRANCH; fi
           if [[ $CODE_COVERAGE == "true" ]]; then
             Rscript ci/.ci.R --coverage
           else
             Rscript ci/.ci.R --testthat
           fi
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: Worker logs
+          path: /tmp/sparklyr.log
+      - name: Dump worker logs on failure
+        if: failure()
+        run: cat /tmp/sparklyr.log

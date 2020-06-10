@@ -158,21 +158,19 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
   if (is_arrow_devel) {
     arrow_devel_tests <- c(
-      "^dplyr$",
+      "^binds$",
+      "^connect-shell$",
+      "^dplyr.*",
       "^dbi$",
       "^copy-to$",
+      "^read-write$",
       "^sdf-collect$",
       "^serialization$",
-      "^spark-apply.",
-      "^ml-clustering-kmeans$"
+      "^spark-apply.*",
+      "^ml-clustering.*kmeans$"
     )
 
     test_filter <- paste(arrow_devel_tests, collapse = "|")
-  }
-
-  r_arrow <- isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))
-  if (r_arrow) {
-    get("library")("arrow")
   }
 
   on.exit({ spark_disconnect_all() ; tryCatch(livy_service_stop(), error = function(e) {}) })

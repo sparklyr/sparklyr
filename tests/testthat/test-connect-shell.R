@@ -13,7 +13,7 @@ test_that("'spark_connect' can create a secondary connection", {
 })
 
 test_that("`spark_connect()` returns invisibly", {
-  skip_on_arrow()
+  skip_on_arrow() # Why is this skipped on arrow?
   sc2 <- spark_connect(master = "local", app_name = "other")
   expect_identical(
     capture.output(spark_disconnect(sc2)),

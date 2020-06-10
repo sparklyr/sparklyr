@@ -1,8 +1,12 @@
 library(sparklyr)
 library(dplyr)
 
+if (isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))) {
+  library(arrow)
+}
+
 get_spark_warehouse_dir <- function() {
-  ifelse(.Platform$OS.type == "windows", Sys.getenv("TEMP"), "/tmp")
+  ifelse(.Platform$OS.type == "windows", Sys.getenv("TEMP"), tempfile())
 }
 
 spark_install_winutils <- function(version) {
@@ -362,8 +366,7 @@ expect_coef_equal <- function(lhs, rhs) {
 }
 
 skip_on_arrow <- function() {
-  r_arrow <- isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))
-  if (r_arrow) skip("Test unsupported in Apache Arrow")
+  if (using_arrow()) skip("Test unsupported in Apache Arrow")
 }
 
 skip_on_windows <- function() {

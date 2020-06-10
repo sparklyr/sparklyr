@@ -31,6 +31,12 @@ cat << _RSCRIPT_EOF_
   for (pkg in test_deps)
     if (!require(pkg, character.only = TRUE))
       install.packages(pkg)
-
+  if (Sys.getenv("ARROW_ENABLED") == "true") {
+    if (Sys.getenv("ARROW_VERSION") == "devel") {
+      # Add the arrow nightly repository
+      options(repos = c("https://dl.bintray.com/ursalabs/arrow-r", getOption("repos")))
+    }
+    install.packages("arrow")
+  }
 _RSCRIPT_EOF_
 )
