@@ -4,6 +4,7 @@
 #'
 #' @name spark_connection-class
 #' @exportClass spark_connection
+#' @include spark_version.R
 NULL
 
 methods::setOldClass(c("livy_connection", "spark_connection"))
@@ -146,7 +147,12 @@ spark_connect <- function(master,
   }
 
   # add packages to config
-  if (!is.null(packages)) config <- spark_config_packages(config, packages, version)
+  if (!is.null(packages))
+    config <- spark_config_packages(
+      config,
+      packages,
+      version %||% spark_version_from_home(spark_home)
+    )
 
   if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
 
