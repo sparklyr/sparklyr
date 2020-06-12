@@ -21,7 +21,7 @@
   column-by-column, and fetching rows using iterator instead of collecting all
   rows into memory
 
-### Connection
+### Connections
 
 - Hive integration can now be disabled by configuration in `spark_connect()` (#2465)
 
