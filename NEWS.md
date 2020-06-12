@@ -56,7 +56,7 @@
 
 - Fixed warnings for deprecated functions (#2431)
 
-- More test cases enabled for Databricks Connect
+- More test coverage for Databricks Connect and Databricks Notebook modes
 
 - Embedded R sources are now included as resources rather than as a Scala string
   literal in `sparklyr-*.jar` files, so that they can be updated without
