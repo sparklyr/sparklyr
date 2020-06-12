@@ -160,6 +160,10 @@ spark_config_packages <- function(config, packages, version) {
   if ("avro" %in% packages) {
     packages <- packages[-which(packages == "avro")]
 
+    if (is.null(version))
+      stop("`package = \"avro\")` requires Spark version to be specified via ",
+           "`spark_connect(..., version = <Spark version>)`")
+
     config$sparklyr.shell.packages <- c(
       config$sparklyr.shell.packages,
       spark_avro_package_name(version)
