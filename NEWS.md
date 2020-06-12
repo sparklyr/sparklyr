@@ -42,6 +42,11 @@
 - Embedded nul bytes are removed from strings when reading strings from Spark to R
   (#2250)
 
+### Data
+
+- Created helper methods to integrate Spark SQL higher-order functions with
+  `dplyr::mutate`
+
 - New `spark_read()` method to allow user-defined R functions to be run
   on Spark workers to import data into a Spark data frame
 
