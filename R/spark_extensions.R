@@ -92,7 +92,8 @@ spark_dependencies_from_extensions <- function(spark_version, extensions, config
     jars = jars,
     packages = packages,
     initializers = initializers,
-    catalog_jars = catalog_jars
+    catalog_jars = catalog_jars,
+    repositories = repositories
   )
 }
 
