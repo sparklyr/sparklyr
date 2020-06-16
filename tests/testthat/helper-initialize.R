@@ -98,6 +98,9 @@ testthat_shell_connection <- function(method = "shell") {
     config[["sparklyr.shell.driver-memory"]] <- "3G"
     config[["sparklyr.apply.env.foo"]] <- "env-test"
     config[["spark.sql.warehouse.dir"]] <- get_spark_warehouse_dir()
+    if (identical(.Platform$OS.type, "windows"))
+      # TODO: investigate why there are Windows-specific timezone portability issues
+      config[["spark.sql.session.timeZone"]] <- "UTC"
 
     packages <- if (version >= "2.4.0") "avro" else NULL
 
@@ -253,15 +256,20 @@ testthat_livy_connection <- function() {
       port = livy_service_port,
       timeout_s = 30
     )
+    config <- list()
+    if (identical(.Platform$OS.type, "windows"))
+      # TODO: investigate why there are Windows-specific timezone portability issues
+      config$`spark.sql.session.timeZone` <- "UTC"
+
+    config$`sparklyr.verbose` = TRUE
+    config$`sparklyr.connect.timeout` = 120
+    config$`sparklyr.log.invoke` = "cat"
+    config$`spark.sql.warehouse.dir` = get_spark_warehouse_dir()
+
     sc <- spark_connect(
       master = sprintf("http://localhost:%d", livy_service_port),
       method = "livy",
-      config = list(
-        sparklyr.verbose = TRUE,
-        sparklyr.connect.timeout = 120,
-        sparklyr.log.invoke = "cat",
-        spark.sql.warehouse.dir = get_spark_warehouse_dir()
-      ),
+      config = config,
       version = version,
       sources = TRUE
     )

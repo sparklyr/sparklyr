@@ -6,6 +6,7 @@ init:
         $ErrorActionPreference = "Stop"
         Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
+        Set-TimeZone "GMT Standard Time"
 
 install:
   ps: Bootstrap
@@ -23,6 +24,7 @@ environment:
     R_VERSION: release
     USE_RTOOLS: true
     TEMP: "C:\\Users\\appveyor"
+    TZ: "UTC"
 
   matrix:
   - SPARK_VERSION: "1.6.3"
