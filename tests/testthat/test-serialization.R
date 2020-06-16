@@ -269,10 +269,7 @@ test_that("collect() can retrieve date types successfully", {
   )
   expect_equal(
     as.list(df),
-    as.list(df %>% sdf_copy_to(sc, ., overwrite = TRUE) %>% sdf_collect()),
-    # conversion between non-UTC and UTC may create some small floating point
-    # rounding error due to Date being handled as floating point numbers in R
-    tolerance = 0.001
+    as.list(df %>% sdf_copy_to(sc, ., overwrite = TRUE) %>% sdf_collect())
   )
 })
 
