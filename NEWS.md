@@ -57,6 +57,12 @@
   `sdf_from_avro()`, and `sdf_to_avro()` are implemented and can be optionally
   enabled with `spark_connect(..., package = "avro")`
 
+### Extensions
+
+- Fixed a bug where Spark package repositories specification was not honored by
+  `spark_dependency()`. The `repositories` parameter of `spark_dependency()` now
+  works as expected.
+
 ### Misc
 
 - Fixed warnings for deprecated functions (#2431)
