@@ -32,12 +32,7 @@
 
 ### Serialization
 
-- The new `arrow::write_to_raw()` functionality will be used if available in arrow-
-  enabled Spark connections
-
-- For arrow version 0.17 or above, sparklyr will ensure POSIXt columns have timezone
-  set before being serialized by arrow (columns without timezone will assume
-  `Sys.timezone()`)
+- Timezones, if present in data, are correctly represented now in Arrow serialization
 
 - Embedded nul bytes are removed from strings when reading strings from Spark to R
   (#2250)
