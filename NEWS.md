@@ -23,6 +23,9 @@
 
 ### Connections
 
+- Sparklyr can now connect with Spark 2.4 built with Scala 2.12 using
+  `spark_connect(..., scala_version = "2.12")`
+
 - Hive integration can now be disabled by configuration in `spark_connect()` (#2465)
 
 - A JVM object reference counting bug affecting secondary Spark connections was fixed
