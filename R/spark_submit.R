@@ -10,6 +10,7 @@ spark_submit <- function(master,
                          version = NULL,
                          config = spark_config(),
                          extensions = sparklyr::registered_extensions(),
+                         scala_version = NULL,
                          ...) {
   hadoop_version <- list(...)$hadoop_version
   temp_path <- tempfile()
@@ -36,7 +37,8 @@ spark_submit <- function(master,
                    service = FALSE,
                    remote = FALSE,
                    extensions = extensions,
-                   batch = file)
+                   batch = file,
+                   scala_version = scala_version)
 
   invisible(NULL)
 }

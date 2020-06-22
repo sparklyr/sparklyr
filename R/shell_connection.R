@@ -20,7 +20,7 @@ shell_connection <- function(master,
                              remote,
                              extensions,
                              batch,
-                             scala_version) {
+                             scala_version = NULL) {
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
 
