@@ -262,20 +262,19 @@ start_shell <- function(master,
     csv_config_value <- spark_config_value(config, c("sparklyr.connect.csv.embedded", "sparklyr.csv.embedded"))
     if (!is.null(csv_config_value) &&
         length(grep(csv_config_value, spark_version)) > 0) {
+      packages <- c(packages, "com.univocity:univocity-parsers:1.5.1")
       if (spark_config_value(config, c("sparklyr.connect.csv.scala11"), FALSE)) {
-        jars <- c(
-          jars,
-          normalizePath(system.file(file.path("java", "spark-csv_2.11-1.5.0.jar"), package = "sparklyr")),
-          normalizePath(system.file(file.path("java", "commons-csv-1.5.jar"), package = "sparklyr")),
-          normalizePath(system.file(file.path("java", "univocity-parsers-1.5.1.jar"), package = "sparklyr"))
+        packages <- c(
+          packages,
+          "com.databricks:spark-csv_2.11:1.5.0",
+          "org.apache.commons:commons-csv:1.5"
         )
       }
       else {
-        jars <- c(
-          jars,
-          normalizePath(system.file(file.path("java", "spark-csv_2.10-1.5.0.jar"), package = "sparklyr")),
-          normalizePath(system.file(file.path("java", "commons-csv-1.1.jar"), package = "sparklyr")),
-          normalizePath(system.file(file.path("java", "univocity-parsers-1.5.1.jar"), package = "sparklyr"))
+        packages <- c(
+          packages,
+          "com.databricks:spark-csv_2.10:1.5.0",
+          "org.apache.commons:commons-csv:1.1"
         )
       }
     }
