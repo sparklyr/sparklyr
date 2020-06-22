@@ -56,8 +56,10 @@ spark_dependency <- function(jars = NULL,
 spark_dependencies_from_extensions <- function(spark_version, extensions, config) {
   if (spark_version < "2.0")
     scala_version <- numeric_version("2.10")
-  else
+  else if (spark_version < "2.4.0")
     scala_version <- numeric_version("2.11")
+  else
+    scala_version <- numeric_version("2.12")
 
   jars <- character()
   packages <- character()
