@@ -141,13 +141,15 @@ spark_dependency_fallback <- function(spark_version, supported_versions) {
   sort(supported, decreasing = TRUE)[[1]]
 }
 
-sparklyr_jar_path <- function(spark_version) {
-  if (spark_version < "2.0")
-    scala_version <- "2.10"
-  else if (spark_version < "3.0")
-    scala_version <- "2.11"
-  else
-    scala_version <- "2.12"
+sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
+  scala_version <- scala_version %||% (
+    if (spark_version < "2.0")
+      "2.10"
+    else if (spark_version < "3.0")
+      "2.11"
+    else
+      "2.12"
+  )
   spark_major_minor <- spark_version[1, 1:2]
 
   exact_jar <- sprintf("sparklyr-%s-%s.jar", spark_major_minor, scala_version)

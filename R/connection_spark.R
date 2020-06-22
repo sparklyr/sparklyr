@@ -60,6 +60,11 @@ spark_default_app_jar <- function(version) {
 #'   \code{sparklyr.shell.packages} configuration option. Notice that the \code{version}
 #'   parameter is used to choose the correct package, otherwise assumes the latest version
 #'   is being used.
+#' @param scala_version Load the sparklyr jar file that is built with the version of
+#'   Scala specified (this currently only makes sense for Spark 2.4, where sparklyr will
+#'   by default assume Spark 2.4 on current host is built with Scala 2.11, and therefore
+#'   `scala_version = '2.12'` is needed if sparklyr is connecting to Spark 2.4 built with
+#'   Scala 2.12)
 #'
 #' @param ... Optional arguments; currently unused.
 #'
@@ -115,6 +120,7 @@ spark_connect <- function(master,
                           config = spark_config(),
                           extensions = sparklyr::registered_extensions(),
                           packages = NULL,
+                          scala_version = NULL,
                           ...)
 {
   # validate method
@@ -208,7 +214,8 @@ spark_connect <- function(master,
                                "sparklyr.gateway.remote",
                                spark_master_is_yarn_cluster(master, config)),
                              extensions = extensions,
-                             batch = NULL)
+                             batch = NULL,
+                             scala_version = scala_version)
     if (method != "shell") {
       scon$method <- method
     }
