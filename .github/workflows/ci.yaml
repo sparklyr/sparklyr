@@ -59,7 +59,7 @@ jobs:
               LIVY_VERSION: '0.5.0'
               SPARK_VERSION: '2.3.0'
               JAVA_VERSION: 'oraclejdk8'
-              SPARKLYR_LIVY_BRANCH: 'test/livy'
+              SPARKLYR_LIVY_BRANCH: 'feature/sparklyr-1.3.0'
           - name: 'Arrow (release)'
             r: 'release'
             env:
