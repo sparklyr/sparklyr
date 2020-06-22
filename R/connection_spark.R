@@ -23,9 +23,9 @@ spark_version_numeric <- function(version) {
   numeric_version(gsub("[-_a-zA-Z]", "", version))
 }
 
-spark_default_app_jar <- function(version) {
+spark_default_app_jar <- function(version, scala_version = NULL) {
   version <- version %||% .spark_default_version
-  sparklyr_jar_path(spark_version_numeric(version))
+  sparklyr_jar_path(spark_version_numeric(version), scala_version)
 }
 
 #' Manage Spark Connections
