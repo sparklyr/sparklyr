@@ -111,7 +111,8 @@ test_that("one-tree forest agrees with ml_decision_tree()", {
                  collect(),
                dt %>%
                  ml_predict(iris_tbl) %>%
-                 collect())
+                 collect(),
+               tolerance = 0.05)
 })
 
 test_that("checkpointing works for rf", {

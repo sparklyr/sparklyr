@@ -230,10 +230,15 @@ new_ml_multilayer_perceptron_classification_model <- function(jobj) {
       weights = read_spark_vector(jobj, "weights"),
       class = "ml_multilayer_perceptron_classification_model")
   } else {
+    layers <- invoke(jobj, "layers")
+
+    if ("spark_jobj" %in% class(layers))
+      layers <- invoke(jobj, "%>%", list("get", layers), list("get"))
+
     new_ml_probabilistic_classification_model(
       jobj,
       weights = read_spark_vector(jobj, "weights"),
-      layers = invoke(jobj, "layers"),
+      layers = layers,
       class = "ml_multilayer_perceptron_classification_model")
   }
 }
