@@ -18,7 +18,7 @@ test_that("ml_tree_feature_importance() works properly", {
   dt_importance <- ml_tree_feature_importance(dt)
   expect_equal(colnames(rf_importance), c("feature", "importance"))
   expect_equal(nrow(rf_importance), 3)
-  expect_equal(rf_importance, dt_importance)
+  expect_equal(rf_importance, dt_importance, tolerance = 0.025)
 })
 
 test_that("ml_tree_feature_importance() works for decision tree classification", {
