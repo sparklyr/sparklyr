@@ -19,7 +19,8 @@ shell_connection <- function(master,
                              service,
                              remote,
                              extensions,
-                             batch) {
+                             batch,
+                             scala_version = NULL) {
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
 
@@ -82,7 +83,8 @@ shell_connection <- function(master,
     shell_args = shell_args,
     service = service,
     remote = remote,
-    batch = batch
+    batch = batch,
+    scala_version = scala_version
   )
 }
 
@@ -157,6 +159,7 @@ start_shell <- function(master,
                         service = FALSE,
                         remote = FALSE,
                         batch = NULL,
+                        scala_version = NULL,
                         gateway_connect_attempts = 5,
                         gateway_connect_retry_interval_s = 0.25,
                         gateway_connect_retry_interval_multiplier = 2) {
@@ -194,7 +197,7 @@ start_shell <- function(master,
     # read app jar through config, this allows "sparkr-shell" to test sparkr backend
     app_jar <- spark_config_value(config, c("sparklyr.connect.app.jar", "sparklyr.app.jar"), NULL)
     if (is.null(app_jar)) {
-      app_jar <- spark_default_app_jar(versionSparkHome)
+      app_jar <- spark_default_app_jar(versionSparkHome, scala_version = scala_version)
       if (typeof(app_jar) != "character" || nchar(app_jar) == 0) {
         stop("sparklyr does not support Spark version: ", versionSparkHome)
       }

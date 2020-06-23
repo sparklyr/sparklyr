@@ -264,42 +264,49 @@ find_jar <- function() {
 spark_default_compilation_spec <- function(
   pkg = infer_active_package_name(),
   locations = NULL) {
-  list(
-    spark_compilation_spec(
-      spark_version = "1.5.2",
-      scalac_path = find_scalac("2.10", locations),
-      jar_name = sprintf("%s-1.5-2.10.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("1.5.2"),
-      embedded_srcs = c(),
+  c(
+    list(
+      spark_compilation_spec(
+        spark_version = "1.5.2",
+        scalac_path = find_scalac("2.10", locations),
+        jar_name = sprintf("%s-1.5-2.10.jar", pkg),
+        jar_path = find_jar(),
+        scala_filter = make_version_filter("1.5.2"),
+        embedded_srcs = c(),
+      ),
+      spark_compilation_spec(
+        spark_version = "1.6.0",
+        scalac_path = find_scalac("2.10", locations),
+        jar_name = sprintf("%s-1.6-2.10.jar", pkg),
+        jar_path = find_jar(),
+        scala_filter = make_version_filter("1.6.1")
+      ),
+      spark_compilation_spec(
+        spark_version = "2.0.0",
+        scalac_path = find_scalac("2.11", locations),
+        jar_name = sprintf("%s-2.0-2.11.jar", pkg),
+        jar_path = find_jar(),
+        scala_filter = make_version_filter("2.0.0")
+      ),
+      spark_compilation_spec(
+        spark_version = "2.3.0",
+        scalac_path = find_scalac("2.11", locations),
+        jar_name = sprintf("%s-2.3-2.11.jar", pkg),
+        jar_path = find_jar(),
+        scala_filter = make_version_filter("2.3.0")
+      )
     ),
-    spark_compilation_spec(
-      spark_version = "1.6.0",
-      scalac_path = find_scalac("2.10", locations),
-      jar_name = sprintf("%s-1.6-2.10.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("1.6.1")
-    ),
-    spark_compilation_spec(
-      spark_version = "2.0.0",
-      scalac_path = find_scalac("2.11", locations),
-      jar_name = sprintf("%s-2.0-2.11.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("2.0.0")
-    ),
-    spark_compilation_spec(
-      spark_version = "2.3.0",
-      scalac_path = find_scalac("2.11", locations),
-      jar_name = sprintf("%s-2.3-2.11.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("2.3.0")
-    ),
-    spark_compilation_spec(
-      spark_version = "2.4.0",
-      scalac_path = find_scalac("2.11", locations),
-      jar_name = sprintf("%s-2.4-2.11.jar", pkg),
-      jar_path = find_jar(),
-      scala_filter = make_version_filter("2.4.0")
+    lapply(
+      c("2.11", "2.12"),
+      function(scala_version) {
+        spark_compilation_spec(
+          spark_version = "2.4.0",
+          scalac_path = find_scalac(scala_version, locations),
+          jar_name = sprintf("%s-2.4-%s.jar", pkg, scala_version),
+          jar_path = find_jar(),
+          scala_filter = make_version_filter("2.4.0")
+        )
+      }
     )
   )
 }
