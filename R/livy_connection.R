@@ -592,7 +592,8 @@ livy_connection <- function(master,
                             app_name,
                             version,
                             hadoop_version,
-                            extensions) {
+                            extensions,
+                            scala_version = NULL) {
 
   if (is.null(version)) {
     stop("Livy connections now require the Spark version to be specified.", call. = FALSE)
@@ -612,7 +613,7 @@ livy_connection <- function(master,
   livy_validate_master(master, config)
 
   if (!spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
-    extensions <- spark_dependencies_from_extensions(version, extensions, config)
+    extensions <- spark_dependencies_from_extensions(version, scala_version, extensions, config)
 
     config$livy.jars <- as.character(c(livy_connection_jars(config, version), extensions$catalog_jars))
 

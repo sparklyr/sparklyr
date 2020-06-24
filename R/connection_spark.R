@@ -157,7 +157,8 @@ spark_connect <- function(master,
     config <- spark_config_packages(
       config,
       packages,
-      version %||% spark_version_from_home(spark_home)
+      version %||% spark_version_from_home(spark_home),
+      scala_version
     )
 
   if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
@@ -220,12 +221,13 @@ spark_connect <- function(master,
       scon$method <- method
     }
   } else if (method == "livy") {
-    scon <- livy_connection(master = master,
-                            config = config,
+    scon <- livy_connection(master,
+                            config,
                             app_name,
                             version,
                             hadoop_version ,
-                            extensions)
+                            extensions,
+                            scala_version = scala_version)
   } else if (method == "gateway") {
     scon <- gateway_connection(master = master, config = config)
   } else if (method == "databricks") {
