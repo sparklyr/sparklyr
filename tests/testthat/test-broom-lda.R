@@ -25,7 +25,8 @@ test_that("lda.tidy() works", {
                ifelse(spark_version(sc) < "3.0.0",
                       list(c(0.8773, 0.9466, 1.2075)),
                       list(c(0.8790, 0.9478, 1.1515)))[[1]],
-               tolerance = 0.001)
+               tolerance = 0.001,
+               scale = 1)
 })
 
 test_that("lda.augment() works", {

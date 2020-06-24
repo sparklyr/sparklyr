@@ -13,7 +13,7 @@ test_that("random_forest.tidy() works", {
 
   check_tidy(td1, exp.row = 2,
              exp.names = c("feature", "importance"))
-  expect_equal(td1$importance, c(0.941, 0.0586), tolerance = 0.1)
+  expect_equal(td1$importance, c(0.941, 0.0586), tolerance = 0.1, scale = 1)
 
   # for regression
   td2 <- iris_tbl %>%
@@ -22,7 +22,7 @@ test_that("random_forest.tidy() works", {
 
   check_tidy(td2, exp.row = 2,
              exp.names = c("feature", "importance"))
-  expect_equal(td2$importance, c(0.658, 0.342), tolerance = 0.1)
+  expect_equal(td2$importance, c(0.658, 0.342), tolerance = 0.1, scale = 1)
 
 })
 
