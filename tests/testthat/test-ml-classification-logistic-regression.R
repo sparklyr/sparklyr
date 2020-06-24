@@ -93,7 +93,7 @@ test_that("ml_logistic_regression() agrees with stats::glm()", {
                               formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
                               reg_param = 0L,
                               weight_col = "weights")
-  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
            family = binomial(logit), data = iris_weighted)
@@ -101,7 +101,7 @@ test_that("ml_logistic_regression() agrees with stats::glm()", {
                               formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
                               reg_param = 0L,
                               weight_col = "ones")
-  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 })
 
 test_that("ml_logistic_regression can fit without intercept",{
@@ -117,7 +117,7 @@ test_that("ml_logistic_regression can fit without intercept",{
     formula = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
     fit_intercept=FALSE),NA)
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width - 1, family=binomial(logit), data=iris_weighted)
-  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 })
 
 test_that("ml_logistic_regression() agrees with stats::glm() for reversed categories", {
@@ -136,7 +136,7 @@ test_that("ml_logistic_regression() agrees with stats::glm() for reversed catego
                               formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
                               reg_param = 0L,
                               weight_col = "weights")
-  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
            family = binomial(logit), data = iris_weighted)
@@ -144,7 +144,7 @@ test_that("ml_logistic_regression() agrees with stats::glm() for reversed catego
                               formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
                               reg_param = 0L,
                               weight_col = "ones")
-  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 })
 
 test_that("ml_logistic_regression.tbl_spark() takes both quoted and unquoted formulas", {
@@ -254,7 +254,7 @@ test_that("weights column works for logistic regression", {
                               features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
                               reg_param = 0L,
                               weight_col = "weights")
-  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
            family = binomial(logit), data = iris_weighted)
@@ -263,7 +263,7 @@ test_that("weights column works for logistic regression", {
                               features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
                               reg_param = 0L,
                               weight_col = "ones")
-  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5)
+  expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 })
 
 test_that("logistic regression bounds on coefficients", {

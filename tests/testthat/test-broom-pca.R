@@ -20,7 +20,7 @@ test_that("pca.tidy() works", {
 
   expect_equal(td1$PC1,
                -as.vector(model$rotation[,1]),
-               tolerance = 0.001)
+               tolerance = 0.001, scale = 1)
 
 })
 

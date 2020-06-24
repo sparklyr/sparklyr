@@ -15,7 +15,7 @@ test_that("linear_svc.tidy() works", {
   check_tidy(td1, exp.row = 5, exp.col = 2,
              exp.names = c("features", "coefficients"))
   expect_equal(td1$coefficients, c(-4.55, -0.981, -2.85, 1.87, 6.06),
-               tolerance = 0.001)
+               tolerance = 0.01, scale = 1)
 
 })
 

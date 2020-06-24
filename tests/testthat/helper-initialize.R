@@ -370,7 +370,7 @@ expect_coef_equal <- function(lhs, rhs) {
   lhs <- lhs[nm]
   rhs <- rhs[nm]
 
-  expect_true(all.equal(lhs, rhs, tolerance = 0.01))
+  expect_true(all.equal(lhs, rhs, tolerance = 0.01, scale = 1))
 }
 
 skip_on_arrow <- function() {

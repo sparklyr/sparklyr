@@ -98,13 +98,13 @@ test_that("ml_compute_cost() for kmeans", {
   } else {
     expect_equal(
       ml_compute_cost(iris_kmeans, iris_tbl),
-      46.7123, tolerance = 0.01
+      46.7123, tolerance = 0.01, scale = 1
     )
     expect_equal(
       iris_tbl %>%
         ft_r_formula(~ . - Species) %>%
         ml_compute_cost(iris_kmeans$model, .),
-      46.7123, tolerance = 0.01
+      46.7123, tolerance = 0.01, scale = 1
     )
   }
 })
