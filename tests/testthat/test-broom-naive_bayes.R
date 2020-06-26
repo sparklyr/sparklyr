@@ -17,7 +17,7 @@ test_that("naive_bayes.tidy() works", {
   check_tidy(td1, exp.row = 3, exp.col = 4,
              exp.names = c(".label", "Sepal_Length",
                            "Petal_Length", ".pi"))
-  expect_equal(td1$Sepal_Length, c(-0.258, -0.542, -0.612), tolerance = 0.001)
+  expect_equal(td1$Sepal_Length, c(-0.258, -0.542, -0.612), tolerance = 0.001, scale = 1)
 
 })
 

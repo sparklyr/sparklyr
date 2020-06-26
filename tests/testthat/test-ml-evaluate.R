@@ -167,7 +167,7 @@ test_that("ml_evaluate() works for kmeans", {
      ml_evaluate(iris_tbl)
 
   expect_equal(names(kmeans_silhouette), "Silhouette")
-  expect_equal(kmeans_silhouette$Silhouette, 0.85, tolerance = 0.001)
+  expect_equal(kmeans_silhouette$Silhouette, 0.85, tolerance = 0.001, scale = 1)
 })
 
 test_that("ml_evaluate() works for bisecting kmeans", {
@@ -178,7 +178,7 @@ test_that("ml_evaluate() works for bisecting kmeans", {
     ml_evaluate(iris_tbl)
 
   expect_equal(names(bi_kmeans_silhouette), "Silhouette")
-  expect_equal(bi_kmeans_silhouette$Silhouette, 0.517, tolerance = 0.001)
+  expect_equal(bi_kmeans_silhouette$Silhouette, 0.517, tolerance = 0.001, scale = 1)
 })
 
 test_that("ml_evaluate() works for gaussian mixtures model", {
@@ -189,7 +189,7 @@ test_that("ml_evaluate() works for gaussian mixtures model", {
     ml_evaluate(iris_tbl)
 
   expect_equal(names(gmm_silhouette), "Silhouette")
-  expect_equal(gmm_silhouette$Silhouette, 0.477, tolerance = 0.001)
+  expect_equal(gmm_silhouette$Silhouette, 0.477, tolerance = 0.001, scale = 1)
 })
 
 test_that("ml_evaluate() works for naive bayes model", {
@@ -199,7 +199,7 @@ test_that("ml_evaluate() works for naive bayes model", {
     ml_evaluate(iris_tbl)
 
   expect_equal(names(nb_acc), "Accuracy")
-  expect_equal(nb_acc$Accuracy, 0.953, tolerance = 0.001)
+  expect_equal(nb_acc$Accuracy, 0.953, tolerance = 0.001, scale = 1)
 })
 
 test_that("ml_evaluate() works for random forest model", {
@@ -258,5 +258,5 @@ test_that("ml_evaluate() works for svc model", {
     ml_evaluate(iris_tbl)
 
   expect_equal(names(svc_acc), "Accuracy")
-  expect_equal(svc_acc$Accuracy, 0.95, tolerance = 0.01)
+  expect_equal(svc_acc$Accuracy, 0.95, tolerance = 0.01, scale = 1)
 })

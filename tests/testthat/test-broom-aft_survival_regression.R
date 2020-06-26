@@ -19,7 +19,7 @@ test_that("aft_survival_regression.tidy() works", {
   check_tidy(td1, exp.row = 3, exp.col = 2,
              exp.names = c("features", "coefficients"))
   expect_equal(td1$coefficients, c(2.64, -0.496, 0.198),
-               tolerance = 0.001)
+               tolerance = 0.001, scale = 1)
 
 })
 

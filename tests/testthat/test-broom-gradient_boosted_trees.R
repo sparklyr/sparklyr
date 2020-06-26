@@ -22,11 +22,11 @@ test_that("gradient_boosted_trees.tidy() works", {
   check_tidy(td1, exp.row = 2,
              exp.names = c("feature", "importance"))
   if (spark_version(sc) < "3.0.0") {
-    expect_equal(get_importance(tbl = td1, "Petal_Length"), 0.594, tolerance = 0.05)
-    expect_equal(get_importance(tbl = td1, "Sepal_Length"), 0.406, tolerance = 0.05)
+    expect_equal(get_importance(tbl = td1, "Petal_Length"), 0.594, tolerance = 0.05, scale = 1)
+    expect_equal(get_importance(tbl = td1, "Sepal_Length"), 0.406, tolerance = 0.05, scale = 1)
   } else {
-    expect_equal(get_importance(tbl = td1, "Petal_Length"), 0.819, tolerance = 0.05)
-    expect_equal(get_importance(tbl = td1, "Sepal_Length"), 0.181, tolerance = 0.05)
+    expect_equal(get_importance(tbl = td1, "Petal_Length"), 0.819, tolerance = 0.05, scale = 1)
+    expect_equal(get_importance(tbl = td1, "Sepal_Length"), 0.181, tolerance = 0.05, scale = 1)
   }
 
   # for regression
@@ -37,11 +37,11 @@ test_that("gradient_boosted_trees.tidy() works", {
   check_tidy(td2, exp.row = 2,
              exp.names = c("feature", "importance"))
   if (spark_version(sc) < "3.0.0") {
-    expect_equal(get_importance(tbl = td2, "Petal_Length"), 0.607, tolerance = 0.001)
-    expect_equal(get_importance(tbl = td2, "Petal_Width"), 0.393, tolerance = 0.001)
+    expect_equal(get_importance(tbl = td2, "Petal_Length"), 0.607, tolerance = 0.001, scale = 1)
+    expect_equal(get_importance(tbl = td2, "Petal_Width"), 0.393, tolerance = 0.001, scale = 1)
   } else {
-    expect_equal(get_importance(tbl = td2, "Petal_Length"), 0.798, tolerance = 0.001)
-    expect_equal(get_importance(tbl = td2, "Petal_Width"), 0.202, tolerance = 0.001)
+    expect_equal(get_importance(tbl = td2, "Petal_Length"), 0.798, tolerance = 0.001, scale = 1)
+    expect_equal(get_importance(tbl = td2, "Petal_Width"), 0.202, tolerance = 0.001, scale = 1)
   }
 })
 

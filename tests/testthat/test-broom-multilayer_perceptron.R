@@ -32,7 +32,7 @@ test_that("multilayer_perceptron.tidy() works", {
 
   expect_equal(td1$weight_matrix[[3]],
                matrix(expected_coeffs, nrow = 4, byrow = TRUE),
-               tolerance = 0.001)
+               tolerance = 0.001, scale = 1)
 
 })
 

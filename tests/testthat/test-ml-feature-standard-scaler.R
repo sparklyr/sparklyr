@@ -37,7 +37,7 @@ test_that("ft_standard_scaler() works properly", {
       dplyr::pull(scaledFeatures) %>%
       unlist() %>%
       sum(),
-    295.3425, tolerance = 0.001
+    295.3425, tolerance = 0.001, scale = 1
   )
 
   expect_output_file(

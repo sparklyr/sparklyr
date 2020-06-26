@@ -14,7 +14,7 @@ test_that("logistic_regression.tidy() works", {
   check_tidy(td1, exp.row = 3, exp.col = 4,
              exp.names = c("features", "versicolor_coef",
                            "virginica_coef", "setosa_coef"))
-  expect_equal(td1$versicolor_coef, c(15.26, -5.07, 7.7), tolerance = 0.001)
+  expect_equal(td1$versicolor_coef, c(15.26, -5.07, 7.7), tolerance = 0.01, scale = 1)
 
   # for binary classification
   td2 <- iris_tbl %>%
@@ -24,7 +24,7 @@ test_that("logistic_regression.tidy() works", {
 
   check_tidy(td2, exp.row = 3, exp.col = 2,
              exp.names = c("features", "coefficients"))
-  expect_equal(td2$coefficients, c(-39.8, -4.02, 13.3), tolerance = 0.001)
+  expect_equal(td2$coefficients, c(-39.84, -4.023, 13.31), tolerance = 0.01, scale = 1)
 
 })
 

@@ -12,7 +12,8 @@ test_that("ml_clustering_evaluator() works", {
   expect_equal(
     ml_clustering_evaluator(predictions),
     0.999753,
-    tolerance = 1e-5
+    tolerance = 1e-5,
+    scale = 1
   )
 })
 
