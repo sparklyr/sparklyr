@@ -1003,7 +1003,7 @@ spark_read_delta <- function(sc,
 #' an explicitly specified Spark version (i.e.,
 #' \code{spark_connect(..., version = <version>, packages = c("avro", <other package(s)>), ...)})
 #' or a specific version of Spark avro package to use (e.g.,
-#' \code{spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0-preview2", <other package(s)>), ...)}).
+#' \code{spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0", <other package(s)>), ...)}).
 #'
 #' @inheritParams spark_read_csv
 #' @param avro_schema Optional Avro schema in JSON format
@@ -1049,7 +1049,7 @@ spark_read_avro <- function(sc,
 #' an explicitly specified Spark version (i.e.,
 #' \code{spark_connect(..., version = <version>, packages = c("avro", <other package(s)>), ...)})
 #' or a specific version of Spark avro package to use (e.g.,
-#' \code{spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0-preview2", <other package(s)>), ...)}).
+#' \code{spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0", <other package(s)>), ...)}).
 #'
 #' @inheritParams spark_write_csv
 #' @param avro_schema Optional Avro schema in JSON format

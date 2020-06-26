@@ -1,7 +1,7 @@
 
 #' Pipe operator
 #'
-#' See \code{\link[dplyr]{\%>\%}} for more details.
+#' See \code{\link[dplyr:reexports]{\%>\%}} for more details.
 #'
 #' @name %>%
 #' @rdname pipe
@@ -13,7 +13,7 @@ NULL
 
 #' Copy To
 #'
-#' See \code{\link[dplyr]{copy_to}} for more details.
+#' See \code{\link[dplyr:copy_to]{copy_to}} for more details.
 #'
 #' @name copy_to
 #' @keywords internal
