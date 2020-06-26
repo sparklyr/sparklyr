@@ -19,7 +19,8 @@ shell_connection <- function(master,
                              service,
                              remote,
                              extensions,
-                             batch) {
+                             batch,
+                             scala_version = NULL) {
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
 
@@ -82,7 +83,8 @@ shell_connection <- function(master,
     shell_args = shell_args,
     service = service,
     remote = remote,
-    batch = batch
+    batch = batch,
+    scala_version = scala_version
   )
 }
 
@@ -157,6 +159,7 @@ start_shell <- function(master,
                         service = FALSE,
                         remote = FALSE,
                         batch = NULL,
+                        scala_version = NULL,
                         gateway_connect_attempts = 5,
                         gateway_connect_retry_interval_s = 0.25,
                         gateway_connect_retry_interval_multiplier = 2) {
@@ -194,7 +197,7 @@ start_shell <- function(master,
     # read app jar through config, this allows "sparkr-shell" to test sparkr backend
     app_jar <- spark_config_value(config, c("sparklyr.connect.app.jar", "sparklyr.app.jar"), NULL)
     if (is.null(app_jar)) {
-      app_jar <- spark_default_app_jar(versionSparkHome)
+      app_jar <- spark_default_app_jar(versionSparkHome, scala_version = scala_version)
       if (typeof(app_jar) != "character" || nchar(app_jar) == 0) {
         stop("sparklyr does not support Spark version: ", versionSparkHome)
       }
@@ -250,7 +253,7 @@ start_shell <- function(master,
              gsub("[-_a-zA-Z]", "", spark_version)
       )
     )
-    extensions <- spark_dependencies_from_extensions(spark_version, extensions, config)
+    extensions <- spark_dependencies_from_extensions(spark_version, scala_version, extensions, config)
 
     # combine passed jars and packages with extensions
     all_jars <- c(jars, extensions$jars)
@@ -262,20 +265,19 @@ start_shell <- function(master,
     csv_config_value <- spark_config_value(config, c("sparklyr.connect.csv.embedded", "sparklyr.csv.embedded"))
     if (!is.null(csv_config_value) &&
         length(grep(csv_config_value, spark_version)) > 0) {
+      packages <- c(packages, "com.univocity:univocity-parsers:1.5.1")
       if (spark_config_value(config, c("sparklyr.connect.csv.scala11"), FALSE)) {
-        jars <- c(
-          jars,
-          normalizePath(system.file(file.path("java", "spark-csv_2.11-1.5.0.jar"), package = "sparklyr")),
-          normalizePath(system.file(file.path("java", "commons-csv-1.5.jar"), package = "sparklyr")),
-          normalizePath(system.file(file.path("java", "univocity-parsers-1.5.1.jar"), package = "sparklyr"))
+        packages <- c(
+          packages,
+          "com.databricks:spark-csv_2.11:1.5.0",
+          "org.apache.commons:commons-csv:1.5"
         )
       }
       else {
-        jars <- c(
-          jars,
-          normalizePath(system.file(file.path("java", "spark-csv_2.10-1.5.0.jar"), package = "sparklyr")),
-          normalizePath(system.file(file.path("java", "commons-csv-1.1.jar"), package = "sparklyr")),
-          normalizePath(system.file(file.path("java", "univocity-parsers-1.5.1.jar"), package = "sparklyr"))
+        packages <- c(
+          packages,
+          "com.databricks:spark-csv_2.10:1.5.0",
+          "org.apache.commons:commons-csv:1.1"
         )
       }
     }

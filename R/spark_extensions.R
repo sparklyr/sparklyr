@@ -53,12 +53,17 @@ spark_dependency <- function(jars = NULL,
   ))
 }
 
-spark_dependencies_from_extensions <- function(spark_version, extensions, config) {
-  if (spark_version < "2.0")
-    scala_version <- numeric_version("2.10")
-  else
-    scala_version <- numeric_version("2.11")
-
+spark_dependencies_from_extensions <- function(spark_version, scala_version, extensions, config) {
+  scala_version <- numeric_version(
+    scala_version %||% (
+      if (spark_version < "2.0")
+        scala_version <- "2.10"
+      else if (spark_version < "3.0")
+        scala_version <- "2.11"
+      else
+        scala_version <- "2.12"
+    )
+  )
   jars <- character()
   packages <- character()
   initializers <- list()
@@ -141,13 +146,15 @@ spark_dependency_fallback <- function(spark_version, supported_versions) {
   sort(supported, decreasing = TRUE)[[1]]
 }
 
-sparklyr_jar_path <- function(spark_version) {
-  if (spark_version < "2.0")
-    scala_version <- "2.10"
-  else if (spark_version < "3.0")
-    scala_version <- "2.11"
-  else
-    scala_version <- "2.12"
+sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
+  scala_version <- scala_version %||% (
+    if (spark_version < "2.0")
+      "2.10"
+    else if (spark_version < "3.0")
+      "2.11"
+    else
+      "2.12"
+  )
   spark_major_minor <- spark_version[1, 1:2]
 
   exact_jar <- sprintf("sparklyr-%s-%s.jar", spark_major_minor, scala_version)
@@ -178,5 +185,5 @@ sparklyr_jar_path <- function(spark_version) {
 
 # sparklyr's own declared dependencies
 spark_dependencies <- function(spark_version, scala_version) {
-  spark_dependency(jars = sparklyr_jar_path(spark_version))
+  spark_dependency(jars = sparklyr_jar_path(spark_version, scala_version))
 }
