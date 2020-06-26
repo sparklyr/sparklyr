@@ -36,6 +36,7 @@ spark_submit(
   version = NULL,
   config = spark_config(),
   extensions = sparklyr::registered_extensions(),
+  scala_version = NULL,
   ...
 )
 }
