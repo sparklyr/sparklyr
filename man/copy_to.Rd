@@ -4,6 +4,6 @@
 \alias{copy_to}
 \title{Copy To}
 \description{
-See \code{\link[dplyr]{copy_to}} for more details.
+See \code{\link[dplyr:copy_to]{copy_to}} for more details.
 }
 \keyword{internal}

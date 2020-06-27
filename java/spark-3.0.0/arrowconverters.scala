@@ -24,6 +24,7 @@ import org.apache.spark.sql.util.ArrowUtils
 import org.apache.spark.sql.execution.arrow.ArrowWriter
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.util.__THIS_IS_THE_ROAD_TO_CLOWNTOWN__ArrowUtils
 import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch, ColumnVector}
 import org.apache.spark.util.TaskCompletionListener
 
@@ -99,9 +100,9 @@ class ArrowConvertersImpl {
       timeZoneId: String,
       context: Option[TaskContext]): Iterator[Array[Byte]] = {
 
-    val arrowSchema = ArrowUtils.toArrowSchema(schema, timeZoneId)
+    val arrowSchema = org.apache.spark.sql.util.__THIS_IS_THE_ROAD_TO_CLOWNTOWN__ArrowUtils.toArrowSchema(schema, timeZoneId)
     val allocator =
-      ArrowUtils.rootAllocator.newChildAllocator("toBatchIterator", 0, Long.MaxValue)
+      org.apache.spark.sql.util.__THIS_IS_THE_ROAD_TO_CLOWNTOWN__ArrowUtils.rootAllocator.newChildAllocator("toBatchIterator", 0, Long.MaxValue)
 
     val root = VectorSchemaRoot.create(arrowSchema, allocator)
     val unloader = new VectorUnloader(root)
@@ -116,7 +117,7 @@ class ArrowConvertersImpl {
       })
     }
 
-    val encoder = RowEncoder(schema)
+    val toRow = RowEncoder(schema).createSerializer
 
     new Iterator[Array[Byte]] {
 
@@ -134,7 +135,7 @@ class ArrowConvertersImpl {
           var rowCount = 0
           while (rowIter.hasNext && (maxRecordsPerBatch <= 0 || rowCount < maxRecordsPerBatch)) {
             val row: Row = rowIter.next()
-            val internalRow: InternalRow = encoder.toRow(row)
+            val internalRow: InternalRow = toRow(row)
             arrowWriter.write(internalRow)
             rowCount += 1
           }
@@ -166,7 +167,7 @@ class ArrowConvertersImpl {
       payloadIter: Iterator[Array[Byte]],
       context: Option[TaskContext]): ArrowRowIterator = {
     val allocator =
-      ArrowUtils.rootAllocator.newChildAllocator("fromPayloadIterator", 0, Long.MaxValue)
+      org.apache.spark.sql.util.__THIS_IS_THE_ROAD_TO_CLOWNTOWN__ArrowUtils.rootAllocator.newChildAllocator("fromPayloadIterator", 0, Long.MaxValue)
 
     new ArrowRowIterator {
       private var reader: ArrowStreamReader = null
