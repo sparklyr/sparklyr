@@ -23,7 +23,7 @@ NULL
 
 #' Collect
 #'
-#' See \code{\link[dplyr]{collect}} for more details.
+#' See \code{\link[dplyr:compute]{collect}} for more details.
 #'
 #' @name collect
 #' @keywords internal
