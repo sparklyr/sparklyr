@@ -307,6 +307,15 @@ spark_default_compilation_spec <- function(
           scala_filter = make_version_filter("2.4.0")
         )
       }
+    ),
+    list(
+      spark_compilation_spec(
+        spark_version = "3.0.0",
+        scalac_path = find_scalac("2.12", locations),
+        jar_name = sprintf("%s-3.0-2.12.jar", pkg),
+        jar_path = find_jar(),
+        scala_filter = make_version_filter("3.0.0")
+      )
     )
   )
 }

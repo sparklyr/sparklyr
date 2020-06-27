@@ -8,14 +8,13 @@ import org.apache.arrow.vector.ipc.message.{ArrowRecordBatch, MessageSerializer}
 import org.apache.arrow.vector.ipc.WriteChannel
 
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.util.ArrowUtils
+import org.apache.spark.sql.util.__THIS_IS_THE_ROAD_TO_CLOWNTOWN__ArrowUtils
 
 class ArrowBatchStreamWriter(
     schema: org.apache.spark.sql.types.StructType,
     out: java.io.OutputStream,
     timeZoneId: String) {
-
-  val arrowSchema = ArrowUtils.toArrowSchema(schema, timeZoneId)
+  val arrowSchema = org.apache.spark.sql.util.__THIS_IS_THE_ROAD_TO_CLOWNTOWN__ArrowUtils.toArrowSchema(schema, timeZoneId)
   val writeChannel = new WriteChannel(Channels.newChannel(out))
 
   // Write the Arrow schema first, before batches

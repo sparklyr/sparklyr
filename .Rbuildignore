@@ -8,6 +8,7 @@
 ^configure$
 ^configure\.win$
 ^configure\.R$
+^update_embedded_sources\.R$
 ^.github/
 ^examples/
 ^demo\.R$
