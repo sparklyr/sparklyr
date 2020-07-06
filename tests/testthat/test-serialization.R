@@ -148,13 +148,20 @@ test_that("collect() can retrieve all data types correctly", {
   atime <- as.character(as.POSIXct(utime, origin = "1970-01-01"))
 
   arrow_compat <- using_arrow()
+  if (arrow_compat && packageVersion("arrow") > "0.17.1") {
+    # Arrow will pull int64 into R as integer if all values fit in 32-bit int
+    # (which they do in this test suite)
+    arrowbigint <- "integer"
+  } else {
+    arrowbigint <- "integer64"
+  }
 
   hive_type <- tibble::tribble(
     ~stype,            ~svalue,      ~rtype,     ~rvalue,      ~atype,     ~avalue,
     "tinyint",             "1",   "integer",         "1",   "integer",         "1",
     "smallint",            "1",   "integer",         "1",   "integer",         "1",
     "integer",             "1",   "integer",         "1",   "integer",         "1",
-    "bigint",              "1",   "numeric",         "1", "integer64",         "1",
+    "bigint",              "1",   "numeric",         "1", arrowbigint,         "1",
     "float",               "1",   "numeric",         "1",   "numeric",         "1",
     "double",              "1",   "numeric",         "1",   "numeric",         "1",
     "decimal",             "1",   "numeric",         "1",   "numeric",         "1",
@@ -207,7 +214,7 @@ test_that("collect() can retrieve NULL data types as NAs", {
      "tinyint",     "integer",         "raw",
     "smallint",     "integer",     "integer",
      "integer",     "integer",     "integer",
-      "bigint",     "numeric",   "integer64",
+      "bigint",     "numeric",   arrowbigint,
        "float",     "numeric",     "numeric",
       "double",     "numeric",     "numeric",
      "decimal",     "numeric",     "numeric",
@@ -217,11 +224,6 @@ test_that("collect() can retrieve NULL data types as NAs", {
  "varchar(10)",   "character",   "character",
     "char(10)",   "character",   "character",
   )
-
-  if (using_arrow()) {
-    # Disable while tracking fix for ARROW-3794
-    hive_type <- hive_type %>% filter(stype != "tinyint")
-  }
 
   if (spark_version(sc) < "2.2.0") {
     hive_type <- hive_type %>% filter(stype != "integer")
@@ -241,7 +243,7 @@ test_that("collect() can retrieve NULL data types as NAs", {
 
   expect_equal(
     spark_types,
-    hive_type %>% pull(!! if(using_arrow()) "atype" else "rtype")
+    hive_type %>% pull(!! if(arrow_compat) "atype" else "rtype")
   )
 
   spark_results <- DBI::dbGetQuery(sc, spark_query)
