@@ -128,6 +128,15 @@ test_that("copy_to() succeeds when last column contains missing / empty values",
   expect_equal(sdf_ncol(df_tbl), 2)
 })
 
+arrow_compat <- using_arrow()
+if (arrow_compat && packageVersion("arrow") > "0.17.1") {
+  # Arrow will pull int64 into R as integer if all values fit in 32-bit int
+  # (which they do in this test suite)
+  arrowbigint <- "integer"
+} else {
+  arrowbigint <- "integer64"
+}
+
 test_that("collect() can retrieve all data types correctly", {
   skip_databricks_connect()
   # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes
@@ -146,15 +155,6 @@ test_that("collect() can retrieve all data types correctly", {
   stime <- paste0("to_utc_timestamp(from_unixtime(", utime, "), 'UTC')")
   rtime <- "2010-01-01 01:01:10"
   atime <- as.character(as.POSIXct(utime, origin = "1970-01-01"))
-
-  arrow_compat <- using_arrow()
-  if (arrow_compat && packageVersion("arrow") > "0.17.1") {
-    # Arrow will pull int64 into R as integer if all values fit in 32-bit int
-    # (which they do in this test suite)
-    arrowbigint <- "integer"
-  } else {
-    arrowbigint <- "integer64"
-  }
 
   hive_type <- tibble::tribble(
     ~stype,            ~svalue,      ~rtype,     ~rvalue,      ~atype,     ~avalue,
