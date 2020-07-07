@@ -211,7 +211,7 @@ test_that("collect() can retrieve NULL data types as NAs", {
 
   hive_type <- tibble::tribble(
         ~stype,        ~rtype,        ~atype,
-     "tinyint",     "integer",         "raw",
+     "tinyint",     "integer",     "integer",
     "smallint",     "integer",     "integer",
      "integer",     "integer",     "integer",
       "bigint",     "numeric",   arrowbigint,
