@@ -20,7 +20,7 @@ translate_formula <- function(f) {
   # renaming variables because Spark SQL cannot handle lambda variable name
   # starting with '.'
   f <- do.call(substitute, list(f, list(.x = var_x, .y = var_y)))
-  vars <- all.vars(f)
+  vars <- sort(all.vars(f))
   params_sql <- (
     if (length(vars) > 1)
       paste0("(", paste0(vars, collapse = ", "), ")")
