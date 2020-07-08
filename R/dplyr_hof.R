@@ -366,3 +366,41 @@ hof_zip_with <- function(
 
   do.mutate(x, dest_col, sql, ...)
 }
+
+#' Sort array using a custom comparator
+#'
+#' Applies a custom comparator function to sort an array
+#' (this is essentially a dplyr wrapper to the `array_sort(expr, func)` higher-
+#' order function, which is supported since Spark 3.0)
+#'
+#' @param x The Spark data frame to transform
+#' @param func The transformation to apply
+#' @param expr The array being transformed, could be any SQL expression evaluating to an array
+#'  (default: the last column of the Spark data frame)
+#' @param dest_col Column to store the transformed result (default: expr)
+#' @param ... Additional params to dplyr::mutate
+#'
+#' TODO: example
+#'
+#' @export
+hof_array_sort <- function(
+  x,
+  func,
+  expr = NULL,
+  dest_col = NULL,
+  ...
+) {
+  func <- process_lambda(func)
+  expr <- process_expr(x, rlang::enexpr(expr))
+  dest_col <- process_dest_col(expr, rlang::enexpr(dest_col))
+
+  sql <- paste(
+    "ARRAY_SORT(",
+    as.character(dbplyr::translate_sql(!! expr)),
+    ",",
+    as.character(func),
+    ")"
+  )
+
+  do.mutate(x, dest_col, sql, ...)
+}
