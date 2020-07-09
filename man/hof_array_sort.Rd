@@ -2,7 +2,7 @@
 % Please edit documentation in R/dplyr_hof.R
 \name{hof_array_sort}
 \alias{hof_array_sort}
-\title{Sort array using a custom comparator}
+\title{Sorts array using a custom comparator}
 \usage{
 hof_array_sort(x, func, expr = NULL, dest_col = NULL, ...)
 }
@@ -21,7 +21,20 @@ the second)}
 
 \item{...}{Additional params to dplyr::mutate
 
-TODO: example}
+\dontrun{
+
+library(sparklyr)
+sc <- spark_connect(master = "local[3]", version = "3.0.0")
+copy_to(
+  sc,
+  tibble::tibble(
+    # x contains 2 arrays each having elements in ascending order
+    x = list(1:5, 6:10)
+  )
+) %>%
+  # now each array from x gets sorted in descending order
+  hof_array_sort(~ as.integer(sign(.y - .x)))
+}}
 }
 \description{
 Applies a custom comparator function to sort an array

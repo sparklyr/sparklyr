@@ -367,7 +367,7 @@ hof_zip_with <- function(
   do.mutate(x, dest_col, sql, ...)
 }
 
-#' Sort array using a custom comparator
+#' Sorts array using a custom comparator
 #'
 #' Applies a custom comparator function to sort an array
 #' (this is essentially a dplyr wrapper to the `array_sort(expr, func)` higher-
@@ -383,7 +383,20 @@ hof_zip_with <- function(
 #' @param dest_col Column to store the transformed result (default: expr)
 #' @param ... Additional params to dplyr::mutate
 #'
-#' TODO: example
+#' \dontrun{
+#'
+#' library(sparklyr)
+#' sc <- spark_connect(master = "local[3]", version = "3.0.0")
+#' copy_to(
+#'   sc,
+#'   tibble::tibble(
+#'     # x contains 2 arrays each having elements in ascending order
+#'     x = list(1:5, 6:10)
+#'   )
+#' ) %>%
+#'   # now each array from x gets sorted in descending order
+#'   hof_array_sort(~ as.integer(sign(.y - .x)))
+#' }
 #'
 #' @export
 hof_array_sort <- function(
