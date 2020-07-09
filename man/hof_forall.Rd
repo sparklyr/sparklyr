@@ -27,7 +27,16 @@ order function, which is supported since Spark 3.0)
 \examples{
 \dontrun{
 
-# TODO:
+sc <- spark_connect(master = "local", version = "3.0.0")
+df <- tibble::tibble(
+  x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+  y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+)
+sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
+
+all_positible_tbl <- sdf \%>\%
+ hof_forall(pred = ~ .x > 0, expr = y, dest_col = all_positive) \%>\%
+ dplyr::select(all_positive)
 }
 
 }
