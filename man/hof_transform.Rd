@@ -28,7 +28,7 @@ Apply an element-wise transformation function to an array column
 \dontrun{
 
 library(sparklyr)
-sc <- spark_connect(master = "local[3]")
+sc <- spark_connect(master = "local")
 # applies the (x -> x * x) transformation to elements of all arrays
 copy_to(sc, tibble::tibble(arr = list(1:5, 21:25))) \%>\%
   hof_transform(~ .x * .x)

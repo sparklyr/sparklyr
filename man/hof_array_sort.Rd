@@ -30,7 +30,7 @@ order function, which is supported since Spark 3.0)
 \dontrun{
 
 library(sparklyr)
-sc <- spark_connect(master = "local[3]", version = "3.0.0")
+sc <- spark_connect(master = "local", version = "3.0.0")
 copy_to(
   sc,
   tibble::tibble(

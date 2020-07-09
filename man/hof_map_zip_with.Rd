@@ -36,7 +36,27 @@ order function, which is supported since Spark 3.0)
 
 library(sparklyr)
 sc <- spark_connect(master = "local", version = "3.0.0")
-#TODO:
+
+# create a Spark dataframe with 2 columns of type MAP<STRING, INT>
+two_maps_tbl <- sdf_copy_to(
+  sc,
+  tibble::tibble(
+    m1 = c("{\"1\":2,\"3\":4,\"5\":6}", "{\"2\":1,\"4\":3,\"6\":5}"),
+    m2 = c("{\"1\":1,\"3\":3,\"5\":5}", "{\"2\":2,\"4\":4,\"6\":6}")
+  ),
+  overwrite = TRUE
+) \%>\%
+  dplyr::mutate(m1 = from_json(m1, "MAP<STRING, INT>"),
+                m2 = from_json(m2, "MAP<STRING, INT>"))
+
+# create a 3rd column containing MAP<STRING, INT> values derived from the
+# first 2 columns
+
+transformed_two_maps_tbl <- two_maps_tbl \%>\%
+  hof_map_zip_with(
+    func = .(k, v1, v2) \%->\% (CONCAT(k, "_", v1, "_", v2)),
+    dest_col = m3
+  )
 }
 
 }

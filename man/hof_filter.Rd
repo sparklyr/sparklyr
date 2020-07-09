@@ -27,7 +27,7 @@ Apply an element-wise filtering function to an array column
 \dontrun{
 
 library(sparklyr)
-sc <- spark_connect(master = "local[3]")
+sc <- spark_connect(master = "local")
 # only keep odd elements in each array in `array_column`
 copy_to(sc, tibble::tibble(array_column = list(1:5, 21:25))) \%>\%
   hof_filter(~ .x \%\% 2 == 1)

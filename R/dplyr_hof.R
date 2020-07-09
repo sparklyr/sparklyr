@@ -142,7 +142,7 @@ do.mutate <- function(x, dest_col_name, sql, ...) {
 #' \dontrun{
 #'
 #' library(sparklyr)
-#' sc <- spark_connect(master = "local[3]")
+#' sc <- spark_connect(master = "local")
 #' # applies the (x -> x * x) transformation to elements of all arrays
 #' copy_to(sc, tibble::tibble(arr = list(1:5, 21:25))) %>%
 #'   hof_transform(~ .x * .x)
@@ -188,7 +188,7 @@ hof_transform <- function(
 #' \dontrun{
 #'
 #' library(sparklyr)
-#' sc <- spark_connect(master = "local[3]")
+#' sc <- spark_connect(master = "local")
 #' # only keep odd elements in each array in `array_column`
 #' copy_to(sc, tibble::tibble(array_column = list(1:5, 21:25))) %>%
 #'   hof_filter(~ .x %% 2 == 1)
@@ -231,7 +231,7 @@ hof_filter <- function(x, func, expr = NULL, dest_col = NULL, ...) {
 #' \dontrun{
 #'
 #' library(sparklyr)
-#' sc <- spark_connect(master = "local[3]")
+#' sc <- spark_connect(master = "local")
 #' # concatenates all numbers of each array in `array_column` and add parentheses
 #' # around the resulting string
 #' copy_to(sc, tibble::tibble(array_column = list(1:5, 21:25))) %>%
@@ -323,7 +323,7 @@ hof_exists <- function(x, pred, expr = NULL, dest_col = NULL, ...) {
 #' \dontrun{
 #'
 #' library(sparklyr)
-#' sc <- spark_connect(master = "local[3]")
+#' sc <- spark_connect(master = "local")
 #' # compute element-wise products of 2 arrays from each row of `left` and `right`
 #' # and store the resuling array in `res`
 #' copy_to(
@@ -387,7 +387,7 @@ hof_zip_with <- function(
 #' \dontrun{
 #'
 #' library(sparklyr)
-#' sc <- spark_connect(master = "local[3]", version = "3.0.0")
+#' sc <- spark_connect(master = "local", version = "3.0.0")
 #' copy_to(
 #'   sc,
 #'   tibble::tibble(
@@ -493,7 +493,7 @@ hof_map_filter <- function(
 #' )
 #' sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
 #'
-#' all_positible_tbl <- sdf %>%
+#' all_positive_tbl <- sdf %>%
 #'  hof_forall(pred = ~ .x > 0, expr = y, dest_col = all_positive) %>%
 #'  dplyr::select(all_positive)
 #' }
@@ -638,7 +638,27 @@ hof_transform_values <- function(
 #'
 #' library(sparklyr)
 #' sc <- spark_connect(master = "local", version = "3.0.0")
-#' #TODO:
+#'
+#' # create a Spark dataframe with 2 columns of type MAP<STRING, INT>
+#' two_maps_tbl <- sdf_copy_to(
+#'   sc,
+#'   tibble::tibble(
+#'     m1 = c("{\"1\":2,\"3\":4,\"5\":6}", "{\"2\":1,\"4\":3,\"6\":5}"),
+#'     m2 = c("{\"1\":1,\"3\":3,\"5\":5}", "{\"2\":2,\"4\":4,\"6\":6}")
+#'   ),
+#'   overwrite = TRUE
+#' ) %>%
+#'   dplyr::mutate(m1 = from_json(m1, "MAP<STRING, INT>"),
+#'                 m2 = from_json(m2, "MAP<STRING, INT>"))
+#'
+#' # create a 3rd column containing MAP<STRING, INT> values derived from the
+#' # first 2 columns
+#'
+#' transformed_two_maps_tbl <- two_maps_tbl %>%
+#'   hof_map_zip_with(
+#'     func = .(k, v1, v2) %->% (CONCAT(k, "_", v1, "_", v2)),
+#'     dest_col = m3
+#'   )
 #' }
 #'
 #' @export
