@@ -780,6 +780,99 @@ test_that("'hof_map_filter' works with default args", {
   expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3))
 })
 
+test_that("'hof_forall' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_forall(
+      pred = x %->% (x != 5),
+      expr = x,
+      dest_col = does_not_contain_5
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      does_not_contain_5 = c(FALSE, TRUE)
+    )
+  )
+})
+
+test_that("'hof_forall' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_forall(
+      pred = x %->% (x != 5),
+      expr = x
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = c(FALSE, TRUE),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12)
+    )
+  )
+})
+
+test_that("'hof_forall' works with array(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_forall(
+      pred = x %->% (x != 5),
+      expr = array(z - 8, z - 7),
+      dest_col = does_not_contain_5
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      does_not_contain_5 = c(TRUE, FALSE)
+    )
+  )
+})
+
+test_that("'hof_forall' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_forall(
+      pred = ~ .x != 5,
+      expr = array(z - 8, z - 7),
+      dest_col = does_not_contain_5
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      does_not_contain_5 = c(TRUE, FALSE)
+    )
+  )
+})
+
+test_that("'hof_forall' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- single_col_tbl %>% hof_forall(~ .x != 5) %>% sdf_collect()
+
+  expect_equivalent(res, tibble::tibble(x = c(FALSE, TRUE)))
+})
 
 test_that("accessing struct field inside lambda expression", {
   test_requires_version("2.4.0")
