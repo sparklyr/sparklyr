@@ -898,6 +898,101 @@ test_that("accessing struct field inside lambda expression", {
   )
 })
 
+test_that("'hof_transform_keys' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_keys(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = m1,
+      dest_col = transformed_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  transformed_m1 = to_json(transformed_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[1]]), c(k_1_v_2 = 2, k_4_v_3 = 3, k_6_v_5 = 5))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[2]]), c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7))
+})
+
+test_that("'hof_transform_keys' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_keys(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c(k_1_v_2 = 2, k_4_v_3 = 3, k_6_v_5 = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+})
+
+test_that("'hof_transform_keys' works with map(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- sdf_len(sc, 1) %>%
+    hof_transform_keys(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = map(1, 2, 4, 3, 7, 8, 6, 5),
+      dest_col = m
+    ) %>%
+    dplyr::mutate(m = to_json(m)) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    rjson::fromJSON(res$m),
+    c(k_1_v_2 = 2, k_4_v_3 = 3, k_7_v_8 = 8, k_6_v_5 = 5)
+  )
+})
+
+test_that("'hof_transform_keys' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_keys(
+      func = ~ CONCAT("k_", .x, "_v_", .y),
+      expr = m1,
+      dest_col = transformed_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  transformed_m1 = to_json(transformed_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[1]]), c(k_1_v_2 = 2, k_4_v_3 = 3, k_6_v_5 = 5))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[2]]), c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7))
+})
+
+test_that("'hof_transform_keys' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_keys(~ CONCAT("k_", .x, "_v_", .y)) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c(k_6_v_5 = 5, k_4_v_3 = 3, k_1_v_2 = 2))
+})
+
 test_that("accessing struct field inside formula", {
   test_requires_version("2.4.0")
 
