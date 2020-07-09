@@ -9,8 +9,8 @@ hof_transform_keys(x, func, expr = NULL, dest_col = NULL, ...)
 \arguments{
 \item{x}{The Spark data frame to be processed}
 
-\item{func}{The transformation function to apply (it should take a map key as argument
-and return a transformed value)}
+\item{func}{The transformation function to apply (it should take (key, value) as
+arguments and return a transformed key)}
 
 \item{expr}{The map being transformed, could be any SQL expression evaluating to a map
 (default: the last column of the Spark data frame)}
@@ -29,8 +29,8 @@ order function, which is supported since Spark 3.0)
 
 library(sparklyr)
 sc <- spark_connect(master = "local", version = "3.0.0")
-sdf <- sdf_len(sc, 1) \%>\% dplyr::mutate(m = map(1, 0, 2, 2, 3, -1))
-transformed_sdf <- sdf \%>\% hof_transform_keys(~ .x * .x)
+sdf <- sdf_len(sc, 1) \%>\% dplyr::mutate(m = map("a", 0L, "b", 2L, "c", -1L))
+transformed_sdf <- sdf \%>\% hof_transform_keys(~ CONCAT(.x, " == ", .y))
 }
 
 }
