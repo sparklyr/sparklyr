@@ -17,6 +17,21 @@ single_col_tbl <- testthat_tbl(
   data = tibble::tibble(x = list(1:5, 6:10))
 )
 
+build_map_tbl <- function() {
+  df <- tibble::tibble(
+    m1 = c("{\"1\":2,\"4\":3,\"6\":5}", "{\"2\":1,\"3\":4,\"8\":7}"),
+    m2 = c("{\"2\":1,\"3\":4,\"8\":7}", "{\"6\":5,\"4\":3,\"1\":2}")
+  )
+  sdf <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
+    dplyr::mutate(m1 = from_json(m1, "MAP<STRING, INT>"),
+                  m2 = from_json(m2, "MAP<STRING, INT>"))
+
+  sdf
+}
+
+if (spark_version(sc) >= "3.0.0")
+  map_tbl <- build_map_tbl()
+
 test_that("'hof_transform' creating a new column", {
   test_requires_version("2.4.0")
 
@@ -671,6 +686,98 @@ test_that("'hof_array_sort' works with default args", {
       x = list(5:1, 10:6)
     )
   )
+})
+
+test_that("'hof_map_filter' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_map_filter(
+      func = .(x, y) %->% (as.integer(x) > y),
+      expr = m1,
+      dest_col = filtered_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  filtered_m1 = to_json(filtered_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$filtered_m1[[1]]), c("4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$filtered_m1[[2]]), c("2" = 1, "8" = 7))
+})
+
+test_that("'hof_map_filter' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_map_filter(
+      func = .(x, y) %->% (as.integer(x) > y),
+      expr = m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+})
+
+test_that("'hof_map_filter' works with map(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- sdf_len(sc, 1) %>%
+    hof_map_filter(
+      func = .(x, y) %->% (as.integer(x) > y),
+      expr = map(1, 2, 4, 3, 7, 8, 6, 5),
+      dest_col = m
+    ) %>%
+    dplyr::mutate(m = to_json(m)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m), c("4" = 3, "6" = 5))
+})
+
+test_that("'hof_map_filter' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_map_filter(
+      func = ~ as.integer(.x) > .y,
+      expr = m1,
+      dest_col = filtered_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  filtered_m1 = to_json(filtered_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$filtered_m1[[1]]), c("4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$filtered_m1[[2]]), c("2" = 1, "8" = 7))
+})
+
+test_that("'hof_map_filter' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_map_filter(~ as.integer(.x) > .y) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3))
 })
 
 

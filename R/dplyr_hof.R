@@ -373,16 +373,17 @@ hof_zip_with <- function(
 #' (this is essentially a dplyr wrapper to the `array_sort(expr, func)` higher-
 #' order function, which is supported since Spark 3.0)
 #'
-#' @param x The Spark data frame to transform
+#' @param x The Spark data frame to be processed
 #' @param func The comparator function to apply (it should take 2 array elements as arguments
 #'  and return an integer, with a return value of -1 indicating the first element is less than
 #'  the second, 0 indicating both are equal, or 1 indicating the first element is greater than
 #'  the second)
-#' @param expr The array being transformed, could be any SQL expression evaluating to an array
+#' @param expr The array being sorted, could be any SQL expression evaluating to an array
 #'  (default: the last column of the Spark data frame)
-#' @param dest_col Column to store the transformed result (default: expr)
+#' @param dest_col Column to store the sorted result (default: expr)
 #' @param ... Additional params to dplyr::mutate
 #'
+#' @examples
 #' \dontrun{
 #'
 #' library(sparklyr)
@@ -412,6 +413,51 @@ hof_array_sort <- function(
 
   sql <- paste(
     "ARRAY_SORT(",
+    as.character(dbplyr::translate_sql(!! expr)),
+    ",",
+    as.character(func),
+    ")"
+  )
+
+  do.mutate(x, dest_col, sql, ...)
+}
+
+#' Filters a map
+#'
+#' Filters entries in a map using the function specified
+#' (this is essentially a dplyr wrapper to the `map_filter(expr, func)` higher-
+#' order function, which is supported since Spark 3.0)
+#'
+#' @param x The Spark data frame to be processed
+#' @param func The filter function to apply (it should take (key, value) as arguments
+#'  and return a boolean value, with FALSE indicating the key-value pair should be discarded
+#'  and TRUE otherwise)
+#' @param expr The map being filtered, could be any SQL expression evaluating to a map
+#'  (default: the last column of the Spark data frame)
+#' @param dest_col Column to store the filtered result (default: expr)
+#' @param ... Additional params to dplyr::mutate
+#'
+#' @examples
+#' \dontrun{
+#'
+#' TODO: SEE ~/sparklyr/test_map_filter.R
+#'
+#' }
+#'
+#' @export
+hof_map_filter <- function(
+  x,
+  func,
+  expr = NULL,
+  dest_col = NULL,
+  ...
+) {
+  func <- process_lambda(func)
+  expr <- process_expr(x, rlang::enexpr(expr))
+  dest_col <- process_dest_col(expr, rlang::enexpr(dest_col))
+
+  sql <- paste(
+    "MAP_FILTER(",
     as.character(dbplyr::translate_sql(!! expr)),
     ",",
     as.character(func),
