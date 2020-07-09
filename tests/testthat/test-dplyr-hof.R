@@ -1138,6 +1138,24 @@ test_that("'hof_map_zip_with' works with map(...) expression", {
   )
 })
 
+test_that("'hof_map_zip_with' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- map_zip_with_test_tbl %>%
+    hof_map_zip_with(
+      func = ~ CONCAT(.x, "_", .y, "_", .z),
+      map1 = m1,
+      map2 = m2
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1), m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "3" = 4, "5" = 6))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5"))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6"))
+})
+
 test_that("'hof_map_zip_with' works with default args", {
   test_requires_version("3.0.0")
 

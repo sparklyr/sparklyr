@@ -17,10 +17,11 @@ validate_lambda <- function(f) {
 translate_formula <- function(f) {
   var_x <- as.name(random_string("x_"))
   var_y <- as.name(random_string("y_"))
+  var_z <- as.name(random_string("z_"))
   # renaming variables because Spark SQL cannot handle lambda variable name
   # starting with '.'
-  f <- do.call(substitute, list(f, list(.x = var_x, .y = var_y)))
-  vars <- sort(all.vars(f))
+  f <- do.call(substitute, list(f, list(.x = var_x, .y = var_y, .z = var_z)))
+  vars <- stringr::str_sort(all.vars(f))
   params_sql <- (
     if (length(vars) > 1)
       paste0("(", paste0(vars, collapse = ", "), ")")
