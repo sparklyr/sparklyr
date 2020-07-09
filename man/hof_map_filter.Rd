@@ -28,8 +28,10 @@ order function, which is supported since Spark 3.0)
 \examples{
 \dontrun{
 
-TODO: SEE ~/sparklyr/test_map_filter.R
-
+library(sparklyr)
+sc <- spark_connect(master = "local", version = "3.0.0")
+sdf <- sdf_len(sc, 1) \%>\% dplyr::mutate(m = map(1, 0, 2, 2, 3, -1))
+filtered_sdf <- sdf \%>\% hof_map_filter(~ .x > .y)
 }
 
 }
