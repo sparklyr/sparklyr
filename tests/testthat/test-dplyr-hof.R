@@ -1016,3 +1016,120 @@ test_that("accessing struct field inside formula", {
     )
   )
 })
+
+test_that("'hof_transform_values' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_values(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = m1,
+      dest_col = transformed_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  transformed_m1 = to_json(transformed_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[1]]), c("1" = "k_1_v_2", "4" = "k_4_v_3", "6" = "k_6_v_5"))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[2]]), c("2" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7"))
+})
+
+test_that("'hof_transform_values' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_values(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = "k_1_v_2", "4" = "k_4_v_3", "6" = "k_6_v_5"))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7"))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+})
+
+test_that("'hof_transform_values' works with map(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- sdf_len(sc, 1) %>%
+    hof_transform_values(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = map(1L, 2L, 4L, 3L, 7L, 8L, 6L, 5L),
+      dest_col = m
+    ) %>%
+    dplyr::mutate(m = to_json(m)) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    rjson::fromJSON(res$m),
+    c("1" = "k_1_v_2", "4" = "k_4_v_3", "7" = "k_7_v_8", "6" = "k_6_v_5")
+  )
+})
+
+test_that("'hof_transform_values' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_values(
+      func = ~ CONCAT("k_", .x, "_v_", .y),
+      expr = m1,
+      dest_col = transformed_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  transformed_m1 = to_json(transformed_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[1]]), c("1" = "k_1_v_2", "4" = "k_4_v_3", "6" = "k_6_v_5"))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[2]]), c("2" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7"))
+})
+
+test_that("'hof_transform_values' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    dplyr::select(m2) %>%
+    hof_transform_values(~ CONCAT("k_", .x, "_v_", .y)) %>%
+    dplyr::mutate(m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7"))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = "k_6_v_5", "4" = "k_4_v_3", "1" = "k_1_v_2"))
+})
+
+test_that("accessing struct field inside formula", {
+  test_requires_version("2.4.0")
+
+  res <- test_tbl %>%
+    dplyr::mutate(array_of_structs = array(struct(z), named_struct("z", -1))) %>%
+    hof_transform(
+      dest_col = w,
+      expr = array_of_structs,
+      func = ~ .x$z
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      array_of_structs = list(list(list(z = 11), list(z = -1)), list(list(z = 12), list(z = -1))),
+      w = list(c(11, -1), c(12, -1))
+    )
+  )
+})
