@@ -612,3 +612,62 @@ hof_transform_values <- function(
 
   do.mutate(x, dest_col, sql, ...)
 }
+
+#' Merges two maps into one
+#'
+#' Merges two maps into a single map by applying the function specified to pairs of
+#' values with the same key
+#' (this is essentially a dplyr wrapper to the `map_zip_with(map1, map2, func)` higher-
+#' order function, which is supported since Spark 3.0)
+#'
+#' @param x The Spark data frame to be processed
+#' @param func The function to apply (it should take (key, value1, value2) as arguments,
+#'   where (key, value1) is a key-value pair present in map1, (key, value2) is a key-value
+#'   pair present in map2, and return a transformed value associated with key in the
+#'   resulting map
+#' @param dest_col Column to store the query result
+#'   (default: the last column of the Spark data frame)
+#' @param map1 The first map being merged, could be any SQL expression evaluating to a
+#'  map (default: the first column of the Spark data frame)
+#' @param map2 The second map being merged, could be any SQL expression evaluating to a
+#'  map (default: the second column of the Spark data frame)
+#' @param ... Additional params to dplyr::mutate
+#'
+#' @examples
+#' \dontrun{
+#'
+#' library(sparklyr)
+#' sc <- spark_connect(master = "local", version = "3.0.0")
+#' #TODO:
+#' }
+#'
+#' @export
+hof_map_zip_with <- function(
+  x,
+  func,
+  dest_col = NULL,
+  map1 = NULL,
+  map2 = NULL,
+  ...
+) {
+  func <- process_lambda(func)
+  dest_col <- process_col(
+    x,
+    rlang::enexpr(dest_col),
+    default_idx = length(colnames(x))
+  )
+  map1 <- process_col(x, rlang::enexpr(map1), default_idx = 1)
+  map2 <- process_col(x, rlang::enexpr(map2), default_idx = 2)
+
+  sql <- paste(
+    "MAP_ZIP_WITH(",
+    as.character(dbplyr::translate_sql(!! map1)),
+    ",",
+    as.character(dbplyr::translate_sql(!! map2)),
+    ",",
+    as.character(func),
+    ")"
+  )
+
+  do.mutate(x, dest_col, sql, ...)
+}

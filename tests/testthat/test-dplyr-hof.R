@@ -18,16 +18,33 @@ single_col_tbl <- testthat_tbl(
 )
 
 build_map_tbl <- function() {
-  df <- tibble::tibble(
-    m1 = c("{\"1\":2,\"4\":3,\"6\":5}", "{\"2\":1,\"3\":4,\"8\":7}"),
-    m2 = c("{\"2\":1,\"3\":4,\"8\":7}", "{\"6\":5,\"4\":3,\"1\":2}")
-  )
-  sdf <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
+  sdf_copy_to(
+    sc,
+    tibble::tibble(
+      m1 = c("{\"1\":2,\"4\":3,\"6\":5}", "{\"2\":1,\"3\":4,\"8\":7}"),
+      m2 = c("{\"2\":1,\"3\":4,\"8\":7}", "{\"6\":5,\"4\":3,\"1\":2}")
+    ),
+    overwrite = TRUE
+  ) %>%
     dplyr::mutate(m1 = from_json(m1, "MAP<STRING, INT>"),
                   m2 = from_json(m2, "MAP<STRING, INT>"))
-
-  sdf
 }
+
+build_map_zip_with_test_tbl <- function() {
+  sdf_copy_to(
+    sc,
+    tibble::tibble(
+      m1 = c("{\"1\":2,\"3\":4,\"5\":6}", "{\"2\":1,\"4\":3,\"6\":5}"),
+      m2 = c("{\"1\":1,\"3\":3,\"5\":5}", "{\"2\":2,\"4\":4,\"6\":6}")
+    ),
+    overwrite = TRUE
+  ) %>%
+    dplyr::mutate(m1 = from_json(m1, "MAP<STRING, INT>"),
+                  m2 = from_json(m2, "MAP<STRING, INT>"))
+}
+
+map_tbl <- build_map_tbl()
+map_zip_with_test_tbl <- build_map_zip_with_test_tbl()
 
 if (spark_version(sc) >= "3.0.0")
   map_tbl <- build_map_tbl()
@@ -874,30 +891,6 @@ test_that("'hof_forall' works with default args", {
   expect_equivalent(res, tibble::tibble(x = c(FALSE, TRUE)))
 })
 
-test_that("accessing struct field inside lambda expression", {
-  test_requires_version("2.4.0")
-
-  res <- test_tbl %>%
-    dplyr::mutate(array_of_structs = array(struct(z), named_struct("z", -1))) %>%
-    hof_transform(
-      dest_col = w,
-      expr = array_of_structs,
-      func = s %->% (s$z)
-    ) %>%
-    sdf_collect()
-
-  expect_equivalent(
-    res,
-    tibble::tibble(
-      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
-      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
-      z = c(11, 12),
-      array_of_structs = list(list(list(z = 11), list(z = -1)), list(list(z = 12), list(z = -1))),
-      w = list(c(11, -1), c(12, -1))
-    )
-  )
-})
-
 test_that("'hof_transform_keys' creating a new column", {
   test_requires_version("3.0.0")
 
@@ -993,30 +986,6 @@ test_that("'hof_transform_keys' works with default args", {
   expect_equivalent(rjson::fromJSON(res$m2[[2]]), c(k_6_v_5 = 5, k_4_v_3 = 3, k_1_v_2 = 2))
 })
 
-test_that("accessing struct field inside formula", {
-  test_requires_version("2.4.0")
-
-  res <- test_tbl %>%
-    dplyr::mutate(array_of_structs = array(struct(z), named_struct("z", -1))) %>%
-    hof_transform(
-      dest_col = w,
-      expr = array_of_structs,
-      func = ~ .x$z
-    ) %>%
-    sdf_collect()
-
-  expect_equivalent(
-    res,
-    tibble::tibble(
-      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
-      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
-      z = c(11, 12),
-      array_of_structs = list(list(list(z = 11), list(z = -1)), list(list(z = 12), list(z = -1))),
-      w = list(c(11, -1), c(12, -1))
-    )
-  )
-})
-
 test_that("'hof_transform_values' creating a new column", {
   test_requires_version("3.0.0")
 
@@ -1108,6 +1077,103 @@ test_that("'hof_transform_values' works with default args", {
 
   expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7"))
   expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = "k_6_v_5", "4" = "k_4_v_3", "1" = "k_1_v_2"))
+})
+
+test_that("'hof_map_zip_with' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- map_zip_with_test_tbl %>%
+    hof_map_zip_with(
+      func = .(k, v1, v2) %->% (CONCAT(k, "_", v1, "_", v2)),
+      map1 = m1,
+      map2 = m2,
+      dest_col = z
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1), m2 = to_json(m2), z = to_json(z)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "3" = 4, "5" = 6))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = 1, "3" = 3, "5" = 5))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("2" = 2, "4" = 4, "6" = 6))
+  expect_equivalent(rjson::fromJSON(res$z[[1]]), c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5"))
+  expect_equivalent(rjson::fromJSON(res$z[[2]]), c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6"))
+})
+
+test_that("'hof_map_zip_with' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- map_zip_with_test_tbl %>%
+    hof_map_zip_with(
+      func = .(k, v1, v2) %->% (CONCAT(k, "_", v1, "_", v2)),
+      map1 = m1,
+      map2 = m2
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1), m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "3" = 4, "5" = 6))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5"))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6"))
+})
+
+test_that("'hof_map_zip_with' works with map(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- sdf_len(sc, 1) %>%
+    hof_map_zip_with(
+      func = .(k, v1, v2) %->% (CONCAT(k, "_", v1, "_", v2)),
+      map1 = map(1L, 2L, 4L, 3L, 7L, 8L, 6L, 5L),
+      map2 = map(1L, 1L, 4L, 4L, 7L, 7L, 6L, 6L),
+      dest_col = m
+    ) %>%
+    dplyr::select(m) %>%
+    dplyr::mutate(m = to_json(m)) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    rjson::fromJSON(res$m),
+    c("1" = "1_2_1", "4" = "4_3_4", "7" = "7_8_7", "6" = "6_5_6")
+  )
+})
+
+test_that("'hof_map_zip_with' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- map_zip_with_test_tbl %>%
+    hof_map_zip_with(func = .(k, v1, v2) %->% (CONCAT(k, "_", v1, "_", v2))) %>%
+    dplyr::mutate(m1 = to_json(m1), m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "3" = 4, "5" = 6))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5"))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6"))
+})
+
+test_that("accessing struct field inside lambda expression", {
+  test_requires_version("2.4.0")
+
+  res <- test_tbl %>%
+    dplyr::mutate(array_of_structs = array(struct(z), named_struct("z", -1))) %>%
+    hof_transform(
+      dest_col = w,
+      expr = array_of_structs,
+      func = s %->% (s$z)
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      array_of_structs = list(list(list(z = 11), list(z = -1)), list(list(z = 12), list(z = -1))),
+      w = list(c(11, -1), c(12, -1))
+    )
+  )
 })
 
 test_that("accessing struct field inside formula", {
