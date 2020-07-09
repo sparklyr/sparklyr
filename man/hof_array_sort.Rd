@@ -9,7 +9,10 @@ hof_array_sort(x, func, expr = NULL, dest_col = NULL, ...)
 \arguments{
 \item{x}{The Spark data frame to transform}
 
-\item{func}{The transformation to apply}
+\item{func}{The comparator function to apply (it should take 2 array elements as arguments
+and return an integer, with a return value of -1 indicating the first element is less than
+the second, 0 indicating both are equal, or 1 indicating the first element is greater than
+the second)}
 
 \item{expr}{The array being transformed, could be any SQL expression evaluating to an array
 (default: the last column of the Spark data frame)}
