@@ -1,3 +1,11 @@
+# Sparklyr 1.3.0.9000
+
+### Distributed R
+
+- Fixed a bug in ordering of parameters for a lamba expression when the lambda
+  expression passed to a `hof_*` method is specified with a R formula and the
+  lambda takes 2 parameters
+
 # Sparklyr 1.3.0
 
 ### Spark ML

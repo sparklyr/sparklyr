@@ -325,12 +325,12 @@ test_that("'hof_aggregate' works with default args", {
   test_requires_version("2.4.0")
 
   agg <- single_col_tbl %>%
-    hof_aggregate("", ~ CONCAT(.y, .x), ~ CONCAT("(", .x, ")")) %>%
+    hof_aggregate("-", ~ CONCAT(.y, .x), ~ CONCAT("(", .x, ")")) %>%
     sdf_collect()
 
   expect_equivalent(
     agg,
-    tibble::tibble(x = c("(12345)", "(678910)"))
+    tibble::tibble(x = c("(54321-)", "(109876-)"))
   )
 })
 
