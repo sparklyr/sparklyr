@@ -572,6 +572,108 @@ test_that("'hof_zip_with' works with default args", {
   )
 })
 
+test_that("'hof_array_sort' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_array_sort(
+      func = .(x, y) %->% (as.integer(sign(y - x))),
+      expr = x,
+      dest_col = sorted_x
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      sorted_x = list(c(5, 4, 3, 2, 1), c(10, 9, 8, 7, 6))
+    )
+  )
+})
+
+test_that("'hof_array_sort' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_array_sort(
+      func = .(x, y) %->% (as.integer(sign(y - x))),
+      expr = x
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(5, 4, 3, 2, 1), c(10, 9, 8, 7, 6)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+    )
+  )
+})
+
+test_that("'hof_array_sort' works with array(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_array_sort(
+      func = .(x, y) %->% (as.integer(sign(y - x))),
+      expr = array(z + 1, z + 3),
+      dest_col = sorted_arr
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      sorted_arr = list(c(14, 12), c(15, 13))
+    )
+  )
+})
+
+test_that("'hof_array_sort' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_array_sort(
+      func = ~ as.integer(sign(.y - .x)),
+      expr = x,
+      dest_col = sorted_x
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      sorted_x = list(c(5, 4, 3, 2, 1), c(10, 9, 8, 7, 6))
+    )
+  )
+})
+
+test_that("'hof_array_sort' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- single_col_tbl %>%
+    hof_array_sort(~ as.integer(sign(.y - .x))) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(5:1, 10:6)
+    )
+  )
+})
+
+
 test_that("accessing struct field inside lambda expression", {
   test_requires_version("2.4.0")
 
