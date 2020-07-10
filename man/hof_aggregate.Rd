@@ -40,7 +40,7 @@ built-in Spark SQL functions)
 \dontrun{
 
 library(sparklyr)
-sc <- spark_connect(master = "local[3]")
+sc <- spark_connect(master = "local")
 # concatenates all numbers of each array in `array_column` and add parentheses
 # around the resulting string
 copy_to(sc, tibble::tibble(array_column = list(1:5, 21:25))) \%>\%

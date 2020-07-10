@@ -32,7 +32,7 @@ built-in function in Spark SQL)
 \dontrun{
 
 library(sparklyr)
-sc <- spark_connect(master = "local[3]")
+sc <- spark_connect(master = "local")
 # compute element-wise products of 2 arrays from each row of `left` and `right`
 # and store the resuling array in `res`
 copy_to(

@@ -17,6 +17,38 @@ single_col_tbl <- testthat_tbl(
   data = tibble::tibble(x = list(1:5, 6:10))
 )
 
+build_map_tbl <- function() {
+  sdf_copy_to(
+    sc,
+    tibble::tibble(
+      m1 = c("{\"1\":2,\"4\":3,\"6\":5}", "{\"2\":1,\"3\":4,\"8\":7}"),
+      m2 = c("{\"2\":1,\"3\":4,\"8\":7}", "{\"6\":5,\"4\":3,\"1\":2}")
+    ),
+    overwrite = TRUE
+  ) %>%
+    dplyr::mutate(m1 = from_json(m1, "MAP<STRING, INT>"),
+                  m2 = from_json(m2, "MAP<STRING, INT>"))
+}
+
+build_map_zip_with_test_tbl <- function() {
+  sdf_copy_to(
+    sc,
+    tibble::tibble(
+      m1 = c("{\"1\":2,\"3\":4,\"5\":6}", "{\"2\":1,\"4\":3,\"6\":5}"),
+      m2 = c("{\"1\":1,\"3\":3,\"5\":5}", "{\"2\":2,\"4\":4,\"6\":6}")
+    ),
+    overwrite = TRUE
+  ) %>%
+    dplyr::mutate(m1 = from_json(m1, "MAP<STRING, INT>"),
+                  m2 = from_json(m2, "MAP<STRING, INT>"))
+}
+
+map_tbl <- build_map_tbl()
+map_zip_with_test_tbl <- build_map_zip_with_test_tbl()
+
+if (spark_version(sc) >= "3.0.0")
+  map_tbl <- build_map_tbl()
+
 test_that("'hof_transform' creating a new column", {
   test_requires_version("2.4.0")
 
@@ -570,6 +602,572 @@ test_that("'hof_zip_with' works with default args", {
       z = list(c(1, 8, 6, 32, 25), c(42, 7, 32, 18, 80))
     )
   )
+})
+
+test_that("'hof_array_sort' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_array_sort(
+      func = .(x, y) %->% (as.integer(sign(y - x))),
+      expr = x,
+      dest_col = sorted_x
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      sorted_x = list(c(5, 4, 3, 2, 1), c(10, 9, 8, 7, 6))
+    )
+  )
+})
+
+test_that("'hof_array_sort' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_array_sort(
+      func = .(x, y) %->% (as.integer(sign(y - x))),
+      expr = x
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(5, 4, 3, 2, 1), c(10, 9, 8, 7, 6)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+    )
+  )
+})
+
+test_that("'hof_array_sort' works with array(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_array_sort(
+      func = .(x, y) %->% (as.integer(sign(y - x))),
+      expr = array(z + 1, z + 3),
+      dest_col = sorted_arr
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      sorted_arr = list(c(14, 12), c(15, 13))
+    )
+  )
+})
+
+test_that("'hof_array_sort' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_array_sort(
+      func = ~ as.integer(sign(.y - .x)),
+      expr = x,
+      dest_col = sorted_x
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      sorted_x = list(c(5, 4, 3, 2, 1), c(10, 9, 8, 7, 6))
+    )
+  )
+})
+
+test_that("'hof_array_sort' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- single_col_tbl %>%
+    hof_array_sort(~ as.integer(sign(.y - .x))) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(5:1, 10:6)
+    )
+  )
+})
+
+test_that("'hof_map_filter' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_map_filter(
+      func = .(x, y) %->% (as.integer(x) > y),
+      expr = m1,
+      dest_col = filtered_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  filtered_m1 = to_json(filtered_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$filtered_m1[[1]]), c("4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$filtered_m1[[2]]), c("2" = 1, "8" = 7))
+})
+
+test_that("'hof_map_filter' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_map_filter(
+      func = .(x, y) %->% (as.integer(x) > y),
+      expr = m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+})
+
+test_that("'hof_map_filter' works with map(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- sdf_len(sc, 1) %>%
+    hof_map_filter(
+      func = .(x, y) %->% (as.integer(x) > y),
+      expr = map(1, 2, 4, 3, 7, 8, 6, 5),
+      dest_col = m
+    ) %>%
+    dplyr::mutate(m = to_json(m)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m), c("4" = 3, "6" = 5))
+})
+
+test_that("'hof_map_filter' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_map_filter(
+      func = ~ as.integer(.x) > .y,
+      expr = m1,
+      dest_col = filtered_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  filtered_m1 = to_json(filtered_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$filtered_m1[[1]]), c("4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$filtered_m1[[2]]), c("2" = 1, "8" = 7))
+})
+
+test_that("'hof_map_filter' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_map_filter(~ as.integer(.x) > .y) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3))
+})
+
+test_that("'hof_forall' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_forall(
+      pred = x %->% (x != 5),
+      expr = x,
+      dest_col = does_not_contain_5
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      does_not_contain_5 = c(FALSE, TRUE)
+    )
+  )
+})
+
+test_that("'hof_forall' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_forall(
+      pred = x %->% (x != 5),
+      expr = x
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = c(FALSE, TRUE),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12)
+    )
+  )
+})
+
+test_that("'hof_forall' works with array(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_forall(
+      pred = x %->% (x != 5),
+      expr = array(z - 8, z - 7),
+      dest_col = does_not_contain_5
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      does_not_contain_5 = c(TRUE, FALSE)
+    )
+  )
+})
+
+test_that("'hof_forall' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- test_tbl %>%
+    hof_forall(
+      pred = ~ .x != 5,
+      expr = array(z - 8, z - 7),
+      dest_col = does_not_contain_5
+    ) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    res,
+    tibble::tibble(
+      x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
+      y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
+      z = c(11, 12),
+      does_not_contain_5 = c(TRUE, FALSE)
+    )
+  )
+})
+
+test_that("'hof_forall' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- single_col_tbl %>% hof_forall(~ .x != 5) %>% sdf_collect()
+
+  expect_equivalent(res, tibble::tibble(x = c(FALSE, TRUE)))
+})
+
+test_that("'hof_transform_keys' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_keys(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = m1,
+      dest_col = transformed_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  transformed_m1 = to_json(transformed_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[1]]), c(k_1_v_2 = 2, k_4_v_3 = 3, k_6_v_5 = 5))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[2]]), c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7))
+})
+
+test_that("'hof_transform_keys' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_keys(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c(k_1_v_2 = 2, k_4_v_3 = 3, k_6_v_5 = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+})
+
+test_that("'hof_transform_keys' works with map(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- sdf_len(sc, 1) %>%
+    hof_transform_keys(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = map(1, 2, 4, 3, 7, 8, 6, 5),
+      dest_col = m
+    ) %>%
+    dplyr::mutate(m = to_json(m)) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    rjson::fromJSON(res$m),
+    c(k_1_v_2 = 2, k_4_v_3 = 3, k_7_v_8 = 8, k_6_v_5 = 5)
+  )
+})
+
+test_that("'hof_transform_keys' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_keys(
+      func = ~ CONCAT("k_", .x, "_v_", .y),
+      expr = m1,
+      dest_col = transformed_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  transformed_m1 = to_json(transformed_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[1]]), c(k_1_v_2 = 2, k_4_v_3 = 3, k_6_v_5 = 5))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[2]]), c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7))
+})
+
+test_that("'hof_transform_keys' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_keys(~ CONCAT("k_", .x, "_v_", .y)) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c(k_6_v_5 = 5, k_4_v_3 = 3, k_1_v_2 = 2))
+})
+
+test_that("'hof_transform_values' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_values(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = m1,
+      dest_col = transformed_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  transformed_m1 = to_json(transformed_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[1]]), c("1" = "k_1_v_2", "4" = "k_4_v_3", "6" = "k_6_v_5"))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[2]]), c("2" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7"))
+})
+
+test_that("'hof_transform_values' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_values(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = "k_1_v_2", "4" = "k_4_v_3", "6" = "k_6_v_5"))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7"))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+})
+
+test_that("'hof_transform_values' works with map(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- sdf_len(sc, 1) %>%
+    hof_transform_values(
+      func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
+      expr = map(1L, 2L, 4L, 3L, 7L, 8L, 6L, 5L),
+      dest_col = m
+    ) %>%
+    dplyr::mutate(m = to_json(m)) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    rjson::fromJSON(res$m),
+    c("1" = "k_1_v_2", "4" = "k_4_v_3", "7" = "k_7_v_8", "6" = "k_6_v_5")
+  )
+})
+
+test_that("'hof_transform_values' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    hof_transform_values(
+      func = ~ CONCAT("k_", .x, "_v_", .y),
+      expr = m1,
+      dest_col = transformed_m1
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1),
+                  m2 = to_json(m2),
+                  transformed_m1 = to_json(transformed_m1)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("2" = 1, "3" = 4, "8" = 7))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = 5, "4" = 3, "1" = 2))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[1]]), c("1" = "k_1_v_2", "4" = "k_4_v_3", "6" = "k_6_v_5"))
+  expect_equivalent(rjson::fromJSON(res$transformed_m1[[2]]), c("2" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7"))
+})
+
+test_that("'hof_transform_values' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- map_tbl %>%
+    dplyr::select(m2) %>%
+    hof_transform_values(~ CONCAT("k_", .x, "_v_", .y)) %>%
+    dplyr::mutate(m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7"))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("6" = "k_6_v_5", "4" = "k_4_v_3", "1" = "k_1_v_2"))
+})
+
+test_that("'hof_map_zip_with' creating a new column", {
+  test_requires_version("3.0.0")
+
+  res <- map_zip_with_test_tbl %>%
+    hof_map_zip_with(
+      func = .(k, v1, v2) %->% (CONCAT(k, "_", v1, "_", v2)),
+      map1 = m1,
+      map2 = m2,
+      dest_col = z
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1), m2 = to_json(m2), z = to_json(z)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "3" = 4, "5" = 6))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = 1, "3" = 3, "5" = 5))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("2" = 2, "4" = 4, "6" = 6))
+  expect_equivalent(rjson::fromJSON(res$z[[1]]), c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5"))
+  expect_equivalent(rjson::fromJSON(res$z[[2]]), c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6"))
+})
+
+test_that("'hof_map_zip_with' overwriting an existing column", {
+  test_requires_version("3.0.0")
+
+  res <- map_zip_with_test_tbl %>%
+    hof_map_zip_with(
+      func = .(k, v1, v2) %->% (CONCAT(k, "_", v1, "_", v2)),
+      map1 = m1,
+      map2 = m2
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1), m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "3" = 4, "5" = 6))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5"))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6"))
+})
+
+test_that("'hof_map_zip_with' works with map(...) expression", {
+  test_requires_version("3.0.0")
+
+  res <- sdf_len(sc, 1) %>%
+    hof_map_zip_with(
+      func = .(k, v1, v2) %->% (CONCAT(k, "_", v1, "_", v2)),
+      map1 = map(1L, 2L, 4L, 3L, 7L, 8L, 6L, 5L),
+      map2 = map(1L, 1L, 4L, 4L, 7L, 7L, 6L, 6L),
+      dest_col = m
+    ) %>%
+    dplyr::select(m) %>%
+    dplyr::mutate(m = to_json(m)) %>%
+    sdf_collect()
+
+  expect_equivalent(
+    rjson::fromJSON(res$m),
+    c("1" = "1_2_1", "4" = "4_3_4", "7" = "7_8_7", "6" = "6_5_6")
+  )
+})
+
+test_that("'hof_map_zip_with' works with formula", {
+  test_requires_version("3.0.0")
+
+  res <- map_zip_with_test_tbl %>%
+    hof_map_zip_with(
+      func = ~ CONCAT(.x, "_", .y, "_", .z),
+      map1 = m1,
+      map2 = m2
+    ) %>%
+    dplyr::mutate(m1 = to_json(m1), m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "3" = 4, "5" = 6))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5"))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6"))
+})
+
+test_that("'hof_map_zip_with' works with default args", {
+  test_requires_version("3.0.0")
+
+  res <- map_zip_with_test_tbl %>%
+    hof_map_zip_with(func = .(k, v1, v2) %->% (CONCAT(k, "_", v1, "_", v2))) %>%
+    dplyr::mutate(m1 = to_json(m1), m2 = to_json(m2)) %>%
+    sdf_collect()
+
+  expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "3" = 4, "5" = 6))
+  expect_equivalent(rjson::fromJSON(res$m1[[2]]), c("2" = 1, "4" = 3, "6" = 5))
+  expect_equivalent(rjson::fromJSON(res$m2[[1]]), c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5"))
+  expect_equivalent(rjson::fromJSON(res$m2[[2]]), c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6"))
 })
 
 test_that("accessing struct field inside lambda expression", {
