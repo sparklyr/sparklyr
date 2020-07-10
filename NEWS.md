@@ -1,4 +1,4 @@
-# Sparklyr 1.3.0.9000
+# Sparklyr 1.3.1
 
 ### Distributed R
 
@@ -28,7 +28,7 @@
 - `sdf_collect()` now supports fetching Spark data frame row-by-row rather than
   column-by-column, and fetching rows using iterator instead of collecting all
   rows into memory
-  
+
 - Support for `partition` when using barrier execution in `spark_apply` (#2454)
 
 ### Connections
