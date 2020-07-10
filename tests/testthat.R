@@ -140,7 +140,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   # enforce all configuration settings are described
   options(sparklyr.test.enforce.config = TRUE)
 
-  test_filter <- NULL
+  test_filter <- "^dplyr-hof$"
 
   livy_version <- Sys.getenv("LIVY_VERSION")
   if (nchar(livy_version) > 0) {

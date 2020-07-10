@@ -377,8 +377,8 @@ hof_zip_with <- function(
 #' @param x The Spark data frame to be processed
 #' @param func The comparator function to apply (it should take 2 array elements as arguments
 #'  and return an integer, with a return value of -1 indicating the first element is less than
-#'  the second, 0 indicating both are equal, or 1 indicating the first element is greater than
-#'  the second)
+#'  the second, 0 indicating equality, or 1 indicating the first element is greater than the
+#'  second)
 #' @param expr The array being sorted, could be any SQL expression evaluating to an array
 #'  (default: the last column of the Spark data frame)
 #' @param dest_col Column to store the sorted result (default: expr)
