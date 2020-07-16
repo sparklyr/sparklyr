@@ -60,6 +60,7 @@ Other Spark data frames:
 \code{\link{sdf_random_split}()},
 \code{\link{sdf_register}()},
 \code{\link{sdf_sample}()},
-\code{\link{sdf_sort}()}
+\code{\link{sdf_sort}()},
+\code{\link{sdf_weighted_sample}()}
 }
 \concept{Spark data frames}

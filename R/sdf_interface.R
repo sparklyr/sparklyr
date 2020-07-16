@@ -197,6 +197,53 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
   sdf_register(sampled)
 }
 
+#' Perform Weighted Random Sampling on a Spark DataFrame
+#'
+#' Draw a random sample of rows (with or without replacement) from a Spark
+#' DataFrame
+#' If the sampling is done without replacement, then it will be conceptually
+#' equivalent to an iterative process such that in each step the probability of
+#' adding a row to the sample set is equal to its weight divided by summation of
+#' weights of all rows that are not in the sample set yet in that step.
+#'
+#' @template roxlate-sdf
+#'
+#' @param x An object coercable to a Spark DataFrame.
+#' @param weight_col Name of the weight column
+#' @param n Sample set size
+#' @param replacement Whether to sample with replacement
+#' @param seed An (optional) integer seed
+#' @family Spark data frames
+#'
+#' @export
+sdf_weighted_sample <- function(x, weight_col, n, replacement = TRUE, seed = NULL) {
+  # TODO: address replacement == FALSE separately
+  weight_col <- as.name(weight_col)
+  sdf <- spark_dataframe(x) %>%
+    sdf_register() %>%
+    dplyr::filter(!!weight_col > 0)
+  cols <- colnames(sdf)
+
+  sample_priority_col <- random_string(prefix = "sdf_weighted_sample_priority_")
+  sample_priority_sql <- list(
+    if (is.null(seed))
+      dbplyr::translate_sql(log(rand()) / !!weight_col)
+    else
+      dbplyr::translate_sql(log(rand(as.integer(seed))) / !!weight_col)
+  )
+  names(sample_priority_sql) <- sample_priority_col
+  samples_sdf <- do.call(dplyr::mutate, c(list(sdf), sample_priority_sql)) %>%
+    spark_dataframe()
+  schema <- invoke(samples_sdf, "schema")
+
+  samples_sdf %>%
+    invoke("rdd") %>%
+    invoke_static(sc, "sparklyr.SamplingUtils", "top", ., sample_priority_col, as.integer(n)) %>%
+    invoke(hive_context(sc), "createDataFrame", ., schema) %>%
+    sdf_register() %>%
+    dplyr::select(dplyr::all_of(cols))
+}
+
 #' Sort a Spark DataFrame
 #'
 #' Sort a Spark DataFrame by one or more columns, with each column
