@@ -217,7 +217,16 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
 #'
 #' @export
 sdf_weighted_sample <- function(x, weight_col, n, replacement = TRUE, seed = NULL) {
-  # TODO: address replacement == FALSE separately
+  impl <- ifelse(
+    identical(replacement, FALSE),
+    sdf_weighted_sample_without_replacement,
+    sdf_weighted_sample_with_replacement
+  )
+
+  impl(x, weight_col, n, seed)
+}
+
+sdf_weighted_sample_without_replacement <- function(x, weight_col, n, seed) {
   weight_col <- as.name(weight_col)
   sdf <- spark_dataframe(x) %>%
     sdf_register() %>%
@@ -238,7 +247,53 @@ sdf_weighted_sample <- function(x, weight_col, n, replacement = TRUE, seed = NUL
 
   samples_sdf %>%
     invoke("rdd") %>%
-    invoke_static(sc, "sparklyr.SamplingUtils", "top", ., sample_priority_col, as.integer(n)) %>%
+    invoke_static(
+      sc,
+      "sparklyr.SamplingUtils",
+      "sampleWithoutReplacement",
+      .,
+      sample_priority_col,
+      as.integer(n)
+    ) %>%
+    invoke(hive_context(sc), "createDataFrame", ., schema) %>%
+    sdf_register() %>%
+    dplyr::select(dplyr::all_of(cols))
+}
+
+sdf_weighted_sample_with_replacement <- function(x, weight_col, n, seed) {
+  weight_col <- as.name(weight_col)
+  weight_col_sql <- dbplyr::translate_sql(!!weight_col)
+  n <- as.integer(n)
+  sdf <- spark_dataframe(x) %>%
+    sdf_register() %>%
+    dplyr::filter(!!weight_col > 0)
+  cols <- colnames(sdf)
+
+  rand_expr <- paste0(
+    "x -> LN(",
+    ifelse(is.null(seed), "RAND()", sprintf("RAND(%d)", as.integer(seed))),
+    ") / ",
+    weight_col_sql
+  )
+  sample_priority_sql <- list(
+    dplyr::sql(paste0("TRANSFORM(ARRAY_REPEAT(0, ", n, "), ", rand_expr, ")"))
+  )
+  sample_priority_col <- random_string(prefix = "sdf_weighted_sample_priority_")
+  names(sample_priority_sql) <- sample_priority_col
+  samples_sdf <- do.call(dplyr::mutate, c(list(sdf), sample_priority_sql)) %>%
+    spark_dataframe()
+  schema <- invoke(samples_sdf, "schema")
+
+  samples_sdf %>%
+    invoke("rdd") %>%
+    invoke_static(
+      sc,
+      "sparklyr.SamplingUtils",
+      "sampleWithReplacement",
+      .,
+      sample_priority_col,
+      as.integer(n)
+    ) %>%
     invoke(hive_context(sc), "createDataFrame", ., schema) %>%
     sdf_register() %>%
     dplyr::select(dplyr::all_of(cols))
