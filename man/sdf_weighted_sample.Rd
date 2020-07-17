@@ -4,14 +4,14 @@
 \alias{sdf_weighted_sample}
 \title{Perform Weighted Random Sampling on a Spark DataFrame}
 \usage{
-sdf_weighted_sample(x, weight_col, n, replacement = TRUE, seed = NULL)
+sdf_weighted_sample(x, weight_col, k, replacement = TRUE, seed = NULL)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame.}
 
 \item{weight_col}{Name of the weight column}
 
-\item{n}{Sample set size}
+\item{k}{Sample set size}
 
 \item{replacement}{Whether to sample with replacement}
 
