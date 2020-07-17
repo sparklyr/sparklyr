@@ -15,15 +15,12 @@ object SamplingUtils {
     rdd: RDD[Row],
     weightColumn: String,
     k: Int,
-    seed: java.lang.Long
+    random: Random
   ): RDD[Row] = {
     val sc = rdd.context
     if (0 == k) {
       sc.emptyRDD
     } else {
-      val random = (
-        if (null == seed) new Random() else new Random(seed)
-      )
       val mapRDDs = rdd.mapPartitions { iter =>
         val pq = new BoundedPriorityQueue[Sample](k)
 
@@ -58,15 +55,12 @@ object SamplingUtils {
     rdd: RDD[Row],
     weightColumn: String,
     k: Int,
-    seed: java.lang.Long
+    random: Random
   ): RDD[Row] = {
     val sc = rdd.context
     if (0 == k) {
       sc.emptyRDD
     } else {
-      val random = (
-        if (null == seed) new Random() else new Random(seed)
-      )
       val seqOp = (s: Array[Sample], r: Row) => {
         val weight = r.getAs[Double](weightColumn)
 
