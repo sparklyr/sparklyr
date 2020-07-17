@@ -21,12 +21,14 @@ object SamplingUtils {
     if (0 == k) {
       sc.emptyRDD
     } else {
+      val maxWeight = getMaxWeight(rdd, weightColumn)
       val mapRDDs = rdd.mapPartitions { iter =>
         val pq = new BoundedPriorityQueue[Sample](k)
 
         for (row <- iter) {
-          val weight = row.getAs[Double](weightColumn)
+          var weight = row.getAs[Double](weightColumn)
           if (weight > 0) {
+            if (maxWeight > 0) weight /= maxWeight
             val sample = Sample(scala.math.log(random.nextDouble) / weight, row)
             pq += sample
           }
@@ -61,33 +63,50 @@ object SamplingUtils {
     if (0 == k) {
       sc.emptyRDD
     } else {
-      val seqOp = (s: Array[Sample], r: Row) => {
-        val weight = r.getAs[Double](weightColumn)
+      val maxWeight = getMaxWeight(rdd, weightColumn)
+      val mapRDDs = rdd.mapPartitions { iter =>
+        val samples = Array.fill[Sample](k)(Sample(Double.NegativeInfinity, null))
+        for (row <- iter) {
+          var weight = row.getAs[Double](weightColumn)
+          if (weight > 0)
+            if (maxWeight > 0) weight /= maxWeight
+            Range(0, k).foreach(idx => {
+              val priority = scala.math.log(random.nextDouble) / weight
+              if (samples(idx).priority < priority)
+                samples(idx) = Sample(priority, row)
+            })
+        }
 
-        if (weight > 0)
-          Range(0, k).par.foreach(idx => {
-            val priority = scala.math.log(random.nextDouble) / weight
-            if (s(idx).priority < priority) s(idx) = Sample(priority, r)
-          })
-
-        s
-      }
-      val combOp = (s1: Array[Sample], s2: Array[Sample]) => {
-        Range(0, k).par.foreach(idx => {
-          if (s1(idx).priority < s2(idx).priority)
-            s1(idx) = s2(idx)
-        })
-
-        s1
+        Iterator.single(samples)
       }
 
-      sc.parallelize(
-        rdd.treeAggregate(
-          Array.fill[Sample](k)(Sample(Double.NegativeInfinity, null))
+      if (0 == mapRDDs.partitions.length) {
+        sc.emptyRDD
+      } else {
+        sc.parallelize(
+          mapRDDs.reduce(
+            (s1, s2) => {
+              Range(0, k).foreach(idx => {
+                if (s1(idx).priority < s2(idx).priority) s1(idx) = s2(idx)
+              })
+
+              s1
+            }
+          ).map(x => x.row)
         )
-        (seqOp, combOp, 2)
-        .map(x => x.row)
-      )
+      }
+    }
+  }
+
+  def getMaxWeight(rdd: RDD[Row], weightColumn: String) : Double = {
+    if (0 == rdd.count) {
+      1
+    } else {
+      rdd.mapPartitions(
+        iter => {
+          iter.map(_.getAs[Double](weightColumn))
+        }
+      ).max
     }
   }
 }
