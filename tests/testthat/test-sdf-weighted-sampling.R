@@ -1,11 +1,11 @@
 context("sdf-weighted-sampling")
 
-sc <- testthat_spark_connection()
+test_requires("dplyr")
 
 sample_space_sz <- 100
 num_zeroes <- 50
 
-df <- data.frame(
+weighted_sampling_test_df <- data.frame(
   id = seq(sample_space_sz + num_zeroes),
   weight = c(
     rep(1, 50),
@@ -16,12 +16,10 @@ df <- data.frame(
     rep(0, num_zeroes)
   )
 )
-
-sdf <- copy_to(sc, df, overwrite = TRUE) %>%
-  sdf_repartition(5L)
+sdf <- testthat_tbl("weighted_sampling_test_df", repartition = 5L)
 
 sample_sz <- 20
-num_sampling_iters <- 1000
+num_sampling_iters <- 100
 alpha <- 0.05
 
 verify_distribution <- function(replacement) {
@@ -29,7 +27,7 @@ verify_distribution <- function(replacement) {
   actual_dist <- rep(0, sample_space_sz)
 
   for (x in seq(num_sampling_iters)) {
-    sample <- df %>%
+    sample <- weighted_sampling_test_df %>%
       dplyr::slice_sample(
         n = sample_sz,
         weight_by = weight,
@@ -49,9 +47,9 @@ verify_distribution <- function(replacement) {
       actual_dist[[id]] <- actual_dist[[id]] + 1
   }
 
-  ks.test.res <- ks.test(x = actual_dist, y = expected_dist)
+  res <- ks.test(x = actual_dist, y = expected_dist)
 
-  expect_gte(ks.test.res$p.value, alpha)
+  expect_gte(res$p.value, alpha)
 }
 
 test_that("sdf_weighted_sample with replacement = TRUE works as expected", {
@@ -64,7 +62,7 @@ test_that("sdf_weighted_sample with replacement = FALSE works as expected", {
 
 test_that("sdf_weighted_sample works with seed parameter", {
   seed <- 142857
-  for (replacement = c(TRUE, FALSE)) {
+  for (replacement in c(TRUE, FALSE)) {
     samples <- lapply(
       seq(2),
       function(x) {
