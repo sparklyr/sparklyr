@@ -218,6 +218,7 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
 #' @export
 sdf_weighted_sample <- function(x, weight_col, k, replacement = TRUE, seed = NULL) {
   sdf <- spark_dataframe(x)
+  sc <- spark_connection(sdf)
   schema <- invoke(sdf, "schema")
   random <- do.call(
     invoke_new,

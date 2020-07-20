@@ -5,7 +5,7 @@ test_requires("dplyr")
 sample_space_sz <- 100
 num_zeroes <- 50
 
-weighted_sampling_test_df <- data.frame(
+weighted_sampling_test_data <- data.frame(
   id = seq(sample_space_sz + num_zeroes),
   weight = c(
     rep(1, 50),
@@ -16,10 +16,13 @@ weighted_sampling_test_df <- data.frame(
     rep(0, num_zeroes)
   )
 )
-sdf <- testthat_tbl("weighted_sampling_test_df", repartition = 5L)
+sdf <- testthat_tbl(
+  name = "weighted_sampling_test_data",
+  repartition = 5L
+)
 
 sample_sz <- 20
-num_sampling_iters <- 100
+num_sampling_iters <- 500
 alpha <- 0.05
 
 verify_distribution <- function(replacement) {
@@ -27,7 +30,7 @@ verify_distribution <- function(replacement) {
   actual_dist <- rep(0, sample_space_sz)
 
   for (x in seq(num_sampling_iters)) {
-    sample <- weighted_sampling_test_df %>%
+    sample <- weighted_sampling_test_data %>%
       dplyr::slice_sample(
         n = sample_sz,
         weight_by = weight,
@@ -68,7 +71,7 @@ test_that("sdf_weighted_sample works with seed parameter", {
       function(x) {
         sdf %>%
         sdf_weighted_sample(
-          weight_col = weight,
+          weight_col = "weight",
           k = sample_sz,
           replacement = replacement,
           seed = seed
@@ -77,6 +80,9 @@ test_that("sdf_weighted_sample works with seed parameter", {
       }
     )
 
-    expect_equivalent(samples[[1]], samples[[2]])
+    expect_equivalent(
+      samples[[1]] %>% dplyr::arrange(id),
+      samples[[2]] %>% dplyr::arrange(id)
+    )
   }
 })
