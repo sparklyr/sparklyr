@@ -15,21 +15,20 @@ object SamplingUtils {
     rdd: RDD[Row],
     weightColumn: String,
     k: Int,
-    random: Random
+    seed: Long
   ): RDD[Row] = {
     val sc = rdd.context
     if (0 == k) {
       sc.emptyRDD
     } else {
-      val maxWeight = getMaxWeight(rdd, weightColumn)
-      val mapRDDs = rdd.mapPartitions { iter =>
+      val mapRDDs = rdd.mapPartitionsWithIndex { (index, iter) =>
+        val random = new Random(seed + index)
         val pq = new BoundedPriorityQueue[Sample](k)
 
         for (row <- iter) {
           var weight = row.getAs[Double](weightColumn)
           if (weight > 0) {
-            if (maxWeight > 0) weight /= maxWeight
-            val sample = Sample(scala.math.log(random.nextDouble) / weight, row)
+            val sample = Sample(genSamplePriority(weight, random), row)
             pq += sample
           }
         }
@@ -57,23 +56,24 @@ object SamplingUtils {
     rdd: RDD[Row],
     weightColumn: String,
     k: Int,
-    random: Random
+    seed: Long
   ): RDD[Row] = {
     val sc = rdd.context
     if (0 == k) {
       sc.emptyRDD
     } else {
-      val maxWeight = getMaxWeight(rdd, weightColumn)
-      val mapRDDs = rdd.mapPartitions { iter =>
-        val samples = Array.fill[Sample](k)(Sample(Double.NegativeInfinity, null))
+      val mapRDDs = rdd.mapPartitionsWithIndex { (index, iter) =>
+        val random = new Random(seed + index)
+        val samples = Array.fill[Sample](k)(
+          Sample(Double.NegativeInfinity, null)
+        )
         for (row <- iter) {
           var weight = row.getAs[Double](weightColumn)
           if (weight > 0)
-            if (maxWeight > 0) weight /= maxWeight
             Range(0, k).foreach(idx => {
-              val priority = scala.math.log(random.nextDouble) / weight
-              if (samples(idx).priority < priority)
-                samples(idx) = Sample(priority, row)
+              val replacement = Sample(genSamplePriority(weight, random), row)
+              if (samples(idx) < replacement)
+                samples(idx) = replacement
             })
         }
 
@@ -87,7 +87,7 @@ object SamplingUtils {
           mapRDDs.reduce(
             (s1, s2) => {
               Range(0, k).foreach(idx => {
-                if (s1(idx).priority < s2(idx).priority) s1(idx) = s2(idx)
+                if (s1(idx) < s2(idx)) s1(idx) = s2(idx)
               })
 
               s1
@@ -98,15 +98,9 @@ object SamplingUtils {
     }
   }
 
-  def getMaxWeight(rdd: RDD[Row], weightColumn: String) : Double = {
-    if (0 == rdd.count) {
-      1
-    } else {
-      rdd.mapPartitions(
-        iter => {
-          iter.map(_.getAs[Double](weightColumn))
-        }
-      ).max
-    }
+  // generate a sampling priority for a row given the sampling weight and
+  // source of randomness
+  def genSamplePriority(weight: Double, random: Random): Double = {
+    scala.math.log(random.nextDouble) / weight
   }
 }

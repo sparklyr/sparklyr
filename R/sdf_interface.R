@@ -220,13 +220,7 @@ sdf_weighted_sample <- function(x, weight_col, k, replacement = TRUE, seed = NUL
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
   schema <- invoke(sdf, "schema")
-  random <- do.call(
-    invoke_new,
-    c(
-      list(sc, "scala.util.Random"),
-      if (is.null(seed)) NULL else list(seed)
-    )
-  )
+  seed <- seed %||% Sys.time()
 
   sdf %>%
     invoke("rdd") %>%
@@ -237,7 +231,7 @@ sdf_weighted_sample <- function(x, weight_col, k, replacement = TRUE, seed = NUL
       .,
       weight_col,
       as.integer(k),
-      random
+      as.integer(seed)
     ) %>%
     invoke(hive_context(sc), "createDataFrame", ., schema) %>%
     sdf_register()
