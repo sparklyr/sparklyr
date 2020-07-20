@@ -55,15 +55,15 @@ verify_distribution <- function(replacement) {
   expect_gte(res$p.value, alpha)
 }
 
-test_that("sdf_weighted_sample with replacement = TRUE works as expected", {
-  verify_distribution(replacement = TRUE)
-})
-
-test_that("sdf_weighted_sample with replacement = FALSE works as expected", {
+test_that("sdf_weighted_sample without replacement works as expected", {
   verify_distribution(replacement = FALSE)
 })
 
-test_that("sdf_weighted_sample works with seed parameter", {
+test_that("sdf_weighted_sample with replacement works as expected", {
+  verify_distribution(replacement = TRUE)
+})
+
+test_that("sdf_weighted_sample returns repeatable results from a fixed PRNG seed", {
   seed <- 142857
   for (replacement in c(TRUE, FALSE)) {
     samples <- lapply(
