@@ -81,7 +81,7 @@ registerDoSpark <- function(spark_conn, ...) {
         enclos <- envir
         expr_globals <- as.list(expr_globals)
         for (k in names(expr_globals)) {
-          v <- expr_globals$k
+          v <- expr_globals[[k]]
           if (identical(typeof(v), "closure")) {
             # to make `enclos` truly self-contained, each of its element that is
             # a closure will need to have its enclosing environment replaced with

@@ -86,5 +86,10 @@ test_that("doSpark works for loop with arbitrary R objects with multicombine", {
 })
 
 test_that("doSpark works for loop referencing external functions and variables", {
+  n <- 5
+  expect_equal(
+    unlist(foreach(x = 1:5) %dopar% { n * x }),
+    n * seq(5)
+  )
   foreach(x = 1:20, .combine = list) %test% quote(fn_2(list(x, y, z, fn_3(x)(y), fn_4(x))))
 })
