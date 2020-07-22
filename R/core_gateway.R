@@ -1,3 +1,8 @@
+sparklyr_gateway_trouble_shooting_msg <- function() {
+  c("\n\n\nTry running `options(sparklyr.log.console = TRUE)` followed by ",
+    "`sc <- spark_connect(...)` for more debugging info.")
+}
+
 wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {
   waitSeconds <- if (isStarting)
     spark_config_value(config, "sparklyr.connect.timeout", 60)
@@ -59,7 +64,12 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
 
   if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
     if (isStarting)
-      stop("Sparklyr gateway did not respond while retrieving ports information after ", waitSeconds, " seconds")
+      stop(
+        "Sparklyr gateway did not respond while retrieving ports information after ",
+        waitSeconds,
+        " seconds.",
+        sparklyr_gateway_trouble_shooting_msg()
+      )
     else
       return(NULL)
   }
@@ -84,7 +94,9 @@ spark_connect_gateway <- function(
   if (is.null(gateway)) {
     if (isStarting)
       stop(
-        "Gateway in ", gatewayAddress, ":", gatewayPort, " did not respond.")
+        "Gateway in ", gatewayAddress, ":", gatewayPort, " did not respond.",
+        sparklyr_gateway_trouble_shooting_msg()
+      )
 
     NULL
   }
