@@ -44,6 +44,7 @@ livy_available_jars <- function() {
 #' @param password The password to use in the Authorization header
 #' @param negotiate Whether to use gssnegotiate method or not
 #' @param custom_headers List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.
+#' @param proxy Either NULL or a proxy specified by httr::use_proxy(). Defaults to NULL.
 #' @param ... additional Livy session parameters
 #'
 #' @details
@@ -82,6 +83,7 @@ livy_config <- function(config = spark_config(),
                         password = NULL,
                         negotiate = FALSE,
                         custom_headers = list("X-Requested-By" = "sparklyr"),
+                        proxy = NULL,
                         ...) {
   additional_params <- list(...)
 

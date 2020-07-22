@@ -10,6 +10,7 @@ livy_config(
   password = NULL,
   negotiate = FALSE,
   custom_headers = list(`X-Requested-By` = "sparklyr"),
+  proxy = NULL,
   ...
 )
 }
@@ -23,6 +24,8 @@ livy_config(
 \item{negotiate}{Whether to use gssnegotiate method or not}
 
 \item{custom_headers}{List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.}
+
+\item{proxy}{Either NULL or a proxy specified by httr::use_proxy(). Defaults to NULL.}
 
 \item{...}{additional Livy session parameters}
 }
