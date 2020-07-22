@@ -433,3 +433,40 @@ get_sample_data_path <- function(file_name) {
 
   sample_data_path
 }
+
+# Helper method to launch a local proxy listening on `proxy_port` and forwarding
+# TCP packets to `dest_port`
+# This method will return an opaque handle with a finalizer that will stop the
+# proxy process once called
+local_tcp_proxy <- function(proxy_port, dest_port) {
+  pid <- system2(
+    "bash",
+    args = c(
+      "-c",
+      paste0(
+        "'socat tcp-l:",
+        as.integer(proxy_port),
+        ",fork,reuseaddr tcp:localhost:",
+        as.integer(dest_port),
+       " >/dev/null 2>&1 & disown; echo $!'"
+      )
+    ),
+    stdout = TRUE
+  )
+  wait_for_svc("local_tcp_proxy", proxy_port, timeout_s = 10)
+
+  handle <- structure(
+    new.env(parent = emptyenv()),
+    class = "local_tcp_proxy_handle"
+  )
+  reg.finalizer(
+    handle,
+    function(x) {
+      system2("pkill", args = c("-P", pid))
+      system2("kill", args = pid)
+    },
+    onexit = TRUE
+  )
+
+  handle
+}

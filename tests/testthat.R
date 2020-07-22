@@ -149,7 +149,9 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
       "^dbi$",
       "^copy-to$",
       "^spark-apply$",
-      "^ml-clustering-kmeans$"
+      "^ml-clustering-kmeans$",
+      "^livy-config$",
+      "^livy-proxy$"
     )
 
     test_filter <- paste(livy_tests, collapse = "|")

@@ -44,6 +44,10 @@ livy_available_jars <- function() {
 #' @param password The password to use in the Authorization header
 #' @param negotiate Whether to use gssnegotiate method or not
 #' @param custom_headers List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.
+#' @param proxy Either NULL or a proxy specified by httr::use_proxy(). Defaults to NULL.
+#' @param curl_opts List of CURL options (e.g., verbose, connecttimeout, dns_cache_timeout, etc, see httr::httr_options() for a
+#'   list of valid options) -- NOTE: these configurations are for libcurl only and separate from HTTP headers or Livy session
+#'   parameters.
 #' @param ... additional Livy session parameters
 #'
 #' @details
@@ -82,6 +86,8 @@ livy_config <- function(config = spark_config(),
                         password = NULL,
                         negotiate = FALSE,
                         custom_headers = list("X-Requested-By" = "sparklyr"),
+                        proxy = NULL,
+                        curl_opts = NULL,
                         ...) {
   additional_params <- list(...)
 
@@ -97,6 +103,10 @@ livy_config <- function(config = spark_config(),
         config[["sparklyr.livy.headers"]], custom_headers[l])
     }
   }
+
+  if (!is.null(proxy)) config[["sparklyr.livy.proxy"]] <- proxy
+
+  if (!is.null(curl_opts)) config[["sparklyr.livy.curl_opts"]] <- curl_opts
 
   #Params need to be restrictued or livy will complain about unknown parameters
   allowed_params <- c("proxy_user",
@@ -149,18 +159,25 @@ livy_config <- function(config = spark_config(),
   config
 }
 
-livy_get_httr_headers <- function(config, headers) {
+livy_get_httr_config <- function(config, headers) {
+  httr_config <- list()
   headers <- c(headers, config[["sparklyr.livy.headers"]])
   if (length(headers) > 0)
-    do.call(add_headers, headers)
-  else
-    NULL
+    httr_config <- do.call(add_headers, headers)
+
+  proxy <- config[["sparklyr.livy.proxy"]]
+  httr_config$options <- c(httr_config$options, proxy$options)
+
+  curl_opts <- config[["sparklyr.livy.curl_opts"]]
+  httr_config$options <- c(httr_config$options, curl_opts)
+
+  httr_config
 }
 
 #' @importFrom httr GET
 livy_get_json <- function(url, config) {
   req <- GET(url,
-             livy_get_httr_headers(config, list(
+             config = livy_get_httr_config(config, list(
                "Content-Type" = "application/json"
              )),
              config$sparklyr.livy.auth
@@ -218,7 +235,7 @@ livy_create_session <- function(master, config) {
   if (length(session_params) > 0) data <- append(data, session_params)
 
   req <- POST(paste(master, "sessions", sep = "/"),
-              livy_get_httr_headers(config, list(
+              config = livy_get_httr_config(config, list(
                 "Content-Type" = "application/json"
               )),
               body = toJSON(
@@ -240,7 +257,7 @@ livy_create_session <- function(master, config) {
 
 livy_destroy_session <- function(sc) {
   req <- DELETE(paste(sc$master, "sessions", sc$sessionId, sep = "/"),
-                livy_get_httr_headers(sc$config, list(
+                config = livy_get_httr_config(sc$config, list(
                   "Content-Type" = "application/json"
                 )),
                 body = NULL,
@@ -387,7 +404,7 @@ livy_post_statement <- function(sc, code) {
   livy_log_operation(sc, code)
 
   req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
-              livy_get_httr_headers(sc$config, list(
+              config = livy_get_httr_config(sc$config, list(
                 "Content-Type" = "application/json"
               )),
               body = toJSON(
