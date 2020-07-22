@@ -41,6 +41,8 @@ spark_config_settings <- function() {
     sparklyr.livy.branch = "GitHub branch to be used to deploy sparklyr JAR to Livy.",
     sparklyr.livy.jar = "URL or path to the sparklyr JAR to be used by Livy.",
     sparklyr.livy.headers = "Additional HTTP headers for Livy connections.",
+    sparklyr.livy.proxy = "Optional HTTP proxy setting for Livy connections (any non-default value must be specified via httr::use_proxy()).",
+    sparklyr.livy.additional_curl_opts = "Additional CURL options for Livy connections (see httr::httr_options() for a list of valid options).",
     sparklyr.livy.sources = "Should sparklyr sources be sourced when connecting? If false, manually register sparklyr jars.",
     sparklyr.log.invoke = "Should every call to invoke() be printed in the console? Can be set to 'callstack' to log call stack.",
     sparklyr.log.console = "Should driver logs be printed in the console?",

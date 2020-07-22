@@ -149,18 +149,25 @@ livy_config <- function(config = spark_config(),
   config
 }
 
-livy_get_httr_headers <- function(config, headers) {
+livy_get_httr_config <- function(config, headers) {
+  httr_config <- list()
   headers <- c(headers, config[["sparklyr.livy.headers"]])
   if (length(headers) > 0)
-    do.call(add_headers, headers)
-  else
-    NULL
+    httr_config <- do.call(add_headers, headers)
+
+  proxy <- config[["sparklyr.livy.proxy"]]
+  httr_config$options <- c(httr_config$options, proxy$options)
+
+  additional_curl_opts <- config[["sparklyr.livy.additional_curl_opts"]]
+  httr_config$options <- c(httr_config$options, additional_curl_opts)
+
+  httr_config
 }
 
 #' @importFrom httr GET
 livy_get_json <- function(url, config) {
   req <- GET(url,
-             livy_get_httr_headers(config, list(
+             config = livy_get_httr_config(config, list(
                "Content-Type" = "application/json"
              )),
              config$sparklyr.livy.auth
@@ -218,7 +225,7 @@ livy_create_session <- function(master, config) {
   if (length(session_params) > 0) data <- append(data, session_params)
 
   req <- POST(paste(master, "sessions", sep = "/"),
-              livy_get_httr_headers(config, list(
+              config = livy_get_httr_config(config, list(
                 "Content-Type" = "application/json"
               )),
               body = toJSON(
@@ -240,7 +247,7 @@ livy_create_session <- function(master, config) {
 
 livy_destroy_session <- function(sc) {
   req <- DELETE(paste(sc$master, "sessions", sc$sessionId, sep = "/"),
-                livy_get_httr_headers(sc$config, list(
+                config = livy_get_httr_config(sc$config, list(
                   "Content-Type" = "application/json"
                 )),
                 body = NULL,
@@ -387,7 +394,7 @@ livy_post_statement <- function(sc, code) {
   livy_log_operation(sc, code)
 
   req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
-              livy_get_httr_headers(sc$config, list(
+              config = livy_get_httr_config(sc$config, list(
                 "Content-Type" = "application/json"
               )),
               body = toJSON(
