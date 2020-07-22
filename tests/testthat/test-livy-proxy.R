@@ -11,7 +11,7 @@ num_open_fds <- function(port) {
 }
 
 test_that("Livy connection works with HTTP proxy", {
-  sc <- testthat_livy_connection()
+  sc <- testthat_spark_connection()
   proxy_port <- 9999
   handle <- local_tcp_proxy(proxy_port = proxy_port, dest_port = 8998)
   expect_equal(num_open_fds(proxy_port), 1)
@@ -24,5 +24,9 @@ test_that("Livy connection works with HTTP proxy", {
     config = config,
     version = version
   )
-  expect_equal(num_open_fds(proxy_port), 3)
+  expect_gte(num_open_fds(proxy_port), 2)
+
+  expect_equivalent(sdf_len(sc, 10) %>% collect(), tibble::tibble(id = seq(10)))
+
+  spark_disconnect(sc)
 })

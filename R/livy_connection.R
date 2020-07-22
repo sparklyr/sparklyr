@@ -100,6 +100,8 @@ livy_config <- function(config = spark_config(),
     }
   }
 
+  if (!is.null(proxy)) config[["sparklyr.livy.proxy"]] <- proxy
+
   #Params need to be restrictued or livy will complain about unknown parameters
   allowed_params <- c("proxy_user",
                       "jars",
