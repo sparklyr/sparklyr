@@ -11,6 +11,7 @@ livy_config(
   negotiate = FALSE,
   custom_headers = list(`X-Requested-By` = "sparklyr"),
   proxy = NULL,
+  curl_opts = NULL,
   ...
 )
 }
@@ -26,6 +27,10 @@ livy_config(
 \item{custom_headers}{List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.}
 
 \item{proxy}{Either NULL or a proxy specified by httr::use_proxy(). Defaults to NULL.}
+
+\item{curl_opts}{List of CURL options (e.g., verbose, connecttimeout, dns_cache_timeout, etc, see httr::httr_options() for a
+list of valid options) -- NOTE: these configurations are for libcurl only and separate from HTTP headers or Livy session
+parameters.}
 
 \item{...}{additional Livy session parameters}
 }

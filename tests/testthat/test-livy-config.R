@@ -21,3 +21,12 @@ test_that("'livy_config()' works with authentication", {
     httr::authenticate("", "", type = "gssnegotiate")
   )
 })
+
+test_that("'livy_config()' works with additional_curl_opts", {
+  config <- livy_config()
+  expect_null(config$sparklyr.livy.curl_opts)
+
+  curl_opts <- list(accepttimeout_ms = 5000, verbose = 1)
+  config <- livy_config(curl_opts = curl_opts)
+  expect_equal(config$sparklyr.livy.curl_opts, curl_opts)
+})

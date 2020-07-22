@@ -45,6 +45,9 @@ livy_available_jars <- function() {
 #' @param negotiate Whether to use gssnegotiate method or not
 #' @param custom_headers List of custom headers to append to http requests. Defaults to \code{list("X-Requested-By" = "sparklyr")}.
 #' @param proxy Either NULL or a proxy specified by httr::use_proxy(). Defaults to NULL.
+#' @param curl_opts List of CURL options (e.g., verbose, connecttimeout, dns_cache_timeout, etc, see httr::httr_options() for a
+#'   list of valid options) -- NOTE: these configurations are for libcurl only and separate from HTTP headers or Livy session
+#'   parameters.
 #' @param ... additional Livy session parameters
 #'
 #' @details
@@ -84,6 +87,7 @@ livy_config <- function(config = spark_config(),
                         negotiate = FALSE,
                         custom_headers = list("X-Requested-By" = "sparklyr"),
                         proxy = NULL,
+                        curl_opts = NULL,
                         ...) {
   additional_params <- list(...)
 
@@ -101,6 +105,8 @@ livy_config <- function(config = spark_config(),
   }
 
   if (!is.null(proxy)) config[["sparklyr.livy.proxy"]] <- proxy
+
+  if (!is.null(curl_opts)) config[["sparklyr.livy.curl_opts"]] <- curl_opts
 
   #Params need to be restrictued or livy will complain about unknown parameters
   allowed_params <- c("proxy_user",
@@ -162,8 +168,8 @@ livy_get_httr_config <- function(config, headers) {
   proxy <- config[["sparklyr.livy.proxy"]]
   httr_config$options <- c(httr_config$options, proxy$options)
 
-  additional_curl_opts <- config[["sparklyr.livy.additional_curl_opts"]]
-  httr_config$options <- c(httr_config$options, additional_curl_opts)
+  curl_opts <- config[["sparklyr.livy.curl_opts"]]
+  httr_config$options <- c(httr_config$options, curl_opts)
 
   httr_config
 }
