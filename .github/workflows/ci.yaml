@@ -117,7 +117,7 @@ jobs:
           restore-keys: sparklyr-${{ runner.os }}-r-${{ matrix.r }}
       - name: Install system dependencies
         run: |
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libsodium23 libsodium-dev libwebp6 libwebp-dev libcurl4 libcurl4-gnutls-dev libhiredis0.13 libhiredis-dev libudunits2-0 libudunits2-dev libraptor2-dev librasqal3-dev librdf0-dev procps socat
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libcurl4-gnutls-dev procps socat
       - name: Install dependencies
         run: source ./ci/install_r_dependencies.sh
         continue-on-error: true
