@@ -22,12 +22,15 @@ sdf <- testthat_tbl(
 )
 
 sample_sz <- 20
-num_sampling_iters <- 500
+num_sampling_iters <- 100
 alpha <- 0.05
 
 verify_distribution <- function(replacement) {
   expected_dist <- rep(0, sample_space_sz)
   actual_dist <- rep(0, sample_space_sz)
+
+  seed <- 142857L
+  set.seed(seed)
 
   for (x in seq(num_sampling_iters)) {
     sample <- weighted_sampling_test_data %>%
@@ -43,7 +46,8 @@ verify_distribution <- function(replacement) {
       sdf_weighted_sample(
         weight_col = "weight",
         k = sample_sz,
-        replacement = replacement
+        replacement = replacement,
+        seed = seed + x
       ) %>%
       collect()
     for (id in sample$id)
