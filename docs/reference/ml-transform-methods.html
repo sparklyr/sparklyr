@@ -9,14 +9,18 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Methods for transformation, fit, and prediction. These are mirrors of the corresponding <a href='sdf-transform-methods.html'>sdf-transform-methods</a>.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>is_ml_transformer</span>(<span class='no'>x</span>)
 
@@ -32,7 +36,7 @@ aliases:
 
 <span class='co'># S3 method for ml_model_classification</span>
 <span class='fu'>ml_predict</span>(<span class='no'>x</span>, <span class='no'>dataset</span>, <span class='kw'>probability_prefix</span> <span class='kw'>=</span> <span class='st'>"probability_"</span>, <span class='no'>...</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -58,14 +62,15 @@ aliases:
       <td><p>String used to prepend the class probability output columns.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>When <code>x</code> is an estimator, <code>ml_fit()</code> returns a transformer whereas <code>ml_fit_and_transform()</code> returns a transformed dataset. When <code>x</code> is a transformer, <code>ml_transform()</code> and <code>ml_predict()</code> return a transformed dataset. When <code>ml_predict()</code> is called on a <code>ml_model</code> object, additional columns (e.g. probabilities in case of classification models) are appended to the transformed output for the user's convenience.</p>
+    
     <h2 id="details">Details</h2>
 
     <p>These methods are</p>
-
+    
 
     </div>
 

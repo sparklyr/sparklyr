@@ -9,18 +9,24 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
+
     <li><a href="#see-also">See also</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Rescale each feature individually to a common range [min, max] linearly using
   column summary statistics, which is also known as min-max normalization or
   Rescaling</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_min_max_scaler</span>(
   <span class='no'>x</span>,
@@ -31,7 +37,7 @@ aliases:
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"min_max_scaler_"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -69,7 +75,7 @@ aliases:
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -84,10 +90,12 @@ aliases:
   immediately applied to the input <code>tbl_spark</code>, returning a <code>tbl_spark</code></p></li>
 </ul>
 
+    
     <h2 id="details">Details</h2>
 
     <p>In the case where <code>x</code> is a <code>tbl_spark</code>, the estimator fits against <code>x</code>
   to obtain a transformer, which is then immediately used to transform <code>x</code>, returning a <code>tbl_spark</code>.</p>
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
@@ -126,6 +134,7 @@ aliases:
 <code><a href='ft_vector_indexer.html'>ft_vector_indexer</a>()</code>,
 <code><a href='ft_vector_slicer.html'>ft_vector_slicer</a>()</code>,
 <code><a href='ft_word2vec.html'>ft_word2vec</a>()</code></p></div>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -140,7 +149,6 @@ aliases:
   <span class='fu'>ft_min_max_scaler</span>(<span class='kw'>input_col</span> <span class='kw'>=</span> <span class='st'>"features_temp"</span>,
                      <span class='kw'>output_col</span> <span class='kw'>=</span> <span class='st'>"features"</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

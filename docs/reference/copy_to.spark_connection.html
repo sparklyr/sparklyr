@@ -9,15 +9,18 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Copy an R <code>data.frame</code> to Spark, and return a reference to the
 generated Spark DataFrame as a <code>tbl_spark</code>. The returned object will
 act as a <code>dplyr</code>-compatible interface to the underlying Spark table.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># S3 method for spark_connection</span>
 <span class='fu'><a href='copy_to.html'>copy_to</a></span>(
@@ -29,7 +32,7 @@ act as a <code>dplyr</code>-compatible interface to the underlying Spark table.<
   <span class='kw'>repartition</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -70,12 +73,12 @@ partitioning.</p></td>
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>A <code>tbl_spark</code>, representing a <code>dplyr</code>-compatible interface
   to a Spark DataFrame.</p>
-
+    
 
     </div>
 

@@ -9,17 +9,21 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Retrieve the version of Spark associated with a Spark connection.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_version</span>(<span class='no'>sc</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -33,16 +37,17 @@ aliases:
       <td><p>A <code>spark_connection</code>.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The Spark version as a <code><a href='https://rdrr.io/r/base/numeric_version.html'>numeric_version</a></code>.</p>
+    
     <h2 id="details">Details</h2>
 
     <p>Suffixes for e.g. preview versions, or snapshotted versions,
 are trimmed -- if you require the full Spark version, you can
 retrieve it with <code><a href='invoke.html'>invoke(spark_context(sc), "version")</a></code>.</p>
-
+    
 
     </div>
 

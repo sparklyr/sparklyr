@@ -9,15 +9,20 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>A set of functions to calculate performance metrics for prediction models. Also see the Spark ML Documentation <a href='https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.evaluation.package'>https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.ml.evaluation.package</a></p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_binary_classification_evaluator</span>(
   <span class='no'>x</span>,
@@ -59,7 +64,7 @@ aliases:
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"regression_evaluator_"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -99,10 +104,11 @@ label or value NOT the scored probability. Column should be of type
 <code>Double</code>.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The calculated performance metric</p>
+    
     <h2 id="details">Details</h2>
 
     <p>The following metrics are supported</p><ul>
@@ -114,6 +120,7 @@ label or value NOT the scored probability. Column should be of type
 
 <p><code>ml_binary_classification_eval()</code> is an alias for <code>ml_binary_classification_evaluator()</code> for backwards compatibility.</p>
 <p><code>ml_classification_eval()</code> is an alias for <code>ml_multiclass_classification_evaluator()</code> for backwards compatibility.</p>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -150,7 +157,6 @@ label or value NOT the scored probability. Column should be of type
 
 <span class='fu'>ml_binary_classification_evaluator</span>(<span class='no'>pred</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

@@ -9,17 +9,20 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#details">Details</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Persist a Spark DataFrame, forcing any pending computations and (optionally)
 serializing the results to disk.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_persist</span>(<span class='no'>x</span>, <span class='kw'>storage.level</span> <span class='kw'>=</span> <span class='st'>"MEMORY_AND_DISK"</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -39,7 +42,7 @@ serializing the results to disk.</p>
 for information on what storage levels are accepted.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="details">Details</h2>
 
     <p>Spark DataFrames invoke their operations lazily -- pending operations are
@@ -51,7 +54,7 @@ otherwise).</p>
 which are non-deterministic -- otherwise, one might see that the values
 within a column seem to 'change' as new operations are performed on that
 data set.</p>
-
+    
 
     </div>
 

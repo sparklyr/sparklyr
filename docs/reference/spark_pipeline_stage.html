@@ -9,12 +9,14 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
-    </ul>
+            </ul>
     </div>
 
     <div>
 
+    
     <p>Helper function to create pipeline stage objects with common parameter setters.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_pipeline_stage</span>(
   <span class='no'>sc</span>,
@@ -33,7 +35,7 @@ aliases:
   <span class='kw'>output_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>output_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -104,8 +106,7 @@ reproducible across repeated calls.</p></td>
       <td><p>Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values &gt; 0 excepting that at most one value may be 0. The class with largest value <code>p/t</code> is predicted, where <code>p</code> is the original probability of that class and <code>t</code> is the class's threshold.</p></td>
     </tr>
     </table>
-
-
+    
 
     </div>
 

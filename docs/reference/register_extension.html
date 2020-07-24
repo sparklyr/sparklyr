@@ -9,20 +9,23 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#note">Note</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Registering an extension package will result in the package being
 automatically scanned for spark dependencies when a connection to Spark is
 created.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>register_extension</span>(<span class='no'>package</span>)
 
 <span class='fu'>registered_extensions</span>()</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -36,13 +39,13 @@ created.</p>
       <td><p>The package(s) to register.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="note">Note</h2>
 
     <p>Packages should typically register their extensions in their
   <code>.onLoad</code> hook -- this ensures that their extensions are registered
   when their namespaces are loaded.</p>
-
+    
 
     </div>
 

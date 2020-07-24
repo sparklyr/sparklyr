@@ -9,16 +9,21 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#see-also">See also</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>K-means clustering with support for k-means|| initialization proposed by Bahmani et al.
   Using `ml_kmeans()` with the formula interface requires Spark 2.0+.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_kmeans</span>(
   <span class='no'>x</span>,
@@ -36,7 +41,7 @@ aliases:
 )
 
 <span class='fu'>ml_compute_cost</span>(<span class='no'>model</span>, <span class='no'>dataset</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -103,7 +108,7 @@ reproducible across repeated calls.</p></td>
       <td><p>Dataset on which to calculate K-means cost</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -125,6 +130,7 @@ reproducible across repeated calls.</p></td>
 <p><code>ml_compute_cost()</code> returns the K-means cost (sum of
   squared distances of points to their nearest center) for the model
   on the given data.</p>
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for
@@ -133,6 +139,7 @@ reproducible across repeated calls.</p></td>
 <code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a>()</code>,
 <code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a>()</code>,
 <code><a href='ml_lda.html'>ml_lda</a>()</code></p></div>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -140,7 +147,6 @@ reproducible across repeated calls.</p></td>
 <span class='no'>iris_tbl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sdf_copy_to.html'>sdf_copy_to</a></span>(<span class='no'>sc</span>, <span class='no'>iris</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"iris_tbl"</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 <span class='fu'>ml_kmeans</span>(<span class='no'>iris_tbl</span>, <span class='no'>Species</span> ~ <span class='no'>.</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

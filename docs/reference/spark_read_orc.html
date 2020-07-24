@@ -9,15 +9,19 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#details">Details</a></li>
+
     <li><a href="#see-also">See also</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Read a <a href='https://orc.apache.org/'>ORC</a> file into a Spark
 DataFrame.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_read_orc</span>(
   <span class='no'>sc</span>,
@@ -31,7 +35,7 @@ DataFrame.</p>
   <span class='kw'>schema</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -90,11 +94,12 @@ If specified, the elements can be <code>"binary"</code> for <code>BinaryType</co
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="details">Details</h2>
 
     <p>You can read data from HDFS (<code>hdfs://</code>), S3 (<code>s3a://</code>), as well as
   the local file system (<code>file://</code>).</p>
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>Other Spark serialization routines: 
@@ -121,7 +126,7 @@ If specified, the elements can be <code>"binary"</code> for <code>BinaryType</co
 <code><a href='spark_write_source.html'>spark_write_source</a>()</code>,
 <code><a href='spark_write_table.html'>spark_write_table</a>()</code>,
 <code><a href='spark_write_text.html'>spark_write_text</a>()</code></p></div>
-
+    
 
     </div>
 

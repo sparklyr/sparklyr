@@ -9,15 +9,20 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Perform hyper-parameter tuning using either K-fold cross validation or train-validation split.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_sub_models</span>(<span class='no'>model</span>)
 
@@ -48,7 +53,7 @@ aliases:
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"train_validation_split_"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -110,7 +115,7 @@ reproducible across repeated calls.</p></td>
       <td><p>Ratio between train and validation data. Must be between 0 and 1. Default: 0.75</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -130,9 +135,11 @@ reproducible across repeated calls.</p></td>
   order of the estimator param maps.</p>
 <p><code>ml_validation_metrics()</code> returns a data frame of performance
   metrics and hyperparameter combinations.</p>
+    
     <h2 id="details">Details</h2>
 
     <p><code>ml_cross_validator()</code> performs k-fold cross validation while <code>ml_train_validation_split()</code> performs tuning on one pair of train and validation datasets.</p>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -168,7 +175,6 @@ reproducible across repeated calls.</p></td>
 <span class='fu'>ml_validation_metrics</span>(<span class='no'>cv_model</span>)
 
 }</div></code></pre></div>
-
     </div>
 
     </div>

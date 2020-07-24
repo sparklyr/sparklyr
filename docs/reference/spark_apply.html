@@ -9,14 +9,18 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#configuration">Configuration</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Applies an R function to a Spark object (typically, a Spark DataFrame).</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_apply</span>(
   <span class='no'>x</span>,
@@ -32,7 +36,7 @@ aliases:
   <span class='kw'>partition_index_param</span> <span class='kw'>=</span> <span class='st'>""</span>,
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -129,7 +133,7 @@ specify the column types. The sample size is configurable using the
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="configuration">Configuration</h2>
 
     
@@ -142,6 +146,7 @@ worker node use the <code>sparklyr.apply.env.*</code> config, to launch workers
 without <code>--vanilla</code> use <code>sparklyr.apply.options.vanilla</code> set to
 <code>FALSE</code>, to run a custom script before launching Rscript use
 <code>sparklyr.apply.options.rscript.before</code>.</p>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -157,7 +162,6 @@ without <code>--vanilla</code> use <code>sparklyr.apply.options.vanilla</code> s
   <span class='fu'>spark_apply</span>(<span class='no'>nrow</span>, <span class='kw'>barrier</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>id</span> <span class='kw'>=</span> <span class='st'>"integer"</span>)) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='collect.html'>collect</a></span>()
 }</div></code></pre></div>
-
     </div>
 
     </div>

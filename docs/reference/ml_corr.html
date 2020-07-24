@@ -9,17 +9,21 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Compute correlation matrix</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_corr</span>(<span class='no'>x</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pearson"</span>, <span class='st'>"spearman"</span>))</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -43,10 +47,11 @@ column is specified, it must be a vector column (for example, assembled using
       <td><p>The method to use, either <code>"pearson"</code> or <code>"spearman"</code>.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>A correlation matrix organized as a data frame.</p>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -57,7 +62,6 @@ column is specified, it must be a vector column (for example, assembled using
 
 <span class='fu'>ml_corr</span>(<span class='no'>iris_tbl</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='no'>features</span> , <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"pearson"</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

@@ -9,13 +9,16 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#transforming-spark-dataframes">Transforming Spark DataFrames</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Project features onto principal components</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_project</span>(
   <span class='no'>object</span>,
@@ -24,7 +27,7 @@ aliases:
   <span class='kw'>feature_prefix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -54,7 +57,7 @@ aliases:
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="transforming-spark-dataframes">Transforming Spark DataFrames</h2>
 
     
@@ -69,7 +72,7 @@ the underlying Spark DataFrame <em>does</em> execute its operations lazily, so
 that even though the pending set of operations (currently) are not exposed at
 the <span style="R">R</span> level, these operations will only be executed when you explicitly
 <code><a href='collect.html'>collect()</a></code> the table.</p>
-
+    
 
     </div>
 

@@ -9,13 +9,16 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+        
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Compute performance metrics.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_evaluate</span>(<span class='no'>x</span>, <span class='no'>dataset</span>)
 
@@ -45,7 +48,7 @@ aliases:
 
 <span class='co'># S3 method for ml_evaluator</span>
 <span class='fu'>ml_evaluate</span>(<span class='no'>x</span>, <span class='no'>dataset</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -63,7 +66,7 @@ aliases:
       <td><p>The dataset to be validate the model on.</p></td>
     </tr>
     </table>
-
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -79,7 +82,6 @@ aliases:
 <span class='fu'><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a></span>(<span class='no'>iris_tbl</span>, <span class='no'>Species</span> ~ <span class='no'>.</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'>ml_evaluate</span>(<span class='no'>iris_tbl</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

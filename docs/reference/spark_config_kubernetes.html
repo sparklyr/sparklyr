@@ -9,14 +9,16 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
-    </ul>
+            </ul>
     </div>
 
     <div>
 
+    
     <p>Convenience function to initialize a Kubernetes configuration instead
 of <code><a href='spark_config.html'>spark_config()</a></code>, exposes common properties to set in Kubernetes
 clusters.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_config_kubernetes</span>(
   <span class='no'>master</span>,
@@ -33,7 +35,7 @@ clusters.</p>
   <span class='kw'>fix_config</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>.Platform</span>$<span class='no'>OS.type</span>, <span class='st'>"windows"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -105,8 +107,7 @@ on disconnection.</p></td>
       <td><p>Additional parameters, currently not in use.</p></td>
     </tr>
     </table>
-
-
+    
 
     </div>
 

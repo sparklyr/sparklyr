@@ -9,15 +9,20 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
+
     <li><a href="#see-also">See also</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Word2Vec transforms a word into a code for further natural language processing or machine learning process.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_word2vec</span>(
   <span class='no'>x</span>,
@@ -35,7 +40,7 @@ aliases:
 )
 
 <span class='fu'>ml_find_synonyms</span>(<span class='no'>model</span>, <span class='no'>word</span>, <span class='no'>num</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -109,7 +114,7 @@ reproducible across repeated calls.</p></td>
       <td><p>Number of words closest in similarity to the given word to find.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -125,10 +130,12 @@ reproducible across repeated calls.</p></td>
 </ul>
 
 <p><code>ml_find_synonyms()</code> returns a DataFrame of synonyms and cosine similarities</p>
+    
     <h2 id="details">Details</h2>
 
     <p>In the case where <code>x</code> is a <code>tbl_spark</code>, the estimator fits against <code>x</code>
   to obtain a transformer, which is then immediately used to transform <code>x</code>, returning a <code>tbl_spark</code>.</p>
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
@@ -167,7 +174,7 @@ reproducible across repeated calls.</p></td>
 <code><a href='ft_vector_assembler.html'>ft_vector_assembler</a>()</code>,
 <code><a href='ft_vector_indexer.html'>ft_vector_indexer</a>()</code>,
 <code><a href='ft_vector_slicer.html'>ft_vector_slicer</a>()</code></p></div>
-
+    
 
     </div>
 

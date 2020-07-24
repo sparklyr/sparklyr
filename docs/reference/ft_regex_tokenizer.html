@@ -9,17 +9,21 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#see-also">See also</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>A regex based tokenizer that extracts tokens either by using the provided
 regex pattern to split the text (default) or repeatedly matching the regex
 (if <code>gaps</code> is false). Optional parameters also allow filtering tokens using a
 minimal length. It returns an array of strings that can be empty.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_regex_tokenizer</span>(
   <span class='no'>x</span>,
@@ -32,7 +36,7 @@ minimal length. It returns an array of strings that can be empty.</p>
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"regex_tokenizer_"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -78,7 +82,7 @@ minimal length. It returns an array of strings that can be empty.</p>
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -93,6 +97,7 @@ minimal length. It returns an array of strings that can be empty.</p>
   immediately applied to the input <code>tbl_spark</code>, returning a <code>tbl_spark</code></p></li>
 </ul>
 
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
@@ -131,7 +136,7 @@ minimal length. It returns an array of strings that can be empty.</p>
 <code><a href='ft_vector_indexer.html'>ft_vector_indexer</a>()</code>,
 <code><a href='ft_vector_slicer.html'>ft_vector_slicer</a>()</code>,
 <code><a href='ft_word2vec.html'>ft_word2vec</a>()</code></p></div>
-
+    
 
     </div>
 

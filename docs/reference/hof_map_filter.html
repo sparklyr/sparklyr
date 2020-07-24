@@ -9,18 +9,21 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+        
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Filters entries in a map using the function specified
 (this is essentially a dplyr wrapper to the `map_filter(expr, func)` higher-
 order function, which is supported since Spark 3.0)</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>hof_map_filter</span>(<span class='no'>x</span>, <span class='no'>func</span>, <span class='kw'>expr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>dest_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -53,7 +56,7 @@ and TRUE otherwise)</p></td>
       <td><p>Additional params to dplyr::mutate</p></td>
     </tr>
     </table>
-
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -61,9 +64,8 @@ and TRUE otherwise)</p></td>
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>sparklyr</span>)
 <span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"local"</span>, <span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"3.0.0"</span>)
 <span class='no'>sdf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sdf_len.html'>sdf_len</a></span>(<span class='no'>sc</span>, <span class='fl'>1</span>) <span class='kw'>%&gt;%</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='kw'>m</span> <span class='kw'>=</span> <span class='fu'>map</span>(<span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>3</span>, -<span class='fl'>1</span>))
-<span class='no'>filtered_sdf</span> <span class='kw'>&lt;-</span> <span class='no'>sdf</span> <span class='kw'>%&gt;%</span> <span class='fu'>hof_map_filter</span>(~ <span class='no'>.x</span> <span class='kw'>&gt;</span> <span class='no'>.y</span>)
+<span class='no'>filtered_sdf</span> <span class='kw'>&lt;-</span> <span class='no'>sdf</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/pkg/sparklyr/man/hof_map_filter.html'>hof_map_filter</a></span>(~ <span class='no'>.x</span> <span class='kw'>&gt;</span> <span class='no'>.y</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

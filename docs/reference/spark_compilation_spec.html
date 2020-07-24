@@ -9,16 +9,19 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#details">Details</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>For use with <code><a href='compile_package_jars.html'>compile_package_jars</a></code>. The Spark compilation
 specification is used when compiling Spark extension Java Archives, and
 defines which versions of Spark, as well as which versions of Scala, should
 be used for compilation.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_compilation_spec</span>(
   <span class='kw'>spark_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -30,7 +33,7 @@ be used for compilation.</p>
   <span class='kw'>jar_dep</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>embedded_srcs</span> <span class='kw'>=</span> <span class='st'>"embedded_sources.R"</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -84,12 +87,12 @@ during compilation of your Spark extension.</p></td>
 be included in the root of the resulting jar file as resources</p></td>
     </tr>
     </table>
-
+    
     <h2 id="details">Details</h2>
 
     <p>Most Spark extensions won't need to define their own compilation specification,
 and can instead rely on the default behavior of <code>compile_package_jars</code>.</p>
-
+    
 
     </div>
 
