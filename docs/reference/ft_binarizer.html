@@ -9,18 +9,23 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#see-also">See also</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Apply thresholding to a column, such that values less than or equal to the
 <code>threshold</code> are assigned the value 0.0, and values greater than the
 threshold are assigned the value 1.0. Column output is numeric for
 compatibility with other modeling functions.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_binarizer</span>(
   <span class='no'>x</span>,
@@ -30,7 +35,7 @@ compatibility with other modeling functions.</p>
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"binarizer_"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -64,7 +69,7 @@ compatibility with other modeling functions.</p>
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -79,6 +84,7 @@ compatibility with other modeling functions.</p>
   immediately applied to the input <code>tbl_spark</code>, returning a <code>tbl_spark</code></p></li>
 </ul>
 
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
@@ -117,6 +123,7 @@ compatibility with other modeling functions.</p>
 <code><a href='ft_vector_indexer.html'>ft_vector_indexer</a>()</code>,
 <code><a href='ft_vector_slicer.html'>ft_vector_slicer</a>()</code>,
 <code><a href='ft_word2vec.html'>ft_word2vec</a>()</code></p></div>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -131,7 +138,6 @@ compatibility with other modeling functions.</p>
                <span class='kw'>threshold</span>  <span class='kw'>=</span> <span class='fl'>5</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='no'>Sepal_Length</span>, <span class='no'>Sepal_Length_bin</span>, <span class='no'>Species</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

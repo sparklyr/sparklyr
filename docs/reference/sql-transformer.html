@@ -9,20 +9,25 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
+
     <li><a href="#see-also">See also</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Implements the transformations which are defined by SQL statement. Currently we
   only support SQL syntax like 'SELECT ... FROM __THIS__ ...' where '__THIS__' represents
   the underlying table of the input dataset. The select clause specifies the
   fields, constants, and expressions to display in the output, it can be any
   select clause that Spark SQL supports. Users can also use Spark SQL built-in
   function and UDFs to operate on these selected columns.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_sql_transformer</span>(
   <span class='no'>x</span>,
@@ -32,7 +37,7 @@ aliases:
 )
 
 <span class='fu'>ft_dplyr_transformer</span>(<span class='no'>x</span>, <span class='no'>tbl</span>, <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"dplyr_transformer_"</span>), <span class='no'>...</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -62,7 +67,7 @@ aliases:
       <td><p>A <code>tbl_spark</code> generated using <code>dplyr</code> transformations.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -77,6 +82,7 @@ aliases:
   immediately applied to the input <code>tbl_spark</code>, returning a <code>tbl_spark</code></p></li>
 </ul>
 
+    
     <h2 id="details">Details</h2>
 
     <p><code>ft_dplyr_transformer()</code> is a wrapper around <code>ft_sql_transformer()</code> that
@@ -84,6 +90,7 @@ aliases:
   extracts the <code>dplyr</code> transformations used to generate <code>tbl</code> as a SQL statement
   then passes it on to <code>ft_sql_transformer()</code>. Note that only single-table <code>dplyr</code> verbs
   are supported and that the <code>sdf_</code> family of functions are not.</p>
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
@@ -122,7 +129,7 @@ aliases:
 <code><a href='ft_vector_indexer.html'>ft_vector_indexer</a>()</code>,
 <code><a href='ft_vector_slicer.html'>ft_vector_slicer</a>()</code>,
 <code><a href='ft_word2vec.html'>ft_word2vec</a>()</code></p></div>
-
+    
 
     </div>
 

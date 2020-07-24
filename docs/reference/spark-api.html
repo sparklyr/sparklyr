@@ -9,18 +9,25 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#details">Details</a></li>
+
     <li><a href="#spark-context">Spark Context</a></li>
+
     <li><a href="#java-spark-context">Java Spark Context</a></li>
+
     <li><a href="#hive-context">Hive Context</a></li>
+
     <li><a href="#spark-session">Spark Session</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Access the commonly-used Spark objects associated with a Spark instance.
 These objects provide access to different facets of the Spark API.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_context</span>(<span class='no'>sc</span>)
 
@@ -29,7 +36,7 @@ These objects provide access to different facets of the Spark API.</p>
 <span class='fu'>hive_context</span>(<span class='no'>sc</span>)
 
 <span class='fu'>spark_session</span>(<span class='no'>sc</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -43,12 +50,13 @@ These objects provide access to different facets of the Spark API.</p>
       <td><p>A <code>spark_connection</code>.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="details">Details</h2>
 
     <p>The <a href='http://spark.apache.org/docs/latest/api/scala/#package'>Scala API documentation</a>
 is useful for discovering what methods are available for each of these
 objects. Use <code><a href='invoke.html'>invoke</a></code> to call methods on these objects.</p>
+    
     <h2 id="spark-context">Spark Context</h2>
 
     
@@ -57,12 +65,14 @@ objects. Use <code><a href='invoke.html'>invoke</a></code> to call methods on th
 <p>The main entry point for Spark functionality. The <strong>Spark Context</strong>
 represents the connection to a Spark cluster, and can be used to create
 <code>RDD</code>s, accumulators and broadcast variables on that cluster.</p>
+    
     <h2 id="java-spark-context">Java Spark Context</h2>
 
     
 
 
 <p>A Java-friendly version of the aforementioned <strong>Spark Context</strong>.</p>
+    
     <h2 id="hive-context">Hive Context</h2>
 
     
@@ -76,6 +86,7 @@ deprecated -- it is superceded by the <strong>Spark Session</strong> class, and
 <code>hive_context</code> will return a <strong>Spark Session</strong> object instead.
 Note that both classes share a SQL interface, and therefore one can invoke
 SQL through these objects.</p>
+    
     <h2 id="spark-session">Spark Session</h2>
 
     
@@ -85,7 +96,7 @@ SQL through these objects.</p>
 <strong>Spark Context</strong> and <strong>Hive Context</strong> classes into a single
 interface. Its use is recommended over the older APIs for code
 targeting Spark 2.0.0 and above.</p>
-
+    
 
     </div>
 

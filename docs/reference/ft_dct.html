@@ -9,18 +9,23 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
+
     <li><a href="#see-also">See also</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>A feature transformer that takes the 1D discrete cosine transform of a real
   vector. No zero padding is performed on the input vector. It returns a real
   vector of the same length representing the DCT. The return vector is scaled
   such that the transform matrix is unitary (aka scaled DCT-II).</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_dct</span>(
   <span class='no'>x</span>,
@@ -39,7 +44,7 @@ aliases:
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"dct_"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -73,7 +78,7 @@ aliases:
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -88,9 +93,11 @@ aliases:
   immediately applied to the input <code>tbl_spark</code>, returning a <code>tbl_spark</code></p></li>
 </ul>
 
+    
     <h2 id="details">Details</h2>
 
     <p><code>ft_discrete_cosine_transform()</code> is an alias for <code>ft_dct</code> for backwards compatibility.</p>
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
@@ -129,7 +136,7 @@ aliases:
 <code><a href='ft_vector_indexer.html'>ft_vector_indexer</a>()</code>,
 <code><a href='ft_vector_slicer.html'>ft_vector_slicer</a>()</code>,
 <code><a href='ft_word2vec.html'>ft_word2vec</a>()</code></p></div>
-
+    
 
     </div>
 

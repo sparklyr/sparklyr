@@ -9,18 +9,20 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
-    </ul>
+            </ul>
     </div>
 
     <div>
 
+    
     <p>Force a Spark table with name <code>name</code> to be loaded into memory.
 Operations on cached tables should normally (although not always)
 be more performant than the same operation performed on an uncached
 table.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>tbl_cache</span>(<span class='no'>sc</span>, <span class='no'>name</span>, <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -43,8 +45,7 @@ table.</p>
 by calling the <code>count</code> API on the associated Spark DataFrame.</p></td>
     </tr>
     </table>
-
-
+    
 
     </div>
 

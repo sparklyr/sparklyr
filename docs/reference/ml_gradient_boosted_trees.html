@@ -9,16 +9,22 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
+
     <li><a href="#see-also">See also</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Perform binary classification and regression using gradient boosted trees. Multiclass classification is not supported yet.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_gbt_classifier</span>(
   <span class='no'>x</span>,
@@ -97,7 +103,7 @@ aliases:
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"gbt_regressor_"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -226,7 +232,7 @@ then regression is used; classification otherwise.</p></td>
       <td><p>(Deprecated) The name of features (terms) to use for the model fit.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -245,6 +251,7 @@ then regression is used; classification otherwise.</p></td>
     wrapper of a <code>ml_pipeline_model</code>.</p></li>
 </ul>
 
+    
     <h2 id="details">Details</h2>
 
     <p>When <code>x</code> is a <code>tbl_spark</code> and <code>formula</code> (alternatively, <code>response</code> and <code>features</code>) is specified, the function returns a <code>ml_model</code> object wrapping a <code>ml_pipeline_model</code> which contains data pre-processing transformers, the ML predictor, and, for classification models, a post-processing transformer that converts predictions into class labels. For classification, an optional argument <code>predicted_label_col</code> (defaults to <code>"predicted_label"</code>) can be used to specify the name of the predicted label column. In addition to the fitted <code>ml_pipeline_model</code>, <code>ml_model</code> objects also contain a <code>ml_pipeline</code> object where the ML predictor stage is an estimator ready to be fit against data. This is utilized by <code><a href='ml-persistence.html'>ml_save</a></code> with <code>type = "pipeline"</code> to faciliate model refresh workflows.</p>
@@ -258,6 +265,7 @@ then regression is used; classification otherwise.</p></td>
 </ul>
 
 <p><code>ml_gradient_boosted_trees</code> is a wrapper around <code>ml_gbt_regressor.tbl_spark</code> and <code>ml_gbt_classifier.tbl_spark</code> and calls the appropriate method based on model type.</p>
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-classification-regression.html'>http://spark.apache.org/docs/latest/ml-classification-regression.html</a> for
@@ -274,6 +282,7 @@ then regression is used; classification otherwise.</p></td>
 <code><a href='ml_naive_bayes.html'>ml_naive_bayes</a>()</code>,
 <code><a href='ml_one_vs_rest.html'>ml_one_vs_rest</a>()</code>,
 <code><a href='ml_random_forest.html'>ml_random_forest_classifier</a>()</code></p></div>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -293,7 +302,6 @@ then regression is used; classification otherwise.</p></td>
 
 <span class='fu'><a href='ml_evaluator.html'>ml_regression_evaluator</a></span>(<span class='no'>pred</span>, <span class='kw'>label_col</span> <span class='kw'>=</span> <span class='st'>"Sepal_Length"</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

@@ -9,13 +9,16 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Save/load Spark ML objects</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_save</span>(<span class='no'>x</span>, <span class='no'>path</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
 
@@ -29,7 +32,7 @@ aliases:
 )
 
 <span class='fu'>ml_load</span>(<span class='no'>sc</span>, <span class='no'>path</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -63,12 +66,12 @@ aliases:
       <td><p>A Spark connection.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p><code>ml_save()</code> serializes a Spark object into a format that can be read back into <code>sparklyr</code> or by the Scala or PySpark APIs. When called on <code>ml_model</code> objects, i.e. those that were created via the <code>tbl_spark - formula</code> signature, the associated pipeline model is serialized. In other words, the saved model contains both the data processing (<code>RFormulaModel</code>) stage and the machine learning stage.</p>
 <p><code>ml_load()</code> reads a saved Spark object into <code>sparklyr</code>. It calls the correct Scala <code>load</code> method based on parsing the saved metadata. Note that a <code>PipelineModel</code> object saved from a sparklyr <code>ml_model</code> via <code>ml_save()</code> will be read back in as an <code>ml_pipeline_model</code>, rather than the <code>ml_model</code> object.</p>
-
+    
 
     </div>
 

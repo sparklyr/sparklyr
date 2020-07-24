@@ -9,20 +9,24 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Conduct Pearson's independence test for every feature against the
   label. For each feature, the (feature, label) pairs are converted
   into a contingency matrix for which the Chi-squared statistic is
   computed. All label and feature values must be categorical.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_chisquare_test</span>(<span class='no'>x</span>, <span class='no'>features</span>, <span class='no'>label</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -45,11 +49,12 @@ of a single vector column created using <code><a href='ft_vector_assembler.html'
       <td><p>The name of the label column.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>A data frame with one row for each (feature, label) pair with p-values,
   degrees of freedom, and test statistics.</p>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -60,7 +65,6 @@ of a single vector column created using <code><a href='ft_vector_assembler.html'
 
 <span class='fu'>ml_chisquare_test</span>(<span class='no'>iris_tbl</span>, <span class='kw'>features</span> <span class='kw'>=</span> <span class='no'>features</span>, <span class='kw'>label</span> <span class='kw'>=</span> <span class='st'>"Species"</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

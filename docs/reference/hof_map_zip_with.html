@@ -9,19 +9,22 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+        
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Merges two maps into a single map by applying the function specified to pairs of
 values with the same key
 (this is essentially a dplyr wrapper to the `map_zip_with(map1, map2, func)` higher-
 order function, which is supported since Spark 3.0)</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>hof_map_zip_with</span>(<span class='no'>x</span>, <span class='no'>func</span>, <span class='kw'>dest_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>map1</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>map2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -61,7 +64,7 @@ map (default: the second column of the Spark data frame)</p></td>
       <td><p>Additional params to dplyr::mutate</p></td>
     </tr>
     </table>
-
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -85,12 +88,11 @@ map (default: the second column of the Spark data frame)</p></td>
 <span class='co'># first 2 columns</span>
 
 <span class='no'>transformed_two_maps_tbl</span> <span class='kw'>&lt;-</span> <span class='no'>two_maps_tbl</span> <span class='kw'>%&gt;%</span>
-  <span class='fu'>hof_map_zip_with</span>(
+  <span class='fu'><a href='https://rdrr.io/pkg/sparklyr/man/hof_map_zip_with.html'>hof_map_zip_with</a></span>(
     <span class='kw'>func</span> <span class='kw'>=</span> <span class='fu'>.</span>(<span class='no'>k</span>, <span class='no'>v1</span>, <span class='no'>v2</span>) <span class='kw'>%-&gt;%</span> (<span class='fu'>CONCAT</span>(<span class='no'>k</span>, <span class='st'>"_"</span>, <span class='no'>v1</span>, <span class='st'>"_"</span>, <span class='no'>v2</span>)),
     <span class='kw'>dest_col</span> <span class='kw'>=</span> <span class='no'>m3</span>
   )
 }</div></code></pre></div>
-
     </div>
 
     </div>

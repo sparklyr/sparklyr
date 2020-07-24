@@ -9,18 +9,22 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Evaluator for clustering results. The metric computes the Silhouette measure using the squared
   Euclidean distance. The Silhouette is a measure for the validation of the consistency
    within clusters. It ranges between 1 and -1, where a value close to 1 means that the
     points in a cluster are close to the other points in the same cluster and far from the
     points of the other clusters.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_clustering_evaluator</span>(
   <span class='no'>x</span>,
@@ -30,7 +34,7 @@ aliases:
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"clustering_evaluator_"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -64,10 +68,11 @@ aliases:
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The calculated performance metric</p>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -97,7 +102,6 @@ aliases:
 <span class='fu'>ml_clustering_evaluator</span>(<span class='no'>pred_b_kmeans</span>)
 <span class='fu'>ml_clustering_evaluator</span>(<span class='no'>pred_gmm</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

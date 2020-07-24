@@ -9,15 +9,20 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
+
     <li><a href="#see-also">See also</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Feature Transformation -- FeatureHasher (Transformer)</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_feature_hasher</span>(
   <span class='no'>x</span>,
@@ -28,7 +33,7 @@ aliases:
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"feature_hasher_"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -69,7 +74,7 @@ treat as categorical.</p></td>
       <td><p>Optional arguments; currently unused.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -84,6 +89,7 @@ treat as categorical.</p></td>
   immediately applied to the input <code>tbl_spark</code>, returning a <code>tbl_spark</code></p></li>
 </ul>
 
+    
     <h2 id="details">Details</h2>
 
     <p>Feature hashing projects a set of categorical or numerical features into a
@@ -110,6 +116,7 @@ treat as categorical.</p></td>
  simple modulo on the hashed value is used to determine the vector index, it is
  advisable to use a power of two as the num_features parameter; otherwise the
  features will not be mapped evenly to the vector indices.</p>
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
@@ -148,7 +155,7 @@ treat as categorical.</p></td>
 <code><a href='ft_vector_indexer.html'>ft_vector_indexer</a>()</code>,
 <code><a href='ft_vector_slicer.html'>ft_vector_slicer</a>()</code>,
 <code><a href='ft_word2vec.html'>ft_word2vec</a>()</code></p></div>
-
+    
 
     </div>
 

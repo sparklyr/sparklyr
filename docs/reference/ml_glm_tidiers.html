@@ -9,13 +9,16 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#details">Details</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>These methods summarize the results of Spark ML models into tidy forms.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># S3 method for ml_model_generalized_linear_regression</span>
 <span class='fu'><a href='https://rdrr.io/pkg/generics/man/tidy.html'>tidy</a></span>(<span class='no'>x</span>, <span class='kw'>exponentiate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
@@ -44,7 +47,7 @@ aliases:
 
 <span class='co'># S3 method for ml_model_linear_regression</span>
 <span class='fu'><a href='https://rdrr.io/pkg/generics/man/glance.html'>glance</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -75,12 +78,12 @@ aliases:
 <code>"working"</code> when <code>newdata</code> is supplied.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="details">Details</h2>
 
     <p>The residuals attached by <code>augment</code> are of type "working" by default,
   which is different from the default of "deviance" for <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> or <code><a href='sdf_residuals.html'>sdf_residuals()</a></code>.</p>
-
+    
 
     </div>
 

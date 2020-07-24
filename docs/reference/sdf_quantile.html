@@ -9,13 +9,15 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
-    </ul>
+            </ul>
     </div>
 
     <div>
 
+    
     <p>Given a numeric column within a Spark DataFrame, compute
 approximate quantiles (to some relative error).</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_quantile</span>(
   <span class='no'>x</span>,
@@ -23,7 +25,7 @@ approximate quantiles (to some relative error).</p>
   <span class='kw'>probabilities</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0.25</span>, <span class='fl'>0.5</span>, <span class='fl'>0.75</span>, <span class='fl'>1</span>),
   <span class='kw'>relative.error</span> <span class='kw'>=</span> <span class='fl'>1e-05</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -51,8 +53,7 @@ which quantiles should be computed.</p></td>
 precision in the computed quantiles.</p></td>
     </tr>
     </table>
-
-
+    
 
     </div>
 

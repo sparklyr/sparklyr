@@ -9,16 +9,19 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>Create Spark ML Pipelines</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_pipeline</span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"pipeline_"</span>))</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -40,11 +43,11 @@ aliases:
       <td><p>A character string used to uniquely identify the ML estimator.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>When <code>x</code> is a <code>spark_connection</code>, <code>ml_pipeline()</code> returns an empty pipeline object. When <code>x</code> is a <code>ml_pipeline_stage</code>, <code>ml_pipeline()</code> returns an <code>ml_pipeline</code> with the stages set to <code>x</code> and any transformers or estimators given in <code>...</code>.</p>
-
+    
 
     </div>
 

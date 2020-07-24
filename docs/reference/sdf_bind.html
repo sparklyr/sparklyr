@@ -9,21 +9,25 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p><code>sdf_bind_rows()</code> and <code>sdf_bind_cols()</code> are implementation of the common pattern of
 <code><a href='https://rdrr.io/r/base/do.call.html'>do.call(rbind, sdfs)</a></code> or <code><a href='https://rdrr.io/r/base/do.call.html'>do.call(cbind, sdfs)</a></code> for binding many
 Spark DataFrames into one.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_bind_rows</span>(<span class='no'>...</span>, <span class='kw'>id</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='fu'>sdf_bind_cols</span>(<span class='no'>...</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -53,15 +57,16 @@ Spark DataFrames into one.</p>
   used instead.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p><code>sdf_bind_rows()</code> and <code>sdf_bind_cols()</code> return <code>tbl_spark</code></p>
+    
     <h2 id="details">Details</h2>
 
     <p>The output of <code>sdf_bind_rows()</code> will contain a column if that column
 appears in any of the inputs.</p>
-
+    
 
     </div>
 

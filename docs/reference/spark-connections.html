@@ -9,14 +9,18 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#details">Details</a></li>
+    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>These routines allow you to manage your connections to Spark.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_connect</span>(
   <span class='no'>master</span>,
@@ -25,7 +29,7 @@ aliases:
   <span class='kw'>app_name</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>,
   <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(),
-  <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='register_extension.html'>registered_extensions</a></span>(),
+  <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sparklyr/man/register_extension.html'>registered_extensions</a></span>(),
   <span class='kw'>packages</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>scala_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
@@ -44,11 +48,11 @@ aliases:
   <span class='kw'>app_name</span> <span class='kw'>=</span> <span class='st'>"sparklyr"</span>,
   <span class='kw'>version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>config</span> <span class='kw'>=</span> <span class='fu'><a href='spark_config.html'>spark_config</a></span>(),
-  <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='register_extension.html'>registered_extensions</a></span>(),
+  <span class='kw'>extensions</span> <span class='kw'>=</span> <span class='kw pkg'>sparklyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sparklyr/man/register_extension.html'>registered_extensions</a></span>(),
   <span class='kw'>scala_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -129,18 +133,18 @@ Scala 2.12)</p></td>
       <td><p>Path to R source file to submit for batch execution.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="details">Details</h2>
 
     <p>When using <code>method = "livy"</code>, jars are downloaded from GitHub but the path
 to a local <code>sparklyr</code> JAR can also be specified through the <code>livy.jars</code> setting.</p>
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
 <span class='no'>sc</span> <span class='kw'>&lt;-</span> <span class='fu'>spark_connect</span>(<span class='kw'>master</span> <span class='kw'>=</span> <span class='st'>"spark://HOST:PORT"</span>)
 <span class='fu'><a href='connection_is_open.html'>connection_is_open</a></span>(<span class='no'>sc</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 <span class='fu'>spark_disconnect</span>(<span class='no'>sc</span>)</div></code></pre></div>
-
     </div>
 
     </div>

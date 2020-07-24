@@ -9,18 +9,21 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+        
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
+    
     <p>Checks whether the predicate specified holds for all elements in an array
 (this is essentially a dplyr wrapper to the `forall(expr, pred)` higher-
 order function, which is supported since Spark 3.0)</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>hof_forall</span>(<span class='no'>x</span>, <span class='no'>pred</span>, <span class='kw'>expr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>dest_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -52,7 +55,7 @@ array (default: the last column of the Spark data frame)</p></td>
       <td><p>Additional params to dplyr::mutate</p></td>
     </tr>
     </table>
-
+    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -68,7 +71,6 @@ array (default: the last column of the Spark data frame)</p></td>
  <span class='fu'>hof_forall</span>(<span class='kw'>pred</span> <span class='kw'>=</span> ~ <span class='no'>.x</span> <span class='kw'>&gt;</span> <span class='fl'>0</span>, <span class='kw'>expr</span> <span class='kw'>=</span> <span class='no'>y</span>, <span class='kw'>dest_col</span> <span class='kw'>=</span> <span class='no'>all_positive</span>) <span class='kw'>%&gt;%</span>
  <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='no'>all_positive</span>)
 }</div></code></pre></div>
-
     </div>
 
     </div>

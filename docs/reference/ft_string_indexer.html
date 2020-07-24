@@ -9,19 +9,24 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
+    
     <li><a href="#value">Value</a></li>
+
     <li><a href="#details">Details</a></li>
+
     <li><a href="#see-also">See also</a></li>
-    </ul>
+        </ul>
     </div>
 
     <div>
 
+    
     <p>A label indexer that maps a string column of labels to an ML column of
   label indices. If the input column is numeric, we cast it to string and
   index the string values. The indices are in <code>[0, numLabels)</code>, ordered by
   label frequencies. So the most frequent label gets index 0. This function
   is the inverse of <code><a href='ft_index_to_string.html'>ft_index_to_string</a></code>.</p>
+    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ft_string_indexer</span>(
   <span class='no'>x</span>,
@@ -44,7 +49,7 @@ aliases:
   <span class='kw'>uid</span> <span class='kw'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span>(<span class='st'>"string_indexer_model_"</span>),
   <span class='no'>...</span>
 )</code></pre></div>
-
+    
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -95,7 +100,7 @@ Defaults to <code>"frequencyDesc"</code>.</p></td>
       <td><p>Vector of labels, corresponding to indices to be assigned.</p></td>
     </tr>
     </table>
-
+    
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -111,10 +116,12 @@ Defaults to <code>"frequencyDesc"</code>.</p></td>
 </ul>
 
 <p><code>ml_labels()</code> returns a vector of labels, corresponding to indices to be assigned.</p>
+    
     <h2 id="details">Details</h2>
 
     <p>In the case where <code>x</code> is a <code>tbl_spark</code>, the estimator fits against <code>x</code>
   to obtain a transformer, which is then immediately used to transform <code>x</code>, returning a <code>tbl_spark</code>.</p>
+    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-features.html'>http://spark.apache.org/docs/latest/ml-features.html</a> for
@@ -154,7 +161,7 @@ Defaults to <code>"frequencyDesc"</code>.</p></td>
 <code><a href='ft_vector_indexer.html'>ft_vector_indexer</a>()</code>,
 <code><a href='ft_vector_slicer.html'>ft_vector_slicer</a>()</code>,
 <code><a href='ft_word2vec.html'>ft_word2vec</a>()</code></p></div>
-
+    
 
     </div>
 
