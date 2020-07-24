@@ -28,6 +28,8 @@ reference:
     - spark_read_libsvm
   - title: Spark Data
     contents:
+    - spark_read
+    - spark_read_avro
     - spark_read_csv
     - spark_read_delta
     - spark_read_jdbc
@@ -38,6 +40,8 @@ reference:
     - spark_read_orc
     - spark_read_text
     - spark_save_table
+    - spark_write
+    - spark_write_avro
     - spark_write_orc
     - spark_write_text
     - spark_write_csv
@@ -62,6 +66,8 @@ reference:
     - sdf_checkpoint
     - sdf_coalesce
     - sdf_copy_to
+    - sdf_drop_duplicates
+    - sdf_from_avro
     - sdf_len
     - sdf_num_partitions
     - sdf_partition
@@ -75,6 +81,7 @@ reference:
     - sdf_separate_column
     - sdf_seq
     - sdf_sort
+    - sdf_to_avro
     - sdf_with_unique_id
     - sdf_collect
     - sdf_crosstab
@@ -223,6 +230,18 @@ reference:
     - ml_binary_classification_eval
     - ml_classification_eval
     - ml_tree_feature_importance
+    - ml_als_tidiers
+    - ml_glm_tidiers
+    - ml_isotonic_regression_tidiers
+    - ml_lda_tidiers
+    - ml_linear_svc_tidiers
+    - ml_logistic_regression_tidiers
+    - ml_multilayer_perceptron_tidiers
+    - ml_naive_bayes_tidiers
+    - ml_pca_tidiers
+    - ml_survival_regression_tidiers
+    - ml_tree_tidiers
+    - ml_unsupervised_tidiers
   - title: Extensions
     contents:
     - compile_package_jars
@@ -236,7 +255,6 @@ reference:
     - register_extension
     - spark_compilation_spec
     - spark_default_compilation_spec
-    - spark_connections
     - spark_context
     - spark_context_config
     - spark_dataframe
@@ -269,10 +287,11 @@ reference:
     - stream_name
     - stream_read_csv
     - stream_read_json
+    - stream_read_delta
     - stream_read_kafka
     - stream_read_orc
     - stream_read_parquet
-    - stream_read_scoket
+    - stream_read_socket
     - stream_read_text
     - stream_render
     - stream_stats
@@ -283,6 +302,7 @@ reference:
     - stream_watermark
     - stream_write_console
     - stream_write_csv
+    - stream_write_delta
     - stream_write_json
     - stream_write_kafka
     - stream_write_memory
