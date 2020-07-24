@@ -1,6 +1,5 @@
-# TODO: investigate why content-reference-index.html is not working
-# template:
-#   path: inst/pkgdown/templates
+template:
+  path: inst/pkgdown/templates
 reference:
   - title: Spark Operations
     contents:
