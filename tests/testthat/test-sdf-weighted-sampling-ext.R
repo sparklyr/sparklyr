@@ -11,7 +11,7 @@ sdf <- testthat_tbl(
   repartition = 4L
 )
 
-num_sampling_iters <- 500
+num_sampling_iters <- 1000
 alpha <- 0.05
 
 sample_sz <- 3
