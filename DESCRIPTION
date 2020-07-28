@@ -87,6 +87,7 @@ Collate:
     'spark_data_build_types.R'
     'arrow_data.R'
     'spark_invoke.R'
+    'browse_url.R'
     'spark_connection.R'
     'avro_utils.R'
     'config_settings.R'

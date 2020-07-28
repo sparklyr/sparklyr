@@ -1,11 +1,14 @@
 # nocov start
 
+#' @include browse_url.R
+NULL
+
 connection_progress_update <- function(jobName, progressUnits, url) {
   jobActions <- NULL
   if (nchar(url) > 0) {
     jobActions <- list(
       info = function(id) {
-        browseURL(url)
+        browse_url(url)
       }
     )
   }

@@ -1,5 +1,7 @@
 # nocov start
 
+#' @include browse_url.R
+
 # connection-specific actions possible with Spark connections
 spark_actions <- function(scon) {
   icons <- system.file(file.path("icons"), package = "sparklyr")
@@ -8,7 +10,7 @@ spark_actions <- function(scon) {
     "Spark" = list(
       icon = file.path(icons, "spark-ui.png"),
       callback = function() {
-        utils::browseURL(spark_web(scon))
+        browse_url(spark_web(scon))
       }
     )
   )
@@ -20,7 +22,7 @@ spark_actions <- function(scon) {
         "YARN" = list(
           icon = file.path(icons, "yarn-ui.png"),
           callback = function() {
-            utils::browseURL(spark_connection_yarn_ui(scon))
+            browse_url(spark_connection_yarn_ui(scon))
           }
         )
       )

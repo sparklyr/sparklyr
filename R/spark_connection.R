@@ -39,6 +39,8 @@
 #' @param sc A \code{spark_connection}.
 #'
 #' @name spark-api
+#'
+#' @include browse_url.R
 NULL
 
 #' @name spark-api
@@ -185,43 +187,34 @@ print.spark_log <- function(x, ...) {
 #' @export
 spark_web <- function(sc, ...) {
   if (!identical(sc$state, NULL) && !identical(sc$state$spark_web, NULL)) {
-    return(sc$state$spark_web)
-  }
-
-  sparkui_url <- spark_config_value(
-    sc$config, c("sparklyr.web.spark", "sparklyr.sparkui.url")
-  )
-
-  if (!is.null(sparkui_url)) {
-    structure(sparkui_url, class = "spark_web_url")
-  }
-  else if (spark_version(sc) >= "2.0.0" &&
-    !spark_context(sc) %>%
-      invoke("uiWebUrl") %>%
-      invoke("isEmpty")) {
-    spark_context(sc) %>%
-      invoke("uiWebUrl") %>%
-      invoke("get") %>%
-      structure(class = "spark_web_url")
-  }
-  else {
-    UseMethod("spark_web")
+    sc$state$spark_web
+  } else {
+    sparkui_url <- spark_config_value(
+      sc$config, c("sparklyr.web.spark", "sparklyr.sparkui.url")
+    )
+    if (!is.null(sparkui_url)) {
+      structure(sprintf("%s/jobs/", sparkui_url), class = "spark_web_url")
+    } else {
+      UseMethod("spark_web")
+    }
   }
 }
 
-#' @export
 spark_web.default <- function(sc, ...) {
-  url <- tryCatch({
-    invoke(spark_context(sc), "%>%", list("uiWebUrl"), list("get"))
-  }, error = function(e) {
-    default_url <- "http://localhost:4040"
-    warning(
-      "Unable to retrieve Spark UI URL through SparkContext, ",
-      sprintf("will boldly assume it's '%s'", default_url)
-    )
+  url <- tryCatch(
+    {
+      invoke(spark_context(sc), "%>%", list("uiWebUrl"), list("get"))
+    },
+    error = function(e) {
+      default_url <- "http://localhost:4040"
+      warning(
+        "Unable to retrieve Spark UI URL through SparkContext, ",
+        sprintf("will boldly assume it's '%s'", default_url)
+      )
 
-    default_url
-  })
+      default_url
+    }
+  )
   if (!identical(substr(url, nchar(url), nchar(url)), "/")) {
     url <- paste0(url, "/")
   }
@@ -231,7 +224,10 @@ spark_web.default <- function(sc, ...) {
 
 #' @export
 print.spark_web_url <- function(x, ...) {
-  utils::browseURL(x)
+  tryCatch({
+    browse_url(x)
+  }, error = NULL
+  )
 }
 
 #' Retrieve the Spark connection's SQL catalog implementation property
