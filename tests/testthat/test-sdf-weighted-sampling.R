@@ -44,8 +44,8 @@ verify_distribution <- function(replacement) {
 
     sample <- sdf %>%
       sdf_weighted_sample(
-        weight_col = "weight",
         k = sample_sz,
+        weight_col = "weight",
         replacement = replacement,
         seed = seed + x
       ) %>%
