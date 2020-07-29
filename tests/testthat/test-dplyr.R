@@ -45,6 +45,24 @@ test_that("the implementation of 'filter' functions as expected", {
   )
 })
 
+test_that("grepl works as expected", {
+  test_requires("dplyr")
+
+  regexes <- c(
+    "a|c", ".", "b", "x|z", "", "y", "e", "^", "$", "^$", "[0-9]", "[a-z]", "[b-z]"
+  )
+  for (regex in regexes) {
+    expect_equivalent(
+      df2 %>% dplyr::filter(grepl(regex, b)),
+      df2_tbl %>% dplyr::filter(grepl(regex, b)) %>% collect()
+    )
+    expect_equivalent(
+      df2 %>% dplyr::filter(grepl(regex, c)),
+      df2_tbl %>% dplyr::filter(grepl(regex, c)) %>% collect()
+    )
+  }
+})
+
 test_that("'head' uses 'limit' clause", {
   test_requires("dplyr")
   test_requires("dbplyr")
