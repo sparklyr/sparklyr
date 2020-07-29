@@ -85,6 +85,13 @@ jobs:
       - uses: r-lib/actions/setup-r@master
         with:
           r-version: ${{ matrix.r }}
+      - name: Print debugging info
+        run: |
+          echo $PATH
+          which R
+          ls /opt
+          find /opt/ -name 'R'
+          R --version
       - name: Install Java
         run: |
           if [[ ! -z "$JAVA_VERSION" ]]; then
