@@ -45,6 +45,32 @@ test_that("the implementation of 'filter' functions as expected", {
   )
 })
 
+test_that("grepl works as expected", {
+  test_requires("dplyr")
+
+  regexes <- c(
+    "a|c", ".", "b", "x|z", "", "y", "e", "^", "$", "^$", "[0-9]", "[a-z]", "[b-z]"
+  )
+  verify_equivalent <- function(actual, expected) {
+    # handle an edge case for arrow-enabled Spark connection
+    for (col in colnames(df2))
+      expect_equivalent(
+        as.character(actual[[col]]),
+        as.character(expected[[col]])
+      )
+  }
+  for (regex in regexes) {
+    verify_equivalent(
+      df2 %>% dplyr::filter(grepl(regex, b)),
+      df2_tbl %>% dplyr::filter(grepl(regex, b)) %>% collect()
+    )
+    verify_equivalent(
+      df2 %>% dplyr::filter(grepl(regex, c)),
+      df2_tbl %>% dplyr::filter(grepl(regex, c)) %>% collect()
+    )
+  }
+})
+
 test_that("'head' uses 'limit' clause", {
   test_requires("dplyr")
   test_requires("dbplyr")

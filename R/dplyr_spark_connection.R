@@ -91,7 +91,8 @@ sql_translate_env.spark_connection <- function(con) {
       pmax = function(...) build_sql_if_compare(..., con = con, compare = ">="),
       `%like%` = function(x, y) dbplyr::build_sql(x, " like ", y),
       `%rlike%` = function(x, y) dbplyr::build_sql(x, " rlike ", y),
-      `%regexp%`  = function(x, y) dbplyr::build_sql(x, " regexp ", y)
+      `%regexp%`  = function(x, y) dbplyr::build_sql(x, " regexp ", y),
+      grepl = function(x, y) dbplyr::build_sql(y, " rlike ", x)
     ),
 
     aggregate = dbplyr::sql_translator(
