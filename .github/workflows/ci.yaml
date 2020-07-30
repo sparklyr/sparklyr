@@ -81,12 +81,16 @@ jobs:
     steps:
       - name: Mount tmpfs
         run: sudo mount -t tmpfs tmpfs /tmp
-      - name: Delete pre-existing R binary
+      - name: Delete pre-existing R binaries
         run: |
-          while [ -n "$(which R)" ]
+          for b in R Rscript
           do
-            sudo rm -v "$(which R)"
+            while [ -n "$(which "$b")" ]
+            do
+              sudo rm -v "$(which "$b")"
+            done
           done
+        shell: bash
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@master
         with:
