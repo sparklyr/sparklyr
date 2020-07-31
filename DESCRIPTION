@@ -12,7 +12,8 @@ Authors@R: c(
     person("Hossein", "Falaki", role = "aut", email = "hossein@databricks.com"),
     person("Lu", "Wang", role = "aut", email = "lu.wang@databricks.com"),
     person("Andy", "Zhang", role = "aut", email = "yue.zhang@databricks.com"),
-    person("Yitao", "Li", role = c("aut", "cre"), email = "yitao@rstudio.com"),
+    person("Yitao", "Li", role = c("aut", "cre"), email = "yitao@rstudio.com",
+           comment = c(ORCID = "0000-0002-1261-905X")),
     person(family = "RStudio", role = c("cph")),
     person(family = "The Apache Software Foundation", role = c("aut", "cph"))
     )
