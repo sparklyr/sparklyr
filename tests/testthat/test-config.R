@@ -58,3 +58,16 @@ test_that("spark_config() can load from options", {
     10
   )
 })
+
+test_that("spark_config_shell_args() works as expected", {
+  config <- list(
+    sparklyr.shell.conf = "key1=value1",
+    sparklyr.shell.conf = "key2=value2",
+    sparklyr.shell.key3 = "value3"
+  )
+
+  expect_equal(
+    spark_config_shell_args(config = config, master = "local"),
+    c("--conf", "key1=value1", "--conf", "key2=value2", "--key3", "value3")
+  )
+})

@@ -196,21 +196,20 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
       "ai.rapids:cudf:0.14"
     )
 
-    rapids_configs <- list(
-      spark.rapids.sql.incompatibleOps.enabled = "true"
-    )
     rapids_prefix <- "spark.rapids."
-    additional_rapids_configs <- connection_config(
+    rapids_configs <- connection_config(
       sc = list(config = config),
       prefix = rapids_prefix
     )
+    rapids_configs[["sql.incompatibleOps.enabled"]] <-
+      rapids_configs[["sql.incompatibleOps.enabled"]] %||% "true"
     config <- append(
       config,
       list(sparklyr.shell.conf = "spark.plugins=com.nvidia.spark.SQLPlugin")
     )
-    for (idx in seq_along(additional_rapids_configs)) {
-      k <- names(additional_rapids_configs)[[idx]]
-      v <- additional_rapids_configs[[idx]]
+    for (idx in seq_along(rapids_configs)) {
+      k <- names(rapids_configs)[[idx]]
+      v <- rapids_configs[[idx]]
       config <- append(
         config,
         list(sparklyr.shell.conf = paste0(rapids_prefix, k, "=", v))
