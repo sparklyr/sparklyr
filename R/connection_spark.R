@@ -86,10 +86,10 @@ spark_config_shell_args <- function(config, master) {
   shell_args <- connection_config(config_sc, "sparklyr.shell.")
 
   # flatten shell_args to make them compatible with sparklyr
-  unlist(lapply(names(shell_args), function(name) {
-    lapply(shell_args[[name]], function(value) {
-      list(paste0("--", name), value)
-    })
+  unlist(lapply(seq_along(shell_args), function(idx) {
+    name <- names(shell_args)[[idx]]
+    value <- shell_args[[idx]]
+    list(paste0("--", name), value)
   }))
 }
 
@@ -158,7 +158,8 @@ spark_connect <- function(master,
       config,
       packages,
       version %||% spark_version_from_home(spark_home),
-      scala_version
+      scala_version,
+      method = method
     )
 
   if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
