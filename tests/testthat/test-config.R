@@ -63,11 +63,12 @@ test_that("spark_config_shell_args() works as expected", {
   config <- list(
     sparklyr.shell.conf = "key1=value1",
     sparklyr.shell.conf = "key2=value2",
-    sparklyr.shell.key3 = "value3"
+    sparklyr.shell.key3 = "value3",
+    sparklyr.shell.packages = c("pkg1", "pkg2", "pkg3")
   )
 
   expect_equal(
     spark_config_shell_args(config = config, master = "local"),
-    c("--conf", "key1=value1", "--conf", "key2=value2", "--key3", "value3")
+    c("--conf", "key1=value1", "--conf", "key2=value2", "--key3", "value3", "--packages", "pkg1,pkg2,pkg3")
   )
 })

@@ -80,6 +80,9 @@ spark_master_local_cores <- function(master, config) {
 }
 
 spark_config_shell_args <- function(config, master) {
+  if (!is.null(config$sparklyr.shell.packages))
+    config$sparklyr.shell.packages <- paste0(config$sparklyr.shell.packages, collapse = ",")
+
   # determine shell_args (use fake connection b/c we don't yet
   # have a real connection)
   config_sc <- list(config = config, master = master)
