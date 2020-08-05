@@ -4,7 +4,7 @@
 \alias{spark_config_packages}
 \title{Creates Spark Configuration}
 \usage{
-spark_config_packages(config, packages, version, scala_version = NULL)
+spark_config_packages(config, packages, version, scala_version = NULL, ...)
 }
 \arguments{
 \item{config}{The Spark configuration object.}
@@ -14,6 +14,8 @@ spark_config_packages(config, packages, version, scala_version = NULL)
 \item{version}{The version of Spark being used.}
 
 \item{scala_version}{Acceptable Scala version of packages to be loaded}
+
+\item{...}{Additional configurations}
 }
 \description{
 Creates Spark Configuration

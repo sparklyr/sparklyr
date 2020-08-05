@@ -118,46 +118,36 @@ spark_connection.spark_jobj <- function(x, ...) {
 #'
 #' @export
 connection_config <- function(sc, prefix, not_prefix = list()) {
-
   config <- sc$config
   master <- sc$master
   isLocal <- spark_master_is_local(master)
 
-  configNames <- Filter(function(e) {
-    found <- is.null(prefix) ||
-      (substring(e, 1, nchar(prefix)) == prefix)
+  isApplicable <- unlist(lapply(
+    seq_along(config),
+    function(idx) {
+      config_name <- names(config)[[idx]]
 
-    if (grepl("\\.local$", e) && !isLocal)
-      found <- FALSE
+      (is.null(prefix) || identical(substring(config_name, 1, nchar(prefix)), prefix)) &&
+      all(unlist(
+        lapply(not_prefix, function(x) !identical(substring(config_name, 1, nchar(x)), x))
+      )) &&
+      !(grepl("\\.local$", config_name) && !isLocal) &&
+      !(grepl("\\.remote$", config_name) && isLocal) &&
+      !(is.character(config[[idx]]) && all(nchar(config[[idx]]) == 0))
+    }
+  ))
+  configNames <- lapply(
+    names(config)[isApplicable],
+    function(configName) {
+      configName %>%
+        substr(nchar(prefix) + 1, nchar(configName)) %>%
+        sub("(\\.local$)|(\\.remote$)", "", ., perl = TRUE)
+    }
+  )
+  configValues <- config[isApplicable]
+  names(configValues) <- configNames
 
-    if (grepl("\\.remote$", e) && isLocal)
-      found <- FALSE
-
-    if (is.character(config[[e]]) && all(nchar(config[[e]]) == 0))
-      found <- FALSE
-
-    found
-  }, names(config))
-
-  lapply(not_prefix, function(notPrefix) {
-    configNames <<- Filter(function(e) {
-      substring(e, 1, nchar(notPrefix)) != notPrefix
-    }, configNames)
-  })
-
-  paramsNames <- lapply(configNames, function(configName) {
-    paramName <- substr(configName, nchar(prefix) + 1, nchar(configName))
-    paramName <- sub("(\\.local$)|(\\.remote$)", "", paramName, perl = TRUE)
-
-    paramName
-  })
-
-  params <- lapply(configNames, function(configName) {
-    config[[configName]]
-  })
-
-  names(params) <- paramsNames
-  params
+  configValues
 }
 
 #' View Entries in the Spark Log

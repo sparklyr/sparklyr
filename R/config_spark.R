@@ -130,10 +130,11 @@ spark_config_value_retries <- function(config, name, default, retries) {
 #' @param packages A list of named packages or versioned packagese to add.
 #' @param version The version of Spark being used.
 #' @param scala_version Acceptable Scala version of packages to be loaded
+#' @param ... Additional configurations
 #'
 #' @keywords interenal
 #' @export
-spark_config_packages <- function(config, packages, version, scala_version = NULL) {
+spark_config_packages <- function(config, packages, version, scala_version = NULL, ...) {
   version <- spark_version_latest(version)
 
   if ("kafka" %in% packages) {
@@ -175,6 +176,45 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
       config$sparklyr.shell.packages,
       spark_avro_package_name(version, scala_version)
     )
+  }
+
+  if ("rapids" %in% packages) {
+    packages <- packages[-which(packages == "rapids")]
+
+    if (version < "3.0.0")
+      stop("RAPIDS library is only supported in Spark 3.0.0 or higher")
+
+    additional_configs <- list(...)
+    config$sparklyr.shell.packages <- c(
+      config$sparklyr.shell.packages,
+      (
+        if (additional_configs$method %in% c("databricks", "databricks-connect"))
+          "com.nvidia:rapids-4-spark_2.12:0.1.0-databricks"
+        else
+          "com.nvidia:rapids-4-spark_2.12:0.1.0"
+      ),
+      "ai.rapids:cudf:0.14"
+    )
+
+    rapids_prefix <- "spark.rapids."
+    rapids_configs <- connection_config(
+      sc = list(config = config),
+      prefix = rapids_prefix
+    )
+    rapids_configs[["sql.incompatibleOps.enabled"]] <-
+      rapids_configs[["sql.incompatibleOps.enabled"]] %||% "true"
+    config <- append(
+      config,
+      list(sparklyr.shell.conf = "spark.plugins=com.nvidia.spark.SQLPlugin")
+    )
+    for (idx in seq_along(rapids_configs)) {
+      k <- names(rapids_configs)[[idx]]
+      v <- rapids_configs[[idx]]
+      config <- append(
+        config,
+        list(sparklyr.shell.conf = paste0(rapids_prefix, k, "=", v))
+      )
+    }
   }
 
   if (!is.null(packages)) {
