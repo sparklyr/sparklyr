@@ -42,6 +42,7 @@ unite.tbl_spark <- function(data, col, ..., sep = "_", remove = TRUE, na.rm = FA
   args <- append(list(data), sql)
   out <- do.call(dplyr::mutate, args) %>%
     ungroup(setdiff(colnames(data), output_cols))
+  out <- update_group_vars(data, out, output_cols)
   do.call(
     dplyr::select,
     append(list(out), lapply(output_cols, as.symbol))
