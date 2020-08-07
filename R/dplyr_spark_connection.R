@@ -3,10 +3,11 @@
 #' @importFrom dbplyr sql_quote
 sql_escape_ident.spark_connection <- function(con, x) {
   # Assuming it might include database name like: `dbname.tableName`
-  if (length(x) == 1)
+  if (length(x) == 1) {
     tbl_quote_name(con, x)
-  else
-    dbplyr::sql_quote(x, '`')
+  } else {
+    dbplyr::sql_quote(x, "`")
+  }
 }
 
 #' @importFrom dbplyr sql
@@ -14,7 +15,9 @@ build_sql_if_compare <- function(..., con, compare) {
   args <- list(...)
 
   build_sql_if_parts <- function(ifParts, ifValues) {
-    if(length(ifParts) == 1) return(ifParts[[1]])
+    if (length(ifParts) == 1) {
+      return(ifParts[[1]])
+    }
 
     current <- ifParts[[1]]
     currentName <- ifValues[[1]]
@@ -56,7 +59,6 @@ build_sql_if_compare <- function(..., con, compare) {
 #' @importFrom dbplyr win_current_order
 sql_translate_env.spark_connection <- function(con) {
   win_recycled_params <- function(prefix) {
-
     function(x, y) {
       # Use win_current_frame() once exported form `dbplyr`
       sql_context <- get("sql_context", envir = asNamespace("dbplyr"))
@@ -72,16 +74,15 @@ sql_translate_env.spark_connection <- function(con) {
   }
 
   dbplyr::sql_variant(
-
     scalar = dbplyr::sql_translator(
       .parent = dbplyr::base_scalar,
       as.numeric = function(x) dbplyr::build_sql("CAST(", x, " AS DOUBLE)"),
-      as.double  = function(x) dbplyr::build_sql("CAST(", x, " AS DOUBLE)"),
-      as.integer  = function(x) dbplyr::build_sql("CAST(", x, " AS INT)"),
+      as.double = function(x) dbplyr::build_sql("CAST(", x, " AS DOUBLE)"),
+      as.integer = function(x) dbplyr::build_sql("CAST(", x, " AS INT)"),
       as.logical = function(x) dbplyr::build_sql("CAST(", x, " AS BOOLEAN)"),
-      as.character  = function(x) dbplyr::build_sql("CAST(", x, " AS STRING)"),
-      as.date  = function(x) dbplyr::build_sql("CAST(", x, " AS DATE)"),
-      as.Date  = function(x) dbplyr::build_sql("CAST(", x, " AS DATE)"),
+      as.character = function(x) dbplyr::build_sql("CAST(", x, " AS STRING)"),
+      as.date = function(x) dbplyr::build_sql("CAST(", x, " AS DATE)"),
+      as.Date = function(x) dbplyr::build_sql("CAST(", x, " AS DATE)"),
       paste = function(..., sep = " ") dbplyr::build_sql("CONCAT_WS", list(sep, ...)),
       paste0 = function(...) dbplyr::build_sql("CONCAT", list(...)),
       xor = function(x, y) dbplyr::build_sql(x, " ^ ", y),
@@ -91,7 +92,7 @@ sql_translate_env.spark_connection <- function(con) {
       pmax = function(...) build_sql_if_compare(..., con = con, compare = ">="),
       `%like%` = function(x, y) dbplyr::build_sql(x, " like ", y),
       `%rlike%` = function(x, y) dbplyr::build_sql(x, " rlike ", y),
-      `%regexp%`  = function(x, y) dbplyr::build_sql(x, " regexp ", y),
+      `%regexp%` = function(x, y) dbplyr::build_sql(x, " regexp ", y),
       grepl = function(x, y) dbplyr::build_sql(y, " rlike ", x)
     ),
 
@@ -102,7 +103,7 @@ sql_translate_env.spark_connection <- function(con) {
       n_distinct = function(...) dbplyr::build_sql("count(DISTINCT", list(...), ")"),
       cor = dbplyr::sql_prefix("corr"),
       cov = dbplyr::sql_prefix("covar_samp"),
-      sd =  dbplyr::sql_prefix("stddev_samp"),
+      sd = dbplyr::sql_prefix("stddev_samp"),
       var = dbplyr::sql_prefix("var_samp")
     ),
 
@@ -124,45 +125,52 @@ sql_translate_env.spark_connection <- function(con) {
           order = order
         )
       },
-      count = function() dbplyr::win_over(
-        dbplyr::sql("count(*)"),
-        partition = dbplyr::win_current_group()
-      ),
+      count = function() {
+        dbplyr::win_over(
+          dbplyr::sql("count(*)"),
+          partition = dbplyr::win_current_group()
+        )
+      },
       n_distinct = dbplyr::win_absent("distinct"),
       cor = win_recycled_params("corr"),
-      cov =  win_recycled_params("covar_samp"),
-      sd =  dbplyr::win_recycled("stddev_samp"),
+      cov = win_recycled_params("covar_samp"),
+      sd = dbplyr::win_recycled("stddev_samp"),
       var = dbplyr::win_recycled("var_samp"),
       cumprod = function(x) {
         dbplyr::build_sql(
           "exp(",
           dbplyr::win_over(
-            dbplyr::build_sql("sum(if(", x,
-                              "= 0, 0, ln(abs(", x,
-                              "))))"),
+            dbplyr::build_sql(
+              "sum(if(", x,
+              "= 0, 0, ln(abs(", x,
+              "))))"
+            ),
             partition = dbplyr::win_current_group(),
             order = dbplyr::win_current_order()
           ), ") * (1 - 2 * pmod(",
           # count number of negatives up to current row
           #   and adjust sign accordingly
           dbplyr::win_over(
-            dbplyr::build_sql("sum(if(", x,
-                              ">= 0, 0, 1))"),
+            dbplyr::build_sql(
+              "sum(if(", x,
+              ">= 0, 0, 1))"
+            ),
             partition = dbplyr::win_current_group(),
             order = dbplyr::win_current_order()
           ), ", 2)) * if(",
           # if there's a zero then all cumprod after that row
           #   vanish
           dbplyr::win_over(
-            dbplyr::build_sql("min(abs(", x,
-                              "))"),
+            dbplyr::build_sql(
+              "min(abs(", x,
+              "))"
+            ),
             partition = dbplyr::win_current_group(),
             order = dbplyr::win_current_order()
           ), "= 0, 0, 1)"
         )
       }
     )
-
   )
 }
 

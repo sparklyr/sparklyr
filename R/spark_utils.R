@@ -6,10 +6,11 @@
 #' @export
 spark_set_checkpoint_dir <- function(sc, dir) {
   invisible(sc %>%
-              spark_context() %>%
-              invoke("setCheckpointDir",
-                     spark_normalize_path(dir))
-  )
+    spark_context() %>%
+    invoke(
+      "setCheckpointDir",
+      spark_normalize_path(dir)
+    ))
 }
 
 #' @rdname checkpoint_directory
@@ -19,10 +20,12 @@ spark_get_checkpoint_dir <- function(sc) {
     spark_context() %>%
     invoke("getCheckpointDir")
 
-  invoke_static(spark_connection(sc),
-                "sparklyr.Utils",
-                "unboxString",
-                dir)
+  invoke_static(
+    spark_connection(sc),
+    "sparklyr.Utils",
+    "unboxString",
+    dir
+  )
 }
 
 #' Generate a Table Name from Expression
@@ -36,8 +39,12 @@ spark_get_checkpoint_dir <- function(sc) {
 spark_table_name <- function(expr) {
   table_name <- deparse(expr)
   if (identical(length(table_name), 1L) &&
-      grepl("^[a-zA-Z][a-zA-Z0-9_]*$", table_name[[1]])
-  ) table_name else random_string(prefix = "sparklyr_tmp_")
+    grepl("^[a-zA-Z][a-zA-Z0-9_]*$", table_name[[1]])
+  ) {
+    table_name
+  } else {
+    random_string(prefix = "sparklyr_tmp_")
+  }
 }
 
 #' Superclasses of object
@@ -49,10 +56,12 @@ spark_table_name <- function(expr) {
 #' @keywords internal
 #' @export
 jobj_class <- function(jobj, simple_name = TRUE) {
-  invoke_static(spark_connection(jobj),
-                "sparklyr.Utils",
-                "getAncestry",
-                jobj,
-                cast_scalar_logical(simple_name)) %>%
+  invoke_static(
+    spark_connection(jobj),
+    "sparklyr.Utils",
+    "getAncestry",
+    jobj,
+    cast_scalar_logical(simple_name)
+  ) %>%
     unlist()
 }

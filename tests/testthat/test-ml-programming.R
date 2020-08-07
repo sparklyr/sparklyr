@@ -41,7 +41,7 @@ test_that("one can program with ft_ function (.spark_connection)", {
   bin2 <- foo2(sc, 0.3)
   bin3 <- foo3(sc, 0.3)
 
-  for (binarizer in list(bin1, bin2, bin3))
+  for (binarizer in list(bin1, bin2, bin3)) {
     expect_identical(
       ml_param_map(binarizer),
       list(
@@ -50,5 +50,5 @@ test_that("one can program with ft_ function (.spark_connection)", {
         input_col = "Petal_Width"
       )
     )
-
+  }
 })

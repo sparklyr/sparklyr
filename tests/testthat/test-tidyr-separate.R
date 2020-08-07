@@ -101,7 +101,9 @@ test_that("too few pieces dealt with as requested", {
 test_that("preserves grouping", {
   test_requires_version("3.0.0")
 
-  sdf <- simple_sdf %>% dplyr::mutate(g = 1) %>% dplyr::group_by(g)
+  sdf <- simple_sdf %>%
+    dplyr::mutate(g = 1) %>%
+    dplyr::group_by(g)
   rs <- sdf %>% tidyr::separate(x, c("a", "b"))
   expect_equal(class(sdf), class(rs))
   expect_equal(dplyr::group_vars(sdf), dplyr::group_vars(rs))

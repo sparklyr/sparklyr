@@ -23,7 +23,6 @@ ml_index_to_string <- ft_index_to_string
 #' @export
 ft_index_to_string.spark_connection <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
                                                 uid = random_string("index_to_string_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -45,7 +44,6 @@ ft_index_to_string.spark_connection <- function(x, input_col = NULL, output_col 
 #' @export
 ft_index_to_string.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
                                            uid = random_string("index_to_string_"), ...) {
-
   stage <- ft_index_to_string.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -60,7 +58,6 @@ ft_index_to_string.ml_pipeline <- function(x, input_col = NULL, output_col = NUL
 #' @export
 ft_index_to_string.tbl_spark <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
                                          uid = random_string("index_to_string_"), ...) {
-
   stage <- ft_index_to_string.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

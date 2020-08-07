@@ -48,7 +48,6 @@ ml_naive_bayes.spark_connection <- function(x, formula = NULL, model_type = "mul
                                             prediction_col = "prediction", probability_col = "probability",
                                             raw_prediction_col = "rawPrediction",
                                             uid = random_string("naive_bayes_"), ...) {
-
   .args <- list(
     model_type = model_type,
     smoothing = smoothing,
@@ -163,5 +162,6 @@ new_ml_naive_bayes_model <- function(jobj) {
     jobj,
     pi = read_spark_vector(jobj, "pi"),
     theta = read_spark_matrix(jobj, "theta"),
-    class = "ml_naive_bayes_model")
+    class = "ml_naive_bayes_model"
+  )
 }

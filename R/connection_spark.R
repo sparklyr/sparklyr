@@ -73,15 +73,17 @@ NULL
 
 spark_master_local_cores <- function(master, config) {
   cores <- spark_config_value(config, c("sparklyr.connect.cores.local", "sparklyr.cores.local"))
-  if (master == "local" && !identical(cores, NULL))
+  if (master == "local" && !identical(cores, NULL)) {
     master <- paste("local[", cores, "]", sep = "")
+  }
 
   master
 }
 
 spark_config_shell_args <- function(config, master) {
-  if (!is.null(config$sparklyr.shell.packages))
+  if (!is.null(config$sparklyr.shell.packages)) {
     config$sparklyr.shell.packages <- paste0(config$sparklyr.shell.packages, collapse = ",")
+  }
 
   # determine shell_args (use fake connection b/c we don't yet
   # have a real connection)
@@ -108,7 +110,6 @@ no_databricks_guid <- function() {
 #' connection_is_open(sc)
 #'
 #' spark_disconnect(sc)
-#'
 #' @details
 #'
 #' When using \code{method = "livy"}, jars are downloaded from GitHub but the path
@@ -124,8 +125,7 @@ spark_connect <- function(master,
                           extensions = sparklyr::registered_extensions(),
                           packages = NULL,
                           scala_version = NULL,
-                          ...)
-{
+                          ...) {
   # validate method
   method <- match.arg(method)
 
@@ -144,19 +144,22 @@ spark_connect <- function(master,
   if (missing(master)) {
     if (identical(method, "databricks")) {
       master <- "databricks"
-    } else if(identical(method, "qubole")) {
+    } else if (identical(method, "qubole")) {
       master <- "yarn-client"
       spark_home <- "/usr/lib/spark"
     } else {
       master <- spark_config_value(config, "spark.master", NULL)
-      if (is.null(master))
-        stop("You must either pass a value for master or include a spark.master ",
-             "entry in your config.yml")
+      if (is.null(master)) {
+        stop(
+          "You must either pass a value for master or include a spark.master ",
+          "entry in your config.yml"
+        )
+      }
     }
   }
 
   # add packages to config
-  if (!is.null(packages))
+  if (!is.null(packages)) {
     config <- spark_config_packages(
       config,
       packages,
@@ -164,13 +167,14 @@ spark_connect <- function(master,
       scala_version,
       method = method
     )
+  }
 
   if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
 
   # increase default memory
   if (spark_master_is_local(master) &&
-      identical(spark_config_value(config, "sparklyr.shell.driver-memory"), NULL) &&
-      java_is_x64()) {
+    identical(spark_config_value(config, "sparklyr.shell.driver-memory"), NULL) &&
+    java_is_x64()) {
     config$`sparklyr.shell.driver-memory` <- "2g"
   }
 
@@ -188,62 +192,74 @@ spark_connect <- function(master,
   shell_args <- spark_config_shell_args(config, master)
 
   # clean spark_apply per-connection cache
-  if (dir.exists(spark_apply_bundle_path()))
+  if (dir.exists(spark_apply_bundle_path())) {
     unlink(spark_apply_bundle_path(), recursive = TRUE)
+  }
 
   # connect using the specified method
 
   # if master is an example code, run in test mode
-  if (master == "spark://HOST:PORT")
+  if (master == "spark://HOST:PORT") {
     method <- "test"
+  }
 
-  if (spark_master_is_gateway(master))
+  if (spark_master_is_gateway(master)) {
     method <- "gateway"
+  }
 
   # spark-shell (local install of spark)
   if (method == "shell" || method == "qubole" || method == "databricks-connect") {
-    scon <- shell_connection(master = master,
-                             spark_home = spark_home,
-                             method = method,
-                             app_name = app_name,
-                             version = version,
-                             hadoop_version = hadoop_version,
-                             shell_args = shell_args,
-                             config = config,
-                             service = spark_config_value(
-                               config,
-                               "sparklyr.gateway.service",
-                               FALSE),
-                             remote = spark_config_value(
-                               config,
-                               "sparklyr.gateway.remote",
-                               spark_master_is_yarn_cluster(master, config)),
-                             extensions = extensions,
-                             batch = NULL,
-                             scala_version = scala_version)
+    scon <- shell_connection(
+      master = master,
+      spark_home = spark_home,
+      method = method,
+      app_name = app_name,
+      version = version,
+      hadoop_version = hadoop_version,
+      shell_args = shell_args,
+      config = config,
+      service = spark_config_value(
+        config,
+        "sparklyr.gateway.service",
+        FALSE
+      ),
+      remote = spark_config_value(
+        config,
+        "sparklyr.gateway.remote",
+        spark_master_is_yarn_cluster(master, config)
+      ),
+      extensions = extensions,
+      batch = NULL,
+      scala_version = scala_version
+    )
     if (method != "shell") {
       scon$method <- method
     }
   } else if (method == "livy") {
     scon <- livy_connection(master,
-                            config,
-                            app_name,
-                            version,
-                            hadoop_version ,
-                            extensions,
-                            scala_version = scala_version)
+      config,
+      app_name,
+      version,
+      hadoop_version,
+      extensions,
+      scala_version = scala_version
+    )
   } else if (method == "gateway") {
     scon <- gateway_connection(master = master, config = config)
   } else if (method == "databricks") {
-    scon <- databricks_connection(config = config,
-                                  extensions)
+    scon <- databricks_connection(
+      config = config,
+      extensions
+    )
   } else if (method == "test") {
-    scon <- test_connection(master = master,
-                            config = config,
-                            app_name,
-                            version,
-                            hadoop_version ,
-                            extensions)
+    scon <- test_connection(
+      master = master,
+      config = config,
+      app_name,
+      version,
+      hadoop_version,
+      extensions
+    )
   } else {
     # other methods
 
@@ -276,16 +292,19 @@ spark_connect <- function(master,
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
   libs <- vapply(libs,
-                 function(lib) paste0("library(", lib, ")"),
-                 character("1"),
-                 USE.NAMES = FALSE)
+    function(lib) paste0("library(", lib, ")"),
+    character("1"),
+    USE.NAMES = FALSE
+  )
   libs <- paste(libs, collapse = "\n")
-  if ("package:dplyr" %in% search())
+  if ("package:dplyr" %in% search()) {
     libs <- paste(libs, "library(dplyr)", sep = "\n")
+  }
   parentCall <- match.call()
   connectCall <- paste(libs,
-                       paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
-                       sep = "\n")
+    paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
+    sep = "\n"
+  )
 
   # let viewer know that we've opened a connection; guess that the result will
   # be assigned into the global environment
@@ -323,11 +342,14 @@ spark_disconnect <- function(sc, ...) {
 
 #' @export
 spark_disconnect.spark_connection <- function(sc, ...) {
-  tryCatch({
-    subclass <- remove_class(sc, "spark_connection")
-    spark_disconnect(subclass, ...)
-  }, error = function(err) {
-  })
+  tryCatch(
+    {
+      subclass <- remove_class(sc, "spark_connection")
+      spark_disconnect(subclass, ...)
+    },
+    error = function(err) {
+    }
+  )
 
   spark_connections_remove(sc)
 
@@ -401,7 +423,7 @@ spark_master_is_yarn_cluster <- function(master, config) {
   grepl("^yarn-cluster$", master, ignore.case = TRUE, perl = TRUE) ||
     (
       identical(config[["sparklyr.shell.deploy-mode"]], "cluster") &&
-      identical(master, "yarn")
+        identical(master, "yarn")
     )
 }
 
@@ -423,26 +445,31 @@ spark_disconnect_all <- function() {
 
 spark_inspect <- function(jobj) {
   print(jobj)
-  if (!connection_is_open(spark_connection(jobj)))
+  if (!connection_is_open(spark_connection(jobj))) {
     return(jobj)
+  }
 
   class <- invoke(jobj, "getClass")
 
   cat("Fields:\n")
   fields <- invoke(class, "getDeclaredFields")
-  lapply(fields, function(field) { print(field) })
+  lapply(fields, function(field) {
+    print(field)
+  })
 
   cat("Methods:\n")
   methods <- invoke(class, "getDeclaredMethods")
-  lapply(methods, function(method) { print(method) })
+  lapply(methods, function(method) {
+    print(method)
+  })
 
   jobj
 }
 
 initialize_method <- function(method, scon) {
-   UseMethod("initialize_method")
+  UseMethod("initialize_method")
 }
 
 initialize_method.default <- function(method, scon) {
-   scon
+  scon
 }

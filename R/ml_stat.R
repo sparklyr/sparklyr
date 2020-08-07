@@ -15,7 +15,7 @@
 #'
 #' features <- c("Petal_Width", "Petal_Length", "Sepal_Length", "Sepal_Width")
 #'
-#' ml_corr(iris_tbl, columns = features , method = "pearson")
+#' ml_corr(iris_tbl, columns = features, method = "pearson")
 #' }
 #' @export
 ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
@@ -23,7 +23,9 @@ ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
 
   method <- match.arg(method)
 
-  columns <- if (rlang::is_null(columns)) colnames(x) else {
+  columns <- if (rlang::is_null(columns)) {
+    colnames(x)
+  } else {
     sapply(columns, cast_string)
   }
 
@@ -31,15 +33,19 @@ ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
   if (!all(col_in_df)) {
     bad_cols <- paste0(columns[!col_in_df], collapse = ", ")
     stop("All columns specified must be in x. Failed to find ",
-         bad_cols, ".", call. = FALSE)
+      bad_cols, ".",
+      call. = FALSE
+    )
   }
 
   if (identical(length(columns), 1L)) {
     # check to see that the column is a VectorUDT
 
-    if (!grepl("VectorUDT", sdf_schema(x)[[columns]][["type"]]))
+    if (!grepl("VectorUDT", sdf_schema(x)[[columns]][["type"]])) {
       stop("When only one column is specified, it must be a column of Vectors. For example, the output of `ft_vector_assembler()`.",
-           call. = FALSE)
+        call. = FALSE
+      )
+    }
 
     num_features <- x %>%
       dplyr::select(!!columns) %>%
@@ -60,16 +66,19 @@ ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
       spark_dataframe()
   }
 
-  invoke_static(spark_connection(sdf),
-                "org.apache.spark.ml.stat.Correlation",
-                "corr", sdf, features_col) %>%
+  invoke_static(
+    spark_connection(sdf),
+    "org.apache.spark.ml.stat.Correlation",
+    "corr", sdf, features_col
+  ) %>%
     invoke("first") %>%
     sapply(invoke, "toArray") %>%
     matrix(nrow = num_features) %>%
     dplyr::as_tibble(.name_repair = "unique") %>%
-    dplyr::rename(!!!rlang::set_names(paste0("...", seq_len(num_features)),
-                                      feature_names)
-                  )
+    dplyr::rename(!!!rlang::set_names(
+      paste0("...", seq_len(num_features)),
+      feature_names
+    ))
 }
 
 #' Chi-square hypothesis testing for categorical data.
@@ -106,7 +115,9 @@ ml_chisquare_test <- function(x, features, label) {
   if (!all(col_in_df)) {
     bad_cols <- paste(columns[!col_in_df], collapse = ", ")
     stop("All columns specified must be in x. Failed to find ",
-         bad_cols, ".", call. = FALSE)
+      bad_cols, ".",
+      call. = FALSE
+    )
   }
 
   label_is_double <- identical(schema[[label]][["type"]], "DoubleType")
@@ -134,13 +145,16 @@ ml_chisquare_test <- function(x, features, label) {
     if (label_is_double) {
       label_col <- label
       df <- ft_r_formula(x, paste0("~ ", paste0(features, collapse = " + ")),
-                         features_col = features_col)
+        features_col = features_col
+      )
     } else {
       label_col <- random_string("label")
-      df <- ft_r_formula(x, paste0(label, " ~ ",
-                                   paste0(features, collapse = " + ")),
-                         features_col = features_col,
-                         label_col = label_col, force_index_label = TRUE
+      df <- ft_r_formula(x, paste0(
+        label, " ~ ",
+        paste0(features, collapse = " + ")
+      ),
+      features_col = features_col,
+      label_col = label_col, force_index_label = TRUE
       )
     }
   }
@@ -148,8 +162,10 @@ ml_chisquare_test <- function(x, features, label) {
   sdf <- spark_dataframe(df)
   sc <- spark_connection(sdf)
 
-  invoke_static(sc, "org.apache.spark.ml.stat.ChiSquareTest", "test",
-                sdf, features_col, label_col) %>%
+  invoke_static(
+    sc, "org.apache.spark.ml.stat.ChiSquareTest", "test",
+    sdf, features_col, label_col
+  ) %>%
     sdf_register() %>%
     dplyr::collect() %>%
     tidyr::unnest() %>%
@@ -158,6 +174,8 @@ ml_chisquare_test <- function(x, features, label) {
       degrees_of_freedom = unlist(!!rlang::sym("degreesOfFreedom")),
       statistic = !!rlang::sym("statistics")
     ) %>%
-    dplyr::bind_cols(data.frame(feature = feature_names,
-                                label = label), .)
+    dplyr::bind_cols(data.frame(
+      feature = feature_names,
+      label = label
+    ), .)
 }

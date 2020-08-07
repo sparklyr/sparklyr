@@ -26,8 +26,10 @@ test_that("ft_max_abs_scaler() works properly", {
       ft_vector_assembler(paste0("V", 1:3), "features") %>%
       ft_max_abs_scaler("features", "scaled") %>%
       pull(scaled),
-    list(c(0.25, 0.01, -1),
-         c(0.5, 0.1, -0.5),
-         c(1, 1, 1))
+    list(
+      c(0.25, 0.01, -1),
+      c(0.5, 0.1, -0.5),
+      c(1, 1, 1)
+    )
   )
 })

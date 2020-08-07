@@ -10,15 +10,15 @@ NULL
 #' @rdname ml_unsupervised_tidiers
 #' @export
 tidy.ml_model_kmeans <- function(x,
-                                 ...){
-
+                                 ...) {
   center <- x$centers
   size <- x$summary$cluster_sizes()
   k <- x$summary$k
 
   cbind(center,
-        size = size,
-        cluster = 0:(k - 1) ) %>%
+    size = size,
+    cluster = 0:(k - 1)
+  ) %>%
     dplyr::as_tibble()
 }
 
@@ -29,11 +29,11 @@ tidy.ml_model_kmeans <- function(x,
 #'
 #' @export
 augment.ml_model_kmeans <- function(x, newdata = NULL,
-                                    ...){
+                                    ...) {
 
   # if the user doesn't provide a new data, this funcion will
   # use the training set
-  if (is.null(newdata)){
+  if (is.null(newdata)) {
     newdata <- x$dataset
   }
   vars <- c(dplyr::tbl_vars(newdata), "prediction")
@@ -47,29 +47,29 @@ augment.ml_model_kmeans <- function(x, newdata = NULL,
 #' @export
 glance.ml_model_kmeans <- function(x,
                                    ...) {
-
   k <- x$summary$k
   wssse <- compute_wssse(x)
 
-  glance_tbl <- dplyr::tibble(k = k,
-                              wssse = wssse)
+  glance_tbl <- dplyr::tibble(
+    k = k,
+    wssse = wssse
+  )
 
   add_silhouette(x, glance_tbl)
-
 }
 
 #' @rdname ml_unsupervised_tidiers
 #' @export
 tidy.ml_model_bisecting_kmeans <- function(x,
-                                 ...){
-
+                                           ...) {
   center <- x$centers
   size <- x$summary$cluster_sizes()
   k <- x$summary$k
 
   cbind(center,
-        size = size,
-        cluster = 0:(k - 1) ) %>%
+    size = size,
+    cluster = 0:(k - 1)
+  ) %>%
     dplyr::as_tibble()
 }
 
@@ -79,11 +79,11 @@ tidy.ml_model_bisecting_kmeans <- function(x,
 #'
 #' @export
 augment.ml_model_bisecting_kmeans <- function(x, newdata = NULL,
-                                    ...){
+                                              ...) {
 
   # if the user doesn't provide a new data, this funcion will
   # use the training set
-  if (is.null(newdata)){
+  if (is.null(newdata)) {
     newdata <- x$dataset
   }
   vars <- c(dplyr::tbl_vars(newdata), "prediction")
@@ -96,13 +96,14 @@ augment.ml_model_bisecting_kmeans <- function(x, newdata = NULL,
 #' @rdname ml_unsupervised_tidiers
 #' @export
 glance.ml_model_bisecting_kmeans <- function(x,
-                                   ...) {
-
+                                             ...) {
   k <- x$summary$k
   wssse <- compute_wssse(x)
 
-  glance_tbl <- dplyr::tibble(k = k,
-                              wssse = wssse)
+  glance_tbl <- dplyr::tibble(
+    k = k,
+    wssse = wssse
+  )
 
   add_silhouette(x, glance_tbl)
 }
@@ -111,7 +112,6 @@ glance.ml_model_bisecting_kmeans <- function(x,
 #' @importFrom dplyr .data
 #' @export
 tidy.ml_model_gaussian_mixture <- function(x, ...) {
-
   center <- x$gaussians_df()$mean %>%
     as.data.frame() %>%
     t() %>%
@@ -125,9 +125,10 @@ tidy.ml_model_gaussian_mixture <- function(x, ...) {
   k <- x$summary$k
 
   cbind(center,
-        weight = weight,
-        size = size,
-        cluster = 0:(k - 1) ) %>%
+    weight = weight,
+    size = size,
+    cluster = 0:(k - 1)
+  ) %>%
     dplyr::as_tibble()
 }
 
@@ -137,11 +138,11 @@ tidy.ml_model_gaussian_mixture <- function(x, ...) {
 #'
 #' @export
 augment.ml_model_gaussian_mixture <- function(x, newdata = NULL,
-                                              ...){
+                                              ...) {
 
   # if the user doesn't provide a new data, this funcion will
   # use the training set
-  if (is.null(newdata)){
+  if (is.null(newdata)) {
     newdata <- x$dataset
   }
   vars <- c(dplyr::tbl_vars(newdata), "prediction")
@@ -155,7 +156,6 @@ augment.ml_model_gaussian_mixture <- function(x, newdata = NULL,
 #' @export
 glance.ml_model_gaussian_mixture <- function(x,
                                              ...) {
-
   k <- x$summary$k
   glance_tbl <- dplyr::tibble(k = k)
   add_silhouette(x, glance_tbl)
@@ -163,16 +163,15 @@ glance.ml_model_gaussian_mixture <- function(x,
 
 # this function add silhouette to glance if
 # spark version is even or greater than 2.3.0
-add_silhouette <- function(x, glance_tbl){
-
+add_silhouette <- function(x, glance_tbl) {
   sc <- spark_connection(x$dataset)
   version <- spark_version(sc)
 
   if (version >= "2.3.0") {
-
     silhouette <- ml_clustering_evaluator(x$summary$predictions)
     glance_tbl <- dplyr::bind_cols(glance_tbl,
-                                   silhouette = silhouette)
+      silhouette = silhouette
+    )
   }
   glance_tbl
 }

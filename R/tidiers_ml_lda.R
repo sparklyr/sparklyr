@@ -11,8 +11,7 @@ NULL
 #' @importFrom rlang !!
 #' @export
 tidy.ml_model_lda <- function(x,
-                              ...){
-
+                              ...) {
   term <- ml_vocabulary(x)
   topics_matrix <- x$model$topics_matrix() %>%
     dplyr::as_tibble(.name_repair = "unique")
@@ -30,17 +29,17 @@ tidy.ml_model_lda <- function(x,
 #' @importFrom rlang syms
 #' @export
 augment.ml_model_lda <- function(x, newdata = NULL,
-                                 ...){
+                                 ...) {
 
   # if the user doesn't provide a new data, this funcion will
   # use the training set
-  if (is.null(newdata)){
+  if (is.null(newdata)) {
     newdata <- x$dataset
   }
 
   vars <- c(dplyr::tbl_vars(newdata), "topicDistribution")
 
-  ml_predict(x, newdata ) %>%
+  ml_predict(x, newdata) %>%
     dplyr::select(!!!syms(vars)) %>%
     dplyr::rename(.topic = !!"topicDistribution")
 }
@@ -48,15 +47,16 @@ augment.ml_model_lda <- function(x, newdata = NULL,
 #' @rdname ml_lda_tidiers
 #' @export
 glance.ml_model_lda <- function(x,
-                                ...){
-
-  k = x$model$param_map$k
+                                ...) {
+  k <- x$model$param_map$k
   vocab_size <- x$model$vocab_size
   learning_decay <- x$model$param_map$learning_decay
   optimizer <- x$model$param_map$optimizer
 
-  dplyr::tibble(k = k,
-                vocab_size = vocab_size,
-                learning_decay = learning_decay,
-                optimizer = optimizer)
+  dplyr::tibble(
+    k = k,
+    vocab_size = vocab_size,
+    learning_decay = learning_decay,
+    optimizer = optimizer
+  )
 }

@@ -27,8 +27,9 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
   lapply(sampleRows, function(r) {
     row <- r %>% invoke("toSeq")
 
-    if (is.null(colTypes))
+    if (is.null(colTypes)) {
       colTypes <<- replicate(length(row), "character")
+    }
 
     lapply(seq_along(row), function(colIdx) {
       colVal <- row[[colIdx]]
@@ -41,14 +42,16 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
     })
   })
 
-  if (any(sapply(colTypes, is.null)))
+  if (any(sapply(colTypes, is.null))) {
     stop("Failed to infer column types, please use explicit types.")
+  }
 
   fields <- lapply(seq_along(colTypes), function(idx) {
-    name <- if (idx <= length(column_names))
+    name <- if (idx <= length(column_names)) {
       column_names[[idx]]
-    else
+    } else {
       paste0("X", idx)
+    }
 
     invoke_static(
       sc,

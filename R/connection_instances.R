@@ -2,8 +2,9 @@
 sparkConnectionsEnv <- new.env(parent = emptyenv())
 
 spark_connection_instances <- function() {
-  if (is.null(sparkConnectionsEnv$instances))
+  if (is.null(sparkConnectionsEnv$instances)) {
     sparkConnectionsEnv$instances <- list()
+  }
 
   sparkConnectionsEnv$instances
 }
@@ -28,7 +29,9 @@ spark_connections_remove <- function(sc) {
 }
 
 spark_connection_find_scon <- function(test) {
-  Filter(function(e) { test(e) }, spark_connection_instances())
+  Filter(function(e) {
+    test(e)
+  }, spark_connection_instances())
 }
 
 #' Find Spark Connection

@@ -41,31 +41,39 @@ test_that("ft_count_vectorizer() works", {
   expect_identical(counts2, list(c(1, 1, 1), c(3, 2, 1)))
 
   # correct classes
-  expect_identical(class(ft_count_vectorizer(sc, "words", "features"))[1],
-                   "ml_count_vectorizer")
+  expect_identical(
+    class(ft_count_vectorizer(sc, "words", "features"))[1],
+    "ml_count_vectorizer"
+  )
 
   cv_model <- ft_count_vectorizer(sc, "words", "features") %>%
     ml_fit(ft_tokenizer(df_tbl, "text", "words"))
 
-  expect_identical(class(cv_model)[1],
-                   "ml_count_vectorizer_model")
+  expect_identical(
+    class(cv_model)[1],
+    "ml_count_vectorizer_model"
+  )
 
   # vocab extraction
   expect_identical(cv_model$vocabulary, list("a", "b", "c"))
 
   cv <- ft_count_vectorizer(
-    sc, "words", "features", binary = TRUE, min_df = 2, min_tf = 2,
+    sc, "words", "features",
+    binary = TRUE, min_df = 2, min_tf = 2,
     vocab_size = 1024
   )
 
-  expect_equal(ml_params(cv, list(
-    "input_col", "output_col", "binary", "min_df", "min_tf", "vocab_size"
-  )),
-  list(input_col = "words",
-       output_col = "features",
-       binary = TRUE,
-       min_df = 2L,
-       min_tf = 2L,
-       vocab_size = 1024L)
+  expect_equal(
+    ml_params(cv, list(
+      "input_col", "output_col", "binary", "min_df", "min_tf", "vocab_size"
+    )),
+    list(
+      input_col = "words",
+      output_col = "features",
+      binary = TRUE,
+      min_df = 2L,
+      min_tf = 2L,
+      vocab_size = 1024L
+    )
   )
 })

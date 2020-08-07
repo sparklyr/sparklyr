@@ -1,5 +1,6 @@
 
-setMethod("dbWriteTable", "spark_connection",
+setMethod(
+  "dbWriteTable", "spark_connection",
   function(conn, name, value, temporary = getOption("sparklyr.dbwritetable.temp", FALSE), append = FALSE, repartition = 0, serializer = NULL) {
     found <- dbExistsTable(conn, name)
     if (found) {
@@ -10,18 +11,20 @@ setMethod("dbWriteTable", "spark_connection",
 
     spark_data_copy(conn, value, temp_name, repartition, serializer = serializer)
 
-    if (identical(temporary, FALSE))
+    if (identical(temporary, FALSE)) {
       spark_write_table(
         tbl(conn, temp_name),
         name,
         if (identical(append, TRUE)) "append" else NULL
       )
+    }
 
     invisible(TRUE)
   }
 )
 
-setMethod("dbReadTable", c("spark_connection", "character"),
+setMethod(
+  "dbReadTable", c("spark_connection", "character"),
   function(conn, name) {
     name <- dbQuoteIdentifier(conn, name)
     dbGetQuery(conn, paste("SELECT * FROM ", name))
@@ -48,7 +51,8 @@ setMethod("dbExistsTable", c("spark_connection", "character"), function(conn, na
 })
 
 
-setMethod("dbRemoveTable", c("spark_connection", "character"),
+setMethod(
+  "dbRemoveTable", c("spark_connection", "character"),
   function(conn, name) {
     dbi_ensure_no_backtick(name)
 
@@ -56,4 +60,3 @@ setMethod("dbRemoveTable", c("spark_connection", "character"),
     invisible(TRUE)
   }
 )
-

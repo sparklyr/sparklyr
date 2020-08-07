@@ -14,7 +14,7 @@ test_that("ft_elementwise_product() param setting", {
 
 test_that("ft_elementwise_product() works", {
   sc <- testthat_spark_connection()
-  test_requires_version('2.0.0', "elementwise product requires spark 2.0+")
+  test_requires_version("2.0.0", "elementwise product requires spark 2.0+")
   df <- data.frame(a = 1, b = 3, c = 5)
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
@@ -24,18 +24,24 @@ test_that("ft_elementwise_product() works", {
     pull(multiplied) %>%
     rlang::flatten_dbl()
 
-  expect_identical(nums,
-                   c(1, 3, 5) * c(2, 4, 6))
+  expect_identical(
+    nums,
+    c(1, 3, 5) * c(2, 4, 6)
+  )
 
   ewp <- ft_elementwise_product(
-    sc, "features", "multiplied", scaling_vec = c(1, 3, 5))
+    sc, "features", "multiplied",
+    scaling_vec = c(1, 3, 5)
+  )
 
   expect_equal(
     ml_params(ewp, list(
       "input_col", "output_col", "scaling_vec"
     )),
-    list(input_col = "features",
-         output_col = "multiplied",
-         scaling_vec = c(1, 3, 5))
+    list(
+      input_col = "features",
+      output_col = "multiplied",
+      scaling_vec = c(1, 3, 5)
+    )
   )
 })

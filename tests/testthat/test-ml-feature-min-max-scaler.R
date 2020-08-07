@@ -34,9 +34,10 @@ test_that("ft_min_max_scaler() works properly", {
 
   expect_equal(
     scaled_features,
-    list(c(0, 0, 0),
-         c(0.5, 0.1, 0.5),
-         c(1, 1, 1))
+    list(
+      c(0, 0, 0),
+      c(0.5, 0.1, 0.5),
+      c(1, 1, 1)
+    )
   )
 })
-

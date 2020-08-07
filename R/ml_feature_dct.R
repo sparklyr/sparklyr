@@ -21,7 +21,6 @@ ml_dct <- ft_dct
 #' @export
 ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                     inverse = FALSE, uid = random_string("dct_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -33,7 +32,8 @@ ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.DCT",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     invoke("setInverse", .args[["inverse"]])
 
   new_ml_dct(jobj)

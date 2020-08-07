@@ -3,30 +3,34 @@
 #' @include utils.R
 
 validate_args <- function(into, sep) {
-  if (!is.character(into))
+  if (!is.character(into)) {
     rlang::abort("`into` must be a character vector")
+  }
 
-  if (!is.numeric(sep) && !is.character(sep))
+  if (!is.numeric(sep) && !is.character(sep)) {
     rlang::abort("`sep` must be either numeric or character")
+  }
 
-  if (is.numeric(sep) && !identical(length(sep) + 1L, length(into)))
+  if (is.numeric(sep) && !identical(length(sep) + 1L, length(into))) {
     rlang::abort("The length of `sep` should be one less than `into`.")
+  }
 }
 
 strsep_to_sql <- function(col, into, sep) {
   splitting_idx <- lapply(
     sep,
     function(idx) {
-      if (idx >= 0)
+      if (idx >= 0) {
         as.character(idx)
-      else
+      } else {
         sprintf("ARRAY_MAX(ARRAY(0, CHAR_LENGTH(%s) + %d))", col, idx)
+      }
     }
   )
   pos <-
     list("0") %>%
-      append(splitting_idx) %>%
-      append(sprintf("CHAR_LENGTH(%s)", col))
+    append(splitting_idx) %>%
+    append(sprintf("CHAR_LENGTH(%s)", col))
   sql <- lapply(
     seq(length(pos) - 1),
     function(i) {
@@ -79,7 +83,7 @@ process_warnings <- function(out, substr_arr_col, n, extra, fill) {
         dplyr::select(rlang::sym(row_num)) %>%
         collect()
       rows <- rows[[row_num]]
-      if (length(rows) > 0)
+      if (length(rows) > 0) {
         sprintf(
           "Expected %d piece(s). Additional piece(s) discarded in %d row(s) [%s].",
           n,
@@ -87,6 +91,7 @@ process_warnings <- function(out, substr_arr_col, n, extra, fill) {
           paste0(rows, collapse = ", ")
         ) %>%
           rlang::warn()
+      }
     }
     if (identical(fill, "warn")) {
       pred <- sprintf("SIZE(%s) < %d", substr_arr_col_sql, n)
@@ -95,7 +100,7 @@ process_warnings <- function(out, substr_arr_col, n, extra, fill) {
         dplyr::select(rlang::sym(row_num)) %>%
         collect()
       rows <- rows[[row_num]]
-      if (length(rows) > 0)
+      if (length(rows) > 0) {
         sprintf(
           "Expected %d piece(s). Missing piece(s) filled with NULL value(s) in %d row(s) [%s].",
           n,
@@ -103,6 +108,7 @@ process_warnings <- function(out, substr_arr_col, n, extra, fill) {
           paste0(rows, collapse = ", ")
         ) %>%
           rlang::warn()
+      }
     }
   }
 
@@ -113,13 +119,14 @@ process_warnings <- function(out, substr_arr_col, n, extra, fill) {
 #' @export
 separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
                                remove = TRUE, extra = "warn", fill = "warn", ...) {
-  if (data %>% spark_connection() %>% spark_version() < "3.0.0")
+  if (data %>% spark_connection() %>% spark_version() < "3.0.0") {
     rlang::abort("`separate.tbl_spark` is only supported in Spark 3.0.0 or higher")
+  }
 
   check_present(col)
   validate_args(into, sep)
 
-  var <- tidyselect::vars_pull(colnames(data), !! rlang::enquo(col))
+  var <- tidyselect::vars_pull(colnames(data), !!rlang::enquo(col))
 
   col <- quote_column_name(var)
   if (is.numeric(sep)) {
@@ -135,7 +142,7 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
       seq_along(into),
       function(idx) {
         dplyr::sql(
-          if (fill_left)
+          if (fill_left) {
             sprintf(
               "IF(%s, NULL, %s)",
               sprintf("%d <= %d - SIZE(%s)", idx, n, substr_arr_col),
@@ -147,7 +154,7 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
                 substr_arr_col
               )
             )
-          else
+          } else {
             sprintf(
               "IF(%d <= SIZE(%s), ELEMENT_AT(%s, %d), NULL)",
               idx,
@@ -155,6 +162,7 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
               substr_arr_col,
               idx
             )
+          }
         )
       }
     )

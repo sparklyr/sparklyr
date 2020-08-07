@@ -1,19 +1,16 @@
-stream_class <- function(stream)
-{
+stream_class <- function(stream) {
   class(stream) <- c("spark_stream", class(stream))
   stream
 }
 
-stream_status <- function(stream)
-{
+stream_status <- function(stream) {
   invoke(stream, "status") %>%
     invoke("json") %>%
     jsonlite::fromJSON()
 }
 
 #' @export
-print.spark_stream <- function(x, ...)
-{
+print.spark_stream <- function(x, ...) {
   id <- stream_id(x)
   status <- stream_status(x)
   active <- invoke(x, "isActive")
@@ -38,8 +35,7 @@ print.spark_stream <- function(x, ...)
 #' @param stream The spark stream object to be stopped.
 #'
 #' @export
-stream_stop <- function(stream)
-{
+stream_stop <- function(stream) {
   if (!is.null(stream$job)) rstudio_jobs_api()$add_job_progress(stream$job, 100L)
 
   stopped <- invoke(stream, "stop")
@@ -49,14 +45,13 @@ stream_stop <- function(stream)
   invisible(stopped)
 }
 
-stream_validate <- function(stream)
-{
+stream_validate <- function(stream) {
   waitSeconds <- cast_scalar_integer(spark_config_value(config, "sparklyr.stream.validate.timeout", 3)) %>%
     as.difftime(units = "secs")
 
   commandStart <- Sys.time()
   while (!grepl("waiting", stream_status(stream)$message) &&
-         commandStart + waitSeconds > Sys.time()) {
+    commandStart + waitSeconds > Sys.time()) {
     Sys.sleep(0.1)
   }
 
@@ -88,9 +83,7 @@ stream_validate <- function(stream)
 #' @seealso \code{\link{stream_trigger_continuous}}
 #' @export
 stream_trigger_interval <- function(
-  interval = 1000
-)
-{
+                                    interval = 1000) {
   structure(class = c("stream_trigger_interval"), list(
     interval = interval
   ))
@@ -107,26 +100,21 @@ stream_trigger_interval <- function(
 #' @seealso \code{\link{stream_trigger_interval}}
 #' @export
 stream_trigger_continuous <- function(
-  checkpoint = 5000
-)
-{
+                                      checkpoint = 5000) {
   structure(class = c("stream_trigger_continuous"), list(
     interval = checkpoint
   ))
 }
 
-stream_trigger_create <- function(trigger, sc)
-{
+stream_trigger_create <- function(trigger, sc) {
   UseMethod("stream_trigger_create")
 }
 
-stream_trigger_create.stream_trigger_interval <- function(trigger, sc)
-{
+stream_trigger_create.stream_trigger_interval <- function(trigger, sc) {
   invoke_static(sc, "org.apache.spark.sql.streaming.Trigger", "ProcessingTime", as.integer(trigger$interval))
 }
 
-stream_trigger_create.stream_trigger_continuous <- function(trigger, sc)
-{
+stream_trigger_create.stream_trigger_continuous <- function(trigger, sc) {
   invoke_static(sc, "org.apache.spark.sql.streaming.Trigger", "Continuous", as.integer(trigger$interval))
 }
 
@@ -137,8 +125,7 @@ stream_trigger_create.stream_trigger_continuous <- function(trigger, sc)
 #' @param stream The spark stream object.
 #'
 #' @export
-stream_name <- function(stream)
-{
+stream_name <- function(stream) {
   invoke(stream, "name")
 }
 
@@ -149,13 +136,11 @@ stream_name <- function(stream)
 #' @param stream The spark stream object.
 #'
 #' @export
-stream_id <- function(stream)
-{
+stream_id <- function(stream) {
   invoke(stream, "id") %>% invoke("toString")
 }
 
-sdf_collect_stream <- function(x, ...)
-{
+sdf_collect_stream <- function(x, ...) {
   sc <- spark_connection(x)
   args <- list(...)
   n <- args$n
@@ -186,20 +171,20 @@ sdf_collect_stream <- function(x, ...)
 }
 
 stream_generate_test_entry <- function(
-  df,
-  path,
-  distribution,
-  iterations,
-  interval,
-  idxDataStart = 1,
-  idxDataEnd = 1,
-  idxDist = 1,
-  idxFile = 1
-)
-{
+                                       df,
+                                       path,
+                                       distribution,
+                                       iterations,
+                                       interval,
+                                       idxDataStart = 1,
+                                       idxDataEnd = 1,
+                                       idxDist = 1,
+                                       idxFile = 1) {
   later <- get("later", envir = asNamespace("later"))
 
-  if (idxFile > iterations) return();
+  if (idxFile > iterations) {
+    return()
+  }
 
   if (idxDist > length(distribution)) idxDist <- 1
 
@@ -207,7 +192,7 @@ stream_generate_test_entry <- function(
   idxDataEnd <- idxDataStart + distribution[idxDist]
 
   dfCycle <- df
-  while(nrow(dfCycle) < idxDataEnd) {
+  while (nrow(dfCycle) < idxDataEnd) {
     dfCycle <- rbind(dfCycle, df)
   }
 
@@ -220,15 +205,17 @@ stream_generate_test_entry <- function(
   idxFile <- idxFile + 1
 
   later(function() {
-    stream_generate_test_entry(df,
-                               path,
-                               distribution,
-                               iterations,
-                               interval,
-                               idxDataStart,
-                               idxDataEnd,
-                               idxDist,
-                               idxFile)
+    stream_generate_test_entry(
+      df,
+      path,
+      distribution,
+      iterations,
+      interval,
+      idxDataStart,
+      idxDataEnd,
+      idxDist,
+      idxFile
+    )
   }, interval)
 }
 
@@ -253,13 +240,11 @@ stream_generate_test_entry <- function(
 #' @importFrom stats runif
 #' @export
 stream_generate_test <- function(
-  df = rep(1:1000),
-  path = "source",
-  distribution = floor(10 + 1e5 * stats::dbinom(1:20, 20, 0.5)),
-  iterations = 50,
-  interval = 1
-)
-{
+                                 df = rep(1:1000),
+                                 path = "source",
+                                 distribution = floor(10 + 1e5 * stats::dbinom(1:20, 20, 0.5)),
+                                 iterations = 50,
+                                 interval = 1) {
   if (!"later" %in% installed.packages()) {
     stop("'stream_generate_test()' requires the 'later' package.")
   }
@@ -278,22 +263,24 @@ stream_generate_test <- function(
 #' @param id The stream identifier to find.
 #'
 #' @examples
-#'\dontrun{
+#' \dontrun{
 #' sc <- spark_connect(master = "local")
 #' sdf_len(sc, 10) %>%
 #'   spark_write_parquet(path = "parquet-in")
 #'
 #' stream <- stream_read_parquet(sc, "parquet-in") %>%
-#'  stream_write_parquet("parquet-out")
+#'   stream_write_parquet("parquet-out")
 #'
 #' stream_id <- stream_id(stream)
 #' stream_find(sc, stream_id)
 #' }
 #'
 #' @export
-stream_find <- function(sc, id)
-{
-  spark_session(sc) %>% invoke("streams") %>% invoke("get", id) %>% stream_class()
+stream_find <- function(sc, id) {
+  spark_session(sc) %>%
+    invoke("streams") %>%
+    invoke("get", id) %>%
+    stream_class()
 }
 
 #' Watermark Stream
@@ -308,8 +295,7 @@ stream_find <- function(sc, id)
 #'   to ten minutes.
 #'
 #' @export
-stream_watermark <- function(x, column = "timestamp", threshold = "10 minutes")
-{
+stream_watermark <- function(x, column = "timestamp", threshold = "10 minutes") {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(x)
 

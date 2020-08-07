@@ -2,8 +2,9 @@ context("submit")
 
 skip_databricks_connect()
 test_that("spark_submit() can submit batch jobs", {
-  if (.Platform$OS.type == "windows")
+  if (.Platform$OS.type == "windows") {
     skip("spark_submit() not yet implemented for windows")
+  }
 
   batch_file <- dir(getwd(), recursive = TRUE, pattern = "batch.R", full.names = TRUE)
 

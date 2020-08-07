@@ -236,10 +236,11 @@ new_ml_logistic_regression_model <- function(jobj) {
   is_multinomial <- invoke(jobj, "numClasses") > 2
 
   summary <- if (invoke(jobj, "hasSummary")) {
-    if (!is_multinomial && spark_version(spark_connection(jobj)) >= "2.3.0")
+    if (!is_multinomial && spark_version(spark_connection(jobj)) >= "2.3.0") {
       new_ml_binary_logistic_regression_training_summary(invoke(jobj, "binarySummary"))
-    else
+    } else {
       new_ml_logistic_regression_training_summary(invoke(jobj, "summary"))
+    }
   }
 
   new_ml_probabilistic_classification_model(
@@ -250,7 +251,8 @@ new_ml_logistic_regression_model <- function(jobj) {
     intercept_vector = possibly_null(~ read_spark_vector(jobj, "interceptVector"))(),
     threshold = if (ml_is_set(jobj, "threshold")) invoke(jobj, "getThreshold") else NULL,
     summary = summary,
-    class = "ml_logistic_regression_model")
+    class = "ml_logistic_regression_model"
+  )
 }
 
 new_ml_logistic_regression_summary <- function(jobj, ..., class = character()) {
@@ -258,8 +260,10 @@ new_ml_logistic_regression_summary <- function(jobj, ..., class = character()) {
     jobj,
     features_col = function() invoke(jobj, "featuresCol"),
     label_col = function() invoke(jobj, "labelCol"),
-    predictions = function() invoke(jobj, "predictions") %>%
-      sdf_register(),
+    predictions = function() {
+      invoke(jobj, "predictions") %>%
+        sdf_register()
+    },
     probability_col = function() invoke(jobj, "probabilityCol"),
     ...,
     class = c(class, "ml_logistic_regression_summary")
@@ -303,16 +307,26 @@ new_ml_binary_logistic_regression_summary <- function(jobj, ..., class = charact
   new_ml_logistic_regression_summary(
     jobj,
     area_under_roc = function() invoke(jobj, "areaUnderROC"),
-    f_measure_by_threshold = function() invoke(jobj, "fMeasureByThreshold") %>%
-      sdf_register(),
-    pr = function() invoke(jobj, "pr") %>%
-      sdf_register(),
-    precision_by_threshold = function() invoke(jobj, "precisionByThreshold") %>%
-      sdf_register(),
-    recall_by_threshold = function() invoke(jobj, "recallByThreshold") %>%
-      sdf_register(),
-    roc = function() invoke(jobj, "roc") %>%
-      sdf_register(),
+    f_measure_by_threshold = function() {
+      invoke(jobj, "fMeasureByThreshold") %>%
+        sdf_register()
+    },
+    pr = function() {
+      invoke(jobj, "pr") %>%
+        sdf_register()
+    },
+    precision_by_threshold = function() {
+      invoke(jobj, "precisionByThreshold") %>%
+        sdf_register()
+    },
+    recall_by_threshold = function() {
+      invoke(jobj, "recallByThreshold") %>%
+        sdf_register()
+    },
+    roc = function() {
+      invoke(jobj, "roc") %>%
+        sdf_register()
+    },
     class = c(class, "ml_binary_logistic_regression_summary")
   )
 }
@@ -327,7 +341,9 @@ new_ml_binary_logistic_regression_training_summary <- function(jobj) {
 }
 
 cast_double_matrix <- function(mat) {
-  if (is.null(mat)) return(mat)
+  if (is.null(mat)) {
+    return(mat)
+  }
   mat %>%
     cast_double() %>%
     matrix(nrow = nrow(mat))

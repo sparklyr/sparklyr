@@ -5,7 +5,7 @@ sc <- testthat_spark_connection()
 test_that("cor, cov, sd and var works as expected", {
   test_requires("dplyr")
 
-  stats <- data.frame(x=1:10, y=10:1)
+  stats <- data.frame(x = 1:10, y = 10:1)
   stats_tbl <- copy_to(sc, stats, overwrite = TRUE)
 
   s1 <- stats %>% mutate(
@@ -31,7 +31,7 @@ test_that("cor, cov, sd and var works as expected", {
 test_that("cor, cov, sd and var works as expected over groups", {
   test_requires("dplyr")
 
-  stats <- data.frame(id=rep(c(1,2), 5), x=1:10, y=10:1)
+  stats <- data.frame(id = rep(c(1, 2), 5), x = 1:10, y = 10:1)
   stats_tbl <- copy_to(sc, stats, overwrite = TRUE)
 
   s1 <- stats %>%
@@ -63,8 +63,10 @@ test_that("cor, cov, sd and var works as expected over groups", {
 test_that("cumprod works as expected", {
   test_requires("dplyr")
 
-  stats <- data.frame(id = 1:10,
-                      x = c(1:3, -4, 5, -6, 7, 0, 0, 10))
+  stats <- data.frame(
+    id = 1:10,
+    x = c(1:3, -4, 5, -6, 7, 0, 0, 10)
+  )
   stats_tbl <- copy_to(sc, stats, overwrite = TRUE)
 
   s1 <- stats %>%

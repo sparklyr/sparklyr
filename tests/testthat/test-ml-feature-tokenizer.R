@@ -14,7 +14,7 @@ test_that("ft_tokenizer() param setting", {
 test_that("ft_tokenizer.tbl_spark() works as expected", {
   sc <- testthat_spark_connection()
   test_requires("janeaustenr")
-  austen     <- austen_books()
+  austen <- austen_books()
   austen_tbl <- testthat_tbl("austen")
 
   spark_tokens <- austen_tbl %>%

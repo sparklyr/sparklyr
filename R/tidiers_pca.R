@@ -9,8 +9,7 @@ NULL
 
 #' @rdname ml_pca_tidiers
 #' @export
-tidy.ml_model_pca <- function(x, ...){
-
+tidy.ml_model_pca <- function(x, ...) {
   dplyr::as_tibble(x$pc, rownames = "features")
 }
 
@@ -19,11 +18,11 @@ tidy.ml_model_pca <- function(x, ...){
 #'
 #' @export
 augment.ml_model_pca <- function(x, newdata = NULL,
-                                                 ...){
+                                 ...) {
 
   # if the user doesn't provide a new data, this funcion will
   # use the training set
-  if (is.null(newdata)){
+  if (is.null(newdata)) {
     newdata <- x$dataset
   }
 
@@ -33,10 +32,11 @@ augment.ml_model_pca <- function(x, newdata = NULL,
 #' @rdname ml_pca_tidiers
 #' @export
 glance.ml_model_pca <- function(x, ...) {
-
   explained_variance <- x$explained_variance
-  names(explained_variance) <- purrr::map_chr(names(explained_variance),
-                 function(e) paste0("explained_variance_", e))
+  names(explained_variance) <- purrr::map_chr(
+    names(explained_variance),
+    function(e) paste0("explained_variance_", e)
+  )
 
   k <- c("k" = x$k)
 
@@ -44,4 +44,3 @@ glance.ml_model_pca <- function(x, ...) {
     as.list() %>%
     dplyr::as_tibble()
 }
-

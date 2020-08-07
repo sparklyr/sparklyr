@@ -31,8 +31,7 @@
 #'
 #' ml_binary_classification_evaluator(pred)
 #' }
-
-
+#'
 #' @export
 ml_linear_svc <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
                           max_iter = 100, standardization = TRUE, weight_col = NULL,
@@ -51,7 +50,6 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
                                            features_col = "features", label_col = "label",
                                            prediction_col = "prediction", raw_prediction_col = "rawPrediction",
                                            uid = random_string("linear_svc_"), ...) {
-
   .args <- list(
     fit_intercept = fit_intercept,
     reg_param = reg_param,
@@ -75,19 +73,23 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
     prediction_col = .args[["prediction_col"]]
   ) %>% (
     function(obj) {
-      do.call(invoke,
-              c(obj, "%>%", Filter(function(x) !is.null(x),
-                                   list(
-                                        list("setRawPredictionCol", .args[["raw_prediction_col"]]),
-                                        list("setFitIntercept", .args[["fit_intercept"]]),
-                                        list("setRegParam", .args[["reg_param"]]),
-                                        list("setMaxIter", .args[["max_iter"]]),
-                                        list("setStandardization", .args[["standardization"]]),
-                                        list("setTol", .args[["tol"]]),
-                                        list("setAggregationDepth", .args[["aggregation_depth"]]),
-                                        list("setThreshold", .args[["threshold"]]),
-                                        jobj_set_param_helper(obj, "setWeightCol", .args[["weight_col"]])))))
-
+      do.call(
+        invoke,
+        c(obj, "%>%", Filter(
+          function(x) !is.null(x),
+          list(
+            list("setRawPredictionCol", .args[["raw_prediction_col"]]),
+            list("setFitIntercept", .args[["fit_intercept"]]),
+            list("setRegParam", .args[["reg_param"]]),
+            list("setMaxIter", .args[["max_iter"]]),
+            list("setStandardization", .args[["standardization"]]),
+            list("setTol", .args[["tol"]]),
+            list("setAggregationDepth", .args[["aggregation_depth"]]),
+            list("setThreshold", .args[["threshold"]]),
+            jobj_set_param_helper(obj, "setWeightCol", .args[["weight_col"]])
+          )
+        ))
+      )
     })
 
   new_ml_linear_svc(jobj)
@@ -100,7 +102,6 @@ ml_linear_svc.ml_pipeline <- function(x, formula = NULL, fit_intercept = TRUE, r
                                       features_col = "features", label_col = "label",
                                       prediction_col = "prediction", raw_prediction_col = "rawPrediction",
                                       uid = random_string("linear_svc_"), ...) {
-
   stage <- ml_linear_svc.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -194,5 +195,6 @@ new_ml_linear_svc_model <- function(jobj) {
     intercept = invoke(jobj, "intercept"),
     threshold = invoke(jobj, "threshold"),
     weight_col = possibly_null(~ invoke(jobj, "weightCol"))(),
-    class = "ml_linear_svc_model")
+    class = "ml_linear_svc_model"
+  )
 }

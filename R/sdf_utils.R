@@ -10,22 +10,26 @@
 #'
 #' @param ... Spark DataFrames to cbind
 sdf_fast_bind_cols <- function(...) {
-
   dots <- list(...)
   n <- length(dots)
   self <- dots[[1]]
-  if (n == 1)
+  if (n == 1) {
     return(self)
+  }
 
   sc <- self %>%
     spark_dataframe() %>%
     spark_connection()
 
-  zip_sdf <- function(df1, df2) invoke_static(sc,
-                           "sparklyr.DFUtils",
-                           "zipDataFrames",
-                           spark_context(sc),
-                           df1, df2)
+  zip_sdf <- function(df1, df2) {
+    invoke_static(
+      sc,
+      "sparklyr.DFUtils",
+      "zipDataFrames",
+      spark_context(sc),
+      df1, df2
+    )
+  }
 
   Reduce(zip_sdf, lapply(dots, spark_dataframe)) %>%
     sdf_register()
@@ -45,11 +49,12 @@ sdf_debug_string <- function(x, print = TRUE) {
     spark_dataframe() %>%
     invoke("%>%", list("rdd"), list("toDebugString"))
 
-  if (print)
+  if (print) {
     cat(debug_string)
+  }
 
   debug_string %>%
-    strsplit("\n", fixed=TRUE) %>%
+    strsplit("\n", fixed = TRUE) %>%
     unlist() %>%
     invisible()
 }

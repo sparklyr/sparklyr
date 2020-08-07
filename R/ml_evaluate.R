@@ -77,13 +77,13 @@ ml_evaluate.ml_generalized_linear_regression_model <- function(x, dataset) {
 #' @rdname ml_evaluate
 #' @export
 ml_evaluate.ml_model_clustering <- function(x, dataset) {
-  if(inherits(x, "ml_model_lda")){
+  if (inherits(x, "ml_model_lda")) {
     stop("`ml_evaluate()` is not supported for `ml_model_lda`.", call. = FALSE)
   }
 
   sc <- spark_connection(x$model)
 
-  if(spark_version(sc) >= "2.3.0"){
+  if (spark_version(sc) >= "2.3.0") {
     prediction <- x %>%
       spark_jobj() %>%
       invoke("transform", spark_dataframe(dataset))
@@ -93,7 +93,7 @@ ml_evaluate.ml_model_clustering <- function(x, dataset) {
       invoke("evaluate", prediction)
 
     dplyr::tibble(Silhouette = silhouette)
-  } else{
+  } else {
     stop("Silhouette is only available for spark 2.3.0 or greater.")
   }
 }
@@ -128,7 +128,9 @@ evaluate_ml_transformer <- function(x, dataset) {
     invoke("evaluate", spark_dataframe(dataset))
 }
 
-logreg_summary <- function(jobj) tryCatch(
-  new_ml_binary_logistic_regression_summary(invoke(jobj, "asBinary")),
-  error = function(e) new_ml_logistic_regression_summary(jobj)
-)
+logreg_summary <- function(jobj) {
+  tryCatch(
+    new_ml_binary_logistic_regression_summary(invoke(jobj, "asBinary")),
+    error = function(e) new_ml_logistic_regression_summary(jobj)
+  )
+}

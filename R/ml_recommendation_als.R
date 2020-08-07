@@ -82,7 +82,6 @@ ml_als.spark_connection <- function(x, formula = NULL, rating_col = "rating", us
                                     num_item_blocks = 10, checkpoint_interval = 10,
                                     cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
                                     final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
-
   .args <- list(
     rating_col = rating_col,
     user_col = user_col,
@@ -105,34 +104,39 @@ ml_als.spark_connection <- function(x, formula = NULL, rating_col = "rating", us
   jobj <- invoke_new(x, "org.apache.spark.ml.recommendation.ALS", uid) %>%
     (
       function(obj) {
-        do.call(invoke,
-                c(obj, "%>%", Filter(function(x) !is.null(x),
-                                     list(
-                                          list("setRatingCol", .args[["rating_col"]]),
-                                          list("setUserCol", .args[["user_col"]]),
-                                          list("setItemCol", .args[["item_col"]]),
-                                          list("setRank", .args[["rank"]]),
-                                          list("setRegParam", .args[["reg_param"]]),
-                                          list("setImplicitPrefs", .args[["implicit_prefs"]]),
-                                          list("setAlpha", .args[["alpha"]]),
-                                          list("setNonnegative", .args[["nonnegative"]]),
-                                          list("setMaxIter", .args[["max_iter"]]),
-                                          list("setNumUserBlocks", .args[["num_user_blocks"]]),
-                                          list("setNumItemBlocks", .args[["num_item_blocks"]]),
-                                          list("setCheckpointInterval", .args[["checkpoint_interval"]]),
-                                          jobj_set_param_helper(
-                                            obj, "setIntermediateStorageLevel", .args[["intermediate_storage_level"]],
-                                            "2.0.0", "MEMORY_AND_DISK"),
-                                          jobj_set_param_helper(
-                                            obj, "setFinalStorageLevel", .args[["final_storage_level"]],
-                                            "2.0.0","MEMORY_AND_DISK"
-                                          ),
-                                          jobj_set_param_helper(
-                                            obj, "setColdStartStrategy", .args[["cold_start_strategy"]],
-                                            "2.2.0", "nan"
-                                          )))))
-      }
-    )
+        do.call(
+          invoke,
+          c(obj, "%>%", Filter(
+            function(x) !is.null(x),
+            list(
+              list("setRatingCol", .args[["rating_col"]]),
+              list("setUserCol", .args[["user_col"]]),
+              list("setItemCol", .args[["item_col"]]),
+              list("setRank", .args[["rank"]]),
+              list("setRegParam", .args[["reg_param"]]),
+              list("setImplicitPrefs", .args[["implicit_prefs"]]),
+              list("setAlpha", .args[["alpha"]]),
+              list("setNonnegative", .args[["nonnegative"]]),
+              list("setMaxIter", .args[["max_iter"]]),
+              list("setNumUserBlocks", .args[["num_user_blocks"]]),
+              list("setNumItemBlocks", .args[["num_item_blocks"]]),
+              list("setCheckpointInterval", .args[["checkpoint_interval"]]),
+              jobj_set_param_helper(
+                obj, "setIntermediateStorageLevel", .args[["intermediate_storage_level"]],
+                "2.0.0", "MEMORY_AND_DISK"
+              ),
+              jobj_set_param_helper(
+                obj, "setFinalStorageLevel", .args[["final_storage_level"]],
+                "2.0.0", "MEMORY_AND_DISK"
+              ),
+              jobj_set_param_helper(
+                obj, "setColdStartStrategy", .args[["cold_start_strategy"]],
+                "2.2.0", "nan"
+              )
+            )
+          ))
+        )
+      })
 
   new_ml_als(jobj)
 }
@@ -144,7 +148,6 @@ ml_als.ml_pipeline <- function(x, formula = NULL, rating_col = "rating", user_co
                                num_item_blocks = 10, checkpoint_interval = 10,
                                cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
                                final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
-
   stage <- ml_als.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -176,7 +179,6 @@ ml_als.tbl_spark <- function(x, formula = NULL, rating_col = "rating", user_col 
                              num_item_blocks = 10, checkpoint_interval = 10,
                              cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
                              final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
-
   formula <- ml_standardize_formula(formula)
 
   stage <- ml_als.spark_connection(
@@ -263,7 +265,8 @@ new_ml_als_model <- function(jobj) {
     user_col = invoke(jobj, "getUserCol"),
     item_col = invoke(jobj, "getItemCol"),
     prediction_col = invoke(jobj, "getPredictionCol"),
-    class = "ml_als_model")
+    class = "ml_als_model"
+  )
 }
 
 # Hideous hack
@@ -278,20 +281,20 @@ utils::globalVariables("explode")
 #'
 #' @export
 ml_recommend <- function(model, type = c("items", "users"), n = 1) {
-
   version <- spark_jobj(model) %>%
     spark_connection() %>%
     spark_version()
 
   if (version < "2.2.0") stop("`ml_recommend()`` is only supported for Spark 2.2+.", call. = FALSE)
 
-  model <-  if (inherits(model, "ml_model_als")) model$model else model
+  model <- if (inherits(model, "ml_model_als")) model$model else model
 
   type <- match.arg(type)
   n <- cast_scalar_integer(n)
   (switch(type,
-          items = model$recommend_for_all_users,
-          users = model$recommend_for_all_items))(n) %>%
+    items = model$recommend_for_all_users,
+    users = model$recommend_for_all_items
+  ))(n) %>%
     dplyr::mutate(recommendations = explode(!!as.name("recommendations"))) %>%
     sdf_separate_column("recommendations")
 }

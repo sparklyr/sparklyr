@@ -28,7 +28,9 @@ test_that("ml_naive_bayes() works properly", {
   sample_data_path <- get_sample_data_path("sample_libsvm_data.txt")
 
   sample_data <- spark_read_libsvm(sc, "sample_data",
-                                   sample_data_path, overwrite = TRUE)
+    sample_data_path,
+    overwrite = TRUE
+  )
 
   sample_data_partitioned <- sample_data %>%
     sdf_random_split(weights = c(train = 0.7, test = 0.3), seed = 1)
@@ -38,10 +40,14 @@ test_that("ml_naive_bayes() works properly", {
   predictions <- model %>%
     ml_predict(sample_data_partitioned$test)
 
-  expect_equal(ml_multiclass_classification_evaluator(
-    predictions, label_col = "label", prediction_col = "prediction",
-    metric_name = "accuracy"),
-    1.0)
+  expect_equal(
+    ml_multiclass_classification_evaluator(
+      predictions,
+      label_col = "label", prediction_col = "prediction",
+      metric_name = "accuracy"
+    ),
+    1.0
+  )
 })
 
 test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {
@@ -83,6 +89,7 @@ test_that("ml_naive_bayes() print outputs are correct", {
   )
   expect_output_file(
     summary(m),
-    output_file("print/naive_bayes.txt"), update = FALSE
+    output_file("print/naive_bayes.txt"),
+    update = FALSE
   )
 })

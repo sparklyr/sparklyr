@@ -43,7 +43,7 @@ sdf_seq <- function(sc, from = 1L, to = 1L, by = 1L, repartition = type, type = 
   repartition <- cast_scalar_integer(repartition)
 
   rdd <- invoke(spark_context(sc), "range", from, to, by, repartition)
-  rdd <- invoke_static(sc, "sparklyr.Utils", paste0("mapRdd", type_name , "ToRddRow"), rdd)
+  rdd <- invoke_static(sc, "sparklyr.Utils", paste0("mapRdd", type_name, "ToRddRow"), rdd)
 
   schema <- invoke_static(sc, "sparklyr.Utils", paste0("buildStructTypeFor", type_name, "Field"))
   sdf <- invoke(hive_context(sc), "createDataFrame", rdd, schema)

@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' sc <-  spark_connect(master = "local")
+#' sc <- spark_connect(master = "local")
 #'
 #' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 #' partitions <- iris_tbl %>%
@@ -26,14 +26,13 @@
 #' iris_test <- partitions$test
 #'
 #' mlp_model <- iris_training %>%
-#'   ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4,3,3))
+#'   ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4, 3, 3))
 #'
 #' pred <- ml_predict(mlp_model, iris_test)
 #'
 #' ml_multiclass_classification_evaluator(pred)
 #' }
-
-
+#'
 #' @export
 ml_multilayer_perceptron_classifier <- function(x, formula = NULL, layers = NULL, max_iter = 100,
                                                 step_size = 0.03, tol = 1e-06, block_size = 128,
@@ -56,7 +55,6 @@ ml_multilayer_perceptron_classifier.spark_connection <- function(x, formula = NU
                                                                  prediction_col = "prediction", probability_col = "probability",
                                                                  raw_prediction_col = "rawPrediction",
                                                                  uid = random_string("multilayer_perceptron_classifier_"), ...) {
-
   .args <- list(
     layers = layers,
     max_iter = max_iter,
@@ -93,11 +91,14 @@ ml_multilayer_perceptron_classifier.spark_connection <- function(x, formula = NU
     jobj_set_param("setRawPredictionCol", .args[["raw_prediction_col"]], "2.3.0", "rawPrediction")
 
 
-  if(!is.null(initial_weights) && spark_version(x) >= "2.0.0")
-    jobj <- invoke_static(spark_connection(jobj),
-                          "sparklyr.MLUtils2",
-                          "setInitialWeights",
-                          jobj, .args[["initial_weights"]])
+  if (!is.null(initial_weights) && spark_version(x) >= "2.0.0") {
+    jobj <- invoke_static(
+      spark_connection(jobj),
+      "sparklyr.MLUtils2",
+      "setInitialWeights",
+      jobj, .args[["initial_weights"]]
+    )
+  }
 
   new_ml_multilayer_perceptron_classifier(jobj)
 }
@@ -228,17 +229,20 @@ new_ml_multilayer_perceptron_classification_model <- function(jobj) {
       jobj,
       layers = layers,
       weights = read_spark_vector(jobj, "weights"),
-      class = "ml_multilayer_perceptron_classification_model")
+      class = "ml_multilayer_perceptron_classification_model"
+    )
   } else {
     layers <- invoke(jobj, "layers")
 
-    if ("spark_jobj" %in% class(layers))
+    if ("spark_jobj" %in% class(layers)) {
       layers <- invoke(jobj, "%>%", list("get", layers), list("get"))
+    }
 
     new_ml_probabilistic_classification_model(
       jobj,
       weights = read_spark_vector(jobj, "weights"),
       layers = layers,
-      class = "ml_multilayer_perceptron_classification_model")
+      class = "ml_multilayer_perceptron_classification_model"
+    )
   }
 }

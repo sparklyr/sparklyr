@@ -24,7 +24,9 @@ getSerdeType <- function(object) {
     type
   } else {
     # Check if all elements are of same type
-    elemType <- unique(sapply(object, function(elem) { getSerdeType(elem) }))
+    elemType <- unique(sapply(object, function(elem) {
+      getSerdeType(elem)
+    }))
     if (length(elemType) <= 1) {
 
       # Check that there are no NAs in arrays since they are unsupported in scala
@@ -56,25 +58,26 @@ writeObject <- function(con, object, writeType = TRUE) {
     writeType(con, serdeType)
   }
   switch(serdeType,
-         NULL = writeVoid(con),
-         integer = writeInt(con, object),
-         character = writeString(con, object),
-         logical = writeBoolean(con, object),
-         double = writeDouble(con, object),
-         numeric = writeDouble(con, object),
-         raw = writeRaw(con, object),
-         array = writeArray(con, object),
-         list = writeList(con, object),
-         struct = writeList(con, object),
-         spark_jobj = writeJobj(con, object),
-         environment = writeEnv(con, object),
-         Date = writeDate(con, object),
-         POSIXlt = writeTime(con, object),
-         POSIXct = writeTime(con, object),
-         factor = writeFactor(con, object),
-         `data.frame` = writeList(con, object),
-         spark_apply_binary_result = writeList(con, object),
-         stop("Unsupported type '", serdeType, "' for serialization"))
+    NULL = writeVoid(con),
+    integer = writeInt(con, object),
+    character = writeString(con, object),
+    logical = writeBoolean(con, object),
+    double = writeDouble(con, object),
+    numeric = writeDouble(con, object),
+    raw = writeRaw(con, object),
+    array = writeArray(con, object),
+    list = writeList(con, object),
+    struct = writeList(con, object),
+    spark_jobj = writeJobj(con, object),
+    environment = writeEnv(con, object),
+    Date = writeDate(con, object),
+    POSIXlt = writeTime(con, object),
+    POSIXct = writeTime(con, object),
+    factor = writeFactor(con, object),
+    `data.frame` = writeList(con, object),
+    spark_apply_binary_result = writeList(con, object),
+    stop("Unsupported type '", serdeType, "' for serialization")
+  )
 }
 
 writeVoid <- function(con) {
@@ -114,25 +117,26 @@ writeRaw <- function(con, batch) {
 
 writeType <- function(con, class) {
   type <- switch(class,
-                 NULL = "n",
-                 integer = "i",
-                 character = "c",
-                 logical = "b",
-                 double = "d",
-                 numeric = "d",
-                 raw = "r",
-                 array = "a",
-                 list = "l",
-                 struct = "s",
-                 spark_jobj = "j",
-                 environment = "e",
-                 Date = "D",
-                 POSIXlt = "t",
-                 POSIXct = "t",
-                 factor = "c",
-                 `data.frame` = "l",
-                 spark_apply_binary_result = "l",
-                 stop("Unsupported type '", class, "' for serialization"))
+    NULL = "n",
+    integer = "i",
+    character = "c",
+    logical = "b",
+    double = "d",
+    numeric = "d",
+    raw = "r",
+    array = "a",
+    list = "l",
+    struct = "s",
+    spark_jobj = "j",
+    environment = "e",
+    Date = "D",
+    POSIXlt = "t",
+    POSIXct = "t",
+    factor = "c",
+    `data.frame` = "l",
+    spark_apply_binary_result = "l",
+    stop("Unsupported type '", class, "' for serialization")
+  )
   writeBin(charToRaw(type), con)
 }
 
@@ -171,7 +175,9 @@ writeEnv <- function(con, env) {
   writeInt(con, len)
   if (len > 0) {
     writeArray(con, as.list(ls(env)))
-    vals <- lapply(ls(env), function(x) { env[[x]] })
+    vals <- lapply(ls(env), function(x) {
+      env[[x]]
+    })
     writeList(con, as.list(vals))
   }
 }

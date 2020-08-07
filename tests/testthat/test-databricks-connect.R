@@ -25,6 +25,6 @@ test_that("csv_file is disabled when using databricks-connect", {
 test_that("spark local property is set", {
   sc <- testthat_spark_connection()
 
-  client_type = spark_context(sc) %>% invoke("getLocalProperty", "spark.databricks.service.client.type")
+  client_type <- spark_context(sc) %>% invoke("getLocalProperty", "spark.databricks.service.client.type")
   expect_equal(client_type, "sparklyr")
 })

@@ -3,7 +3,9 @@ create_hive_context <- function(sc) {
 }
 
 apply_config <- function(object, params, method, prefix) {
-  if (!length(params)) return(object)
+  if (!length(params)) {
+    return(object)
+  }
 
   params %>%
     purrr::map_if(is.logical, ~ (if (.x) "true" else "false")) %>%

@@ -1,10 +1,9 @@
 # nocov start
 
 spark_worker_connect <- function(
-  sessionId,
-  backendPort = 8880,
-  config = list()) {
-
+                                 sessionId,
+                                 backendPort = 8880,
+                                 config = list()) {
   gatewayPort <- spark_config_value(config, "sparklyr.worker.gateway.port", backendPort)
 
   gatewayAddress <- spark_config_value(config, "sparklyr.worker.gateway.address", "localhost")
@@ -13,32 +12,38 @@ spark_worker_connect <- function(
   worker_log("is connecting to backend using port ", gatewayPort)
 
   gatewayInfo <- spark_connect_gateway(gatewayAddress,
-                                       gatewayPort,
-                                       sessionId,
-                                       config = config,
-                                       isStarting = TRUE)
+    gatewayPort,
+    sessionId,
+    config = config,
+    isStarting = TRUE
+  )
 
   worker_log("is connected to backend")
   worker_log("is connecting to backend session")
 
-  tryCatch({
-    interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
+  tryCatch(
+    {
+      interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
 
-    backend <- socketConnection(host = "localhost",
-                                port = gatewayInfo$backendPort,
-                                server = FALSE,
-                                blocking = interval > 0,
-                                open = "wb",
-                                timeout = interval)
+      backend <- socketConnection(
+        host = "localhost",
+        port = gatewayInfo$backendPort,
+        server = FALSE,
+        blocking = interval > 0,
+        open = "wb",
+        timeout = interval
+      )
 
-    class(backend) <- c(class(backend), "shell_backend")
-  }, error = function(err) {
-    close(gatewayInfo$gateway)
+      class(backend) <- c(class(backend), "shell_backend")
+    },
+    error = function(err) {
+      close(gatewayInfo$gateway)
 
-    stop(
-      "Failed to open connection to backend:", err$message
-    )
-  })
+      stop(
+        "Failed to open connection to backend:", err$message
+      )
+    }
+  )
 
   worker_log("is connected to backend session")
 

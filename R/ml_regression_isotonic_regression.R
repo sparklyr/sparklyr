@@ -42,7 +42,6 @@ ml_isotonic_regression.spark_connection <- function(x, formula = NULL, feature_i
                                                     weight_col = NULL, features_col = "features",
                                                     label_col = "label", prediction_col = "prediction",
                                                     uid = random_string("isotonic_regression_"), ...) {
-
   .args <- list(
     feature_index = feature_index,
     isotonic = isotonic,
@@ -71,7 +70,6 @@ ml_isotonic_regression.ml_pipeline <- function(x, formula = NULL, feature_index 
                                                weight_col = NULL, features_col = "features",
                                                label_col = "label", prediction_col = "prediction",
                                                uid = random_string("isotonic_regression_"), ...) {
-
   stage <- ml_isotonic_regression.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -141,5 +139,6 @@ new_ml_isotonic_regression_model <- function(jobj) {
     boundaries = function() read_spark_vector(jobj, "boundaries"), # lazy val
     predictions = function() read_spark_vector(jobj, "predictions"), # lazy val
     feature_index = invoke(jobj, "getFeatureIndex"),
-    class = "ml_isotonic_regression_model")
+    class = "ml_isotonic_regression_model"
+  )
 }

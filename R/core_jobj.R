@@ -23,7 +23,9 @@ spark_jobj_id <- function(x) {
 #' @export
 spark_jobj.default <- function(x, ...) {
   stop("Unable to retrieve a spark_jobj from object of class ",
-       paste(class(x), collapse = " "), call. = FALSE)
+    paste(class(x), collapse = " "),
+    call. = FALSE
+  )
 }
 
 #' @export
@@ -96,42 +98,55 @@ jobj_create <- function(con, objId) {
 }
 
 jobj_info <- function(jobj) {
-  if (!inherits(jobj, "spark_jobj"))
+  if (!inherits(jobj, "spark_jobj")) {
     stop("'jobj_info' called on non-jobj")
+  }
 
   class <- NULL
   repr <- NULL
 
-  tryCatch({
-    class <- invoke(jobj, "getClass")
-    if (inherits(class, "spark_jobj"))
-      class <- invoke(class, "getName")
-  }, error = function(e) {
-  })
-  tryCatch({
-    repr <- invoke(jobj, "toString")
-  }, error = function(e) {
-  })
+  tryCatch(
+    {
+      class <- invoke(jobj, "getClass")
+      if (inherits(class, "spark_jobj")) {
+        class <- invoke(class, "getName")
+      }
+    },
+    error = function(e) {
+    }
+  )
+  tryCatch(
+    {
+      repr <- invoke(jobj, "toString")
+    },
+    error = function(e) {
+    }
+  )
   list(
     class = class,
-    repr  = repr
+    repr = repr
   )
 }
 
 jobj_inspect <- function(jobj) {
   print(jobj)
-  if (!connection_is_open(spark_connection(jobj)))
+  if (!connection_is_open(spark_connection(jobj))) {
     return(jobj)
+  }
 
   class <- invoke(jobj, "getClass")
 
   cat("Fields:\n")
   fields <- invoke(class, "getDeclaredFields")
-  lapply(fields, function(field) { print(field) })
+  lapply(fields, function(field) {
+    print(field)
+  })
 
   cat("Methods:\n")
   methods <- invoke(class, "getDeclaredMethods")
-  lapply(methods, function(method) { print(method) })
+  lapply(methods, function(method) {
+    print(method)
+  })
 
   jobj
 }
@@ -167,7 +182,6 @@ clear_jobjs <- function() {
 }
 
 attach_connection <- function(jobj, connection) {
-
   if (inherits(jobj, "spark_jobj")) {
     jobj$connection <- connection
   }

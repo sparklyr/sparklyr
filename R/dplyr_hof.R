@@ -8,10 +8,13 @@ NULL
 
 # throw an error if f is not a valid lambda expression
 validate_lambda <- function(f) {
-  if (! "spark_sql_lambda" %in% class(f) && ! "formula" %in% class(f))
-    stop("Expected 'f' to be a lambda expression (e.g., 'a %->% (a + 1)' or ",
-         "'.(a, b) %->% (a + b + 1)') or a formula (e.g., '~ .x + 1' or ",
-         "'~ .x + .y + 1').")
+  if (!"spark_sql_lambda" %in% class(f) && !"formula" %in% class(f)) {
+    stop(
+      "Expected 'f' to be a lambda expression (e.g., 'a %->% (a + 1)' or ",
+      "'.(a, b) %->% (a + b + 1)') or a formula (e.g., '~ .x + 1' or ",
+      "'~ .x + .y + 1')."
+    )
+  }
 }
 
 translate_formula <- function(f) {
@@ -23,10 +26,11 @@ translate_formula <- function(f) {
   f <- do.call(substitute, list(f, list(.x = var_x, .y = var_y, .z = var_z)))
   vars <- stringr::str_sort(all.vars(f))
   params_sql <- (
-    if (length(vars) > 1)
+    if (length(vars) > 1) {
       paste0("(", paste0(vars, collapse = ", "), ")")
-    else
+    } else {
       as.character(vars)
+    }
   )
   body_sql <- dbplyr::translate_sql_(list(f[[2]]), con = dbplyr::simulate_dbi())
   lambda <- dbplyr::sql(paste(params_sql, "->", body_sql))
@@ -36,31 +40,35 @@ translate_formula <- function(f) {
 
 process_lambda <- function(f) {
   validate_lambda(f)
-  if ("formula" %in% class(f))
+  if ("formula" %in% class(f)) {
     f <- translate_formula(f)
-  else
+  } else {
     f
+  }
 }
 
 process_expr <- function(x, expr) {
-  if (is.null(expr))
+  if (is.null(expr)) {
     as.name(tail(colnames(x), 1))
-  else
+  } else {
     expr
+  }
 }
 
 process_col <- function(x, col, default_idx) {
-  if (is.null(col))
+  if (is.null(col)) {
     as.name(colnames(x)[[default_idx]])
-  else
+  } else {
     col
+  }
 }
 
 process_dest_col <- function(expr, dest_col) {
-  if (is.null(dest_col))
+  if (is.null(dest_col)) {
     expr
-  else
+  } else {
     dest_col
+  }
 }
 
 #' Infix operator for composing a lambda expression
@@ -82,7 +90,7 @@ process_dest_col <- function(expr, dest_col) {
 #' a %->% (mean(a) + 1) # translates to <SQL> `a` -> (AVG(`a`) OVER () + 1.0)
 #'
 #' .(a, b) %->% (a < 1 && b > 1) # translates to <SQL> `a`,`b` -> (`a` < 1.0 AND `b` > 1.0)
-#'}
+#' }
 #' @export
 `%->%` <- function(params, body) {
   `.` <- function(...) {
@@ -93,12 +101,13 @@ process_dest_col <- function(expr, dest_col) {
     paste0("(", params, ")")
   }
   process_params <- function(x) {
-    if ("call" %in% class(x))
+    if ("call" %in% class(x)) {
       # params is of the form '.(<comma-separated list of variables>)'
       eval(x)
-    else
+    } else {
       # params consists of a single variable
       x
+    }
   }
 
   params_sql <- rlang::enexpr(params) %>%
@@ -151,19 +160,18 @@ do.mutate <- function(x, dest_col_name, sql, ...) {
 #'
 #' @export
 hof_transform <- function(
-  x,
-  func,
-  expr = NULL,
-  dest_col = NULL,
-  ...
-) {
+                          x,
+                          func,
+                          expr = NULL,
+                          dest_col = NULL,
+                          ...) {
   func <- process_lambda(func)
   expr <- process_expr(x, rlang::enexpr(expr))
   dest_col <- process_dest_col(expr, rlang::enexpr(dest_col))
 
   sql <- paste(
     "TRANSFORM(",
-    as.character(dbplyr::translate_sql(!! expr)),
+    as.character(dbplyr::translate_sql(!!expr)),
     ",",
     as.character(func),
     ")"
@@ -203,7 +211,7 @@ hof_filter <- function(x, func, expr = NULL, dest_col = NULL, ...) {
 
   sql <- paste(
     "FILTER(",
-    as.character(dbplyr::translate_sql(!! expr)),
+    as.character(dbplyr::translate_sql(!!expr)),
     ",",
     as.character(func),
     ")"
@@ -245,14 +253,13 @@ hof_filter <- function(x, func, expr = NULL, dest_col = NULL, ...) {
 #'
 #' @export
 hof_aggregate <- function(
-  x,
-  start,
-  merge,
-  finish = NULL,
-  expr = NULL,
-  dest_col = NULL,
-  ...
-) {
+                          x,
+                          start,
+                          merge,
+                          finish = NULL,
+                          expr = NULL,
+                          dest_col = NULL,
+                          ...) {
   merge <- process_lambda(merge)
   args <- list(...)
   if (!identical(finish, NULL)) finish <- process_lambda(finish)
@@ -261,9 +268,9 @@ hof_aggregate <- function(
 
   sql <- do.call(paste, as.list(c(
     "AGGREGATE(",
-    as.character(dbplyr::translate_sql(!! expr)),
+    as.character(dbplyr::translate_sql(!!expr)),
     ",",
-    as.character(dbplyr::translate_sql(!! rlang::enexpr(start))),
+    as.character(dbplyr::translate_sql(!!rlang::enexpr(start))),
     ",",
     as.character(merge),
     if (identical(finish, NULL)) NULL else c(",", as.character(finish)),
@@ -294,7 +301,7 @@ hof_exists <- function(x, pred, expr = NULL, dest_col = NULL, ...) {
 
   sql <- paste(
     "EXISTS(",
-    as.character(dbplyr::translate_sql(!! expr)),
+    as.character(dbplyr::translate_sql(!!expr)),
     ",",
     as.character(pred),
     ")"
@@ -332,20 +339,20 @@ hof_exists <- function(x, pred, expr = NULL, dest_col = NULL, ...) {
 #'   tibble::tibble(
 #'     left = list(1:5, 21:25),
 #'     right = list(6:10, 16:20),
-#'     res = c(0, 0))
+#'     res = c(0, 0)
+#'   )
 #' ) %>%
 #'   hof_zip_with(~ .x * .y)
 #' }
 #'
 #' @export
 hof_zip_with <- function(
-  x,
-  func,
-  dest_col = NULL,
-  left = NULL,
-  right = NULL,
-  ...
-) {
+                         x,
+                         func,
+                         dest_col = NULL,
+                         left = NULL,
+                         right = NULL,
+                         ...) {
   func <- process_lambda(func)
   dest_col <- process_col(
     x,
@@ -357,9 +364,9 @@ hof_zip_with <- function(
 
   sql <- paste(
     "ZIP_WITH(",
-    as.character(dbplyr::translate_sql(!! left)),
+    as.character(dbplyr::translate_sql(!!left)),
     ",",
-    as.character(dbplyr::translate_sql(!! right)),
+    as.character(dbplyr::translate_sql(!!right)),
     ",",
     as.character(func),
     ")"
@@ -402,19 +409,18 @@ hof_zip_with <- function(
 #'
 #' @export
 hof_array_sort <- function(
-  x,
-  func,
-  expr = NULL,
-  dest_col = NULL,
-  ...
-) {
+                           x,
+                           func,
+                           expr = NULL,
+                           dest_col = NULL,
+                           ...) {
   func <- process_lambda(func)
   expr <- process_expr(x, rlang::enexpr(expr))
   dest_col <- process_dest_col(expr, rlang::enexpr(dest_col))
 
   sql <- paste(
     "ARRAY_SORT(",
-    as.character(dbplyr::translate_sql(!! expr)),
+    as.character(dbplyr::translate_sql(!!expr)),
     ",",
     as.character(func),
     ")"
@@ -449,19 +455,18 @@ hof_array_sort <- function(
 #'
 #' @export
 hof_map_filter <- function(
-  x,
-  func,
-  expr = NULL,
-  dest_col = NULL,
-  ...
-) {
+                           x,
+                           func,
+                           expr = NULL,
+                           dest_col = NULL,
+                           ...) {
   func <- process_lambda(func)
   expr <- process_expr(x, rlang::enexpr(expr))
   dest_col <- process_dest_col(expr, rlang::enexpr(dest_col))
 
   sql <- paste(
     "MAP_FILTER(",
-    as.character(dbplyr::translate_sql(!! expr)),
+    as.character(dbplyr::translate_sql(!!expr)),
     ",",
     as.character(func),
     ")"
@@ -495,25 +500,24 @@ hof_map_filter <- function(
 #' sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
 #'
 #' all_positive_tbl <- sdf %>%
-#'  hof_forall(pred = ~ .x > 0, expr = y, dest_col = all_positive) %>%
-#'  dplyr::select(all_positive)
+#'   hof_forall(pred = ~ .x > 0, expr = y, dest_col = all_positive) %>%
+#'   dplyr::select(all_positive)
 #' }
 #'
 #' @export
 hof_forall <- function(
-  x,
-  pred,
-  expr = NULL,
-  dest_col = NULL,
-  ...
-) {
+                       x,
+                       pred,
+                       expr = NULL,
+                       dest_col = NULL,
+                       ...) {
   pred <- process_lambda(pred)
   expr <- process_expr(x, rlang::enexpr(expr))
   dest_col <- process_dest_col(expr, rlang::enexpr(dest_col))
 
   sql <- paste(
     "FORALL(",
-    as.character(dbplyr::translate_sql(!! expr)),
+    as.character(dbplyr::translate_sql(!!expr)),
     ",",
     as.character(pred),
     ")"
@@ -547,19 +551,18 @@ hof_forall <- function(
 #'
 #' @export
 hof_transform_keys <- function(
-  x,
-  func,
-  expr = NULL,
-  dest_col = NULL,
-  ...
-) {
+                               x,
+                               func,
+                               expr = NULL,
+                               dest_col = NULL,
+                               ...) {
   func <- process_lambda(func)
   expr <- process_expr(x, rlang::enexpr(expr))
   dest_col <- process_dest_col(expr, rlang::enexpr(dest_col))
 
   sql <- paste(
     "TRANSFORM_KEYS(",
-    as.character(dbplyr::translate_sql(!! expr)),
+    as.character(dbplyr::translate_sql(!!expr)),
     ",",
     as.character(func),
     ")"
@@ -593,19 +596,18 @@ hof_transform_keys <- function(
 #'
 #' @export
 hof_transform_values <- function(
-  x,
-  func,
-  expr = NULL,
-  dest_col = NULL,
-  ...
-) {
+                                 x,
+                                 func,
+                                 expr = NULL,
+                                 dest_col = NULL,
+                                 ...) {
   func <- process_lambda(func)
   expr <- process_expr(x, rlang::enexpr(expr))
   dest_col <- process_dest_col(expr, rlang::enexpr(dest_col))
 
   sql <- paste(
     "TRANSFORM_VALUES(",
-    as.character(dbplyr::translate_sql(!! expr)),
+    as.character(dbplyr::translate_sql(!!expr)),
     ",",
     as.character(func),
     ")"
@@ -664,13 +666,12 @@ hof_transform_values <- function(
 #'
 #' @export
 hof_map_zip_with <- function(
-  x,
-  func,
-  dest_col = NULL,
-  map1 = NULL,
-  map2 = NULL,
-  ...
-) {
+                             x,
+                             func,
+                             dest_col = NULL,
+                             map1 = NULL,
+                             map2 = NULL,
+                             ...) {
   func <- process_lambda(func)
   dest_col <- process_col(
     x,
@@ -682,9 +683,9 @@ hof_map_zip_with <- function(
 
   sql <- paste(
     "MAP_ZIP_WITH(",
-    as.character(dbplyr::translate_sql(!! map1)),
+    as.character(dbplyr::translate_sql(!!map1)),
     ",",
-    as.character(dbplyr::translate_sql(!! map2)),
+    as.character(dbplyr::translate_sql(!!map2)),
     ",",
     as.character(func),
     ")"

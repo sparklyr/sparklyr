@@ -1,6 +1,5 @@
 #' @importFrom jsonlite fromJSON
-stream_progress <- function(stream)
-{
+stream_progress <- function(stream) {
   lastProgress <- invoke(stream, "lastProgress")
 
   if (is.null(lastProgress)) {
@@ -36,10 +35,8 @@ stream_progress <- function(stream)
 #' @import r2d3
 #' @export
 stream_view <- function(
-  stream,
-  ...
-)
-{
+                        stream,
+                        ...) {
   if (!"shiny" %in% installed.packages()) stop("The 'shiny' package is required for this operation.")
 
   validate <- stream_progress(stream)
@@ -116,13 +113,13 @@ stream_view <- function(
 #'   back to the \code{stats} parameter to continue aggregating streaming stats.
 #'
 #' @examples
-#'\dontrun{
+#' \dontrun{
 #' sc <- spark_connect(master = "local")
 #' sdf_len(sc, 10) %>%
 #'   spark_write_parquet(path = "parquet-in")
 #'
 #' stream <- stream_read_parquet(sc, "parquet-in") %>%
-#'  stream_write_parquet("parquet-out")
+#'   stream_write_parquet("parquet-out")
 #'
 #' stream_stats(stream)
 #' }
@@ -176,12 +173,10 @@ stream_stats <- function(stream, stats = list()) {
 #' @import r2d3
 #' @export
 stream_render <- function(
-  stream = NULL,
-  collect = 10,
-  stats = NULL,
-  ...
-)
-{
+                          stream = NULL,
+                          collect = 10,
+                          stats = NULL,
+                          ...) {
   if (is.null(stats)) {
     stats <- stream_stats(stream)
 

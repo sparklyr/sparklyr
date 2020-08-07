@@ -13,17 +13,19 @@
 #'
 #' @export
 spark_home_dir <- function(version = NULL, hadoop_version = NULL) {
-  tryCatch({
-    installInfo <- spark_install_find(
-      version = version,
-      hadoop_version = hadoop_version
-    )
+  tryCatch(
+    {
+      installInfo <- spark_install_find(
+        version = version,
+        hadoop_version = hadoop_version
+      )
 
-    installInfo$sparkVersionDir
-  },
+      installInfo$sparkVersionDir
+    },
     error = function(e) {
       NULL
-    })
+    }
+  )
 }
 
 
@@ -49,10 +51,10 @@ spark_home_dir <- function(version = NULL, hadoop_version = NULL) {
 #' @export
 spark_home_set <- function(path = NULL, ...) {
   verbose <- spark_config_value(list(), "sparklyr.verbose", is.null(path))
-  if(is.null(path)) {
+  if (is.null(path)) {
     path <- spark_install_find()$sparkVersionDir
   }
-  if(verbose) {
+  if (verbose) {
     message("Setting SPARK_HOME environment variable to ", path)
   }
   Sys.setenv(SPARK_HOME = path)

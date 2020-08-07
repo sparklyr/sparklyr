@@ -1,30 +1,38 @@
 sparklyr_gateway_trouble_shooting_msg <- function() {
-  c("\n\n\nTry running `options(sparklyr.log.console = TRUE)` followed by ",
-    "`sc <- spark_connect(...)` for more debugging info.")
+  c(
+    "\n\n\nTry running `options(sparklyr.log.console = TRUE)` followed by ",
+    "`sc <- spark_connect(...)` for more debugging info."
+  )
 }
 
 wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {
-  waitSeconds <- if (isStarting)
+  waitSeconds <- if (isStarting) {
     spark_config_value(config, "sparklyr.connect.timeout", 60)
-  else
+  } else {
     spark_config_value(config, "sparklyr.gateway.timeout", 1)
+  }
 
   gateway <- NULL
   commandStart <- Sys.time()
 
   while (is.null(gateway) && Sys.time() < commandStart + waitSeconds) {
-    tryCatch({
-      suppressWarnings({
-        timeout <- spark_config_value(config, "sparklyr.gateway.interval", 1)
-        gateway <- socketConnection(host = gatewayAddress,
-                                    port = gatewayPort,
-                                    server = FALSE,
-                                    blocking = TRUE,
-                                    open = "rb",
-                                    timeout = timeout)
-      })
-    }, error = function(err) {
-    })
+    tryCatch(
+      {
+        suppressWarnings({
+          timeout <- spark_config_value(config, "sparklyr.gateway.interval", 1)
+          gateway <- socketConnection(
+            host = gatewayAddress,
+            port = gatewayPort,
+            server = FALSE,
+            blocking = TRUE,
+            open = "rb",
+            timeout = timeout
+          )
+        })
+      },
+      error = function(err) {
+      }
+    )
 
     startWait <- spark_config_value(config, "sparklyr.gateway.wait", 50 / 1000)
     Sys.sleep(startWait)
@@ -41,10 +49,11 @@ spark_gateway_commands <- function() {
 }
 
 query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
-  waitSeconds <- if (isStarting)
+  waitSeconds <- if (isStarting) {
     spark_config_value(config, "sparklyr.connect.timeout", 60)
-  else
+  } else {
     spark_config_value(config, "sparklyr.gateway.timeout", 1)
+  }
 
   writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
   writeInt(gateway, sessionId)
@@ -54,7 +63,7 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   redirectGatewayPort <- NULL
 
   commandStart <- Sys.time()
-  while(length(backendSessionId) == 0 && commandStart + waitSeconds > Sys.time()) {
+  while (length(backendSessionId) == 0 && commandStart + waitSeconds > Sys.time()) {
     backendSessionId <- readInt(gateway)
     Sys.sleep(0.1)
   }
@@ -63,15 +72,16 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   backendPort <- readInt(gateway)
 
   if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
-    if (isStarting)
+    if (isStarting) {
       stop(
         "Sparklyr gateway did not respond while retrieving ports information after ",
         waitSeconds,
         " seconds.",
         sparklyr_gateway_trouble_shooting_msg()
       )
-    else
+    } else {
       return(NULL)
+    }
   }
 
   list(
@@ -82,21 +92,22 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
 }
 
 spark_connect_gateway <- function(
-  gatewayAddress,
-  gatewayPort,
-  sessionId,
-  config,
-  isStarting = FALSE) {
+                                  gatewayAddress,
+                                  gatewayPort,
+                                  sessionId,
+                                  config,
+                                  isStarting = FALSE) {
 
   # try connecting to existing gateway
   gateway <- wait_connect_gateway(gatewayAddress, gatewayPort, config, isStarting)
 
   if (is.null(gateway)) {
-    if (isStarting)
+    if (isStarting) {
       stop(
         "Gateway in ", gatewayAddress, ":", gatewayPort, " did not respond.",
         sparklyr_gateway_trouble_shooting_msg()
       )
+    }
 
     NULL
   }
@@ -117,11 +128,12 @@ spark_connect_gateway <- function(
     if (redirectGatewayPort == 0) {
       close(gateway)
 
-      if (isStarting)
+      if (isStarting) {
         stop("Gateway in ", gatewayAddress, ":", gatewayPort, " does not have the requested session registered")
+      }
 
       NULL
-    } else if(redirectGatewayPort != gatewayPort) {
+    } else if (redirectGatewayPort != gatewayPort) {
       close(gateway)
 
       spark_connect_gateway(gatewayAddress, redirectGatewayPort, sessionId, config, isStarting)

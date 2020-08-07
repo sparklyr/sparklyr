@@ -1,5 +1,5 @@
 spark_version_clean <- function(version) {
-  gsub("\\.$","", gsub("([0-9]+\\.?)[^0-9\\.](.*)","\\1", version))
+  gsub("\\.$", "", gsub("([0-9]+\\.?)[^0-9\\.](.*)", "\\1", version))
 }
 
 #' Get the Spark Version Associated with a Spark Connection
@@ -23,8 +23,9 @@ spark_version <- function(sc) {
 spark_version.default <- function(sc) {
 
   # use cached value if available
-  if (!is.null(sc$state$spark_version))
+  if (!is.null(sc$state$spark_version)) {
     return(sc$state$spark_version)
+  }
 
   # get the version
   version <- invoke(spark_context(sc), "version")
@@ -83,7 +84,8 @@ spark_version_from_home <- function(spark_home, default = NULL) {
       )
 
       candidateFiles <- lapply(candidateVersions, function(e) {
-        c(e,
+        c(
+          e,
           list(
             files = list.files(
               file.path(spark_home, e$path),
@@ -107,7 +109,9 @@ spark_version_from_home <- function(spark_home, default = NULL) {
     useSparkSubmit = function() {
       version_output <- system2(
         file.path(spark_home, "bin", "spark-submit"),
-        "--version", stderr = TRUE, stdout = TRUE)
+        "--version",
+        stderr = TRUE, stdout = TRUE
+      )
 
       version_matches <- regmatches(version_output, regexec("   version (.*)$", version_output))
       if (any(sapply(version_matches, length) > 0)) {
@@ -119,18 +123,23 @@ spark_version_from_home <- function(spark_home, default = NULL) {
 
   for (versionAttempt in versionAttempts) {
     result <- versionAttempt()
-    if (length(result) > 0)
+    if (length(result) > 0) {
       return(spark_version_clean(result))
+    }
   }
 
   stop(
     "Failed to detect version from SPARK_HOME or SPARK_HOME_VERSION. ",
-    "Try passing the spark version explicitly.")
+    "Try passing the spark version explicitly."
+  )
 }
 
 spark_version_latest <- function(version = NULL) {
   versions <- spark_available_versions(show_minor = TRUE, show_future = TRUE)$spark
 
-  if (is.null(version)) versions[length(versions)]
-  else max(versions[grepl(version, versions, fixed = TRUE)])
+  if (is.null(version)) {
+    versions[length(versions)]
+  } else {
+    max(versions[grepl(version, versions, fixed = TRUE)])
+  }
 }

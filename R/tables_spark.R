@@ -1,6 +1,6 @@
 tbl_quote_name <- function(sc, name) {
   if (!spark_config_value(sc$config, "sparklyr.dplyr.period.splits", TRUE)) {
-    return(dbplyr::sql_quote(name, '`'))
+    return(dbplyr::sql_quote(name, "`"))
   }
 
   y <- gsub("`", "``", name, fixed = TRUE)
@@ -18,8 +18,9 @@ tbl_cache_sdf <- function(sc, name, force) {
   sdf <- spark_dataframe(tbl)
 
   invoke(sdf, "cache")
-  if (force)
+  if (force) {
     invoke(sdf, "count")
+  }
 }
 
 tbl_cache_sql <- function(sc, name, force) {
@@ -59,10 +60,11 @@ tbl_cache <- function(sc, name, force = TRUE) {
   # Using tbl_cache_sdf is supported for high-number of columns; however, it
   # displays a non-friendly name that we try to avoid.
 
-  if (spark_version(sc) < "2.0.0" && countColumns(sc, name) >= 1000)
+  if (spark_version(sc) < "2.0.0" && countColumns(sc, name) >= 1000) {
     tbl_cache_sdf(sc, name, force)
-  else
+  } else {
     tbl_cache_sql(sc, name, force)
+  }
 
   invisible(NULL)
 }

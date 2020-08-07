@@ -16,13 +16,14 @@ read_bin_wait <- function(con, what, n, endian = NULL) {
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
   progressTimeout <- Sys.time() + progressInterval
-  if (is.null(sc$state$progress))
+  if (is.null(sc$state$progress)) {
     sc$state$progress <- new.env()
+  }
   progressUpdated <- FALSE
 
   waitInterval <- 0
   commandStart <- Sys.time()
-  while(length(result) == 0 && commandStart + timeout > Sys.time()) {
+  while (length(result) == 0 && commandStart + timeout > Sys.time()) {
     Sys.sleep(waitInterval)
     waitInterval <- min(0.1, waitInterval + 0.01)
 
@@ -65,23 +66,24 @@ readObject <- function(con) {
 }
 
 readTypedObject <- function(con, type) {
-  switch (type,
-          "i" = readInt(con),
-          "c" = readString(con),
-          "b" = readBoolean(con),
-          "d" = readDouble(con),
-          "r" = readRaw(con),
-          "D" = readDate(con),
-          "t" = readTime(con),
-          "a" = readArray(con),
-          "l" = readList(con),
-          "e" = readEnv(con),
-          "s" = readStruct(con),
-          "f" = readFastStringArray(con),
-          "n" = NULL,
-          "j" = getJobj(con, readString(con)),
-          "J" = rjson::fromJSON(readString(con)),
-          stop(paste("Unsupported type for deserialization", type)))
+  switch(type,
+    "i" = readInt(con),
+    "c" = readString(con),
+    "b" = readBoolean(con),
+    "d" = readDouble(con),
+    "r" = readRaw(con),
+    "D" = readDate(con),
+    "t" = readTime(con),
+    "a" = readArray(con),
+    "l" = readList(con),
+    "e" = readEnv(con),
+    "s" = readStruct(con),
+    "f" = readFastStringArray(con),
+    "n" = NULL,
+    "j" = getJobj(con, readString(con)),
+    "J" = rjson::fromJSON(readString(con)),
+    stop(paste("Unsupported type for deserialization", type))
+  )
 }
 
 readString <- function(con) {
@@ -91,8 +93,8 @@ readString <- function(con) {
   if (stringLen > 0) {
     raw <- read_bin(con, raw(), stringLen, endian = "big")
     if (is.element("00", raw)) {
-     warning("Input contains embedded nuls, removing.")
-     raw <- raw[raw != "00"]
+      warning("Input contains embedded nuls, removing.")
+      raw <- raw[raw != "00"]
     }
     string <- rawToChar(raw)
   }
@@ -107,31 +109,35 @@ readFastStringArray <- function(con) {
 }
 
 readDateArray <- function(con, n = 1) {
-  if (n == 0)
+  if (n == 0) {
     as.Date(NA)
-  else
+  } else {
     do.call(c, lapply(seq(n), function(x) readDate(con)))
+  }
 }
 
 readInt <- function(con, n = 1) {
-  if (n == 0)
+  if (n == 0) {
     integer(0)
-  else
+  } else {
     read_bin(con, integer(), n = n, endian = "big")
+  }
 }
 
 readDouble <- function(con, n = 1) {
-  if (n == 0)
+  if (n == 0) {
     double(0)
-  else
+  } else {
     read_bin(con, double(), n = n, endian = "big")
+  }
 }
 
 readBoolean <- function(con, n = 1) {
-  if (n == 0)
+  if (n == 0) {
     logical(0)
-  else
+  } else {
     as.logical(readInt(con, n = n))
+  }
 }
 
 readType <- function(con) {
@@ -140,24 +146,25 @@ readType <- function(con) {
 
 readDate <- function(con) {
   date_str <- readString(con)
-  if (is.null(date_str) || identical(date_str, ""))
+  if (is.null(date_str) || identical(date_str, "")) {
     as.Date(NA)
-  else if (getOption("sparklyr.collect.datechars", FALSE))
+  } else if (getOption("sparklyr.collect.datechars", FALSE)) {
     date_str
-  else
+  } else {
     as.Date(date_str, tz = "UTC")
+  }
 }
 
 readTime <- function(con, n = 1) {
-  if (identical(n, 0))
+  if (identical(n, 0)) {
     as.POSIXct(character(0))
-  else {
+  } else {
     t <- readDouble(con, n)
 
     r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
-    if (getOption("sparklyr.collect.datechars", FALSE))
+    if (getOption("sparklyr.collect.datechars", FALSE)) {
       as.character(r)
-    else {
+    } else {
       r
     }
   }
@@ -242,8 +249,9 @@ readStruct <- function(con) {
 
 readRaw <- function(con) {
   dataLen <- readInt(con)
-  if (dataLen == 0)
+  if (dataLen == 0) {
     raw()
-  else
+  } else {
     read_bin(con, raw(), as.integer(dataLen), endian = "big")
+  }
 }

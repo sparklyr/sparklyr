@@ -53,14 +53,13 @@ spark_worker_init_packages <- function(sc, context) {
 }
 
 spark_worker_execute_closure <- function(
-  closure,
-  df,
-  funcContext,
-  grouped_by,
-  barrier_map,
-  fetch_result_as_sdf,
-  partition_index
-) {
+                                         closure,
+                                         df,
+                                         funcContext,
+                                         grouped_by,
+                                         barrier_map,
+                                         fetch_result_as_sdf,
+                                         partition_index) {
   if (nrow(df) == 0) {
     worker_log("found that source has no rows to be proceesed")
     return(NULL)
@@ -76,7 +75,7 @@ spark_worker_execute_closure <- function(
   closure_params <- length(formals(closure))
   has_partition_index_param <- (
     !is.null(funcContext$partition_index_param) &&
-    nchar(funcContext$partition_index_param) > 0
+      nchar(funcContext$partition_index_param) > 0
   )
   if (has_partition_index_param) closure_params <- closure_params - 1
   closure_args <- c(
@@ -85,8 +84,9 @@ spark_worker_execute_closure <- function(
     lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]]),
     barrier_arg
   )[0:closure_params]
-  if (has_partition_index_param)
+  if (has_partition_index_param) {
     closure_args[[funcContext$partition_index_param]] <- partition_index
+  }
 
   worker_log("computing closure")
   result <- do.call(closure, closure_args)
@@ -113,7 +113,7 @@ spark_worker_execute_closure <- function(
 
 spark_worker_clean_factors <- function(result) {
   if (any(sapply(result, is.factor))) {
-    result <- as.data.frame(lapply(result, function(x) if(is.factor(x)) as.character(x) else x), stringsAsFactors = F)
+    result <- as.data.frame(lapply(result, function(x) if (is.factor(x)) as.character(x) else x), stringsAsFactors = F)
   }
 
   result
@@ -121,9 +121,10 @@ spark_worker_clean_factors <- function(result) {
 
 spark_worker_maybe_serialize_list_cols_as_json <- function(config, result) {
   if (identical(config$fetch_result_as_sdf, TRUE) &&
-      config$spark_version >= "2.4.0" &&
-      any(sapply(result, is.list))) {
-    result <- do.call(tibble::tibble,
+    config$spark_version >= "2.4.0" &&
+    any(sapply(result, is.list))) {
+    result <- do.call(
+      tibble::tibble,
       lapply(
         result,
         function(x) {
@@ -190,7 +191,7 @@ spark_worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
       new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
       names(new_column_values) <- grouped_by
 
-      if("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
+      if ("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
       result <- do.call("cbind", list(new_column_values, result))
 
       names(result) <- gsub("\\.", "_", make.unique(names(result)))
@@ -254,17 +255,17 @@ spark_worker_apply_arrow <- function(sc, config) {
     result <- NULL
 
     if (!is.null(df)) {
-      colnames(df) <- columnNames[1: length(colnames(df))]
+      colnames(df) <- columnNames[1:length(colnames(df))]
 
       result <- spark_worker_execute_closure(
-                  closure,
-                  df,
-                  funcContext,
-                  grouped_by,
-                  barrier_map,
-                  config$fetch_result_as_sdf,
-                  partition_index
-                )
+        closure,
+        df,
+        funcContext,
+        grouped_by,
+        barrier_map,
+        config$fetch_result_as_sdf,
+        partition_index
+      )
 
       result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
@@ -361,7 +362,6 @@ spark_worker_apply <- function(sc, config) {
 
     # rbind removes Date classes so we re-assign them here
     if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0) {
-
       if (any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
         first_row <- data[[1]]
         for (idx in seq_along(first_row)) {
@@ -378,22 +378,22 @@ spark_worker_apply <- function(sc, config) {
       for (i in 1:ncol(df)) {
         target_type <- funcContext$column_types[[i]]
         if (!is.null(target_type) && class(df[[i]]) != target_type) {
-        df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
+          df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
         }
       }
     }
 
-    colnames(df) <- columnNames[1: length(colnames(df))]
+    colnames(df) <- columnNames[1:length(colnames(df))]
 
     result <- spark_worker_execute_closure(
-                closure,
-                df,
-                funcContext,
-                grouped_by,
-                barrier_map,
-                config$fetch_result_as_sdf,
-                partition_index
-              )
+      closure,
+      df,
+      funcContext,
+      grouped_by,
+      barrier_map,
+      config$fetch_result_as_sdf,
+      partition_index
+    )
 
     result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
@@ -409,7 +409,7 @@ spark_worker_apply <- function(sc, config) {
   if (!is.null(all_results) && nrow(all_results) > 0) {
     worker_log("updating ", nrow(all_results), " rows")
 
-    all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
+    all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i, ]))
 
     worker_invoke(context, "setResultArraySeq", all_data)
     worker_log("updated ", nrow(all_results), " rows")
@@ -422,10 +422,11 @@ spark_worker_apply <- function(sc, config) {
 
 spark_worker_rlang_unserialize <- function() {
   rlang_unserialize <- core_get_package_function("rlang", "bytes_unserialise")
-  if (is.null(rlang_unserialize))
+  if (is.null(rlang_unserialize)) {
     core_get_package_function("rlanglabs", "bytes_unserialise")
-  else
+  } else {
     rlang_unserialize
+  }
 }
 
 spark_worker_unbundle_path <- function() {

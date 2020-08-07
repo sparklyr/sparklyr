@@ -8,7 +8,7 @@ sc <- testthat_spark_connection()
 
 mtcars_tbl <- testthat_tbl("mtcars")
 
-austen     <- austen_books()
+austen <- austen_books()
 austen_tbl <- testthat_tbl("austen")
 
 test_that("we can interact with vector columns", {
@@ -54,11 +54,9 @@ test_that("we can interact with vector columns", {
   # verify they're equal
   expect_equal(first, sdf_read_column(splat, "on"))
   expect_equal(second, sdf_read_column(splat, "off"))
-
 })
 
 test_that("we can separate array<string> columns", {
-
   tokens <- austen_tbl %>%
     na.omit() %>%
     filter(length(text) > 0) %>%
@@ -75,7 +73,6 @@ test_that("we can separate array<string> columns", {
   first <- sdf_read_column(separated, "first")
 
   expect_equal(as.list(first), lapply(all, `[[`, 1))
-
 })
 
 test_that("we can separate struct columns (#690)", {
@@ -83,10 +80,12 @@ test_that("we can separate struct columns (#690)", {
   date_seq <- seq.Date(
     from = as.Date("2013-01-01"),
     to = as.Date("2017-01-01"),
-    by = "1 day")
+    by = "1 day"
+  )
 
   date_sdf <- copy_to(sc, tibble(event_date = as.character(date_seq)),
-                      overwrite = TRUE)
+    overwrite = TRUE
+  )
 
   sliding_window_sdf <- date_sdf %>%
     dplyr::mutate(sw = window(event_date, "150 days", "30 days"))

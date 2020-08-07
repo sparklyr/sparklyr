@@ -55,22 +55,27 @@ ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "
   response_type <- schema[[response_col]]$type
 
   type <- rlang::arg_match(type)
-  model_type <- if (!identical(type, "auto")) type else {
-    if (response_type %in% c("DoubleType", "IntegerType"))
+  model_type <- if (!identical(type, "auto")) {
+    type
+  } else {
+    if (response_type %in% c("DoubleType", "IntegerType")) {
       "regression"
-    else
+    } else {
       "classification"
+    }
   }
 
   impurity <- if (identical(impurity, "auto")) {
     if (identical(model_type, "regression")) "variance" else "gini"
   } else if (identical(model_type, "classification")) {
-    if (!impurity %in% c("gini", "entropy"))
+    if (!impurity %in% c("gini", "entropy")) {
       stop("`impurity` must be \"gini\" or \"entropy\" for classification.", call. = FALSE)
+    }
     impurity
   } else {
-    if (!identical(impurity, "variance"))
+    if (!identical(impurity, "variance")) {
       stop("`impurity` must be \"variance\" for regression.", call. = FALSE)
+    }
     impurity
   }
 
@@ -122,7 +127,8 @@ ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "
 new_ml_model_decision_tree_classification <- function(pipeline_model, formula, dataset, label_col,
                                                       features_col, predicted_label_col) {
   new_ml_model_classification(
-    pipeline_model, formula, dataset = dataset,
+    pipeline_model, formula,
+    dataset = dataset,
     label_col = label_col, features_col = features_col,
     predicted_label_col = predicted_label_col,
     class = "ml_model_decision_tree_classification"
@@ -132,7 +138,8 @@ new_ml_model_decision_tree_classification <- function(pipeline_model, formula, d
 new_ml_model_decision_tree_regression <- function(pipeline_model, formula, dataset, label_col,
                                                   features_col) {
   new_ml_model_regression(
-    pipeline_model, formula, dataset = dataset,
+    pipeline_model, formula,
+    dataset = dataset,
     label_col = label_col, features_col = features_col,
     class = "ml_model_decision_tree_regression"
   )

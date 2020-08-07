@@ -24,7 +24,6 @@ ml_random_forest_classifier.spark_connection <- function(x, formula = NULL, num_
                                                          label_col = "label", prediction_col = "prediction",
                                                          probability_col = "probability", raw_prediction_col = "rawPrediction",
                                                          uid = random_string("random_forest_classifier_"), ...) {
-
   .args <- list(
     num_trees = num_trees,
     subsampling_rate = subsampling_rate,
@@ -55,22 +54,27 @@ ml_random_forest_classifier.spark_connection <- function(x, formula = NULL, num_
     raw_prediction_col = .args[["raw_prediction_col"]]
   ) %>% (
     function(obj) {
-      do.call(invoke,
-              c(obj, "%>%", Filter(function(x) !is.null(x),
-                              list(
-                                   list("setCheckpointInterval", .args[["checkpoint_interval"]]),
-                                   list("setMaxBins", .args[["max_bins"]]),
-                                   list("setMaxDepth", .args[["max_depth"]]),
-                                   list("setMinInfoGain", .args[["min_info_gain"]]),
-                                   list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
-                                   list("setCacheNodeIds", .args[["cache_node_ids"]]),
-                                   list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
-                                   list("setNumTrees", .args[["num_trees"]]),
-                                   list("setSubsamplingRate", .args[["subsampling_rate"]]),
-                                   list("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]]),
-                                   list("setImpurity", .args[["impurity"]]),
-                                   jobj_set_param_helper(obj, "setThresholds", .args[["thresholds"]]),
-                                   jobj_set_param_helper(obj, "setSeed", .args[["seed"]])))))
+      do.call(
+        invoke,
+        c(obj, "%>%", Filter(
+          function(x) !is.null(x),
+          list(
+            list("setCheckpointInterval", .args[["checkpoint_interval"]]),
+            list("setMaxBins", .args[["max_bins"]]),
+            list("setMaxDepth", .args[["max_depth"]]),
+            list("setMinInfoGain", .args[["min_info_gain"]]),
+            list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
+            list("setCacheNodeIds", .args[["cache_node_ids"]]),
+            list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
+            list("setNumTrees", .args[["num_trees"]]),
+            list("setSubsamplingRate", .args[["subsampling_rate"]]),
+            list("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]]),
+            list("setImpurity", .args[["impurity"]]),
+            jobj_set_param_helper(obj, "setThresholds", .args[["thresholds"]]),
+            jobj_set_param_helper(obj, "setSeed", .args[["seed"]])
+          )
+        ))
+      )
     })
 
   new_ml_random_forest_classifier(jobj)
@@ -192,7 +196,10 @@ new_ml_random_forest_classification_model <- function(jobj) {
     total_num_nodes = function() invoke(jobj, "totalNumNodes"),
     # `def treeWeights`, `def trees`
     tree_weights = function() invoke(jobj, "treeWeights"),
-    trees = function() invoke(jobj, "trees") %>%
-      purrr::map(new_ml_decision_tree_regression_model),
-    class = "ml_random_forest_classification_model")
+    trees = function() {
+      invoke(jobj, "trees") %>%
+        purrr::map(new_ml_decision_tree_regression_model)
+    },
+    class = "ml_random_forest_classification_model"
+  )
 }

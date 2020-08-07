@@ -21,13 +21,14 @@ registerDoSpark <- function(spark_conn, ...) {
   .processOpts <- function(...) {
     opts <- list(...)
     optnames <- names(opts)
-    if (is.null(optnames))
-      optnames <- rep('', length(opts))
+    if (is.null(optnames)) {
+      optnames <- rep("", length(opts))
+    }
 
     # filter out unnamed arguments with a warning
-    unnamed <- ! nzchar(optnames)
+    unnamed <- !nzchar(optnames)
     if (any(unnamed)) {
-      warning('ignoring doSpark package option(s) specified with unnamed argument')
+      warning("ignoring doSpark package option(s) specified with unnamed argument")
       opts <- opts[!unnamed]
       optnames <- optnames[!unnamed]
     }
@@ -35,8 +36,10 @@ registerDoSpark <- function(spark_conn, ...) {
     # filter out unrecognized options with a warning
     recog <- optnames %in% .globals$do_spark$valid_options
     if (any(!recog)) {
-      warning(sprintf('ignoring unrecognized doSpark package option(s): %s',
-                      paste(optnames[!recog], collapse = ', ')), call. = FALSE)
+      warning(sprintf(
+        "ignoring unrecognized doSpark package option(s): %s",
+        paste(optnames[!recog], collapse = ", ")
+      ), call. = FALSE)
       opts <- opts[recog]
       optnames <- optnames[recog]
     }
@@ -45,8 +48,8 @@ registerDoSpark <- function(spark_conn, ...) {
     remove(list = ls(.globals$do_spark$options), pos = .globals$do_spark$options)
 
     # set new options
-    for (i in seq(along=opts)) {
-      assign(optnames[i], opts[[i]], pos=.globals$do_spark$options)
+    for (i in seq(along = opts)) {
+      assign(optnames[i], opts[[i]], pos = .globals$do_spark$options)
     }
   }
 
@@ -55,10 +58,11 @@ registerDoSpark <- function(spark_conn, ...) {
     obj$packages <- unique(c(obj$packages, (.packages())))
     # internal function to compile an expression if possible
     .compile <- function(expr, ...) {
-      if (getRversion() < "2.13.0" || isTRUE(.globals$do_spark$options$nocompile))
+      if (getRversion() < "2.13.0" || isTRUE(.globals$do_spark$options$nocompile)) {
         expr
-      else
+      } else {
         compiler::compile(expr, ...)
+      }
     }
 
     # internal functions to serialize and unserialize an arbitrary R object to/from string
@@ -75,7 +79,7 @@ registerDoSpark <- function(spark_conn, ...) {
     # internal function to process spark data frames
     .process_spark_items <- function(...) {
       # load necessary packages
-      for (p in obj$packages) library(p, character.only=TRUE)
+      for (p in obj$packages) library(p, character.only = TRUE)
 
       f <- function(item) {
         enclos <- envir
@@ -112,22 +116,25 @@ registerDoSpark <- function(spark_conn, ...) {
       lapply(encoded_res, .decode_item)
     }
 
-    if (!inherits(obj, "foreach"))
+    if (!inherits(obj, "foreach")) {
       stop("obj must be a foreach object")
+    }
 
     spark_conn <- data$spark_conn
     spark_apply_args <- data$spark_apply_args
 
     it <- iterators::iter(obj)
     accumulator <- foreach::makeAccum(it)
-    items <- it %>% as.list() %>% lapply(.encode_item)
+    items <- it %>%
+      as.list() %>%
+      lapply(.encode_item)
     spark_items <- sdf_copy_to(spark_conn, items, overwrite = TRUE)
     expr <- .compile(expr)
     res <- do.call(.process_spark_items, spark_apply_args)
     tryCatch(
       accumulator(res, seq(along = res)),
       error = function(e) {
-        cat("error calling combine function:\n", file=stderr())
+        cat("error calling combine function:\n", file = stderr())
         print(e)
       }
     )
@@ -149,13 +156,15 @@ registerDoSpark <- function(spark_conn, ...) {
       version = packageDescription(pkgName, fields = "Version"),
       workers = tryCatch(
         {
-          spark_conf<-invoke(data$spark_conn$state$spark_context, "getConf")
+          spark_conf <- invoke(data$spark_conn$state$spark_context, "getConf")
           # return an integer value greater than 1 as number of workers if
           # "spark.executor.instances" is not set
           invoke(spark_conf, "getInt", "spark.executor.instances", as.integer(2))
         },
         # return 0 as number of workers if there is an exception
-        error = function(e) { 0 }
+        error = function(e) {
+          0
+        }
       ),
       NULL
     )
@@ -163,15 +172,15 @@ registerDoSpark <- function(spark_conn, ...) {
 
   .globals$do_spark <- list(
     # list of valid options for doSpark
-    valid_options = c('nocompile'),
+    valid_options = c("nocompile"),
     # options from the last successful call to registerDoSpark
-    options = new.env(parent=emptyenv())
+    options = new.env(parent = emptyenv())
   )
 
   .processOpts(...)
   foreach::setDoPar(
-    fun=.doSpark,
-    data=list(spark_conn = spark_conn, spark_apply_args = list(...)),
-    info=.info
+    fun = .doSpark,
+    data = list(spark_conn = spark_conn, spark_apply_args = list(...)),
+    info = .info
   )
 }

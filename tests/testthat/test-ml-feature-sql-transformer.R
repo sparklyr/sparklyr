@@ -34,7 +34,8 @@ test_that("ft_sql/dplyr_transformer() works", {
   )
 
   sql_transformer <- ft_sql_transformer(
-    sc, "select *, petal_width * 2 as pw2 from `__THIS__`")
+    sc, "select *, petal_width * 2 as pw2 from `__THIS__`"
+  )
 
   expect_equal(
     ml_param_map(sql_transformer),
@@ -55,7 +56,9 @@ test_that("ft_dplyr_transformer() handles cases where table name isn't quoted (#
   iris_tbl <- testthat_tbl("iris")
   sampled <- iris_tbl %>%
     sample_frac(0.01)
-  expect_true(grepl("__THIS__",
-        ft_dplyr_transformer(sc, sampled) %>%
-          ml_param("statement")))
+  expect_true(grepl(
+    "__THIS__",
+    ft_dplyr_transformer(sc, sampled) %>%
+      ml_param("statement")
+  ))
 })

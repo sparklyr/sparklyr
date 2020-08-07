@@ -31,8 +31,9 @@ spark_install_winutils <- function(version) {
 }
 
 testthat_spark_connection <- function() {
-  if (!exists(".testthat_latest_spark", envir = .GlobalEnv))
+  if (!exists(".testthat_latest_spark", envir = .GlobalEnv)) {
     assign(".testthat_latest_spark", "2.3.0", envir = .GlobalEnv)
+  }
 
   livy_branch <- Sys.getenv("SPARKLYR_LIVY_BRANCH")
   if (nchar(livy_branch) > 0) {
@@ -42,12 +43,13 @@ testthat_spark_connection <- function() {
   livy_version <- Sys.getenv("LIVY_VERSION")
   test_databricks_connect <- Sys.getenv("TEST_DATABRICKS_CONNECT")
 
-  if (nchar(livy_version) > 0)
+  if (nchar(livy_version) > 0) {
     testthat_livy_connection()
-  else if (test_databricks_connect == "true")
+  } else if (test_databricks_connect == "true") {
     testthat_shell_connection(method = "databricks")
-  else
+  } else {
     testthat_shell_connection()
+  }
 }
 
 testthat_latest_spark <- function() get(".testthat_latest_spark", envir = .GlobalEnv)
@@ -66,7 +68,7 @@ testthat_shell_connection <- function(method = "shell") {
   if (!is.null(version) && version == "master") {
     assign(".test_on_spark_master", TRUE, envir = .GlobalEnv)
     spark_installed <- spark_installed[with(spark_installed, order(spark, decreasing = TRUE)), ]
-    version <- spark_installed[1,]$spark
+    version <- spark_installed[1, ]$spark
   }
 
   if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
@@ -98,9 +100,10 @@ testthat_shell_connection <- function(method = "shell") {
     config[["sparklyr.shell.driver-memory"]] <- "3G"
     config[["sparklyr.apply.env.foo"]] <- "env-test"
     config[["spark.sql.warehouse.dir"]] <- get_spark_warehouse_dir()
-    if (identical(.Platform$OS.type, "windows"))
+    if (identical(.Platform$OS.type, "windows")) {
       # TODO: investigate why there are Windows-specific timezone portability issues
       config[["spark.sql.session.timeZone"]] <- "UTC"
+    }
 
     packages <- if (version >= "2.4.0") "avro" else NULL
 
@@ -138,7 +141,6 @@ skip_unless_verbose <- function(message = NULL) {
 }
 
 test_requires <- function(...) {
-
   suppressPackageStartupMessages({
     for (pkg in list(...)) {
       if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
@@ -173,7 +175,7 @@ check_tidy <- function(o, exp.row = NULL, exp.col = NULL, exp.names = NULL) {
   }
 }
 
-sdf_query_plan <- function(x, plan_type=c("optimizedPlan", "analyzed")) {
+sdf_query_plan <- function(x, plan_type = c("optimizedPlan", "analyzed")) {
   plan_type <- match.arg(plan_type)
 
   x %>%
@@ -250,21 +252,23 @@ testthat_livy_connection <- function() {
       version = livy_version,
       spark_version = version,
       stdout = FALSE,
-      stderr = FALSE)
+      stderr = FALSE
+    )
     wait_for_svc(
       svc_name = "livy",
       port = livy_service_port,
       timeout_s = 30
     )
     config <- list()
-    if (identical(.Platform$OS.type, "windows"))
+    if (identical(.Platform$OS.type, "windows")) {
       # TODO: investigate why there are Windows-specific timezone portability issues
       config$`spark.sql.session.timeZone` <- "UTC"
+    }
 
-    config$`sparklyr.verbose` = TRUE
-    config$`sparklyr.connect.timeout` = 120
-    config$`sparklyr.log.invoke` = "cat"
-    config$`spark.sql.warehouse.dir` = get_spark_warehouse_dir()
+    config$`sparklyr.verbose` <- TRUE
+    config$`sparklyr.connect.timeout` <- 120
+    config$`sparklyr.log.invoke` <- "cat"
+    config$`spark.sql.warehouse.dir` <- get_spark_warehouse_dir()
 
     sc <- spark_connect(
       master = sprintf("http://localhost:%d", livy_service_port),
@@ -289,14 +293,16 @@ test_requires_version <- function(min_version, comment = NULL, max_version = NUL
   sc <- testthat_spark_connection()
   if (spark_version(sc) < min_version) {
     msg <- paste0("test requires Spark version ", min_version)
-    if (!is.null(comment))
+    if (!is.null(comment)) {
       msg <- paste0(msg, ": ", comment)
+    }
     skip(msg)
   } else if (!is.null(max_version)) {
     if (spark_version(sc) >= max_version) {
       msg <- paste0("test is not needed with Spark version ", max_version)
-      if (!is.null(comment))
+      if (!is.null(comment)) {
         msg <- paste0(msg, ": ", comment)
+      }
       skip(msg)
     }
   }
@@ -308,17 +314,19 @@ test_requires_latest_spark <- function() {
 
 param_filter_version <- function(args, min_version, params) {
   sc <- testthat_spark_connection()
-  if (spark_version(sc) < min_version)
+  if (spark_version(sc) < min_version) {
     args[params] <- NULL
+  }
   args
 }
 
 param_add_version <- function(args, min_version, ...) {
   sc <- testthat_spark_connection()
-  if (spark_version(sc) >= min_version)
+  if (spark_version(sc) >= min_version) {
     c(args, list(...))
-  else
+  } else {
     args
+  }
 }
 
 output_file <- function(filename) file.path("output", filename)
@@ -378,8 +386,9 @@ skip_on_arrow <- function() {
 }
 
 skip_on_windows <- function() {
-  if (identical(.Platform$OS.type, "windows"))
+  if (identical(.Platform$OS.type, "windows")) {
     skip("Test will be skipped on Windows")
+  }
 }
 
 skip_covr <- function(message) {
@@ -411,13 +420,15 @@ is_testing_databricks_connect <- function() {
 }
 
 skip_unless_databricks_connect <- function() {
-  if (!is_testing_databricks_connect())
+  if (!is_testing_databricks_connect()) {
     skip("Test only runs on Databricks Connect")
+  }
 }
 
 skip_databricks_connect <- function() {
-  if (is_testing_databricks_connect())
+  if (is_testing_databricks_connect()) {
     skip("Test is skipped on Databricks Connect")
+  }
 }
 
 random_table_name <- function(prefix) {
@@ -448,7 +459,7 @@ local_tcp_proxy <- function(proxy_port, dest_port) {
         as.integer(proxy_port),
         ",fork,reuseaddr tcp:localhost:",
         as.integer(dest_port),
-       " >/dev/null 2>&1 & disown; echo $!'"
+        " >/dev/null 2>&1 & disown; echo $!'"
       )
     ),
     stdout = TRUE

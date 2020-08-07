@@ -20,11 +20,15 @@
 #' features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
 #'
 #' iris_tbl %>%
-#'   ft_vector_assembler(input_col = features,
-#'                       output_col = "features_temp") %>%
-#'   ft_standard_scaler(input_col = "features_temp",
-#'                      output_col = "features",
-#'                      with_mean = TRUE)
+#'   ft_vector_assembler(
+#'     input_col = features,
+#'     output_col = "features_temp"
+#'   ) %>%
+#'   ft_standard_scaler(
+#'     input_col = "features_temp",
+#'     output_col = "features",
+#'     with_mean = TRUE
+#'   )
 #' }
 #'
 #' @export
@@ -41,7 +45,6 @@ ml_standard_scaler <- ft_standard_scaler
 ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                 with_mean = FALSE, with_std = TRUE,
                                                 uid = random_string("standard_scaler_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -56,9 +59,11 @@ ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col 
     x, "org.apache.spark.ml.feature.StandardScaler",
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
-    invoke("%>%",
-           list("setWithMean", .args[["with_mean"]]),
-           list("setWithStd", .args[["with_std"]])) %>%
+    invoke(
+      "%>%",
+      list("setWithMean", .args[["with_mean"]]),
+      list("setWithStd", .args[["with_std"]])
+    ) %>%
     new_ml_standard_scaler()
 
   estimator
@@ -78,7 +83,6 @@ ft_standard_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NUL
     ...
   )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
@@ -95,10 +99,11 @@ ft_standard_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_standard_scaler <- function(jobj) {
@@ -110,7 +115,8 @@ new_ml_standard_scaler_model <- function(jobj) {
     jobj,
     mean = possibly_null(read_spark_vector)(jobj, "mean"),
     std = possibly_null(read_spark_vector)(jobj, "std"),
-    class = "ml_standard_scaler_model")
+    class = "ml_standard_scaler_model"
+  )
 }
 
 validator_ml_standard_scaler <- function(.args) {

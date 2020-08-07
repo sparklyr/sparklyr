@@ -29,9 +29,9 @@ test_that("ft_chisq_select() works properly", {
   test_requires_version("2.1.0", "Spark behavior changed (https://issues.apache.org/jira/browse/SPARK-17870)")
   df <- tribble(
     ~id, ~V1, ~V2, ~V3, ~V4, ~clicked,
-    7,   0,   0,   18,  1,   1,
-    8,   0,   1,   12,  0,   0,
-    9,   1,   0,   15,  0.1, 0
+    7, 0, 0, 18, 1, 1,
+    8, 0, 1, 12, 0, 0,
+    9, 1, 0, 15, 0.1, 0
   )
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
     ft_vector_assembler(paste0("V", 1:4), "features") %>%

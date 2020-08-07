@@ -31,7 +31,6 @@ ft_chisq_selector.spark_connection <- function(x, features_col = "features", out
                                                selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
                                                num_top_features = 50, percentile = 0.1,
                                                uid = random_string("chisq_selector_"), ...) {
-
   .args <- list(
     features_col = features_col,
     output_col = output_col,
@@ -48,20 +47,28 @@ ft_chisq_selector.spark_connection <- function(x, features_col = "features", out
     validator_ml_chisq_selector()
 
   estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.ChiSqSelector", output_col = .args[["output_col"]],
-    uid = .args[["uid"]]) %>% (
+    x, "org.apache.spark.ml.feature.ChiSqSelector",
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
+  ) %>%
+    (
       function(obj) {
-        do.call(invoke,
-                c(obj, "%>%", Filter(function(x) !is.null(x),
-                                     list(
-                                          jobj_set_param_helper(obj, "setFdr", .args[["fdr"]], "2.2.0", 0.05),
-                                          list("setFeaturesCol", .args[["features_col"]]),
-                                          jobj_set_param_helper(obj, "setFpr", .args[["fpr"]], "2.1.0", 0.05),
-                                          jobj_set_param_helper(obj, "setFwe", .args[["fwe"]], "2.2.0", 0.05),
-                                          list("setLabelCol", .args[["label_col"]]),
-                                          list("setNumTopFeatures", .args[["num_top_features"]]),
-                                          jobj_set_param_helper(obj, "setPercentile", .args[["percentile"]], "2.1.0", 0.1),
-                                          jobj_set_param_helper(obj, "setSelectorType", .args[["selector_type"]], "2.1.0", "numTopFeatures")))))
+        do.call(
+          invoke,
+          c(obj, "%>%", Filter(
+            function(x) !is.null(x),
+            list(
+              jobj_set_param_helper(obj, "setFdr", .args[["fdr"]], "2.2.0", 0.05),
+              list("setFeaturesCol", .args[["features_col"]]),
+              jobj_set_param_helper(obj, "setFpr", .args[["fpr"]], "2.1.0", 0.05),
+              jobj_set_param_helper(obj, "setFwe", .args[["fwe"]], "2.2.0", 0.05),
+              list("setLabelCol", .args[["label_col"]]),
+              list("setNumTopFeatures", .args[["num_top_features"]]),
+              jobj_set_param_helper(obj, "setPercentile", .args[["percentile"]], "2.1.0", 0.1),
+              jobj_set_param_helper(obj, "setSelectorType", .args[["selector_type"]], "2.1.0", "numTopFeatures")
+            )
+          ))
+        )
       }) %>%
     new_ml_chisq_selector()
 
@@ -110,10 +117,11 @@ ft_chisq_selector.tbl_spark <- function(x, features_col = "features", output_col
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_chisq_selector <- function(jobj) {

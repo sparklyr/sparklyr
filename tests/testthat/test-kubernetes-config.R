@@ -2,8 +2,10 @@ context("kubernetes config")
 
 test_that("spark_kubernetes_config can generate correct config", {
   expect_equal(
-    spark_config_kubernetes("k8s://https://192.168.99.100:8443", driver = "spark-driver",
-                            forward = FALSE, fix_config = FALSE),
+    spark_config_kubernetes("k8s://https://192.168.99.100:8443",
+      driver = "spark-driver",
+      forward = FALSE, fix_config = FALSE
+    ),
     list(
       spark.master = "k8s://https://192.168.99.100:8443",
       sparklyr.shell.master = "k8s://https://192.168.99.100:8443",

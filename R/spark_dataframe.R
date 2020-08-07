@@ -16,11 +16,12 @@ spark_dataframe <- function(x, ...) {
 #' @export
 spark_dataframe.default <- function(x, ...) {
   stop("Unable to retrieve a Spark DataFrame from object of class ",
-       paste(class(x), collapse = " "), call. = FALSE)
+    paste(class(x), collapse = " "),
+    call. = FALSE
+  )
 }
 
 #' @export
 spark_dataframe.spark_jobj <- function(x, ...) {
   x
 }
-

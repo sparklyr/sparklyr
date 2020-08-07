@@ -51,5 +51,3 @@ test_that("'validate_java_version_line' works with java 9 in non-local mode", {
 
   succeed()
 })
-
-

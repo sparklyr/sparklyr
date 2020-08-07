@@ -15,10 +15,9 @@
 #'   A version of Spark known to be compatible with the requested version of
 #'   \samp{livy} is chosen when possible.
 #' @export
-livy_install <- function(version       = "0.6.0",
-                         spark_home    = NULL,
-                         spark_version = NULL)
-{
+livy_install <- function(version = "0.6.0",
+                         spark_home = NULL,
+                         spark_version = NULL) {
   version <- cast_string(version)
 
   # determine an appropriate spark version
@@ -38,44 +37,45 @@ livy_install <- function(version       = "0.6.0",
       )
     }
 
-    if (interactive())
+    if (interactive()) {
       message("* Using Spark: ", spark_version)
+    }
   }
 
   # warn if the user attempts to use livy 0.2.0 with Spark >= 2.0.0
   spark_version <- cast_string(spark_version)
   if (version == "0.2.0" &&
-      numeric_version(spark_version) >= "2.0.0")
-  {
+    numeric_version(spark_version) >= "2.0.0") {
     stopf("livy %s is not compatible with Spark (>= %s)", version, "2.0.0")
   }
 
   # determine spark home (auto-install as needed)
   if (is.null(spark_home)) {
-
     spark_home <- spark_home_dir(version = spark_version)
     if (is.null(spark_home)) {
-
       prompt <- sprintf(
         "* Spark %s is not installed. Download and install? [Y/n]: ",
         spark_version
       )
 
       response <- readline(prompt = prompt)
-      if (!identical(tolower(response[1]), "y"))
+      if (!identical(tolower(response[1]), "y")) {
         stop("Installation aborted by user.")
+      }
 
       spark_install(version = spark_version)
       spark_home <- spark_home_dir(version = spark_version)
     }
 
-    if (interactive())
+    if (interactive()) {
       message("* Using Spark home: ", spark_home)
+    }
   }
 
   # ensure that spark home exists
-  if (!file.exists(spark_home))
+  if (!file.exists(spark_home)) {
     stopf("No Spark installation found at '%s'", spark_home)
+  }
 
   # construct path where livy will be unpacked
   livy_cache <- livy_install_dir()
@@ -118,8 +118,9 @@ livy_install <- function(version       = "0.6.0",
   }
 
   download.file(url, destfile = destfile)
-  if (!file.exists(destfile))
+  if (!file.exists(destfile)) {
     stop("livy download failed")
+  }
 
   # unzip to livy directory (not full path; we will rename after)
   extracted_files <- unzip(destfile, exdir = livy_cache)
@@ -128,13 +129,15 @@ livy_install <- function(version       = "0.6.0",
   relative_paths <- substring(extracted_files, nchar(livy_cache) + 2L)
   first_slashes <- as.integer(regexec("/", relative_paths, fixed = TRUE))
   folder_name <- unique(substring(relative_paths, 1L, first_slashes - 1L))
-  if (length(folder_name) != 1)
+  if (length(folder_name) != 1) {
     stop("failed to ascertain unpacked livy folder name")
+  }
 
   # rename folder to taret location
   file.rename(file.path(livy_cache, folder_name), livy_path)
-  if (!file.exists(livy_path))
+  if (!file.exists(livy_path)) {
     stopf("failed to move '%s' to '%s'", folder_name, basename(livy_path))
+  }
 
   livyStart <- file.path(livy_path, "bin/livy-server")
   livyLogs <- file.path(livy_path, "logs")
@@ -148,8 +151,9 @@ livy_install <- function(version       = "0.6.0",
   }
 
   # return installation path on success
-  if (interactive())
+  if (interactive()) {
     message("* livy ", version, " installed successfully!")
+  }
 
   invisible(livy_path)
 }
@@ -175,7 +179,6 @@ livy_install_dir <- function() {
 #' @rdname livy_install
 #' @export
 livy_installed_versions <- function() {
-
   livyDir <- livy_install_dir()
 
   livy <- character()
@@ -194,9 +197,11 @@ livy_installed_versions <- function() {
     }
   })
 
-  versions <- data.frame(livy = livy,
-                         livyVersionDir = livyVersionDir,
-                         stringsAsFactors = FALSE)
+  versions <- data.frame(
+    livy = livy,
+    livyVersionDir = livyVersionDir,
+    stringsAsFactors = FALSE
+  )
 
   versions
 }
@@ -205,7 +210,7 @@ livy_install_find <- function(livyVersion = NULL) {
   versions <- livy_installed_versions()
   versions <- if (is.null(livyVersion)) versions else versions[versions$livy == livyVersion, ]
 
-  if(NROW(versions) == 0) {
+  if (NROW(versions) == 0) {
     livyInstall <- quote(livy_install(version = ""))
     livyInstall$version <- livyVersion
 
@@ -230,13 +235,15 @@ livy_install_find <- function(livyVersion = NULL) {
 #' @rdname livy_install
 #' @export
 livy_home_dir <- function(version = NULL) {
-  tryCatch({
-    installInfo <- livy_install_find(livyVersion = version)
-    installInfo$livyVersionDir
-  },
-  error = function(e) {
-    NULL
-  })
+  tryCatch(
+    {
+      installInfo <- livy_install_find(livyVersion = version)
+      installInfo$livyVersionDir
+    },
+    error = function(e) {
+      NULL
+    }
+  )
 }
 
 # nocov end

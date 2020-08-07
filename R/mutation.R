@@ -30,14 +30,14 @@
 NULL
 
 #' @rawNamespace S3method(rbind,tbl_spark)
-rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparklyr_tmp_"))
-{
+rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparklyr_tmp_")) {
   dots <- list(...)
   n <- length(dots)
   self <- dots[[1]]
 
-  if (n == 1)
+  if (n == 1) {
     return(self)
+  }
 
   sdf <- spark_dataframe(self)
 
@@ -59,8 +59,9 @@ rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
       invoke("select", cols)
   }
 
-  for (i in 2:n)
+  for (i in 2:n) {
     sdf <- invoke(sdf, method, reorder_columns(spark_dataframe(dots[[i]])))
+  }
 
   sdf_register(sdf, name = name)
 }
@@ -72,14 +73,16 @@ rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
 sdf_bind_rows <- function(..., id = NULL) {
   id <- cast_nullable_string(id)
   dots <- Filter(length, rlang::dots_splice(...))
-  if (! all(sapply(dots, is.tbl_spark)))
+  if (!all(sapply(dots, is.tbl_spark))) {
     stop("all inputs must be tbl_spark")
+  }
 
   n <- length(dots)
   self <- dots[[1]]
 
-  if (n == 1)
+  if (n == 1) {
     return(self)
+  }
 
   sc <- self %>%
     spark_dataframe() %>%
@@ -87,7 +90,7 @@ sdf_bind_rows <- function(..., id = NULL) {
 
   schemas <- lapply(dots, function(x) {
     schema <- x %>%
-      spark_dataframe %>%
+      spark_dataframe() %>%
       invoke("schema")
     col_names <- schema %>%
       invoke("fieldNames") %>%
@@ -102,14 +105,16 @@ sdf_bind_rows <- function(..., id = NULL) {
 
   master_schema <- schemas %>%
     dplyr::bind_rows() %>%
-    dplyr::group_by(!! rlang::sym("name")) %>%
+    dplyr::group_by(!!rlang::sym("name")) %>%
     dplyr::slice(1)
 
   schema_complements <- schemas %>%
-    lapply(function(x) dplyr::as_tibble(master_schema) %>%
-             dplyr::select(!! rlang::sym("name")) %>%
-             dplyr::setdiff(select(x, !!rlang::sym("name"))) %>%
-             dplyr::left_join(master_schema, by = "name"))
+    lapply(function(x) {
+      dplyr::as_tibble(master_schema) %>%
+        dplyr::select(!!rlang::sym("name")) %>%
+        dplyr::setdiff(select(x, !!rlang::sym("name"))) %>%
+        dplyr::left_join(master_schema, by = "name")
+    })
 
   sdf_augment <- function(x, schema_complement) {
     sdf <- spark_dataframe(x)
@@ -134,12 +139,14 @@ sdf_bind_rows <- function(..., id = NULL) {
     lapply(sdf_register)
 
   if (!is.null(id)) {
-    if (!all(rlang::have_name(dots)))
+    if (!all(rlang::have_name(dots))) {
       names(dots) <- as.character(seq_along(dots))
+    }
     augmented_dots <- Map(
-      function(x, label)
+      function(x, label) {
         dplyr::mutate(x, !!sym(id) := label) %>%
-        dplyr::select(!!sym(id), everything()),
+          dplyr::select(!!sym(id), everything())
+      },
       augmented_dots,
       names(dots)
     )
@@ -154,8 +161,9 @@ cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
   n <- length(dots)
   self <- dots[[1]]
 
-  if (n == 1)
+  if (n == 1) {
     return(self)
+  }
 
   id <- random_string("id_")
 
@@ -164,26 +172,29 @@ cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
 
   dots_num_rows <- dots_with_ids %>%
     lapply(function(x) sdf_last_index(x, id = id)) %>%
-    unlist
+    unlist()
 
   if (length(unique(dots_num_rows)) > 1) {
     stop("All inputs must have the same number of rows.", call. = FALSE)
   }
 
-    Reduce(function(x, y) dplyr::inner_join(x, y, by = id),
-           dots_with_ids) %>%
-      dplyr::arrange(!!rlang::sym(id)) %>%
-      spark_dataframe() %>%
-      invoke("drop", id) %>%
-      sdf_register()
+  Reduce(
+    function(x, y) dplyr::inner_join(x, y, by = id),
+    dots_with_ids
+  ) %>%
+    dplyr::arrange(!!rlang::sym(id)) %>%
+    spark_dataframe() %>%
+    invoke("drop", id) %>%
+    sdf_register()
 }
 
 #' @rdname sdf_bind
 #' @export
 sdf_bind_cols <- function(...) {
   dots <- Filter(length, rlang::dots_splice(...))
-  if (! all(sapply(dots, is.tbl_spark)))
+  if (!all(sapply(dots, is.tbl_spark))) {
     stop("all inputs must be tbl_spark")
+  }
 
   do.call(cbind, dots)
 }

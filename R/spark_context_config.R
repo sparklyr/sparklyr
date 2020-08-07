@@ -5,8 +5,7 @@
 #' @param sc A \code{spark_connection}.
 #'
 #' @export
-spark_context_config <- function(sc)
-{
+spark_context_config <- function(sc) {
   sparkConfigAll <- spark_context(sc) %>% invoke("%>%", list("conf"), list("getAll"))
   sparkConfigNames <- lapply(sparkConfigAll, function(e) invoke(e, "_1")) %>% as.list()
   sparkConfig <- lapply(sparkConfigAll, function(e) invoke(e, "_2")) %>% as.list()
@@ -22,12 +21,12 @@ spark_context_config <- function(sc)
 #' @param sc A \code{spark_connection}.
 #'
 #' @export
-hive_context_config <- function(sc)
-{
-  if (spark_version(sc) < "2.0.0")
+hive_context_config <- function(sc) {
+  if (spark_version(sc) < "2.0.0") {
     hive_context(sc) %>% invoke("getAllConfs")
-  else
+  } else {
     hive_context(sc) %>% invoke("%>%", list("conf"), list("getAll"))
+  }
 }
 
 #' Runtime configuration interface for the Spark Session
@@ -52,10 +51,11 @@ spark_session_config <- function(sc, config = TRUE, value = NULL) {
   else {
     spark_require_version(sc, "2.0.0")
 
-    if (is.numeric(value))
+    if (is.numeric(value)) {
       value <- as.integer(value)
-    else if (!is.logical(value) && !is.character(value))
+    } else if (!is.logical(value) && !is.character(value)) {
       stop("Only logical, integer (long), and character values are allowed.")
+    }
     sc %>%
       spark_session() %>%
       invoke("%>%", list("conf"), list("set", config, value)) %>%

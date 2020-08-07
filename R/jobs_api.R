@@ -13,24 +13,26 @@ rstudio_jobs_api <- function() {
   )
 }
 
-rstudio_jobs_api_new <- function(jobName, progressUnits, jobActions)
-{
+rstudio_jobs_api_new <- function(jobName, progressUnits, jobActions) {
   api <- rstudio_jobs_api()
   if ("actions" %in% names(formals(api$add_job)) && !is.null(jobActions)) {
     api$add_job(jobName,
-                progressUnits = progressUnits,
-                show = FALSE,
-                autoRemove = FALSE,
-                actions = jobActions)
+      progressUnits = progressUnits,
+      show = FALSE,
+      autoRemove = FALSE,
+      actions = jobActions
+    )
   } else if ("show" %in% names(formals(api$add_job))) {
     api$add_job(jobName,
-                progressUnits = progressUnits,
-                show = FALSE,
-                autoRemove = FALSE)
+      progressUnits = progressUnits,
+      show = FALSE,
+      autoRemove = FALSE
+    )
   } else {
     api$add_job(jobName,
-                progressUnits = progressUnits,
-                autoRemove = FALSE)
+      progressUnits = progressUnits,
+      autoRemove = FALSE
+    )
   }
 }
 

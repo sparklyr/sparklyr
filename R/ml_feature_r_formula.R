@@ -60,7 +60,6 @@ ml_r_formula <- ft_r_formula
 ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "features", label_col = "label",
                                           force_index_label = FALSE,
                                           uid = random_string("r_formula_"), ...) {
-
   .args <- list(
     formula = formula,
     features_col = features_col,
@@ -85,7 +84,6 @@ ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "fea
 ft_r_formula.ml_pipeline <- function(x, formula = NULL, features_col = "features", label_col = "label",
                                      force_index_label = FALSE,
                                      uid = random_string("r_formula_"), ...) {
-
   stage <- ft_r_formula.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -96,14 +94,12 @@ ft_r_formula.ml_pipeline <- function(x, formula = NULL, features_col = "features
     ...
   )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
 ft_r_formula.tbl_spark <- function(x, formula = NULL, features_col = "features", label_col = "label",
                                    force_index_label = FALSE,
                                    uid = random_string("r_formula_"), ...) {
-
   stage <- ft_r_formula.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -114,10 +110,11 @@ ft_r_formula.tbl_spark <- function(x, formula = NULL, features_col = "features",
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_r_formula <- function(jobj) {
@@ -126,19 +123,21 @@ new_ml_r_formula <- function(jobj) {
 
 new_ml_r_formula_model <- function(jobj) {
   new_ml_transformer(jobj,
-                     formula = possibly_null(
-                       ~ jobj %>%
-                         invoke("parent") %>%
-                         invoke("getFormula")
-                     )(),
-                     class = "ml_r_formula_model")
+    formula = possibly_null(
+      ~ jobj %>%
+        invoke("parent") %>%
+        invoke("getFormula")
+    )(),
+    class = "ml_r_formula_model"
+  )
 }
 
 # Validator
 
 validator_ml_r_formula <- function(.args) {
-  if (rlang::is_formula(.args[["formula"]]))
+  if (rlang::is_formula(.args[["formula"]])) {
     .args[["formula"]] <- rlang::expr_text(.args[["formula"]], width = 500L)
+  }
   .args[["formula"]] <- cast_nullable_string(.args[["formula"]])
   .args[["features_col"]] <- cast_string(.args[["features_col"]])
   .args[["label_col"]] <- cast_string(.args[["label_col"]])

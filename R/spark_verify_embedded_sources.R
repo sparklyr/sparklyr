@@ -4,7 +4,7 @@
 #' @include utils.R
 
 spark_verify_embedded_sources <- function() {
-  expected <- tempfile(pattern = 'spark_embedded_sources_', fileext = ".R")
+  expected <- tempfile(pattern = "spark_embedded_sources_", fileext = ".R")
   spark_gen_embedded_sources(output = expected)
   jar <- find_jar() %||% path_program("jar", fmt = "Unable to locate '%s' binary")
 

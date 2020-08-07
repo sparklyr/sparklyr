@@ -36,8 +36,10 @@ test_that("ml_aft_survival_regression() works properly", {
   training_tbl <- sdf_copy_to(sc, training, overwrite = TRUE) %>%
     ft_vector_assembler(c("V1", "V2"), "features")
 
-  aft <- ml_aft_survival_regression(training_tbl, quantile_probabilities = list(0.3, 0.6),
-                             quantiles_col = "quantiles")
+  aft <- ml_aft_survival_regression(training_tbl,
+    quantile_probabilities = list(0.3, 0.6),
+    quantiles_col = "quantiles"
+  )
 
   expect_equal(aft$coefficients, c(-0.49631114666506776, 0.19844437699934067), tolerance = 1e-4, scale = 1)
   expect_equal(aft$intercept, 2.6380946151040043, tolerance = 1e-4, scale = 1)
@@ -45,18 +47,21 @@ test_that("ml_aft_survival_regression() works properly", {
 
   predicted_tbl <- ml_predict(aft, training_tbl)
   expect_equal(predicted_tbl %>%
-                 dplyr::pull(quantiles) %>%
-                 dplyr::first(),
-               c(1.1603238947151593, 4.995456010274735),
-               tolerance = 1e-4, scale = 1)
+    dplyr::pull(quantiles) %>%
+    dplyr::first(),
+  c(1.1603238947151593, 4.995456010274735),
+  tolerance = 1e-4, scale = 1
+  )
   expect_equal(predicted_tbl %>%
-                 dplyr::pull(prediction) %>%
-                 dplyr::first(),
-               5.718979487634966, tolerance = 1e-4, scale = 1)
+    dplyr::pull(prediction) %>%
+    dplyr::first(),
+  5.718979487634966,
+  tolerance = 1e-4, scale = 1
+  )
 
   aft_model <- ml_aft_survival_regression(training_tbl, label ~ V1 + V2, features_col = "feat")
   expect_equal(coef(aft_model),
-               structure(c(2.63808989630564, -0.496304411053117, 0.198452172529228
-               ), .Names = c("(Intercept)", "V1", "V2")),
-               tolerance = 1e-05, scale = 1)
+    structure(c(2.63808989630564, -0.496304411053117, 0.198452172529228), .Names = c("(Intercept)", "V1", "V2")),
+    tolerance = 1e-05, scale = 1
+  )
 })

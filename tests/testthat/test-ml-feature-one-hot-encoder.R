@@ -51,7 +51,7 @@ test_that("ft_one_hot_encoder() with multiple columns", {
 
   if (spark_version(sc) < "3.0.0") {
     expect_error(df_tbl %>%
-                   ft_one_hot_encoder(c("input1", "input2"), c("output1", "output2")))
+      ft_one_hot_encoder(c("input1", "input2"), c("output1", "output2")))
   }
   else {
     expect_identical(

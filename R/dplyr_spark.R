@@ -8,8 +8,7 @@ spark_connection.src_spark <- function(x, ...) {
 
   # for development version of dplyr (>= 0.5.0.9000)
   if ("dplyr" %in% loadedNamespaces() &&
-      exists("con_acquire", envir = asNamespace("dplyr")))
-  {
+    exists("con_acquire", envir = asNamespace("dplyr"))) {
     acquire <- get("con_acquire", envir = asNamespace("dplyr"))
     return(acquire(x))
   }
@@ -22,10 +21,12 @@ spark_connection.src_spark <- function(x, ...) {
 #' @importFrom dplyr db_desc
 db_desc.src_spark <- function(x) {
   sc <- spark_connection(x)
-  paste("spark connection",
-        paste("master", sc$master, sep = "="),
-        paste("app", sc$app_name, sep = "="),
-        paste("local", spark_connection_is_local(sc), sep = "="))
+  paste(
+    "spark connection",
+    paste("master", sc$master, sep = "="),
+    paste("app", sc$app_name, sep = "="),
+    paste("local", spark_connection_is_local(sc), sep = "=")
+  )
 }
 
 #' @export
@@ -102,8 +103,7 @@ copy_to.spark_connection <- function(dest,
                                      overwrite = FALSE,
                                      memory = TRUE,
                                      repartition = 0L,
-                                     ...)
-{
+                                     ...) {
   sdf_copy_to(dest, df, name, memory, repartition, overwrite, ...)
 }
 
@@ -124,8 +124,7 @@ print.src_spark <- function(x, ...) {
 
 #' @export
 #' @importFrom dplyr db_save_query
-db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...)
-{
+db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
   df <- spark_dataframe(con, sql)
   sdf_register(df, name)
 
@@ -141,7 +140,9 @@ db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...
 #' @importFrom dbplyr build_sql
 #' @importFrom DBI dbExecute
 db_analyze.spark_connection <- function(con, table, ...) {
-  if (spark_version(con) < "2.0.0") return(NULL)
+  if (spark_version(con) < "2.0.0") {
+    return(NULL)
+  }
 
   info <- dbGetQuery(con, build_sql("SHOW TABLES LIKE", table, con = con))
   if (nrow(info) > 0 && identical(info$isTemporary, FALSE)) {
@@ -152,7 +153,9 @@ db_analyze.spark_connection <- function(con, table, ...) {
 #' @export
 #' @importFrom dplyr same_src
 same_src.src_spark <- function(x, y) {
-  if (!inherits(y, "src_spark")) return(FALSE)
+  if (!inherits(y, "src_spark")) {
+    return(FALSE)
+  }
 
   # By default, dplyr uses identical(x$con, y$con); however,
   # sparklyr connection might slightly change due to the state

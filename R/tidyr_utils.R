@@ -3,8 +3,9 @@
 # emit an error if the given arg is missing
 check_present <- function(x) {
   arg <- rlang::ensym(x)
-  if (missing(x))
+  if (missing(x)) {
     abort(paste0("Argument `", arg, "` is missing with no default"))
+  }
 }
 
 # helper method returning a minimal R dataframe containing the same set of
@@ -27,8 +28,9 @@ update_group_vars <- function(input, output, preserved) {
   output <- do.call(dplyr::group_by, append(list(output), lapply(incl, as.symbol)))
 
   excl <- setdiff(incl, preserved)
-  if (length(excl) > 0)
+  if (length(excl) > 0) {
     output <- do.call(dplyr::ungroup, append(list(output), lapply(excl, as.symbol)))
+  }
 
   output
 }

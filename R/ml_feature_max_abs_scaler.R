@@ -12,10 +12,14 @@
 #' features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
 #'
 #' iris_tbl %>%
-#'   ft_vector_assembler(input_col = features,
-#'                       output_col = "features_temp") %>%
-#'   ft_max_abs_scaler(input_col = "features_temp",
-#'                      output_col = "features")
+#'   ft_vector_assembler(
+#'     input_col = features,
+#'     output_col = "features_temp"
+#'   ) %>%
+#'   ft_max_abs_scaler(
+#'     input_col = "features_temp",
+#'     output_col = "features"
+#'   )
 #' }
 #'
 #' @template roxlate-ml-feature-input-output-col
@@ -56,7 +60,6 @@ ft_max_abs_scaler.spark_connection <- function(x, input_col = NULL, output_col =
 #' @export
 ft_max_abs_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
                                           uid = random_string("max_abs_scaler_"), ...) {
-
   stage <- ft_max_abs_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -65,13 +68,11 @@ ft_max_abs_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
     ...
   )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
 ft_max_abs_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
                                         uid = random_string("max_abs_scaler_"), ...) {
-
   stage <- ft_max_abs_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -80,10 +81,11 @@ ft_max_abs_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_max_abs_scaler <- function(jobj) {

@@ -1,6 +1,5 @@
 #' @importFrom rstudioapi sendToConsole
-stream_register <- function(stream)
-{
+stream_register <- function(stream) {
   sc <- spark_connection(stream)
 
   if (is.null(sc$state$streams)) sc$state$streams <- new.env()
@@ -49,7 +48,9 @@ stream_register <- function(stream)
 }
 
 stream_unregister <- function(stream) {
-  if (is.null(stream)) return()
+  if (is.null(stream)) {
+    return()
+  }
 
   sc <- spark_connection(stream)
 

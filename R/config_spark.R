@@ -36,7 +36,7 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   mergedConfig <- merge_lists(baseEnvConfig, userConfig)
 
   if (nchar(Sys.getenv("SPARK_DRIVER_CLASSPATH")) > 0 &&
-      is.null(mergedConfig$master$`sparklyr.shell.driver-class-path`)) {
+    is.null(mergedConfig$master$`sparklyr.shell.driver-class-path`)) {
     mergedConfig$master$`sparklyr.shell.driver-class-path` <- Sys.getenv("SPARK_DRIVER_CLASSPATH")
   }
 
@@ -66,22 +66,24 @@ spark_config_exists <- function(config, name, default = NULL) {
 # recursively merge two lists -- extracted from code used by rmarkdown
 # package to merge _output.yml, _site.yml, front matter, etc.:
 # https://github.com/rstudio/rmarkdown/blob/master/R/util.R#L174
-merge_lists <- function (base_list, overlay_list, recursive = TRUE) {
-  if (length(base_list) == 0)
+merge_lists <- function(base_list, overlay_list, recursive = TRUE) {
+  if (length(base_list) == 0) {
     overlay_list
-  else if (length(overlay_list) == 0)
+  } else if (length(overlay_list) == 0) {
     base_list
-  else {
+  } else {
     merged_list <- base_list
     for (name in names(overlay_list)) {
       base <- base_list[[name]]
       overlay <- overlay_list[[name]]
-      if (is.list(base) && is.list(overlay) && recursive)
+      if (is.list(base) && is.list(overlay) && recursive) {
         merged_list[[name]] <- merge_lists(base, overlay)
-      else {
+      } else {
         merged_list[[name]] <- NULL
-        merged_list <- append(merged_list,
-                              overlay_list[which(names(overlay_list) %in% name)])
+        merged_list <- append(
+          merged_list,
+          overlay_list[which(names(overlay_list) %in% name)]
+        )
       }
     }
     merged_list
@@ -95,26 +97,28 @@ spark_config_value_retries <- function(config, name, default, retries) {
   while (!success && retries > 0) {
     retries <- retries - 1
 
-    result <- tryCatch({
-      list(
-        value = spark_config_value(config, name, default),
-        success = TRUE
-      )
-    }, error = function(e) {
-      if (spark_config_value(config, "sparklyr.verbose", FALSE)) {
-        message("Reading ", name, " failed with error: ", e$message)
+    result <- tryCatch(
+      {
+        list(
+          value = spark_config_value(config, name, default),
+          success = TRUE
+        )
+      },
+      error = function(e) {
+        if (spark_config_value(config, "sparklyr.verbose", FALSE)) {
+          message("Reading ", name, " failed with error: ", e$message)
+        }
+
+        if (retries > 0) Sys.sleep(1)
+
+        list(
+          success = FALSE
+        )
       }
-
-      if (retries > 0) Sys.sleep(1)
-
-      list(
-        success = FALSE
-      )
-    })
+    )
 
     success <- result$success
     value <- result$value
-
   }
 
   if (!success) {
@@ -168,9 +172,12 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
   if ("avro" %in% packages) {
     packages <- packages[-which(packages == "avro")]
 
-    if (is.null(version))
-      stop("`package = \"avro\")` requires Spark version to be specified via ",
-           "`spark_connect(..., version = <Spark version>)`")
+    if (is.null(version)) {
+      stop(
+        "`package = \"avro\")` requires Spark version to be specified via ",
+        "`spark_connect(..., version = <Spark version>)`"
+      )
+    }
 
     config$sparklyr.shell.packages <- c(
       config$sparklyr.shell.packages,
@@ -181,17 +188,19 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
   if ("rapids" %in% packages) {
     packages <- packages[-which(packages == "rapids")]
 
-    if (version < "3.0.0")
+    if (version < "3.0.0") {
       stop("RAPIDS library is only supported in Spark 3.0.0 or higher")
+    }
 
     additional_configs <- list(...)
     config$sparklyr.shell.packages <- c(
       config$sparklyr.shell.packages,
       (
-        if (additional_configs$method %in% c("databricks", "databricks-connect"))
+        if (additional_configs$method %in% c("databricks", "databricks-connect")) {
           "com.nvidia:rapids-4-spark_2.12:0.1.0-databricks"
-        else
+        } else {
           "com.nvidia:rapids-4-spark_2.12:0.1.0"
+        }
       ),
       "ai.rapids:cudf:0.14"
     )

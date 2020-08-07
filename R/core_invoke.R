@@ -1,16 +1,14 @@
-core_invoke_sync_socket <- function(sc)
-{
+core_invoke_sync_socket <- function(sc) {
   flush <- c(1)
-  while(length(flush) > 0) {
+  while (length(flush) > 0) {
     flush <- readBin(sc$backend, raw(), 1000)
 
     # while flushing monitored connections we don't want to hang forever
-    if (identical(sc$state$use_monitoring, TRUE)) break;
+    if (identical(sc$state$use_monitoring, TRUE)) break
   }
 }
 
-core_invoke_sync <- function(sc)
-{
+core_invoke_sync <- function(sc) {
   # sleep until connection clears is back on valid state
   while (!core_invoke_synced(sc)) {
     Sys.sleep(1)
@@ -18,19 +16,21 @@ core_invoke_sync <- function(sc)
   }
 }
 
-core_invoke_cancel_running <- function(sc)
-{
-  if (is.null(spark_context(sc)))
+core_invoke_cancel_running <- function(sc) {
+  if (is.null(spark_context(sc))) {
     return()
+  }
 
   # if something fails while using a monitored connection we don't cancel jobs
-  if (identical(sc$state$use_monitoring, TRUE))
+  if (identical(sc$state$use_monitoring, TRUE)) {
     return()
+  }
 
   # if something fails while cancelling jobs we don't cancel jobs, this can
   # happen in OutOfMemory errors that shut down the spark context
-  if (identical(sc$state$cancelling_all_jobs, TRUE))
+  if (identical(sc$state$cancelling_all_jobs, TRUE)) {
     return()
+  }
 
   connection_progress_context(sc, function() {
     sc$state$cancelling_all_jobs <- TRUE
@@ -61,10 +61,10 @@ write_bin_args <- function(backend, object, static, method, args) {
   writeBin(con, backend)
 }
 
-core_invoke_synced <- function(sc)
-{
-  if (is.null(sc))
+core_invoke_synced <- function(sc) {
+  if (is.null(sc)) {
     stop("The connection is no longer valid.")
+  }
 
   backend <- core_invoke_socket(sc)
   echo_id <- "sparklyr"
@@ -83,44 +83,46 @@ core_invoke_synced <- function(sc)
 }
 
 core_invoke_socket <- function(sc) {
-  if (identical(sc$state$use_monitoring, TRUE))
+  if (identical(sc$state$use_monitoring, TRUE)) {
     sc$monitoring
-  else
+  } else {
     sc$backend
+  }
 }
 
 core_invoke_socket_name <- function(sc) {
-  if (identical(sc$state$use_monitoring, TRUE))
+  if (identical(sc$state$use_monitoring, TRUE)) {
     "monitoring"
-  else
+  } else {
     "backend"
+  }
 }
 
 core_remove_jobjs <- function(sc, ids) {
   core_invoke_method_impl(sc, static = TRUE, noreply = TRUE, "Handler", "rm", as.list(ids))
 }
 
-core_invoke_method <- function(sc, static, object, method, ...)
-{
+core_invoke_method <- function(sc, static, object, method, ...) {
   core_invoke_method_impl(sc, static, noreply = FALSE, object, method, ...)
 }
 
-core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
-{
+core_invoke_method_impl <- function(sc, static, noreply, object, method, ...) {
   # N.B.: the reference to `object` must be retained until after a value or exception is returned to us
   # from the invoked method here (i.e., cannot have `object <- something_else` before that), because any
   # re-assignment could cause the last reference to `object` to be destroyed and the underlying JVM object
   # to be deleted from JVMObjectTracker before the actual invocation of the method could happen.
   lockBinding("object", environment())
 
-  if (is.null(sc))
+  if (is.null(sc)) {
     stop("The connection is no longer valid.")
+  }
 
   args <- list(...)
 
   # initialize status if needed
-  if (is.null(sc$state$status))
+  if (is.null(sc$state$status)) {
     sc$state$status <- list()
+  }
 
   # choose connection socket
   backend <- core_invoke_socket(sc)
@@ -136,10 +138,11 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
   }
 
   if (!identical(object, "Handler") &&
-      spark_config_value(sc$config, c("sparklyr.cancellable", "sparklyr.connection.cancellable"), TRUE)) {
+    spark_config_value(sc$config, c("sparklyr.cancellable", "sparklyr.connection.cancellable"), TRUE)) {
     # if connection still running, sync to valid state
-    if (identical(sc$state$status[[connection_name]], "running"))
+    if (identical(sc$state$status[[connection_name]], "running")) {
       core_invoke_sync(sc)
+    }
 
     # while exiting this function, if interrupted (still running), cancel server job
     on.exit(core_invoke_cancel_running(sc))
@@ -153,7 +156,7 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
   write_bin_args(backend, objId, static, method, args)
 
   if (identical(object, "Handler") &&
-      (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
+    (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
     # by the time we read response, backend might be already down.
     return(NULL)
   }
@@ -173,7 +176,8 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
         stop(
           "Unexpected state in sparklyr backend: ",
           msg,
-          call. = FALSE)
+          call. = FALSE
+        )
       })
     }
 
@@ -227,10 +231,11 @@ core_handle_known_errors <- function(sc, msg) {
     )
   }
   else if (grepl("check worker logs for details", msg, ignore.case = TRUE) &&
-           spark_master_is_local(sc$master)) {
+    spark_master_is_local(sc$master)) {
     abort_shell(
       "sparklyr worker rscript failure, check worker logs for details",
-      NULL, NULL, sc$output_file, sc$error_file)
+      NULL, NULL, sc$output_file, sc$error_file
+    )
   }
 }
 

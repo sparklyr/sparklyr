@@ -9,8 +9,7 @@ NULL
 
 #' @rdname ml_als_tidiers
 #' @export
-tidy.ml_model_als <- function(x, ...){
-
+tidy.ml_model_als <- function(x, ...) {
   user_factors <- x$model$user_factors %>%
     dplyr::select(!!"id", !!"features") %>%
     dplyr::rename(user_factors = !!"features")
@@ -26,11 +25,11 @@ tidy.ml_model_als <- function(x, ...){
 #' @param newdata a tbl_spark of new data to use for prediction.
 #'
 #' @export
-augment.ml_model_als <- function(x, newdata = NULL, ...){
+augment.ml_model_als <- function(x, newdata = NULL, ...) {
 
   # if the user doesn't provide a new data, this funcion will
   # use the training set
-  if (is.null(newdata)){
+  if (is.null(newdata)) {
     newdata <- x$dataset
   }
 
@@ -40,10 +39,11 @@ augment.ml_model_als <- function(x, newdata = NULL, ...){
 #' @rdname ml_als_tidiers
 #' @export
 glance.ml_model_als <- function(x, ...) {
-
   rank <- x$model$rank
   cold_start_strategy <- x$model$param_map$cold_start_strategy
 
-  dplyr::tibble(rank = rank,
-                cold_start_strategy = cold_start_strategy)
+  dplyr::tibble(
+    rank = rank,
+    cold_start_strategy = cold_start_strategy
+  )
 }

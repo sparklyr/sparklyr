@@ -39,8 +39,9 @@ verify_distribution <- function(replacement) {
         weight_by = weight,
         replace = replacement
       )
-    for (id in sample$id)
+    for (id in sample$id) {
       expected_dist[[id]] <- expected_dist[[id]] + 1
+    }
 
     sample <- sdf %>%
       sdf_weighted_sample(
@@ -50,8 +51,9 @@ verify_distribution <- function(replacement) {
         seed = seed + x
       ) %>%
       collect()
-    for (id in sample$id)
+    for (id in sample$id) {
       actual_dist[[id]] <- actual_dist[[id]] + 1
+    }
   }
 
   res <- ks.test(x = actual_dist, y = expected_dist)
@@ -74,13 +76,13 @@ test_that("sdf_weighted_sample returns repeatable results from a fixed PRNG seed
       seq(2),
       function(x) {
         sdf %>%
-        sdf_weighted_sample(
-          weight_col = "weight",
-          k = sample_sz,
-          replacement = replacement,
-          seed = seed
-        ) %>%
-        collect()
+          sdf_weighted_sample(
+            weight_col = "weight",
+            k = sample_sz,
+            replacement = replacement,
+            seed = seed
+          ) %>%
+          collect()
       }
     )
 

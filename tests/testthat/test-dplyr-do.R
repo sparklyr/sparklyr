@@ -28,5 +28,4 @@ test_that("the (serial) implementation of 'do' functions as expected", {
     rhs <- S$model[[i]]
     expect_equal(lhs$coefficients, rhs$coefficients)
   }
-
 })

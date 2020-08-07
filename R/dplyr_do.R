@@ -54,12 +54,10 @@ do.tbl_spark <- function(.data, ...) {
         rlang::eval_tidy(quosure),
         error = identity
       )
-
     })
 
     # store
     outputs[[i]] <<- fits
-
   })
 
   # produce 'result' dataset by adding outputs to 'combos'
@@ -75,5 +73,4 @@ do.tbl_spark <- function(.data, ...) {
   }
 
   result
-
 }

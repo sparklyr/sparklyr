@@ -11,24 +11,27 @@ spark_versions_url <- function() {
 #' @importFrom jsonlite fromJSON
 read_spark_versions_json <- function(latest = TRUE, future = FALSE) {
   # see if we have a cached version
-  if (!exists("sparkVersionsJson", envir = .globals))
-  {
+  if (!exists("sparkVersionsJson", envir = .globals)) {
     # This function might be called during a custom configuration and the package
     # will not be available at that time; allow overriding with environment variable
     packagePathEnv <- Sys.getenv("R_SPARKINSTALL_INSTALL_INFO_PATH", unset = NA)
-    packagePath <- if (!is.na(packagePathEnv))
+    packagePath <- if (!is.na(packagePathEnv)) {
       packagePathEnv
-    else
+    } else {
       system.file(file.path("extdata", "versions.json"), package = packageName())
+    }
 
     versionsJson <- NULL
     if (latest) {
-      versionsJson <- tryCatch({
-        suppressWarnings(
-          fromJSON(spark_versions_url(), simplifyDataFrame = TRUE)
-        )
-      }, error = function(e) {
-      })
+      versionsJson <- tryCatch(
+        {
+          suppressWarnings(
+            fromJSON(spark_versions_url(), simplifyDataFrame = TRUE)
+          )
+        },
+        error = function(e) {
+        }
+      )
     }
 
     if (is.null(versionsJson)) {
@@ -54,7 +57,6 @@ read_spark_versions_json <- function(latest = TRUE, future = FALSE) {
 #'
 #' @export
 spark_installed_versions <- function() {
-
   spark <- character()
   hadoop <- character()
   dir <- character()
@@ -69,10 +71,12 @@ spark_installed_versions <- function() {
       }
     }
   })
-  versions <- data.frame(spark = spark,
-                         hadoop = hadoop,
-                         dir = file.path(spark_install_dir(), dir),
-                         stringsAsFactors = FALSE)
+  versions <- data.frame(
+    spark = spark,
+    hadoop = hadoop,
+    dir = file.path(spark_install_dir(), dir),
+    stringsAsFactors = FALSE
+  )
 
   versions
 }
@@ -108,7 +112,6 @@ spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE, sh
 #' @keywords internal
 #' @export
 spark_versions <- function(latest = TRUE) {
-
   downloadData <- read_spark_versions_json(latest, future = TRUE)
   downloadData$installed <- rep(FALSE, NROW(downloadData))
 
@@ -134,14 +137,15 @@ spark_versions <- function(latest = TRUE) {
 
   mergedData <- downloadData
   lapply(
-    Filter(function(e) !is.null(e),
-           lapply(dir(c(spark_install_old_dir(), spark_install_dir()), full.names = TRUE), function(maybeDir) {
-             if (dir.exists(maybeDir)) {
-               fileName <- basename(maybeDir)
-               m <- regmatches(fileName, regexec(spark_versions_file_pattern(), fileName))[[1]]
-               if (length(m) > 2) list(spark = m[[2]], hadoop = m[[3]], pattern = fileName) else NULL
-             }
-           })
+    Filter(
+      function(e) !is.null(e),
+      lapply(dir(c(spark_install_old_dir(), spark_install_dir()), full.names = TRUE), function(maybeDir) {
+        if (dir.exists(maybeDir)) {
+          fileName <- basename(maybeDir)
+          m <- regmatches(fileName, regexec(spark_versions_file_pattern(), fileName))[[1]]
+          if (length(m) > 2) list(spark = m[[2]], hadoop = m[[3]], pattern = fileName) else NULL
+        }
+      })
     ),
     function(row) {
       currentRow <- downloadData[downloadData$spark == row$spark & downloadData$hadoop == row$hadoop, ]
@@ -185,7 +189,7 @@ spark_versions_info <- function(version, hadoop_version, latest = TRUE) {
     stop("Hadoop version is not available")
   }
 
-  version <- versions[1,]
+  version <- versions[1, ]
 
   if (nchar(versions$pattern) > 0) {
     componentName <- sub("\\.tgz", "", sprintf(versions$pattern, version$spark, version$hadoop))
@@ -197,7 +201,7 @@ spark_versions_info <- function(version, hadoop_version, latest = TRUE) {
   packageName <- paste0(componentName, ".tgz")
   packageRemotePath <- version$download
 
-  list (
+  list(
     componentName = componentName,
     packageName = packageName,
     packageRemotePath = packageRemotePath

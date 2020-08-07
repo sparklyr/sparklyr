@@ -27,18 +27,20 @@ spark_submit <- function(master,
   shell_args <- spark_config_shell_args(config, master)
   if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
 
-  shell_connection(master = master,
-                   spark_home = spark_home,
-                   app_name = app_name,
-                   version = version,
-                   hadoop_version = hadoop_version,
-                   shell_args = shell_args,
-                   config = config,
-                   service = FALSE,
-                   remote = FALSE,
-                   extensions = extensions,
-                   batch = file,
-                   scala_version = scala_version)
+  shell_connection(
+    master = master,
+    spark_home = spark_home,
+    app_name = app_name,
+    version = version,
+    hadoop_version = hadoop_version,
+    shell_args = shell_args,
+    config = config,
+    service = FALSE,
+    remote = FALSE,
+    extensions = extensions,
+    batch = file,
+    scala_version = scala_version
+  )
 
   invisible(NULL)
 }

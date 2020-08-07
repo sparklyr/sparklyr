@@ -24,8 +24,9 @@ test_that("sdf_collect() works properly with impl = \"column-wise\"", {
 })
 
 test_that("sdf_collect() works with nested lists", {
-  if (spark_version(sc) < "2.4")
+  if (spark_version(sc) < "2.4") {
     skip("serializing nested list into Spark StructType is only supported in Spark 2.4+")
+  }
 
   df <- tibble::tibble(
     a = list(c(1, 2, 3), c(4, 5), c(6)),
@@ -39,8 +40,9 @@ test_that("sdf_collect() works with nested lists", {
 })
 
 test_that("sdf_collect() works with nested named lists", {
-  if (spark_version(sc) < "2.4")
+  if (spark_version(sc) < "2.4") {
     skip("serializing nested named list into Spark StructType is only supported in Spark 2.4+")
+  }
 
   df <- tibble::tibble(
     x = list(c(a = 1, b = 2), c(a = 3, b = 4), c(a = 5, b = 6)),
@@ -50,13 +52,15 @@ test_that("sdf_collect() works with nested named lists", {
   sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
   res <- sdf_collect(sdf)
 
-  for (col in colnames(df))
+  for (col in colnames(df)) {
     expect_equivalent(lapply(df[[col]], as.list), res[[col]])
+  }
 })
 
 test_that("sdf_collect() works with structs inside arrays", {
-  if (spark_version(sc) < "2.3")
+  if (spark_version(sc) < "2.3") {
     skip("deserializing Spark StructType into named list is only supported in Spark 2.3+")
+  }
 
   jsonFilePath <- get_sample_data_path("struct-inside-arrays.json")
 
@@ -66,25 +70,31 @@ test_that("sdf_collect() works with structs inside arrays", {
   expect_equal(sentences_local$text, c("t e x t"))
 
   expected <- list(
-      list(begin = 0,
-           end = 58,
-           metadata = list(embeddings = c(1, 2, 3), sentence = 1),
-           result = "French",
-           type = "document1"),
-      list(begin = 59,
-           end = 118,
-           metadata = list(embeddings = c(4, 5, 6), sentence = 2),
-           result = "English",
-           type = "document2")
+    list(
+      begin = 0,
+      end = 58,
+      metadata = list(embeddings = c(1, 2, 3), sentence = 1),
+      result = "French",
+      type = "document1"
+    ),
+    list(
+      begin = 59,
+      end = 118,
+      metadata = list(embeddings = c(4, 5, 6), sentence = 2),
+      result = "English",
+      type = "document2"
+    )
   )
   expect_equal(sentences_local$sentences, list(expected))
 })
 
 test_that("sdf_collect() works with structs inside nested arrays", {
-  if (spark_version(sc) < "2.3")
+  if (spark_version(sc) < "2.3") {
     skip("deserializing Spark StructType into named list is only supported in Spark 2.3+")
-  if (spark_version(sc) < "2.4")
+  }
+  if (spark_version(sc) < "2.4") {
     skip("to_json on nested arrays is only supported in Spark 2.4+")
+  }
 
   jsonFilePath <- get_sample_data_path("struct-inside-nested-arrays.json")
 
@@ -94,16 +104,20 @@ test_that("sdf_collect() works with structs inside nested arrays", {
   expect_equal(sentences_local$text, c("t e x t"))
 
   expected <- list(
-      list(list(begin = 0,
-           end = 58,
-           metadata = list(embeddings = c(1, 2, 3), sentence = 1),
-           result = "French",
-           type = "document1")),
-      list(list(begin = 59,
-           end = 118,
-           metadata = list(embeddings = c(4, 5, 6), sentence = 2),
-           result = "English",
-           type = "document2"))
+    list(list(
+      begin = 0,
+      end = 58,
+      metadata = list(embeddings = c(1, 2, 3), sentence = 1),
+      result = "French",
+      type = "document1"
+    )),
+    list(list(
+      begin = 59,
+      end = 118,
+      metadata = list(embeddings = c(4, 5, 6), sentence = 2),
+      result = "English",
+      type = "document2"
+    ))
   )
   expect_equal(sentences_local$sentences, list(expected))
 })
@@ -183,7 +197,7 @@ test_that("sdf_collect() supports callback expression", {
 
   row_count <- 0
   sdf_len(sc, 10, repartition = 2) %>%
-    collect(callback = ~(row_count <<- row_count + nrow(.x)))
+    collect(callback = ~ (row_count <<- row_count + nrow(.x)))
 
   expect_equal(
     10,

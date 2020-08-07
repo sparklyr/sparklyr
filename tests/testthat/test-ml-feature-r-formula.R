@@ -48,16 +48,19 @@ test_that("r formula works as expected", {
     x = sc,
     formula = "Sepal_Length ~ Petal_Width + Species",
     features_col = "x",
-    label_col = "y")
+    label_col = "y"
+  )
 
-  if (spark_version(sc) >= "2.1.0")
+  if (spark_version(sc) >= "2.1.0") {
     args <- c(args, force_index_label = TRUE)
+  }
 
   rf <- do.call(ft_r_formula, args)
 
   expect_equal(
     ml_params(rf, names(args)[-1]),
-    args[-1])
+    args[-1]
+  )
 })
 
 test_that("ft_r_formula takes formula", {

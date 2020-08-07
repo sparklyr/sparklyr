@@ -19,7 +19,8 @@ test_that("ft_pca() works", {
     V2 = c(1, 0, 0),
     V3 = c(0, 3, 0),
     V4 = c(7, 4, 6),
-    V5 = c(0, 5, 7))
+    V5 = c(0, 5, 7)
+  )
 
   s <- dplyr::tibble(
     PC1 = c(1.6485728230883807, -4.645104331781534, -6.428880535676489),
@@ -87,24 +88,28 @@ test_that("sdf_project() returns correct number of columns", {
   mat_tbl <- testthat_tbl("mat")
 
   for (k in 1:2) {
-    expect_equal(mat_tbl %>%
-                   ml_pca(k = k) %>%
-                   sdf_project() %>%
-                   select(starts_with("PC")) %>%
-                   collect() %>%
-                   ncol(),
-                 k)
+    expect_equal(
+      mat_tbl %>%
+        ml_pca(k = k) %>%
+        sdf_project() %>%
+        select(starts_with("PC")) %>%
+        collect() %>%
+        ncol(),
+      k
+    )
   }
 })
 
 test_that("sdf_project() takes newdata argument", {
   mat_tbl <- testthat_tbl("mat")
 
-  expect_equal(mat_tbl %>%
-                 ml_pca(k = 3) %>%
-                 sdf_project() %>%
-                 collect(),
-               mat_tbl %>% ml_pca(k = 3) %>%
-                 sdf_project(mat_tbl) %>%
-                 collect())
+  expect_equal(
+    mat_tbl %>%
+      ml_pca(k = 3) %>%
+      sdf_project() %>%
+      collect(),
+    mat_tbl %>% ml_pca(k = 3) %>%
+      sdf_project(mat_tbl) %>%
+      collect()
+  )
 })

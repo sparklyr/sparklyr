@@ -22,7 +22,8 @@ test_that("ml_one_vs_rest with two classes agrees with logistic regression", {
   sc <- testthat_spark_connection()
   iris_tbl2 <- testthat_tbl("iris") %>%
     mutate(is_versicolor = ifelse(
-      Species == "versicolor", "versicolor", "other")) %>%
+      Species == "versicolor", "versicolor", "other"
+    )) %>%
     select(-Species)
 
   lr_model <- ml_logistic_regression(iris_tbl2, formula = is_versicolor ~ .)

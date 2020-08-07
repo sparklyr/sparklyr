@@ -22,9 +22,12 @@ test_that("ft_standard_scaler() works properly", {
   sc <- testthat_spark_connection()
   sample_data_path <- get_sample_data_path("sample_libsvm_data.txt")
   sample_data <- spark_read_libsvm(sc, "sample_data",
-                                   sample_data_path, overwrite = TRUE)
+    sample_data_path,
+    overwrite = TRUE
+  )
   scaler <- ft_standard_scaler(
-    sc, input_col = "features", output_col = "scaledFeatures",
+    sc,
+    input_col = "features", output_col = "scaledFeatures",
     with_std = TRUE, with_mean = FALSE, uid = "standard_scalaer_999"
   )
 
@@ -37,7 +40,8 @@ test_that("ft_standard_scaler() works properly", {
       dplyr::pull(scaledFeatures) %>%
       unlist() %>%
       sum(),
-    295.3425, tolerance = 0.001, scale = 1
+    295.3425,
+    tolerance = 0.001, scale = 1
   )
 
   expect_output_file(

@@ -30,16 +30,22 @@ ml_train_validation_split.spark_connection <- function(x, estimator = NULL, esti
   ml_new_validator(
     x, "org.apache.spark.ml.tuning.TrainValidationSplit", uid,
     .args[["estimator"]], .args[["evaluator"]], .args[["estimator_param_maps"]], .args[["seed"]]
-  ) %>% (
-    function(obj) {
-      do.call(invoke,
-              c(obj, "%>%", Filter(function(x) !is.null(x),
-                                   list(
-                                        list("setTrainRatio", .args[["train_ratio"]]),
-                                        jobj_set_param_helper(obj, "setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE),
-                                        jobj_set_param_helper(obj, "setParallelism", .args[["parallelism"]], "2.3.0", 1)))))
-     }) %>%
-  new_ml_train_validation_split()
+  ) %>%
+    (
+      function(obj) {
+        do.call(
+          invoke,
+          c(obj, "%>%", Filter(
+            function(x) !is.null(x),
+            list(
+              list("setTrainRatio", .args[["train_ratio"]]),
+              jobj_set_param_helper(obj, "setCollectSubModels", .args[["collect_sub_models"]], "2.3.0", FALSE),
+              jobj_set_param_helper(obj, "setParallelism", .args[["parallelism"]], "2.3.0", 1)
+            )
+          ))
+        )
+      }) %>%
+    new_ml_train_validation_split()
 }
 
 #' @export
@@ -118,7 +124,8 @@ new_ml_train_validation_split_model <- function(jobj) {
         invoke("subModels") %>%
         purrr::map(ml_call_constructor)
     ),
-    class = "ml_train_validation_split_model")
+    class = "ml_train_validation_split_model"
+  )
 }
 
 #' @export

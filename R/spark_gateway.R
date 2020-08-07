@@ -16,10 +16,12 @@ gateway_connection <- function(master, config) {
   gatewayPort <- as.integer(portAndSesssion[[1]])
   sessionId <- if (length(portAndSesssion) > 1) as.integer(portAndSesssion[[2]]) else 0
 
-  gatewayInfo <- spark_connect_gateway(gatewayAddress = gatewayAddress,
-                                       gatewayPort = gatewayPort,
-                                       sessionId = sessionId,
-                                       config = config)
+  gatewayInfo <- spark_connect_gateway(
+    gatewayAddress = gatewayAddress,
+    gatewayPort = gatewayPort,
+    sessionId = sessionId,
+    config = config
+  )
 
   if (is.null(gatewayInfo)) {
     stop("Failed to connect to gateway: ", master)
@@ -35,28 +37,35 @@ gateway_connection <- function(master, config) {
 }
 
 spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress) {
-  tryCatch({
-    interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
+  tryCatch(
+    {
+      interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
 
-    backend <- socketConnection(host = gatewayAddress,
-                                port = gatewayInfo$backendPort,
-                                server = FALSE,
-                                blocking = interval > 0,
-                                open = "wb",
-                                timeout = interval)
-    class(backend) <- c(class(backend), "shell_backend")
+      backend <- socketConnection(
+        host = gatewayAddress,
+        port = gatewayInfo$backendPort,
+        server = FALSE,
+        blocking = interval > 0,
+        open = "wb",
+        timeout = interval
+      )
+      class(backend) <- c(class(backend), "shell_backend")
 
-    monitoring <- socketConnection(host = gatewayAddress,
-                                   port = gatewayInfo$backendPort,
-                                   server = FALSE,
-                                   blocking = interval > 0,
-                                   open = "wb",
-                                   timeout = interval)
-    class(monitoring) <- c(class(monitoring), "shell_backend")
-  }, error = function(err) {
-    close(gatewayInfo$gateway)
-    stop("Failed to open connection to backend:", err$message)
-  })
+      monitoring <- socketConnection(
+        host = gatewayAddress,
+        port = gatewayInfo$backendPort,
+        server = FALSE,
+        blocking = interval > 0,
+        open = "wb",
+        timeout = interval
+      )
+      class(monitoring) <- c(class(monitoring), "shell_backend")
+    },
+    error = function(err) {
+      close(gatewayInfo$gateway)
+      stop("Failed to open connection to backend:", err$message)
+    }
+  )
 
   # create the shell connection
   sc <- new_spark_gateway_connection(list(
@@ -102,4 +111,3 @@ invoke_method.spark_gateway_connection <- invoke_method.spark_shell_connection
 
 #' @export
 print_jobj.spark_gateway_connection <- print_jobj.spark_shell_connection
-

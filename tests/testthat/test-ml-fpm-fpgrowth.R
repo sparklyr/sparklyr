@@ -31,12 +31,14 @@ test_that("ml_fpgrowth() works properly", {
   expect_equal(
     ml_freq_itemsets(fp_model) %>%
       sdf_nrow(),
-    7)
+    7
+  )
 
   expect_equal(
     ml_association_rules(fp_model) %>%
       sdf_nrow(),
-    9)
+    9
+  )
 
   expect_identical(
     fp_model %>%

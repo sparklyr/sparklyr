@@ -26,61 +26,73 @@ ml_pipeline.ml_pipeline_stage <-
     uid <- cast_string(uid)
     sc <- spark_connection(x)
     dots <- list(...) %>%
-      lapply(function(x)
-        spark_jobj(x))
+      lapply(function(x) {
+        spark_jobj(x)
+      })
     stages <- c(spark_jobj(x), dots)
-    jobj <- invoke_static(sc,
-                          "sparklyr.MLUtils",
-                          "createPipelineFromStages",
-                          uid,
-                          stages)
+    jobj <- invoke_static(
+      sc,
+      "sparklyr.MLUtils",
+      "createPipelineFromStages",
+      uid,
+      stages
+    )
     new_ml_pipeline(jobj)
   }
 
 # Constructors
 
 new_ml_pipeline <- function(jobj, ..., class = character()) {
-  stages <- tryCatch({
-    jobj %>%
-      invoke("getStages") %>%
-      lapply(ml_call_constructor)
-  },
-  error = function(e) {
-    NULL
-  })
+  stages <- tryCatch(
+    {
+      jobj %>%
+        invoke("getStages") %>%
+        lapply(ml_call_constructor)
+    },
+    error = function(e) {
+      NULL
+    }
+  )
   new_ml_estimator(
     jobj,
     stages = stages,
-    stage_uids = if (rlang::is_null(stages))
+    stage_uids = if (rlang::is_null(stages)) {
       NULL
-    else
-      sapply(stages, function(x)
-        x$uid),
+    } else {
+      sapply(stages, function(x) {
+        x$uid
+      })
+    },
     ...,
     class = c(class, "ml_pipeline")
   )
 }
 
 new_ml_pipeline_model <- function(jobj, ..., class = character()) {
-  stages <- tryCatch({
-    jobj %>%
-      invoke("stages")
-  },
-  error = function(e) {
-    NULL
-  })
+  stages <- tryCatch(
+    {
+      jobj %>%
+        invoke("stages")
+    },
+    error = function(e) {
+      NULL
+    }
+  )
 
-  if (!rlang::is_na(stages))
+  if (!rlang::is_na(stages)) {
     stages <- lapply(stages, ml_call_constructor)
+  }
 
   new_ml_transformer(
     jobj,
     stages = stages,
-    stage_uids = if (rlang::is_null(stages))
+    stage_uids = if (rlang::is_null(stages)) {
       NULL
-    else
-      sapply(stages, function(x)
-        x$uid),
+    } else {
+      sapply(stages, function(x) {
+        x$uid
+      })
+    },
     ...,
     class = c(class, "ml_pipeline_model")
   )
@@ -103,17 +115,19 @@ spark_connection.ml_pipeline_model <- function(x, ...) {
 
 print_pipeline <- function(x, type = c("pipeline", "pipeline_model")) {
   type <- match.arg(type)
-  if (identical(type, "pipeline"))
+  if (identical(type, "pipeline")) {
     cat(paste0("Pipeline (Estimator) with "))
-  else
+  } else {
     cat(paste0("PipelineModel (Transformer) with "))
+  }
   num_stages <- length(ml_stages(x))
-  if (num_stages == 0)
+  if (num_stages == 0) {
     cat("no stages")
-  else if (num_stages == 1)
+  } else if (num_stages == 1) {
     cat("1 stage")
-  else
+  } else {
     cat(paste0(num_stages, " stages"))
+  }
   cat("\n")
   cat(paste0("<", x$uid, ">"), "\n")
   if (num_stages > 0) {

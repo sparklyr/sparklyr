@@ -16,4 +16,3 @@ test_that("spark_dependency_fallback() works correctly", {
     "2.1"
   )
 })
-

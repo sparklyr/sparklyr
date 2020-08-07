@@ -14,18 +14,19 @@ spark_csv_is_embedded <- function(sc) {
 }
 
 spark_csv_is_loaded <- function(sc) {
-  if (spark_version(sc) >= "2.0.0")
+  if (spark_version(sc) >= "2.0.0") {
     TRUE
-  else {
+  } else {
     spark_csv_is_embedded(sc)
   }
 }
 
 spark_csv_format_if_needed <- function(source, sc) {
-  if (spark_csv_is_embedded(sc))
+  if (spark_csv_is_embedded(sc)) {
     invoke(source, "format", spark_csv_embedded_namespace())
-  else
+  } else {
     source
+  }
 }
 
 spark_csv_load_name <- function(sc) {
@@ -72,10 +73,11 @@ spark_csv_read <- function(sc,
   df <- invoke(
     optionSchema,
     spark_csv_load_name(sc),
-    path)
+    path
+  )
 
   if ((identical(columns, NULL) && identical(csvOptions$header, "false")) ||
-      (!identical(columns, NULL) && !columnsHaveTypes)) {
+    (!identical(columns, NULL) && !columnsHaveTypes)) {
     if (!identical(columns, NULL)) {
       newNames <- columns
     }
@@ -90,8 +92,9 @@ spark_csv_read <- function(sc,
     # sanitize column names
     colNames <- as.character(invoke(df, "columns"))
     sanitized <- spark_sanitize_names(colNames, sc$config)
-    if (!identical(colNames, sanitized))
+    if (!identical(colNames, sanitized)) {
       df <- invoke(df, "toDF", as.list(sanitized))
+    }
   }
 
   df
@@ -107,15 +110,17 @@ spark_csv_write <- function(df, path, csvOptions, mode, partition_by) {
     options <- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
   }
 
-  if (!is.null(partition_by))
+  if (!is.null(partition_by)) {
     options <- invoke(options, "partitionBy", as.list(partition_by))
+  }
 
   options <- spark_data_apply_mode(options, mode)
 
   invoke(
     options,
     spark_csv_save_name(sc),
-    path)
+    path
+  )
 
   invisible(TRUE)
 }

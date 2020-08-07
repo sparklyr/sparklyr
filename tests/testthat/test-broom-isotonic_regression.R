@@ -10,9 +10,10 @@ test_that("isotonic_regression.tidy() works", {
     ml_isotonic_regression(Petal_Length ~ Petal_Width) %>%
     tidy()
 
-  check_tidy(td1, exp.row = 44,
-             exp.names = c("boundaries", "predictions"))
-
+  check_tidy(td1,
+    exp.row = 44,
+    exp.names = c("boundaries", "predictions")
+  )
 })
 
 test_that("isotonic_regression.augment() works", {
@@ -25,9 +26,13 @@ test_that("isotonic_regression.augment() works", {
     augment() %>%
     dplyr::collect()
 
-  check_tidy(au1, exp.row = 150,
-             exp.name = c(dplyr::tbl_vars(iris_tbl),
-                          ".prediction"))
+  check_tidy(au1,
+    exp.row = 150,
+    exp.name = c(
+      dplyr::tbl_vars(iris_tbl),
+      ".prediction"
+    )
+  )
 })
 
 test_that("isotonic_regression.glance() works", {
@@ -39,6 +44,8 @@ test_that("isotonic_regression.glance() works", {
     ml_isotonic_regression(Petal_Length ~ Petal_Width) %>%
     glance()
 
-  check_tidy(gl1, exp.row = 1,
-             exp.names = c("isotonic", "num_boundaries"))
+  check_tidy(gl1,
+    exp.row = 1,
+    exp.names = c("isotonic", "num_boundaries")
+  )
 })

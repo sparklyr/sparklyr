@@ -10,11 +10,11 @@ NULL
 #' @rdname ml_isotonic_regression_tidiers
 #' @export
 tidy.ml_model_isotonic_regression <- function(x,
-                                                  ...){
-
-  dplyr::tibble(boundaries = x$model$boundaries(),
-                predictions = x$model$predictions())
-
+                                              ...) {
+  dplyr::tibble(
+    boundaries = x$model$boundaries(),
+    predictions = x$model$predictions()
+  )
 }
 
 #' @rdname ml_isotonic_regression_tidiers
@@ -22,19 +22,18 @@ tidy.ml_model_isotonic_regression <- function(x,
 #'
 #' @export
 augment.ml_model_isotonic_regression <- function(x, newdata = NULL,
-                                              ...){
-
+                                                 ...) {
   broom_augment_supervised(x, newdata = newdata)
 }
 
 #' @rdname ml_isotonic_regression_tidiers
 #' @export
 glance.ml_model_isotonic_regression <- function(x, ...) {
-
   isotonic <- x$model$param_map$isotonic
   num_boundaries <- length(x$model$boundaries())
 
-  dplyr::tibble(isotonic = isotonic,
-                num_boundaries = num_boundaries)
+  dplyr::tibble(
+    isotonic = isotonic,
+    num_boundaries = num_boundaries
+  )
 }
-

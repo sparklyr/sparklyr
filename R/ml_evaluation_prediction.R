@@ -72,7 +72,6 @@ ml_binary_classification_evaluator <- function(x, label_col = "label", raw_predi
 ml_binary_classification_evaluator.spark_connection <- function(x, label_col = "label", raw_prediction_col = "rawPrediction",
                                                                 metric_name = "areaUnderROC",
                                                                 uid = random_string("binary_classification_evaluator_"), ...) {
-
   .args <- list(
     label_col = label_col,
     raw_prediction_col = raw_prediction_col,
@@ -90,7 +89,7 @@ ml_binary_classification_evaluator.spark_connection <- function(x, label_col = "
 #' @export
 ml_binary_classification_evaluator.tbl_spark <- function(x, label_col = "label", raw_prediction_col = "rawPrediction",
                                                          metric_name = "areaUnderROC",
-                                                         uid = random_string("binary_classification_evaluator_"), ...){
+                                                         uid = random_string("binary_classification_evaluator_"), ...) {
   evaluator <- ml_binary_classification_evaluator.spark_connection(
     x = spark_connection(x),
     label_col = label_col,
@@ -142,13 +141,13 @@ ml_multiclass_classification_evaluator.spark_connection <- function(x, label_col
   ) %>%
     validator_ml_multiclass_classification_evaluator()
 
-  spark_metric = list(
+  spark_metric <- list(
     "1.6" = c("f1", "precision", "recall", "weightedPrecision", "weightedRecall"),
     "2.0" = c("f1", "weightedPrecision", "weightedRecall", "accuracy")
   )
 
   if (spark_version(x) >= "2.0.0" && !metric_name %in% spark_metric[["2.0"]] ||
-      spark_version(x) <  "2.0.0" && !metric_name %in% spark_metric[["1.6"]]) {
+    spark_version(x) < "2.0.0" && !metric_name %in% spark_metric[["1.6"]]) {
     stop("Metric `", metric_name, "` is unsupported in Spark ", spark_version(x), ".")
   }
 
@@ -215,7 +214,7 @@ ml_regression_evaluator.spark_connection <- function(x, label_col = "label", pre
   evaluator <- spark_pipeline_stage(x, "org.apache.spark.ml.evaluation.RegressionEvaluator", uid) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
     invoke("setPredictionCol", .args[["prediction_col"]]) %>%
-    invoke("setMetricName", .args[["metric_name"]])  %>%
+    invoke("setMetricName", .args[["metric_name"]]) %>%
     new_ml_evaluator()
 
   evaluator

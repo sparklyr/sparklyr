@@ -30,7 +30,8 @@ ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.IDF",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     invoke("setMinDocFreq", .args[["min_doc_freq"]]) %>%
     new_ml_idf()
 
@@ -40,8 +41,7 @@ ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
 #' @export
 ft_idf.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
                                min_doc_freq = 0, uid = random_string("idf_"), ...) {
-
- stage <- ft_idf.spark_connection(
+  stage <- ft_idf.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
     output_col = output_col,
@@ -50,7 +50,6 @@ ft_idf.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
     ...
   )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
@@ -65,10 +64,11 @@ ft_idf.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_idf <- function(jobj) {
