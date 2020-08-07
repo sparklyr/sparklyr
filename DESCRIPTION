@@ -284,6 +284,7 @@ Collate:
     'tidiers_pca.R'
     'tidiers_utils.R'
     'tidyr_utils.R'
+    'tidyr_separate.R'
     'tidyr_unite.R'
     'worker_apply.R'
     'worker_connect.R'
