@@ -20,7 +20,7 @@ test_that("missing values in input are missing in output", {
   sdf <- copy_to(sc, tibble::tibble(x = c(NA, "a b")))
 
   expect_equivalent(
-    sdf %>% tidyr::separate(x, c("x", "y")) %>% collect(),
+    suppressWarnings(sdf %>% tidyr::separate(x, c("x", "y")) %>% collect()),
     tibble::tibble(x = c(NA, "a"), y = c(NA, "b"))
   )
 })
@@ -60,6 +60,13 @@ test_that("extreme integer values handled sensibly", {
 test_that("too many pieces dealt with as requested", {
   test_requires_version("3.0.0")
 
+  suppressWarnings(
+    expect_warning(
+      tidyr::separate(len_mismatch_sdf, x, c("x", "y")),
+      "Expected 2 piece\\(s\\)\\. Additional piece\\(s\\) discarded in 1 row\\(s\\) \\[2\\]\\."
+    )
+  )
+
   expect_equivalent(
     tidyr::separate(len_mismatch_sdf, x, c("x", "y"), extra = "merge") %>% collect(),
     tibble::tibble(x = c("a", "a"), y = c("b", "b c"))
@@ -73,6 +80,13 @@ test_that("too many pieces dealt with as requested", {
 
 test_that("too few pieces dealt with as requested", {
   test_requires_version("3.0.0")
+
+  suppressWarnings(
+    expect_warning(
+      tidyr::separate(len_mismatch_sdf, x, c("x", "y", "z")),
+      "Expected 3 piece\\(s\\)\\. Missing piece\\(s\\) filled with NULL value\\(s\\) in 1 row\\(s\\) \\[1\\]\\."
+    )
+  )
 
   expect_equivalent(
     tidyr::separate(len_mismatch_sdf, x, c("x", "y", "z"), fill = "left") %>% collect(),

@@ -81,7 +81,7 @@ process_warnings <- function(out, substr_arr_col, n, extra, fill) {
       rows <- rows[[row_num]]
       if (length(rows) > 0)
         sprintf(
-          "Expected %d piece(s). Additional piece(s) discarded in %d row(s) [%s]",
+          "Expected %d piece(s). Additional piece(s) discarded in %d row(s) [%s].",
           n,
           length(rows),
           paste0(rows, collapse = ", ")
@@ -97,7 +97,7 @@ process_warnings <- function(out, substr_arr_col, n, extra, fill) {
       rows <- rows[[row_num]]
       if (length(rows) > 0)
         sprintf(
-          "Expected %d piece(s). Missing piece(s) filled with NULL value(s) in %d row(s) [%s]",
+          "Expected %d piece(s). Missing piece(s) filled with NULL value(s) in %d row(s) [%s].",
           n,
           length(rows),
           paste0(rows, collapse = ", ")
