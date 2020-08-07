@@ -41,7 +41,7 @@ strsep_to_sql <- function(col, into, sep) {
   sql[!is.na(into)]
 }
 
-str_split_fixed_to_sql <- function(tmp_col, col, sep, n, extra, fill) {
+str_split_fixed_to_sql <- function(substr_arr_col, col, sep, n, extra, fill) {
   if (identical(extra, "error")) {
     rlang::warn("`extra = \"error\"` is deprecated. Please use `extra = \"warn\"` instead")
     extra <- "warn"
@@ -53,9 +53,60 @@ str_split_fixed_to_sql <- function(tmp_col, col, sep, n, extra, fill) {
   sep <- dbplyr::translate_sql_(list(sep), con = dbplyr::simulate_dbi())
   limit <- if (identical(extra, "merge")) n else -1L
   sql <- list(dplyr::sql(sprintf("SPLIT(%s, %s, %d)", col, sep, limit)))
-  names(sql) <- tmp_col
+  names(sql) <- substr_arr_col
 
   sql
+}
+
+process_warnings <- function(out, substr_arr_col, n, extra, fill) {
+  if (identical(extra, "warn") || identical(fill, "warn")) {
+    output_cols <- colnames(out)
+    tmp_tbl_name <- random_string("__tidyr_separate_tmp_tbl_")
+    row_num <- random_string("__tidyr_separate_row_num_")
+    row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY (SELECT 0))"))
+    names(row_num_sql) <- row_num
+    out <- do.call(dplyr::mutate, append(list(out), row_num_sql)) %>%
+      dplyr::compute(name = tmp_tbl_name)
+    substr_arr_col_sql <- sprintf(
+      "%s.%s",
+      quote_column_name(tmp_tbl_name),
+      substr_arr_col
+    )
+    if (identical(extra, "warn")) {
+      pred <- sprintf("SIZE(%s) > %d", substr_arr_col_sql, n)
+      rows <- out %>%
+        dplyr::filter(dplyr::sql(pred)) %>%
+        dplyr::select(rlang::sym(row_num)) %>%
+        collect()
+      rows <- rows[[row_num]]
+      if (length(rows) > 0)
+        sprintf(
+          "Expected %d piece(s). Additional piece(s) discarded in %d row(s) [%s]",
+          n,
+          length(rows),
+          paste0(rows, collapse = ", ")
+        ) %>%
+          rlang::warn()
+    }
+    if (identical(fill, "warn")) {
+      pred <- sprintf("SIZE(%s) < %d", substr_arr_col_sql, n)
+      rows <- out %>%
+        dplyr::filter(dplyr::sql(pred)) %>%
+        dplyr::select(rlang::sym(row_num)) %>%
+        collect()
+      rows <- rows[[row_num]]
+      if (length(rows) > 0)
+        sprintf(
+          "Expected %d piece(s). Missing piece(s) filled with NULL value(s) in %d row(s) [%s]",
+          n,
+          length(rows),
+          paste0(rows, collapse = ", ")
+        ) %>%
+          rlang::warn()
+    }
+  }
+
+  out
 }
 
 #' @importFrom tidyr separate
@@ -75,10 +126,10 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
     sql <- strsep_to_sql(col, into, sep)
     out <- do.call(dplyr::mutate, append(list(data), sql))
   } else {
-    tmp_col <- random_string("__tidyr_separate_tmp_")
+    substr_arr_col <- random_string("__tidyr_separate_tmp_")
     n <- length(into)
-    split_str_sql <- str_split_fixed_to_sql(tmp_col, col, sep, n, extra, fill)
-    tmp_col <- quote_column_name(tmp_col)
+    split_str_sql <- str_split_fixed_to_sql(substr_arr_col, col, sep, n, extra, fill)
+    substr_arr_col <- quote_column_name(substr_arr_col)
     fill_left <- identical(fill, "left")
     assign_results_sql <- lapply(
       seq_along(into),
@@ -86,19 +137,31 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
         dplyr::sql(
           if (fill_left)
             sprintf(
-              "IF(%d <= %d - SIZE(%s), NULL, ELEMENT_AT(%s, %d - ARRAY_MAX(ARRAY(0, %d - SIZE(%s)))))",
-              idx, n, tmp_col, tmp_col, idx, n, tmp_col
+              "IF(%s, NULL, %s)",
+              sprintf("%d <= %d - SIZE(%s)", idx, n, substr_arr_col),
+              sprintf(
+                "ELEMENT_AT(%s, %d - ARRAY_MAX(ARRAY(0, %d - SIZE(%s))))",
+                substr_arr_col,
+                idx,
+                n,
+                substr_arr_col
+              )
             )
           else
             sprintf(
-              "IF(%d <= SIZE(%s), ELEMENT_AT(%s, %d), NULL)", idx, tmp_col, tmp_col, idx
+              "IF(%d <= SIZE(%s), ELEMENT_AT(%s, %d), NULL)",
+              idx,
+              substr_arr_col,
+              substr_arr_col,
+              idx
             )
         )
       }
     )
     names(assign_results_sql) <- into
     assign_results_sql <- assign_results_sql[!is.na(into)]
-    out <- do.call(dplyr::mutate, append(list(data), split_str_sql))
+    out <- do.call(dplyr::mutate, append(list(data), split_str_sql)) %>%
+      process_warnings(substr_arr_col, n, extra, fill)
     out <- do.call(dplyr::mutate, append(list(out), assign_results_sql))
   }
 
