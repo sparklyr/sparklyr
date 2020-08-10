@@ -587,7 +587,7 @@ livy_connection_not_used_warn <- function(value, default = NULL, name = deparse(
   }
 }
 
-livy_connection_jars <- function(config, version) {
+livy_connection_jars <- function(config, version, scala_version) {
   livy_jars <- spark_config_value(config, "sparklyr.livy.jar", NULL)
   livy_jars <- if (is.null(livy_jars)) list() else list(livy_jars)
 
@@ -604,7 +604,19 @@ livy_connection_jars <- function(config, version) {
 
     target_version <- previouis_versions[length(previouis_versions)]
 
-    target_jar <- dir(system.file("java", package = "sparklyr"), pattern = paste0("sparklyr-", target_version))
+    target_jar_pattern <- (
+      if (is.null(scala_version)) {
+        paste0("sparklyr-", target_version)
+      } else {
+        paste0("sparklyr-", target_version, "-", scala_version)
+      }
+    )
+    target_jar <- dir(system.file("java", package = "sparklyr"), pattern = target_jar_pattern)
+    # Select the jar file built with the lowest version of Scala in case there is no
+    # requirement for Scala version compatibility
+    if (length(target_jar) > 1) {
+      target_jar <- stringr::str_sort(target_jar)[[1]]
+    }
 
     livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "feature/sparklyr-1.3.0")
 
@@ -647,7 +659,7 @@ livy_connection <- function(master,
   if (!spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
     extensions <- spark_dependencies_from_extensions(version, scala_version, extensions, config)
 
-    config$livy.jars <- as.character(c(livy_connection_jars(config, version), extensions$catalog_jars))
+    config$livy.jars <- as.character(c(livy_connection_jars(config, version, scala_version), extensions$catalog_jars))
 
     config[["sparklyr.livy.sources"]] <- FALSE
     config[["spark.jars.packages"]] <- paste(c(config[["spark.jars.packages"]], extensions$packages), collapse = ",")
