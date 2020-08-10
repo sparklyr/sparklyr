@@ -1,8 +1,7 @@
 spark_config_kubernetes_forward_init <- function(
-  driver,
-  timeout,
-  ports
-) {
+                                                 driver,
+                                                 timeout,
+                                                 ports) {
   Sys.sleep(timeout)
   system2(
     "kubectl",
@@ -28,10 +27,9 @@ spark_config_kubernetes_terminal_id <- function() {
 }
 
 spark_config_kubernetes_forward_init_message <- function(
-  driver,
-  timeout,
-  ports
-) {
+                                                         driver,
+                                                         timeout,
+                                                         ports) {
   message("Please enable port forwarding from your terminal:")
   message(paste("kubectl port-forward", driver, paste(ports, collapse = " ")))
 
@@ -39,10 +37,9 @@ spark_config_kubernetes_forward_init_message <- function(
 }
 
 spark_config_kubernetes_forward_init_terminal <- function(
-  driver,
-  timeout,
-  ports
-) {
+                                                          driver,
+                                                          timeout,
+                                                          ports) {
   Sys.sleep(timeout)
 
   id <- spark_config_kubernetes_terminal_id()
@@ -52,8 +49,7 @@ spark_config_kubernetes_forward_init_terminal <- function(
 }
 
 spark_config_kubernetes_forward_cleanup <- function(
-  driver
-) {
+                                                    driver) {
   if (identical(.Platform$OS.type, "windows")) {
     if (rstudioapi::hasFun("terminalKill")) {
       id <- spark_config_kubernetes_terminal_id()
@@ -100,20 +96,19 @@ spark_config_kubernetes_forward_cleanup <- function(
 #'
 #' @export
 spark_config_kubernetes <- function(
-  master,
-  version = "2.3.2",
-  image = "spark:sparklyr",
-  driver = random_string("sparklyr-"),
-  account = "spark",
-  jars = "local:///opt/sparklyr",
-  forward = TRUE,
-  executors = NULL,
-  conf = NULL,
-  timeout = 120,
-  ports = c(8880, 8881, 4040),
-  fix_config = identical(.Platform$OS.type, "windows"),
-  ...
-) {
+                                    master,
+                                    version = "2.3.2",
+                                    image = "spark:sparklyr",
+                                    driver = random_string("sparklyr-"),
+                                    account = "spark",
+                                    jars = "local:///opt/sparklyr",
+                                    forward = TRUE,
+                                    executors = NULL,
+                                    conf = NULL,
+                                    timeout = 120,
+                                    ports = c(8880, 8881, 4040),
+                                    fix_config = identical(.Platform$OS.type, "windows"),
+                                    ...) {
   args <- list(...)
 
   submit_function <- NULL

@@ -52,7 +52,6 @@ ml_linear_regression.spark_connection <- function(x, formula = NULL, fit_interce
                                                   features_col = "features", label_col = "label",
                                                   prediction_col = "prediction",
                                                   uid = random_string("linear_regression_"), ...) {
-
   .args <- list(
     fit_intercept = fit_intercept,
     elastic_net_param = elastic_net_param,
@@ -186,7 +185,9 @@ new_ml_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary")) {
     fit_intercept <- ml_get_param_map(jobj)$fit_intercept
     new_ml_linear_regression_training_summary(invoke(jobj, "summary"), fit_intercept)
-  } else NULL
+  } else {
+    NULL
+  }
 
   new_ml_prediction_model(
     jobj,
@@ -194,7 +195,8 @@ new_ml_linear_regression_model <- function(jobj) {
     intercept = invoke(jobj, "intercept"),
     scale = if (spark_version(spark_connection(jobj)) >= "2.3.0") invoke(jobj, "scale"),
     summary = summary,
-    class = "ml_linear_regression_model")
+    class = "ml_linear_regression_model"
+  )
 }
 
 new_ml_linear_regression_summary <- function(jobj, fit_intercept, ..., class = character()) {
@@ -202,7 +204,7 @@ new_ml_linear_regression_summary <- function(jobj, fit_intercept, ..., class = c
 
   s <- new_ml_summary(
     jobj,
-        # `lazy val coefficientStandardErrors`
+    # `lazy val coefficientStandardErrors`
     coefficient_standard_errors = possibly_null(
       ~ invoke(jobj, "coefficientStandardErrors") %>%
         arrange_stats()

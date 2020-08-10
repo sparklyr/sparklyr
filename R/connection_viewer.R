@@ -13,8 +13,7 @@ spark_actions <- function(scon) {
     )
   )
 
-  if (spark_connection_is_yarn(scon))
-  {
+  if (spark_connection_is_yarn(scon)) {
     actions <- c(
       actions,
       list(
@@ -28,8 +27,7 @@ spark_actions <- function(scon) {
     )
   }
 
-  if (identical(tolower(scon$method), "livy"))
-  {
+  if (identical(tolower(scon$method), "livy")) {
     actions <- c(
       actions,
       list(
@@ -48,16 +46,15 @@ spark_actions <- function(scon) {
       )
     )
   }
-  else
-  {
+  else {
     actions <- c(
       actions,
       list(
         Log = list(
-            icon = file.path(icons, "spark-log.png"),
-            callback = function() {
-              file.edit(spark_log_file(scon))
-            }
+          icon = file.path(icons, "spark-log.png"),
+          callback = function() {
+            file.edit(spark_log_file(scon))
+          }
         )
       )
     )
@@ -71,18 +68,19 @@ spark_actions <- function(scon) {
         SQL = list(
           icon = file.path(icons, "edit-sql.png"),
           callback = function() {
-
             varname <- "sc"
             if (!exists("sc", envir = .GlobalEnv) ||
-                !identical(get("sc", envir = .GlobalEnv), scon)) {
+              !identical(get("sc", envir = .GlobalEnv), scon)) {
               varname <- Filter(
                 function(e) identical(get(e, envir = .GlobalEnv), scon),
-                ls(envir = .GlobalEnv))
+                ls(envir = .GlobalEnv)
+              )
 
-              if (identical(length(varname), 0L))
+              if (identical(length(varname), 0L)) {
                 varname <- ""
-              else
+              } else {
                 varname <- varname[[1]]
+              }
             }
 
             tables <- dbListTables(scon)
@@ -90,10 +88,11 @@ spark_actions <- function(scon) {
             contents <- paste(
               paste("-- !preview conn=", varname, sep = ""),
               "",
-              if (length(tables) > 0)
+              if (length(tables) > 0) {
                 paste("SELECT * FROM `", tables[[1]], "` LIMIT 1000", sep = "")
-              else
-                "SELECT 1",
+              } else {
+                "SELECT 1"
+              },
               "",
               sep = "\n"
             )
@@ -125,62 +124,65 @@ on_connection_opened <- function(scon, env, connectCall) {
   # RStudio v1.1 generic connection interface --------------------------------
   observer <- getOption("connectionObserver")
   if (!is.null(observer)) {
-    tryCatch({
-      host <- to_host(scon)
-      observer$connectionOpened(
-        # connection type
-        type = "Spark",
+    tryCatch(
+      {
+        host <- to_host(scon)
+        observer$connectionOpened(
+          # connection type
+          type = "Spark",
 
-        # name displayed in connection pane
-        displayName = to_host_display(scon),
+          # name displayed in connection pane
+          displayName = to_host_display(scon),
 
-        # host key
-        host = host,
+          # host key
+          host = host,
 
-        # icon for connection
-        icon = system.file(file.path("icons", "spark.png"), package = "sparklyr"),
+          # icon for connection
+          icon = system.file(file.path("icons", "spark.png"), package = "sparklyr"),
 
-        # connection code
-        connectCode = connectCall,
+          # connection code
+          connectCode = connectCall,
 
-        # disconnection code
-        disconnect = function() {
-          spark_disconnect(scon)
-        },
+          # disconnection code
+          disconnect = function() {
+            spark_disconnect(scon)
+          },
 
-        listObjectTypes = function () {
-          return(list(
-            table = list(contains = "data")))
-        },
+          listObjectTypes = function() {
+            return(list(
+              table = list(contains = "data")
+            ))
+          },
 
-        # table enumeration code
-        listObjects = function(type = "table") {
-          connection_list_tables(scon, includeType = TRUE)
-        },
+          # table enumeration code
+          listObjects = function(type = "table") {
+            connection_list_tables(scon, includeType = TRUE)
+          },
 
-        # column enumeration code
-        listColumns = function(table) {
-          connection_list_columns(scon, table)
-        },
+          # column enumeration code
+          listColumns = function(table) {
+            connection_list_columns(scon, table)
+          },
 
-        # table preview code
-        previewObject = function(rowLimit, table) {
-          connection_preview_table(scon, table, rowLimit)
-        },
+          # table preview code
+          previewObject = function(rowLimit, table) {
+            connection_preview_table(scon, table, rowLimit)
+          },
 
-        # other actions that can be executed on this connection
-        actions = spark_actions(scon),
+          # other actions that can be executed on this connection
+          actions = spark_actions(scon),
 
-        # raw connection object
-        connectionObject = scon
-      )
-    }, error = function(e) NULL)
+          # raw connection object
+          connectionObject = scon
+        )
+      },
+      error = function(e) NULL
+    )
   }
 
   # RStudio v1.0 Spark-style connection interface ----------------------------
   viewer <- getOption("connectionViewer")
   if (!is.null(viewer)) {
-
     viewer$connectionOpened(
       # connection type
       type = "Spark",
@@ -197,8 +199,8 @@ on_connection_opened <- function(scon, env, connectCall) {
         for (name in objs) {
           x <- base::get(name, envir = env)
           if (inherits(x, "spark_connection") &&
-              identical(to_host(x), host) &&
-              sparklyr::connection_is_open(x)) {
+            identical(to_host(x), host) &&
+            sparklyr::connection_is_open(x)) {
             return(name)
           }
         }
@@ -212,7 +214,7 @@ on_connection_opened <- function(scon, env, connectCall) {
       disconnectCode = "spark_disconnect(%s)",
 
       # table enumeration code
-      listTablesCode =  "sparklyr:::connection_list_tables(%s, includeType = FALSE)",
+      listTablesCode = "sparklyr:::connection_list_tables(%s, includeType = FALSE)",
 
       # column enumeration code
       listColumnsCode = "sparklyr:::connection_list_columns(%s, '%s')",
@@ -226,33 +228,39 @@ on_connection_opened <- function(scon, env, connectCall) {
 # return the external connection viewer (or NULL if none active)
 external_viewer <- function() {
   viewer <- getOption("connectionObserver")
-  if (is.null(viewer))
+  if (is.null(viewer)) {
     getOption("connectionViewer")
-  else
+  } else {
     viewer
+  }
 }
 
 on_connection_closed <- function(scon) {
   viewer <- external_viewer()
-  if (!is.null(viewer))
+  if (!is.null(viewer)) {
     viewer$connectionClosed(type = "Spark", host = to_host(scon))
+  }
 }
 
 on_connection_updated <- function(scon, hint) {
   # avoid updating temp tables that are filtered out
-  if (grepl("^sparklyr_tmp_", hint)) return();
+  if (grepl("^sparklyr_tmp_", hint)) {
+    return()
+  }
 
   viewer <- external_viewer()
-  if (!is.null(viewer))
+  if (!is.null(viewer)) {
     viewer$connectionUpdated(type = "Spark", host = to_host(scon), hint = hint)
+  }
 }
 
 connection_list_tables <- function(sc, includeType = FALSE) {
   # extract a list of Spark tables
-  tables <- if (!is.null(sc) && connection_is_open(sc))
+  tables <- if (!is.null(sc) && connection_is_open(sc)) {
     sort(dbListTables(sc))
-  else
+  } else {
     character()
+  }
 
   # return the raw list of tables, or a data frame with object names and types
   if (includeType) {
@@ -274,9 +282,10 @@ connection_list_columns <- function(sc, table) {
       name = names(df),
       type = as.character(lapply(names(df), function(f) {
         capture.output(str(df[[f]],
-                           give.length = FALSE,
-                           width = 30,
-                           strict.width = "cut"))
+          give.length = FALSE,
+          width = 30,
+          strict.width = "cut"
+        ))
       })),
       stringsAsFactors = FALSE
     )

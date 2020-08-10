@@ -1,12 +1,13 @@
 ml_print_uid <- function(x) cat(paste0("<", x$uid, ">"), "\n")
 
 ml_print_class <- function(x, type) {
-  type <- if (is_ml_estimator(x))
+  type <- if (is_ml_estimator(x)) {
     "Estimator"
-  else if (is_ml_transformer(x))
+  } else if (is_ml_transformer(x)) {
     "Transformer"
-  else
+  } else {
     class(x)[1]
+  }
   cat(ml_short_type(x), paste0("(", type, ")\n"))
 }
 
@@ -15,10 +16,13 @@ ml_print_column_name_params <- function(x) {
   out_names <- ml_param_map(x) %>%
     names() %>%
     grep("col|cols$", ., value = TRUE)
-  for (param in sort(out_names))
-    cat(paste0("  ", param, ": ",
-               paste0(ml_param(x, param), collapse = ", "),
-               "\n"))
+  for (param in sort(out_names)) {
+    cat(paste0(
+      "  ", param, ": ",
+      paste0(ml_param(x, param), collapse = ", "),
+      "\n"
+    ))
+  }
 }
 
 ml_print_params <- function(x) {
@@ -40,16 +44,19 @@ ml_print_params <- function(x) {
 
 ml_print_transformer_info <- function(x) {
   items <- names(x) %>%
-      setdiff(c("uid", "param_map", "summary", ".jobj")) %>%
-      grep(".*(?<!col|cols)$", ., value = TRUE, perl = TRUE)
+    setdiff(c("uid", "param_map", "summary", ".jobj")) %>%
+    grep(".*(?<!col|cols)$", ., value = TRUE, perl = TRUE)
   if (length(Filter(length, x[items]))) {
     cat(" (Transformer Info)\n")
-    for (item in sort(items))
-      if (!rlang::is_null(x[[item]]))
+    for (item in sort(items)) {
+      if (!rlang::is_null(x[[item]])) {
         if (rlang::is_atomic(x[[item]])) {
           cat(paste0("  ", item, ": ", capture.output(str(x[[item]]))), "\n")
-        } else
+        } else {
           cat(paste0("  ", item, ": <", class(x[[item]])[1], ">"), "\n")
+        }
+      }
+    }
   }
 }
 
@@ -59,7 +66,6 @@ print_newline <- function() {
 
 ml_model_print_residuals <- function(model,
                                      residuals.header = "Residuals") {
-
   residuals <- model$summary$residuals %>%
     (function(x) if (is.function(x)) x() else x) %>%
     spark_dataframe()
@@ -85,10 +91,11 @@ ml_model_print_residuals <- function(model,
   }
   names(values) <- c("Min", "1Q", "Median", "3Q", "Max")
 
-  header <- if (isApproximate)
+  header <- if (isApproximate) {
     paste(residuals.header, "(approximate):")
-  else
+  } else {
     paste(residuals.header, ":", sep = "")
+  }
 
   cat(header, sep = "\n")
   print(values, digits = max(3L, getOption("digits") - 3L))
@@ -97,7 +104,6 @@ ml_model_print_residuals <- function(model,
 
 #' @importFrom stats coefficients quantile
 ml_model_print_coefficients <- function(model) {
-
   coef <- coefficients(model)
 
   cat("Coefficients:", sep = "\n")
@@ -112,9 +118,11 @@ ml_model_print_coefficients_detailed <- function(model) {
   # error estimates, etc)
   columns <- c("coefficients", "standard.errors", "t.values", "p.values")
   values <- as.list(model[columns])
-  for (value in values)
-    if (is.null(value))
+  for (value in values) {
+    if (is.null(value)) {
       return(ml_model_print_coefficients(model))
+    }
+  }
 
   matrix <- do.call(base::cbind, values)
   colnames(matrix) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
@@ -124,12 +132,11 @@ ml_model_print_coefficients_detailed <- function(model) {
 }
 
 ml_model_print_centers <- function(model) {
-
   centers <- model$centers
-  if (is.null(centers))
+  if (is.null(centers)) {
     return()
+  }
 
   cat("Cluster centers:", sep = "\n")
   print(model$centers)
-
 }

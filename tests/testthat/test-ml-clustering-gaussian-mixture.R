@@ -43,11 +43,13 @@ test_that("ml_gaussian_mixture() default params are correct", {
 
   args <- get_default_args(
     ml_gaussian_mixture,
-    c("x", "uid", "...", "seed"))
+    c("x", "uid", "...", "seed")
+  )
 
   expect_equal(
     ml_params(predictor, names(args)),
-    args)
+    args
+  )
 })
 
 test_that("ml_gaussian_mixture() works properly", {
@@ -55,15 +57,22 @@ test_that("ml_gaussian_mixture() works properly", {
   test_requires_version("2.0.0", "gaussian mixture requires 2.0+")
   sample_data_path <- get_sample_data_path("sample_kmeans_data.txt")
   sample_data <- spark_read_libsvm(sc, "sample_data",
-                                   sample_data_path, overwrite = TRUE)
+    sample_data_path,
+    overwrite = TRUE
+  )
 
   gmm <- ml_gaussian_mixture(sample_data, k = 2, seed = 1)
 
   expect_equal(gmm$weights, c(0.5, 0.5))
-  expect_equal(gmm$gaussians_df() %>% pull(mean),
-               list(c(0.1, 0.1, 0.1), c(9.1, 9.1, 9.1)))
-  expect_equal(gmm$gaussians_df() %>% pull(cov),
-               list(matrix(rep(0.00666666667, 9), nrow = 3),
-                    matrix(rep(0.00666666667, 9), nrow = 3))
+  expect_equal(
+    gmm$gaussians_df() %>% pull(mean),
+    list(c(0.1, 0.1, 0.1), c(9.1, 9.1, 9.1))
+  )
+  expect_equal(
+    gmm$gaussians_df() %>% pull(cov),
+    list(
+      matrix(rep(0.00666666667, 9), nrow = 3),
+      matrix(rep(0.00666666667, 9), nrow = 3)
+    )
   )
 })

@@ -10,8 +10,7 @@ NULL
 #' @rdname ml_naive_bayes_tidiers
 #' @export
 tidy.ml_model_naive_bayes <- function(x,
-                                 ...){
-
+                                      ...) {
   theta <- fix_data_frame(x$theta) %>%
     dplyr::rename(.label = !!"term")
 
@@ -29,19 +28,18 @@ tidy.ml_model_naive_bayes <- function(x,
 #'
 #' @export
 augment.ml_model_naive_bayes <- function(x, newdata = NULL,
-                                              ...){
-
+                                         ...) {
   broom_augment_supervised(x, newdata = newdata)
 }
 
 #' @rdname ml_naive_bayes_tidiers
 #' @export
 glance.ml_model_naive_bayes <- function(x, ...) {
-
   model_type <- x$model$param_map$model_type
   smoothing <- x$model$param_map$smoothing
 
-  dplyr::tibble(model_type = model_type,
-                smoothing = smoothing)
+  dplyr::tibble(
+    model_type = model_type,
+    smoothing = smoothing
+  )
 }
-

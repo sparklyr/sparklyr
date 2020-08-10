@@ -13,11 +13,12 @@ test_that("'spark_apply_bundle' can `worker_spark_apply_unbundle`", {
 })
 
 available_packages_mock <- function() {
-  packages_sample = dir(
+  packages_sample <- dir(
     getwd(),
     recursive = TRUE,
     pattern = "packages-sample.rds",
-    full.names = TRUE)
+    full.names = TRUE
+  )
 
   as.matrix(
     readRDS(file = packages_sample)

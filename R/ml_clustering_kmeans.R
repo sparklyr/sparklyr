@@ -12,11 +12,11 @@
 #' @param init_mode Initialization algorithm. This can be either "random" to choose random points as initial cluster centers, or "k-means||" to use a parallel variant of k-means++ (Bahmani et al., Scalable K-Means++, VLDB 2012). Default: k-means||.
 #'
 #' @examples
-#'\dontrun{
+#' \dontrun{
 #' sc <- spark_connect(master = "local")
 #' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 #' ml_kmeans(iris_tbl, Species ~ .)
-#'}
+#' }
 #'
 #' @export
 ml_kmeans <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-4,
@@ -32,7 +32,6 @@ ml_kmeans.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 20, 
                                        init_steps = 2, init_mode = "k-means||", seed = NULL,
                                        features_col = "features", prediction_col = "prediction",
                                        uid = random_string("kmeans_"), ...) {
-
   .args <- list(
     k = k,
     max_iter = max_iter,
@@ -53,7 +52,7 @@ ml_kmeans.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 20, 
   ) %>%
     invoke("setTol", .args[["tol"]]) %>%
     invoke("setInitSteps", .args[["init_steps"]]) %>%
-    invoke("setInitMode" , .args[["init_mode"]]) %>%
+    invoke("setInitMode", .args[["init_mode"]]) %>%
     invoke("setPredictionCol", .args[["prediction_col"]])
 
   new_ml_kmeans(jobj)
@@ -141,7 +140,8 @@ new_ml_kmeans_model <- function(jobj) {
         purrr::map(invoke, "toArray")
     ),
     summary = summary,
-    class = "ml_kmeans_model")
+    class = "ml_kmeans_model"
+  )
 
   if (!is_required_spark(jobj, "3.0.0")) {
     spark_param_deprecated("compute_cost")
@@ -156,7 +156,8 @@ new_ml_kmeans_model <- function(jobj) {
 new_ml_kmeans_summary <- function(jobj) {
   kmeans_summary <- new_ml_clustering_summary(
     jobj,
-    class = "ml_kmeans_summary")
+    class = "ml_kmeans_summary"
+  )
 
   if (is_required_spark(jobj, "2.4.0")) {
     kmeans_summary[["training_cost"]] <- invoke(jobj, "trainingCost")

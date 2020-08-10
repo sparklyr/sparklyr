@@ -112,7 +112,8 @@ new_ml_cross_validator_model <- function(jobj) {
         invoke("subModels") %>%
         purrr::map(~ purrr::map(.x, ml_call_constructor))
     ),
-    class = "ml_cross_validator_model")
+    class = "ml_cross_validator_model"
+  )
 }
 
 #' @export

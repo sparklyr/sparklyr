@@ -15,17 +15,20 @@ verify_msvcr100 <- function() {
   systemRoot <- Sys.getenv("SystemRoot")
   systemDir <- ifelse(is_win64(), ifelse(is_wow64(), "sysnative", "system32"), "system32")
   msvcr100Path <- normalizePath(file.path(systemRoot, systemDir, "msvcr100.dll"),
-                                winslash = "/", mustWork = FALSE)
+    winslash = "/", mustWork = FALSE
+  )
   haveMsvcr100 <- file.exists(msvcr100Path)
   if (!haveMsvcr100) {
-    msvcr100Url <- ifelse(is_win64() ,
-                          "https://www.microsoft.com/download/en/details.aspx?id=13523",
-                          "https://www.microsoft.com/download/en/details.aspx?id=8328")
+    msvcr100Url <- ifelse(is_win64(),
+      "https://www.microsoft.com/download/en/details.aspx?id=13523",
+      "https://www.microsoft.com/download/en/details.aspx?id=8328"
+    )
     stop("Running Spark on Windows requires the ",
-         "Microsoft Visual C++ 2010 SP1 Redistributable Package. ",
-         "Please download and install from: \n\n  ", msvcr100Url, "\n\n",
-         "Then restart R after the installation completes", "\n",
-         call. = FALSE)
+      "Microsoft Visual C++ 2010 SP1 Redistributable Package. ",
+      "Please download and install from: \n\n  ", msvcr100Url, "\n\n",
+      "Then restart R after the installation completes", "\n",
+      call. = FALSE
+    )
   }
 }
 
@@ -36,8 +39,9 @@ prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
   }
 
   # don't do anything if aren't on windows
-  if (.Platform$OS.type != "windows")
+  if (.Platform$OS.type != "windows") {
     return()
+  }
 
   # verify we have msvcr100
   verify_msvcr100()
@@ -63,20 +67,19 @@ prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
 
   if (is.null(sparkEnvironment)) {
     if (nchar(Sys.getenv("HADOOP_HOME")) == 0 ||
-        Sys.getenv("HADOOP_HOME") != hadoopPath) {
+      Sys.getenv("HADOOP_HOME") != hadoopPath) {
+      if (Sys.getenv("HADOOP_HOME") != hadoopPath) {
+        warning("HADOOP_HOME was already but does not match current Spark installation")
+      } else {
+        verboseMessage("HADOOP_HOME environment variable not set")
+      }
 
+      output <- system2(
+        "SETX", c("HADOOP_HOME", shQuote(hadoopPath)),
+        stdout = if (verbose) TRUE else NULL
+      )
 
-        if (Sys.getenv("HADOOP_HOME") != hadoopPath) {
-          warning("HADOOP_HOME was already but does not match current Spark installation")
-        } else {
-          verboseMessage("HADOOP_HOME environment variable not set")
-        }
-
-        output <- system2(
-          "SETX", c("HADOOP_HOME", shQuote(hadoopPath)),
-          stdout = if(verbose) TRUE else NULL)
-
-        verboseMessage("HADOOP_HOME environment set with output ", output)
+      verboseMessage("HADOOP_HOME environment set with output ", output)
     } else {
       verboseMessage("HADOOP_HOME environment was already set to ", Sys.getenv("HADOOP_HOME"))
     }
@@ -103,17 +106,19 @@ prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
 
   # form path to winutils.exe
   winutils <- normalizePath(file.path(hadoopBinPath, "winutils.exe"),
-                            mustWork = FALSE)
+    mustWork = FALSE
+  )
 
   # get a copy of winutils if we don't already have it
   if (!file.exists(winutils)) {
     verboseMessage("WINUTIL does not exist")
 
     winutilsSrc <- winutils_source_path()
-    if (nzchar(winutilsSrc))
+    if (nzchar(winutilsSrc)) {
       file.copy(winutilsSrc, winutils)
-    else
+    } else {
       stop_with_winutils_error(hadoopBinPath)
+    }
   }
   verboseMessage("WINUTIL exists under ", winutils)
 
@@ -121,14 +126,16 @@ prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
   output <- system2(
     winutils,
     c("chmod", "777", shQuote(hivePath)),
-    stdout = if (verbose) TRUE else NULL)
+    stdout = if (verbose) TRUE else NULL
+  )
 
   verboseMessage("WINUTIL for CHMOD outputs ", output)
 
   output <- system2(
     winutils,
     c("ls", shQuote(hivePath)),
-    stdout = TRUE)
+    stdout = TRUE
+  )
 
   if (!is.null(output) && grepl("error", output)) {
     stop(output)
@@ -144,8 +151,9 @@ winutils_source_path <- function() {
   # check for rstudio version of winutils
   rstudioWinutils <- Sys.getenv("RSTUDIO_WINUTILS", unset = NA)
   if (!is.na(rstudioWinutils)) {
-    if (is_win64())
+    if (is_win64()) {
       rstudioWinutils <- file.path(rstudioWinutils, "x64")
+    }
     rstudioWinutils <- file.path(rstudioWinutils, "winutils.exe")
     winutilsSrc <- normalizePath(rstudioWinutils, mustWork = FALSE)
   }
@@ -155,7 +163,6 @@ winutils_source_path <- function() {
 
 
 stop_with_winutils_error <- function(hadoopBinPath) {
-
   if (is_win64()) {
     winutilsDownload <- "https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/"
   } else {

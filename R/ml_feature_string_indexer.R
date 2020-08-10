@@ -29,7 +29,6 @@ ml_string_indexer <- ft_string_indexer
 ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                handle_invalid = "error", string_order_type = "frequencyDesc",
                                                uid = random_string("string_indexer_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -44,18 +43,16 @@ ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col =
     input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
   ) %>%
     jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
-    jobj_set_param("setStringOrderType", .args[["string_order_type"]], "2.3.0",  "frequencyDesc") %>%
+    jobj_set_param("setStringOrderType", .args[["string_order_type"]], "2.3.0", "frequencyDesc") %>%
     new_ml_string_indexer()
 
   estimator
-
 }
 
 #' @export
 ft_string_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
                                           handle_invalid = "error", string_order_type = "frequencyDesc",
                                           uid = random_string("string_indexer_"), ...) {
-
   stage <- ft_string_indexer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -85,20 +82,22 @@ ft_string_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
   dots <- rlang::dots_list(...)
   if (rlang::has_name(dots, "params") && rlang::is_env(dots$params)) {
     warning("`params` has been deprecated and will be removed in a future release.", call. = FALSE)
-    transformer <- if (is_ml_transformer(stage))
+    transformer <- if (is_ml_transformer(stage)) {
       stage
-    else
+    } else {
       ml_fit(stage, x)
+    }
     dots$params$labels <- spark_jobj(transformer) %>%
       invoke("labels") %>%
       as.character()
     transformer %>%
       ml_transform(x)
   } else {
-    if (is_ml_transformer(stage))
+    if (is_ml_transformer(stage)) {
       ml_transform(stage, x)
-    else
+    } else {
       ml_fit_and_transform(stage, x)
+    }
   }
 }
 
@@ -108,9 +107,10 @@ new_ml_string_indexer <- function(jobj) {
 
 new_ml_string_indexer_model <- function(jobj) {
   new_ml_transformer(jobj,
-                     labels = invoke(jobj, "labels") %>%
-                       as.character(),
-                     class = "ml_string_indexer_model")
+    labels = invoke(jobj, "labels") %>%
+      as.character(),
+    class = "ml_string_indexer_model"
+  )
 }
 
 #' @rdname ft_string_indexer

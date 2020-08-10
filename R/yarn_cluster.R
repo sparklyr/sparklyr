@@ -21,7 +21,7 @@ spark_yarn_cluster_get_app_id <- function(config, start_time, rm_webapp) {
     if (appLookupUseUser) paste0("&user=", appLoookupUser) else ""
   )
 
-  while(length(propertyValue) == 0 && commandStart + waitSeconds > Sys.time()) {
+  while (length(propertyValue) == 0 && commandStart + waitSeconds > Sys.time()) {
     resourceManagerResponce <- httr::GET(resourceManagerQuery)
     yarnApps <- httr::content(resourceManagerResponce)
 
@@ -29,7 +29,7 @@ spark_yarn_cluster_get_app_id <- function(config, start_time, rm_webapp) {
       newSparklyrApps <- Filter(function(e) grepl(appLoookupUser, e[[1]]$user), yarnApps$apps)
     }
     else {
-      newSparklyrApps <- Filter(function(e) grepl(paste0(appLookupPrefix , ".*"), e[[1]]$name), yarnApps$apps)
+      newSparklyrApps <- Filter(function(e) grepl(paste0(appLookupPrefix, ".*"), e[[1]]$name), yarnApps$apps)
     }
 
     if (length(newSparklyrApps) > 1) {
@@ -95,11 +95,11 @@ spark_yarn_cluster_while_app <- function(rm_webapp, appId, waitSeconds, conditio
     appId
   )
 
-  while(commandStart + waitSeconds > Sys.time()) {
+  while (commandStart + waitSeconds > Sys.time()) {
     resourceManagerResponce <- httr::GET(resourceManagerQuery)
     yarnResponse <- httr::content(resourceManagerResponce)
 
-    if (!condition(yarnResponse$app)) break;
+    if (!condition(yarnResponse$app)) break
 
     sleepTime <- ifelse(Sys.time() - commandStart > 60, 30, 1)
     Sys.sleep(sleepTime)
@@ -112,18 +112,21 @@ spark_yarn_cluster_resource_manager_is_online <- function(rm_webapp) {
     "/ws/v1/cluster/info"
   )
 
-  tryCatch({
-    rmResult <- httr::GET(paste0(spark_yarn_cluster_get_protocol(), "://", rmQuery))
-    if (httr::http_error(rmResult)) {
-      warning("Failed to open ", rmQuery, " with status ", httr::status_code(rmResult), ". ")
+  tryCatch(
+    {
+      rmResult <- httr::GET(paste0(spark_yarn_cluster_get_protocol(), "://", rmQuery))
+      if (httr::http_error(rmResult)) {
+        warning("Failed to open ", rmQuery, " with status ", httr::status_code(rmResult), ". ")
+        FALSE
+      } else {
+        TRUE
+      }
+    },
+    error = function(err) {
+      warning("Failed to open ", rmQuery, ". ", err)
       FALSE
-    } else {
-      TRUE
     }
-  }, error = function(err) {
-    warning("Failed to open ", rmQuery, ". ", err)
-    FALSE
-  })
+  )
 }
 
 spark_yarn_cluster_get_resource_manager_webapp <- function() {
@@ -156,7 +159,7 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
 
         if (spark_yarn_cluster_resource_manager_is_online(rmCandidateValue)) {
           mainRMWebapp <- rmCandidate
-          break;
+          break
         }
       }
     }
@@ -190,10 +193,11 @@ spark_yarn_cluster_get_resource_manager_webapp <- function() {
 spark_yarn_cluster_get_protocol <- function() {
   useHttpsValue <- spark_yarn_cluster_get_conf_property("yarn.http.policy")
 
-  if (length(useHttpsValue) > 0 && toupper(useHttpsValue) == "HTTPS_ONLY")
+  if (length(useHttpsValue) > 0 && toupper(useHttpsValue) == "HTTPS_ONLY") {
     "https"
-  else
+  } else {
     "http"
+  }
 }
 
 spark_yarn_cluster_get_gateway <- function(config, start_time) {
@@ -208,7 +212,8 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
   appId <- spark_yarn_cluster_get_app_id(
     config,
     start_time,
-    resourceManagerWebapp)
+    resourceManagerWebapp
+  )
 
   waitAcceptedSeconds <- spark_config_value(config, "sparklyr.yarn.cluster.accepted.timeout", 30)
   spark_yarn_cluster_while_app(
@@ -217,12 +222,14 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
     waitAcceptedSeconds,
     function(app) {
       toupper(app$state) %in% c("NEW", "NEW_SAVING", "SUBMITTED")
-    })
+    }
+  )
 
   currentState <- spark_yarn_cluster_get_app_property(
     resourceManagerWebapp,
     appId,
-    "state")
+    "state"
+  )
 
   if (toupper(currentState) %in% c("NEW", "NEW_SAVING", "SUBMITTED")) {
     stop(
@@ -248,13 +255,15 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
     waitHostAddressSeconds,
     function(app) {
       !"amHostHttpAddress" %in% names(app)
-    })
+    }
+  )
 
   amHostHttpAddress <- spark_yarn_cluster_get_app_property(
     resourceManagerWebapp,
     appId,
     "amHostHttpAddress",
-    ", try adjusting 'config$sparklyr.yarn.cluster.hostaddress.timeout'")
+    ", try adjusting 'config$sparklyr.yarn.cluster.hostaddress.timeout'"
+  )
 
   strsplit(amHostHttpAddress, ":")[[1]][[1]]
 }

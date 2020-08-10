@@ -26,7 +26,6 @@ ml_gbt_classifier.spark_connection <- function(x, formula = NULL, max_iter = 20,
                                                prediction_col = "prediction", probability_col = "probability",
                                                raw_prediction_col = "rawPrediction",
                                                uid = random_string("gbt_classifier_"), ...) {
-
   .args <- list(
     max_iter = max_iter,
     max_depth = max_depth,
@@ -54,38 +53,46 @@ ml_gbt_classifier.spark_connection <- function(x, formula = NULL, max_iter = 20,
   stage_class <- "org.apache.spark.ml.classification.GBTClassifier"
 
   jobj <- (
-    if (spark_version(x) < "2.2.0")
+    if (spark_version(x) < "2.2.0") {
       spark_pipeline_stage(
-        x, stage_class, uid, features_col = .args[["features_col"]],
+        x, stage_class, uid,
+        features_col = .args[["features_col"]],
         label_col = .args[["label_col"]], prediction_col = .args[["prediction_col"]]
       )
-    else
+    } else {
       spark_pipeline_stage(
-        x, stage_class, uid, features_col = .args[["features_col"]],
+        x, stage_class, uid,
+        features_col = .args[["features_col"]],
         label_col = .args[["label_col"]],
         prediction_col = .args[["prediction_col"]],
         probability_col = .args[["probability_col"]],
         raw_prediction_col = .args[["raw_prediction_col"]]
       )
+    }
   ) %>% (
     function(obj) {
-      do.call(invoke,
-              c(obj, "%>%", Filter(function(x) !is.null(x),
-                                   list(
-                                        list("setCheckpointInterval", .args[["checkpoint_interval"]]),
-                                        list("setMaxBins", .args[["max_bins"]]),
-                                        list("setMaxDepth", .args[["max_depth"]]),
-                                        list("setMinInfoGain", .args[["min_info_gain"]]),
-                                        list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
-                                        list("setCacheNodeIds", .args[["cache_node_ids"]]),
-                                        list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
-                                        list("setLossType", .args[["loss_type"]]),
-                                        list("setMaxIter", .args[["max_iter"]]),
-                                        list("setStepSize", .args[["step_size"]]),
-                                        list("setSubsamplingRate", .args[["subsampling_rate"]]),
-                                        jobj_set_param_helper(obj, "setFeatureSubsetStrategy", .args[["feature_subset_strategy"]], "2.3.0", "auto"),
-                                        jobj_set_param_helper(obj, "setThresholds", .args[["thresholds"]]),
-                                        jobj_set_param_helper(obj, "setSeed", .args[["seed"]])))))
+      do.call(
+        invoke,
+        c(obj, "%>%", Filter(
+          function(x) !is.null(x),
+          list(
+            list("setCheckpointInterval", .args[["checkpoint_interval"]]),
+            list("setMaxBins", .args[["max_bins"]]),
+            list("setMaxDepth", .args[["max_depth"]]),
+            list("setMinInfoGain", .args[["min_info_gain"]]),
+            list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
+            list("setCacheNodeIds", .args[["cache_node_ids"]]),
+            list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
+            list("setLossType", .args[["loss_type"]]),
+            list("setMaxIter", .args[["max_iter"]]),
+            list("setStepSize", .args[["step_size"]]),
+            list("setSubsamplingRate", .args[["subsampling_rate"]]),
+            jobj_set_param_helper(obj, "setFeatureSubsetStrategy", .args[["feature_subset_strategy"]], "2.3.0", "auto"),
+            jobj_set_param_helper(obj, "setThresholds", .args[["thresholds"]]),
+            jobj_set_param_helper(obj, "setSeed", .args[["seed"]])
+          )
+        ))
+      )
     })
 
   new_ml_gbt_classifier(jobj)
@@ -213,7 +220,6 @@ new_ml_gbt_classifier <- function(jobj) {
 }
 
 new_ml_gbt_classification_model <- function(jobj) {
-
   v <- jobj %>%
     spark_connection() %>%
     spark_version()
@@ -228,8 +234,10 @@ new_ml_gbt_classification_model <- function(jobj) {
       total_num_nodes = function() invoke(jobj, "totalNumNodes"),
       tree_weights = invoke(jobj, "treeWeights"),
       # `def trees`
-      trees = function() invoke(jobj, "trees") %>%
-        purrr::map(new_ml_decision_tree_regression_model),
+      trees = function() {
+        invoke(jobj, "trees") %>%
+          purrr::map(new_ml_decision_tree_regression_model)
+      },
       class = "ml_multilayer_perceptron_classification_model"
     )
   } else {
@@ -242,8 +250,10 @@ new_ml_gbt_classification_model <- function(jobj) {
       total_num_nodes = function() invoke(jobj, "totalNumNodes"),
       tree_weights = invoke(jobj, "treeWeights"),
       # `def trees`
-      trees = function() invoke(jobj, "trees") %>%
-        purrr::map(new_ml_decision_tree_regression_model),
+      trees = function() {
+        invoke(jobj, "trees") %>%
+          purrr::map(new_ml_decision_tree_regression_model)
+      },
       class = "ml_gbt_classification_model"
     )
   }

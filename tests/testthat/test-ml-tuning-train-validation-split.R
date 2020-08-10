@@ -35,19 +35,25 @@ test_that("we can train a regression with train-validation-split", {
     )
   )
   tvsm <- ml_train_validation_split(
-    iris_tbl, estimator = pipeline, estimator_param_maps = grid,
+    iris_tbl,
+    estimator = pipeline, estimator_param_maps = grid,
     evaluator = ml_multiclass_classification_evaluator(sc),
     collect_sub_models = TRUE,
-    seed = 1)
+    seed = 1
+  )
 
-  expect_identical(names(tvsm$validation_metrics_df),
-                   c("f1", "elastic_net_param_1", "reg_param_1"))
+  expect_identical(
+    names(tvsm$validation_metrics_df),
+    c("f1", "elastic_net_param_1", "reg_param_1")
+  )
   expect_identical(nrow(tvsm$validation_metrics_df), 4L)
   summary_string <- capture.output(summary(tvsm)) %>%
     paste0(collapse = "\n")
 
-  expect_match(summary_string,
-               "0\\.75/0\\.25 train-validation split")
+  expect_match(
+    summary_string,
+    "0\\.75/0\\.25 train-validation split"
+  )
 
   sub_models <- ml_sub_models(tvsm)
   expect_identical(length(sub_models), 4L)

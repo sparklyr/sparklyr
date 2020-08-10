@@ -4,19 +4,23 @@ sc <- testthat_spark_connection()
 iris_table_name <- random_table_name("iris")
 
 test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
-  if (.Platform$OS.type == "windows")
+  if (.Platform$OS.type == "windows") {
     skip("CSV encoding is slightly different in windows")
+  }
   skip_databricks_connect()
 
   csvPath <- get_sample_data_path(
     "spark-read-csv-column-containing-non-ascii.csv"
   )
-  df <- spark_read_csv(sc,name="teste",path=csvPath,header = TRUE,
-                       delimiter = ";",charset = "Latin1",memory = FALSE)
+  df <- spark_read_csv(sc,
+    name = "teste", path = csvPath, header = TRUE,
+    delimiter = ";", charset = "Latin1", memory = FALSE
+  )
 
   expect_true(
     all(dplyr::tbl_vars(df) == c("Municipio", "var", "var_1_0")),
-    info = "success reading non-ascii similar columns from csv")
+    info = "success reading non-ascii similar columns from csv"
+  )
 })
 
 test_that("spark_read_json() can load data using column names", {
@@ -297,7 +301,7 @@ test_that("spark_write() works as expected", {
   }
 
   verify_spark_write_result <- function(res, expected_paths) {
-    sort_df <- function(df) df[do.call(order, as.list(df)),]
+    sort_df <- function(df) df[do.call(order, as.list(df)), ]
 
     actual <- do.call(rbind, lapply(res, function(e) e$df)) %>% sort_df()
 
@@ -307,8 +311,9 @@ test_that("spark_write() works as expected", {
     colnames(expected) <- lapply(colnames(expected), function(x) gsub("\\.", "_", x))
 
     expect_equal(colnames(actual), colnames(expected))
-    for (col in colnames(actual))
+    for (col in colnames(actual)) {
       expect_equal(actual[[col]], expected[[col]])
+    }
 
     expect_equal(lapply(res, function(e) e$path), as.list(expected_paths))
   }
@@ -316,7 +321,7 @@ test_that("spark_write() works as expected", {
   multiple_paths <- lapply(seq(5), function(x) paste0("hdfs://file_", x))
   single_path <- "hdfs://iris"
 
-  for (paths in list(list(multiple_paths), list(single_path)))
+  for (paths in list(list(multiple_paths), list(single_path))) {
     verify_spark_write_result(
       res = spark_write(
         iris_tbl,
@@ -325,6 +330,7 @@ test_that("spark_write() works as expected", {
       ),
       expected_paths = as.list(paths[[1]])
     )
+  }
 })
 
 test_avro_schema <- rjson::toJSON(list(
@@ -357,8 +363,9 @@ test_that("spark_read_avro() works as expected", {
 
     expect_equal(colnames(expected), colnames(actual))
 
-    for (col in colnames(expected))
+    for (col in colnames(expected)) {
       expect_equal(expected[[col]], actual[[col]])
+    }
   }
 })
 
@@ -380,8 +387,9 @@ test_that("spark_write_avro() works as expected", {
 
     expect_equal(colnames(df), colnames(actual))
 
-    for (col in colnames(df))
+    for (col in colnames(df)) {
       expect_equal(df[[col]], actual[[col]])
+    }
   }
 })
 

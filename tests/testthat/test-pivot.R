@@ -22,14 +22,12 @@ test_that("we can construct a simple pivot table", {
     lapply(unname(s)[-1], as.numeric),
     lapply(unname(r)[-1], as.numeric)
   )
-
 })
 
 test_that("we can pivot with an R function for aggregation", {
   test_requires("dplyr")
 
   fun.aggregate <- function(gdf) {
-
     expr <- invoke_static(
       sc,
       "org.apache.spark.sql.functions",
@@ -53,7 +51,6 @@ test_that("we can pivot with an R function for aggregation", {
     as.list()
 
   expect_equal(unname(s), unname(r))
-
 })
 
 test_that("we can pivot with an R list", {
@@ -72,5 +69,4 @@ test_that("we can pivot with an R list", {
     as.list()
 
   expect_equal(unname(s), unname(r))
-
 })

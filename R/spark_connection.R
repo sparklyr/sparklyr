@@ -91,9 +91,10 @@ spark_connection <- function(x, ...) {
 
 #' @export
 spark_connection.default <- function(x, ...) {
-
   stop("Unable to retrieve a spark_connection from object of class ",
-       paste(class(x), collapse = " "), call. = FALSE)
+    paste(class(x), collapse = " "),
+    call. = FALSE
+  )
 }
 
 #' @export
@@ -128,12 +129,12 @@ connection_config <- function(sc, prefix, not_prefix = list()) {
       config_name <- names(config)[[idx]]
 
       (is.null(prefix) || identical(substring(config_name, 1, nchar(prefix)), prefix)) &&
-      all(unlist(
-        lapply(not_prefix, function(x) !identical(substring(config_name, 1, nchar(x)), x))
-      )) &&
-      !(grepl("\\.local$", config_name) && !isLocal) &&
-      !(grepl("\\.remote$", config_name) && isLocal) &&
-      !(is.character(config[[idx]]) && all(nchar(config[[idx]]) == 0))
+        all(unlist(
+          lapply(not_prefix, function(x) !identical(substring(config_name, 1, nchar(x)), x))
+        )) &&
+        !(grepl("\\.local$", config_name) && !isLocal) &&
+        !(grepl("\\.remote$", config_name) && isLocal) &&
+        !(is.character(config[[idx]]) && all(nchar(config[[idx]]) == 0))
     }
   ))
   configNames <- lapply(
@@ -183,7 +184,9 @@ print.spark_log <- function(x, ...) {
 #'
 #' @export
 spark_web <- function(sc, ...) {
-  if (!identical(sc$state, NULL) && !identical(sc$state$spark_web, NULL)) return(sc$state$spark_web)
+  if (!identical(sc$state, NULL) && !identical(sc$state$spark_web, NULL)) {
+    return(sc$state$spark_web)
+  }
 
   sparkui_url <- spark_config_value(
     sc$config, c("sparklyr.web.spark", "sparklyr.sparkui.url")
@@ -193,8 +196,9 @@ spark_web <- function(sc, ...) {
     structure(sparkui_url, class = "spark_web_url")
   }
   else if (spark_version(sc) >= "2.0.0" &&
-           !spark_context(sc) %>% invoke("uiWebUrl") %>% invoke("isEmpty")) {
-
+    !spark_context(sc) %>%
+      invoke("uiWebUrl") %>%
+      invoke("isEmpty")) {
     spark_context(sc) %>%
       invoke("uiWebUrl") %>%
       invoke("get") %>%
@@ -225,11 +229,12 @@ print.spark_web_url <- function(x, ...) {
 #'
 #' @export
 get_spark_sql_catalog_implementation <- function(sc) {
-  if (spark_version(sc) < "2.0.0")
+  if (spark_version(sc) < "2.0.0") {
     stop(
       "get_spark_sql_catalog_implementation is only supported for Spark 2.0.0+",
       call. = FALSE
     )
+  }
 
   invoke(
     hive_context(sc),

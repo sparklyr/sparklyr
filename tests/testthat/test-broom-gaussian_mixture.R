@@ -11,10 +11,11 @@ test_that("gaussian_mixture.tidy() works", {
 
   td1 <- model %>% tidy()
 
-  check_tidy(td1, exp.row = 4,
-             exp.names = c("mpg", "cyl", "weight", "size", "cluster"))
+  check_tidy(td1,
+    exp.row = 4,
+    exp.names = c("mpg", "cyl", "weight", "size", "cluster")
+  )
   expect_equal(td1$size, model$summary$cluster_sizes())
-
 })
 
 test_that("gaussian_mixture.augment() works", {
@@ -27,16 +28,20 @@ test_that("gaussian_mixture.augment() works", {
     augment() %>%
     dplyr::collect()
 
-  check_tidy(au1, exp.row = nrow(mtcars),
-             exp.name = c(names(mtcars), ".cluster"))
+  check_tidy(au1,
+    exp.row = nrow(mtcars),
+    exp.name = c(names(mtcars), ".cluster")
+  )
 
   au2 <- mtcars_tbl %>%
     ml_gaussian_mixture(~ mpg + cyl, k = 4L, seed = 123) %>%
     augment(newdata = head(mtcars_tbl, 25)) %>%
     dplyr::collect()
 
-  check_tidy(au2, exp.row = 25,
-             exp.name = c(names(mtcars), ".cluster"))
+  check_tidy(au2,
+    exp.row = 25,
+    exp.name = c(names(mtcars), ".cluster")
+  )
 })
 
 test_that("gaussian_mixture.glance() works", {
@@ -50,12 +55,15 @@ test_that("gaussian_mixture.glance() works", {
     ml_gaussian_mixture(~ mpg + cyl, k = 4L, seed = 123) %>%
     glance()
 
-  if (version >= "2.3.0"){
-    check_tidy(gl1, exp.row = 1,
-               exp.names = c("k", "silhouette"))
+  if (version >= "2.3.0") {
+    check_tidy(gl1,
+      exp.row = 1,
+      exp.names = c("k", "silhouette")
+    )
   } else {
-    check_tidy(gl1, exp.row = 1,
-               exp.names = "k")
+    check_tidy(gl1,
+      exp.row = 1,
+      exp.names = "k"
+    )
   }
-
 })

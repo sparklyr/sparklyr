@@ -26,7 +26,6 @@ ml_fpgrowth <- function(x, items_col = "items", min_confidence = 0.8,
 ml_fpgrowth.spark_connection <- function(x, items_col = "items", min_confidence = 0.8,
                                          min_support = 0.3, prediction_col = "prediction",
                                          uid = random_string("fpgrowth_"), ...) {
-
   .args <- list(
     items_col = items_col,
     min_confidence = min_confidence,
@@ -38,11 +37,13 @@ ml_fpgrowth.spark_connection <- function(x, items_col = "items", min_confidence 
 
   uid <- cast_string(uid)
   jobj <- invoke_new(x, "org.apache.spark.ml.fpm.FPGrowth", uid) %>%
-    invoke("%>%",
-           list("setItemsCol", .args[["items_col"]]),
-           list("setMinConfidence", .args[["min_confidence"]]),
-           list("setMinSupport", .args[["min_support"]]),
-           list("setPredictionCol", .args[["prediction_col"]]))
+    invoke(
+      "%>%",
+      list("setItemsCol", .args[["items_col"]]),
+      list("setMinConfidence", .args[["min_confidence"]]),
+      list("setMinSupport", .args[["min_support"]]),
+      list("setPredictionCol", .args[["prediction_col"]])
+    )
 
   new_ml_fpgrowth(jobj)
 }
@@ -98,11 +99,14 @@ new_ml_fpgrowth_model <- function(jobj) {
   new_ml_transformer(
     jobj,
     # def
-    association_rules = function() invoke(jobj, "associationRules") %>%
-      sdf_register(),
+    association_rules = function() {
+      invoke(jobj, "associationRules") %>%
+        sdf_register()
+    },
     freq_itemsets = invoke(jobj, "freqItemsets") %>%
       sdf_register(),
-    class = "ml_fpgrowth_model")
+    class = "ml_fpgrowth_model"
+  )
 }
 
 #' @rdname ml_fpgrowth

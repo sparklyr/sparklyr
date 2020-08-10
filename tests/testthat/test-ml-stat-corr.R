@@ -17,12 +17,13 @@ test_that("ml_corr() works", {
 
 test_that("ml_corr() works with assembled column", {
   test_requires_version("2.2.0", "correlation supported in spark 2.2+")
-  expect_equal(mtcars_tbl %>%
-                 ft_vector_assembler(colnames(mtcars_tbl), "features") %>%
-                 ml_corr("features") %>%
-                 as.matrix() %>%
-                 diag(),
-               rep(1, 11)
+  expect_equal(
+    mtcars_tbl %>%
+      ft_vector_assembler(colnames(mtcars_tbl), "features") %>%
+      ml_corr("features") %>%
+      as.matrix() %>%
+      diag(),
+    rep(1, 11)
   )
 })
 

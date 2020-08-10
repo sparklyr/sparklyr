@@ -21,10 +21,11 @@ na.replace.spark_jobj <- function(object, ...) {
   dots <- list(...)
   enumerate(dots, function(key, val) {
     na <- invoke(object, "na")
-    object <<- if (is.null(key))
+    object <<- if (is.null(key)) {
       invoke(na, "fill", val)
-    else
+    } else {
       invoke(na, "fill", val, as.list(key))
+    }
   })
   sdf_register(object)
 }
@@ -40,15 +41,15 @@ na.omit.spark_jobj <- function(object, columns = NULL, ...) {
 
   # report number of rows dropped if requested
   verbose <- spark_config_value(sc$config, c(
-      "sparklyr.verbose.na",
-      "sparklyr.na.omit.verbose",
-      "sparklyr.na.action.verbose",
-      "sparklyr.verbose"
-    ), TRUE)
+    "sparklyr.verbose.na",
+    "sparklyr.na.omit.verbose",
+    "sparklyr.na.action.verbose",
+    "sparklyr.verbose"
+  ), TRUE)
 
   n_before <- invoke(object, "count")
-  dropped  <- sdf_na_omit(object, columns)
-  n_after  <- invoke(dropped, "count")
+  dropped <- sdf_na_omit(object, columns)
+  n_after <- invoke(dropped, "count")
 
   if (verbose) {
     n_diff <- n_before - n_after
@@ -78,11 +79,12 @@ na.fail.tbl_spark <- function(object, columns = NULL, ...) {
 #' @export
 na.fail.spark_jobj <- function(object, columns = NULL, ...) {
   n_before <- invoke(object, "count")
-  dropped  <- sdf_na_omit(object, columns)
-  n_after  <- invoke(dropped, "count")
+  dropped <- sdf_na_omit(object, columns)
+  n_after <- invoke(dropped, "count")
 
-  if (n_before != n_after)
+  if (n_before != n_after) {
     stop("* missing values in object")
+  }
 
   object
 }
@@ -92,32 +94,37 @@ na.fail.spark_jobj <- function(object, columns = NULL, ...) {
 apply_na_action <- function(x, response = NULL, features = NULL, na.action) {
 
   # early exit for NULL, NA na.action
-  if (is.null(na.action))
+  if (is.null(na.action)) {
     return(x)
+  }
 
   # attempt to resolve character na.action
   if (is.character(na.action)) {
-    if (!exists(na.action, envir = parent.frame(), mode = "function"))
+    if (!exists(na.action, envir = parent.frame(), mode = "function")) {
       stop("no function with name '", na.action, "' found")
+    }
 
     na.action <- get(na.action, envir = parent.frame(), mode = "function")
   }
 
-  if (!is.function(na.action))
+  if (!is.function(na.action)) {
     stop("'na.action' is not a function")
+  }
 
   # attempt to apply 'na.action'
   na.action(x,
-            response = response,
-            features = features,
-            columns = c(response, features))
+    response = response,
+    features = features,
+    columns = c(response, features)
+  )
 }
 
 sdf_na_omit <- function(object, columns = NULL) {
   na <- invoke(object, "na")
-  dropped <- if (is.null(columns))
+  dropped <- if (is.null(columns)) {
     invoke(na, "drop")
-  else
+  } else {
     invoke(na, "drop", as.list(columns))
+  }
   dropped
 }

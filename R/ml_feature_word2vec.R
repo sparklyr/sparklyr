@@ -30,7 +30,6 @@ ml_word2vec <- ft_word2vec
 ft_word2vec.spark_connection <- function(x, input_col = NULL, output_col = NULL, vector_size = 100, min_count = 5,
                                          max_sentence_length = 1000, num_partitions = 1, step_size = 0.025, max_iter = 1,
                                          seed = NULL, uid = random_string("word2vec_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -57,8 +56,9 @@ ft_word2vec.spark_connection <- function(x, input_col = NULL, output_col = NULL,
     invoke("setMaxIter", .args[["max_iter"]]) %>%
     jobj_set_param("setMaxSentenceLength", .args[["max_sentence_length"]], "2.0.0", 1000)
 
-  if (!is.null(.args[["seed"]]))
+  if (!is.null(.args[["seed"]])) {
     jobj <- invoke(jobj, "setSeed", .args[["seed"]])
+  }
 
   estimator <- new_ml_word2vec(jobj)
 
@@ -69,7 +69,6 @@ ft_word2vec.spark_connection <- function(x, input_col = NULL, output_col = NULL,
 ft_word2vec.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, vector_size = 100, min_count = 5,
                                     max_sentence_length = 1000, num_partitions = 1, step_size = 0.025, max_iter = 1,
                                     seed = NULL, uid = random_string("word2vec_"), ...) {
-
   stage <- ft_word2vec.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -84,7 +83,6 @@ ft_word2vec.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, vect
     uid = uid
   )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
@@ -105,10 +103,11 @@ ft_word2vec.tbl_spark <- function(x, input_col = NULL, output_col = NULL, vector
     uid = uid
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_word2vec <- function(jobj) {
@@ -117,19 +116,20 @@ new_ml_word2vec <- function(jobj) {
 
 new_ml_word2vec_model <- function(jobj) {
   new_ml_transformer(jobj,
-                     find_synonyms = function(word, num) {
-                       word <- cast_string(word)
-                       num <- cast_scalar_integer(num)
-                       invoke(jobj, "findSynonyms", word, num) %>%
-                         sdf_register()
-                     },
-                     find_synonyms_array = function(word, num) {
-                       word <- cast_string(word)
-                       num <- cast_scalar_integer(num)
-                       invoke(jobj, "findSynonymsArray", word, num)
-                     },
-                     vectors = invoke(jobj, "getVectors"),
-                     class = "ml_word2vec_model")
+    find_synonyms = function(word, num) {
+      word <- cast_string(word)
+      num <- cast_scalar_integer(num)
+      invoke(jobj, "findSynonyms", word, num) %>%
+        sdf_register()
+    },
+    find_synonyms_array = function(word, num) {
+      word <- cast_string(word)
+      num <- cast_scalar_integer(num)
+      invoke(jobj, "findSynonymsArray", word, num)
+    },
+    vectors = invoke(jobj, "getVectors"),
+    class = "ml_word2vec_model"
+  )
 }
 
 validator_ml_word2vec <- function(.args) {

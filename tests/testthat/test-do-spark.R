@@ -18,31 +18,37 @@ y <- 456
 z <- 789
 fn_1 <- function(x) {
   list(fn_1 = list(x = x, u = u))
- }
+}
 fn_2 <- function(x) {
   y <- 123456
-  inner_fn <- function(x) { list(inner_fn = list(x = x, y = y)) }
+  inner_fn <- function(x) {
+    list(inner_fn = list(x = x, y = y))
+  }
   list(fn_2 = list(fn_1(list(fn_1(list(x = x, v = y)), z = z)), y = y, z = z, inner_fn(z)))
 }
 fn_3 <- function(x) {
   u <- 789
-  inner_fn <- function(z) { list(inner_fn = list(u = u, v = v, x = x, y = y, z = z)) }
+  inner_fn <- function(z) {
+    list(inner_fn = list(u = u, v = v, x = x, y = y, z = z))
+  }
   inner_fn
 }
 fn_4 <- fn_3(1357)
 
-'%test%' <- function(obj, quoted_expr) {
+"%test%" <- function(obj, quoted_expr) {
   res <- list()
-  for (impl in c("do", "dopar"))
+  for (impl in c("do", "dopar")) {
     res[[impl]] <- eval(parse(text = paste(
-      "obj %", impl, "% { ", deparse(quoted_expr), " }", sep = ""
+      "obj %", impl, "% { ", deparse(quoted_expr), " }",
+      sep = ""
     )))
+  }
   expect_equal(res$do, res$dopar)
 }
 
 test_that("doSpark preserves exception error message", {
   expect_error(
-    foreach (x = 1:10) %dopar% {
+    foreach(x = 1:10) %dopar% {
       if (x == 10) stop("runtime error")
     },
     regexp = "task 10 failed - \"runtime error\""
@@ -88,7 +94,9 @@ test_that("doSpark works for loop with arbitrary R objects with multicombine", {
 test_that("doSpark works for loop referencing external functions and variables", {
   n <- 5
   expect_equal(
-    unlist(foreach(x = 1:5) %dopar% { n * x }),
+    unlist(foreach(x = 1:5) %dopar% {
+      n * x
+    }),
     n * seq(5)
   )
   foreach(x = 1:20, .combine = list) %test% quote(fn_2(list(x, y, z, fn_3(x)(y), fn_4(x))))

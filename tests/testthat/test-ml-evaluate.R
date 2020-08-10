@@ -164,7 +164,7 @@ test_that("ml_evaluate() works for kmeans", {
 
   iris_tbl <- testthat_tbl("iris")
   kmeans_silhouette <- ml_kmeans(iris_tbl, Species ~ .) %>%
-     ml_evaluate(iris_tbl)
+    ml_evaluate(iris_tbl)
 
   expect_equal(names(kmeans_silhouette), "Silhouette")
   expect_equal(kmeans_silhouette$Silhouette, 0.85, tolerance = 0.001, scale = 1)
@@ -193,7 +193,6 @@ test_that("ml_evaluate() works for gaussian mixtures model", {
 })
 
 test_that("ml_evaluate() works for naive bayes model", {
-
   iris_tbl <- testthat_tbl("iris")
   nb_acc <- ml_naive_bayes(iris_tbl, Species ~ .) %>%
     ml_evaluate(iris_tbl)
@@ -203,7 +202,6 @@ test_that("ml_evaluate() works for naive bayes model", {
 })
 
 test_that("ml_evaluate() works for random forest model", {
-
   iris_tbl <- testthat_tbl("iris")
   rf_acc <- ml_random_forest(iris_tbl, Species ~ .) %>%
     ml_evaluate(iris_tbl)
@@ -213,7 +211,6 @@ test_that("ml_evaluate() works for random forest model", {
 })
 
 test_that("ml_evaluate() works for decision tree model", {
-
   iris_tbl <- testthat_tbl("iris")
   dt_acc <- ml_decision_tree(iris_tbl, Species ~ .) %>%
     ml_evaluate(iris_tbl)
@@ -223,9 +220,8 @@ test_that("ml_evaluate() works for decision tree model", {
 })
 
 test_that("ml_evaluate() works for mlp model", {
-
   iris_tbl <- testthat_tbl("iris")
-  mlp_acc <- ml_multilayer_perceptron_classifier(iris_tbl, Species ~ ., layers = c(4,3,3)) %>%
+  mlp_acc <- ml_multilayer_perceptron_classifier(iris_tbl, Species ~ ., layers = c(4, 3, 3)) %>%
     ml_evaluate(iris_tbl)
 
   expect_equal(names(mlp_acc), "Accuracy")
@@ -233,11 +229,10 @@ test_that("ml_evaluate() works for mlp model", {
 })
 
 test_that("ml_evaluate() works for gbt model", {
-
   iris_tbl <- testthat_tbl("iris")
 
   # gbt only supports binary classification
-  iris_tbl<- iris_tbl %>% dplyr::filter(Species != "setosa")
+  iris_tbl <- iris_tbl %>% dplyr::filter(Species != "setosa")
 
   gbt_acc <- ml_gradient_boosted_trees(iris_tbl, Species ~ .) %>%
     ml_evaluate(iris_tbl)
@@ -252,7 +247,7 @@ test_that("ml_evaluate() works for svc model", {
   iris_tbl <- testthat_tbl("iris")
 
   # gbt only supports binary classification
-  iris_tbl<- iris_tbl %>% dplyr::filter(Species != "setosa")
+  iris_tbl <- iris_tbl %>% dplyr::filter(Species != "setosa")
 
   svc_acc <- ml_linear_svc(iris_tbl, Species ~ .) %>%
     ml_evaluate(iris_tbl)

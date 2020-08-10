@@ -6,4 +6,3 @@ spark_data_build_types <- function(sc, columns) {
 
   invoke_static(sc, "sparklyr.SQLUtils", "createStructType", fields)
 }
-

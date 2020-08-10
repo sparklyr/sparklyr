@@ -16,11 +16,20 @@ test_that("top_n works as expected", {
   test_data <- data.frame("X" = test_data, stringsAsFactors = F)
   test_tbl <- copy_to(sc, test_data)
 
-  tn1 <- test_tbl %>% count(X) %>% top_n(10) %>% collect()
-  tn2 <- test_data %>% count(X) %>% top_n(10)
+  tn1 <- test_tbl %>%
+    count(X) %>%
+    top_n(10) %>%
+    collect()
+  tn2 <- test_data %>%
+    count(X) %>%
+    top_n(10)
 
-  tn2 <- tn2 %>% mutate(n = as.integer(n)) %>% arrange(X)
-  tn1 <- tn1 %>% mutate(n = as.integer(n)) %>% arrange(X)
+  tn2 <- tn2 %>%
+    mutate(n = as.integer(n)) %>%
+    arrange(X)
+  tn1 <- tn1 %>%
+    mutate(n = as.integer(n)) %>%
+    arrange(X)
 
   expect_equal(tn1, tn2)
 })

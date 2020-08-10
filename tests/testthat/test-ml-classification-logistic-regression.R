@@ -40,10 +40,12 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
 
   training <- tibble(
     id = 0:3L,
-    text = c("a b c d e spark",
-             "b d",
-             "spark f g h",
-             "hadoop mapreduce"),
+    text = c(
+      "a b c d e spark",
+      "b d",
+      "spark f g h",
+      "hadoop mapreduce"
+    ),
     label = c(1, 0, 1, 0)
   )
   test <- tibble(
@@ -70,8 +72,8 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
     ml_logistic_regression(max_iter = 10, reg_param = 0.001)
   m2_predictions <- m2 %>%
     ml_transform(test_tbl %>%
-                   ft_tokenizer("text", "words") %>%
-                   ft_hashing_tf("words", "features", num_features = 1000)) %>%
+      ft_tokenizer("text", "words") %>%
+      ft_hashing_tf("words", "features", num_features = 1000)) %>%
     pull(probability)
 
   expect_equal(m1_predictions, m2_predictions)
@@ -81,42 +83,51 @@ test_that("ml_logistic_regression() agrees with stats::glm()", {
   sc <- testthat_spark_connection()
   set.seed(42)
   iris_weighted <- iris %>%
-    mutate(weights = rpois(nrow(iris), 1) + 1,
-           ones = rep(1, nrow(iris)),
-           versicolor = ifelse(Species == "versicolor", 1L, 0L))
+    mutate(
+      weights = rpois(nrow(iris), 1) + 1,
+      ones = rep(1, nrow(iris)),
+      versicolor = ifelse(Species == "versicolor", 1L, 0L)
+    )
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
-           family = binomial(logit), weights = weights,
-           data = iris_weighted)
+    family = binomial(logit), weights = weights,
+    data = iris_weighted
+  )
   s <- ml_logistic_regression(iris_weighted_tbl,
-                              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
-                              reg_param = 0L,
-                              weight_col = "weights")
+    formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+    reg_param = 0L,
+    weight_col = "weights"
+  )
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
-           family = binomial(logit), data = iris_weighted)
+    family = binomial(logit), data = iris_weighted
+  )
   s <- ml_logistic_regression(iris_weighted_tbl,
-                              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
-                              reg_param = 0L,
-                              weight_col = "ones")
+    formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+    reg_param = 0L,
+    weight_col = "ones"
+  )
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 })
 
-test_that("ml_logistic_regression can fit without intercept",{
+test_that("ml_logistic_regression can fit without intercept", {
   sc <- testthat_spark_connection()
   set.seed(42)
   iris_weighted <- iris %>%
-    mutate(weights = rpois(nrow(iris), 1) + 1,
-           ones = rep(1, nrow(iris)),
-           versicolor = ifelse(Species == "versicolor", 1L, 0L))
+    mutate(
+      weights = rpois(nrow(iris), 1) + 1,
+      ones = rep(1, nrow(iris)),
+      versicolor = ifelse(Species == "versicolor", 1L, 0L)
+    )
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
   expect_error(s <- ml_logistic_regression(
     iris_weighted_tbl,
     formula = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
-    fit_intercept=FALSE),NA)
-  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width - 1, family=binomial(logit), data=iris_weighted)
+    fit_intercept = FALSE
+  ), NA)
+  r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width - 1, family = binomial(logit), data = iris_weighted)
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 })
 
@@ -124,26 +135,32 @@ test_that("ml_logistic_regression() agrees with stats::glm() for reversed catego
   sc <- testthat_spark_connection()
   set.seed(42)
   iris_weighted <- iris %>%
-    mutate(weights = rpois(nrow(iris), 1) + 1,
-           ones = rep(1, nrow(iris)),
-           versicolor = ifelse(Species == "versicolor", 1L, 0L))
+    mutate(
+      weights = rpois(nrow(iris), 1) + 1,
+      ones = rep(1, nrow(iris)),
+      versicolor = ifelse(Species == "versicolor", 1L, 0L)
+    )
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
-           family = binomial(logit), weights = weights,
-           data = iris_weighted)
+    family = binomial(logit), weights = weights,
+    data = iris_weighted
+  )
   s <- ml_logistic_regression(iris_weighted_tbl,
-                              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
-                              reg_param = 0L,
-                              weight_col = "weights")
+    formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+    reg_param = 0L,
+    weight_col = "weights"
+  )
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
-           family = binomial(logit), data = iris_weighted)
+    family = binomial(logit), data = iris_weighted
+  )
   s <- ml_logistic_regression(iris_weighted_tbl,
-                              formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
-                              reg_param = 0L,
-                              weight_col = "ones")
+    formula = "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+    reg_param = 0L,
+    weight_col = "ones"
+  )
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 })
 
@@ -184,8 +201,10 @@ test_that("ml_logistic_regression.tbl_spark() warns when 'response' is a formula
   sc <- testthat_spark_connection()
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
   expect_warning(
-    ml_logistic_regression(iris_weighted_tbl, response = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
-                           features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
+    ml_logistic_regression(iris_weighted_tbl,
+      response = versicolor ~ Sepal_Width + Petal_Length + Petal_Width,
+      features = c("Sepal_Width", "Petal_Length", "Petal_Width")
+    ),
     "'features' is ignored when a formula is specified"
   )
 })
@@ -195,14 +214,16 @@ test_that("ml_logistic_regression.tbl_spark() errors if 'formula' is specified a
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
   expect_error(
     ml_logistic_regression(iris_weighted_tbl,
-                           "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
-                           response = "versicolor"),
+      "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+      response = "versicolor"
+    ),
     "only one of 'formula' or 'response'-'features' should be specified"
   )
   expect_error(
     ml_logistic_regression(iris_weighted_tbl,
-                           "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
-                           features = c("Sepal_Width", "Petal_Length", "Petal_Width")),
+      "versicolor ~ Sepal_Width + Petal_Length + Petal_Width",
+      features = c("Sepal_Width", "Petal_Length", "Petal_Width")
+    ),
     "only one of 'formula' or 'response'-'features' should be specified"
   )
 })
@@ -234,35 +255,40 @@ test_that("we can fit multinomial models", {
   sp <- predict(s, copy_to(sc, train, overwrite = TRUE))
 
   expect_equal(as.character(rp), as.character(sp))
-
 })
 
 test_that("weights column works for logistic regression", {
   sc <- testthat_spark_connection()
   set.seed(42)
   iris_weighted <- iris %>%
-    mutate(weights = rpois(nrow(iris), 1) + 1,
-           ones = rep(1, nrow(iris)),
-           versicolor = ifelse(Species == "versicolor", 1L, 0L))
+    mutate(
+      weights = rpois(nrow(iris), 1) + 1,
+      ones = rep(1, nrow(iris)),
+      versicolor = ifelse(Species == "versicolor", 1L, 0L)
+    )
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
-           family = binomial(logit), weights = weights,
-           data = iris_weighted)
+    family = binomial(logit), weights = weights,
+    data = iris_weighted
+  )
   s <- ml_logistic_regression(iris_weighted_tbl,
-                              response = "versicolor",
-                              features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                              reg_param = 0L,
-                              weight_col = "weights")
+    response = "versicolor",
+    features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+    reg_param = 0L,
+    weight_col = "weights"
+  )
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 
   r <- glm(versicolor ~ Sepal.Width + Petal.Length + Petal.Width,
-           family = binomial(logit), data = iris_weighted)
+    family = binomial(logit), data = iris_weighted
+  )
   s <- ml_logistic_regression(iris_weighted_tbl,
-                              response = "versicolor",
-                              features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                              reg_param = 0L,
-                              weight_col = "ones")
+    response = "versicolor",
+    features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+    reg_param = 0L,
+    weight_col = "ones"
+  )
   expect_equal(unname(coef(r)), unname(coef(s)), tolerance = 1e-5, scale = 1)
 })
 
@@ -276,7 +302,8 @@ test_that("logistic regression bounds on coefficients", {
     upper_bounds_on_coefficients = matrix(rep(1, 6), nrow = 3),
     lower_bounds_on_coefficients = matrix(rep(-1, 6), nrow = 3),
     upper_bounds_on_intercepts = c(1, 1, 1),
-    lower_bounds_on_intercepts = c(-1, -1, -1))
+    lower_bounds_on_intercepts = c(-1, -1, -1)
+  )
   expect_equal(max(coef(lr)), 1)
   expect_equal(min(coef(lr)), -1)
 })

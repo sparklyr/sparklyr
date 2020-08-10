@@ -1,9 +1,11 @@
-args <- commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 
 ensure_pkgs <- function(pkgs) {
-  for (pkg in pkgs)
-    if (!require(pkg, character.only = TRUE))
+  for (pkg in pkgs) {
+    if (!require(pkg, character.only = TRUE)) {
       install.packages(pkg)
+    }
+  }
 }
 
 if (length(args) == 0) {
@@ -28,6 +30,6 @@ if (length(args) == 0) {
   ensure_pkgs(c("diffobj", "stringr"))
 
   sparklyr:::spark_verify_embedded_sources()
-}else {
+} else {
   stop("Unsupported arguments")
 }

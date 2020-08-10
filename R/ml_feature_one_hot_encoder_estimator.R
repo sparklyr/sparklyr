@@ -18,8 +18,8 @@
 #'
 #' @export
 ft_one_hot_encoder_estimator <- function(x, input_cols = NULL, output_cols = NULL,
-                                          handle_invalid = "error", drop_last = TRUE,
-                                          uid = random_string("one_hot_encoder_estimator_"), ...) {
+                                         handle_invalid = "error", drop_last = TRUE,
+                                         uid = random_string("one_hot_encoder_estimator_"), ...) {
   check_dots_used()
   UseMethod("ft_one_hot_encoder_estimator")
 }
@@ -28,8 +28,8 @@ ml_one_hot_encoder_estimator <- ft_one_hot_encoder_estimator
 
 #' @export
 ft_one_hot_encoder_estimator.spark_connection <- function(x, input_cols = NULL, output_cols = NULL,
-                                                           handle_invalid = "error", drop_last = TRUE,
-                                                           uid = random_string("one_hot_encoder_estimator_"), ...) {
+                                                          handle_invalid = "error", drop_last = TRUE,
+                                                          uid = random_string("one_hot_encoder_estimator_"), ...) {
   spark_require_version(x, "2.3.0", "3.0.0")
 
   .args <- list(
@@ -54,8 +54,8 @@ ft_one_hot_encoder_estimator.spark_connection <- function(x, input_cols = NULL, 
 
 #' @export
 ft_one_hot_encoder_estimator.ml_pipeline <- function(x, input_cols = NULL, output_cols = NULL,
-                                                      handle_invalid = "error", drop_last = TRUE,
-                                                      uid = random_string("one_hot_encoder_estimator_"), ...) {
+                                                     handle_invalid = "error", drop_last = TRUE,
+                                                     uid = random_string("one_hot_encoder_estimator_"), ...) {
   stage <- ft_one_hot_encoder_estimator.spark_connection(
     x = spark_connection(x),
     input_cols = input_cols,
@@ -70,8 +70,8 @@ ft_one_hot_encoder_estimator.ml_pipeline <- function(x, input_cols = NULL, outpu
 
 #' @export
 ft_one_hot_encoder_estimator.tbl_spark <- function(x, input_cols = NULL, output_cols = NULL,
-                                                    handle_invalid = "error", drop_last = TRUE,
-                                                    uid = random_string("one_hot_encoder_estimator_"), ...) {
+                                                   handle_invalid = "error", drop_last = TRUE,
+                                                   uid = random_string("one_hot_encoder_estimator_"), ...) {
   stage <- ft_one_hot_encoder_estimator.spark_connection(
     x = spark_connection(x),
     input_cols = input_cols,

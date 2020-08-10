@@ -9,7 +9,7 @@
 #' @template roxlate-ml-formula-params
 #' @param probability_col Column name for predicted class conditional probabilities. Note: Not all models output well-calibrated probability estimates! These probabilities should be treated as confidences, not precise probabilities.
 #'
-#'@examples
+#' @examples
 #' \dontrun{
 #' sc <- spark_connect(master = "local")
 #' iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
@@ -18,8 +18,7 @@
 #' pred <- sdf_predict(iris_tbl, gmm_model)
 #' ml_clustering_evaluator(pred)
 #' }
-
-
+#'
 #' @export
 ml_gaussian_mixture <- function(x, formula = NULL, k = 2, max_iter = 100,
                                 tol = 0.01, seed = NULL, features_col = "features",
@@ -65,7 +64,6 @@ ml_gaussian_mixture.ml_pipeline <- function(x, formula = NULL, k = 2, max_iter =
                                             tol = 0.01, seed = NULL, features_col = "features",
                                             prediction_col = "prediction", probability_col = "probability",
                                             uid = random_string("gaussian_mixture_"), ...) {
-
   stage <- ml_gaussian_mixture.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -130,20 +128,25 @@ new_ml_gaussian_mixture <- function(jobj) {
 }
 
 new_ml_gaussian_mixture_model <- function(jobj) {
-  summary <- if (invoke(jobj, "hasSummary"))
+  summary <- if (invoke(jobj, "hasSummary")) {
     new_ml_gaussian_mixture_summary(invoke(jobj, "summary"))
-  else NULL
+  } else {
+    NULL
+  }
 
   new_ml_clustering_model(
     jobj,
     gaussians = invoke(jobj, "gaussians"),
-    gaussians_df = function() invoke(jobj, "gaussiansDF") %>% # def
-      sdf_register() %>%
-      collect() %>%
-      dplyr::mutate(!!rlang::sym("cov") := lapply(!!rlang::sym("cov"), read_spark_matrix)),
+    gaussians_df = function() {
+      invoke(jobj, "gaussiansDF") %>% # def
+        sdf_register() %>%
+        collect() %>%
+        dplyr::mutate(!!rlang::sym("cov") := lapply(!!rlang::sym("cov"), read_spark_matrix))
+    },
     weights = invoke(jobj, "weights"),
     summary = summary,
-    class = "ml_gaussian_mixture_model")
+    class = "ml_gaussian_mixture_model"
+  )
 }
 
 new_ml_gaussian_mixture_summary <- function(jobj) {
@@ -152,5 +155,6 @@ new_ml_gaussian_mixture_summary <- function(jobj) {
     log_likelihood = invoke(jobj, "logLikelihood"),
     probability = invoke(jobj, "probability") %>% sdf_register(),
     probability_col = invoke(jobj, "probabilityCol"),
-    class = "ml_gaussian_mixture_summary")
+    class = "ml_gaussian_mixture_summary"
+  )
 }

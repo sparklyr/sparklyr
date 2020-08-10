@@ -17,8 +17,9 @@ alpha <- 0.05
 sample_sz <- 3
 
 # map each possible outcome to an octal value
-to_oct <- function(sample)
-  sum(8 ^ seq(0, sample_sz - 1) * sample$x)
+to_oct <- function(sample) {
+  sum(8^seq(0, sample_sz - 1) * sample$x)
+}
 
 max_possible_outcome <- to_oct(list(x = rep(7, sample_sz)))
 

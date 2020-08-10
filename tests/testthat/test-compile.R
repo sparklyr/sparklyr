@@ -1,10 +1,13 @@
 context("compile")
 
 scalac_is_available <- function(version, download_path) {
-  tryCatch({
-    find_scalac(version, download_path)
-    TRUE
-  }, error = function(e) FALSE)
+  tryCatch(
+    {
+      find_scalac(version, download_path)
+      TRUE
+    },
+    error = function(e) FALSE
+  )
 }
 
 ensure_download_scalac <- function(download_path) {

@@ -41,25 +41,29 @@ ml_standardize_formula <- function(formula = NULL, response = NULL, features = N
       if (!is.null(features)) warning("'features' is ignored when a formula is specified")
       # convert formula to string
       rlang::expr_text(response, width = 500L)
-    } else
+    } else {
       # otherwise, if both 'response' and 'features' are specified, treat them as
       #   variable names, and construct formula string
       paste0(response, " ~ ", paste(features, collapse = " + "))
+    }
   } else if (is.null(formula) && is.null(response) && !is.null(features)) {
     # if only 'features' is specified, e.g. in clustering algorithms
     paste0("~ ", paste(features, collapse = " + "))
   } else if (!is.null(formula)) {
     # now if 'formula' is specified, check to see that 'response' and 'features' are not
-    if (!is.null(response) || !is.null(features))
+    if (!is.null(response) || !is.null(features)) {
       stop("only one of 'formula' or 'response'-'features' should be specified")
-    if (rlang::is_formula(formula))
+    }
+    if (rlang::is_formula(formula)) {
       # if user inputs a formula, convert it to string
       rlang::expr_text(formula, width = 500L)
-    else
+    } else {
       # otherwise just returns as is
       formula
-  } else
+    }
+  } else {
     formula
+  }
 }
 
 ml_validate_decision_tree_args <- function(.args) {

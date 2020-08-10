@@ -16,15 +16,15 @@ test_that("to_avro and from_avro work properly", {
   sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
   sdf_transformed <- sdf_to_avro(sdf)
   sdf_transformed %>%
-    sdf_collect() %>% (
+    sdf_collect() %>%
+    (
       function(collected) {
         expect_equal(colnames(collected), c("student"))
         expect_equal(typeof(collected$student), "list")
         expect_equal(typeof(collected$student[[1]]), "raw")
-      }
-    )
+      })
 
-  schema = list(
+  schema <- list(
     type = "record",
     name = "topLevelRecord",
     fields = list(
@@ -62,7 +62,8 @@ test_that("to_avro and from_avro work properly", {
       names(actual),
       c("grade", "id", "name")
     )
-    for (attr in c("grade", "id", "name"))
+    for (attr in c("grade", "id", "name")) {
       expect_equal(actual[[attr]], expected[[attr]])
+    }
   }
 })

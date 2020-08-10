@@ -42,8 +42,10 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
     ft_vector_assembler(c("V1", "V2"), "features")
 
   lsh <- ft_bucketed_random_projection_lsh(
-    sc, input_col = "features", output_col = "hashes",
-    bucket_length = 2, num_hash_tables = 3, seed = 666) %>%
+    sc,
+    input_col = "features", output_col = "hashes",
+    bucket_length = 2, num_hash_tables = 3, seed = 666
+  ) %>%
     ml_fit(dfA_tbl)
   transformed <- lsh %>%
     ml_transform(dfA_tbl) %>%

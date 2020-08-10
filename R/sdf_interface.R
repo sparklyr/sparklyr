@@ -38,7 +38,6 @@ NULL
 #'
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #' sdf_copy_to(sc, iris)
-#'
 #' @name sdf_copy_to
 #' @export
 sdf_copy_to <- function(sc,
@@ -60,8 +59,7 @@ sdf_copy_to.default <- function(sc,
                                 repartition = 0L,
                                 overwrite = FALSE,
                                 struct_columns = list(),
-                                ...
-) {
+                                ...) {
   sdf_import(x, sc, name, memory, repartition, overwrite, struct_columns, ...)
 }
 
@@ -96,12 +94,12 @@ sdf_import.default <- function(x,
                                repartition = 0L,
                                overwrite = FALSE,
                                struct_columns = list(),
-                               ...)
-{
-  if (overwrite)
+                               ...) {
+  if (overwrite) {
     spark_remove_table_if_exists(sc, name)
-  else if (name %in% src_tbls(sc))
+  } else if (name %in% src_tbls(sc)) {
     stop("table ", name, " already exists (pass overwrite = TRUE to overwrite)")
+  }
 
   dots <- list(...)
   serializer <- dots$serializer
@@ -114,8 +112,9 @@ sdf_import.default <- function(x,
     struct_columns = struct_columns
   )
 
-  if (memory && !class(x)[[1]] %in% c("iterator", "list"))
+  if (memory && !class(x)[[1]] %in% c("iterator", "list")) {
     tbl_cache(sc, name)
+  }
 
   on_connection_updated(sc, name)
 
@@ -158,10 +157,11 @@ sdf_register.spark_jobj <- function(x, name = NULL) {
   name <- name %||% paste0("sparklyr_tmp_", gsub("-", "_", uuid::UUIDgenerate()))
   sc <- spark_connection(x)
 
-  if (spark_version(sc) < "2.0.0")
+  if (spark_version(sc) < "2.0.0") {
     invoke(x, "registerTempTable", name)
-  else
+  } else {
     invoke(x, "createOrReplaceTempView", name)
+  }
 
   on_connection_updated(sc, name)
   tbl(sc, name)
@@ -182,8 +182,7 @@ sdf_register.spark_jobj <- function(x, name = NULL) {
 #' @family Spark data frames
 #'
 #' @export
-sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL)
-{
+sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL) {
   sdf <- spark_dataframe(x)
 
   sampled <- if (is.null(seed)) {
@@ -255,8 +254,9 @@ sdf_sort <- function(x, columns) {
 
   columns <- as.character(columns)
   n <- length(columns)
-  if (n == 0)
+  if (n == 0) {
     stop("must supply one or more column names")
+  }
 
   sorted <- if (n == 1) {
     invoke(df, "sort", columns, list())
@@ -314,18 +314,19 @@ sdf_with_unique_id <- function(x, id = "id") {
 #'
 #' @export
 sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
-
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
   id <- cast_string(id)
   from <- cast_scalar_integer(from)
 
-  transformed <- invoke_static(sc,
-                               "sparklyr.Utils",
-                               "addSequentialIndex",
-                               sdf,
-                               from,
-                               id)
+  transformed <- invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "addSequentialIndex",
+    sdf,
+    from,
+    id
+  )
 
   sdf_register(transformed)
 }
@@ -343,18 +344,19 @@ sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
 #' @importFrom rlang sym
 #' @importFrom rlang :=
 sdf_last_index <- function(x, id = "id") {
-
   sdf <- x %>%
     dplyr::transmute(!!sym(id) := as.numeric(!!sym(id))) %>%
     spark_dataframe()
   sc <- spark_connection(sdf)
   id <- cast_string(id)
 
-  invoke_static(sc,
-                "sparklyr.Utils",
-                "getLastIndex",
-                sdf,
-                id)
+  invoke_static(
+    sc,
+    "sparklyr.Utils",
+    "getLastIndex",
+    sdf,
+    id
+  )
 }
 
 #' Compute (Approximate) Quantiles with a Spark DataFrame
@@ -373,8 +375,7 @@ sdf_last_index <- function(x, id = "id") {
 sdf_quantile <- function(x,
                          column,
                          probabilities = c(0.00, 0.25, 0.50, 0.75, 1.00),
-                         relative.error = 1E-5)
-{
+                         relative.error = 1E-5) {
   sdf <- spark_dataframe(x)
 
   nm <-
@@ -455,9 +456,11 @@ sdf_broadcast <- function(x) {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
-  invoke_static(sc,
-                "org.apache.spark.sql.functions",
-                "broadcast", sdf) %>%
+  invoke_static(
+    sc,
+    "org.apache.spark.sql.functions",
+    "broadcast", sdf
+  ) %>%
     sdf_register()
 }
 
@@ -484,8 +487,9 @@ sdf_repartition <- function(x, partitions = NULL, partition_by = NULL) {
         sdf_register()
     )
   } else {
-    if (!is.null(partition_by))
+    if (!is.null(partition_by)) {
       stop("partitioning by columns only supported for Spark 2.0.0 and later")
+    }
 
     invoke(sdf, "repartition", partitions) %>%
       sdf_register()
@@ -513,8 +517,9 @@ sdf_coalesce <- function(x, partitions) {
 
   partitions <- cast_scalar_integer(partitions)
 
-  if (partitions < 1)
+  if (partitions < 1) {
     stop("number of partitions must be positive")
+  }
 
   sdf %>%
     invoke("coalesce", partitions) %>%
@@ -524,8 +529,10 @@ sdf_coalesce <- function(x, partitions) {
 validate_cols <- function(x, cols) {
   present <- cols %in% colnames(x)
   if (any(!present)) {
-    msg <- paste0("The following columns are not in the data frame: ",
-                  paste0(cols[which(!present)], collapse = ", "))
+    msg <- paste0(
+      "The following columns are not in the data frame: ",
+      paste0(cols[which(!present)], collapse = ", ")
+    )
     stop(msg)
   }
 }
@@ -554,10 +561,10 @@ sdf_describe <- function(x, cols = colnames(x)) {
 sdf_drop_duplicates <- function(x, cols = NULL) {
   validate_cols(x, cols)
 
-  cols <- cast_character_list(cols, allow_null=TRUE)
+  cols <- cast_character_list(cols, allow_null = TRUE)
   sdf <- spark_dataframe(x)
 
-  sdf_deduplicated <- if(is.null(cols)) {
+  sdf_deduplicated <- if (is.null(cols)) {
     invoke(sdf, "dropDuplicates")
   } else {
     invoke(sdf, "dropDuplicates", cols)
@@ -584,10 +591,11 @@ transform_sdf <- function(x, cols, fn) {
         "org.apache.spark.sql.Column",
         col
       )
-      if (col %in% cols)
+      if (col %in% cols) {
         fn(col, col_obj) %>% invoke("as", col)
-      else
+      } else {
         col_obj
+      }
     }
   )
 

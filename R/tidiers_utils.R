@@ -6,20 +6,26 @@ extract_model_metrics <- function(object, metric_names, new_names) {
 
 #' @export
 tidy.ml_model <- function(x, ...) {
-  stop("'tidy()' not yet supported for ",
-       setdiff(class(x), "ml_model"))
+  stop(
+    "'tidy()' not yet supported for ",
+    setdiff(class(x), "ml_model")
+  )
 }
 
 #' @export
 augment.ml_model <- function(x, ...) {
-  stop("'augment()' not yet supported for ",
-       setdiff(class(x), "ml_model"))
+  stop(
+    "'augment()' not yet supported for ",
+    setdiff(class(x), "ml_model")
+  )
 }
 
 #' @export
 glance.ml_model <- function(x, ...) {
-  stop("'glance()' not yet supported for ",
-       setdiff(class(x), "ml_model"))
+  stop(
+    "'glance()' not yet supported for ",
+    setdiff(class(x), "ml_model")
+  )
 }
 
 # this function provides broom::augment() for
@@ -29,18 +35,17 @@ broom_augment_supervised <- function(x, newdata = NULL, ...) {
 
   # if the user doesn't provide a new data, this funcion will
   # use the training set
-  if (is.null(newdata)){
+  if (is.null(newdata)) {
     newdata <- x$dataset
   }
 
-  if(inherits(x, "ml_model_classification")) {
+  if (inherits(x, "ml_model_classification")) {
     # for classification
     vars <- c(dplyr::tbl_vars(newdata), "predicted_label")
 
     ml_predict(x, newdata) %>%
       dplyr::select(!!!syms(vars)) %>%
       dplyr::rename(.predicted_label = !!rlang::sym("predicted_label"))
-
   } else {
     # for regression
     vars <- c(dplyr::tbl_vars(newdata), "prediction")
@@ -49,7 +54,6 @@ broom_augment_supervised <- function(x, newdata = NULL, ...) {
       dplyr::select(!!!syms(vars)) %>%
       dplyr::rename(.prediction = !!rlang::sym("prediction"))
   }
-
 }
 
 # copied from broom to remove dependency

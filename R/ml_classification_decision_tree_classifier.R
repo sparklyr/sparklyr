@@ -22,7 +22,6 @@ ml_decision_tree_classifier.spark_connection <- function(x, formula = NULL, max_
                                                          label_col = "label", prediction_col = "prediction",
                                                          probability_col = "probability", raw_prediction_col = "rawPrediction",
                                                          uid = random_string("decision_tree_classifier_"), ...) {
-
   .args <- list(
     max_depth = max_depth,
     max_bins = max_bins,
@@ -73,7 +72,6 @@ ml_decision_tree_classifier.ml_pipeline <- function(x, formula = NULL, max_depth
                                                     label_col = "label", prediction_col = "prediction",
                                                     probability_col = "probability", raw_prediction_col = "rawPrediction",
                                                     uid = random_string("decision_tree_classifier_"), ...) {
-
   stage <- ml_decision_tree_classifier.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -110,7 +108,6 @@ ml_decision_tree_classifier.tbl_spark <- function(x, formula = NULL, max_depth =
                                                   uid = random_string("decision_tree_classifier_"),
                                                   response = NULL, features = NULL,
                                                   predicted_label_col = "predicted_label", ...) {
-
   formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_decision_tree_classifier.spark_connection(
@@ -170,5 +167,6 @@ new_ml_decision_tree_classification_model <- function(jobj) {
     feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
     # `numNodes` is a def in Spark.
     num_nodes = function() invoke(jobj, "numNodes"),
-    class = "ml_decision_tree_classification_model")
+    class = "ml_decision_tree_classification_model"
+  )
 }

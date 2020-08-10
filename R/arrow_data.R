@@ -41,7 +41,7 @@ arrow_enabled_object.spark_jobj <- function(object) {
 
 arrow_enabled_dataframe_schema <- function(types) {
   unsupported_expr <- "^$"
-  unsupported <- Filter(function(e) grepl(unsupported_expr , e), types)
+  unsupported <- Filter(function(e) grepl(unsupported_expr, e), types)
 
   enabled <- length(unsupported) == 0
   if (!enabled) warning("Arrow disabled due to columns: ", paste(names(unsupported), collapse = ", "))
@@ -53,8 +53,7 @@ arrow_enabled_object.data.frame <- function(object) {
   arrow_enabled_dataframe_schema(sapply(object, function(e) class(e)[[1]]))
 }
 
-arrow_read_stream <- function(stream)
-{
+arrow_read_stream <- function(stream) {
   reader <- arrow_record_stream_reader(stream)
   record_entry <- arrow_read_record_batch(reader)
 
@@ -67,11 +66,10 @@ arrow_read_stream <- function(stream)
   entries
 }
 
-arrow_copy_to <- function(sc, df, parallelism)
-{
+arrow_copy_to <- function(sc, df, parallelism) {
   # replace factors with characters
   if (any(sapply(df, is.factor))) {
-    df <- dplyr::as_tibble(lapply(df, function(x) if(is.factor(x)) as.character(x) else x))
+    df <- dplyr::as_tibble(lapply(df, function(x) if (is.factor(x)) as.character(x) else x))
   }
 
   # serialize to arrow
@@ -90,15 +88,17 @@ arrow_copy_to <- function(sc, df, parallelism)
   sdf
 }
 
-arrow_collect <- function(tbl, ...)
-{
+arrow_collect <- function(tbl, ...) {
   args <- list(...)
 
   sc <- spark_connection(tbl)
   sdf <- spark_dataframe(tbl)
   session <- spark_session(sc)
 
-  time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
+  time_zone <- spark_session(sc) %>%
+    invoke("sessionState") %>%
+    invoke("conf") %>%
+    invoke("sessionLocalTimeZone")
 
   if (!identical(args$callback, NULL)) {
     cb <- args$callback

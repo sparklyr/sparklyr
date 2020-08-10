@@ -9,26 +9,27 @@ NULL
 
 #' @rdname ml_logistic_regression_tidiers
 #' @export
-tidy.ml_model_logistic_regression <- function(x, ...){
+tidy.ml_model_logistic_regression <- function(x, ...) {
+  num_classes <- x$model$num_classes
 
- num_classes <- x$model$num_classes
+  if (num_classes == 2) {
+    as.data.frame(x$coefficients) %>%
+      dplyr::as_tibble(rownames = "features") %>%
+      dplyr::rename(coefficients = !!"x$coefficients")
+  } else {
+    coefficients <- as.data.frame(x$coefficients) %>%
+      t() %>%
+      dplyr::as_tibble(rownames = "features")
 
- if(num_classes == 2){
-   as.data.frame(x$coefficients) %>%
-     dplyr::as_tibble(rownames = "features") %>%
-     dplyr::rename(coefficients = !!"x$coefficients")
- } else {
-   coefficients <- as.data.frame(x$coefficients) %>%
-     t() %>%
-     dplyr::as_tibble(rownames = "features")
+    # add "_coef" to column name
+    names(coefficients)[2:ncol(coefficients)] <-
+      purrr::map_chr(
+        names(coefficients)[2:ncol(coefficients)],
+        function(e) paste0(e, "_coef")
+      )
 
-   # add "_coef" to column name
-   names(coefficients)[2:ncol(coefficients)] <-
-     purrr::map_chr(names(coefficients)[2:ncol(coefficients)],
-                    function(e) paste0(e, "_coef"))
-
-   coefficients
- }
+    coefficients
+  }
 }
 
 #' @rdname ml_logistic_regression_tidiers
@@ -36,19 +37,18 @@ tidy.ml_model_logistic_regression <- function(x, ...){
 #'
 #' @export
 augment.ml_model_logistic_regression <- function(x, newdata = NULL,
-                                                 ...){
-
+                                                 ...) {
   broom_augment_supervised(x, newdata = newdata)
 }
 
 #' @rdname ml_logistic_regression_tidiers
 #' @export
 glance.ml_model_logistic_regression <- function(x, ...) {
-
   elastic_net_param <- x$model$param_map$elastic_net_param
   lambda <- x$model$param_map$reg_param
 
-  dplyr::tibble(elastic_net_param = elastic_net_param,
-                lambda = lambda)
+  dplyr::tibble(
+    elastic_net_param = elastic_net_param,
+    lambda = lambda
+  )
 }
-

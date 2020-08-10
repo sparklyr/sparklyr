@@ -27,9 +27,12 @@ test_that("ft_word2vec() param setting", {
 test_that("ft_word2vec() returns result with correct length", {
   sc <- testthat_spark_connection()
   sentence_df <- data.frame(
-    sentence = c("Hi I heard about Spark",
-                 "I wish Java could use case classes",
-                 "Logistic regression models are neat"))
+    sentence = c(
+      "Hi I heard about Spark",
+      "I wish Java could use case classes",
+      "Logistic regression models are neat"
+    )
+  )
   sentence_tbl <- sdf_copy_to(sc, sentence_df, overwrite = TRUE)
   tokenized_tbl <- ft_tokenizer(sentence_tbl, "sentence", "words") %>%
     sdf_register("tokenized")
@@ -50,7 +53,7 @@ test_that("ml_find_synonyms works properly", {
   sdf <- sdf_copy_to(sc, doc, overwrite = TRUE)
   tokenized_tbl <- ft_tokenizer(sdf, "sentence", "words")
 
-  model <- ft_word2vec(sc, "words", "result", vector_size= 10, seed = 42L, min_count = 0) %>%
+  model <- ft_word2vec(sc, "words", "result", vector_size = 10, seed = 42L, min_count = 0) %>%
     ml_fit(tokenized_tbl)
 
   synonyms <- ml_find_synonyms(model, "a", 2) %>% pull(word)
@@ -58,4 +61,3 @@ test_that("ml_find_synonyms works properly", {
   # synonym-wise "b" should be closer to "a" than "c" is
   expect_equal(synonyms, c("b", "c"))
 })
-

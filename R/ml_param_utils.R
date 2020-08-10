@@ -58,9 +58,13 @@ ml_params <- function(x, params = NULL, allow_null = FALSE, ...) {
 ml_set_param <- function(x, param, value, ...) {
   setter <- param %>%
     ml_map_param_names(direction = "rs") %>%
-    {paste0("set",
-            toupper(substr(., 1, 1)),
-            substr(., 2, nchar(.)))}
+    {
+      paste0(
+        "set",
+        toupper(substr(., 1, 1)),
+        substr(., 2, nchar(.))
+      )
+    }
   spark_jobj(x) %>%
     invoke(setter, value) %>%
     ml_call_constructor()
@@ -68,41 +72,47 @@ ml_set_param <- function(x, param, value, ...) {
 
 ml_get_param_map <- function(jobj) {
   sc <- spark_connection(jobj)
-  object <- if (spark_version(sc) < "2.0.0")
+  object <- if (spark_version(sc) < "2.0.0") {
     "sparklyr.MLUtils"
-  else
+  } else {
     "sparklyr.MLUtils2"
+  }
 
-  invoke_static(sc,
-                object,
-                "getParamMap",
-                jobj) %>%
+  invoke_static(
+    sc,
+    object,
+    "getParamMap",
+    jobj
+  ) %>%
     ml_map_param_list_names()
 }
 
 ml_map_param_list_names <- function(x, direction = c("sr", "rs"), ...) {
   direction <- rlang::arg_match(direction)
-  mapping <- if (identical(direction, "sr"))
+  mapping <- if (identical(direction, "sr")) {
     .globals$param_mapping_s_to_r
-  else
+  } else {
     .globals$param_mapping_r_to_s
+  }
 
   rlang::set_names(
     x,
     unname(
       sapply(
         names(x),
-        function(nm) rlang::env_get(mapping, nm, default = NULL, inherit = TRUE) %||% nm)
+        function(nm) rlang::env_get(mapping, nm, default = NULL, inherit = TRUE) %||% nm
+      )
     )
   )
 }
 
 ml_map_param_names <- function(x, direction = c("sr", "rs"), ...) {
   direction <- rlang::arg_match(direction)
-  mapping <- if (identical(direction, "sr"))
+  mapping <- if (identical(direction, "sr")) {
     .globals$param_mapping_s_to_r
-  else
+  } else {
     .globals$param_mapping_r_to_s
+  }
 
   unname(
     sapply(

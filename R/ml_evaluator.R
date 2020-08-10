@@ -19,7 +19,7 @@ spark_jobj.ml_evaluator <- function(x, ...) {
 #' @export
 print.ml_evaluator <- function(x, ...) {
   cat(ml_short_type(x), "(Evaluator) \n")
-  cat(paste0("<", x$uid, ">"),"\n")
+  cat(paste0("<", x$uid, ">"), "\n")
   ml_print_column_name_params(x)
   cat(" (Evaluation Metric)\n")
   cat(paste0("  ", "metric_name: ", ml_param(x, "metric_name")))

@@ -5,10 +5,12 @@ sc <- testthat_spark_connection()
 
 training <- dplyr::tibble(
   id = 0:3L,
-  text = c("a b c d e spark",
-           "b d",
-           "spark f g h",
-           "hadoop mapreduce"),
+  text = c(
+    "a b c d e spark",
+    "b d",
+    "spark f g h",
+    "hadoop mapreduce"
+  ),
   label = c(1, 0, 1, 0)
 )
 

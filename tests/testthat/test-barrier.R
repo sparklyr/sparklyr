@@ -12,5 +12,7 @@ test_that("barrier-spark_apply works", {
     collect()
 
   expect_true(grepl("[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}|localhost",
-                    address$address[1], perl = TRUE))
+    address$address[1],
+    perl = TRUE
+  ))
 })

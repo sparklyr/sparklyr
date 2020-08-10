@@ -12,11 +12,13 @@ test_that("linear_svc.tidy() works", {
     ml_linear_svc(Species ~ .) %>%
     tidy()
 
-  check_tidy(td1, exp.row = 5, exp.col = 2,
-             exp.names = c("features", "coefficients"))
+  check_tidy(td1,
+    exp.row = 5, exp.col = 2,
+    exp.names = c("features", "coefficients")
+  )
   expect_equal(td1$coefficients, c(-4.55, -0.981, -2.85, 1.87, 6.06),
-               tolerance = 0.01, scale = 1)
-
+    tolerance = 0.01, scale = 1
+  )
 })
 
 test_that("linear_svc.augment() works", {
@@ -33,9 +35,13 @@ test_that("linear_svc.augment() works", {
     augment(head(iris_tbl2, 25)) %>%
     dplyr::collect()
 
-  check_tidy(au1, exp.row = 25,
-             exp.name = c(dplyr::tbl_vars(iris_tbl),
-                          ".predicted_label"))
+  check_tidy(au1,
+    exp.row = 25,
+    exp.name = c(
+      dplyr::tbl_vars(iris_tbl),
+      ".predicted_label"
+    )
+  )
 })
 
 test_that("linear_svc.glance() works", {
@@ -48,6 +54,8 @@ test_that("linear_svc.glance() works", {
     ml_linear_svc(Species ~ .) %>%
     glance()
 
-  check_tidy(gl1, exp.row = 1,
-             exp.names = c("reg_param", "standardization", "aggregation_depth"))
+  check_tidy(gl1,
+    exp.row = 1,
+    exp.names = c("reg_param", "standardization", "aggregation_depth")
+  )
 })

@@ -44,15 +44,15 @@
 #' diamonds_tbl %>% sdf_random_split(weights = weights)
 #' }
 sdf_random_split <- function(x,
-                          ...,
-                          weights = NULL,
-                          seed = sample(.Machine$integer.max, 1))
-{
+                             ...,
+                             weights = NULL,
+                             seed = sample(.Machine$integer.max, 1)) {
   sdf <- spark_dataframe(x)
   weights <- weights %||% list(...)
   nm <- names(weights)
-  if (is.null(nm) || any(!nzchar(nm)))
+  if (is.null(nm) || any(!nzchar(nm))) {
     stop("all weights must be named")
+  }
   partitions <- sdf_split(sdf, as.numeric(weights), seed = seed)
   registered <- sdf_register(partitions)
   names(registered) <- nm
@@ -82,22 +82,24 @@ sdf_partition <- function(x,
 sdf_project <- function(object, newdata,
                         features = dimnames(object$pc)[[1]],
                         feature_prefix = NULL, ...) {
-
   dots <- list(...)
-  if (!rlang::is_null(dots$feature.prefix))
+  if (!rlang::is_null(dots$feature.prefix)) {
     assign("feature_prefix", dots$feature.prefix)
+  }
 
 
   feature_prefix <- cast_nullable_string(feature_prefix)
 
   # when newdata is not supplied, attempt to use original dataset
-  if (missing(newdata) || is.null(newdata))
+  if (missing(newdata) || is.null(newdata)) {
     newdata <- object$dataset
+  }
 
-  output_names <- if (rlang::is_null(feature_prefix))
+  output_names <- if (rlang::is_null(feature_prefix)) {
     dimnames(object$pc)[[2]]
-  else
+  } else {
     paste0(feature_prefix, seq_len(object$k))
+  }
 
   assembled <- random_string("assembled")
   out <- random_string("out")
@@ -107,5 +109,5 @@ sdf_project <- function(object, newdata,
     ml_set_param("output_col", out) %>%
     ml_transform(ft_vector_assembler(newdata, features, assembled)) %>%
     sdf_separate_column(column = out, into = output_names) %>%
-    select(!!! rlang::syms(c(colnames(newdata), output_names)))
+    select(!!!rlang::syms(c(colnames(newdata), output_names)))
 }

@@ -28,15 +28,19 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
   new_names <- c("estimate", "std.error", "statistic", "p.value")
 
   if (exponentiate) {
-    exp_warning <- paste("Exponentiating coefficients, but model did not use",
-                         "a log or logit link function")
+    exp_warning <- paste(
+      "Exponentiating coefficients, but model did not use",
+      "a log or logit link function"
+    )
 
     if (rlang::is_null(ml_param(model, "link", allow_null = TRUE))) {
-      if (!ml_param(model, "family") %in% c("binomial", "poisson"))
+      if (!ml_param(model, "family") %in% c("binomial", "poisson")) {
         warning(exp_warning)
+      }
     } else {
-      if (!ml_param(model, "link") %in% c("log", "logit"))
+      if (!ml_param(model, "link") %in% c("log", "logit")) {
         warning(exp_warning)
+      }
     }
     trans <- exp
     # drop standard errors because they're not valid after exponentiating
@@ -55,7 +59,6 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
     fix_data_frame(newnames = new_names) %>%
     dplyr::mutate(estimate = trans(!!sym("estimate"))) %>%
     dplyr::select(!!!syms(vars))
-
 }
 
 #' @rdname ml_glm_tidiers
@@ -91,8 +94,9 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   type.residuals <- rlang::arg_match(type.residuals) %>%
     cast_string()
 
-  if (!is.null(newdata) && !(type.residuals == "working"))
+  if (!is.null(newdata) && !(type.residuals == "working")) {
     stop("'type.residuals' must be set to 'working' when 'newdata' is supplied")
+  }
 
   newdata <- newdata %||% ml_model_data(x)
 
@@ -102,8 +106,7 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
     predictions <- ml_predict(x, newdata) %>%
       dplyr::rename(fitted = !!rlang::sym("prediction"))
     return(predictions %>%
-             dplyr::mutate(resid = `-`(!!sym(x$response), !!sym("fitted")))
-    )
+      dplyr::mutate(resid = `-`(!!sym(x$response), !!sym("fitted"))))
   }
 
   # If the code reaches here, user didn't supply 'newdata' so we're dealing with
@@ -123,8 +126,10 @@ augment.ml_model_linear_regression <- augment.ml_model_generalized_linear_regres
 #' @rdname ml_glm_tidiers
 #' @export
 glance.ml_model_generalized_linear_regression <- function(x, ...) {
-  metric_names <- c("null_deviance", "residual_degree_of_freedom_null", "aic", "deviance",
-                    "residual_degree_of_freedom")
+  metric_names <- c(
+    "null_deviance", "residual_degree_of_freedom_null", "aic", "deviance",
+    "residual_degree_of_freedom"
+  )
   new_names <- c("null.deviance", "df.null", "AIC", "deviance", "df.residual")
   extract_model_metrics(x, metric_names, new_names)
 }
@@ -132,10 +137,14 @@ glance.ml_model_generalized_linear_regression <- function(x, ...) {
 #' @rdname ml_glm_tidiers
 #' @export
 glance.ml_model_linear_regression <- function(x, ...) {
-  metric_names <- c("explained_variance", "mean_absolute_error",
-                    "mean_squared_error",
-                    "r2", "root_mean_squared_error")
-  new_names <- c("explained.variance", "mean.absolute.error",
-                 "mean.squared.error", "r.squared", "root.mean.squared.error")
+  metric_names <- c(
+    "explained_variance", "mean_absolute_error",
+    "mean_squared_error",
+    "r2", "root_mean_squared_error"
+  )
+  new_names <- c(
+    "explained.variance", "mean.absolute.error",
+    "mean.squared.error", "r.squared", "root.mean.squared.error"
+  )
   extract_model_metrics(x, metric_names, new_names)
 }

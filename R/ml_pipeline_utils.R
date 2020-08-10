@@ -9,20 +9,26 @@
 #' @export
 ml_add_stage <- function(x, stage) {
   sc <- spark_connection(x)
-  stages <- if (rlang::is_null(ml_stages(x))) list(spark_jobj(stage)) else {
+  stages <- if (rlang::is_null(ml_stages(x))) {
+    list(spark_jobj(stage))
+  } else {
     tryCatch(spark_jobj(x) %>%
-               invoke("getStages") %>%
-               c(spark_jobj(stage)),
-             error = function(e) spark_jobj(x) %>%
-               invoke("stages") %>%
-               c(spark_jobj(stage))
+      invoke("getStages") %>%
+      c(spark_jobj(stage)),
+    error = function(e) {
+      spark_jobj(x) %>%
+        invoke("stages") %>%
+        c(spark_jobj(stage))
+    }
     )
   }
 
-  jobj <- invoke_static(sc, "sparklyr.MLUtils",
-                        "createPipelineFromStages",
-                        ml_uid(x),
-                        stages)
+  jobj <- invoke_static(
+    sc, "sparklyr.MLUtils",
+    "createPipelineFromStages",
+    ml_uid(x),
+    stages
+  )
   new_ml_pipeline(jobj)
 }
 
@@ -43,18 +49,21 @@ ml_add_stage <- function(x, stage) {
 #' @export
 jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NULL) {
   set_param_args <- jobj_set_param_helper(jobj, setter, value, min_version, default)
-  if (is.null(set_param_args))
+  if (is.null(set_param_args)) {
     # not setting any param
     jobj
-  else
+  } else {
     do.call(invoke, c(jobj, set_param_args))
+  }
 }
 
 # returns NULL if no setter should be called, otherwise returns a list of params
 # (aside from jobj itself) to be passed to `invoke`
 jobj_set_param_helper <- function(jobj, setter, value, min_version = NULL, default = NULL) {
   # if value is NULL, don't set
-  if (is.null(value)) return(NULL)
+  if (is.null(value)) {
+    return(NULL)
+  }
 
   if (!is.null(min_version)) {
     # if min_version specified, check Spark version
@@ -65,8 +74,10 @@ jobj_set_param_helper <- function(jobj, setter, value, min_version = NULL, defau
     if (ver < min_version) {
       if (!isTRUE(all.equal(c(value), default))) {
         # if user does not have required version, and tries to set parameter, throw error
-        stop(paste0("Parameter `", deparse(substitute(value)),
-                    "` is only available for Spark ", min_version, " and later."))
+        stop(paste0(
+          "Parameter `", deparse(substitute(value)),
+          "` is only available for Spark ", min_version, " and later."
+        ))
       } else {
         # otherwise, don't call the setter
         return(NULL)
@@ -123,25 +134,29 @@ jobj_set_ml_params <- function(jobj, features_col, label_col, prediction_col,
                                probability_col, raw_prediction_col,
                                k, max_iter, seed, input_col, input_cols,
                                output_col, output_cols) {
-  params_to_set <- Filter(function(x) !is.null(x),
-                          list(
-                               jobj_set_param_helper(jobj, "setFeaturesCol", features_col),
-                               jobj_set_param_helper(jobj, "setLabelCol", label_col),
-                               jobj_set_param_helper(jobj, "setPredictionCol", prediction_col),
-                               jobj_set_param_helper(jobj, "setProbabilityCol", probability_col),
-                               jobj_set_param_helper(jobj, "setRawPredictionCol", raw_prediction_col),
-                               jobj_set_param_helper(jobj, "setK", k),
-                               jobj_set_param_helper(jobj, "setMaxIter", max_iter),
-                               jobj_set_param_helper(jobj, "setSeed", seed),
-                               jobj_set_param_helper(jobj, "setInputCol", input_col),
-                               jobj_set_param_helper(jobj, "setInputCols", input_cols),
-                               jobj_set_param_helper(jobj, "setOutputCol", output_col),
-                               jobj_set_param_helper(jobj, "setOutputCols", output_cols)))
-  if (length(params_to_set) > 0)
+  params_to_set <- Filter(
+    function(x) !is.null(x),
+    list(
+      jobj_set_param_helper(jobj, "setFeaturesCol", features_col),
+      jobj_set_param_helper(jobj, "setLabelCol", label_col),
+      jobj_set_param_helper(jobj, "setPredictionCol", prediction_col),
+      jobj_set_param_helper(jobj, "setProbabilityCol", probability_col),
+      jobj_set_param_helper(jobj, "setRawPredictionCol", raw_prediction_col),
+      jobj_set_param_helper(jobj, "setK", k),
+      jobj_set_param_helper(jobj, "setMaxIter", max_iter),
+      jobj_set_param_helper(jobj, "setSeed", seed),
+      jobj_set_param_helper(jobj, "setInputCol", input_col),
+      jobj_set_param_helper(jobj, "setInputCols", input_cols),
+      jobj_set_param_helper(jobj, "setOutputCol", output_col),
+      jobj_set_param_helper(jobj, "setOutputCols", output_cols)
+    )
+  )
+  if (length(params_to_set) > 0) {
     do.call(invoke, c(jobj, "%>%", params_to_set))
-  else
+  } else {
     # no need to set any param
     jobj
+  }
 }
 
 validate_args_transformer <- function(.args) {
@@ -179,15 +194,16 @@ ml_uid <- function(x) {
 #' @return For \code{ml_stage()}: The stage specified.
 #' @export
 ml_stage <- function(x, stage) {
-  matched_index <- if (is.numeric(stage))
+  matched_index <- if (is.numeric(stage)) {
     stage
-  else
+  } else {
     grep(paste0("^", stage), x$stage_uids)
+  }
 
   switch(length(matched_index) %>% as.character(),
-         "0" = stop("stage not found"),
-         "1" = x$stages[[matched_index]],
-         stop("multiple stages found")
+    "0" = stop("stage not found"),
+    "1" = x$stages[[matched_index]],
+    stop("multiple stages found")
   )
 }
 
@@ -199,8 +215,7 @@ ml_stages <- function(x, stages = NULL) {
   if (rlang::is_null(stages)) {
     x$stages
   } else {
-    matched_indexes <- if (is.numeric(stages))
-    {
+    matched_indexes <- if (is.numeric(stages)) {
       stages
     } else {
       lapply(stages, function(stage) grep(paste0("^", stage), x$stage_uids)) %>%
@@ -212,8 +227,8 @@ ml_stages <- function(x, stages = NULL) {
     if (length(bad_matches)) {
       bad_match <- bad_matches[[1]]
       switch(as.character(length(bad_match)),
-             "0" = stop("no stages found for identifier ", names(bad_matches)[1]),
-             stop("multiple stages found for identifier ", names(bad_matches)[1])
+        "0" = stop("no stages found for identifier ", names(bad_matches)[1]),
+        stop("multiple stages found for identifier ", names(bad_matches)[1])
       )
     }
     x$stages[unlist(matched_indexes)]
@@ -223,11 +238,16 @@ ml_stages <- function(x, stages = NULL) {
 ml_column_metadata <- function(tbl, column) {
   sdf <- spark_dataframe(tbl)
   sdf_schema <- invoke(sdf, "schema")
-  field_index <- sdf_schema %>% invoke("fieldIndex", column) %>% cast_scalar_integer()
-  sdf_schema %>% invoke("%>%",
-                        list("apply", field_index),
-                        list("metadata"),
-                        list("json")) %>%
+  field_index <- sdf_schema %>%
+    invoke("fieldIndex", column) %>%
+    cast_scalar_integer()
+  sdf_schema %>%
+    invoke(
+      "%>%",
+      list("apply", field_index),
+      list("metadata"),
+      list("json")
+    ) %>%
     jsonlite::fromJSON() %>%
     `[[`("ml_attr")
 }
@@ -241,10 +261,11 @@ ml_column_metadata <- function(tbl, column) {
 #' @param allow_null Whether null results are allowed when the metric is not found in the summary.
 #' @export
 ml_summary <- function(x, metric = NULL, allow_null = FALSE) {
-  if (rlang::is_null(metric))
+  if (rlang::is_null(metric)) {
     x$summary %||% stop(deparse(substitute(x)), " has no summary")
-  else if (allow_null)
+  } else if (allow_null) {
     x$summary[[metric]]
-  else
+  } else {
     x$summary[[metric]] %||% stop("metric ", metric, " not found")
+  }
 }

@@ -24,8 +24,10 @@ test_that("ft_stop_words_remover() param setting", {
 test_that("ft_stop_words_remover() works", {
   test_requires_version("2.0.0", "loadDefaultStopWords requires Spark 2.0+")
   sc <- testthat_spark_connection()
-  df <- tibble(id = c(0, 1),
-               raw = c("I saw the red balloon", "Mary had a little lamb"))
+  df <- tibble(
+    id = c(0, 1),
+    raw = c("I saw the red balloon", "Mary had a little lamb")
+  )
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
   expect_identical(
@@ -47,16 +49,21 @@ test_that("ft_stop_words_remover() works", {
   )
 
   swr <- ft_stop_words_remover(
-    sc, "input", "output", case_sensitive = TRUE,
-    stop_words = as.list(letters), uid = "hello")
+    sc, "input", "output",
+    case_sensitive = TRUE,
+    stop_words = as.list(letters), uid = "hello"
+  )
 
   expect_equal(
     ml_params(swr, list(
-      "input_col", "output_col", "case_sensitive", "stop_words")),
-    list(input_col = "input",
-         output_col = "output",
-         case_sensitive = TRUE,
-         stop_words = as.list(letters))
+      "input_col", "output_col", "case_sensitive", "stop_words"
+    )),
+    list(
+      input_col = "input",
+      output_col = "output",
+      case_sensitive = TRUE,
+      stop_words = as.list(letters)
+    )
   )
 })
 

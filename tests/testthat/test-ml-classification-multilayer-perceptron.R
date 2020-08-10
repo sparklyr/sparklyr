@@ -29,7 +29,8 @@ test_that("ml_multilayer_perceptron returns correct number of weights", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   mlp <- ml_multilayer_perceptron_classifier(
-    iris_tbl, formula = "Species ~ .", seed = 42,
+    iris_tbl,
+    formula = "Species ~ .", seed = 42,
     layers = c(4, 10, 3)
   )
   expect_equal(length(mlp$model$weights), 4 * 10 + 10 + 10 * 3 + 3)

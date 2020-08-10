@@ -28,16 +28,16 @@ spark_compile <- function(jar_name,
                           scalac = NULL,
                           jar = NULL,
                           jar_dep = NULL,
-                          embedded_srcs = "embedded_sources.R")
-{
+                          embedded_srcs = "embedded_sources.R") {
   default_install <- spark_install_find()
-  spark_home <- if (is.null(spark_home) && !is.null(default_install))
+  spark_home <- if (is.null(spark_home) && !is.null(default_install)) {
     spark_install_find()$sparkVersionDir
-  else
+  } else {
     spark_home
+  }
 
   scalac <- scalac %||% path_program("scalac")
-  jar    <- jar %||% path_program("jar")
+  jar <- jar %||% path_program("jar")
 
   scalac_version <- get_scalac_version(scalac)
   spark_version <- numeric_version(spark_version_from_home(spark_home))
@@ -48,13 +48,16 @@ spark_compile <- function(jar_name,
   jar_path <- file.path(java_path, jar_name)
 
   scala_path <- file.path(root, "java")
-  scala_files <- list.files(scala_path, pattern = "scala$",
-                            full.names = TRUE,
-                            recursive = TRUE)
+  scala_files <- list.files(scala_path,
+    pattern = "scala$",
+    full.names = TRUE,
+    recursive = TRUE
+  )
 
   # apply user filter to scala files
-  if (is.function(filter))
+  if (is.function(filter)) {
     scala_files <- filter(scala_files)
+  }
 
   message("==> using scalac ", scalac_version)
   message("==> building against Spark ", spark_version)
@@ -82,14 +85,16 @@ spark_compile <- function(jar_name,
       pattern = "jar$"
     )
 
-    if (length(jars))
+    if (length(jars)) {
       break
+    }
   }
 
   jars <- c(jars, jar_dep)
 
-  if (!length(jars))
+  if (!length(jars)) {
     stop("failed to discover Spark jars")
+  }
 
   # construct classpath
   CLASSPATH <- paste(jars, collapse = .Platform$path.sep)
@@ -101,8 +106,9 @@ spark_compile <- function(jar_name,
   # copy embedded sources to current working directory
   message("==> embedded source(s): ", paste(embedded_srcs, collapse = ", "), "\n")
   ensure_directory("sparklyr")
-  for (src in embedded_srcs)
+  for (src in embedded_srcs) {
     file.copy(file.path(scala_path, src), "sparklyr")
+  }
 
   # call 'scalac' with CLASSPATH set
   classpath <- Sys.getenv("CLASSPATH")
@@ -111,17 +117,20 @@ spark_compile <- function(jar_name,
   scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
   optflag <- ifelse(grepl("2.12", scalac_version), "-opt:l:default", "-optimise")
   status <- execute(shQuote(scalac), optflag, "-deprecation", scala_files_quoted)
-  if (status)
+  if (status) {
     stop("==> failed to compile Scala source files")
+  }
 
   # call 'jar' to create our jar
   status <- execute(shQuote(jar), "cf", shQuote(jar_path), ".")
-  if (status)
+  if (status) {
     stop("==> failed to build Java Archive")
+  }
 
   # double-check existence of jar
-  if (!file.exists(jar_path))
+  if (!file.exists(jar_path)) {
     stop("==> failed to create ", jar_name)
+  }
 
   message("==> ", basename(jar_path), " successfully created\n")
   TRUE
@@ -145,22 +154,24 @@ compile_package_jars <- function(..., spec = NULL) {
 
   # unpack compilation specification
   spec <- spec %||% list(...)
-  if (!length(spec))
+  if (!length(spec)) {
     spec <- spark_default_compilation_spec()
+  }
 
-  if (!is.list(spec[[1]]))
+  if (!is.list(spec[[1]])) {
     spec <- list(spec)
+  }
 
   for (el in spec) {
     el <- as.list(el)
 
     spark_version <- el$spark_version
-    spark_home    <- el$spark_home
-    jar_name      <- el$jar_name
-    scalac_path   <- el$scalac_path
-    filter        <- el$scala_filter
-    jar_path      <- el$jar_path
-    jar_dep       <- el$jar_dep
+    spark_home <- el$spark_home
+    jar_name <- el$jar_name
+    scalac_path <- el$scalac_path
+    filter <- el$scala_filter
+    jar_path <- el$jar_path
+    jar_dep <- el$jar_dep
     embedded_srcs <- el$embedded_srcs
 
     # try to automatically download + install Spark
@@ -185,7 +196,6 @@ compile_package_jars <- function(..., spec = NULL) {
       jar_dep = jar_dep,
       embedded_srcs = embedded_srcs
     )
-
   }
 }
 
@@ -228,26 +238,28 @@ spark_compilation_spec <- function(spark_version = NULL,
                                    jar_name = NULL,
                                    jar_path = NULL,
                                    jar_dep = NULL,
-                                   embedded_srcs = "embedded_sources.R")
-{
-  spark_home    <- spark_home %||% spark_home_dir(spark_version)
+                                   embedded_srcs = "embedded_sources.R") {
+  spark_home <- spark_home %||% spark_home_dir(spark_version)
   spark_version <- spark_version %||% spark_version_from_home(spark_home)
 
-  list(spark_version = spark_version,
-       spark_home = spark_home,
-       scalac_path = scalac_path,
-       scala_filter = scala_filter,
-       jar_name = jar_name,
-       jar_path = jar_path,
-       jar_dep = jar_dep,
-       embedded_srcs = embedded_srcs)
+  list(
+    spark_version = spark_version,
+    spark_home = spark_home,
+    scalac_path = scalac_path,
+    scala_filter = scala_filter,
+    jar_name = jar_name,
+    jar_path = jar_path,
+    jar_dep = jar_dep,
+    embedded_srcs = embedded_srcs
+  )
 }
 
 find_jar <- function() {
-  if (nchar(Sys.getenv("JAVA_HOME")) > 0)
+  if (nchar(Sys.getenv("JAVA_HOME")) > 0) {
     normalizePath(file.path(Sys.getenv("JAVA_HOME"), "bin", "jar"), mustWork = FALSE)
-  else
+  } else {
     NULL
+  }
 }
 
 #' Default Compilation Specification for Spark Extensions
@@ -262,8 +274,8 @@ find_jar <- function() {
 #'
 #' @export
 spark_default_compilation_spec <- function(
-  pkg = infer_active_package_name(),
-  locations = NULL) {
+                                           pkg = infer_active_package_name(),
+                                           locations = NULL) {
   c(
     list(
       spark_compilation_spec(
@@ -360,10 +372,11 @@ download_scalac <- function(dest_path = NULL) {
 
     download.file(download_url, destfile = dest_file)
 
-    if (ext == "zip")
+    if (ext == "zip") {
       unzip(dest_file, exdir = dest_path)
-    else
+    } else {
       untar(dest_file, exdir = dest_path)
+    }
   })
 }
 
@@ -384,7 +397,6 @@ download_scalac <- function(dest_path = NULL) {
 #'
 #' @export
 find_scalac <- function(version, locations = NULL) {
-
   locations <- locations %||% scalac_default_locations()
   re_version <- paste("^", version, "(\\.[0-9]+)?$", sep = "")
 
@@ -392,23 +404,26 @@ find_scalac <- function(version, locations = NULL) {
     installs <- sort(list.files(location))
 
     versions <- sub("^scala-?", "", installs)
-    matches  <- grep(re_version, versions)
-    if (!any(matches))
+    matches <- grep(re_version, versions)
+    if (!any(matches)) {
       next
+    }
 
     index <- tail(matches, n = 1)
     install <- installs[index]
     scalac_path <- file.path(location, install, "bin/scalac")
-    if (!file.exists(scalac_path))
+    if (!file.exists(scalac_path)) {
       next
+    }
 
     return(scalac_path)
   }
 
   stopf("failed to discover scala-%s compiler -- search paths were:\n%s",
-        version,
-        paste("-", shQuote(locations), collapse = "\n"),
-        call. = FALSE)
+    version,
+    paste("-", shQuote(locations), collapse = "\n"),
+    call. = FALSE
+  )
 }
 
 scalac_default_locations <- function() {
@@ -428,10 +443,11 @@ scalac_default_locations <- function() {
 
 get_scalac_version <- function(scalac = Sys.which("scalac")) {
   cmd <- paste(shQuote(scalac), "-version 2>&1")
-  version_string <- if (Sys.info()[["sysname"]] == "Windows")
+  version_string <- if (Sys.info()[["sysname"]] == "Windows") {
     shell(cmd, intern = TRUE)
-  else
+  } else {
     system(cmd, intern = TRUE)
+  }
   splat <- strsplit(version_string, "\\s+", perl = TRUE)[[1]]
   splat[[4]]
 }
@@ -449,10 +465,11 @@ make_version_filter <- function(version_upper) {
         dplyr::last()
 
       if (grepl("([0-9]+\\.){2}[0-9]+", maybe_version)) {
-        if (version_upper == "master")
+        if (version_upper == "master") {
           use_file <- TRUE
-        else
+        } else {
           use_file <- numeric_version(maybe_version) <= numeric_version(version_upper)
+        }
         file_name <- basename(file)
 
         # is there is more than one file with the same name

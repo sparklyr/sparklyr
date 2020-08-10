@@ -26,8 +26,9 @@ ensure_round_trip <- function(sc, data) {
 
 test_that("objects survive Spark roundtrips", {
   datasets <- list(mtcars = mtcars)
-  for (dataset in datasets)
+  for (dataset in datasets) {
     ensure_round_trip(sc, dataset)
+  }
 })
 
 test_that("primitive values survive Spark roundtrips", {
@@ -41,7 +42,6 @@ test_that("primitive values survive Spark roundtrips", {
   )
 
   ensure_round_trip(sc, df)
-
 })
 
 test_that("NA values survive Spark roundtrips", {
@@ -115,7 +115,6 @@ test_that("'ml_predict()', 'predict()' return same results", {
 })
 
 test_that("copy_to() succeeds when last column contains missing / empty values", {
-
   df <- data.frame(
     x = c(1, 2),
     z = c(NA, ""),
@@ -193,7 +192,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   expect_equal(
     spark_types,
-    hive_type %>% pull(!! if(arrow_compat) "atype" else "rtype")
+    hive_type %>% pull(!!if (arrow_compat) "atype" else "rtype")
   )
 
   spark_results <- DBI::dbGetQuery(sc, spark_query)
@@ -202,7 +201,7 @@ test_that("collect() can retrieve all data types correctly", {
 
   expect_equal(
     spark_results,
-    hive_type %>% pull(!! if(arrow_compat) "avalue" else "rvalue")
+    hive_type %>% pull(!!if (arrow_compat) "avalue" else "rvalue")
   )
 })
 
@@ -210,19 +209,19 @@ test_that("collect() can retrieve NULL data types as NAs", {
   library(dplyr)
 
   hive_type <- tibble::tribble(
-        ~stype,        ~rtype,        ~atype,
-     "tinyint",     "integer",     "integer",
-    "smallint",     "integer",     "integer",
-     "integer",     "integer",     "integer",
-      "bigint",     "numeric",   arrowbigint,
-       "float",     "numeric",     "numeric",
-      "double",     "numeric",     "numeric",
-     "decimal",     "numeric",     "numeric",
-   "timestamp",     "POSIXct",     "POSIXct",
-        "date",        "Date",        "Date",
-      "string",   "character",   "character",
- "varchar(10)",   "character",   "character",
-    "char(10)",   "character",   "character",
+    ~stype, ~rtype, ~atype,
+    "tinyint", "integer", "integer",
+    "smallint", "integer", "integer",
+    "integer", "integer", "integer",
+    "bigint", "numeric", arrowbigint,
+    "float", "numeric", "numeric",
+    "double", "numeric", "numeric",
+    "decimal", "numeric", "numeric",
+    "timestamp", "POSIXct", "POSIXct",
+    "date", "Date", "Date",
+    "string", "character", "character",
+    "varchar(10)", "character", "character",
+    "char(10)", "character", "character",
   )
 
   if (spark_version(sc) < "2.2.0") {
@@ -243,7 +242,7 @@ test_that("collect() can retrieve NULL data types as NAs", {
 
   expect_equal(
     spark_types,
-    hive_type %>% pull(!! if(arrow_compat) "atype" else "rtype")
+    hive_type %>% pull(!!if (arrow_compat) "atype" else "rtype")
   )
 
   spark_results <- DBI::dbGetQuery(sc, spark_query)
@@ -330,7 +329,7 @@ test_that("collect() can retrieve specific dates without timezones", {
   expect_equal(
     as.double(
       data_tbl %>%
-        mutate(date_alt = from_utc_timestamp(timestamp(t) ,'UTC')) %>%
+        mutate(date_alt = from_utc_timestamp(timestamp(t), "UTC")) %>%
         pull(date_alt)
     ),
     as.double(as.POSIXct("2014-12-21 01:41:43 UTC", tz = "UTC")),
@@ -341,13 +340,13 @@ test_that("collect() can retrieve specific dates without timezones", {
   expect_equal(
     as.double(
       data_tbl %>%
-        mutate(date_alt = to_date(from_utc_timestamp(timestamp(t) ,'UTC'))) %>%
+        mutate(date_alt = to_date(from_utc_timestamp(timestamp(t), "UTC"))) %>%
         pull(date_alt)
     ),
     as.double(
       as.Date(
         data_tbl %>%
-          mutate(date_alt = as.character(to_date(from_utc_timestamp(timestamp(t) ,'UTC')))) %>%
+          mutate(date_alt = as.character(to_date(from_utc_timestamp(timestamp(t), "UTC")))) %>%
           pull(date_alt)
       )
     ),

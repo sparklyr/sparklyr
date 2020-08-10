@@ -22,7 +22,6 @@ ml_hashing_tf <- ft_hashing_tf
 #' @export
 ft_hashing_tf.spark_connection <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
                                            num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -35,7 +34,8 @@ ft_hashing_tf.spark_connection <- function(x, input_col = NULL, output_col = NUL
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.HashingTF",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     jobj_set_param("setBinary", .args[["binary"]], "2.0.0", FALSE) %>%
     invoke("setNumFeatures", .args[["num_features"]])
 

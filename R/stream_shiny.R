@@ -13,8 +13,7 @@
 #' @export
 reactiveSpark <- function(x,
                           intervalMillis = 1000,
-                          session = NULL)
-{
+                          session = NULL) {
   if (!"shiny" %in% installed.packages()) stop("The 'shiny' package is required for this operation.")
 
   getDefaultReactiveDomain <- get("getDefaultReactiveDomain", envir = asNamespace("shiny"))
@@ -63,5 +62,6 @@ reactiveSpark <- function(x,
         invoke("table", name) %>%
         invoke("drop", "reactive_timestamp") %>%
         sdf_collect()
-    })
+    }
+  )
 }

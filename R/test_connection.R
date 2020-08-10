@@ -1,9 +1,9 @@
 test_connection <- function(master = master,
-                config = config,
-                app_name,
-                version,
-                hadoop_version ,
-                extensions) {
+                            config = config,
+                            app_name,
+                            version,
+                            hadoop_version,
+                            extensions) {
   sc <- new_test_connection(list(
     # spark_connection
     master = master,
@@ -60,10 +60,11 @@ test_jobj_create <- function(sc) {
 
 #' @export
 invoke.test_jobj <- function(jobj, method, ...) {
-  if (method == "version")
+  if (method == "version") {
     "1.0.0"
-  else
+  } else {
     test_jobj_create(jobj$connection)
+  }
 }
 
 #' @export

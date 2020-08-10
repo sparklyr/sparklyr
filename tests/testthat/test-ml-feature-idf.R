@@ -22,9 +22,12 @@ test_that("ft_idf() works properly", {
   test_requires_version("2.0.0", "hashing implementation changed in 2.0 -- https://issues.apache.org/jira/browse/SPARK-10574")
   sc <- testthat_spark_connection()
   sentence_df <- data.frame(
-    sentence = c("Hi I heard about Spark",
-                 "I wish Java could use case classes",
-                 "Logistic regression models are neat"))
+    sentence = c(
+      "Hi I heard about Spark",
+      "I wish Java could use case classes",
+      "Logistic regression models are neat"
+    )
+  )
   sentence_tbl <- copy_to(sc, sentence_df, overwrite = TRUE)
   idf_1 <- sentence_tbl %>%
     ft_tokenizer("sentence", "words") %>%

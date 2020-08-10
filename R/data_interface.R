@@ -130,7 +130,8 @@ spark_read_csv <- function(sc,
     sc,
     spark_normalize_path(path),
     options,
-    columns)
+    columns
+  )
 
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
@@ -386,9 +387,11 @@ spark_expect_jobj_class <- function(jobj, expectedClassName) {
   class <- invoke(jobj, "getClass")
   className <- invoke(class, "getName")
   if (!identical(className, expectedClassName)) {
-    stop("This operation is only supported on ",
-         expectedClassName, " jobjs but found ",
-         className, " instead.")
+    stop(
+      "This operation is only supported on ",
+      expectedClassName, " jobjs but found ",
+      className, " instead."
+    )
   }
 }
 
@@ -454,8 +457,9 @@ spark_data_write_generic <- function(df,
     options <<- invoke(options, "option", writeOptionName, writeOptions[[writeOptionName]])
   })
 
-  if (!is.null(partition_by))
+  if (!is.null(partition_by)) {
     options <- invoke(options, "partitionBy", as.list(partition_by))
+  }
 
   if (is_jdbc) {
     sc <- spark_connection(df)
@@ -577,7 +581,8 @@ spark_write_table.tbl_spark <- function(x,
     stop(
       "spark_write_table is not supported in local clusters for Spark ",
       spark_version(sc), ". ",
-      "Upgrade to Spark 2.X or use this function in a non-local Spark cluster.")
+      "Upgrade to Spark 2.X or use this function in a non-local Spark cluster."
+    )
   }
 
   fileMethod <- ifelse(identical(mode, "append"), "insertInto", "saveAsTable")
@@ -609,14 +614,13 @@ spark_write_table.spark_jobj <- function(x,
 #'
 #' @export
 spark_read_jdbc <- function(sc,
-                             name,
-                             options = list(),
-                             repartition = 0,
-                             memory = TRUE,
-                             overwrite = TRUE,
-                             columns = NULL,
-                             ...) {
-
+                            name,
+                            options = list(),
+                            repartition = 0,
+                            memory = TRUE,
+                            overwrite = TRUE,
+                            columns = NULL,
+                            ...) {
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, "jdbc", "format", options, columns) %>% invoke("load")
@@ -633,12 +637,12 @@ spark_read_jdbc <- function(sc,
 #'
 #' @export
 spark_read_libsvm <- function(sc,
-                            name = NULL,
-                            path = name,
-                            repartition = 0,
-                            memory = TRUE,
-                            overwrite = TRUE,
-                            ...) {
+                              name = NULL,
+                              path = name,
+                              repartition = 0,
+                              memory = TRUE,
+                              overwrite = TRUE,
+                              ...) {
   c(name, path) %<-% spark_read_compat_param(sc, name, path)
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
@@ -659,15 +663,15 @@ spark_read_libsvm <- function(sc,
 #'
 #' @export
 spark_read_source <- function(sc,
-                            name = NULL,
-                            path = name,
-                            source,
-                            options = list(),
-                            repartition = 0,
-                            memory = TRUE,
-                            overwrite = TRUE,
-                            columns = NULL,
-                            ...) {
+                              name = NULL,
+                              path = name,
+                              source,
+                              options = list(),
+                              repartition = 0,
+                              memory = TRUE,
+                              overwrite = TRUE,
+                              columns = NULL,
+                              ...) {
   c(name, path) %<-% spark_read_compat_param(sc, name, path)
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
@@ -800,7 +804,7 @@ spark_read_text <- function(sc,
   path <- params[-1L]
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  columns = list(line = "character")
+  columns <- list(line = "character")
 
   if (identical(whole, TRUE)) {
     if (length(path) != 1L) stop("spark_read_text is only suppored with path of length 1 if whole=TRUE.")
@@ -987,13 +991,14 @@ spark_read_delta <- function(sc,
   if (!is.null(timestamp)) options$timestampAsOf <- timestamp
 
   spark_read_source(sc,
-                    name = name,
-                    path = path,
-                    source = "delta",
-                    options = options,
-                    repartition = repartition,
-                    memory = memory,
-                    overwrite = overwrite)
+    name = name,
+    path = path,
+    source = "delta",
+    options = options,
+    repartition = repartition,
+    memory = memory,
+    overwrite = overwrite
+  )
 }
 
 #' Read Apache Avro data into a Spark DataFrame.
@@ -1025,21 +1030,23 @@ spark_read_avro <- function(sc,
 
   options <- list()
   if (!is.null(avro_schema)) {
-    if (!is.character(avro_schema))
+    if (!is.character(avro_schema)) {
       stop("Expect Avro schema to be a JSON string")
+    }
 
     options$avroSchema <- avro_schema
   }
   options$ignoreExtension <- ignore_extension
 
   spark_read_source(sc,
-                    name = name,
-                    path = path,
-                    source = "avro",
-                    options = options,
-                    repartition = repartition,
-                    memory = memory,
-                    overwrite = overwrite)
+    name = name,
+    path = path,
+    source = "avro",
+    options = options,
+    repartition = repartition,
+    memory = memory,
+    overwrite = overwrite
+  )
 }
 
 #' Serialize a Spark DataFrame into Apache Avro format
@@ -1071,8 +1078,9 @@ spark_write_avro <- function(x,
 
   options <- list()
   if (!is.null(avro_schema)) {
-    if (!is.character(avro_schema))
+    if (!is.character(avro_schema)) {
       stop("Expect Avro schema to be a JSON string")
+    }
 
     options$avroSchema <- avro_schema
   }
@@ -1269,8 +1277,9 @@ spark_write.tbl_spark <- function(x,
                                   writer,
                                   paths,
                                   packages = NULL) {
-  if (length(paths) == 0)
+  if (length(paths) == 0) {
     stop("'paths' must contain at least 1 path")
+  }
 
   assert_that(is.function(writer) || is.language(writer))
 
@@ -1278,8 +1287,9 @@ spark_write.tbl_spark <- function(x,
   dst_num_partitions <- length(paths)
   src_num_partitions <- sdf_num_partitions(x)
 
-  if (!identical(src_num_partitions, dst_num_partitions))
+  if (!identical(src_num_partitions, dst_num_partitions)) {
     x <- sdf_repartition(x, dst_num_partitions)
+  }
 
   spark_apply(
     x,

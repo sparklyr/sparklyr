@@ -26,8 +26,10 @@ build_map_tbl <- function() {
     ),
     overwrite = TRUE
   ) %>%
-    dplyr::mutate(m1 = from_json(m1, "MAP<STRING, INT>"),
-                  m2 = from_json(m2, "MAP<STRING, INT>"))
+    dplyr::mutate(
+      m1 = from_json(m1, "MAP<STRING, INT>"),
+      m2 = from_json(m2, "MAP<STRING, INT>")
+    )
 }
 
 build_map_zip_with_test_tbl <- function() {
@@ -39,15 +41,18 @@ build_map_zip_with_test_tbl <- function() {
     ),
     overwrite = TRUE
   ) %>%
-    dplyr::mutate(m1 = from_json(m1, "MAP<STRING, INT>"),
-                  m2 = from_json(m2, "MAP<STRING, INT>"))
+    dplyr::mutate(
+      m1 = from_json(m1, "MAP<STRING, INT>"),
+      m2 = from_json(m2, "MAP<STRING, INT>")
+    )
 }
 
 map_tbl <- build_map_tbl()
 map_zip_with_test_tbl <- build_map_zip_with_test_tbl()
 
-if (spark_version(sc) >= "3.0.0")
+if (spark_version(sc) >= "3.0.0") {
   map_tbl <- build_map_tbl()
+}
 
 test_that("'hof_transform' creating a new column", {
   test_requires_version("2.4.0")
@@ -714,9 +719,11 @@ test_that("'hof_map_filter' creating a new column", {
       expr = m1,
       dest_col = filtered_m1
     ) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2),
-                  filtered_m1 = to_json(filtered_m1)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2),
+      filtered_m1 = to_json(filtered_m1)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
@@ -735,8 +742,10 @@ test_that("'hof_map_filter' overwriting an existing column", {
       func = .(x, y) %->% (as.integer(x) > y),
       expr = m1
     ) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("4" = 3, "6" = 5))
@@ -769,9 +778,11 @@ test_that("'hof_map_filter' works with formula", {
       expr = m1,
       dest_col = filtered_m1
     ) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2),
-                  filtered_m1 = to_json(filtered_m1)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2),
+      filtered_m1 = to_json(filtered_m1)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
@@ -787,8 +798,10 @@ test_that("'hof_map_filter' works with default args", {
 
   res <- map_tbl %>%
     hof_map_filter(~ as.integer(.x) > .y) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
@@ -886,7 +899,9 @@ test_that("'hof_forall' works with formula", {
 test_that("'hof_forall' works with default args", {
   test_requires_version("3.0.0")
 
-  res <- single_col_tbl %>% hof_forall(~ .x != 5) %>% sdf_collect()
+  res <- single_col_tbl %>%
+    hof_forall(~ .x != 5) %>%
+    sdf_collect()
 
   expect_equivalent(res, tibble::tibble(x = c(FALSE, TRUE)))
 })
@@ -900,9 +915,11 @@ test_that("'hof_transform_keys' creating a new column", {
       expr = m1,
       dest_col = transformed_m1
     ) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2),
-                  transformed_m1 = to_json(transformed_m1)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2),
+      transformed_m1 = to_json(transformed_m1)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
@@ -921,8 +938,10 @@ test_that("'hof_transform_keys' overwriting an existing column", {
       func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
       expr = m1
     ) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c(k_1_v_2 = 2, k_4_v_3 = 3, k_6_v_5 = 5))
@@ -958,9 +977,11 @@ test_that("'hof_transform_keys' works with formula", {
       expr = m1,
       dest_col = transformed_m1
     ) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2),
-                  transformed_m1 = to_json(transformed_m1)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2),
+      transformed_m1 = to_json(transformed_m1)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
@@ -976,8 +997,10 @@ test_that("'hof_transform_keys' works with default args", {
 
   res <- map_tbl %>%
     hof_transform_keys(~ CONCAT("k_", .x, "_v_", .y)) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
@@ -995,9 +1018,11 @@ test_that("'hof_transform_values' creating a new column", {
       expr = m1,
       dest_col = transformed_m1
     ) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2),
-                  transformed_m1 = to_json(transformed_m1)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2),
+      transformed_m1 = to_json(transformed_m1)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))
@@ -1016,8 +1041,10 @@ test_that("'hof_transform_values' overwriting an existing column", {
       func = .(x, y) %->% (CONCAT("k_", x, "_v_", y)),
       expr = m1
     ) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = "k_1_v_2", "4" = "k_4_v_3", "6" = "k_6_v_5"))
@@ -1053,9 +1080,11 @@ test_that("'hof_transform_values' works with formula", {
       expr = m1,
       dest_col = transformed_m1
     ) %>%
-    dplyr::mutate(m1 = to_json(m1),
-                  m2 = to_json(m2),
-                  transformed_m1 = to_json(transformed_m1)) %>%
+    dplyr::mutate(
+      m1 = to_json(m1),
+      m2 = to_json(m2),
+      transformed_m1 = to_json(transformed_m1)
+    ) %>%
     sdf_collect()
 
   expect_equivalent(rjson::fromJSON(res$m1[[1]]), c("1" = 2, "4" = 3, "6" = 5))

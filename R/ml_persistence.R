@@ -54,8 +54,9 @@ ml_save.ml_model <- function(x, path, overwrite = FALSE,
     spark_version()
 
   # https://issues.apache.org/jira/browse/SPARK-11891
-  if (version < "2.0.0")
+  if (version < "2.0.0") {
     stop("Saving of 'ml_model' is supported in Spark 2.0.0+")
+  }
 
   path <- cast_string(path) %>%
     spark_normalize_path()
@@ -93,8 +94,10 @@ ml_load <- function(sc, path) {
   }
 
   metadata_table_name <- random_string("ml_load_metadata")
-  class <- spark_read_json(sc, metadata_table_name,
-                           paste0(path, "/metadata/part-00000")) %>%
+  class <- spark_read_json(
+    sc, metadata_table_name,
+    paste0(path, "/metadata/part-00000")
+  ) %>%
     dplyr::pull(!!rlang::sym("class"))
 
   # Drop temp view

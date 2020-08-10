@@ -6,16 +6,18 @@
 unite.tbl_spark <- function(data, col, ..., sep = "_", remove = TRUE, na.rm = FALSE) {
   col <- rlang::as_string(rlang::ensym(col))
 
-  if (rlang::dots_n(...) == 0)
+  if (rlang::dots_n(...) == 0) {
     src_cols <- colnames(data)
-  else
+  } else {
     src_cols <- names(
       tidyselect::eval_select(rlang::expr(c(...)), columns(data))
     )
+  }
 
   output_cols <- colnames(data)
-  if (remove)
+  if (remove) {
     output_cols <- setdiff(output_cols, src_cols)
+  }
 
   first_pos <- which(colnames(data) %in% src_cols)[[1]]
   output_cols <- append(output_cols, col, after = first_pos - 1L)
@@ -24,10 +26,11 @@ unite.tbl_spark <- function(data, col, ..., sep = "_", remove = TRUE, na.rm = FA
     src_cols,
     function(col) {
       col <- quote_column_name(col)
-      if (!na.rm)
+      if (!na.rm) {
         paste0("IF(ISNULL(", col, "), \"NA\", ", col, ")")
-      else
+      } else {
         col
+      }
     }
   )
   sql <- paste0(

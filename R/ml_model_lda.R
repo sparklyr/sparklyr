@@ -1,6 +1,5 @@
 new_ml_model_lda <- function(pipeline_model, formula, dataset,
                              features_col) {
-
   vocabulary <- pipeline_model %>%
     ml_stage("count_vectorizer") %>%
     ml_vocabulary()

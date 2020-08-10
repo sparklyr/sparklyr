@@ -21,7 +21,8 @@ spark_serialize_csv_file <- function(sc, df, columns, repartition) {
     csvOptions = list(
       header = "true"
     ),
-    columns = columns)
+    columns = columns
+  )
 
   if (repartition > 0) {
     df <- invoke(df, "repartition", as.integer(repartition))
@@ -35,17 +36,18 @@ spark_serialize_csv_string <- function(sc, df, columns, repartition) {
 
   # Map date and time columns as standard doubles or strings
   df <- as.data.frame(lapply(df, function(e) {
-    if (inherits(e, "POSIXt"))
+    if (inherits(e, "POSIXt")) {
       sapply(e, function(t) {
         class(t) <- NULL
         t
       })
-    else if (inherits(e, "Date"))
+    } else if (inherits(e, "Date")) {
       sapply(e, function(t) {
         as.character(t)
       })
-    else
+    } else {
       e
+    }
   }), optional = TRUE)
 
   separator <- split_separator(sc)
@@ -73,17 +75,18 @@ spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
 
   # Map date and time columns as standard doubles or strings
   df <- as.data.frame(lapply(df, function(e) {
-    if (inherits(e, "POSIXt"))
+    if (inherits(e, "POSIXt")) {
       sapply(e, function(t) {
         class(t) <- NULL
         t
       })
-    else if (inherits(e, "Date"))
+    } else if (inherits(e, "Date")) {
       sapply(e, function(t) {
         as.character(t)
       })
-    else
+    } else {
       e
+    }
   }), optional = TRUE)
 
   separator <- split_separator(sc)
@@ -125,14 +128,15 @@ spark_serialize_arrow <- function(sc, df, columns, repartition) {
 
 spark_data_translate_columns <- function(df) {
   lapply(df, function(e) {
-    if (is.factor(e))
+    if (is.factor(e)) {
       "character"
-    else if ("POSIXct" %in% class(e))
+    } else if ("POSIXct" %in% class(e)) {
       "timestamp"
-    else if (inherits(e, "Date"))
+    } else if (inherits(e, "Date")) {
       "date"
-    else
+    } else {
       typeof(e)
+    }
   })
 }
 
@@ -190,20 +194,19 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition) {
 
     rdd <- invoke_static(sc, "sparklyr.Utils", "unionRdd", spark_context(sc), rdd_list)
     schema <- invoke(sdf_list[[1]], "schema")
-    sdf <- invoke(hive_context(sc),  "createDataFrame", rdd, schema)
+    sdf <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
   }
 
   sdf
 }
 
 spark_data_copy <- function(
-  sc,
-  df,
-  name,
-  repartition,
-  serializer = NULL,
-  struct_columns = list()) {
-
+                            sc,
+                            df,
+                            name,
+                            repartition,
+                            serializer = NULL,
+                            struct_columns = list()) {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
   }
@@ -228,18 +231,18 @@ spark_data_copy <- function(
   struct_columns <- union(struct_columns, additional_struct_columns)
 
   serializer <- ifelse(
-                  is.null(serializer),
-                  ifelse(
-                    arrow_enabled(sc, df),
-                    "arrow",
-                    ifelse(
-                      spark_connection_in_driver(sc),
-                      "csv_file_scala",
-                      getOption("sparklyr.copy.serializer", "csv_string")
-                    )
-                  ),
-                  serializer
-                )
+    is.null(serializer),
+    ifelse(
+      arrow_enabled(sc, df),
+      "arrow",
+      ifelse(
+        spark_connection_in_driver(sc),
+        "csv_file_scala",
+        getOption("sparklyr.copy.serializer", "csv_string")
+      )
+    ),
+    serializer
+  )
 
   serializers <- list(
     "csv_file" = spark_serialize_csv_file,
@@ -261,8 +264,9 @@ spark_data_copy <- function(
     )
   }
 
-  if (spark_version(sc) < "2.0.0")
+  if (spark_version(sc) < "2.0.0") {
     invoke(df, "registerTempTable", name)
-  else
+  } else {
     invoke(df, "createOrReplaceTempView", name)
+  }
 }

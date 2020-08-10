@@ -19,14 +19,14 @@ test_that("'spark_apply' can apply identity function", {
 })
 
 test_that("'spark_apply' works with 'group_by'", {
-
   grouped_lm <- spark_apply(
     iris_tbl,
     function(e) {
       lm(Petal_Width ~ Petal_Length, e)$coefficients[["(Intercept)"]]
     },
     names = "Intercept",
-    group_by = "Species") %>% collect()
+    group_by = "Species"
+  ) %>% collect()
 
   lapply(
     unique(iris$Species),
@@ -54,7 +54,7 @@ test_columns_param <- function(cols) {
   }
   expect_equal(nrow(res), 10)
   for (x in seq(1, 10)) {
-    expect_equal(res[x,][[col_name]], x * x)
+    expect_equal(res[x, ][[col_name]], x * x)
   }
 }
 
@@ -128,13 +128,14 @@ test_that("'spark_apply' supports nested lists as return type", {
   )
   actual <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
     spark_apply(
-      function(df)
+      function(df) {
         tibble::tibble(
           person = lapply(
             df$json,
             function(x) rjson::fromJSON(x)
           )
         )
+      }
     ) %>%
     sdf_collect()
   expected <- list(
@@ -143,8 +144,8 @@ test_that("'spark_apply' supports nested lists as return type", {
       list(id = 2, name = "Bob")
     ),
     list(
-      list(id = 3,name = "Carlos"),
-      list(id = 4,name = "David")
+      list(id = 3, name = "Carlos"),
+      list(id = 4, name = "David")
     ),
     list(
       list(id = 5, name = "Eddie"),

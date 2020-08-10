@@ -8,8 +8,7 @@
 #' @keywords internal
 connection_spark_shinyapp <- function() {
   if (!"shiny" %in% installed.packages()) {
-
-    install_shiny = showQuestion("Shiny Required", "The 'shiny' package is not installed, install?", ok = "Install")
+    install_shiny <- showQuestion("Shiny Required", "The 'shiny' package is not installed, install?", ok = "Install")
     if (identical(install_shiny, TRUE)) {
       install_command <- get("install.packages")
       install_command("shiny")

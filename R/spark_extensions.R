@@ -56,12 +56,13 @@ spark_dependency <- function(jars = NULL,
 spark_dependencies_from_extensions <- function(spark_version, scala_version, extensions, config) {
   scala_version <- numeric_version(
     scala_version %||% (
-      if (spark_version < "2.0")
+      if (spark_version < "2.0") {
         scala_version <- "2.10"
-      else if (spark_version < "3.0")
+      } else if (spark_version < "3.0") {
         scala_version <- "2.11"
-      else
+      } else {
         scala_version <- "2.12"
+      }
     )
   )
   jars <- character()
@@ -105,27 +106,33 @@ spark_dependencies_from_extensions <- function(spark_version, scala_version, ext
 spark_dependencies_from_extension <- function(spark_version, scala_version, extension) {
 
   # attempt to find the function
-  spark_dependencies <- tryCatch({
-    get("spark_dependencies", asNamespace(extension), inherits = FALSE)
-  },
-  error = function(e) {
-    stop("spark_dependencies function not found within ",
-         "extension package ", extension, call. = FALSE)
-  }
+  spark_dependencies <- tryCatch(
+    {
+      get("spark_dependencies", asNamespace(extension), inherits = FALSE)
+    },
+    error = function(e) {
+      stop("spark_dependencies function not found within ",
+        "extension package ", extension,
+        call. = FALSE
+      )
+    }
   )
 
   # reduce the spark_version to just major and minor versions
   spark_version <- package_version(spark_version)
-  spark_version <- paste(spark_version$major, spark_version$minor, sep = '.')
+  spark_version <- paste(spark_version$major, spark_version$minor, sep = ".")
   spark_version <- numeric_version(spark_version)
 
   # call the function
-  dependency <- spark_dependencies(spark_version = spark_version,
-                                   scala_version = scala_version)
+  dependency <- spark_dependencies(
+    spark_version = spark_version,
+    scala_version = scala_version
+  )
 
   # if it's just a single dependency then wrap it in a list
-  if (inherits(dependency, "spark_dependency"))
+  if (inherits(dependency, "spark_dependency")) {
     dependency <- list(dependency)
+  }
 
   # return it
   dependency
@@ -148,12 +155,13 @@ spark_dependency_fallback <- function(spark_version, supported_versions) {
 
 sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
   scala_version <- scala_version %||% (
-    if (spark_version < "2.0")
+    if (spark_version < "2.0") {
       "2.10"
-    else if (spark_version < "3.0")
+    } else if (spark_version < "3.0") {
       "2.11"
-    else
+    } else {
       "2.12"
+    }
   )
   spark_major_minor <- spark_version[1, 1:2]
 
@@ -176,8 +184,9 @@ sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
     prev_versions <- all_versions[all_versions <= spark_version]
 
     dir(system.file("java", package = "sparklyr"),
-        pattern = paste0("sparklyr-", prev_versions[1]),
-        full.names = T)
+      pattern = paste0("sparklyr-", prev_versions[1]),
+      full.names = T
+    )
   } else {
     ""
   }

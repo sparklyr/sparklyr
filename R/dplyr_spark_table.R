@@ -18,8 +18,9 @@ sample_n.tbl_spark <- function(tbl,
                                replace = FALSE,
                                weight = NULL,
                                .env = parent.frame()) {
-  if (spark_version(spark_connection(tbl)) < "2.0.0")
-      stop("sample_n() is not supported until Spark 2.0 or later. Use sdf_sample instead.")
+  if (spark_version(spark_connection(tbl)) < "2.0.0") {
+    stop("sample_n() is not supported until Spark 2.0 or later. Use sdf_sample instead.")
+  }
 
   add_op_single("sample_n", .data = tbl, args = list(
     size = size,
@@ -37,8 +38,9 @@ sample_frac.tbl_spark <- function(tbl,
                                   replace = FALSE,
                                   weight = NULL,
                                   .env = parent.frame()) {
-  if (spark_version(spark_connection(tbl)) < "2.0.0")
+  if (spark_version(spark_connection(tbl)) < "2.0.0") {
     stop("sample_frac() is not supported until Spark 2.0 or later.")
+  }
 
   add_op_single("sample_frac", .data = tbl, args = list(
     size = size,
@@ -66,8 +68,7 @@ dim.tbl_spark_print <- function(x) {
 
 #' @importFrom tibble tbl_sum
 #' @export
-tbl_sum.tbl_spark_print <- function (x)
-{
+tbl_sum.tbl_spark_print <- function(x) {
   attributes(x)$spark_summary
 }
 
@@ -102,7 +103,7 @@ print.tbl_spark <- function(x, ...) {
     purrr::map_if(rlang::is_formula, rlang::f_rhs) %>%
     purrr::map_chr(rlang::expr_text, width = 500L)
 
-  mark <- if (identical(getOption("OutDec"), ","))  "." else ","
+  mark <- if (identical(getOption("OutDec"), ",")) "." else ","
   cols_fmt <- formatC(dim(x)[2], big.mark = mark)
 
   # collect rows + 1 to ensure that tibble knows there is more data to collect
@@ -117,7 +118,7 @@ print.tbl_spark <- function(x, ...) {
   attributes(data)$spark_dims <- c(NA_real_, sdf_ncol(x))
 
   remote_name <- dbplyr::remote_name(x)
-  remote_name <- if(is.null(remote_name) || grepl("^sparklyr_tmp_", remote_name)) "?" else remote_name
+  remote_name <- if (is.null(remote_name) || grepl("^sparklyr_tmp_", remote_name)) "?" else remote_name
 
   attributes(data)$spark_summary <- c(
     Source = paste0(

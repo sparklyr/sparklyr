@@ -1,7 +1,8 @@
 new_ml_model_linear_regression <- function(pipeline_model, formula, dataset, label_col,
                                            features_col) {
   m <- new_ml_model_regression(
-    pipeline_model, formula, dataset = dataset,
+    pipeline_model, formula,
+    dataset = dataset,
     label_col = label_col, features_col = features_col,
     class = "ml_model_linear_regression"
   )
@@ -12,10 +13,11 @@ new_ml_model_linear_regression <- function(pipeline_model, formula, dataset, lab
   coefficients <- model$coefficients
   names(coefficients) <- m$feature_names
 
-  m$coefficients <- if (ml_param(model, "fit_intercept")){
+  m$coefficients <- if (ml_param(model, "fit_intercept")) {
     rlang::set_names(
       c(invoke(jobj, "intercept"), model$coefficients),
-      c("(Intercept)", m$feature_names))
+      c("(Intercept)", m$feature_names)
+    )
   } else {
     coefficients
   }
@@ -42,8 +44,10 @@ summary.ml_model_linear_regression <- function(object, ...) {
   print_newline()
 
   cat(paste("R-Squared:", signif(object$summary$r2, 4)), sep = "\n")
-  cat(paste("Root Mean Squared Error:",
-            signif(object$summary$root_mean_squared_error, 4)), sep = "\n")
+  cat(paste(
+    "Root Mean Squared Error:",
+    signif(object$summary$root_mean_squared_error, 4)
+  ), sep = "\n")
 }
 
 #' @export

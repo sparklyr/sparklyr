@@ -6,7 +6,9 @@ test_that("ml_clustering_evaluator() works", {
   sc <- testthat_spark_connection()
   sample_data_path <- get_sample_data_path("sample_kmeans_data.txt")
   sample_data <- spark_read_libsvm(sc, "sample_data",
-                                   sample_data_path, overwrite = TRUE)
+    sample_data_path,
+    overwrite = TRUE
+  )
   kmeans <- ml_kmeans(sample_data, k = 2, seed = 1)
   predictions <- ml_transform(kmeans, sample_data)
   expect_equal(

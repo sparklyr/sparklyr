@@ -21,7 +21,6 @@ ml_vector_indexer <- ft_vector_indexer
 ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                max_categories = 20,
                                                uid = random_string("vector_indexer_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -33,7 +32,8 @@ ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col =
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.VectorIndexer",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     invoke("setMaxCategories", .args[["max_categories"]]) %>%
     new_ml_vector_indexer()
 
@@ -44,7 +44,6 @@ ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col =
 ft_vector_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
                                           max_categories = 20,
                                           uid = random_string("vector_indexer_"), ...) {
-
   stage <- ft_vector_indexer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -54,7 +53,6 @@ ft_vector_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
     ...
   )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
@@ -70,10 +68,11 @@ ft_vector_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_vector_indexer <- function(jobj) {

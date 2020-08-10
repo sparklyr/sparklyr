@@ -41,7 +41,6 @@ ft_ngram.spark_connection <- function(x, input_col = NULL, output_col = NULL, n 
 #' @export
 ft_ngram.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, n = 2,
                                  uid = random_string("ngram_"), ...) {
-
   stage <- ft_ngram.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

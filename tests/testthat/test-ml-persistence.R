@@ -6,10 +6,12 @@ sc <- testthat_spark_connection()
 test_requires("dplyr")
 training <- tibble(
   id = 0:3L,
-  text = c("a b c d e spark",
-           "b d",
-           "spark f g h",
-           "hadoop mapreduce"),
+  text = c(
+    "a b c d e spark",
+    "b d",
+    "spark f g h",
+    "hadoop mapreduce"
+  ),
   label = c(1, 0, 1, 0)
 )
 
@@ -75,7 +77,6 @@ test_that("ml_save/ml_load work for nested pipeline", {
 })
 
 test_that("ml_fit() returns a ml_pipeline_model", {
-
   tokenizer <- ft_tokenizer(sc, input_col = "text", output_col = "words")
   hashing_tf <- ft_hashing_tf(sc, input_col = "words", output_col = "features")
   lr <- ml_logistic_regression(sc, max_iter = 10, reg_param = 0.001)
@@ -117,9 +118,11 @@ test_that("we can save a ml_model and load a pipeline model back", {
   test_requires_version("2.0.0", "RFormula export requires Spark 2.0+")
   set.seed(42)
   iris_weighted <- iris %>%
-    dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
-                  ones = rep(1, nrow(iris)),
-                  versicolor = ifelse(Species == "versicolor", 1L, 0L))
+    dplyr::mutate(
+      weights = rpois(nrow(iris), 1) + 1,
+      ones = rep(1, nrow(iris)),
+      versicolor = ifelse(Species == "versicolor", 1L, 0L)
+    )
 
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
@@ -132,18 +135,23 @@ test_that("we can save a ml_model and load a pipeline model back", {
   ml_save(m1, path)
   m2 <- ml_load(sc, path)
 
-  expect_equal(ml_stage(m1$pipeline_model, 1) %>%
-                 ml_param_map(),
-               ml_stage(m2, 1) %>%
-                 ml_param_map())
+  expect_equal(
+    ml_stage(m1$pipeline_model, 1) %>%
+      ml_param_map(),
+    ml_stage(m2, 1) %>%
+      ml_param_map()
+  )
 
-  expect_equal(ml_stage(m1$pipeline_model, 2) %>%
-                 ml_param_map(),
-               ml_stage(m2, 2) %>%
-                 ml_param_map())
+  expect_equal(
+    ml_stage(m1$pipeline_model, 2) %>%
+      ml_param_map(),
+    ml_stage(m2, 2) %>%
+      ml_param_map()
+  )
 
-  expect_identical(ml_stage(m1$pipeline_model, 2)$coefficients,
-               ml_stage(m2, 2)$coefficients
+  expect_identical(
+    ml_stage(m1$pipeline_model, 2)$coefficients,
+    ml_stage(m2, 2)$coefficients
   )
 })
 
@@ -151,9 +159,11 @@ test_that("we can fit a pipeline saved then loaded from ml_model", {
   test_requires_version("2.0.0", "RFormula export requires Spark 2.0+")
   set.seed(42)
   iris_weighted <- iris %>%
-    dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
-                  ones = rep(1, nrow(iris)),
-                  versicolor = ifelse(Species == "versicolor", 1L, 0L))
+    dplyr::mutate(
+      weights = rpois(nrow(iris), 1) + 1,
+      ones = rep(1, nrow(iris)),
+      versicolor = ifelse(Species == "versicolor", 1L, 0L)
+    )
 
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
@@ -167,7 +177,8 @@ test_that("we can fit a pipeline saved then loaded from ml_model", {
   pipeline <- ml_load(sc, path)
   m2 <- pipeline %>%
     ml_fit(iris_weighted_tbl)
-  expect_identical(ml_stage(m1$pipeline_model, 2)$coefficients,
-                   ml_stage(m2, 2)$coefficients
+  expect_identical(
+    ml_stage(m1$pipeline_model, 2)$coefficients,
+    ml_stage(m2, 2)$coefficients
   )
 })

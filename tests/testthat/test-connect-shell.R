@@ -43,7 +43,7 @@ test_that("'spark_connect' fails with bad configuration'", {
 test_that("'spark_session_id' generates different ids for different apps", {
   expect_true(
     spark_session_id(app_name = "foo", master = "local") !=
-    spark_session_id(app_name = "bar", master = "local")
+      spark_session_id(app_name = "bar", master = "local")
   )
 })
 
@@ -75,8 +75,9 @@ test_that("'spark_inspect' can enumerate information from the context", {
 test_that("'spark_connect' can allow Hive support to be disabled", {
   version <- spark_version(sc)
 
-  if (version >= "2.0.0")
+  if (version >= "2.0.0") {
     expect_equal(get_spark_sql_catalog_implementation(sc), "hive")
+  }
 
   # hive support is enabled by default
   expect_equal(sc$state$hive_support_enabled, TRUE)
@@ -90,8 +91,9 @@ test_that("'spark_connect' can allow Hive support to be disabled", {
     config = config
   )
 
-  if (version >= "2.0.0")
+  if (version >= "2.0.0") {
     expect_equal(get_spark_sql_catalog_implementation(sc2), "in-memory")
+  }
 
   expect_equal(sc2$state$hive_support_enabled, FALSE)
   spark_disconnect(sc2)
@@ -104,8 +106,9 @@ test_that("'spark_connect' can allow Hive support to be disabled", {
     config = config
   )
 
-  if (version >= "2.0.0")
+  if (version >= "2.0.0") {
     expect_equal(get_spark_sql_catalog_implementation(sc2), "hive")
+  }
 
   expect_equal(sc2$state$hive_support_enabled, TRUE)
   spark_disconnect(sc2)

@@ -18,10 +18,14 @@
 #' features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
 #'
 #' iris_tbl %>%
-#'   ft_vector_assembler(input_col = features,
-#'                       output_col = "features_temp") %>%
-#'   ft_min_max_scaler(input_col = "features_temp",
-#'                      output_col = "features")
+#'   ft_vector_assembler(
+#'     input_col = features,
+#'     output_col = "features_temp"
+#'   ) %>%
+#'   ft_min_max_scaler(
+#'     input_col = "features_temp",
+#'     output_col = "features"
+#'   )
 #' }
 #'
 #' @export
@@ -57,14 +61,12 @@ ft_min_max_scaler.spark_connection <- function(x, input_col = NULL, output_col =
     new_ml_min_max_scaler()
 
   estimator
-
 }
 
 #' @export
 ft_min_max_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
                                           min = 0, max = 1,
                                           uid = random_string("min_max_scaler_"), ...) {
-
   stage <- ft_min_max_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -75,14 +77,12 @@ ft_min_max_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
     ...
   )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
 ft_min_max_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
                                         min = 0, max = 1,
                                         uid = random_string("min_max_scaler_"), ...) {
-
   stage <- ft_min_max_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -93,10 +93,11 @@ ft_min_max_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_min_max_scaler <- function(jobj) {

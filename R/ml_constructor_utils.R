@@ -5,7 +5,9 @@ find_in_extensions <- function(what) {
     purrr::map(asNamespace)
 
   (function(what, namespaces) {
-    if (!length(namespaces)) return(NULL)
+    if (!length(namespaces)) {
+      return(NULL)
+    }
 
     # Look in `namespaces` one at a time for the function
     purrr::possibly(get, NULL)(what, envir = namespaces[[1]], mode = "function") %||%

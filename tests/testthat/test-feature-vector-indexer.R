@@ -21,23 +21,31 @@ test_that("ft_vector_indexer() works properly", {
   sc <- testthat_spark_connection()
   sample_data_path <- get_sample_data_path("sample_libsvm_data.txt")
   sample_data <- spark_read_libsvm(sc, "sample_data",
-                                   sample_data_path, overwrite = TRUE)
-  indexer <- ft_vector_indexer(sc, input_col = "features", output_col = "indexed",
-                               max_categories = 10) %>%
+    sample_data_path,
+    overwrite = TRUE
+  )
+  indexer <- ft_vector_indexer(sc,
+    input_col = "features", output_col = "indexed",
+    max_categories = 10
+  ) %>%
     ml_fit(sample_data)
-  expect_identical(indexer %>%
-    ml_transform(sample_data) %>%
-    head(1) %>%
-    pull(indexed) %>%
-    unlist() %>%
-    length(),
-  692L)
+  expect_identical(
+    indexer %>%
+      ml_transform(sample_data) %>%
+      head(1) %>%
+      pull(indexed) %>%
+      unlist() %>%
+      length(),
+    692L
+  )
 
-  expect_identical(sample_data %>%
-                     ft_vector_indexer("features", "indexed", max_categories = 10) %>%
-                     head(1) %>%
-                     pull(indexed) %>%
-                     unlist() %>%
-                     length(),
-                   692L)
+  expect_identical(
+    sample_data %>%
+      ft_vector_indexer("features", "indexed", max_categories = 10) %>%
+      head(1) %>%
+      pull(indexed) %>%
+      unlist() %>%
+      length(),
+    692L
+  )
 })

@@ -58,7 +58,8 @@ test_that("ft_quantile_discretizer works on multiple columns", {
     ft_quantile_discretizer(
       input_cols = c("hour", "hour2"),
       output_cols = c("result", "result2"),
-      num_buckets_array = c(3, 2)) %>%
+      num_buckets_array = c(3, 2)
+    ) %>%
     collect()
 
   expect_identical(names(result), c("id", "hour", "hour2", "result", "result2"))

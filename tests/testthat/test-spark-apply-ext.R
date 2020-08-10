@@ -34,7 +34,7 @@ test_that("'spark_apply' can concatenate", {
 
 test_that("'spark_apply' can filter", {
   expect_equivalent(
-    iris_tbl %>% spark_apply(function(e) e[e$Species == "setosa",]) %>% collect(),
+    iris_tbl %>% spark_apply(function(e) e[e$Species == "setosa", ]) %>% collect(),
     iris_tbl %>% filter(Species == "setosa") %>% collect()
   )
 })
@@ -55,7 +55,6 @@ test_that("'spark_apply' works with 'sdf_repartition'", {
 })
 
 test_that("'spark_apply' works with 'group_by' over multiple columns", {
-
   iris_tbl_ints <- iris_tbl %>%
     mutate(Petal_Width_Int = as.integer(Petal_Width))
 
@@ -65,7 +64,8 @@ test_that("'spark_apply' works with 'group_by' over multiple columns", {
       lm(Petal_Width ~ Petal_Length, e)$coefficients[["(Intercept)"]]
     },
     names = "Intercept",
-    group_by = c("Species", "Petal_Width_Int")) %>% collect()
+    group_by = c("Species", "Petal_Width_Int")
+  ) %>% collect()
 
   iris_int <- iris %>% mutate(
     Petal_Width_Int = as.integer(Petal.Width),
@@ -103,11 +103,14 @@ test_that("'spark_apply' works over 'tryCatch'", {
   expect_equal(
     sdf_len(sc, 1) %>%
       spark_apply(function(e) {
-        tryCatch({
-          stop("x")
-        }, error = function(e) {
-          100
-        })
+        tryCatch(
+          {
+            stop("x")
+          },
+          error = function(e) {
+            100
+          }
+        )
       }) %>%
       pull() %>%
       as.integer(),
@@ -119,7 +122,7 @@ test_that("'spark_apply' can filter data.frame", {
   skip_slow("takes too long to measure coverage")
   expect_equal(
     sdf_len(sc, 10) %>%
-      spark_apply(function(e) as.data.frame(e[e$id > 1,])) %>%
+      spark_apply(function(e) as.data.frame(e[e$id > 1, ])) %>%
       collect() %>%
       nrow(),
     9
@@ -190,7 +193,7 @@ test_that("'spark_apply' supports grouped empty results", {
   skip_slow("takes too long to measure coverage")
   process_data <- function(DF, exclude) {
     DF <- subset(DF, select = colnames(DF)[!colnames(DF) %in% exclude])
-    DF[complete.cases(DF),]
+    DF[complete.cases(DF), ]
   }
 
   data <- data.frame(
@@ -202,13 +205,17 @@ test_that("'spark_apply' supports grouped empty results", {
 
   data_spark <- sdf_copy_to(sc, data, "grp_data", memory = TRUE, overwrite = TRUE)
 
-  collected <- data_spark %>% spark_apply(
-    process_data,
-    group_by = "grp",
-    columns = c("x1", "x2"),
-    packages = FALSE,
-    context = {exclude <- "grp"}
-  ) %>% collect()
+  collected <- data_spark %>%
+    spark_apply(
+      process_data,
+      group_by = "grp",
+      columns = c("x1", "x2"),
+      packages = FALSE,
+      context = {
+        exclude <- "grp"
+      }
+    ) %>%
+    collect()
 
   expect_equivalent(
     collected %>% arrange(x1),

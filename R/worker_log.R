@@ -3,7 +3,7 @@
 worker_log_env <- new.env()
 
 worker_log_session <- function(sessionId) {
-  assign('sessionId', sessionId, envir = worker_log_env)
+  assign("sessionId", sessionId, envir = worker_log_env)
 }
 
 worker_log_format <- function(message, session, level = "INFO", component = "RScript") {
@@ -17,7 +17,8 @@ worker_log_format <- function(message, session, level = "INFO", component = "RSc
     session,
     ") ",
     message,
-    sep = "")
+    sep = ""
+  )
 }
 
 worker_log_level <- function(..., level, component = "RScript") {
@@ -28,10 +29,11 @@ worker_log_level <- function(..., level, component = "RScript") {
     }
   }
 
-  args = list(...)
+  args <- list(...)
   message <- paste(args, sep = "", collapse = "")
   formatted <- worker_log_format(message, worker_log_env$sessionId,
-                                 level = level, component = component)
+    level = level, component = component
+  )
   cat(formatted, "\n")
 }
 
@@ -39,7 +41,7 @@ worker_log <- function(...) {
   worker_log_level(..., level = "INFO")
 }
 
-worker_log_warning<- function(...) {
+worker_log_warning <- function(...) {
   worker_log_level(..., level = "WARN")
 }
 

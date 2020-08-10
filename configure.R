@@ -1,18 +1,20 @@
 #!/usr/bin/env Rscript
-args = commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 
-if (length(args)==0) {
-  targets <- c("1.5.2",
-               "1.6.0",
-               "2.0.0",
-               "2.3.0",
-               "2.4.0",
-               "3.0.0")
-} else if (length(args)==1) {
+if (length(args) == 0) {
+  targets <- c(
+    "1.5.2",
+    "1.6.0",
+    "2.0.0",
+    "2.3.0",
+    "2.4.0",
+    "3.0.0"
+  )
+} else if (length(args) == 1) {
   # default output file
   targets <- c(args[1])
 } else {
-  stop("Cannot take more than one argument.", call.=FALSE)
+  stop("Cannot take more than one argument.", call. = FALSE)
 }
 
 print(targets)
@@ -30,4 +32,3 @@ sparklyr::compile_package_jars(spec = spec)
 
 # for now, spark master and spark 3.0.0 are equivalent
 file.copy("inst/java/sparklyr-3.0-2.12.jar", "inst/java/sparklyr-master-2.12.jar", overwrite = TRUE)
-

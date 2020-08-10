@@ -12,13 +12,13 @@
 #'
 #' @export
 setClass("DBISparkResult",
-         contains = "DBIResult",
-         slots = list(
-           sql = "character",
-           sdf = "spark_jobj",
-           conn = "spark_connection",
-           state = "environment"
-         )
+  contains = "DBIResult",
+  slots = list(
+    sql = "character",
+    sdf = "spark_jobj",
+    conn = "spark_connection",
+    state = "environment"
+  )
 )
 
 setMethod("dbGetStatement", "DBISparkResult", function(res, ...) {
@@ -41,43 +41,49 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
   ""
 })
 
-setMethod("dbSendQuery",
-          "spark_connection",
-          function(conn, statement, ...) {
-  sql <- as.character(DBI::sqlInterpolate(conn, statement, ...))
+setMethod(
+  "dbSendQuery",
+  "spark_connection",
+  function(conn, statement, ...) {
+    sql <- as.character(DBI::sqlInterpolate(conn, statement, ...))
 
-  sdf <- invoke(hive_context(conn), "sql", sql)
-  rs <- new("DBISparkResult",
-            sql = sql,
-            conn = conn,
-            sdf = sdf,
-            state = new.env())
-  rs
-})
-
-setMethod("dbGetQuery",
-          # c("spark_connection", "character"),
-          "spark_connection",
-          function(conn, statement, ...) {
-  rs <- dbSendQuery(conn, statement, ...)
-  on.exit(dbClearResult(rs))
-
-  df <- tryCatch(
-    dbFetch(rs, n = -1, ...),
-    error = function(e) {
-      stop("Failed to fetch data: ", e$message)
-    }
-  )
-
-  if (!dbHasCompleted(rs)) {
-    warning("Pending rows", call. = FALSE)
+    sdf <- invoke(hive_context(conn), "sql", sql)
+    rs <- new("DBISparkResult",
+      sql = sql,
+      conn = conn,
+      sdf = sdf,
+      state = new.env()
+    )
+    rs
   }
+)
 
-  if (ncol(df) > 0)
-    df
-  else
-    invisible(df)
-})
+setMethod(
+  "dbGetQuery",
+  # c("spark_connection", "character"),
+  "spark_connection",
+  function(conn, statement, ...) {
+    rs <- dbSendQuery(conn, statement, ...)
+    on.exit(dbClearResult(rs))
+
+    df <- tryCatch(
+      dbFetch(rs, n = -1, ...),
+      error = function(e) {
+        stop("Failed to fetch data: ", e$message)
+      }
+    )
+
+    if (!dbHasCompleted(rs)) {
+      warning("Pending rows", call. = FALSE)
+    }
+
+    if (ncol(df) > 0) {
+      df
+    } else {
+      invisible(df)
+    }
+  }
+)
 
 setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
   start <- 1
@@ -94,16 +100,14 @@ setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA
 
   if (n > 0) {
     range <- 0
-    if (nrow(df) > 0)
-    {
+    if (nrow(df) > 0) {
       end <- min(nrow(df), nrow(df))
       range <- start:end
     }
     df <- df[range, ]
   }
 
-  if (nrow(df) == 0)
-  {
+  if (nrow(df) == 0) {
     df <- df[]
   }
 

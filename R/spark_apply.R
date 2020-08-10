@@ -2,13 +2,12 @@
 #' @include spark_schema_from_rdd.R
 
 spark_apply_worker_config <- function(
-  sc,
-  debug,
-  profile,
-  schema = FALSE,
-  arrow = FALSE,
-  fetch_result_as_sdf = TRUE
-) {
+                                      sc,
+                                      debug,
+                                      profile,
+                                      schema = FALSE,
+                                      arrow = FALSE,
+                                      fetch_result_as_sdf = TRUE) {
   worker_config_serialize(
     c(
       list(
@@ -143,8 +142,9 @@ spark_apply <- function(x,
                         fetch_result_as_sdf = TRUE,
                         partition_index_param = "",
                         ...) {
-  if (!is.character(partition_index_param))
+  if (!is.character(partition_index_param)) {
     stop("Expected 'partition_index_param' to be a string.")
+  }
 
   memory <- force(memory)
   args <- list(...)
@@ -169,11 +169,11 @@ spark_apply <- function(x,
   sdf <- spark_dataframe(x)
   sdf_columns <- colnames(x)
 
-  if (identical(barrier, TRUE)){
+  if (identical(barrier, TRUE)) {
     # barrier works in rdd
     args$rdd <- TRUE
 
-    if (spark_version(sc) < "2.4.0"){
+    if (spark_version(sc) < "2.4.0") {
       stop("Barrier execution is only available for spark 2.4.0 or greater.")
     }
 
@@ -199,12 +199,15 @@ spark_apply <- function(x,
   records_per_batch <- NULL
   arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
   if (identical(fetch_result_as_sdf, FALSE) &&
-      identical(arrow, TRUE)) {
+    identical(arrow, TRUE)) {
     warning("Disabling arrow due to its potential incompatibility with fetch_result_as_sdf = FALSE")
     arrow <- FALSE
   }
   if (arrow) {
-    time_zone <- spark_session(sc) %>% invoke("sessionState") %>% invoke("conf") %>% invoke("sessionLocalTimeZone")
+    time_zone <- spark_session(sc) %>%
+      invoke("sessionState") %>%
+      invoke("conf") %>%
+      invoke("sessionLocalTimeZone")
     records_per_batch <- as.integer(spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||% 10000)
   }
 
@@ -311,7 +314,7 @@ spark_apply <- function(x,
   if (!is.null(records_per_batch)) spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
 
   if (identical(args$rdd, TRUE)) {
-    if (identical(barrier, TRUE)){
+    if (identical(barrier, TRUE)) {
       rdd <- invoke_static(
         sc,
         "sparklyr.RDDBarrier",
@@ -423,7 +426,9 @@ spark_apply <- function(x,
 
       columns <- columns_infer
 
-      if (identical(args$schema, TRUE)) return(columns)
+      if (identical(args$schema, TRUE)) {
+        return(columns)
+      }
     }
 
     schema <- spark_data_build_types(sc, columns)
@@ -466,31 +471,35 @@ spark_apply <- function(x,
     }
   }
 
-  if (identical(barrier, TRUE)){
+  if (identical(barrier, TRUE)) {
     registered <- transformed
   } else {
     name <- name %||% random_string("sparklyr_tmp_")
     registered <- sdf_register(transformed, name = name)
 
     if (memory && !identical(args$rdd, TRUE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
-
   }
 
-  if (identical(fetch_result_as_sdf, FALSE))
-    registered %>% sdf_collect(arrow = arrow) %>% (
-      function(x)
-        lapply(x$spark_apply_binary_result, function(res) unserialize(res[[1]]))
-    )
-  else
+  if (identical(fetch_result_as_sdf, FALSE)) {
+    registered %>%
+      sdf_collect(arrow = arrow) %>%
+      (
+        function(x) {
+          lapply(x$spark_apply_binary_result, function(res) unserialize(res[[1]]))
+        }
+      )
+  } else {
     registered
+  }
 }
 
 spark_apply_rlang_serialize <- function() {
   rlang_serialize <- core_get_package_function("rlang", "serialise_bytes")
-  if (is.null(rlang_serialize))
+  if (is.null(rlang_serialize)) {
     core_get_package_function("rlanglabs", "serialise_bytes")
-  else
+  } else {
     rlang_serialize
+  }
 }
 
 #' Log Writer for Spark Apply

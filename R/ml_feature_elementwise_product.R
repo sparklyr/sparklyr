@@ -10,7 +10,7 @@
 #'
 #' @export
 ft_elementwise_product <- function(x, input_col = NULL, output_col = NULL, scaling_vec = NULL,
-  uid = random_string("elementwise_product_"), ...) {
+                                   uid = random_string("elementwise_product_"), ...) {
   check_dots_used()
   UseMethod("ft_elementwise_product")
 }
@@ -33,9 +33,11 @@ ft_elementwise_product.spark_connection <- function(x, input_col = NULL, output_
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.ElementwiseProduct",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]])
-  if (!is.null(.args[["scaling_vec"]]))
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  )
+  if (!is.null(.args[["scaling_vec"]])) {
     jobj <- invoke_static(x, "sparklyr.MLUtils2", "setScalingVec", jobj, .args[["scaling_vec"]])
+  }
 
   new_ml_elementwise_product(jobj)
 }

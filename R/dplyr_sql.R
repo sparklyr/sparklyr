@@ -8,8 +8,10 @@ sql_build.op_sample_n <- function(op, con, ...) {
     from = sql(
       sql_render(sql_build(op$x, con = con), con = con),
       sql(paste0(" TABLESAMPLE (",
-                 as.integer(op$args$size),
-                 " rows) ", collapse = "")),
+        as.integer(op$args$size),
+        " rows) ",
+        collapse = ""
+      )),
       con = con
     ) %>%
       as.character() %>%
@@ -27,8 +29,10 @@ sql_build.op_sample_frac <- function(op, con, ...) {
     from = sql(
       sql_render(sql_build(op$x, con = con), con = con),
       sql(paste0(" TABLESAMPLE (",
-                 op$args$size * 100,
-                 " PERCENT)", collapse = "")),
+        op$args$size * 100,
+        " PERCENT)",
+        collapse = ""
+      )),
       con = con
     ) %>%
       as.character() %>%

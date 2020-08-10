@@ -46,16 +46,17 @@ require_directory_exists <- function(path, fmt = NULL) {
 }
 
 ensure_directory <- function(path) {
-
   if (file.exists(path)) {
     info <- file.info(path)
-    if (isTRUE(info$isdir)) return(path)
+    if (isTRUE(info$isdir)) {
+      return(path)
+    }
     stopf("path '%s' exists but is not a directory", path)
   }
 
-  if (!dir.create(path, recursive = TRUE))
+  if (!dir.create(path, recursive = TRUE)) {
     stopf("failed to create directory at path '%s'", path)
+  }
 
   invisible(path)
-
 }

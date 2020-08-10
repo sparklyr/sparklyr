@@ -1,9 +1,10 @@
 register_mapping_tables <- function() {
-
   flip_named_list <- function(x) stats::setNames(as.list(names(x)), unlist(x))
-  create_env_from_mappings <- function(x) purrr::reduce(
-    purrr::map(x, ~ list2env(.x, parent = emptyenv())), rlang::env_poke_parent
-  )
+  create_env_from_mappings <- function(x) {
+    purrr::reduce(
+      purrr::map(x, ~ list2env(.x, parent = emptyenv())), rlang::env_poke_parent
+    )
+  }
 
   read_extension_mappings <- function(file_name) {
     pkgs <- registered_extensions()
@@ -56,11 +57,11 @@ register_mapping_tables <- function() {
   extension_class_mappings <- read_extension_mappings(file_name = "class_mapping.json")
 
   ml_package_mapping <- read_base_mapping(file_name = "class_mapping.json") %>%
-    purrr::map(~ "sparklyr") %>%
+    purrr::map(~"sparklyr") %>%
     as.environment()
 
   extension_package_mappings <- read_extension_mappings(file_name = "class_mapping.json") %>%
-    purrr::imap(function(l, pkg) purrr::map(l, ~ pkg))
+    purrr::imap(function(l, pkg) purrr::map(l, ~pkg))
 
 
 

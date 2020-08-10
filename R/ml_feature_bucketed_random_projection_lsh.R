@@ -88,10 +88,11 @@ ft_bucketed_random_projection_lsh.tbl_spark <- function(x, input_col = NULL, out
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_bucketed_random_projection_lsh <- function(jobj) {
@@ -103,7 +104,8 @@ new_ml_bucketed_random_projection_lsh_model <- function(jobj) {
     jobj,
     approx_nearest_neighbors = make_approx_nearest_neighbors(jobj),
     approx_similarity_join = make_approx_similarity_join(jobj),
-    class = "ml_bucketed_random_projection_lsh_model")
+    class = "ml_bucketed_random_projection_lsh_model"
+  )
 }
 
 validator_ml_bucketed_random_projection_lsh <- function(.args) {

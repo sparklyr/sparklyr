@@ -11,8 +11,10 @@ test_that("decision_tree.tidy() works", {
     ml_decision_tree(Species ~ Sepal_Length + Petal_Length, seed = 123) %>%
     tidy()
 
-  check_tidy(td1, exp.row = 2,
-             exp.names = c("feature", "importance"))
+  check_tidy(td1,
+    exp.row = 2,
+    exp.names = c("feature", "importance")
+  )
   expect_equal(td1$importance, c(0.94, 0.0603), tolerance = 0.001, scale = 1)
 
   # for regression
@@ -20,10 +22,11 @@ test_that("decision_tree.tidy() works", {
     ml_decision_tree(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123) %>%
     tidy()
 
-  check_tidy(td2, exp.row = 2,
-             exp.names = c("feature", "importance"))
+  check_tidy(td2,
+    exp.row = 2,
+    exp.names = c("feature", "importance")
+  )
   expect_equal(td2$importance, c(0.954, 0.0456), tolerance = 0.001, scale = 1)
-
 })
 
 test_that("decision_tree.augment() works", {
@@ -37,9 +40,13 @@ test_that("decision_tree.augment() works", {
     augment() %>%
     dplyr::collect()
 
-  check_tidy(au1, exp.row = nrow(iris),
-             exp.name = c(dplyr::tbl_vars(iris_tbl),
-                          ".predicted_label"))
+  check_tidy(au1,
+    exp.row = nrow(iris),
+    exp.name = c(
+      dplyr::tbl_vars(iris_tbl),
+      ".predicted_label"
+    )
+  )
 
 
   # for regression with newdata
@@ -48,9 +55,13 @@ test_that("decision_tree.augment() works", {
     augment(head(iris_tbl, 25)) %>%
     dplyr::collect()
 
-  check_tidy(au2, exp.row = 25,
-             exp.name = c(dplyr::tbl_vars(iris_tbl),
-                          ".prediction"))
+  check_tidy(au2,
+    exp.row = 25,
+    exp.name = c(
+      dplyr::tbl_vars(iris_tbl),
+      ".prediction"
+    )
+  )
 })
 
 test_that("decision_tree.glance() works", {
@@ -63,15 +74,18 @@ test_that("decision_tree.glance() works", {
     ml_decision_tree(Species ~ Sepal_Length + Petal_Length, seed = 123) %>%
     glance()
 
-  check_tidy(gl1, exp.row = 1,
-             exp.names = c("num_nodes", "depth", "impurity"))
+  check_tidy(gl1,
+    exp.row = 1,
+    exp.names = c("num_nodes", "depth", "impurity")
+  )
 
   # for regression
   gl2 <- iris_tbl %>%
     ml_decision_tree(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123) %>%
     glance()
 
-  check_tidy(gl2, exp.row = 1,
-             exp.names = c("num_nodes", "depth", "impurity"))
-
+  check_tidy(gl2,
+    exp.row = 1,
+    exp.names = c("num_nodes", "depth", "impurity")
+  )
 })

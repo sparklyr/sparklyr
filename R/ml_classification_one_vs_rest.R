@@ -93,12 +93,14 @@ ml_one_vs_rest.tbl_spark <- function(x, formula = NULL, classifier = NULL, featu
 
 validator_ml_one_vs_rest <- function(.args) {
   .args <- validate_args_predictor(.args)
-  .args[["classifier"]] <- if (inherits(.args[["classifier"]], "spark_jobj"))
+  .args[["classifier"]] <- if (inherits(.args[["classifier"]], "spark_jobj")) {
     ml_call_constructor(.args[["classifier"]])
-  else
+  } else {
     .args[["classifier"]]
-  if (!is.null(.args[["classifier"]]) && !inherits(.args[["classifier"]], "ml_classifier"))
+  }
+  if (!is.null(.args[["classifier"]]) && !inherits(.args[["classifier"]], "ml_classifier")) {
     stop("`classifier` must be an `ml_classifier`.", call. = FALSE)
+  }
   .args
 }
 
@@ -111,5 +113,6 @@ new_ml_one_vs_rest_model <- function(jobj) {
     jobj,
     models = invoke(jobj, "models") %>%
       purrr::map(ml_call_constructor),
-    class = "ml_one_vs_rest_model")
+    class = "ml_one_vs_rest_model"
+  )
 }

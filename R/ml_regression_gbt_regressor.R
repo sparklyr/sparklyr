@@ -22,8 +22,6 @@ ml_gbt_regressor.spark_connection <- function(x, formula = NULL, max_iter = 20, 
                                               max_memory_in_mb = 256, features_col = "features",
                                               label_col = "label", prediction_col = "prediction",
                                               uid = random_string("gbt_regressor_"), ...) {
-
-
   .args <- list(
     max_iter = max_iter,
     max_depth = max_depth,
@@ -179,7 +177,10 @@ new_ml_gbt_regression_model <- function(jobj) {
     # `def treeWeights`
     tree_weights = function() invoke(jobj, "treeWeights"),
     # `def trees`
-    trees = function() invoke(jobj, "trees") %>%
-      purrr::map(new_ml_decision_tree_regression_model),
-    class = "ml_gbt_regression_model")
+    trees = function() {
+      invoke(jobj, "trees") %>%
+        purrr::map(new_ml_decision_tree_regression_model)
+    },
+    class = "ml_gbt_regression_model"
+  )
 }

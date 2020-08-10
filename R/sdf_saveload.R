@@ -23,7 +23,7 @@ sdf_save_table <- function(x, name, overwrite = FALSE, append = FALSE) {
 
   writer <- invoke(sdf, "write")
   if (overwrite) writer <- invoke(writer, "mode", "overwrite")
-  if (append)    writer <- invoke(writer, "mode", "append")
+  if (append) writer <- invoke(writer, "mode", "append")
 
   # Spark < 2.0.0 doesn't respect the metastore directory when
   # using the 'saveAsTable' API, so we directly call 'save'.
@@ -71,7 +71,7 @@ sdf_save_parquet <- function(x, path, overwrite = FALSE, append = FALSE) {
 
   write <- invoke(sdf, "write")
   if (overwrite) write <- invoke(write, "mode", "overwrite")
-  if (append)    write <- invoke(write, "mode", "append")
+  if (append) write <- invoke(write, "mode", "append")
 
   invoke(write, "parquet", path)
 }

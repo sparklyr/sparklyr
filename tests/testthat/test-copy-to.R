@@ -39,10 +39,11 @@ test_that("sdf_copy_to works for csv serializer", {
 
 test_that("spark_table_name() doesn't warn for multiline expression (#1386)", {
   expect_warning(
-    spark_table_name(data.frame(foo = c(1, 2, 3),
-               bar = c(2, 1, 3),
-               foobar = c("a", "b", "c"))
-               ),
+    spark_table_name(data.frame(
+      foo = c(1, 2, 3),
+      bar = c(2, 1, 3),
+      foobar = c("a", "b", "c")
+    )),
     NA
   )
 })
@@ -76,11 +77,13 @@ test_that("sdf_copy_to works for json serializer", {
 })
 
 test_that("sdf_copy_to can preserve list columns", {
-  if (!"sparklyr.nested" %in% installed.packages())
+  if (!"sparklyr.nested" %in% installed.packages()) {
     skip("sparklyr.nested not installed.")
+  }
 
-  if (spark_version(sc) < "2.4")
+  if (spark_version(sc) < "2.4") {
     skip("preserving list columns is only supported with Spark 2.4+")
+  }
 
   df <- tibble::tibble(
     a = list(c(11.0, 111.0), c(22.0, 222.0), c(33.0, 333.0)),

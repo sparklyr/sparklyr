@@ -41,7 +41,8 @@ ft_regex_tokenizer.spark_connection <- function(x, input_col = NULL, output_col 
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.RegexTokenizer",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]) %>%
+    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+  ) %>%
     invoke("setGaps", .args[["gaps"]]) %>%
     invoke("setMinTokenLength", .args[["min_token_length"]]) %>%
     invoke("setPattern", .args[["pattern"]]) %>%
@@ -54,7 +55,7 @@ ft_regex_tokenizer.spark_connection <- function(x, input_col = NULL, output_col 
 ft_regex_tokenizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, gaps = TRUE,
                                            min_token_length = 1, pattern = "\\s+", to_lower_case = TRUE,
                                            uid = random_string("regex_tokenizer_"), ...) {
-  stage <-ft_regex_tokenizer.spark_connection(
+  stage <- ft_regex_tokenizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
     output_col = output_col,
@@ -72,7 +73,7 @@ ft_regex_tokenizer.ml_pipeline <- function(x, input_col = NULL, output_col = NUL
 ft_regex_tokenizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, gaps = TRUE,
                                          min_token_length = 1, pattern = "\\s+", to_lower_case = TRUE,
                                          uid = random_string("regex_tokenizer_"), ...) {
-  stage <-ft_regex_tokenizer.spark_connection(
+  stage <- ft_regex_tokenizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
     output_col = output_col,

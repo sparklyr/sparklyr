@@ -45,7 +45,7 @@ spark_config_value <- function(config, name, default = NULL) {
   if (getOption("sparklyr.test.enforce.config", FALSE) && any(grepl("^sparklyr.", name))) {
     settings <- get("spark_config_settings")()
     if (!any(name %in% settings$name) &&
-        !grepl("^sparklyr\\.shell\\.", name)) {
+      !grepl("^sparklyr\\.shell\\.", name)) {
       stop("Config value '", name[[1]], "' not described in spark_config_settings()")
     }
   }
@@ -104,13 +104,14 @@ read_bin_wait <- function(con, what, n, endian = NULL) {
   result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 
   progressTimeout <- Sys.time() + progressInterval
-  if (is.null(sc$state$progress))
+  if (is.null(sc$state$progress)) {
     sc$state$progress <- new.env()
+  }
   progressUpdated <- FALSE
 
   waitInterval <- 0
   commandStart <- Sys.time()
-  while(length(result) == 0 && commandStart + timeout > Sys.time()) {
+  while (length(result) == 0 && commandStart + timeout > Sys.time()) {
     Sys.sleep(waitInterval)
     waitInterval <- min(0.1, waitInterval + 0.01)
 
@@ -153,23 +154,24 @@ readObject <- function(con) {
 }
 
 readTypedObject <- function(con, type) {
-  switch (type,
-          "i" = readInt(con),
-          "c" = readString(con),
-          "b" = readBoolean(con),
-          "d" = readDouble(con),
-          "r" = readRaw(con),
-          "D" = readDate(con),
-          "t" = readTime(con),
-          "a" = readArray(con),
-          "l" = readList(con),
-          "e" = readEnv(con),
-          "s" = readStruct(con),
-          "f" = readFastStringArray(con),
-          "n" = NULL,
-          "j" = getJobj(con, readString(con)),
-          "J" = rjson::fromJSON(readString(con)),
-          stop(paste("Unsupported type for deserialization", type)))
+  switch(type,
+    "i" = readInt(con),
+    "c" = readString(con),
+    "b" = readBoolean(con),
+    "d" = readDouble(con),
+    "r" = readRaw(con),
+    "D" = readDate(con),
+    "t" = readTime(con),
+    "a" = readArray(con),
+    "l" = readList(con),
+    "e" = readEnv(con),
+    "s" = readStruct(con),
+    "f" = readFastStringArray(con),
+    "n" = NULL,
+    "j" = getJobj(con, readString(con)),
+    "J" = rjson::fromJSON(readString(con)),
+    stop(paste("Unsupported type for deserialization", type))
+  )
 }
 
 readString <- function(con) {
@@ -179,8 +181,8 @@ readString <- function(con) {
   if (stringLen > 0) {
     raw <- read_bin(con, raw(), stringLen, endian = "big")
     if (is.element("00", raw)) {
-     warning("Input contains embedded nuls, removing.")
-     raw <- raw[raw != "00"]
+      warning("Input contains embedded nuls, removing.")
+      raw <- raw[raw != "00"]
     }
     string <- rawToChar(raw)
   }
@@ -195,31 +197,35 @@ readFastStringArray <- function(con) {
 }
 
 readDateArray <- function(con, n = 1) {
-  if (n == 0)
+  if (n == 0) {
     as.Date(NA)
-  else
+  } else {
     do.call(c, lapply(seq(n), function(x) readDate(con)))
+  }
 }
 
 readInt <- function(con, n = 1) {
-  if (n == 0)
+  if (n == 0) {
     integer(0)
-  else
+  } else {
     read_bin(con, integer(), n = n, endian = "big")
+  }
 }
 
 readDouble <- function(con, n = 1) {
-  if (n == 0)
+  if (n == 0) {
     double(0)
-  else
+  } else {
     read_bin(con, double(), n = n, endian = "big")
+  }
 }
 
 readBoolean <- function(con, n = 1) {
-  if (n == 0)
+  if (n == 0) {
     logical(0)
-  else
+  } else {
     as.logical(readInt(con, n = n))
+  }
 }
 
 readType <- function(con) {
@@ -228,24 +234,25 @@ readType <- function(con) {
 
 readDate <- function(con) {
   date_str <- readString(con)
-  if (is.null(date_str) || identical(date_str, ""))
+  if (is.null(date_str) || identical(date_str, "")) {
     as.Date(NA)
-  else if (getOption("sparklyr.collect.datechars", FALSE))
+  } else if (getOption("sparklyr.collect.datechars", FALSE)) {
     date_str
-  else
+  } else {
     as.Date(date_str, tz = "UTC")
+  }
 }
 
 readTime <- function(con, n = 1) {
-  if (identical(n, 0))
+  if (identical(n, 0)) {
     as.POSIXct(character(0))
-  else {
+  } else {
     t <- readDouble(con, n)
 
     r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
-    if (getOption("sparklyr.collect.datechars", FALSE))
+    if (getOption("sparklyr.collect.datechars", FALSE)) {
       as.character(r)
-    else {
+    } else {
       r
     }
   }
@@ -330,38 +337,47 @@ readStruct <- function(con) {
 
 readRaw <- function(con) {
   dataLen <- readInt(con)
-  if (dataLen == 0)
+  if (dataLen == 0) {
     raw()
-  else
+  } else {
     read_bin(con, raw(), as.integer(dataLen), endian = "big")
+  }
 }
 sparklyr_gateway_trouble_shooting_msg <- function() {
-  c("\n\n\nTry running `options(sparklyr.log.console = TRUE)` followed by ",
-    "`sc <- spark_connect(...)` for more debugging info.")
+  c(
+    "\n\n\nTry running `options(sparklyr.log.console = TRUE)` followed by ",
+    "`sc <- spark_connect(...)` for more debugging info."
+  )
 }
 
 wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {
-  waitSeconds <- if (isStarting)
+  waitSeconds <- if (isStarting) {
     spark_config_value(config, "sparklyr.connect.timeout", 60)
-  else
+  } else {
     spark_config_value(config, "sparklyr.gateway.timeout", 1)
+  }
 
   gateway <- NULL
   commandStart <- Sys.time()
 
   while (is.null(gateway) && Sys.time() < commandStart + waitSeconds) {
-    tryCatch({
-      suppressWarnings({
-        timeout <- spark_config_value(config, "sparklyr.gateway.interval", 1)
-        gateway <- socketConnection(host = gatewayAddress,
-                                    port = gatewayPort,
-                                    server = FALSE,
-                                    blocking = TRUE,
-                                    open = "rb",
-                                    timeout = timeout)
-      })
-    }, error = function(err) {
-    })
+    tryCatch(
+      {
+        suppressWarnings({
+          timeout <- spark_config_value(config, "sparklyr.gateway.interval", 1)
+          gateway <- socketConnection(
+            host = gatewayAddress,
+            port = gatewayPort,
+            server = FALSE,
+            blocking = TRUE,
+            open = "rb",
+            timeout = timeout
+          )
+        })
+      },
+      error = function(err) {
+      }
+    )
 
     startWait <- spark_config_value(config, "sparklyr.gateway.wait", 50 / 1000)
     Sys.sleep(startWait)
@@ -378,10 +394,11 @@ spark_gateway_commands <- function() {
 }
 
 query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
-  waitSeconds <- if (isStarting)
+  waitSeconds <- if (isStarting) {
     spark_config_value(config, "sparklyr.connect.timeout", 60)
-  else
+  } else {
     spark_config_value(config, "sparklyr.gateway.timeout", 1)
+  }
 
   writeInt(gateway, spark_gateway_commands()[["GetPorts"]])
   writeInt(gateway, sessionId)
@@ -391,7 +408,7 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   redirectGatewayPort <- NULL
 
   commandStart <- Sys.time()
-  while(length(backendSessionId) == 0 && commandStart + waitSeconds > Sys.time()) {
+  while (length(backendSessionId) == 0 && commandStart + waitSeconds > Sys.time()) {
     backendSessionId <- readInt(gateway)
     Sys.sleep(0.1)
   }
@@ -400,15 +417,16 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   backendPort <- readInt(gateway)
 
   if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
-    if (isStarting)
+    if (isStarting) {
       stop(
         "Sparklyr gateway did not respond while retrieving ports information after ",
         waitSeconds,
         " seconds.",
         sparklyr_gateway_trouble_shooting_msg()
       )
-    else
+    } else {
       return(NULL)
+    }
   }
 
   list(
@@ -419,21 +437,22 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
 }
 
 spark_connect_gateway <- function(
-  gatewayAddress,
-  gatewayPort,
-  sessionId,
-  config,
-  isStarting = FALSE) {
+                                  gatewayAddress,
+                                  gatewayPort,
+                                  sessionId,
+                                  config,
+                                  isStarting = FALSE) {
 
   # try connecting to existing gateway
   gateway <- wait_connect_gateway(gatewayAddress, gatewayPort, config, isStarting)
 
   if (is.null(gateway)) {
-    if (isStarting)
+    if (isStarting) {
       stop(
         "Gateway in ", gatewayAddress, ":", gatewayPort, " did not respond.",
         sparklyr_gateway_trouble_shooting_msg()
       )
+    }
 
     NULL
   }
@@ -454,11 +473,12 @@ spark_connect_gateway <- function(
     if (redirectGatewayPort == 0) {
       close(gateway)
 
-      if (isStarting)
+      if (isStarting) {
         stop("Gateway in ", gatewayAddress, ":", gatewayPort, " does not have the requested session registered")
+      }
 
       NULL
-    } else if(redirectGatewayPort != gatewayPort) {
+    } else if (redirectGatewayPort != gatewayPort) {
       close(gateway)
 
       spark_connect_gateway(gatewayAddress, redirectGatewayPort, sessionId, config, isStarting)
@@ -471,19 +491,17 @@ spark_connect_gateway <- function(
     }
   }
 }
-core_invoke_sync_socket <- function(sc)
-{
+core_invoke_sync_socket <- function(sc) {
   flush <- c(1)
-  while(length(flush) > 0) {
+  while (length(flush) > 0) {
     flush <- readBin(sc$backend, raw(), 1000)
 
     # while flushing monitored connections we don't want to hang forever
-    if (identical(sc$state$use_monitoring, TRUE)) break;
+    if (identical(sc$state$use_monitoring, TRUE)) break
   }
 }
 
-core_invoke_sync <- function(sc)
-{
+core_invoke_sync <- function(sc) {
   # sleep until connection clears is back on valid state
   while (!core_invoke_synced(sc)) {
     Sys.sleep(1)
@@ -491,19 +509,21 @@ core_invoke_sync <- function(sc)
   }
 }
 
-core_invoke_cancel_running <- function(sc)
-{
-  if (is.null(spark_context(sc)))
+core_invoke_cancel_running <- function(sc) {
+  if (is.null(spark_context(sc))) {
     return()
+  }
 
   # if something fails while using a monitored connection we don't cancel jobs
-  if (identical(sc$state$use_monitoring, TRUE))
+  if (identical(sc$state$use_monitoring, TRUE)) {
     return()
+  }
 
   # if something fails while cancelling jobs we don't cancel jobs, this can
   # happen in OutOfMemory errors that shut down the spark context
-  if (identical(sc$state$cancelling_all_jobs, TRUE))
+  if (identical(sc$state$cancelling_all_jobs, TRUE)) {
     return()
+  }
 
   connection_progress_context(sc, function() {
     sc$state$cancelling_all_jobs <- TRUE
@@ -534,10 +554,10 @@ write_bin_args <- function(backend, object, static, method, args) {
   writeBin(con, backend)
 }
 
-core_invoke_synced <- function(sc)
-{
-  if (is.null(sc))
+core_invoke_synced <- function(sc) {
+  if (is.null(sc)) {
     stop("The connection is no longer valid.")
+  }
 
   backend <- core_invoke_socket(sc)
   echo_id <- "sparklyr"
@@ -556,44 +576,46 @@ core_invoke_synced <- function(sc)
 }
 
 core_invoke_socket <- function(sc) {
-  if (identical(sc$state$use_monitoring, TRUE))
+  if (identical(sc$state$use_monitoring, TRUE)) {
     sc$monitoring
-  else
+  } else {
     sc$backend
+  }
 }
 
 core_invoke_socket_name <- function(sc) {
-  if (identical(sc$state$use_monitoring, TRUE))
+  if (identical(sc$state$use_monitoring, TRUE)) {
     "monitoring"
-  else
+  } else {
     "backend"
+  }
 }
 
 core_remove_jobjs <- function(sc, ids) {
   core_invoke_method_impl(sc, static = TRUE, noreply = TRUE, "Handler", "rm", as.list(ids))
 }
 
-core_invoke_method <- function(sc, static, object, method, ...)
-{
+core_invoke_method <- function(sc, static, object, method, ...) {
   core_invoke_method_impl(sc, static, noreply = FALSE, object, method, ...)
 }
 
-core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
-{
+core_invoke_method_impl <- function(sc, static, noreply, object, method, ...) {
   # N.B.: the reference to `object` must be retained until after a value or exception is returned to us
   # from the invoked method here (i.e., cannot have `object <- something_else` before that), because any
   # re-assignment could cause the last reference to `object` to be destroyed and the underlying JVM object
   # to be deleted from JVMObjectTracker before the actual invocation of the method could happen.
   lockBinding("object", environment())
 
-  if (is.null(sc))
+  if (is.null(sc)) {
     stop("The connection is no longer valid.")
+  }
 
   args <- list(...)
 
   # initialize status if needed
-  if (is.null(sc$state$status))
+  if (is.null(sc$state$status)) {
     sc$state$status <- list()
+  }
 
   # choose connection socket
   backend <- core_invoke_socket(sc)
@@ -609,10 +631,11 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
   }
 
   if (!identical(object, "Handler") &&
-      spark_config_value(sc$config, c("sparklyr.cancellable", "sparklyr.connection.cancellable"), TRUE)) {
+    spark_config_value(sc$config, c("sparklyr.cancellable", "sparklyr.connection.cancellable"), TRUE)) {
     # if connection still running, sync to valid state
-    if (identical(sc$state$status[[connection_name]], "running"))
+    if (identical(sc$state$status[[connection_name]], "running")) {
       core_invoke_sync(sc)
+    }
 
     # while exiting this function, if interrupted (still running), cancel server job
     on.exit(core_invoke_cancel_running(sc))
@@ -626,7 +649,7 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
   write_bin_args(backend, objId, static, method, args)
 
   if (identical(object, "Handler") &&
-      (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
+    (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
     # by the time we read response, backend might be already down.
     return(NULL)
   }
@@ -646,7 +669,8 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...)
         stop(
           "Unexpected state in sparklyr backend: ",
           msg,
-          call. = FALSE)
+          call. = FALSE
+        )
       })
     }
 
@@ -700,10 +724,11 @@ core_handle_known_errors <- function(sc, msg) {
     )
   }
   else if (grepl("check worker logs for details", msg, ignore.case = TRUE) &&
-           spark_master_is_local(sc$master)) {
+    spark_master_is_local(sc$master)) {
     abort_shell(
       "sparklyr worker rscript failure, check worker logs for details",
-      NULL, NULL, sc$output_file, sc$error_file)
+      NULL, NULL, sc$output_file, sc$error_file
+    )
   }
 }
 
@@ -749,7 +774,9 @@ spark_jobj_id <- function(x) {
 #' @export
 spark_jobj.default <- function(x, ...) {
   stop("Unable to retrieve a spark_jobj from object of class ",
-       paste(class(x), collapse = " "), call. = FALSE)
+    paste(class(x), collapse = " "),
+    call. = FALSE
+  )
 }
 
 #' @export
@@ -822,42 +849,55 @@ jobj_create <- function(con, objId) {
 }
 
 jobj_info <- function(jobj) {
-  if (!inherits(jobj, "spark_jobj"))
+  if (!inherits(jobj, "spark_jobj")) {
     stop("'jobj_info' called on non-jobj")
+  }
 
   class <- NULL
   repr <- NULL
 
-  tryCatch({
-    class <- invoke(jobj, "getClass")
-    if (inherits(class, "spark_jobj"))
-      class <- invoke(class, "getName")
-  }, error = function(e) {
-  })
-  tryCatch({
-    repr <- invoke(jobj, "toString")
-  }, error = function(e) {
-  })
+  tryCatch(
+    {
+      class <- invoke(jobj, "getClass")
+      if (inherits(class, "spark_jobj")) {
+        class <- invoke(class, "getName")
+      }
+    },
+    error = function(e) {
+    }
+  )
+  tryCatch(
+    {
+      repr <- invoke(jobj, "toString")
+    },
+    error = function(e) {
+    }
+  )
   list(
     class = class,
-    repr  = repr
+    repr = repr
   )
 }
 
 jobj_inspect <- function(jobj) {
   print(jobj)
-  if (!connection_is_open(spark_connection(jobj)))
+  if (!connection_is_open(spark_connection(jobj))) {
     return(jobj)
+  }
 
   class <- invoke(jobj, "getClass")
 
   cat("Fields:\n")
   fields <- invoke(class, "getDeclaredFields")
-  lapply(fields, function(field) { print(field) })
+  lapply(fields, function(field) {
+    print(field)
+  })
 
   cat("Methods:\n")
   methods <- invoke(class, "getDeclaredMethods")
-  lapply(methods, function(method) { print(method) })
+  lapply(methods, function(method) {
+    print(method)
+  })
 
   jobj
 }
@@ -893,7 +933,6 @@ clear_jobjs <- function() {
 }
 
 attach_connection <- function(jobj, connection) {
-
   if (inherits(jobj, "spark_jobj")) {
     jobj$connection <- connection
   }
@@ -936,7 +975,9 @@ getSerdeType <- function(object) {
     type
   } else {
     # Check if all elements are of same type
-    elemType <- unique(sapply(object, function(elem) { getSerdeType(elem) }))
+    elemType <- unique(sapply(object, function(elem) {
+      getSerdeType(elem)
+    }))
     if (length(elemType) <= 1) {
 
       # Check that there are no NAs in arrays since they are unsupported in scala
@@ -968,25 +1009,26 @@ writeObject <- function(con, object, writeType = TRUE) {
     writeType(con, serdeType)
   }
   switch(serdeType,
-         NULL = writeVoid(con),
-         integer = writeInt(con, object),
-         character = writeString(con, object),
-         logical = writeBoolean(con, object),
-         double = writeDouble(con, object),
-         numeric = writeDouble(con, object),
-         raw = writeRaw(con, object),
-         array = writeArray(con, object),
-         list = writeList(con, object),
-         struct = writeList(con, object),
-         spark_jobj = writeJobj(con, object),
-         environment = writeEnv(con, object),
-         Date = writeDate(con, object),
-         POSIXlt = writeTime(con, object),
-         POSIXct = writeTime(con, object),
-         factor = writeFactor(con, object),
-         `data.frame` = writeList(con, object),
-         spark_apply_binary_result = writeList(con, object),
-         stop("Unsupported type '", serdeType, "' for serialization"))
+    NULL = writeVoid(con),
+    integer = writeInt(con, object),
+    character = writeString(con, object),
+    logical = writeBoolean(con, object),
+    double = writeDouble(con, object),
+    numeric = writeDouble(con, object),
+    raw = writeRaw(con, object),
+    array = writeArray(con, object),
+    list = writeList(con, object),
+    struct = writeList(con, object),
+    spark_jobj = writeJobj(con, object),
+    environment = writeEnv(con, object),
+    Date = writeDate(con, object),
+    POSIXlt = writeTime(con, object),
+    POSIXct = writeTime(con, object),
+    factor = writeFactor(con, object),
+    `data.frame` = writeList(con, object),
+    spark_apply_binary_result = writeList(con, object),
+    stop("Unsupported type '", serdeType, "' for serialization")
+  )
 }
 
 writeVoid <- function(con) {
@@ -1026,25 +1068,26 @@ writeRaw <- function(con, batch) {
 
 writeType <- function(con, class) {
   type <- switch(class,
-                 NULL = "n",
-                 integer = "i",
-                 character = "c",
-                 logical = "b",
-                 double = "d",
-                 numeric = "d",
-                 raw = "r",
-                 array = "a",
-                 list = "l",
-                 struct = "s",
-                 spark_jobj = "j",
-                 environment = "e",
-                 Date = "D",
-                 POSIXlt = "t",
-                 POSIXct = "t",
-                 factor = "c",
-                 `data.frame` = "l",
-                 spark_apply_binary_result = "l",
-                 stop("Unsupported type '", class, "' for serialization"))
+    NULL = "n",
+    integer = "i",
+    character = "c",
+    logical = "b",
+    double = "d",
+    numeric = "d",
+    raw = "r",
+    array = "a",
+    list = "l",
+    struct = "s",
+    spark_jobj = "j",
+    environment = "e",
+    Date = "D",
+    POSIXlt = "t",
+    POSIXct = "t",
+    factor = "c",
+    `data.frame` = "l",
+    spark_apply_binary_result = "l",
+    stop("Unsupported type '", class, "' for serialization")
+  )
   writeBin(charToRaw(type), con)
 }
 
@@ -1083,7 +1126,9 @@ writeEnv <- function(con, env) {
   writeInt(con, len)
   if (len > 0) {
     writeArray(con, as.list(ls(env)))
-    vals <- lapply(ls(env), function(x) { env[[x]] })
+    vals <- lapply(ls(env), function(x) {
+      env[[x]]
+    })
     writeList(con, as.list(vals))
   }
 }
@@ -1112,10 +1157,11 @@ writeArgs <- function(con, args) {
 }
 core_get_package_function <- function(packageName, functionName) {
   if (packageName %in% rownames(installed.packages()) &&
-      exists(functionName, envir = asNamespace(packageName)))
+    exists(functionName, envir = asNamespace(packageName))) {
     get(functionName, envir = asNamespace(packageName))
-  else
+  } else {
     NULL
+  }
 }
 worker_config_serialize <- function(config) {
   paste(
@@ -1200,14 +1246,13 @@ spark_worker_init_packages <- function(sc, context) {
 }
 
 spark_worker_execute_closure <- function(
-  closure,
-  df,
-  funcContext,
-  grouped_by,
-  barrier_map,
-  fetch_result_as_sdf,
-  partition_index
-) {
+                                         closure,
+                                         df,
+                                         funcContext,
+                                         grouped_by,
+                                         barrier_map,
+                                         fetch_result_as_sdf,
+                                         partition_index) {
   if (nrow(df) == 0) {
     worker_log("found that source has no rows to be proceesed")
     return(NULL)
@@ -1223,7 +1268,7 @@ spark_worker_execute_closure <- function(
   closure_params <- length(formals(closure))
   has_partition_index_param <- (
     !is.null(funcContext$partition_index_param) &&
-    nchar(funcContext$partition_index_param) > 0
+      nchar(funcContext$partition_index_param) > 0
   )
   if (has_partition_index_param) closure_params <- closure_params - 1
   closure_args <- c(
@@ -1232,8 +1277,9 @@ spark_worker_execute_closure <- function(
     lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]]),
     barrier_arg
   )[0:closure_params]
-  if (has_partition_index_param)
+  if (has_partition_index_param) {
     closure_args[[funcContext$partition_index_param]] <- partition_index
+  }
 
   worker_log("computing closure")
   result <- do.call(closure, closure_args)
@@ -1260,7 +1306,7 @@ spark_worker_execute_closure <- function(
 
 spark_worker_clean_factors <- function(result) {
   if (any(sapply(result, is.factor))) {
-    result <- as.data.frame(lapply(result, function(x) if(is.factor(x)) as.character(x) else x), stringsAsFactors = F)
+    result <- as.data.frame(lapply(result, function(x) if (is.factor(x)) as.character(x) else x), stringsAsFactors = F)
   }
 
   result
@@ -1268,9 +1314,10 @@ spark_worker_clean_factors <- function(result) {
 
 spark_worker_maybe_serialize_list_cols_as_json <- function(config, result) {
   if (identical(config$fetch_result_as_sdf, TRUE) &&
-      config$spark_version >= "2.4.0" &&
-      any(sapply(result, is.list))) {
-    result <- do.call(tibble::tibble,
+    config$spark_version >= "2.4.0" &&
+    any(sapply(result, is.list))) {
+    result <- do.call(
+      tibble::tibble,
       lapply(
         result,
         function(x) {
@@ -1337,7 +1384,7 @@ spark_worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
       new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
       names(new_column_values) <- grouped_by
 
-      if("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
+      if ("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
       result <- do.call("cbind", list(new_column_values, result))
 
       names(result) <- gsub("\\.", "_", make.unique(names(result)))
@@ -1401,17 +1448,17 @@ spark_worker_apply_arrow <- function(sc, config) {
     result <- NULL
 
     if (!is.null(df)) {
-      colnames(df) <- columnNames[1: length(colnames(df))]
+      colnames(df) <- columnNames[1:length(colnames(df))]
 
       result <- spark_worker_execute_closure(
-                  closure,
-                  df,
-                  funcContext,
-                  grouped_by,
-                  barrier_map,
-                  config$fetch_result_as_sdf,
-                  partition_index
-                )
+        closure,
+        df,
+        funcContext,
+        grouped_by,
+        barrier_map,
+        config$fetch_result_as_sdf,
+        partition_index
+      )
 
       result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
@@ -1508,7 +1555,6 @@ spark_worker_apply <- function(sc, config) {
 
     # rbind removes Date classes so we re-assign them here
     if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0) {
-
       if (any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
         first_row <- data[[1]]
         for (idx in seq_along(first_row)) {
@@ -1525,22 +1571,22 @@ spark_worker_apply <- function(sc, config) {
       for (i in 1:ncol(df)) {
         target_type <- funcContext$column_types[[i]]
         if (!is.null(target_type) && class(df[[i]]) != target_type) {
-        df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
+          df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
         }
       }
     }
 
-    colnames(df) <- columnNames[1: length(colnames(df))]
+    colnames(df) <- columnNames[1:length(colnames(df))]
 
     result <- spark_worker_execute_closure(
-                closure,
-                df,
-                funcContext,
-                grouped_by,
-                barrier_map,
-                config$fetch_result_as_sdf,
-                partition_index
-              )
+      closure,
+      df,
+      funcContext,
+      grouped_by,
+      barrier_map,
+      config$fetch_result_as_sdf,
+      partition_index
+    )
 
     result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
 
@@ -1556,7 +1602,7 @@ spark_worker_apply <- function(sc, config) {
   if (!is.null(all_results) && nrow(all_results) > 0) {
     worker_log("updating ", nrow(all_results), " rows")
 
-    all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i,]))
+    all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i, ]))
 
     worker_invoke(context, "setResultArraySeq", all_data)
     worker_log("updated ", nrow(all_results), " rows")
@@ -1569,10 +1615,11 @@ spark_worker_apply <- function(sc, config) {
 
 spark_worker_rlang_unserialize <- function() {
   rlang_unserialize <- core_get_package_function("rlang", "bytes_unserialise")
-  if (is.null(rlang_unserialize))
+  if (is.null(rlang_unserialize)) {
     core_get_package_function("rlanglabs", "bytes_unserialise")
-  else
+  } else {
     rlang_unserialize
+  }
 }
 
 spark_worker_unbundle_path <- function() {
@@ -1615,10 +1662,9 @@ worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
 # nocov start
 
 spark_worker_connect <- function(
-  sessionId,
-  backendPort = 8880,
-  config = list()) {
-
+                                 sessionId,
+                                 backendPort = 8880,
+                                 config = list()) {
   gatewayPort <- spark_config_value(config, "sparklyr.worker.gateway.port", backendPort)
 
   gatewayAddress <- spark_config_value(config, "sparklyr.worker.gateway.address", "localhost")
@@ -1627,32 +1673,38 @@ spark_worker_connect <- function(
   worker_log("is connecting to backend using port ", gatewayPort)
 
   gatewayInfo <- spark_connect_gateway(gatewayAddress,
-                                       gatewayPort,
-                                       sessionId,
-                                       config = config,
-                                       isStarting = TRUE)
+    gatewayPort,
+    sessionId,
+    config = config,
+    isStarting = TRUE
+  )
 
   worker_log("is connected to backend")
   worker_log("is connecting to backend session")
 
-  tryCatch({
-    interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
+  tryCatch(
+    {
+      interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
 
-    backend <- socketConnection(host = "localhost",
-                                port = gatewayInfo$backendPort,
-                                server = FALSE,
-                                blocking = interval > 0,
-                                open = "wb",
-                                timeout = interval)
+      backend <- socketConnection(
+        host = "localhost",
+        port = gatewayInfo$backendPort,
+        server = FALSE,
+        blocking = interval > 0,
+        open = "wb",
+        timeout = interval
+      )
 
-    class(backend) <- c(class(backend), "shell_backend")
-  }, error = function(err) {
-    close(gatewayInfo$gateway)
+      class(backend) <- c(class(backend), "shell_backend")
+    },
+    error = function(err) {
+      close(gatewayInfo$gateway)
 
-    stop(
-      "Failed to open connection to backend:", err$message
-    )
-  })
+      stop(
+        "Failed to open connection to backend:", err$message
+      )
+    }
+  )
 
   worker_log("is connected to backend session")
 
@@ -1681,10 +1733,13 @@ spark_worker_connect <- function(
 connection_is_open.spark_worker_connection <- function(sc) {
   bothOpen <- FALSE
   if (!identical(sc, NULL)) {
-    tryCatch({
-      bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
-    }, error = function(e) {
-    })
+    tryCatch(
+      {
+        bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
+      },
+      error = function(e) {
+      }
+    )
   }
   bothOpen
 }
@@ -1700,8 +1755,7 @@ worker_connection.spark_jobj <- function(x, ...) {
 # nocov end
 # nocov start
 
-worker_invoke_method <- function(sc, static, object, method, ...)
-{
+worker_invoke_method <- function(sc, static, object, method, ...) {
   core_invoke_method(sc, static, object, method, ...)
 }
 
@@ -1727,7 +1781,7 @@ worker_invoke_new <- function(sc, class, ...) {
 worker_log_env <- new.env()
 
 worker_log_session <- function(sessionId) {
-  assign('sessionId', sessionId, envir = worker_log_env)
+  assign("sessionId", sessionId, envir = worker_log_env)
 }
 
 worker_log_format <- function(message, session, level = "INFO", component = "RScript") {
@@ -1741,7 +1795,8 @@ worker_log_format <- function(message, session, level = "INFO", component = "RSc
     session,
     ") ",
     message,
-    sep = "")
+    sep = ""
+  )
 }
 
 worker_log_level <- function(..., level, component = "RScript") {
@@ -1752,10 +1807,11 @@ worker_log_level <- function(..., level, component = "RScript") {
     }
   }
 
-  args = list(...)
+  args <- list(...)
   message <- paste(args, sep = "", collapse = "")
   formatted <- worker_log_format(message, worker_log_env$sessionId,
-                                 level = level, component = component)
+    level = level, component = component
+  )
   cat(formatted, "\n")
 }
 
@@ -1763,7 +1819,7 @@ worker_log <- function(...) {
   worker_log_level(..., level = "INFO")
 }
 
-worker_log_warning<- function(...) {
+worker_log_warning <- function(...) {
   worker_log_level(..., level = "WARN")
 }
 
@@ -1777,59 +1833,60 @@ worker_log_error <- function(...) {
 .worker_globals <- new.env(parent = emptyenv())
 
 spark_worker_main <- function(
-  sessionId,
-  backendPort = 8880,
-  configRaw = NULL) {
-
+                              sessionId,
+                              backendPort = 8880,
+                              configRaw = NULL) {
   spark_worker_hooks()
 
-  tryCatch({
-    worker_log_session(sessionId)
+  tryCatch(
+    {
+      worker_log_session(sessionId)
 
-    if (is.null(configRaw)) configRaw <- worker_config_serialize(list())
+      if (is.null(configRaw)) configRaw <- worker_config_serialize(list())
 
-    config <- worker_config_deserialize(configRaw)
+      config <- worker_config_deserialize(configRaw)
 
-    if (identical(config$profile, TRUE)) {
-      profile_name <- paste("spark-apply-", as.numeric(Sys.time()), ".Rprof", sep = "")
-      worker_log("starting new profile in ", file.path(getwd(), profile_name))
-      utils::Rprof(profile_name)
+      if (identical(config$profile, TRUE)) {
+        profile_name <- paste("spark-apply-", as.numeric(Sys.time()), ".Rprof", sep = "")
+        worker_log("starting new profile in ", file.path(getwd(), profile_name))
+        utils::Rprof(profile_name)
+      }
+
+      if (config$debug) {
+        worker_log("exiting to wait for debugging session to attach")
+
+        # sleep for 1 day to allow long debugging sessions
+        Sys.sleep(60 * 60 * 24)
+        return()
+      }
+
+      worker_log("is starting")
+
+      options(sparklyr.connection.cancellable = FALSE)
+
+      sc <- spark_worker_connect(sessionId, backendPort, config)
+      worker_log("is connected")
+
+      if (config$arrow) {
+        spark_worker_apply_arrow(sc, config)
+      }
+      else {
+        spark_worker_apply(sc, config)
+      }
+
+      if (identical(config$profile, TRUE)) {
+        # utils::Rprof(NULL)
+        worker_log("closing profile")
+      }
+    },
+    error = function(e) {
+      worker_log_error("terminated unexpectedly: ", e$message)
+      if (exists(".stopLastError", envir = .worker_globals)) {
+        worker_log_error("collected callstack: \n", get(".stopLastError", envir = .worker_globals))
+      }
+      quit(status = -1)
     }
-
-    if (config$debug) {
-      worker_log("exiting to wait for debugging session to attach")
-
-      # sleep for 1 day to allow long debugging sessions
-      Sys.sleep(60*60*24)
-      return()
-    }
-
-    worker_log("is starting")
-
-    options(sparklyr.connection.cancellable = FALSE)
-
-    sc <- spark_worker_connect(sessionId, backendPort, config)
-    worker_log("is connected")
-
-    if (config$arrow) {
-      spark_worker_apply_arrow(sc, config)
-    }
-    else {
-      spark_worker_apply(sc, config)
-    }
-
-    if (identical(config$profile, TRUE)) {
-      # utils::Rprof(NULL)
-      worker_log("closing profile")
-    }
-
-  }, error = function(e) {
-    worker_log_error("terminated unexpectedly: ", e$message)
-    if (exists(".stopLastError", envir = .worker_globals)) {
-      worker_log_error("collected callstack: \n", get(".stopLastError", envir = .worker_globals))
-    }
-    quit(status = -1)
-  })
+  )
 
   worker_log("finished")
 }
@@ -1839,7 +1896,7 @@ spark_worker_hooks <- function() {
   lock <- get("lockBinding")
 
   originalStop <- stop
-  unlock("stop",  as.environment("package:base"))
+  unlock("stop", as.environment("package:base"))
   assign("stop", function(...) {
     frame_names <- list()
     frame_start <- max(1, sys.nframe() - 5)
@@ -1851,7 +1908,7 @@ spark_worker_hooks <- function() {
     assign(".stopLastError", paste(rev(frame_names), collapse = "\n"), envir = .worker_globals)
     originalStop(...)
   }, as.environment("package:base"))
-  lock("stop",  as.environment("package:base"))
+  lock("stop", as.environment("package:base"))
 }
 
 # nocov end

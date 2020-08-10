@@ -12,16 +12,14 @@ possibly_null <- function(.f) purrr::possibly(.f, otherwise = NULL)
 #' @export
 predict.ml_model_classification <- function(object,
                                             newdata = ml_model_data(object),
-                                            ...)
-{
+                                            ...) {
   ml_predict(object, newdata) %>%
     sdf_read_column("predicted_label")
 }
 
 #' @export
 predict.ml_model_regression <- function(
-  object, newdata = ml_model_data(object), ...
-) {
+                                        object, newdata = ml_model_data(object), ...) {
   prediction_col <- ml_param(object$model, "prediction_col")
 
   ml_predict(object, newdata) %>%
@@ -30,7 +28,6 @@ predict.ml_model_regression <- function(
 
 #' @export
 fitted.ml_model_prediction <- function(object, ...) {
-
   prediction_col <- object$model %>%
     ml_param("prediction_col")
   object %>%
@@ -76,28 +73,40 @@ ml_short_type <- function(x) {
 }
 
 spark_dense_matrix <- function(sc, mat) {
-  if (is.null(mat)) return(mat)
+  if (is.null(mat)) {
+    return(mat)
+  }
   invoke_new(
     sc, "org.apache.spark.ml.linalg.DenseMatrix", dim(mat)[1L], dim(mat)[2L],
-    as.list(mat))
+    as.list(mat)
+  )
 }
 
 spark_dense_vector <- function(sc, vec) {
-  if (is.null(vec)) return(vec)
-  invoke_static(sc,  "org.apache.spark.ml.linalg.Vectors", "dense",
-                as.list(vec))
+  if (is.null(vec)) {
+    return(vec)
+  }
+  invoke_static(
+    sc, "org.apache.spark.ml.linalg.Vectors", "dense",
+    as.list(vec)
+  )
 }
 
 spark_sql_column <- function(sc, col, alias = NULL) {
   jobj <- invoke_new(sc, "org.apache.spark.sql.Column", col)
-  if (!is.null(alias))
+  if (!is.null(alias)) {
     jobj <- invoke(jobj, "alias", alias)
+  }
   jobj
 }
 
 make_stats_arranger <- function(fit_intercept) {
-  if (fit_intercept)
-    function(x) { force(x); c(tail(x, 1), head(x, length(x) - 1)) }
-  else
+  if (fit_intercept) {
+    function(x) {
+      force(x)
+      c(tail(x, 1), head(x, length(x) - 1))
+    }
+  } else {
     identity
+  }
 }

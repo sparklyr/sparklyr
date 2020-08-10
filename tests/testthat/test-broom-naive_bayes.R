@@ -14,11 +14,14 @@ test_that("naive_bayes.tidy() works", {
     tidy() %>%
     arrange(.label)
 
-  check_tidy(td1, exp.row = 3, exp.col = 4,
-             exp.names = c(".label", "Sepal_Length",
-                           "Petal_Length", ".pi"))
+  check_tidy(td1,
+    exp.row = 3, exp.col = 4,
+    exp.names = c(
+      ".label", "Sepal_Length",
+      "Petal_Length", ".pi"
+    )
+  )
   expect_equal(td1$Sepal_Length, c(-0.258, -0.542, -0.612), tolerance = 0.001, scale = 1)
-
 })
 
 test_that("naive_bayes.augment() works", {
@@ -32,9 +35,13 @@ test_that("naive_bayes.augment() works", {
     augment(head(iris_tbl, 25)) %>%
     dplyr::collect()
 
-  check_tidy(au1, exp.row = 25,
-             exp.name = c(dplyr::tbl_vars(iris_tbl),
-                          ".predicted_label"))
+  check_tidy(au1,
+    exp.row = 25,
+    exp.name = c(
+      dplyr::tbl_vars(iris_tbl),
+      ".predicted_label"
+    )
+  )
 })
 
 test_that("naive_bayes.glance() works", {
@@ -46,6 +53,8 @@ test_that("naive_bayes.glance() works", {
     ml_naive_bayes(Species ~ Sepal_Length + Petal_Length) %>%
     glance()
 
-  check_tidy(gl1, exp.row = 1,
-             exp.names = c("model_type", "smoothing"))
+  check_tidy(gl1,
+    exp.row = 1,
+    exp.names = c("model_type", "smoothing")
+  )
 })

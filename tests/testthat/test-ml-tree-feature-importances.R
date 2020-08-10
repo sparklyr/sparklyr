@@ -7,12 +7,14 @@ test_that("ml_tree_feature_importance() works properly", {
   iris_tbl <- testthat_tbl("iris")
   rf <- iris_tbl %>%
     ml_random_forest(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
-                     type = "regression",
-                     subsampling_rate = 1, feature_subset_strategy = "all",
-                     num_trees = 1)
+      type = "regression",
+      subsampling_rate = 1, feature_subset_strategy = "all",
+      num_trees = 1
+    )
   dt <- iris_tbl %>%
     ml_decision_tree(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
-                     type = "regression")
+      type = "regression"
+    )
 
   rf_importance <- ml_tree_feature_importance(rf)
   dt_importance <- ml_tree_feature_importance(dt)
@@ -47,12 +49,14 @@ test_that("ml_feature_importances work properly (#1436)", {
     ft_vector_assembler(
       sc,
       input_cols = feature_cols,
-      output_col = "features")
+      output_col = "features"
+    )
 
   estimator <-
     ml_random_forest_classifier(
       sc,
-      label_col = "am")
+      label_col = "am"
+    )
 
   pipeline <- ml_pipeline(vector_assembler, estimator)
 

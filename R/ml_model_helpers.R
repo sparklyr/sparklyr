@@ -20,7 +20,8 @@ ml_clustering_pipeline <- function(predictor, dataset, formula, features_col) {
       attr("term.labels")
 
     vector_assembler <- ft_vector_assembler(
-      sc, input_cols = features, output_col = features_col
+      sc,
+      input_cols = features, output_col = features_col
     )
     ml_pipeline(vector_assembler, predictor)
   } else {
@@ -42,7 +43,7 @@ ml_recommendation_pipeline <- function(predictor, dataset, formula) {
 #' @rdname ml-model-constructors
 #' @param constructor The constructor function for the `ml_model`.
 ml_construct_model_supervised <- function(constructor, predictor, formula, dataset,
-                                features_col, label_col, ...) {
+                                          features_col, label_col, ...) {
   pipeline_model <- ml_supervised_pipeline(
     predictor = predictor,
     dataset = dataset,
@@ -86,12 +87,11 @@ ml_construct_model_clustering <- function(constructor, predictor, formula, datas
 
 ml_construct_model_recommendation <- function(constructor, predictor, formula,
                                               dataset, ...) {
-
   pipeline_model <- ml_recommendation_pipeline(
     predictor = predictor,
     dataset = dataset,
     formula = formula
-    )
+  )
 
   .args <- list(
     pipeline_model = pipeline_model,

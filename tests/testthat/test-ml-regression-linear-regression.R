@@ -38,7 +38,7 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
   parMatrix <- expand.grid(values, values, KEEP.OUT.ATTRS = FALSE)
 
   for (i in seq_len(nrow(parMatrix))) {
-    alpha  <- parMatrix[[1]][[i]]
+    alpha <- parMatrix[[1]][[i]]
     lambda <- parMatrix[[2]][[i]]
 
     gFit <- glmnet(
@@ -62,34 +62,39 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
 
     expect_coef_equal(gCoef, sCoef)
   }
-
 })
 
 test_that("weights column works for lm", {
   sc <- testthat_spark_connection()
   set.seed(42)
   iris_weighted <- iris %>%
-    dplyr::mutate(weights = rpois(nrow(iris), 1) + 1,
-                  ones = rep(1, nrow(iris)),
-                  versicolor = ifelse(Species == "versicolor", 1L, 0L))
+    dplyr::mutate(
+      weights = rpois(nrow(iris), 1) + 1,
+      ones = rep(1, nrow(iris)),
+      versicolor = ifelse(Species == "versicolor", 1L, 0L)
+    )
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
   r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
-          weights = weights, data = iris_weighted)
+    weights = weights, data = iris_weighted
+  )
   s <- ml_linear_regression(iris_weighted_tbl,
-                            response = "Sepal_Length",
-                            features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                            reg_param = 0L,
-                            weight_col = "weights")
+    response = "Sepal_Length",
+    features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+    reg_param = 0L,
+    weight_col = "weights"
+  )
   expect_equal(unname(coef(r)), unname(coef(s)))
 
   r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
-          data = iris_weighted)
+    data = iris_weighted
+  )
   s <- ml_linear_regression(iris_weighted_tbl,
-                            response = "Sepal_Length",
-                            features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
-                            reg_param = 0L,
-                            weight_col = "ones")
+    response = "Sepal_Length",
+    features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+    reg_param = 0L,
+    weight_col = "ones"
+  )
   expect_equal(unname(coef(r)), unname(coef(s)))
 })
 
@@ -97,7 +102,8 @@ test_that("ml_linear_regression print methods work", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   linear_model <- ml_linear_regression(
-    iris_tbl, Petal_Length ~ Petal_Width)
+    iris_tbl, Petal_Length ~ Petal_Width
+  )
 
   expect_known_output(
     linear_model,

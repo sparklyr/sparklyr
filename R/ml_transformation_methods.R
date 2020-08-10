@@ -24,8 +24,9 @@ is_ml_estimator <- function(x) inherits(x, "ml_estimator")
 #' @rdname ml-transform-methods
 #' @export
 ml_fit <- function(x, dataset, ...) {
-  if (!is_ml_estimator(x))
+  if (!is_ml_estimator(x)) {
     stop("'ml_fit()' is only applicable to 'ml_estimator' objects")
+  }
 
   spark_jobj(x) %>%
     invoke("fit", spark_dataframe(dataset)) %>%
@@ -45,8 +46,9 @@ ml_transform.default <- function(x, dataset, ...) {
 
 #' @export
 ml_transform.list <- function(x, dataset, ...) {
-  if (!all(sapply(x, is_ml_transformer)))
+  if (!all(sapply(x, is_ml_transformer))) {
     stop("Transformers must be 'ml_transformer' objects.")
+  }
   sdf <- spark_dataframe(dataset)
 
   transforms <- x %>%
@@ -72,10 +74,11 @@ ml_transform.ml_transformer <- function(x, dataset, ...) {
 #' @rdname ml-transform-methods
 #' @export
 ml_fit_and_transform <- function(x, dataset, ...) {
-  if (!is_ml_estimator(x))
+  if (!is_ml_estimator(x)) {
     stop("'ml_fit_and_transform()' is only applicable to 'ml_estimator' objects")
+  }
   sdf <- spark_dataframe(dataset)
-  spark_jobj(x)%>%
+  spark_jobj(x) %>%
     invoke("fit", sdf) %>%
     invoke("transform", sdf) %>%
     sdf_register()
@@ -95,12 +98,14 @@ ml_predict.default <- function(x, dataset, ...) {
 #' @export
 ml_predict.ml_model_regression <- function(x, dataset, ...) {
   # when dataset is not supplied, attempt to use original dataset
-  if (missing(dataset) || rlang::is_null(dataset))
+  if (missing(dataset) || rlang::is_null(dataset)) {
     dataset <- x$dataset
+  }
 
   cols <- x$model %>%
     ml_params(c("prediction_col", "variance_col"),
-              allow_null = TRUE) %>%
+      allow_null = TRUE
+    ) %>%
     Filter(length, .) %>%
     unlist(use.names = FALSE)
 
@@ -112,14 +117,14 @@ ml_predict.ml_model_regression <- function(x, dataset, ...) {
 #' @param probability_prefix String used to prepend the class probability output columns.
 #' @export
 ml_predict.ml_model_classification <- function(
-  x, dataset,
-  probability_prefix = "probability_", ...
-) {
+                                               x, dataset,
+                                               probability_prefix = "probability_", ...) {
   sc <- spark_connection(x$model)
   probability_prefix <- cast_string(probability_prefix)
 
-  if (missing(dataset) || rlang::is_null(dataset))
+  if (missing(dataset) || rlang::is_null(dataset)) {
     dataset <- x$dataset
+  }
 
   predictions <- x$pipeline_model %>%
     ml_transform(dataset)
@@ -142,8 +147,9 @@ ml_predict.ml_model_classification <- function(
 #' @export
 ml_predict.ml_model_clustering <- function(x, dataset, ...) {
   # when dataset is not supplied, attempt to use original dataset
-  if (missing(dataset) || rlang::is_null(dataset))
+  if (missing(dataset) || rlang::is_null(dataset)) {
     dataset <- x$dataset
+  }
 
   x$pipeline_model %>%
     ml_transform(dataset)
@@ -152,8 +158,9 @@ ml_predict.ml_model_clustering <- function(x, dataset, ...) {
 #' @export
 ml_predict.ml_model_recommendation <- function(x, dataset, ...) {
   # when dataset is not supplied, attempt to use original dataset
-  if (missing(dataset) || rlang::is_null(dataset))
+  if (missing(dataset) || rlang::is_null(dataset)) {
     dataset <- x$dataset
+  }
 
   x$pipeline_model %>%
     ml_transform(dataset)
@@ -206,4 +213,3 @@ sdf_fit_and_transform <- function(x, estimator, ...) {
   .Deprecated("ml_fit_and_transform")
   ml_fit_and_transform(estimator, sdf_register(x))
 }
-

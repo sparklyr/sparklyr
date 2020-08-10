@@ -19,8 +19,7 @@ spark_yarn_get_conf_property <- function(property, fails = TRUE) {
   yarnPropertyValue <- xml2::xml_text(xml2::xml_find_all(
     yarnSiteXml,
     paste0("//name[.='", property, "']/parent::property/value")
-  )
-  )
+  ))
 
   get_variables_in_value_strings <- function(strings) {
     var.regex <- "\\$\\{([^$]+)\\}"
@@ -28,7 +27,9 @@ spark_yarn_get_conf_property <- function(property, fails = TRUE) {
     lapply(seq_along(parsed), function(j) {
       p <- parsed[[j]]
       unlist(sapply(seq_along(p), function(i) {
-        if (p[i] == -1) return(NULL)
+        if (p[i] == -1) {
+          return(NULL)
+        }
         st <- attr(p, "capture.start")[i, ]
         substring(strings[j], st, st + attr(p, "capture.length")[i, ] - 1)
       }))
@@ -40,8 +41,7 @@ spark_yarn_get_conf_property <- function(property, fails = TRUE) {
       value <- xml2::xml_text(xml2::xml_find_all(
         yarnSiteXml,
         paste0("//name[.='", var, "']/parent::property/value")
-      )
-      )
+      ))
 
       yarnPropertyValue <- gsub(paste0("${", var, "}"), value, yarnPropertyValue, fixed = TRUE)
     }

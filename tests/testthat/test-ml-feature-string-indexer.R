@@ -41,7 +41,6 @@ test_that("ft_string_indexer() works", {
 })
 
 test_that("ft_index_to_string() works", {
-
   sc <- testthat_spark_connection()
   df_tbl <- testthat_tbl("df")
   s1 <- df_tbl %>%
@@ -62,9 +61,11 @@ test_that("ft_index_to_string() works", {
 
   expect_equal(
     ml_params(its, list("input_col", "output_col", "labels")),
-    list(input_col = "indexed",
-         output_col = "string",
-         labels = list("foo", "bar"))
+    list(
+      input_col = "indexed",
+      output_col = "string",
+      labels = list("foo", "bar")
+    )
   )
 })
 
@@ -72,9 +73,10 @@ test_that("ft_string_indexer respects `string_order_type`", {
   test_requires_version("2.3.0", "string_order_type supported in Spark 2.3")
   sc <- testthat_spark_connection()
   df_tbl <- testthat_tbl("df")
-  expect_identical(df_tbl %>%
-    ft_string_indexer("string", "indexed", string_order_type = "alphabetAsc") %>%
-    dplyr::pull(indexed),
+  expect_identical(
+    df_tbl %>%
+      ft_string_indexer("string", "indexed", string_order_type = "alphabetAsc") %>%
+      dplyr::pull(indexed),
     c(1, 0, 1, 1)
   )
 })

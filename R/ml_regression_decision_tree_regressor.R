@@ -20,7 +20,6 @@ ml_decision_tree_regressor.spark_connection <- function(x, formula = NULL, max_d
                                                         variance_col = NULL, features_col = "features", label_col = "label",
                                                         prediction_col = "prediction", uid = random_string("decision_tree_regressor_"),
                                                         ...) {
-
   .args <- list(
     max_depth = max_depth,
     max_bins = max_bins,
@@ -46,19 +45,24 @@ ml_decision_tree_regressor.spark_connection <- function(x, formula = NULL, max_d
     prediction_col = .args[["prediction_col"]]
   ) %>% (
     function(obj) {
-      do.call(invoke,
-              c(obj, "%>%", Filter(function(x) !is.null(x),
-                            list(
-                                 list("setCheckpointInterval", .args[["checkpoint_interval"]]),
-                                 list("setImpurity", .args[["impurity"]]),
-                                 list("setMaxBins", .args[["max_bins"]]),
-                                 list("setMaxDepth", .args[["max_depth"]]),
-                                 list("setMinInfoGain", .args[["min_info_gain"]]),
-                                 list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
-                                 list("setCacheNodeIds", .args[["cache_node_ids"]]),
-                                 list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
-                                 jobj_set_param_helper(obj, "setVarianceCol", .args[["variance_col"]], "2.0.0"),
-                                 jobj_set_param_helper(obj, "setSeed", .args[["seed"]])))))
+      do.call(
+        invoke,
+        c(obj, "%>%", Filter(
+          function(x) !is.null(x),
+          list(
+            list("setCheckpointInterval", .args[["checkpoint_interval"]]),
+            list("setImpurity", .args[["impurity"]]),
+            list("setMaxBins", .args[["max_bins"]]),
+            list("setMaxDepth", .args[["max_depth"]]),
+            list("setMinInfoGain", .args[["min_info_gain"]]),
+            list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
+            list("setCacheNodeIds", .args[["cache_node_ids"]]),
+            list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
+            jobj_set_param_helper(obj, "setVarianceCol", .args[["variance_col"]], "2.0.0"),
+            jobj_set_param_helper(obj, "setSeed", .args[["seed"]])
+          )
+        ))
+      )
     })
   new_ml_decision_tree_regressor(jobj)
 }
@@ -159,5 +163,6 @@ new_ml_decision_tree_regression_model <- function(jobj) {
     # `numNodes` is a def in Spark.
     num_nodes = function() invoke(jobj, "numNodes"),
     variance_col = possibly_null(invoke)(jobj, "getVarianceCol"),
-    class = "ml_decision_tree_regression_model")
+    class = "ml_decision_tree_regression_model"
+  )
 }

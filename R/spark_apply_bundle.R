@@ -2,15 +2,18 @@ spark_apply_packages <- function(packages) {
   db <- Sys.getenv("sparklyr.apply.packagesdb")
   if (nchar(db) == 0) {
     if (!exists("availablePackagesChache", envir = .globals)) {
-      db <- tryCatch({
-        available.packages()
-      }, error = function(e) {
-        warning(
-          "Failed to run 'available.packages()', using offline connection? ",
-          "See '?spark_apply' for details."
-        )
-        NULL
-      })
+      db <- tryCatch(
+        {
+          available.packages()
+        },
+        error = function(e) {
+          warning(
+            "Failed to run 'available.packages()', using offline connection? ",
+            "See '?spark_apply' for details."
+          )
+          NULL
+        }
+      )
 
       assign("availablePackagesChache", db, envir = .globals)
     }
@@ -35,9 +38,9 @@ spark_apply_bundle_path <- function() {
 spark_apply_bundle_file <- function(packages, base_path, session_id = NULL) {
   file.path(
     base_path,
-    if (isTRUE(packages))
+    if (isTRUE(packages)) {
       do.call(paste, as.list(c("packages", session_id, "tar", sep = ".")))
-    else
+    } else {
       paste(
         substr(
           digest::digest(
@@ -50,6 +53,7 @@ spark_apply_bundle_file <- function(packages, base_path, session_id = NULL) {
         "tar",
         sep = "."
       )
+    }
   )
 }
 
@@ -67,8 +71,9 @@ spark_apply_bundle <- function(packages = TRUE, base_path = getwd(), session_id 
 
   packagesTar <- spark_apply_bundle_file(packages, base_path, session_id)
 
-  if (!dir.exists(spark_apply_bundle_path()))
+  if (!dir.exists(spark_apply_bundle_path())) {
     dir.create(spark_apply_bundle_path(), recursive = TRUE)
+  }
 
   args <- c(
     "-chf",
@@ -87,7 +92,8 @@ spark_apply_bundle <- function(packages = TRUE, base_path = getwd(), session_id 
               added_packages <<- c(added_packages, p)
               p
             }
-          })) %>% unlist()
+          })
+        ) %>% unlist()
 
         if (length(sublib_packages) > 0) c("-C", e, sublib_packages) else NULL
       }) %>% unlist()
@@ -123,7 +129,8 @@ get_spark_apply_bundle_path <- function(sc, packages) {
           sc,
           "org.apache.spark.SparkFiles",
           "get",
-          basename(bundle_path))
+          basename(bundle_path)
+        )
       )
 
       if (!bundle_was_added) {

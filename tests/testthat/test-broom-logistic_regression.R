@@ -11,9 +11,13 @@ test_that("logistic_regression.tidy() works", {
     ml_logistic_regression(Species ~ Sepal_Length + Petal_Length) %>%
     tidy()
 
-  check_tidy(td1, exp.row = 3, exp.col = 4,
-             exp.names = c("features", "versicolor_coef",
-                           "virginica_coef", "setosa_coef"))
+  check_tidy(td1,
+    exp.row = 3, exp.col = 4,
+    exp.names = c(
+      "features", "versicolor_coef",
+      "virginica_coef", "setosa_coef"
+    )
+  )
   expect_equal(td1$versicolor_coef, c(15.26, -5.07, 7.7), tolerance = 0.01, scale = 1)
 
   # for binary classification
@@ -22,10 +26,11 @@ test_that("logistic_regression.tidy() works", {
     ml_logistic_regression(Species ~ Sepal_Length + Petal_Length) %>%
     tidy()
 
-  check_tidy(td2, exp.row = 3, exp.col = 2,
-             exp.names = c("features", "coefficients"))
+  check_tidy(td2,
+    exp.row = 3, exp.col = 2,
+    exp.names = c("features", "coefficients")
+  )
   expect_equal(td2$coefficients, c(-39.84, -4.023, 13.31), tolerance = 0.01, scale = 1)
-
 })
 
 test_that("logistic_regression.augment() works", {
@@ -39,9 +44,13 @@ test_that("logistic_regression.augment() works", {
     augment() %>%
     dplyr::collect()
 
-  check_tidy(au1, exp.row = nrow(iris),
-             exp.name = c(dplyr::tbl_vars(iris_tbl),
-                          ".predicted_label"))
+  check_tidy(au1,
+    exp.row = nrow(iris),
+    exp.name = c(
+      dplyr::tbl_vars(iris_tbl),
+      ".predicted_label"
+    )
+  )
 
 
   # with newdata
@@ -50,9 +59,13 @@ test_that("logistic_regression.augment() works", {
     augment(newdata = head(iris_tbl, 25)) %>%
     dplyr::collect()
 
-  check_tidy(au2, exp.row = 25,
-             exp.name = c(dplyr::tbl_vars(iris_tbl),
-                          ".predicted_label"))
+  check_tidy(au2,
+    exp.row = 25,
+    exp.name = c(
+      dplyr::tbl_vars(iris_tbl),
+      ".predicted_label"
+    )
+  )
 })
 
 test_that("logistic_regression.glance() works", {
@@ -64,7 +77,8 @@ test_that("logistic_regression.glance() works", {
     ml_logistic_regression(Species ~ Sepal_Length + Petal_Length) %>%
     glance()
 
-  check_tidy(gl1, exp.row = 1,
-             exp.names = c("elastic_net_param", "lambda"))
-
+  check_tidy(gl1,
+    exp.row = 1,
+    exp.names = c("elastic_net_param", "lambda")
+  )
 })

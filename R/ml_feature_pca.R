@@ -18,7 +18,6 @@ ft_pca <- function(x, input_col = NULL, output_col = NULL, k = NULL,
 #' @export
 ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = NULL,
                                     uid = random_string("pca_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -41,7 +40,6 @@ ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = 
 #' @export
 ft_pca.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, k = NULL,
                                uid = random_string("pca_"), ...) {
-
   stage <- ft_pca.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -51,13 +49,11 @@ ft_pca.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, k = NULL,
     ...
   )
   ml_add_stage(x, stage)
-
 }
 
 #' @export
 ft_pca.tbl_spark <- function(x, input_col = NULL, output_col = NULL, k = NULL,
                              uid = random_string("pca_"), ...) {
-
   stage <- ft_pca.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -67,10 +63,11 @@ ft_pca.tbl_spark <- function(x, input_col = NULL, output_col = NULL, k = NULL,
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_pca <- function(jobj) {
@@ -82,7 +79,8 @@ new_ml_pca_model <- function(jobj) {
     jobj,
     explained_variance = possibly_null(~ read_spark_vector(jobj, "explainedVariance"))(),
     pc = possibly_null(~ read_spark_matrix(jobj, "pc"))(),
-    class = "ml_pca_model")
+    class = "ml_pca_model"
+  )
 }
 
 validator_ml_pca <- function(.args) {
@@ -117,12 +115,13 @@ ml_pca <- function(x,
                    features = tbl_vars(x),
                    k = length(features),
                    pc_prefix = "PC",
-                   ...)
-{
+                   ...) {
   # If being used as a constructor alias for `ft_pca()`:
-  if (inherits(x, "spark_connection")) return(
-    rlang::exec("ft_pca.spark_connection", !!!rlang::dots_list(x = x, ...))
-  )
+  if (inherits(x, "spark_connection")) {
+    return(
+      rlang::exec("ft_pca.spark_connection", !!!rlang::dots_list(x = x, ...))
+    )
+  }
 
   k <- cast_scalar_integer(k)
 
@@ -167,7 +166,6 @@ ml_pca <- function(x,
 
 #' @export
 print.ml_model_pca <- function(x, ...) {
-
   cat("Explained variance:", sep = "\n")
   if (is.null(x$explained_variance)) {
     cat("[not available in this version of Spark]", sep = "\n")
@@ -180,4 +178,3 @@ print.ml_model_pca <- function(x, ...) {
   cat("Rotation:", sep = "\n")
   print(x$pc)
 }
-

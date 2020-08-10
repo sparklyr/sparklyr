@@ -59,7 +59,6 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
                                                      input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
                                                      handle_invalid = "error", relative_error = 0.001,
                                                      uid = random_string("quantile_discretizer_"), ...) {
-
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -137,10 +136,11 @@ ft_quantile_discretizer.tbl_spark <- function(x, input_col = NULL, output_col = 
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_quantile_discretizer <- function(jobj) {
@@ -150,8 +150,9 @@ new_ml_quantile_discretizer <- function(jobj) {
 validator_ml_quantile_discretizer <- function(.args) {
   .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
 
-  if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]]))
+  if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]])) {
     stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
+  }
   .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
   .args[["num_buckets"]] <- cast_scalar_integer(.args[["num_buckets"]])

@@ -1,7 +1,8 @@
 new_ml_model_naive_bayes <- function(pipeline_model, formula, dataset, label_col,
-                                      features_col, predicted_label_col) {
+                                     features_col, predicted_label_col) {
   m <- new_ml_model_classification(
-    pipeline_model, formula, dataset = dataset,
+    pipeline_model, formula,
+    dataset = dataset,
     label_col = label_col, features_col = features_col,
     predicted_label_col = predicted_label_col,
     class = "ml_model_naive_bayes"
@@ -30,7 +31,7 @@ print.ml_model_naive_bayes <- function(x, ...) {
   print_newline()
 
   printf("Conditional probabilities:\n")
-  print(exp(x$theta[order(row.names(x$theta)),]))
+  print(exp(x$theta[order(row.names(x$theta)), ]))
   print_newline()
 
   x

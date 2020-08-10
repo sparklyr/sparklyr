@@ -32,11 +32,13 @@ test_that("the implementation of 'filter' functions as expected", {
       select(Species) %>%
       collect(),
     iris %>%
-      transmute(Sepal_Length = `Sepal.Length`,
-                Sepal_Width = `Sepal.Width`,
-                Petal_Length = `Petal.Length`,
-                Petal_Width = `Petal.Width`,
-                Species = Species) %>%
+      transmute(
+        Sepal_Length = `Sepal.Length`,
+        Sepal_Width = `Sepal.Width`,
+        Petal_Length = `Petal.Length`,
+        Petal_Width = `Petal.Width`,
+        Species = Species
+      ) %>%
       filter(Sepal_Length == 5.1) %>%
       filter(Sepal_Width == 3.5) %>%
       filter(Petal_Length == 1.4) %>%
@@ -53,11 +55,12 @@ test_that("grepl works as expected", {
   )
   verify_equivalent <- function(actual, expected) {
     # handle an edge case for arrow-enabled Spark connection
-    for (col in colnames(df2))
+    for (col in colnames(df2)) {
       expect_equivalent(
         as.character(actual[[col]]),
         as.character(expected[[col]])
       )
+    }
   }
   for (regex in regexes) {
     verify_equivalent(
@@ -142,7 +145,6 @@ test_that("'sample_n' and 'sample_frac' work in nontrivial queries (#1299)", {
     iris_tbl %>% sample_n(10) %>% collect() %>% nrow(),
     nrow(iris)
   )
-
 })
 
 test_that("'sdf_broadcast' forces broadcast hash join", {

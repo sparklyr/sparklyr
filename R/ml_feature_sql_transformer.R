@@ -25,7 +25,6 @@ ml_sql_transformer <- ft_sql_transformer
 #' @export
 ft_sql_transformer.spark_connection <- function(x, statement = NULL,
                                                 uid = random_string("sql_transformer_"), ...) {
-
   .args <- list(
     statement = statement,
     uid = uid
@@ -35,7 +34,8 @@ ft_sql_transformer.spark_connection <- function(x, statement = NULL,
 
   jobj <- invoke_new(
     x, "org.apache.spark.ml.feature.SQLTransformer",
-    .args[["uid"]]) %>%
+    .args[["uid"]]
+  ) %>%
     jobj_set_param("setStatement", .args[["statement"]])
 
   new_ml_sql_transformer(jobj)
@@ -44,7 +44,6 @@ ft_sql_transformer.spark_connection <- function(x, statement = NULL,
 #' @export
 ft_sql_transformer.ml_pipeline <- function(x, statement = NULL,
                                            uid = random_string("sql_transformer_"), ...) {
-
   stage <- ft_sql_transformer.spark_connection(
     x = spark_connection(x),
     statement = statement,
@@ -57,7 +56,6 @@ ft_sql_transformer.ml_pipeline <- function(x, statement = NULL,
 #' @export
 ft_sql_transformer.tbl_spark <- function(x, statement = NULL,
                                          uid = random_string("sql_transformer_"), ...) {
-
   stage <- ft_sql_transformer.spark_connection(
     x = spark_connection(x),
     statement = statement,
@@ -75,10 +73,11 @@ new_ml_sql_transformer <- function(jobj) {
 
 ft_extract_sql <- function(x) {
   get_base_name <- function(o) {
-    if (!inherits(o$x, "ident"))
+    if (!inherits(o$x, "ident")) {
       get_base_name(o$x)
-    else
+    } else {
       o$x
+    }
   }
   pattern <- paste0("\\b", get_base_name(x$ops), "\\b")
 
@@ -103,7 +102,6 @@ ft_dplyr_transformer <- function(x, tbl,
 #' @export
 ft_dplyr_transformer.spark_connection <- function(x, tbl,
                                                   uid = random_string("dplyr_transformer_"), ...) {
-
   if (!identical(class(tbl)[1], "tbl_spark")) stop("'tbl' must be a Spark table")
   ft_sql_transformer(x, ft_extract_sql(tbl), uid = uid)
 }
@@ -111,7 +109,6 @@ ft_dplyr_transformer.spark_connection <- function(x, tbl,
 #' @export
 ft_dplyr_transformer.ml_pipeline <- function(x, tbl,
                                              uid = random_string("dplyr_transformer_"), ...) {
-
   stage <- ft_dplyr_transformer.spark_connection(
     x = spark_connection(x),
     tbl = tbl,
@@ -124,7 +121,6 @@ ft_dplyr_transformer.ml_pipeline <- function(x, tbl,
 #' @export
 ft_dplyr_transformer.tbl_spark <- function(x, tbl,
                                            uid = random_string("dplyr_transformer_"), ...) {
-
   stage <- ft_dplyr_transformer.spark_connection(
     x = spark_connection(x),
     tbl = tbl,

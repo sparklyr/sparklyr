@@ -11,10 +11,11 @@ spark_partition_register_df <- function(sc, df, name, repartition, memory) {
   }
 
   if (!name %in% dbListTables(sc)) {
-    if (spark_version(sc) < "2.0.0")
+    if (spark_version(sc) < "2.0.0") {
       invoke(df, "registerTempTable", name)
-    else
+    } else {
       invoke(df, "createOrReplaceTempView", name)
+    }
   }
 
   if (memory) {
@@ -34,13 +35,15 @@ spark_remove_table_if_exists <- function(sc, name) {
 }
 
 spark_source_from_ops <- function(x) {
-  classList <- lapply(x, function(e) { attr(e, "class") } )
+  classList <- lapply(x, function(e) {
+    attr(e, "class")
+  })
 
   if (!all(lapply(classList, function(e) !("src" %in% e) || ("src_spark" %in% e)) == TRUE)) {
     stop("This operation does not support multiple remote sources")
   }
 
-  Filter(function(e) "src_spark" %in% attr(e, "class") , x)[[1]]
+  Filter(function(e) "src_spark" %in% attr(e, "class"), x)[[1]]
 }
 
 #' @importFrom dbplyr sql_render

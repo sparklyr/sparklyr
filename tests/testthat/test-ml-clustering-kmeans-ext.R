@@ -24,8 +24,10 @@ test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
 
   set.seed(123)
   iris <- iris %>%
-    rename(Sepal_Length = Sepal.Length,
-           Petal_Length = Petal.Length)
+    rename(
+      Sepal_Length = Sepal.Length,
+      Petal_Length = Petal.Length
+    )
 
   R <- iris %>%
     select(Sepal_Length, Petal_Length) %>%
@@ -33,7 +35,7 @@ test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
 
   S <- iris_tbl %>%
     select(Sepal_Length, Petal_Length) %>%
-    ml_kmeans(~ ., k = 3L)
+    ml_kmeans(~., k = 3L)
 
   lhs <- as.matrix(R$centers)
   rhs <- as.matrix(S$centers)
@@ -43,7 +45,6 @@ test_that("'ml_kmeans' and 'kmeans' produce similar fits", {
   lhs <- lhs[order(lhs[, 1]), ]
   rhs <- rhs[order(rhs[, 1]), ]
   expect_equivalent(lhs, rhs)
-
 })
 
 test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)", {
@@ -52,8 +53,10 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
 
   set.seed(123)
   iris <- iris %>%
-    rename(Sepal_Length = Sepal.Length,
-           Petal_Length = Petal.Length)
+    rename(
+      Sepal_Length = Sepal.Length,
+      Petal_Length = Petal.Length
+    )
 
   R <- iris %>%
     select(Sepal_Length, Petal_Length) %>%
@@ -71,18 +74,19 @@ test_that("'ml_kmeans' supports 'features' argument for backwards compat (#1150)
   lhs <- lhs[order(lhs[, 1]), ]
   rhs <- rhs[order(rhs[, 1]), ]
   expect_equivalent(lhs, rhs)
-
 })
 
 test_that("ml_kmeans() works properly", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, k = 5, seed = 11)
-  expect_equal(ml_predict(iris_kmeans, iris_tbl) %>%
-                 dplyr::distinct(prediction) %>%
-                 dplyr::arrange(prediction) %>%
-                 dplyr::pull(prediction),
-               0:4)
+  expect_equal(
+    ml_predict(iris_kmeans, iris_tbl) %>%
+      dplyr::distinct(prediction) %>%
+      dplyr::arrange(prediction) %>%
+      dplyr::pull(prediction),
+    0:4
+  )
 })
 
 test_that("ml_compute_cost() for kmeans", {
@@ -93,18 +97,20 @@ test_that("ml_compute_cost() for kmeans", {
 
   version <- spark_version(sc)
 
-  if (version >= "3.0.0"){
+  if (version >= "3.0.0") {
     expect_error(ml_compute_cost(iris_kmeans, iris_tbl))
   } else {
     expect_equal(
       ml_compute_cost(iris_kmeans, iris_tbl),
-      46.7123, tolerance = 0.01, scale = 1
+      46.7123,
+      tolerance = 0.01, scale = 1
     )
     expect_equal(
       iris_tbl %>%
         ft_r_formula(~ . - Species) %>%
         ml_compute_cost(iris_kmeans$model, .),
-      46.7123, tolerance = 0.01, scale = 1
+      46.7123,
+      tolerance = 0.01, scale = 1
     )
   }
 })
