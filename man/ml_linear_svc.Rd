@@ -104,6 +104,7 @@ pred <- ml_predict(svc_model, iris_test)
 
 ml_binary_classification_evaluator(pred)
 }
+
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for

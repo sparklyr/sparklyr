@@ -43,14 +43,13 @@ Writes a Spark dataframe stream into a JSON stream.
 sc <- spark_connect(master = "local")
 
 dir.create("json-in")
-jsonlite::write_json(list(a = c(1,2), b = c(10,20)), "json-in/data.json")
+jsonlite::write_json(list(a = c(1, 2), b = c(10, 20)), "json-in/data.json")
 
 json_path <- file.path("file://", getwd(), "json-in")
 
 stream <- stream_read_json(sc, json_path) \%>\% stream_write_json("json-out")
 
 stream_stop(stream)
-
 }
 
 }

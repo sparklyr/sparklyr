@@ -35,8 +35,8 @@ df <- tibble::tibble(
 sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
 
 all_positive_tbl <- sdf \%>\%
- hof_forall(pred = ~ .x > 0, expr = y, dest_col = all_positive) \%>\%
- dplyr::select(all_positive)
+  hof_forall(pred = ~ .x > 0, expr = y, dest_col = all_positive) \%>\%
+  dplyr::select(all_positive)
 }
 
 }

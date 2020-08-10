@@ -33,15 +33,17 @@ iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 
 # aggregating by mean
 iris_tbl \%>\%
-  mutate(Petal_Width = ifelse(Petal_Width > 1.5, "High", "Low" )) \%>\%
+  mutate(Petal_Width = ifelse(Petal_Width > 1.5, "High", "Low")) \%>\%
   sdf_pivot(Petal_Width ~ Species,
-            fun.aggregate = list(Petal_Length = "mean"))
+    fun.aggregate = list(Petal_Length = "mean")
+  )
 
 # aggregating all observations in a list
 iris_tbl \%>\%
-  mutate(Petal_Width = ifelse(Petal_Width > 1.5, "High", "Low" )) \%>\%
+  mutate(Petal_Width = ifelse(Petal_Width > 1.5, "High", "Low")) \%>\%
   sdf_pivot(Petal_Width ~ Species,
-            fun.aggregate = list(Petal_Length = "collect_list"))
+    fun.aggregate = list(Petal_Length = "collect_list")
+  )
 }
 
 }

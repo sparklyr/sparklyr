@@ -38,7 +38,6 @@ sdf_len(sc, 10) \%>\% spark_write_orc("orc-in")
 stream <- stream_read_orc(sc, "orc-in") \%>\% stream_write_orc("orc-out")
 
 stream_stop(stream)
-
 }
 
 }

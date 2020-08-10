@@ -34,7 +34,6 @@ text_path <- file.path("file://", getwd(), "text-in")
 stream <- stream_read_text(sc, text_path) \%>\% stream_write_text("text-out")
 
 stream_stop(stream)
-
 }
 
 }

@@ -37,7 +37,6 @@ stream <- stream_read_delta(sc, "delta-test") \%>\%
   stream_write_json("json-out")
 
 stream_stop(stream)
-
 }
 
 }

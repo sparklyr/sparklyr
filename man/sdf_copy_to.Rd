@@ -53,7 +53,6 @@ implementing the associated method on \code{sdf_import}.
 
 sc <- spark_connect(master = "spark://HOST:PORT")
 sdf_copy_to(sc, iris)
-
 }
 \seealso{
 Other Spark data frames: 

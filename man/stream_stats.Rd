@@ -26,7 +26,7 @@ sdf_len(sc, 10) \%>\%
   spark_write_parquet(path = "parquet-in")
 
 stream <- stream_read_parquet(sc, "parquet-in") \%>\%
- stream_write_parquet("parquet-out")
+  stream_write_parquet("parquet-out")
 
 stream_stats(stream)
 }

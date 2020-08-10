@@ -50,7 +50,6 @@ stream <- stream_read_kafka(sc, options = read_options) \%>\%
   stream_write_kafka(options = write_options)
 
 stream_stop(stream)
-
 }
 
 }

@@ -56,9 +56,11 @@ sc <- spark_connect(master = "local")
 iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 
 iris_tbl \%>\%
-  ft_binarizer(input_col  = "Sepal_Length",
-               output_col = "Sepal_Length_bin",
-               threshold  = 5) \%>\%
+  ft_binarizer(
+    input_col = "Sepal_Length",
+    output_col = "Sepal_Length_bin",
+    threshold = 5
+  ) \%>\%
   select(Sepal_Length, Sepal_Length_bin, Species)
 }
 
