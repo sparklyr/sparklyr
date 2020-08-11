@@ -17,8 +17,8 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::depr
   }
 
   .key <- check_key(.key)
+  group_vars <- dplyr::group_vars(.data)
   if (missing(...)) {
-    group_vars <- dplyr::group_vars(.data)
     if (length(group_vars) > 0) {
       nested_cols <- list(data = setdiff(colnames(.data), group_vars))
     } else {
@@ -59,9 +59,12 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::depr
   )
   names(nesting_sql) <- names(nested_cols)
 
-  out <- do.call(dplyr::group_by, append(list(.data), lapply(non_nested_cols, as.symbol)))
+  out <- dplyr::ungroup(.data)
+  out <- do.call(dplyr::group_by, append(list(out), lapply(non_nested_cols, as.symbol)))
   out <- do.call(dplyr::summarize, append(list(out), nesting_sql))
   output_cols <- c(non_nested_cols, names(nested_cols))
+  group_vars <- intersect(group_vars, output_cols)
+  out <- do.call(dplyr::group_by, append(list(out), lapply(group_vars, as.symbol)))
   out <- do.call(dplyr::select, append(list(out), lapply(output_cols, as.symbol)))
 
   out
