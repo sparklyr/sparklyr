@@ -72,7 +72,7 @@ iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 
 iris_tbl \%>\%
   select(-Species) \%>\%
-  ml_bisecting_kmeans(k = 4 , Species ~ .)
+  ml_bisecting_kmeans(k = 4, Species ~ .)
 }
 
 }

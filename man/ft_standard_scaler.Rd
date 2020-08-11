@@ -64,11 +64,15 @@ iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 features <- c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width")
 
 iris_tbl \%>\%
-  ft_vector_assembler(input_col = features,
-                      output_col = "features_temp") \%>\%
-  ft_standard_scaler(input_col = "features_temp",
-                     output_col = "features",
-                     with_mean = TRUE)
+  ft_vector_assembler(
+    input_col = features,
+    output_col = "features_temp"
+  ) \%>\%
+  ft_standard_scaler(
+    input_col = "features_temp",
+    output_col = "features",
+    with_mean = TRUE
+  )
 }
 
 }

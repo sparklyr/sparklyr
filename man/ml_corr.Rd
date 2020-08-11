@@ -28,6 +28,6 @@ iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 
 features <- c("Petal_Width", "Petal_Length", "Sepal_Length", "Sepal_Width")
 
-ml_corr(iris_tbl, columns = features , method = "pearson")
+ml_corr(iris_tbl, columns = features, method = "pearson")
 }
 }

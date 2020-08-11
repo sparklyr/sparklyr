@@ -27,7 +27,7 @@ SystemRequirements: Spark: 1.6.x or 2.x
 URL: http://spark.rstudio.com
 BugReports: https://github.com/sparklyr/sparklyr/issues
 LazyData: TRUE
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Depends:
     R (>= 3.2)
 Imports:
@@ -43,6 +43,7 @@ Imports:
     globals,
     httr (>= 1.2.1),
     jsonlite (>= 1.4),
+    lifecycle,
     methods,
     openssl (>= 0.8),
     purrr,
@@ -284,6 +285,7 @@ Collate:
     'tidiers_pca.R'
     'tidiers_utils.R'
     'tidyr_utils.R'
+    'tidyr_nest.R'
     'tidyr_separate.R'
     'tidyr_unite.R'
     'worker_apply.R'

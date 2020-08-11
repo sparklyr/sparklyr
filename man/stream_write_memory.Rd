@@ -49,7 +49,6 @@ csv_path <- file.path("file://", getwd(), "csv-in")
 stream <- stream_read_csv(sc, csv_path) \%>\% stream_write_memory("csv-out")
 
 stream_stop(stream)
-
 }
 
 }

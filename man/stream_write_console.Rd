@@ -34,12 +34,13 @@ Writes a Spark dataframe stream into console logs.
 
 sc <- spark_connect(master = "local")
 
-sdf_len(sc, 10) \%>\% dplyr::transmute(text = as.character(id)) \%>\% spark_write_text("text-in")
+sdf_len(sc, 10) \%>\%
+  dplyr::transmute(text = as.character(id)) \%>\%
+  spark_write_text("text-in")
 
 stream <- stream_read_text(sc, "text-in") \%>\% stream_write_console()
 
 stream_stop(stream)
-
 }
 
 }

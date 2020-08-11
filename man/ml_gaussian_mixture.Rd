@@ -75,6 +75,7 @@ gmm_model <- ml_gaussian_mixture(iris_tbl, Species ~ .)
 pred <- sdf_predict(iris_tbl, gmm_model)
 ml_clustering_evaluator(pred)
 }
+
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for

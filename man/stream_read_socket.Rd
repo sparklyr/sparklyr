@@ -33,7 +33,6 @@ sc <- spark_connect(master = "local")
 # Start socket server from terminal, example: nc -lk 9999
 stream <- stream_read_socket(sc, options = list(host = "localhost", port = 9999))
 stream
-
 }
 
 }

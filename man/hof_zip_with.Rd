@@ -40,7 +40,8 @@ copy_to(
   tibble::tibble(
     left = list(1:5, 21:25),
     right = list(6:10, 16:20),
-    res = c(0, 0))
+    res = c(0, 0)
+  )
 ) \%>\%
   hof_zip_with(~ .x * .y)
 }

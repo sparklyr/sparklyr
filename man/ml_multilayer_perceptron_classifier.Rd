@@ -123,7 +123,7 @@ When \code{x} is a \code{tbl_spark} and \code{formula} (alternatively, \code{res
 }
 \examples{
 \dontrun{
-sc <-  spark_connect(master = "local")
+sc <- spark_connect(master = "local")
 
 iris_tbl <- sdf_copy_to(sc, iris, name = "iris_tbl", overwrite = TRUE)
 partitions <- iris_tbl \%>\%
@@ -133,12 +133,13 @@ iris_training <- partitions$training
 iris_test <- partitions$test
 
 mlp_model <- iris_training \%>\%
-  ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4,3,3))
+  ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4, 3, 3))
 
 pred <- ml_predict(mlp_model, iris_test)
 
 ml_multiclass_classification_evaluator(pred)
 }
+
 }
 \seealso{
 See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
