@@ -121,7 +121,7 @@ test_that("nesting works for empty data frames", {
   out <- tidyr::nest(sdf, data = c(x, y)) %>% collect()
 
   expect_named(out, "data")
-  expect_equivalent(out, tibble::tibble(data = list(list())))
+  expect_equivalent(out, tibble::tibble(data = list(NA)))
 })
 
 test_that("can nest multiple columns", {
