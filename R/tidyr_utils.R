@@ -44,3 +44,18 @@ strip_names <- function(df, base, names_sep) {
 
   rlang::set_names(df, names)
 }
+
+# Given a list of column names possibly containing duplicates and a valid tibble
+# name-repair strategy, apply that strategy to the column names and return the
+# result. For compatibility with Spark SQL, all '.'s in column names will be
+# replaced with '_'.
+repair_names <- function(col_names, names_repair) {
+  args <- as.list(rep(NA, length(col_names)))
+  names(args) <- col_names
+  args <- append(args, list(.name_repair = names_repair))
+
+  do.call(tibble::tibble, args) %>%
+    names() %>%
+    lapply(function(x) gsub("\\.", "_", x)) %>%
+    unlist()
+}

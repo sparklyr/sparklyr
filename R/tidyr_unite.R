@@ -25,7 +25,7 @@ unite.tbl_spark <- function(data, col, ..., sep = "_", remove = TRUE, na.rm = FA
   concat_ws_args <- lapply(
     src_cols,
     function(col) {
-      col <- quote_column_name(col)
+      col <- quote_sql_name(col)
       if (!na.rm) {
         paste0("IF(ISNULL(", col, "), \"NA\", ", col, ")")
       } else {

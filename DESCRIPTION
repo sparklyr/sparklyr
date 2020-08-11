@@ -289,6 +289,7 @@ Collate:
     'tidyr_nest.R'
     'tidyr_separate.R'
     'tidyr_unite.R'
+    'tidyr_unnest.R'
     'worker_apply.R'
     'worker_connect.R'
     'worker_connection.R'
