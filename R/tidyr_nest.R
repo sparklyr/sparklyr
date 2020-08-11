@@ -65,6 +65,16 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::depr
   output_cols <- c(non_nested_cols, names(nested_cols))
   group_vars <- intersect(group_vars, output_cols)
   out <- do.call(dplyr::group_by, append(list(out), lapply(group_vars, as.symbol)))
+  handle_empty_lists_sql <- lapply(
+    names(nested_cols),
+    function(nested_col) {
+      nested_col <- quote_column_name(nested_col)
+      dplyr::sql(sprintf("IF(SIZE(%s) == 0, NULL, %s)", nested_col, nested_col))
+    }
+  )
+  names(handle_empty_lists_sql) <- names(nested_cols)
+  out <- do.call(dplyr::mutate, append(list(out), handle_empty_lists_sql))
+
   out <- do.call(dplyr::select, append(list(out), lapply(output_cols, as.symbol)))
 
   out
