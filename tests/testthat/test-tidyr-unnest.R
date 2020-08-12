@@ -63,3 +63,51 @@ test_that("grouping is preserved", {
 
   expect_equal(dplyr::group_vars(sdf), "g")
 })
+
+test_that("handling names_sep correctly", {
+  tbl <- tibble::tibble(
+    a = seq(3), b = c(1, -1, 4), c = 1
+  )
+  sdf.nested <- copy_to(sc, tbl, overwrite = TRUE) %>%
+    tidyr::nest(data = c(b, c))
+
+  for (sep in c(".", "_")) {
+    expect_equivalent(
+      sdf.nested %>%
+        tidyr::unnest(data, names_sep = sep) %>%
+        collect() %>%
+        dplyr::arrange(a),
+      tbl %>% dplyr::mutate(data_b = b, data_c = c) %>%
+        dplyr::select(a, data_b, data_c)
+    )
+  }
+})
+
+test_that("handling names_repair correctly", {
+  sdf.nested <- copy_to(
+    sc,
+    tibble::tibble(
+      a = seq(3), data_b = NA, data_c = NA, b = c(1, -1, 4), c = rep(1, 3)
+    )
+  ) %>%
+    tidyr::nest(data = c(b, c))
+
+  expect_error(
+    sdf.nested %>%
+      tidyr::unnest(data, names_sep = "_", names_repair = "check_unique"),
+    class = "tibble_error_column_names_must_be_unique"
+  )
+  expect_equivalent(
+    sdf.nested %>%
+      tidyr::unnest(data, names_sep = "_", names_repair = "universal") %>%
+      collect() %>%
+      dplyr::arrange(a),
+    tibble::tibble(
+      a = seq(3),
+      data_b___2 = NA,
+      data_c___3 = NA,
+      data_b___4 = c(1, -1, 4),
+      data_c___5 = 1
+    )
+  )
+})

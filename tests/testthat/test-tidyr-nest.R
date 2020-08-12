@@ -10,7 +10,6 @@ simple_sdf_2 <- testthat_tbl(
   data = tibble::tibble(x = 1:3, y = c("B", "A", "A"))
 )
 
-
 test_that("nest turns grouped values into one list-df", {
   test_requires_version("2.0.0")
 
