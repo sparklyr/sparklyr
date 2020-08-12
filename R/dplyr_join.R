@@ -12,6 +12,7 @@ NULL
 
 #' @rdname join.tbl_spark
 #' @export
+#' @importFrom dplyr inner_join
 inner_join.tbl_spark <-
   function(x,
            y,
@@ -33,6 +34,7 @@ inner_join.tbl_spark <-
 
 #' @rdname join.tbl_spark
 #' @export
+#' @importFrom dplyr left_join
 left_join.tbl_spark <-
   function(x,
            y,
@@ -54,6 +56,7 @@ left_join.tbl_spark <-
 
 #' @rdname join.tbl_spark
 #' @export
+#' @importFrom dplyr right_join
 right_join.tbl_spark <-
   function(x,
            y,
@@ -75,6 +78,7 @@ right_join.tbl_spark <-
 
 #' @rdname join.tbl_spark
 #' @export
+#' @importFrom dplyr full_join
 full_join.tbl_spark <-
   function(x,
            y,

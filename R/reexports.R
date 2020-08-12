@@ -30,3 +30,15 @@ NULL
 #' @export
 #' @importFrom dplyr collect
 NULL
+
+#' @export
+dplyr::inner_join
+
+#' @export
+dplyr::left_join
+
+#' @export
+dplyr::right_join
+
+#' @export
+dplyr::full_join

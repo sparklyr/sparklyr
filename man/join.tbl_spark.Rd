@@ -8,7 +8,7 @@
 \alias{full_join.tbl_spark}
 \title{Join Spark tbls.}
 \usage{
-inner_join.tbl_spark(
+\method{inner_join}{tbl_spark}(
   x,
   y,
   by = NULL,
@@ -19,7 +19,7 @@ inner_join.tbl_spark(
   sql_on = NULL
 )
 
-left_join.tbl_spark(
+\method{left_join}{tbl_spark}(
   x,
   y,
   by = NULL,
@@ -30,7 +30,7 @@ left_join.tbl_spark(
   sql_on = NULL
 )
 
-right_join.tbl_spark(
+\method{right_join}{tbl_spark}(
   x,
   y,
   by = NULL,
@@ -41,7 +41,7 @@ right_join.tbl_spark(
   sql_on = NULL
 )
 
-full_join.tbl_spark(
+\method{full_join}{tbl_spark}(
   x,
   y,
   by = NULL,
