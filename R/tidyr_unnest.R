@@ -19,14 +19,11 @@ unnest.tbl_spark <- function(data,
 
   cols <- tidyselect::eval_select(rlang::enquo(cols), columns(data)) %>%
     names()
-
   if (length(cols) == 0) return(data)
 
-  remote_name <- dbplyr::remote_name(data) %||% {
-    data <- dplyr::compute(data)
-    dbplyr::remote_name(data)
-  }
-
+  group_vars <- dplyr::group_vars(data)
+  data <- data %>% dplyr::compute() %>% dplyr::ungroup()
+  sc <- spark_connection(data)
   num_rows <- spark_dataframe(data) %>% invoke("count")
   schema <- data %>% sdf_schema(expand_nested_cols = TRUE)
 
@@ -71,7 +68,7 @@ unnest.tbl_spark <- function(data,
       struct_name <- quote_sql_name(col)
       for (nested_col in struct_fields[[col]]) {
         unnest_col_sql <- sprintf(
-          "EXPLODE(%s.%s) AS %s",
+          "EXPLODE_OUTER(%s.%s) AS %s",
           struct_name,
           quote_sql_name(nested_col),
           quote_sql_name(output_cols[[output_cols_idx]])
@@ -110,7 +107,7 @@ unnest.tbl_spark <- function(data,
     out <- dplyr::filter(out, no_empty_value_sql)
   }
   out <- out %>% dplyr::compute()
-  out_tbl <- out %>% dbplyr::remote_name() %>% quote_sql_name()
+  out_tbl <- out %>% ensure_tmp_view() %>% quote_sql_name()
 
   unnested_cols <- lapply(
     unnest_col_sqls,
@@ -130,5 +127,9 @@ unnest.tbl_spark <- function(data,
   )
 
   out <- do.call(sdf_fast_bind_cols, unnested_cols)
-  do.call(dplyr::select, append(list(out), lapply(output_cols, as.symbol)))
+  out <- do.call(dplyr::select, append(list(out), lapply(output_cols, as.symbol)))
+  group_vars <- intersect(setdiff(group_vars, cols), output_cols)
+  out <- do.call(dplyr::group_by, append(list(out), lapply( group_vars, as.symbol)))
+
+  out
 }
