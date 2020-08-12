@@ -116,6 +116,7 @@ Collate:
     'dplyr_do.R'
     'utils.R'
     'dplyr_hof.R'
+    'dplyr_join.R'
     'dplyr_spark.R'
     'dplyr_spark_connection.R'
     'dplyr_spark_data.R'
