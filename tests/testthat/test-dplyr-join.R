@@ -17,3 +17,48 @@ test_that("left_join works as expected", {
 
   expect_equivalent(j1, j2)
 })
+
+test_that("left_join works with default suffixes", {
+  test_requires("dplyr")
+
+  s1 <- data.frame(group = sample(c("A", "B"), size = 10, replace = T),
+                   value1 = rnorm(10),
+                   conflict = "df1")
+  s2 <- data.frame(group = c("A", "B"),
+                   conflict = "df2")
+
+  d1 <- copy_to(sc, s1, "test1", overwrite = TRUE)
+  d2 <- copy_to(sc, s2, "test2", overwrite = TRUE)
+
+  j1 <- left_join(d1, d2, by = "group")
+  j2 <- collect(j1)
+
+  expect_equal(colnames(j1), c("group","value1","conflict_x","conflict_y"))
+
+  expect_named(j2, c("group","value1","conflict_x","conflict_y"))
+
+})
+
+test_that("left_join works with user-supplied `.` suffixes", {
+  test_requires("dplyr")
+
+  s1 <- data.frame(group = sample(c("A", "B"), size = 10, replace = T),
+                   value1 = rnorm(10),
+                   conflict = "df1")
+  s2 <- data.frame(group = c("A", "B"),
+                   conflict = "df2")
+
+  d1 <- copy_to(sc, s1, "test1", overwrite = TRUE)
+  d2 <- copy_to(sc, s2, "test2", overwrite = TRUE)
+
+  j1 <- left_join(d1, d2, by = "group")
+  j2 <- collect(j1)
+
+  j3 <- left_join(d1, d2, by = "group", suffix = c(".table1",".table2"))
+  j4 <- left_join(d1, d2, by = "group", suffix = c("_table1","_table2"))
+
+  expect_equal(colnames(j3), colnames(j4))
+
+  expect_message(left_join(d1,d2, by = "group", suffix = c(".x",".y")),
+                 "Replacing '.' with '_' in suffixes. New suffixes: _x, _y")
+})
