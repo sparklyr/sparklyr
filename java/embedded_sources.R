@@ -459,7 +459,33 @@ spark_connect_gateway <- function(
   else {
     worker_log("is querying ports from backend using port ", gatewayPort)
 
-    gatewayPortsQuery <- query_gateway_for_port(gateway, sessionId, config, isStarting)
+    gateway_ports_query_attempts <- as.integer(
+      spark_config_value(config, "sparklyr.gateway.port.query.attempts", 3L)
+    )
+    gateway_ports_query_retry_interval_s <- as.integer(
+      spark_config_value(config, "sparklyr.gateway.port.query.retry.interval.seconds", 4L)
+    )
+    while (gateway_ports_query_attempts > 0) {
+      gateway_ports_query_attempts <- gateway_ports_query_attempts - 1
+      withCallingHandlers(
+        {
+          gatewayPortsQuery <- query_gateway_for_port(
+            gateway,
+            sessionId,
+            config,
+            isStarting
+          )
+          break
+        },
+        error = function(e) {
+          isStarting <- FALSE
+          if (gateway_ports_query_attempts > 0) {
+            Sys.sleep(gateway_ports_query_retry_interval_s)
+          }
+          NULL
+        }
+      )
+    }
     if (is.null(gatewayPortsQuery) && !isStarting) {
       close(gateway)
       return(NULL)
