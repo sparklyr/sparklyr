@@ -39,6 +39,12 @@ jobs:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.4.4'
               JAVA_VERSION: 'oraclejdk8'
+          - name: 'Spark 2.4.4 (R release, oraclejdk8, CODE_COVERAGE=true)'
+            r: 'release'
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '2.4.4'
+              JAVA_VERSION: 'oraclejdk8'
               CODE_COVERAGE: 'true'
           - name: 'Spark 3.0.0 (R release, oraclejdk8)'
             r: 'release'
@@ -160,7 +166,7 @@ jobs:
           export TZ='America/Los_Angeles'
 
           if [[ $CODE_COVERAGE == "true" ]]; then
-            Rscript ci/.ci.R --coverage
+            Rscript ci/.ci.R --coverage || :
           else
             Rscript ci/.ci.R --testthat
           fi
