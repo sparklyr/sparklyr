@@ -29,6 +29,8 @@ test_that("can keep empty rows", {
 })
 
 test_that("bad inputs generate errors", {
+  test_requires_version("2.0.0")
+
   expect_error(
     sdf_len(sc, 1) %>% tidyr::unnest(id),
     "Unnesting is only supported for struct type columns\\."
@@ -36,6 +38,8 @@ test_that("bad inputs generate errors", {
 })
 
 test_that("can unnest nested lists", {
+  test_requires_version("2.4.0")
+
   tbl <- tibble::tibble(
     a = c(1, 1, 2, 2, 3, 3, 3),
     b = lapply(seq(7), function(x) rep(1, x)),
@@ -56,6 +60,8 @@ test_that("can unnest nested lists", {
 })
 
 test_that("grouping is preserved", {
+  test_requires_version("2.0.0")
+
   sdf.nested <- copy_to(sc, tibble::tibble(g = 1, x = seq(3))) %>%
     tidyr::nest(x = x) %>%
     dplyr::group_by(g)
@@ -65,6 +71,8 @@ test_that("grouping is preserved", {
 })
 
 test_that("handling names_sep correctly", {
+  test_requires_version("2.0.0")
+
   tbl <- tibble::tibble(
     a = seq(3), b = c(1, -1, 4), c = 1
   )
@@ -84,6 +92,8 @@ test_that("handling names_sep correctly", {
 })
 
 test_that("handling names_repair correctly", {
+  test_requires_version("2.0.0")
+
   sdf.nested <- copy_to(
     sc,
     tibble::tibble(

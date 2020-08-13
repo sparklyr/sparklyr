@@ -68,7 +68,7 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::depr
   handle_empty_lists_sql <- lapply(
     names(nested_cols),
     function(nested_col) {
-      nested_col <- quote_column_name(nested_col)
+      nested_col <- quote_sql_name(nested_col)
       dplyr::sql(sprintf("IF(SIZE(%s) == 0, NULL, %s)", nested_col, nested_col))
     }
   )
