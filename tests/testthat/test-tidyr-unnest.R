@@ -33,7 +33,7 @@ test_that("bad inputs generate errors", {
 
   expect_error(
     sdf_len(sc, 1) %>% tidyr::unnest(id),
-    "Unnesting is only supported for struct type columns\\."
+    "`unnest.tbl_spark` is only supported for columns of type `array<struct<\\.\\*>>`"
   )
 })
 

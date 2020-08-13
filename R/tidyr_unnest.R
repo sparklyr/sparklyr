@@ -31,8 +31,10 @@ unnest.tbl_spark <- function(data,
   for (col in cols) {
     if (!is.list(schema[[col]]$type))
       paste0(
-        "Unnesting is only supported for struct type columns. ",
-        "Column '", col, "' is of type ", schema[[col]]$type
+        "`unnest.tbl_spark` is only supported for columns of type ",
+        "`array<struct<.*>>` (i.e., a column produced by a previous ",
+        "`nest.tbl_spark` operation. Column '", col, "' is of type ",
+        schema[[col]]$type
       ) %>%
         rlang::abort()
 
