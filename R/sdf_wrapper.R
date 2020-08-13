@@ -26,23 +26,44 @@ spark_dataframe.spark_connection <- function(x, sql = NULL, ...) {
 #' \href{http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.types.package}{Spark Scala API Documentation}
 #' for information on what types are available and exposed by Spark.
 #'
+#' @param expand_nested_cols Whether to expand columns containing nested array
+#' of structs (which are usually created by tidyr::nest on a Spark data frame)
+#'
 #' @return An \R \code{list}, with each \code{list} element describing the
 #'   \code{name} and \code{type} of a column.
 #'
 #' @template roxlate-ml-x
 #'
 #' @export
-sdf_schema <- function(x) {
-  jobj <- spark_dataframe(x)
-  schema <- invoke(jobj, "schema")
-  fields <- invoke(schema, "fields")
-  list <- lapply(fields, function(field) {
-    type <- invoke(invoke(field, "dataType"), "toString")
+sdf_schema <- function(x, expand_nested_cols = FALSE) {
+  x %>%
+    spark_dataframe() %>%
+    invoke("schema") %>%
+    struct_type_to_schema(expand_nested_cols)
+}
+
+is_struct_type_arr <- function(data_type_obj) {
+  invoke(data_type_obj, "catalogString") %>%
+    grepl("^array<struct<.*>>$", ., ignore.case = TRUE)
+}
+
+struct_type_to_schema <- function(x, expand_nested_cols) {
+  fields <- invoke(x, "fields")
+  fields_list <- lapply(fields, function(field) {
+    type <- {
+      data_type_obj <- invoke(field, "dataType")
+      if (expand_nested_cols && is_struct_type_arr(data_type_obj)) {
+        struct_type_to_schema(data_type_obj %>% invoke("elementType"), TRUE)
+      } else {
+        invoke(data_type_obj, "toString")
+      }
+    }
     name <- invoke(field, "name")
     list(name = name, type = type)
   })
-  names(list) <- unlist(lapply(list, `[[`, "name"))
-  list
+  names(fields_list) <- unlist(lapply(fields_list, `[[`, "name"))
+
+  fields_list
 }
 
 sdf_deserialize_column <- function(column, sc) {

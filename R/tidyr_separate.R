@@ -73,7 +73,7 @@ process_warnings <- function(out, substr_arr_col, n, extra, fill) {
       dplyr::compute(name = tmp_tbl_name)
     substr_arr_col_sql <- sprintf(
       "%s.%s",
-      quote_column_name(tmp_tbl_name),
+      quote_sql_name(tmp_tbl_name),
       substr_arr_col
     )
     if (identical(extra, "warn")) {
@@ -128,7 +128,7 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
 
   var <- tidyselect::vars_pull(colnames(data), !!rlang::enquo(col))
 
-  col <- quote_column_name(var)
+  col <- quote_sql_name(var)
   if (is.numeric(sep)) {
     sql <- strsep_to_sql(col, into, sep)
     out <- do.call(dplyr::mutate, append(list(data), sql))
@@ -136,7 +136,7 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
     substr_arr_col <- random_string("__tidyr_separate_tmp_")
     n <- length(into)
     split_str_sql <- str_split_fixed_to_sql(substr_arr_col, col, sep, n, extra, fill)
-    substr_arr_col <- quote_column_name(substr_arr_col)
+    substr_arr_col <- quote_sql_name(substr_arr_col)
     fill_left <- identical(fill, "left")
     assign_results_sql <- lapply(
       seq_along(into),
