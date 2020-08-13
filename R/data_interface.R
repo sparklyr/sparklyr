@@ -1,29 +1,28 @@
 #' @include avro_utils.R
 #' @include spark_apply.R
 
+gen_sdf_name <- function(path, config) {
+  path %>%
+    basename() %>%
+    tools::file_path_sans_ext() %>%
+    spark_sanitize_names(config) %>%
+    random_string()
+}
+
 # This function handles backward compatibility to support
 # unnamed datasets while not breaking sparklyr 0.9 param
 # signature. Returns a c(name, path) tuple.
 spark_read_compat_param <- function(sc, name, path) {
   if (is.null(name) && is.null(path)) {
     stop("The 'path' parameter must be specified.")
-  }
-  else if (identical(name, path)) {
+  } else if (identical(name, path)) {
     # This is an invalid use case, for 'spark_read_*(sc, "hello")';
     # however, for convenience and backwards compatibility we allow
     # to use the second parameter as the path.
-    c(
-      spark_sanitize_names(tools::file_path_sans_ext(basename(name)), sc$config),
-      name
-    )
-  }
-  else if (identical(name, NULL)) {
-    c(
-      spark_sanitize_names(tools::file_path_sans_ext(basename(path)), sc$config),
-      path
-    )
-  }
-  else {
+    c(gen_sdf_name(name, sc$config), name)
+  } else if (identical(name, NULL)) {
+    c(gen_sdf_name(path, sc$config), path)
+  } else {
     c(name, path)
   }
 }
