@@ -28,7 +28,7 @@ transpose_list <- function(list) {
 #' @param prefix A length-one character vector.
 #' @export
 random_string <- function(prefix = "table") {
-  basename(tempfile(prefix))
+  paste0(prefix, "_", gsub("-", "_", uuid::UUIDgenerate()))
 }
 
 printf <- function(fmt, ...) {

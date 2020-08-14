@@ -393,6 +393,36 @@ test_that("spark_write_avro() works as expected", {
   }
 })
 
+test_that("spark read/write methods avoid name collision on identical file names", {
+  test_requires_version("2.4.0")
+
+  tbl_1 <- tibble::tibble(name = c("foo_1", "bar_1"))
+  tbl_2 <- tibble::tibble(name = c("foo_2", "bar_2"))
+  sdf_1 <- copy_to(sc, tbl_1)
+  sdf_2 <- copy_to(sc, tbl_2)
+
+  for (impl in list(
+                    list(read = spark_read_csv, write = spark_write_csv),
+                    list(read = spark_read_parquet, write = spark_write_parquet),
+                    list(read = spark_read_json, write = spark_write_json),
+                    list(read = spark_read_text, write = spark_write_text),
+                    list(read = spark_read_orc, write = spark_write_orc),
+                    list(read = spark_read_avro, write = spark_write_avro)
+               )) {
+    path1 <- tempfile()
+    path2 <- tempfile()
+
+    impl$write(sdf_1, path1)
+    impl$write(sdf_2, path2)
+
+    sdf_1 <- impl$read(sc, path1)
+    expect_equivalent(sdf_1 %>% collect(), tbl_1)
+    sdf_2 <- impl$read(sc, path2)
+    expect_equivalent(sdf_2 %>% collect(), tbl_2)
+    expect_equivalent(sdf_1 %>% collect(), tbl_1)
+  }
+})
+
 teardown({
   db_drop_table(iris_table_name)
 })
