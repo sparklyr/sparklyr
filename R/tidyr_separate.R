@@ -45,7 +45,7 @@ strsep_to_sql <- function(col, into, sep) {
   sql[!is.na(into)]
 }
 
-str_split_fixed_to_sql <- function(substr_arr_col, col, sep, n, extra, fill) {
+str_split_fixed_to_sql <- function(substr_arr_col, col, sep, n, extra, fill, impl) {
   if (identical(extra, "error")) {
     rlang::warn("`extra = \"error\"` is deprecated. Please use `extra = \"warn\"` instead")
     extra <- "warn"
@@ -56,7 +56,7 @@ str_split_fixed_to_sql <- function(substr_arr_col, col, sep, n, extra, fill) {
 
   sep <- dbplyr::translate_sql_(list(sep), con = dbplyr::simulate_dbi())
   limit <- if (identical(extra, "merge")) n else -1L
-  sql <- list(dplyr::sql(sprintf("SPLIT(%s, %s, %d)", col, sep, limit)))
+  sql <- list(dplyr::sql(sprintf("%s(%s, %s, %d)", impl, col, sep, limit)))
   names(sql) <- substr_arr_col
 
   sql
@@ -119,12 +119,13 @@ process_warnings <- function(out, substr_arr_col, n, extra, fill) {
 #' @export
 separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
                                remove = TRUE, extra = "warn", fill = "warn", ...) {
-  if (data %>% spark_connection() %>% spark_version() < "3.0.0") {
-    rlang::abort("`separate.tbl_spark` is only supported in Spark 3.0.0 or higher")
-  }
-
   check_present(col)
   validate_args(into, sep)
+
+  sc <- spark_connection(data)
+  if (spark_version(sc) < "2.4.0") {
+    rlang::abort("`separate.tbl_spark` is only supported in Spark 2.4.0 or higher")
+  }
 
   var <- tidyselect::vars_pull(colnames(data), !!rlang::enquo(col))
 
@@ -135,7 +136,15 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
   } else {
     substr_arr_col <- random_string("__tidyr_separate_tmp_")
     n <- length(into)
-    split_str_sql <- str_split_fixed_to_sql(substr_arr_col, col, sep, n, extra, fill)
+    split_str_sql <- str_split_fixed_to_sql(
+      substr_arr_col = substr_arr_col,
+      col = col,
+      sep = sep,
+      n = n,
+      extra = extra,
+      fill = fill,
+      impl = if (spark_version(sc) >= "3.0.0") "SPLIT" else "SPARKLYR_STR_SPLIT"
+    )
     substr_arr_col <- quote_sql_name(substr_arr_col)
     fill_left <- identical(fill, "left")
     assign_results_sql <- lapply(

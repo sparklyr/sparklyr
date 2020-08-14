@@ -15,7 +15,7 @@ len_mismatch_sdf <- testthat_tbl(
 )
 
 test_that("missing values in input are missing in output", {
-  test_requires_version("3.0.0")
+  test_requires_version("2.4.0")
 
   sdf <- copy_to(sc, tibble::tibble(x = c(NA, "a b")))
 
@@ -26,7 +26,7 @@ test_that("missing values in input are missing in output", {
 })
 
 test_that("positive integer values specific position between characters", {
-  test_requires_version("3.0.0")
+  test_requires_version("2.4.0")
 
   expect_equivalent(
     sep_with_ints_sdf %>% tidyr::separate(x, c("x", "y"), 1) %>% collect(),
@@ -35,7 +35,7 @@ test_that("positive integer values specific position between characters", {
 })
 
 test_that("negative integer values specific position between characters", {
-  test_requires_version("3.0.0")
+  test_requires_version("2.4.0")
 
   expect_equivalent(
     sep_with_ints_sdf %>% tidyr::separate(x, c("x", "y"), -1) %>% collect(),
@@ -44,7 +44,7 @@ test_that("negative integer values specific position between characters", {
 })
 
 test_that("extreme integer values handled sensibly", {
-  test_requires_version("3.0.0")
+  test_requires_version("2.4.0")
 
   sdf <- copy_to(sc, tibble::tibble(x = c(NA, "a", "bc", "def")))
   expect_equivalent(
@@ -58,7 +58,7 @@ test_that("extreme integer values handled sensibly", {
 })
 
 test_that("too many pieces dealt with as requested", {
-  test_requires_version("3.0.0")
+  test_requires_version("2.4.0")
 
   suppressWarnings(
     expect_warning(
@@ -79,7 +79,7 @@ test_that("too many pieces dealt with as requested", {
 })
 
 test_that("too few pieces dealt with as requested", {
-  test_requires_version("3.0.0")
+  test_requires_version("2.4.0")
 
   suppressWarnings(
     expect_warning(
@@ -99,7 +99,7 @@ test_that("too few pieces dealt with as requested", {
 })
 
 test_that("preserves grouping", {
-  test_requires_version("3.0.0")
+  test_requires_version("2.4.0")
 
   sdf <- simple_sdf %>%
     dplyr::mutate(g = 1) %>%
@@ -110,7 +110,7 @@ test_that("preserves grouping", {
 })
 
 test_that("drops grouping when needed", {
-  test_requires_version("3.0.0")
+  test_requires_version("2.4.0")
 
   sdf <- simple_sdf %>% dplyr::group_by(x)
   rs <- sdf %>% tidyr::separate(x, c("a", "b"))
@@ -119,7 +119,7 @@ test_that("drops grouping when needed", {
 })
 
 test_that("overwrites existing columns", {
-  test_requires_version("3.0.0")
+  test_requires_version("2.4.0")
 
   expect_equivalent(
     simple_sdf %>% tidyr::separate(x, c("x", "y")) %>% collect(),
@@ -128,7 +128,7 @@ test_that("overwrites existing columns", {
 })
 
 test_that("checks type of `into` and `sep`", {
-  test_requires_version("3.0.0")
+  test_requires_version("2.4.0")
 
   expect_error(
     tidyr::separate(simple_sdf, x, "x", FALSE),

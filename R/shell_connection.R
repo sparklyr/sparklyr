@@ -783,6 +783,10 @@ initialize_connection.spark_shell_connection <- function(sc) {
         spark_context(sc)
       )
 
+      # register necessary sparklyr UDFs
+      udf_reg <- invoke(sc$state$hive_context, "udf")
+      invoke_static(sc, "sparklyr.UdfUtils", "registerSparklyrUDFs", udf_reg)
+
       # return the modified connection
       sc
     },
