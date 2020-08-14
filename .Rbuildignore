@@ -9,7 +9,7 @@
 ^configure\.win$
 ^configure\.R$
 ^update_embedded_sources\.R$
-^.github/
+^\.github/
 ^examples/
 ^demo\.R$
 ^docs/
@@ -21,8 +21,8 @@
 ^spark-warehouse$
 ^log4j\..*$
 ^run-tests$
-^.classpath$
-^.project$
+^\.classpath$
+^\.project$
 ^h2ologs$
 ^docs$
 ^_pkgdown\.yml$
@@ -30,15 +30,15 @@
 ^logs$
 ^build_mapping_tables\.R$
 ^blogdown/
-^_blogdown.yml$
-^config.toml$
-^appveyor.yml$
+^_blogdown\.yml$
+^config\.toml$
+^appveyor\.yml$
 ^checkpoints$
 ^ci$
 ^tests/
 ^logs/
-^CODE_OF_CONDUCT.md$
-^CONTRIBUTORS.md$
-^ROADMAP.md$
+^CODE_OF_CONDUCT\.md$
+^CONTRIBUTORS\.md$
+^ROADMAP\.md$
 ^Jenkinsfile
 
