@@ -1,26 +1,26 @@
 # History files
-.Rhistory
-.Rapp.history
+\.Rhistory
+\.Rapp\.history
 # Session Data files
-.RData
+\.RData
 # User Data files
-.Ruserdata
+\.Ruserdata
 # Example code in package build process
-*-Ex.R
+*-Ex\.R
 # RStudio files
-.Rproj.user
+\.Rproj\.user
 # produced vignettes
-vignettes/*.html
-vignettes/*.pdf
+vignettes/*\.html
+vignettes/*\.pdf
 # internal files (e.g. scratch files)
 internal
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
+\.httr-oauth
 # Spark binaries temp directory
 spark
 # Hive metadata
 metastore_db/
-derby.log
+derby\.log
 # README.md cache
 README_cache
 # Perf.md cache
@@ -29,28 +29,28 @@ spark-warehouse
 # Ignore everything under docs except for docs/reference
 docs/*
 !docs/reference
-.DS_Store
-demo.R
+\.DS_Store
+demo\.R
 # Spark log
-log4j.spark*
+log4j\.spark*
 /configure
 /bin/
-.cache-main
-.settings
-.classpath
+\.cache-main
+\.settings
+\.classpath
 # H2O Files
 h2ologs/*
 **/h2ologs/*
 # IDE stuff
-.project
+\.project
 # blogdown
 /blogdown/public
 flights_model
 flights_pipeline
 new_flights_model
 /checkpoints
-tests/testthat/test.csv
-tests/testthat/test.json
-tests/testthat/batch.csv/
+tests/testthat/test\.csv
+tests/testthat/test\.json
+tests/testthat/batch\.csv/
 tests/testthat/iris-in/
 tests/testthat/iris-out/
