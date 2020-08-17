@@ -27,39 +27,16 @@ pivot_wider.tbl_spark <- function(data,
     names_glue = names_glue,
     names_sort = names_sort
   )
-# TODO:
-#   colnames_df <- replicate_colnames(data)
-#   names_from <- names(tidyselect::eval_select(rlang::enquo(names_from), colnames_df))
-#   values_from <- names(tidyselect::eval_select(rlang::enquo(values_from), colnames_df))
-#
-#   id_cols <- rlang::enquo(id_cols)
-#   if (!rlang::quo_is_null(id_cols)) {
-#     id_cols <- names(tidyselect::eval_select(rlang::enquo(id_cols), colnames_df))
-#   } else {
-#     id_cols <- dplyr::tbl_vars(colnames_df)
-#   }
-#   id_cols <- id_cols %>% setdiff(names_from) %>% setdiff(values_from)
-#
-#   unique_name_tuples <- do.call(
-#     dplyr::distinct,
-#     append(list(data), lapply(names_from, as.symbol))
-#   ) %>%
-#     collect()
-#   unique_names <- lapply(
-#     seq(nrow(unique_name_tuples)),
-#     function(idx) {
-#       if (!is.null(names_glue)) {
-#         glue::glue_data(unique_name_tuples[idx, ], names_glue)
-#       } else {
-#         paste0(
-#           names_prefix,
-#           paste0(unique_name_tuples[idx, ], collapse = names_sep)
-#         )
-#       }
-#     }
-#   ) %>%
-#     unlist()
-#   name_col <- random_string("tidy_pivot_name
+
+  id_cols <- rlang::enquo(id_cols)
+  sdf_pivot_wider(
+    data,
+    spec,
+    !!id_cols,
+    names_repair = names_repair,
+    values_fill = values_fill,
+    values_fn = values_fn
+  )
 }
 
 build_wider_spec_for_sdf <- function(data,
@@ -101,5 +78,91 @@ build_wider_spec_for_sdf <- function(data,
     out$.name <- as.character(glue::glue_data(out, names_glue))
   }
 
-  out
+  list(
+    spec = out,
+    names_cols = names_from,
+    values_cols = values_from
+  )
+}
+
+sdf_pivot_wider <- function(data,
+                            spec,
+                            names_repair = "check_unique",
+                            id_cols = NULL,
+                            values_fill = NULL,
+                            values_fn = NULL) {
+  names_cols <- spec$names_cols
+  values_cols <- spec$values_cols
+  spec <- canonicalize_spec(spec$spec)
+
+  if (is.function(values_fn)) {
+    values_fn <- rlang::rep_named(unique(spec$.value), list(values_fn))
+  }
+  if (!is.null(values_fn) && !is.list(values_fn)) {
+    abort("`values_fn` must be a NULL, a function, or a named list")
+  }
+
+  if (is_scalar(values_fill)) {
+    values_fill <- rlang::rep_named(unique(spec$.value), list(values_fill))
+  }
+  if (!is.null(values_fill) && !is.list(values_fill)) {
+    abort("`values_fill` must be NULL, a scalar, or a named list")
+  }
+
+  spec_cols <- c(names(spec)[-(1:2)], values)
+
+  id_cols <- rlang::enquo(id_cols)
+  colnames_df <- replicate_colnames(data)
+  if (!rlang::quo_is_null(id_cols)) {
+    key_vars <- names(tidyselect::eval_select(id_cols, colnames_df))
+  } else {
+    key_vars <- dplyr::tbl_vars(colnames_df)
+  }
+  key_vars <- setdiff(key_vars, spec_cols)
+
+  grouped <- do.call(
+    dplyr::group_by,
+    append(
+      list(data),
+      lapply(union(names_cols, key_vars), as.symbol)
+    )
+  )
+  summarizers <- lapply(
+    seq_along(values_fn),
+    function(idx) {
+      col <- names(values_fn)[[idx]]
+      if (is.null(values_fn[[idx]])) {
+        sprintf("FIRST(%s)", col)
+      } else {
+        sprintf("values_fn$%s(%s)", col, col)
+      }
+    }
+  )
+  summarizers <- lapply(summarizers, rlang::parse_expr)
+  summarized <- do.call(
+    dplyr::summarize,
+    append(list(grouped), summarizers)
+  )
+  summarized <- sumamrized %>% dplyr::compute()
+
+  value_specs <- unname(split(spec, spec$.value))
+  value_out <- vctrs::vec_init(list(), length(value_specs))
+
+  for (i in seq_along(value_out)) {
+    spec_i <- value_specs[[i]]
+    value <- spec_i$value[[1]]
+# TODO: join by names_cols
+  }
+}
+
+is_scalar <- function(x) {
+  if (is.null(x)) {
+    return(FALSE)
+  }
+
+  if (is.list(x)) {
+    (length(x) == 1) && !have_name(x)
+  } else {
+    length(x) == 1
+  }
 }
