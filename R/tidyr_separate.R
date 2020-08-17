@@ -1,6 +1,7 @@
 #' @include sql_utils.R
 #' @include tidyr_utils.R
 #' @include utils.R
+NULL
 
 validate_args <- function(into, sep) {
   if (!is.character(into)) {

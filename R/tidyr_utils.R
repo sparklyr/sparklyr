@@ -10,7 +10,7 @@ check_present <- function(x) {
 
 # helper method returning a minimal R dataframe containing the same set of
 # column names as `sdf` does
-columns <- function(sdf) {
+replicate_colnames <- function(sdf) {
   columns <- lapply(
     colnames(sdf),
     function(column) {

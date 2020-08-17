@@ -41,6 +41,7 @@ Imports:
     forge,
     generics,
     globals,
+    glue,
     httr (>= 1.2.1),
     jsonlite (>= 1.4),
     lifecycle,
@@ -56,6 +57,7 @@ Imports:
     stringr,
     tibble,
     tidyr,
+    vctrs,
     uuid,
     withr,
     xml2,
@@ -287,6 +289,7 @@ Collate:
     'tidiers_utils.R'
     'tidyr_utils.R'
     'tidyr_nest.R'
+    'tidyr_pivot_wider.R'
     'tidyr_separate.R'
     'tidyr_unite.R'
     'tidyr_unnest.R'

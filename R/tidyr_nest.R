@@ -1,4 +1,5 @@
 #' @include tidyr_utils.R
+NULL
 
 check_key <- function(.key) {
   if (!rlang::is_missing(.key)) {
@@ -29,7 +30,7 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::depr
       nested_cols <- rlang::list2(!!.key := colnames(.data))
     }
   } else {
-    cols <- columns(.data)
+    cols <- replicate_colnames(.data)
     nested_cols <- rlang::enquos(...) %>%
       purrr::map(~ names(tidyselect::eval_select(.x, cols)))
   }
