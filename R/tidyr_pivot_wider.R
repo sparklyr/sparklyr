@@ -1,3 +1,4 @@
+#' @include sql_utils.R
 #' @include tidyr_utils.R
 #' @include utils.R
 NULL
@@ -90,10 +91,10 @@ sdf_pivot_wider <- function(data,
   spec <- canonicalize_spec(spec)
 
   if (!is.null(values_fill) && !is.list(values_fill)) {
-    abort("`values_fill` must be NULL, a scalar, or a named list")
+    rlang::abort("`values_fill` must be NULL, a scalar, or a named list")
   }
   if (!is.null(values_fn) && !is.list(values_fn)) {
-    abort("`values_fn` must be a NULL, a function, or a named list")
+    rlang::abort("`values_fn` must be a NULL, a function, or a named list")
   }
 
   if (is_scalar(values_fill)) {
@@ -207,14 +208,42 @@ sdf_pivot_wider <- function(data,
     }
   }
 
-    # TODO: replace missing values in value column
-    # TODO: need to handle NaN values if column is numeric
-# if (is.list(values_fill)) {
-# values_fill is a named list, so process each column accordingly
-# }
-  out %>%
+  out <- out %>%
     invoke("drop", list(summarized_data_id_col)) %>%
     sdf_register()
+
+  # fill missing values according to `values_fill`
+  values_fill_args <- list()
+  for (col in names(values_fill)) {
+    value <- values_fill[[col]]
+    if (!is.null(value) && !is.na(value) && !is.nan(value)) {
+      value_sql <- dbplyr::translate_sql_(
+        list(value), con = dbplyr::simulate_dbi()
+      )
+      dest_cols <- spec %>%
+        dplyr::filter(.value == col) %>%
+        dplyr::pull(.name)
+      for (dest_col in dest_cols) {
+        dest_col_sql <- quote_sql_name(dest_col)
+        args <- sprintf(
+          "IF(ISNULL(%s) OR ISNAN(%s), %s, %s)",
+          dest_col_sql,
+          dest_col_sql,
+          value_sql,
+          dest_col_sql
+        ) %>%
+          dplyr::sql() %>%
+          list()
+        names(args) <- dest_col
+        values_fill_args <- append(values_fill_args, args)
+      }
+    }
+  }
+  if (length(values_fill_args) > 0) {
+    out <- do.call(dplyr::mutate, append(list(out), values_fill_args))
+  }
+
+  out
 }
 
 is_scalar <- function(x) {

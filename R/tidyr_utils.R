@@ -4,7 +4,7 @@
 check_present <- function(x) {
   arg <- rlang::ensym(x)
   if (missing(x)) {
-    abort(paste0("Argument `", arg, "` is missing with no default"))
+    rlang::abort(paste0("Argument `", arg, "` is missing with no default"))
   }
 }
 
