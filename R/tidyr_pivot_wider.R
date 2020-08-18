@@ -22,7 +22,7 @@ pivot_wider.tbl_spark <- function(data,
     data,
     names_from = !!names_from,
     values_from = !!values_from,
-    name_prefix = names_prefix,
+    names_prefix = names_prefix,
     names_sep = names_sep,
     names_glue = names_glue,
     names_sort = names_sort
@@ -78,11 +78,7 @@ build_wider_spec_for_sdf <- function(data,
     out$.name <- as.character(glue::glue_data(out, names_glue))
   }
 
-  list(
-    spec = out,
-    names_cols = names_from,
-    values_cols = values_from
-  )
+  out
 }
 
 sdf_pivot_wider <- function(data,
@@ -91,12 +87,10 @@ sdf_pivot_wider <- function(data,
                             id_cols = NULL,
                             values_fill = NULL,
                             values_fn = NULL) {
-  names_cols <- spec$names_cols
-  values_cols <- spec$values_cols
-  spec <- canonicalize_spec(spec$spec)
+  spec <- canonicalize_spec(spec)
 
-  if (is.function(values_fn)) {
-    values_fn <- rlang::rep_named(unique(spec$.value), list(values_fn))
+  if (!is.null(values_fill) && !is.list(values_fill)) {
+    abort("`values_fill` must be NULL, a scalar, or a named list")
   }
   if (!is.null(values_fn) && !is.list(values_fn)) {
     abort("`values_fn` must be a NULL, a function, or a named list")
@@ -105,11 +99,14 @@ sdf_pivot_wider <- function(data,
   if (is_scalar(values_fill)) {
     values_fill <- rlang::rep_named(unique(spec$.value), list(values_fill))
   }
-  if (!is.null(values_fill) && !is.list(values_fill)) {
-    abort("`values_fill` must be NULL, a scalar, or a named list")
+  if (!is.list(values_fn)) {
+    values_fn <- rlang::rep_named(unique(spec$.value), list(values_fn))
   }
 
-  spec_cols <- c(names(spec)[-(1:2)], values)
+
+  names_from <- names(spec)[-(1:2)]
+  values_from <- vctrs::vec_unique(spec$.value)
+  spec_cols <- c(names_from, values_from)
 
   id_cols <- rlang::enquo(id_cols)
   colnames_df <- replicate_colnames(data)
@@ -120,12 +117,9 @@ sdf_pivot_wider <- function(data,
   }
   key_vars <- setdiff(key_vars, spec_cols)
 
-  grouped <- do.call(
+  grouped_data <- do.call(
     dplyr::group_by,
-    append(
-      list(data),
-      lapply(union(names_cols, key_vars), as.symbol)
-    )
+    append(list(data), lapply(union(key_vars, names_from), as.symbol))
   )
   summarizers <- lapply(
     seq_along(values_fn),
@@ -138,20 +132,52 @@ sdf_pivot_wider <- function(data,
       }
     }
   )
+  names(summarizers) <- names(values_fn)
   summarizers <- lapply(summarizers, rlang::parse_expr)
-  summarized <- do.call(
+  summarized_data <- do.call(
     dplyr::summarize,
-    append(list(grouped), summarizers)
-  )
-  summarized <- sumamrized %>% dplyr::compute()
+    append(list(grouped_data), summarizers)
+  ) %>%
+    dplyr::compute()
 
   value_specs <- unname(split(spec, spec$.value))
-  value_out <- vctrs::vec_init(list(), length(value_specs))
+  value_out <- vctrs::vec_init(NA, length(value_specs))
 
+  pivot_col <- random_string("sdf_pivot")
   for (i in seq_along(value_out)) {
     spec_i <- value_specs[[i]]
-    value <- spec_i$value[[1]]
-# TODO: join by names_cols
+    value <- spec_i$.value[[1]]
+
+    lhs_cols <- union(key_vars, value)
+    lhs_cols <- union(lhs_cols, names_from)
+    lhs <- do.call(
+      dplyr::select,
+      append(list(summarized_data), lapply(lhs_cols, as.symbol))
+    )
+    rhs_select_args = list(as.symbol(".name"))
+    names(rhs_select_args) <- pivot_col
+    rhs_select_args <- append(rhs_select_args, lapply(names_from, as.symbol))
+    rhs <- do.call(dplyr::select, append(list(spec_i), rhs_select_args)) %>%
+      copy_to(sc, ., name = random_string("pivot_wider_spec_sdf"))
+    # TODO: replace missing values in value column
+# if (is.list(values_fill)) {
+# values_fill is a named list, so process each column accordingly
+# }
+    combined <- spark_dataframe(lhs) %>%
+      invoke("join", spark_dataframe(rhs), as.list(names_from))
+    agg_spec <- new.env(parent = emptyenv())
+    assign(value, "FIRST", envir = agg_spec)
+    sc <- spark_connection(data)
+    group_by_cols <- lapply(
+      union(key_vars, names_from),
+      function(col) invoke_new(sc, "org.apache.spark.sql.Column", col)
+    )
+    pivoted <- combined %>%
+      invoke("groupBy", group_by_cols) %>%
+      invoke("pivot", pivot_col, as.list(spec_i$.name)) %>%
+      invoke("agg", agg_spec)
+
+    print(pivoted %>% sdf_register())
   }
 }
 
