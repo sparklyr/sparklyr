@@ -116,6 +116,7 @@ sdf_pivot_wider <- function(data,
   }
   key_vars <- setdiff(key_vars, spec_cols)
 
+  # apply summarizing function(s)
   grouped_data <- do.call(
     dplyr::group_by,
     append(list(data), lapply(union(key_vars, names_from), as.symbol))
@@ -138,6 +139,24 @@ sdf_pivot_wider <- function(data,
     dplyr::summarize,
     append(list(grouped_data), summarizers)
   )
+
+  # perform any name repair if necessary
+  other_cols <- colnames(summarized_data) %>%
+    setdiff(key_vars) %>%
+    setdiff(spec_cols)
+  output_colnames <- c(key_vars, other_cols, spec$.name) %>%
+    repair_names(names_repair = names_repair)
+  key_vars_renamed <- head(output_colnames, length(key_vars))
+  spec$.name <- tail(output_colnames, length(spec$.name))
+  name_repair_args <- lapply(c(key_vars, other_cols), as.symbol)
+  names(name_repair_args) <- head(output_colnames, length(key_vars) + length(other_cols))
+  if (length(name_repair_args) > 0) {
+    summarized_data <- do.call(
+      dplyr::rename, append(list(summarized_data), name_repair_args)
+    )
+  }
+  key_vars <- key_vars_renamed
+
   summarized_data_id_col_args <- list(dplyr::sql("monotonically_increasing_id()"))
   names(summarized_data_id_col_args) <- summarized_data_id_col
   summarized_data <- do.call(
