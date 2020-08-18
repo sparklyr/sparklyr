@@ -19,7 +19,7 @@ pivot_wider.tbl_spark <- function(data,
                                   ...) {
   names_from <- rlang::enquo(names_from)
   values_from <- rlang::enquo(values_from)
-  spec <- build_wider_spec_for_sdf(
+  spec <- sdf_build_wider_spec(
     data,
     names_from = !!names_from,
     values_from = !!values_from,
@@ -40,13 +40,13 @@ pivot_wider.tbl_spark <- function(data,
   )
 }
 
-build_wider_spec_for_sdf <- function(data,
-                                     names_from = name,
-                                     values_from = value,
-                                     names_prefix = "",
-                                     names_sep = "_",
-                                     names_glue = NULL,
-                                     names_sort = FALSE) {
+sdf_build_wider_spec <- function(data,
+                                 names_from = name,
+                                 values_from = value,
+                                 names_prefix = "",
+                                 names_sep = "_",
+                                 names_glue = NULL,
+                                 names_sort = FALSE) {
   colnames_df <- replicate_colnames(data)
   names_from <- names(tidyselect::eval_select(rlang::enquo(names_from), colnames_df))
   values_from <- names(tidyselect::eval_select(rlang::enquo(values_from), colnames_df))
@@ -88,6 +88,7 @@ sdf_pivot_wider <- function(data,
                             id_cols = NULL,
                             values_fill = NULL,
                             values_fn = NULL) {
+  sc <- spark_connection(data)
   spec <- canonicalize_spec(spec)
 
   if (!is.null(values_fill) && !is.list(values_fill)) {
@@ -127,15 +128,20 @@ sdf_pivot_wider <- function(data,
     function(idx) {
       col <- names(values_fn)[[idx]]
       if (is.null(values_fn[[idx]])) {
-        sprintf("FIRST(%s)", col)
+        col <- quote_sql_name(col)
+        sprintf(
+          "FIRST(IF(ISNULL(%s) OR ISNAN(%s), NULL, %s), TRUE)",
+          col,
+          col,
+          col
+        ) %>%
+          dplyr::sql()
       } else {
-        sprintf("values_fn$%s(%s)", col, col)
+        sprintf("values_fn$%s(%s)", col, col) %>% rlang::parse_expr()
       }
     }
   )
   names(summarizers) <- names(values_fn)
-  summarizers <- lapply(summarizers, rlang::parse_expr)
-  summarized_data_id_col <- random_string("sdf_pivot_id")
   summarized_data <- do.call(
     dplyr::summarize,
     append(list(grouped_data), summarizers)
@@ -158,13 +164,20 @@ sdf_pivot_wider <- function(data,
   }
   key_vars <- key_vars_renamed
 
-  summarized_data_id_col_args <- list(dplyr::sql("monotonically_increasing_id()"))
-  names(summarized_data_id_col_args) <- summarized_data_id_col
-  summarized_data <- do.call(
-    dplyr::mutate,
-    append(list(summarized_data), summarized_data_id_col_args)
-  ) %>%
-    dplyr::compute()
+  if (length(key_vars) > 0) {
+    summarized_data_id_col <- random_string("sdf_pivot_id")
+    summarized_data_id_col_args <- list(dplyr::sql("monotonically_increasing_id()"))
+    names(summarized_data_id_col_args) <- summarized_data_id_col
+    summarized_data <- do.call(
+      dplyr::mutate,
+      append(list(summarized_data), summarized_data_id_col_args)
+    )
+  } else {
+    summarized_data_id_col <- NULL
+  }
+
+  summarized_data <- summarized_data %>% dplyr::compute()
+
   value_specs <- unname(split(spec, spec$.value))
   out <- NULL
 
@@ -185,32 +198,62 @@ sdf_pivot_wider <- function(data,
     rhs <- do.call(dplyr::select, append(list(value_spec), rhs_select_args)) %>%
       copy_to(sc, ., name = random_string("pivot_wider_spec_sdf"))
     combined <- spark_dataframe(lhs) %>%
-      invoke("join", spark_dataframe(rhs), as.list(names_from))
-    agg_spec <- new.env(parent = emptyenv())
-    assign(value, "FIRST", envir = agg_spec)
-    sc <- spark_connection(data)
-    group_by_cols <- union(summarized_data_id_col, key_vars)
-    group_by_cols <- union(group_by_cols, names_from)
+      invoke("join", spark_dataframe(rhs), as.list(names_from)) %>%
+      invoke("drop", as.list(names_from))
+
+    value_col <- invoke_new(sc, "org.apache.spark.sql.Column", value)
+    value_is_null <- invoke_static(sc, "org.apache.spark.sql.functions", "isnull", value_col)
+    value_is_nan <- invoke_static(sc, "org.apache.spark.sql.functions", "isnan", value_col)
+    first_valid_value <- invoke(value_is_null, "or", value_is_nan) %>%
+      invoke_static(sc, "org.apache.spark.sql.functions", "when", ., NULL) %>%
+      invoke("otherwise", value_col) %>%
+      invoke_static(sc, "org.apache.spark.sql.functions", "first", ., TRUE)
     group_by_cols <- lapply(
-      group_by_cols,
+      union(summarized_data_id_col, key_vars),
       function(col) invoke_new(sc, "org.apache.spark.sql.Column", col)
     )
     pivoted <- combined %>%
       invoke("groupBy", group_by_cols) %>%
       invoke("pivot", pivot_col, as.list(value_spec$.name)) %>%
-      invoke("agg", agg_spec)
+      invoke("agg", first_valid_value, list())
 
     if (is.null(out)) {
-      out <- pivoted %>% invoke("drop", as.list(names_from))
+      out <- pivoted
     } else {
-      pivoted <- pivoted %>% invoke("drop", as.list(union(key_vars, names_from)))
-      out <- invoke(out, "join", pivoted, as.list(summarized_data_id_col))
+      pivoted <- pivoted %>% invoke("drop", as.list(key_vars))
+      if (!is.null(summarized_data_id_col)) {
+        out <- invoke(out, "join", pivoted, as.list(summarized_data_id_col))
+      } else {
+        out <- sdf_bind_cols(out, pivoted)
+      }
     }
   }
 
-  out <- out %>%
-    invoke("drop", list(summarized_data_id_col)) %>%
-    sdf_register()
+  if (!is.null(summarized_data_id_col)) {
+    out <- out %>% invoke("drop", list(summarized_data_id_col))
+  }
+
+  # coalesce output columns based on key_vars after dropping `summarized_data_id_col`
+  # (i.e., making sure each observation identified by `key_vars` will occupy 1 row
+  # instead of multiple rows)
+  out <- out %>% sdf_register()
+  out <- do.call(dplyr::group_by, append(list(out), lapply(key_vars, as.symbol)))
+  coalesce_cols <- setdiff(colnames(out), key_vars)
+  coalesce_args <- lapply(
+    coalesce_cols,
+    function(col) {
+      col <- quote_sql_name(col)
+      sprintf(
+        "FIRST(IF(ISNULL(%s) OR ISNAN(%s), NULL, %s), TRUE)",
+        col,
+        col,
+        col
+      ) %>%
+        dplyr::sql()
+    }
+  )
+  names(coalesce_args) <- coalesce_cols
+  out <- do.call(dplyr::summarize, append(list(out), coalesce_args))
 
   # fill missing values according to `values_fill`
   values_fill_args <- list()
