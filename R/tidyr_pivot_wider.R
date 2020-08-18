@@ -103,7 +103,6 @@ sdf_pivot_wider <- function(data,
     values_fn <- rlang::rep_named(unique(spec$.value), list(values_fn))
   }
 
-
   names_from <- names(spec)[-(1:2)]
   values_from <- vctrs::vec_unique(spec$.value)
   spec_cols <- c(names_from, values_from)
@@ -134,22 +133,28 @@ sdf_pivot_wider <- function(data,
   )
   names(summarizers) <- names(values_fn)
   summarizers <- lapply(summarizers, rlang::parse_expr)
+  summarized_data_id_col <- random_string("sdf_pivot_id")
   summarized_data <- do.call(
     dplyr::summarize,
     append(list(grouped_data), summarizers)
+  )
+  summarized_data_id_col_args <- list(dplyr::sql("monotonically_increasing_id()"))
+  names(summarized_data_id_col_args) <- summarized_data_id_col
+  summarized_data <- do.call(
+    dplyr::mutate,
+    append(list(summarized_data), summarized_data_id_col_args)
   ) %>%
     dplyr::compute()
-
   value_specs <- unname(split(spec, spec$.value))
-  value_out <- vctrs::vec_init(NA, length(value_specs))
+  out <- NULL
 
   pivot_col <- random_string("sdf_pivot")
-  for (i in seq_along(value_out)) {
-    spec_i <- value_specs[[i]]
-    value <- spec_i$.value[[1]]
+  for (value_spec in value_specs) {
+    value <- value_spec$.value[[1]]
 
-    lhs_cols <- union(key_vars, value)
-    lhs_cols <- union(lhs_cols, names_from)
+    lhs_cols <- union(summarized_data_id_col, key_vars) %>%
+      union(names_from) %>%
+      union(value)
     lhs <- do.call(
       dplyr::select,
       append(list(summarized_data), lapply(lhs_cols, as.symbol))
@@ -157,28 +162,40 @@ sdf_pivot_wider <- function(data,
     rhs_select_args = list(as.symbol(".name"))
     names(rhs_select_args) <- pivot_col
     rhs_select_args <- append(rhs_select_args, lapply(names_from, as.symbol))
-    rhs <- do.call(dplyr::select, append(list(spec_i), rhs_select_args)) %>%
+    rhs <- do.call(dplyr::select, append(list(value_spec), rhs_select_args)) %>%
       copy_to(sc, ., name = random_string("pivot_wider_spec_sdf"))
-    # TODO: replace missing values in value column
-# if (is.list(values_fill)) {
-# values_fill is a named list, so process each column accordingly
-# }
     combined <- spark_dataframe(lhs) %>%
       invoke("join", spark_dataframe(rhs), as.list(names_from))
     agg_spec <- new.env(parent = emptyenv())
     assign(value, "FIRST", envir = agg_spec)
     sc <- spark_connection(data)
+    group_by_cols <- union(summarized_data_id_col, key_vars)
+    group_by_cols <- union(group_by_cols, names_from)
     group_by_cols <- lapply(
-      union(key_vars, names_from),
+      group_by_cols,
       function(col) invoke_new(sc, "org.apache.spark.sql.Column", col)
     )
     pivoted <- combined %>%
       invoke("groupBy", group_by_cols) %>%
-      invoke("pivot", pivot_col, as.list(spec_i$.name)) %>%
+      invoke("pivot", pivot_col, as.list(value_spec$.name)) %>%
       invoke("agg", agg_spec)
 
-    print(pivoted %>% sdf_register())
+    if (is.null(out)) {
+      out <- pivoted %>% invoke("drop", as.list(names_from))
+    } else {
+      pivoted <- pivoted %>% invoke("drop", as.list(union(key_vars, names_from)))
+      out <- invoke(out, "join", pivoted, as.list(summarized_data_id_col))
+    }
   }
+
+    # TODO: replace missing values in value column
+    # TODO: need to handle NaN values if column is numeric
+# if (is.list(values_fill)) {
+# values_fill is a named list, so process each column accordingly
+# }
+  out %>%
+    invoke("drop", list(summarized_data_id_col)) %>%
+    sdf_register()
 }
 
 is_scalar <- function(x) {
