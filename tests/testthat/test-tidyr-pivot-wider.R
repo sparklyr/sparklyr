@@ -3,8 +3,6 @@ context("tidyr-pivot-wider")
 sc <- testthat_spark_connection()
 
 test_that("can pivot all cols to wide", {
-  test_requires_version("2.0.0")
-
   sdf <- copy_to(sc, tibble::tibble(key = c("x", "y", "z"), val = 1:3))
   pv <- tidyr::pivot_wider(
     sdf, names_from = key, values_from = val, names_sort = TRUE
@@ -51,4 +49,31 @@ test_that("grouping is preserved", {
     tidyr::pivot_wider(names_from = k, values_from = v)
 
   expect_equal(dplyr::group_vars(out), "g")
+})
+
+test_that("nested list column pivots correctly", {
+  test_requires_version("2.4.0")
+
+  sdf <- copy_to(
+    sc,
+    tibble::tibble(
+      i = c(1, 2, 1, 2),
+      g = c("a", "a", "b", "b"),
+      d = list(
+        list(x = 1, y = 5), list(x = 2, y = 6), list(x = 3, y = 7), list(x = 4, y = 8)
+      )
+    )
+  )
+  out <- tidyr::pivot_wider(sdf, names_from = g, values_from = d, names_sort = TRUE) %>%
+    collect() %>%
+    dplyr::arrange(i)
+
+  expect_equivalent(
+    out,
+    tibble::tibble(
+      i = 1:2,
+      a = list(list(x = 1, y = 5), list(x = 2, y = 6)),
+      b = list(list(x = 3, y = 7), list(x = 4, y = 8))
+    )
+  )
 })

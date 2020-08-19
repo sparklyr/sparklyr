@@ -119,6 +119,7 @@ sdf_pivot_wider <- function(data,
     key_vars <- dplyr::tbl_vars(colnames_df)
   }
   key_vars <- setdiff(key_vars, spec_cols)
+  data_schema <- data %>% sdf_schema()
 
   # apply summarizing function(s)
   grouped_data <- do.call(
@@ -130,12 +131,16 @@ sdf_pivot_wider <- function(data,
     function(idx) {
       col <- names(values_fn)[[idx]]
       if (is.null(values_fn[[idx]])) {
+        is_double_type <- identical(data_schema[[col]]$type, "DoubleType")
         col <- quote_sql_name(col)
-        sprintf(
-          "FIRST(IF(ISNULL(%s) OR ISNAN(%s), NULL, %s), TRUE)",
-          col,
-          col,
-          col
+        (
+          if (is_double_type) {
+            sprintf(
+              "FIRST(IF(ISNULL(%s) OR ISNAN(%s), NULL, %s), TRUE)", col, col, col
+            )
+          } else {
+            sprintf("FIRST(IF(ISNULL(%s), NULL, %s), TRUE)", col, col)
+          }
         ) %>%
           dplyr::sql()
       } else {
@@ -202,11 +207,15 @@ sdf_pivot_wider <- function(data,
     combined <- spark_dataframe(lhs) %>%
       invoke("join", spark_dataframe(rhs), as.list(names_from)) %>%
       invoke("drop", as.list(names_from))
+    combined_schema <- combined %>% sdf_schema()
 
     value_col <- invoke_new(sc, "org.apache.spark.sql.Column", value)
-    value_is_null <- invoke_static(sc, "org.apache.spark.sql.functions", "isnull", value_col)
-    value_is_nan <- invoke_static(sc, "org.apache.spark.sql.functions", "isnan", value_col)
-    first_valid_value <- invoke(value_is_null, "or", value_is_nan) %>%
+    value_is_invalid <- invoke_static(sc, "org.apache.spark.sql.functions", "isnull", value_col)
+    if (identical(combined_schema[[value]]$type, "DoubleType")) {
+      value_is_nan <- invoke_static(sc, "org.apache.spark.sql.functions", "isnan", value_col)
+      value_is_invalid <- invoke(value_is_invalid, "or", value_is_nan)
+    }
+    first_valid_value <- value_is_invalid %>%
       invoke_static(sc, "org.apache.spark.sql.functions", "when", ., NULL) %>%
       invoke("otherwise", value_col) %>%
       invoke_static(sc, "org.apache.spark.sql.functions", "first", ., TRUE)
@@ -240,16 +249,21 @@ sdf_pivot_wider <- function(data,
   # instead of multiple rows)
   out <- out %>% sdf_register()
   out <- do.call(dplyr::group_by, append(list(out), lapply(key_vars, as.symbol)))
+  out_schema <- out %>% sdf_schema()
   coalesce_cols <- setdiff(colnames(out), key_vars)
   coalesce_args <- lapply(
     coalesce_cols,
     function(col) {
+      is_double_type <- identical(out_schema[[col]]$type, "DoubleType")
       col <- quote_sql_name(col)
-      sprintf(
-        "FIRST(IF(ISNULL(%s) OR ISNAN(%s), NULL, %s), TRUE)",
-        col,
-        col,
-        col
+      (
+        if (is_double_type) {
+          sprintf(
+            "FIRST(IF(ISNULL(%s) OR ISNAN(%s), NULL, %s), TRUE)", col, col, col
+          )
+        } else {
+          sprintf("FIRST(IF(ISNULL(%s), NULL, %s), TRUE)", col, col)
+        }
       ) %>%
         dplyr::sql()
     }
@@ -258,6 +272,7 @@ sdf_pivot_wider <- function(data,
   out <- do.call(dplyr::summarize, append(list(out), coalesce_args))
 
   # fill missing values according to `values_fill`
+  out_schema <- out %>% sdf_schema()
   values_fill_args <- list()
   for (col in names(values_fill)) {
     value <- values_fill[[col]]
@@ -269,13 +284,19 @@ sdf_pivot_wider <- function(data,
         dplyr::filter(.value == col) %>%
         dplyr::pull(.name)
       for (dest_col in dest_cols) {
+        is_double_type <- identical(out_schema[[dest_col]]$type, "DoubleType")
         dest_col_sql <- quote_sql_name(dest_col)
-        args <- sprintf(
-          "IF(ISNULL(%s) OR ISNAN(%s), %s, %s)",
-          dest_col_sql,
-          dest_col_sql,
-          value_sql,
-          dest_col_sql
+        args <- (
+          if (is_double_type) {
+            sprintf(
+              "IF(ISNULL(%s) OR ISNAN(%s), %s, %s)",
+              dest_col_sql, dest_col_sql, value_sql, dest_col_sql
+            )
+          } else {
+            sprintf(
+              "IF(ISNULL(%s), %s, %s)", dest_col_sql, value_sql, dest_col_sql
+            )
+          }
         ) %>%
           dplyr::sql() %>%
           list()
