@@ -125,7 +125,7 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
 
   sc <- spark_connection(data)
   if (spark_version(sc) < "2.4.0") {
-    rlang::abort("`separate.tbl_spark` is only supported in Spark 2.4.0 or higher")
+    rlang::abort("`separate.tbl_spark` requires Spark 2.4.0 or higher")
   }
 
   var <- tidyselect::vars_pull(colnames(data), !!rlang::enquo(col))

@@ -14,7 +14,7 @@ check_key <- function(.key) {
 #' @export
 nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::deprecated()) {
   if (.data %>% spark_connection() %>% spark_version() < "2.0.0") {
-    rlang::abort("`nest.tbl_spark` is only supported in Spark 2.0.0 or higher")
+    rlang::abort("`nest.tbl_spark` requires Spark 2.0.0 or higher")
   }
 
   .key <- check_key(.key)

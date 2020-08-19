@@ -89,20 +89,24 @@ sdf_pivot_wider <- function(data,
                             values_fill = NULL,
                             values_fn = NULL) {
   sc <- spark_connection(data)
-  spec <- canonicalize_spec(spec)
+  if (spark_version(sc) < "2.0.0") {
+    rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.0.0 or higher")
+  }
 
-  if (!is.null(values_fill) && !is.list(values_fill)) {
-    rlang::abort("`values_fill` must be NULL, a scalar, or a named list")
-  }
-  if (!is.null(values_fn) && !is.list(values_fn)) {
-    rlang::abort("`values_fn` must be a NULL, a function, or a named list")
-  }
+  spec <- canonicalize_spec(spec)
 
   if (is_scalar(values_fill)) {
     values_fill <- rlang::rep_named(unique(spec$.value), list(values_fill))
   }
-  if (!is.list(values_fn)) {
+  if (!is.null(values_fill) && !is.list(values_fill)) {
+    rlang::abort("`values_fill` must be NULL, a scalar, or a named list")
+  }
+
+  if (is.function(values_fn)) {
     values_fn <- rlang::rep_named(unique(spec$.value), list(values_fn))
+  }
+  if (!is.null(values_fn) && !is.list(values_fn)) {
+    rlang::abort("`values_fn` must be a NULL, a function, or a named list")
   }
 
   group_vars <- dplyr::group_vars(data)
@@ -124,12 +128,15 @@ sdf_pivot_wider <- function(data,
   # apply summarizing function(s)
   grouped_data <- do.call(
     dplyr::group_by,
-    append(list(data), lapply(union(key_vars, names_from), as.symbol))
+    append(list(data), lapply(union(key_vars, names_from), as.symbol)),
+    quote = TRUE
   )
-  summarizers <- lapply(
-    seq_along(values_fn),
-    function(idx) {
-      col <- names(values_fn)[[idx]]
+print("VALUES_FN == ")
+print(values_fn)
+  summarizers <- list()
+  for (idx in seq_along(values_fn)) {
+    col <- names(values_fn)[[idx]]
+    summarizers[[col]] <- (
       if (is.null(values_fn[[idx]])) {
         is_double_type <- identical(data_schema[[col]]$type, "DoubleType")
         col <- quote_sql_name(col)
@@ -144,14 +151,16 @@ sdf_pivot_wider <- function(data,
         ) %>%
           dplyr::sql()
       } else {
-        sprintf("values_fn$%s(%s)", col, col) %>% rlang::parse_expr()
+        # rlang::expr(values_fn[[!!col]](!!rlang::sym(col)))
+        rlang::parse_expr(sprintf("values_fn[[\"%s\"]](%s)", col, col))
       }
-    }
-  )
+    )
+  }
   names(summarizers) <- names(values_fn)
+print("SUMMARIZERS == ")
+print(summarizers)
   summarized_data <- do.call(
-    dplyr::summarize,
-    append(list(grouped_data), summarizers)
+    dplyr::summarize, append(list(grouped_data), summarizers)
   )
 
   # perform any name repair if necessary
@@ -171,17 +180,13 @@ sdf_pivot_wider <- function(data,
   }
   key_vars <- key_vars_renamed
 
-  if (length(key_vars) > 0) {
-    summarized_data_id_col <- random_string("sdf_pivot_id")
-    summarized_data_id_col_args <- list(dplyr::sql("monotonically_increasing_id()"))
-    names(summarized_data_id_col_args) <- summarized_data_id_col
-    summarized_data <- do.call(
-      dplyr::mutate,
-      append(list(summarized_data), summarized_data_id_col_args)
-    )
-  } else {
-    summarized_data_id_col <- NULL
-  }
+  summarized_data_id_col <- random_string("sdf_pivot_id")
+  summarized_data_id_col_args <- list(dplyr::sql("monotonically_increasing_id()"))
+  names(summarized_data_id_col_args) <- summarized_data_id_col
+  summarized_data <- do.call(
+    dplyr::mutate,
+    append(list(summarized_data), summarized_data_id_col_args)
+  )
 
   summarized_data <- summarized_data %>% dplyr::compute()
 
@@ -232,11 +237,7 @@ sdf_pivot_wider <- function(data,
       out <- pivoted
     } else {
       pivoted <- pivoted %>% invoke("drop", as.list(key_vars))
-      if (!is.null(summarized_data_id_col)) {
-        out <- invoke(out, "join", pivoted, as.list(summarized_data_id_col))
-      } else {
-        out <- sdf_bind_cols(out, pivoted)
-      }
+      out <- invoke(out, "join", pivoted, as.list(summarized_data_id_col))
     }
   }
 

@@ -189,7 +189,7 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
     packages <- packages[-which(packages == "rapids")]
 
     if (version < "3.0.0") {
-      stop("RAPIDS library is only supported in Spark 3.0.0 or higher")
+      stop("RAPIDS library requires Spark 3.0.0 or higher")
     }
 
     additional_configs <- list(...)
