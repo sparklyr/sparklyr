@@ -105,6 +105,8 @@ sdf_pivot_wider <- function(data,
     values_fn <- rlang::rep_named(unique(spec$.value), list(values_fn))
   }
 
+  group_vars <- dplyr::group_vars(data)
+
   names_from <- names(spec)[-(1:2)]
   values_from <- vctrs::vec_unique(spec$.value)
   spec_cols <- c(names_from, values_from)
@@ -286,7 +288,9 @@ sdf_pivot_wider <- function(data,
     out <- do.call(dplyr::mutate, append(list(out), values_fill_args))
   }
 
-  out
+  out <- out %>% dplyr::ungroup()
+  group_vars <- intersect(group_vars, colnames(out))
+  do.call(dplyr::group_by, append(list(out), lapply(group_vars, as.symbol)))
 }
 
 is_scalar <- function(x) {

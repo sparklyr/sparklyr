@@ -43,3 +43,12 @@ test_that("error when overwriting existing column", {
     class = "tibble_error_column_names_must_be_unique"
   )
 })
+
+test_that("grouping is preserved", {
+  sdf <- copy_to(sc, tibble::tibble(g = 1, k = "x", v = 2))
+  out <- sdf %>%
+    dplyr::group_by(g) %>%
+    tidyr::pivot_wider(names_from = k, values_from = v)
+
+  expect_equal(dplyr::group_vars(out), "g")
+})
