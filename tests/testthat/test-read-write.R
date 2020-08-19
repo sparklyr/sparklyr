@@ -402,14 +402,19 @@ test_that("spark read/write methods avoid name collision on identical file names
   sdf_1 <- copy_to(sc, tbl_1)
   sdf_2 <- copy_to(sc, tbl_2)
 
-  for (impl in list(
-                    list(read = spark_read_csv, write = spark_write_csv),
-                    list(read = spark_read_parquet, write = spark_write_parquet),
-                    list(read = spark_read_json, write = spark_write_json),
-                    list(read = spark_read_text, write = spark_write_text),
-                    list(read = spark_read_orc, write = spark_write_orc),
-                    list(read = spark_read_avro, write = spark_write_avro)
-               )) {
+  impls <- list(
+    list(read = spark_read_csv, write = spark_write_csv),
+    list(read = spark_read_parquet, write = spark_write_parquet),
+    list(read = spark_read_json, write = spark_write_json),
+    list(read = spark_read_text, write = spark_write_text),
+    list(read = spark_read_orc, write = spark_write_orc)
+  )
+
+  if (!is_testing_databricks_connect()) {
+    impls <- c(impls, list(read = spark_read_avro, write = spark_write_avro))
+  }
+
+  for (impl in impls) {
     path1 <- tempfile()
     path2 <- tempfile()
 
