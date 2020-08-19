@@ -393,6 +393,7 @@ test_that("spark_write_avro() works as expected", {
   }
 })
 
+dummy_var <- 5
 test_that("spark read/write methods avoid name collision on identical file names", {
   test_requires_version("2.4.0")
 
