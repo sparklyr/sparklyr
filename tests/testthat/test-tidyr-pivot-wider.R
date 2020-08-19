@@ -23,3 +23,23 @@ test_that("non-pivoted cols are preserved", {
 
   expect_equivalent(pv, tibble::tibble(a = 1, x = 1, y = 2))
 })
+
+test_that("implicit missings turn into explicit missings", {
+  sdf <- copy_to(sc, tibble::tibble(a = 1:2, key = c("x", "y"), val = 1:2))
+  pv <- tidyr::pivot_wider(
+    sdf, names_from = key, values_from = val, names_sort = TRUE
+  ) %>%
+    collect() %>%
+     dplyr::arrange(a)
+
+  expect_equivalent(pv, tibble::tibble(a = 1:2, x = c(1, NA), y = c(NA, 2)))
+})
+
+test_that("error when overwriting existing column", {
+  sdf <- copy_to(sc, tibble::tibble(a = 1, key = c("a", "b"), val = 1:2))
+
+  expect_error(
+    tidyr::pivot_wider(sdf, names_from = key, values_from = val),
+    class = "tibble_error_column_names_must_be_unique"
+  )
+})
