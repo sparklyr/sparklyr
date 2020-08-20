@@ -102,10 +102,10 @@ sdf_pivot_wider <- function(data,
     rlang::abort("`values_fill` must be NULL, a scalar, or a named list")
   }
 
-  if (is.function(values_fn)) {
+  if (is.null(values_fn) || is.function(values_fn)) {
     values_fn <- rlang::rep_named(unique(spec$.value), list(values_fn))
   }
-  if (!is.null(values_fn) && !is.list(values_fn)) {
+  if (!is.list(values_fn)) {
     rlang::abort("`values_fn` must be a NULL, a function, or a named list")
   }
 
@@ -131,8 +131,6 @@ sdf_pivot_wider <- function(data,
     append(list(data), lapply(union(key_vars, names_from), as.symbol)),
     quote = TRUE
   )
-print("VALUES_FN == ")
-print(values_fn)
   summarizers <- list()
   for (idx in seq_along(values_fn)) {
     col <- names(values_fn)[[idx]]
@@ -151,14 +149,11 @@ print(values_fn)
         ) %>%
           dplyr::sql()
       } else {
-        # rlang::expr(values_fn[[!!col]](!!rlang::sym(col)))
-        rlang::parse_expr(sprintf("values_fn[[\"%s\"]](%s)", col, col))
+        rlang::expr((!! values_fn[[col]])(!! rlang::sym(col)))
       }
     )
   }
   names(summarizers) <- names(values_fn)
-print("SUMMARIZERS == ")
-print(summarizers)
   summarized_data <- do.call(
     dplyr::summarize, append(list(grouped_data), summarizers)
   )

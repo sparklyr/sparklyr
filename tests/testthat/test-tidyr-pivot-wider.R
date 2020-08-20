@@ -158,5 +158,20 @@ test_that("values_fn can be a single function", {
     collect() %>%
     dplyr::arrange(a)
 
-  expect_equivalent(pv, tibble::tibble(a = 1:2, x = c(11, 20)))
+  expect_equivalent(pv, tibble::tibble(a = 1:2, x = c(11, 100)))
+})
+
+test_that("values_summarize applied even when no-duplicates", {
+  sdf <- copy_to(sc, tibble::tibble(a = c(1, 2), key = c("x", "x"), val = 1:2))
+  pv <- tidyr::pivot_wider(
+    sdf,
+    names_from = key,
+    values_from = val,
+    values_fn = list(val = rlang::expr(collect_list))
+  ) %>%
+    collect() %>%
+    dplyr::arrange(a)
+
+  expect_equal(pv$a, c(1, 2))
+  expect_equivalent(pv, tibble::tibble(a = 1:2, x = list(1, 2)))
 })
