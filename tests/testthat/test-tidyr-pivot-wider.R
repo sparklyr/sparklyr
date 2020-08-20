@@ -198,12 +198,18 @@ test_that("can fill in missing cells", {
   )
 })
 
-# TODO:
-# test_that("values_fill only affects missing cells", {
-#   df <- tibble(g = c(1, 2), names = c("x", "y"), value = c(1, NA))
-#   out <- pivot_wider(df, names_from = names, values_from = value, values_fill = 0 )
-#   expect_equal(out$y, c(0, NA))
-# })
+test_that("values_fill only affects missing cells", {
+  sdf <- copy_to(
+    sc,
+    tibble::tibble(g = c(1, 2), names = c("x", "y"), value = c(1, NA))
+  )
+  out <- sdf %>%
+    tidyr::pivot_wider(names_from = names, values_from = value, values_fill = 0 ) %>%
+    collect() %>%
+    dplyr::arrange(g)
+
+  expect_equivalent(out, tibble::tibble(g = 1:2, x = c(1, 0), y = c(0, NaN)))
+})
 
 test_that("can pivot from multiple measure cols", {
   sdf <- copy_to(
@@ -216,4 +222,12 @@ test_that("can pivot from multiple measure cols", {
     pv,
     tibble::tibble(row = 1, a_x = 1, a_y = 2, b_x = 3, b_y = 4)
   )
+})
+
+test_that("can pivot from multiple measure cols using all keys", {
+  sdf <- copy_to(sc, tibble::tibble(var = c("x", "y"), a = 1:2, b = 3:4))
+  pv <- tidyr::pivot_wider(sdf, names_from = var, values_from = c(a, b)) %>%
+    collect()
+
+  expect_equivalent(pv, tibble::tibble(a_x = 1, a_y = 2, b_x = 3, b_y = 4))
 })
