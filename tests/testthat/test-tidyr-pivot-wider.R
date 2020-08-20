@@ -3,7 +3,7 @@ context("tidyr-pivot-wider")
 sc <- testthat_spark_connection()
 
 test_that("can pivot all cols to wide", {
-  test_requires_version("2.0.0")
+  test_requires_version("2.3.0")
 
   sdf <- copy_to(sc, tibble::tibble(key = c("x", "y", "z"), val = 1:3))
   pv <- tidyr::pivot_wider(
@@ -15,7 +15,7 @@ test_that("can pivot all cols to wide", {
 })
 
 test_that("non-pivoted cols are preserved", {
-  test_requires_version("2.0.0")
+  test_requires_version("2.3.0")
 
   sdf <- copy_to(sc, tibble::tibble(a = 1, key = c("x", "y"), val = 1:2))
   pv <- tidyr::pivot_wider(
@@ -27,7 +27,7 @@ test_that("non-pivoted cols are preserved", {
 })
 
 test_that("implicit missings turn into explicit missings", {
-  test_requires_version("2.0.0")
+  test_requires_version("2.3.0")
 
   sdf <- copy_to(sc, tibble::tibble(a = 1:2, key = c("x", "y"), val = 1:2))
   pv <- tidyr::pivot_wider(
@@ -40,7 +40,7 @@ test_that("implicit missings turn into explicit missings", {
 })
 
 test_that("error when overwriting existing column", {
-  test_requires_version("2.0.0")
+  test_requires_version("2.3.0")
 
   sdf <- copy_to(sc, tibble::tibble(a = 1, key = c("a", "b"), val = 1:2))
 
@@ -51,7 +51,7 @@ test_that("error when overwriting existing column", {
 })
 
 test_that("grouping is preserved", {
-  test_requires_version("2.0.0")
+  test_requires_version("2.3.0")
 
   sdf <- copy_to(sc, tibble::tibble(g = 1, k = "x", v = 2))
   out <- sdf %>%
@@ -89,7 +89,7 @@ test_that("nested list column pivots correctly", {
 })
 
 test_that("can specify output column names using names_glue", {
-  test_requires_version("2.0.0")
+  test_requires_version("2.3.0")
 
   sdf <- copy_to(
     sc,
@@ -110,6 +110,8 @@ test_that("can specify output column names using names_glue", {
 })
 
 test_that("can sort column names", {
+  test_requires_version("2.3.0")
+
   sdf <- copy_to(
     sc,
     tibble::tibble(int = c(1, 3, 2), days = c("Mon", "Tues", "Wed"))
@@ -125,6 +127,8 @@ test_that("can sort column names", {
 })
 
 test_that("can override default keys", {
+  test_requires_version("2.3.0")
+
   sdf <- copy_to(
     sc,
     tibble::tribble(
@@ -148,6 +152,8 @@ test_that("can override default keys", {
 })
 
 test_that("values_fn can be a single function", {
+  test_requires_version("2.3.0")
+
   sdf <- copy_to(
     sc,
     tibble::tibble(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
@@ -162,6 +168,8 @@ test_that("values_fn can be a single function", {
 })
 
 test_that("values_summarize applied even when no-duplicates", {
+  test_requires_version("2.3.0")
+
   sdf <- copy_to(sc, tibble::tibble(a = c(1, 2), key = c("x", "x"), val = 1:2))
   pv <- tidyr::pivot_wider(
     sdf,
@@ -177,6 +185,8 @@ test_that("values_summarize applied even when no-duplicates", {
 })
 
 test_that("can fill in missing cells", {
+  test_requires_version("2.3.0")
+
   sdf <- copy_to(sc, tibble::tibble(g = 1:2, var = c("x", "y"), val = 1:2))
 
   widen <- function(...) {
@@ -199,6 +209,8 @@ test_that("can fill in missing cells", {
 })
 
 test_that("values_fill only affects missing cells", {
+  test_requires_version("2.3.0")
+
   sdf <- copy_to(
     sc,
     tibble::tibble(g = c(1, 2), names = c("x", "y"), value = c(1, NA))
@@ -212,6 +224,8 @@ test_that("values_fill only affects missing cells", {
 })
 
 test_that("can pivot from multiple measure cols", {
+  test_requires_version("2.3.0")
+
   sdf <- copy_to(
     sc, tibble::tibble(row = 1, var = c("x", "y"), a = 1:2, b = 3:4)
   )
@@ -225,6 +239,8 @@ test_that("can pivot from multiple measure cols", {
 })
 
 test_that("can pivot from multiple measure cols using all keys", {
+  test_requires_version("2.3.0")
+
   sdf <- copy_to(sc, tibble::tibble(var = c("x", "y"), a = 1:2, b = 3:4))
   pv <- tidyr::pivot_wider(sdf, names_from = var, values_from = c(a, b)) %>%
     collect()

@@ -89,8 +89,8 @@ sdf_pivot_wider <- function(data,
                             values_fill = NULL,
                             values_fn = NULL) {
   sc <- spark_connection(data)
-  if (spark_version(sc) < "2.0.0") {
-    rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.0.0 or higher")
+  if (spark_version(sc) < "2.3.0") {
+    rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.1.0 or higher")
   }
 
   spec <- canonicalize_spec(spec)
@@ -233,13 +233,7 @@ sdf_pivot_wider <- function(data,
     val_sql_type <- invoke(combined_schema_obj, "fields")[[val_field_idx]] %>%
       invoke("%>%", list("dataType"), list("sql"))
     fv <- values_fill[[value]]
-    val_fill_sql <-
-    # sprintf(
-    #   "CAST((%s) AS %s)",
-    #   dbplyr::translate_sql_(list(fv), con = dbplyr::simulate_dbi()),
-    #   val_sql_type
-    # ) %>%
-    dbplyr::translate_sql_(list(fv), con = dbplyr::simulate_dbi()) %>%
+    val_fill_sql <- dbplyr::translate_sql_(list(fv), con = dbplyr::simulate_dbi()) %>%
       dplyr::sql() %>%
       list()
     names(val_fill_sql) <- value
@@ -265,59 +259,6 @@ sdf_pivot_wider <- function(data,
       invoke("groupBy", group_by_cols) %>%
       invoke("pivot", pivot_col, as.list(value_spec$.name)) %>%
       invoke("agg", first_valid_value, list())
-
-
-  # out_schema <- out %>% sdf_schema()
-  # values_fill_args <- list()
-  # for (col in names(values_fill)) {
-  #   value <- values_fill[[col]]
-  #   if (!is.null(value) && !is.na(value) && !is.nan(value)) {
-  #     value_sql <- dbplyr::translate_sql_(
-  #       list(value), con = dbplyr::simulate_dbi()
-  #     )
-  #     dest_cols <- spec %>%
-  #       dplyr::filter(.value == col) %>%
-  #       dplyr::pull(.name)
-  #     for (dest_col in dest_cols) {
-  #       is_double_type <- identical(out_schema[[dest_col]]$type, "DoubleType")
-  #       dest_col_sql <- quote_sql_name(dest_col)
-  #       args <- (
-  #         if (is_double_type) {
-  #           sprintf(
-  #             "IF(ISNULL(%s) OR ISNAN(%s), %s, %s)",
-  #             dest_col_sql, dest_col_sql, value_sql, dest_col_sql
-  #           )
-  #         } else {
-  #           sprintf(
-  #             "IF(ISNULL(%s), %s, %s)", dest_col_sql, value_sql, dest_col_sql
-  #           )
-  #         }
-  #       ) %>%
-  #         dplyr::sql() %>%
-  #         list()
-  #       names(args) <- dest_col
-  #       values_fill_args <- append(values_fill_args, args)
-  #     }
-  #   }
-  # }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     if (is.null(out)) {
       out <- pivoted
@@ -356,48 +297,9 @@ sdf_pivot_wider <- function(data,
     }
   )
   names(coalesce_args) <- coalesce_cols
-  out <- do.call(dplyr::summarize, append(list(out), coalesce_args))
+  out <- do.call(dplyr::summarize, append(list(out), coalesce_args)) %>%
+    dplyr::ungroup()
 
-  # TODO:
-  # fill missing values according to `values_fill`
-  # out_schema <- out %>% sdf_schema()
-  # values_fill_args <- list()
-  # for (col in names(values_fill)) {
-  #   value <- values_fill[[col]]
-  #   if (!is.null(value) && !is.na(value) && !is.nan(value)) {
-  #     value_sql <- dbplyr::translate_sql_(
-  #       list(value), con = dbplyr::simulate_dbi()
-  #     )
-  #     dest_cols <- spec %>%
-  #       dplyr::filter(.value == col) %>%
-  #       dplyr::pull(.name)
-  #     for (dest_col in dest_cols) {
-  #       is_double_type <- identical(out_schema[[dest_col]]$type, "DoubleType")
-  #       dest_col_sql <- quote_sql_name(dest_col)
-  #       args <- (
-  #         if (is_double_type) {
-  #           sprintf(
-  #             "IF(ISNULL(%s) OR ISNAN(%s), %s, %s)",
-  #             dest_col_sql, dest_col_sql, value_sql, dest_col_sql
-  #           )
-  #         } else {
-  #           sprintf(
-  #             "IF(ISNULL(%s), %s, %s)", dest_col_sql, value_sql, dest_col_sql
-  #           )
-  #         }
-  #       ) %>%
-  #         dplyr::sql() %>%
-  #         list()
-  #       names(args) <- dest_col
-  #       values_fill_args <- append(values_fill_args, args)
-  #     }
-  #   }
-  # }
-  # if (length(values_fill_args) > 0) {
-  #   out <- do.call(dplyr::mutate, append(list(out), values_fill_args))
-  # }
-
-  out <- out %>% dplyr::ungroup()
   group_vars <- intersect(group_vars, colnames(out))
   do.call(dplyr::group_by, append(list(out), lapply(group_vars, as.symbol)))
 }
