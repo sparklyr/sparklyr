@@ -1,5 +1,7 @@
 #' @include sql_utils.R
 #' @include tidyr_utils.R
+#' @include utils.R
+NULL
 
 #' @importFrom tidyr unnest
 #' @export
@@ -17,7 +19,9 @@ unnest.tbl_spark <- function(data,
   if (!is.null(ptype))
     rlang::abort("`ptype` is unsupported for Spark data frame")
 
-  cols <- tidyselect::eval_select(rlang::enquo(cols), columns(data)) %>%
+  cols <- tidyselect::eval_select(
+    rlang::enquo(cols), replicate_colnames(data)
+  ) %>%
     names()
   if (length(cols) == 0) return(data)
 

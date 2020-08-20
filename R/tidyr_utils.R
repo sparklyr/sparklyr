@@ -4,13 +4,13 @@
 check_present <- function(x) {
   arg <- rlang::ensym(x)
   if (missing(x)) {
-    abort(paste0("Argument `", arg, "` is missing with no default"))
+    rlang::abort(paste0("Argument `", arg, "` is missing with no default"))
   }
 }
 
 # helper method returning a minimal R dataframe containing the same set of
 # column names as `sdf` does
-columns <- function(sdf) {
+replicate_colnames <- function(sdf) {
   columns <- lapply(
     colnames(sdf),
     function(column) {
@@ -76,4 +76,18 @@ ensure_tmp_view <- function(x) {
 
     data_tmp_view_name
   }
+}
+
+canonicalize_spec <- function(spec) {
+  if (!is.data.frame(spec)) {
+    stop("`spec` must be a data frame", call. = FALSE)
+  }
+
+  if (!rlang::has_name(spec, ".name") || !rlang::has_name(spec, ".value")) {
+    stop("`spec` must have `.name` and `.value` columns", call. = FALSE)
+  }
+
+  # Ensure .name and .value come first
+  vars <- union(c(".name", ".value"), names(spec))
+  spec[vars]
 }

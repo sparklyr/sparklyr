@@ -1,4 +1,5 @@
 #' @include tidyr_utils.R
+NULL
 
 check_key <- function(.key) {
   if (!rlang::is_missing(.key)) {
@@ -13,7 +14,7 @@ check_key <- function(.key) {
 #' @export
 nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::deprecated()) {
   if (.data %>% spark_connection() %>% spark_version() < "2.0.0") {
-    rlang::abort("`nest.tbl_spark` is only supported in Spark 2.0.0 or higher")
+    rlang::abort("`nest.tbl_spark` requires Spark 2.0.0 or higher")
   }
 
   .key <- check_key(.key)
@@ -29,7 +30,7 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::depr
       nested_cols <- rlang::list2(!!.key := colnames(.data))
     }
   } else {
-    cols <- columns(.data)
+    cols <- replicate_colnames(.data)
     nested_cols <- rlang::enquos(...) %>%
       purrr::map(~ names(tidyselect::eval_select(.x, cols)))
   }

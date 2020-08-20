@@ -1,5 +1,6 @@
 #' @include sql_utils.R
 #' @include tidyr_utils.R
+NULL
 
 #' @importFrom tidyr unite
 #' @export
@@ -10,7 +11,7 @@ unite.tbl_spark <- function(data, col, ..., sep = "_", remove = TRUE, na.rm = FA
     src_cols <- colnames(data)
   } else {
     src_cols <- names(
-      tidyselect::eval_select(rlang::expr(c(...)), columns(data))
+      tidyselect::eval_select(rlang::expr(c(...)), replicate_colnames(data))
     )
   }
 
