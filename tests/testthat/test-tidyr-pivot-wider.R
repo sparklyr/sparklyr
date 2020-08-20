@@ -36,7 +36,7 @@ test_that("implicit missings turn into explicit missings", {
     collect() %>%
      dplyr::arrange(a)
 
-  expect_equivalent(pv, tibble::tibble(a = 1:2, x = c(1, NA), y = c(NA, 2)))
+  expect_equivalent(pv, tibble::tibble(a = 1:2, x = c(1, NaN), y = c(NaN, 2)))
 })
 
 test_that("error when overwriting existing column", {
@@ -174,4 +174,46 @@ test_that("values_summarize applied even when no-duplicates", {
 
   expect_equal(pv$a, c(1, 2))
   expect_equivalent(pv, tibble::tibble(a = 1:2, x = list(1, 2)))
+})
+
+test_that("can fill in missing cells", {
+  sdf <- copy_to(sc, tibble::tibble(g = 1:2, var = c("x", "y"), val = 1:2))
+
+  widen <- function(...) {
+    sdf %>%
+      tidyr::pivot_wider(names_from = var, values_from = val, ...) %>%
+      collect() %>%
+      dplyr::arrange(g)
+  }
+
+  expect_equivalent(
+    widen(), tibble::tibble(g = 1:2, x = c(1, NaN), y = c(NaN, 2))
+  )
+  expect_equivalent(
+    widen(values_fill = 0), tibble::tibble(g = 1:2, x = c(1, 0), y = c(0, 2))
+  )
+  expect_equivalent(
+    widen(values_fill = list(val = 0)),
+    tibble::tibble(g = 1:2, x = c(1, 0), y = c(0, 2))
+  )
+})
+
+# TODO:
+# test_that("values_fill only affects missing cells", {
+#   df <- tibble(g = c(1, 2), names = c("x", "y"), value = c(1, NA))
+#   out <- pivot_wider(df, names_from = names, values_from = value, values_fill = 0 )
+#   expect_equal(out$y, c(0, NA))
+# })
+
+test_that("can pivot from multiple measure cols", {
+  sdf <- copy_to(
+    sc, tibble::tibble(row = 1, var = c("x", "y"), a = 1:2, b = 3:4)
+  )
+  pv <- tidyr::pivot_wider(sdf, names_from = var, values_from = c(a, b)) %>%
+    collect()
+
+  expect_equivalent(
+    pv,
+    tibble::tibble(row = 1, a_x = 1, a_y = 2, b_x = 3, b_y = 4)
+  )
 })
