@@ -25,11 +25,11 @@ replicate_colnames <- function(sdf) {
 # helper method for updating dplyr group variables
 update_group_vars <- function(input, output, preserved) {
   incl <- dplyr::group_vars(input)
-  output <- do.call(dplyr::group_by, append(list(output), lapply(incl, as.symbol)))
+  output <- output %>>% dplyr::group_by %@% lapply(incl, as.symbol)
 
   excl <- setdiff(incl, preserved)
   if (length(excl) > 0) {
-    output <- do.call(dplyr::ungroup, append(list(output), lapply(excl, as.symbol)))
+    output <- output %>>% dplyr::ungroup %@% lapply(excl, as.symbol)
   }
 
   output

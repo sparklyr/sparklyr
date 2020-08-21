@@ -283,3 +283,15 @@ is.tbl_spark <- function(x) {
 sort_named_list <- function(lst, ...) {
   lst[order(names(lst), ...)]
 }
+
+# syntax sugar for calling dplyr methods with do.call and a non-trivial variable
+# list of args
+`%>>%` <- function(x, fn) {
+  fn_call <- function(largs) {
+    do.call(fn, append(list(x), as.list(largs)))
+  }
+
+  fn_call
+}
+
+`%@%` <- function(fn, largs) fn(largs)

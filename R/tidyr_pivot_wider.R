@@ -51,10 +51,8 @@ sdf_build_wider_spec <- function(data,
   names_from <- names(tidyselect::eval_select(rlang::enquo(names_from), colnames_df))
   values_from <- names(tidyselect::eval_select(rlang::enquo(values_from), colnames_df))
 
-  row_ids <- do.call(
-     dplyr::distinct,
-     append(list(data), lapply(names_from, as.symbol))
-   ) %>%
+  row_ids <- data %>>%
+     dplyr::distinct %@% lapply(names_from, as.symbol) %>%
      collect()
   if (names_sort) {
     row_ids <- vctrs::vec_sort(row_ids)
@@ -127,11 +125,6 @@ sdf_pivot_wider <- function(data,
   key_vars <- setdiff(key_vars, spec_cols)
   data_schema <- data %>% sdf_schema()
 
-  # apply summarizing function(s)
-  grouped_data <- do.call(
-    dplyr::group_by,
-    append(list(data), lapply(union(key_vars, names_from), as.symbol))
-  )
   summarizers <- list()
   for (idx in seq_along(values_fn)) {
     col <- names(values_fn)[[idx]]
@@ -155,9 +148,10 @@ sdf_pivot_wider <- function(data,
     )
   }
   names(summarizers) <- names(values_fn)
-  summarized_data <- do.call(
-    dplyr::summarize, append(list(grouped_data), summarizers)
-  )
+  # apply summarizing function(s)
+  summarized_data <- data %>>%
+    dplyr::group_by %@% lapply(union(key_vars, names_from), as.symbol) %>>%
+    dplyr::summarize %@% summarizers
 
   # perform any name repair if necessary
   other_cols <- colnames(summarized_data) %>%
@@ -170,21 +164,17 @@ sdf_pivot_wider <- function(data,
   name_repair_args <- lapply(c(key_vars, other_cols), as.symbol)
   names(name_repair_args) <- head(output_colnames, length(key_vars) + length(other_cols))
   if (length(name_repair_args) > 0) {
-    summarized_data <- do.call(
-      dplyr::rename, append(list(summarized_data), name_repair_args)
-    )
+    summarized_data <- summarized_data %>>%
+      dplyr::rename %@% name_repair_args
   }
   key_vars <- key_vars_renamed
 
   summarized_data_id_col <- random_string("sdf_pivot_id")
   summarized_data_id_col_args <- list(dplyr::sql("monotonically_increasing_id()"))
   names(summarized_data_id_col_args) <- summarized_data_id_col
-  summarized_data <- do.call(
-    dplyr::mutate,
-    append(list(summarized_data), summarized_data_id_col_args)
-  )
-
-  summarized_data <- summarized_data %>% dplyr::compute()
+  summarized_data <- summarized_data %>>%
+    dplyr::mutate %@% summarized_data_id_col_args %>%
+    dplyr::compute()
 
   value_specs <- unname(split(spec, spec$.value))
   out <- NULL
@@ -196,23 +186,19 @@ sdf_pivot_wider <- function(data,
     lhs_cols <- union(summarized_data_id_col, key_vars) %>%
       union(names_from) %>%
       union(value)
-    lhs <- do.call(
-      dplyr::select,
-      append(list(summarized_data), lapply(lhs_cols, as.symbol))
-    )
+    lhs <- summarized_data %>>%
+      dplyr::select %@% lapply(lhs_cols, as.symbol)
 
-    all_obvs <- do.call(
-      dplyr::distinct,
-      append(
-        list(lhs %>% dplyr::ungroup()),
+    all_obvs <- lhs %>%
+      dplyr::ungroup() %>>%
+      dplyr::distinct %@%
         lapply(union(summarized_data_id_col, key_vars), as.symbol)
-      )
-    )
 
     rhs_select_args = list(as.symbol(".name"))
     names(rhs_select_args) <- pivot_col
     rhs_select_args <- append(rhs_select_args, lapply(names_from, as.symbol))
-    rhs <- do.call(dplyr::select, append(list(value_spec), rhs_select_args)) %>%
+    rhs <- value_spec %>>%
+      dplyr::select %@% rhs_select_args %>%
       copy_to(sc, ., name = random_string("pivot_wider_spec_sdf"))
     combined <- spark_dataframe(lhs) %>%
       invoke("join", spark_dataframe(rhs), as.list(names_from), "inner") %>%
@@ -225,9 +211,9 @@ sdf_pivot_wider <- function(data,
       as.list(union(key_vars, names_from)),
       "left_anti"
     ) %>%
-      invoke("drop", as.list(names_from))
+      invoke("drop", as.list(names_from)) %>%
+      sdf_register()
     combined_cols <- invoke(combined, "columns")
-    missing_vals <- missing_vals %>% sdf_register()
     combined_schema_obj <- invoke(combined, "schema")
     val_field_idx <- invoke(combined_schema_obj, "fieldIndex", value)
     val_sql_type <- invoke(combined_schema_obj, "fields")[[val_field_idx]] %>%
@@ -237,7 +223,7 @@ sdf_pivot_wider <- function(data,
       dplyr::sql() %>%
       list()
     names(val_fill_sql) <- value
-    missing_vals <- do.call(dplyr::mutate, append(list(missing_vals), val_fill_sql))
+    missing_vals <- missing_vals %>>% dplyr::mutate %@% val_fill_sql
     combined <- invoke(combined, "unionByName", spark_dataframe(missing_vals))
     combined_schema <- combined %>% sdf_schema()
 
@@ -275,8 +261,9 @@ sdf_pivot_wider <- function(data,
   # coalesce output columns based on key_vars after dropping `summarized_data_id_col`
   # (i.e., making sure each observation identified by `key_vars` will occupy 1 row
   # instead of multiple rows)
-  out <- out %>% sdf_register()
-  out <- do.call(dplyr::group_by, append(list(out), lapply(key_vars, as.symbol)))
+  out <- out %>%
+    sdf_register() %>>%
+    dplyr::group_by %@% lapply(key_vars, as.symbol)
   out_schema <- out %>% sdf_schema()
   coalesce_cols <- setdiff(colnames(out), key_vars)
   coalesce_args <- lapply(
@@ -297,11 +284,13 @@ sdf_pivot_wider <- function(data,
     }
   )
   names(coalesce_args) <- coalesce_cols
-  out <- do.call(dplyr::summarize, append(list(out), coalesce_args)) %>%
+  out <- out %>>%
+    dplyr::summarize %@% coalesce_args %>%
     dplyr::ungroup()
 
   group_vars <- intersect(group_vars, colnames(out))
-  do.call(dplyr::group_by, append(list(out), lapply(group_vars, as.symbol)))
+
+  out %>>% dplyr::group_by %@% lapply(group_vars, as.symbol)
 }
 
 is_scalar <- function(x) {

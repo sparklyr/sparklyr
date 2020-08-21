@@ -132,10 +132,9 @@ unnest.tbl_spark <- function(data,
     }
   )
 
-  out <- do.call(sdf_fast_bind_cols, unnested_cols)
-  out <- do.call(dplyr::select, append(list(out), lapply(output_cols, as.symbol)))
   group_vars <- intersect(setdiff(group_vars, cols), output_cols)
-  out <- do.call(dplyr::group_by, append(list(out), lapply( group_vars, as.symbol)))
 
-  out
+  do.call(sdf_fast_bind_cols, unnested_cols) %>>%
+    dplyr::select %@% lapply(output_cols, as.symbol) %>>%
+    dplyr::group_by %@% lapply( group_vars, as.symbol)
 }

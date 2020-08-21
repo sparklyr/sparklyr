@@ -60,12 +60,9 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::depr
   )
   names(nesting_sql) <- names(nested_cols)
 
-  out <- dplyr::ungroup(.data)
-  out <- do.call(dplyr::group_by, append(list(out), lapply(non_nested_cols, as.symbol)))
-  out <- do.call(dplyr::summarize, append(list(out), nesting_sql))
   output_cols <- c(non_nested_cols, names(nested_cols))
   group_vars <- intersect(group_vars, output_cols)
-  out <- do.call(dplyr::group_by, append(list(out), lapply(group_vars, as.symbol)))
+
   handle_empty_lists_sql <- lapply(
     names(nested_cols),
     function(nested_col) {
@@ -74,9 +71,11 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::depr
     }
   )
   names(handle_empty_lists_sql) <- names(nested_cols)
-  out <- do.call(dplyr::mutate, append(list(out), handle_empty_lists_sql))
 
-  out <- do.call(dplyr::select, append(list(out), lapply(output_cols, as.symbol)))
-
-  out
+  dplyr::ungroup(.data) %>>%
+    dplyr::group_by %@% lapply(non_nested_cols, as.symbol) %>>%
+    dplyr::summarize %@% nesting_sql %>>%
+    dplyr::group_by %@% lapply(group_vars, as.symbol) %>>%
+    dplyr::mutate %@% handle_empty_lists_sql %>>%
+    dplyr::select %@% lapply(output_cols, as.symbol)
 }
