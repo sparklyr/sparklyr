@@ -175,7 +175,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   })
 
   reporter <- MultiReporter$new(reporters = list(
-   SummaryReporter$new(show_praise = FALSE),
+   SummaryReporter$new(max_reports = 100L, show_praise = FALSE, omit_dots = TRUE),
    PerformanceReporter$new()
   ))
   test_check("sparklyr", filter = test_filter, reporter = reporter)
