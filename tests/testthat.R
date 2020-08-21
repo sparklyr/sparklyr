@@ -52,15 +52,6 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
             paste0(test, ": ", private$expectation_type(result), ": ", result$message),
             "\n"
           )
-          if (is_error) {
-            cat(
-              paste(
-                "  callstack:\n    ",
-                paste0(utils::limitedLabels(result$call), collapse = "\n    "),
-                "\n"
-              )
-            )
-          }
         })
       }
 
@@ -183,5 +174,9 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     tryCatch(livy_service_stop(), error = function(e) {})
   })
 
-  test_check("sparklyr", filter = test_filter, reporter = "performance")
+  reporter <- MultiReporter$new(reporters = list(
+   SummaryReporter$new(show_praise = FALSE),
+   PerformanceReporter$new()
+  ))
+  test_check("sparklyr", filter = test_filter, reporter = reporter)
 }
