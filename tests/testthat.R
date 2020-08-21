@@ -24,7 +24,6 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
 
       self$last_context <- context
       self$last_time <- Sys.time()
-      cat(paste0("\nContext: ", context, "\n"))
     },
 
     add_result = function(context, test, result) {

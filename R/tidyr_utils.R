@@ -1,4 +1,6 @@
-# This file contains helper methods that are useful for working with tidyr.
+#' @include sql_utils.R
+#' @include utils.R
+NULL
 
 # emit an error if the given arg is missing
 check_present <- function(x) {
@@ -90,4 +92,168 @@ canonicalize_spec <- function(spec) {
   # Ensure .name and .value come first
   vars <- union(c(".name", ".value"), names(spec))
   spec[vars]
+}
+
+process_warnings <- function(out, substr_arr_col, n, extra, fill) {
+  if (identical(extra, "warn") || identical(fill, "warn")) {
+    output_cols <- colnames(out)
+    tmp_tbl_name <- random_string("__tidyr_separate_tmp_tbl_")
+    row_num <- random_string("__tidyr_separate_row_num_")
+    row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY (SELECT 0))"))
+    names(row_num_sql) <- row_num
+    out <- out %>>%
+      dplyr::mutate %@% row_num_sql %>%
+      dplyr::compute(name = tmp_tbl_name)
+    substr_arr_col_sql <- sprintf(
+      "%s.%s",
+      quote_sql_name(tmp_tbl_name),
+      substr_arr_col
+    )
+    if (identical(extra, "warn")) {
+      pred <- sprintf("SIZE(%s) > %d", substr_arr_col_sql, n)
+      rows <- out %>%
+        dplyr::filter(dplyr::sql(pred)) %>%
+        dplyr::select(rlang::sym(row_num)) %>%
+        collect()
+      rows <- rows[[row_num]]
+      if (length(rows) > 0) {
+        sprintf(
+          "Expected %d piece(s). Additional piece(s) discarded in %d row(s) [%s].",
+          n,
+          length(rows),
+          paste0(rows, collapse = ", ")
+        ) %>%
+          rlang::warn()
+      }
+    }
+    if (identical(fill, "warn")) {
+      pred <- sprintf("SIZE(%s) < %d", substr_arr_col_sql, n)
+      rows <- out %>%
+        dplyr::filter(dplyr::sql(pred)) %>%
+        dplyr::select(rlang::sym(row_num)) %>%
+        collect()
+      rows <- rows[[row_num]]
+      if (length(rows) > 0) {
+        sprintf(
+          "Expected %d piece(s). Missing piece(s) filled with NULL value(s) in %d row(s) [%s].",
+          n,
+          length(rows),
+          paste0(rows, collapse = ", ")
+        ) %>%
+          rlang::warn()
+      }
+    }
+  }
+
+  out
+}
+
+strsep_to_sql <- function(column, into, sep) {
+  splitting_idx <- lapply(
+    sep,
+    function(idx) {
+      if (idx >= 0) {
+        as.character(idx)
+      } else {
+        sprintf("ARRAY_MAX(ARRAY(0, CHAR_LENGTH(%s) + %d))", column, idx)
+      }
+    }
+  )
+  pos <-
+    list("0") %>%
+    append(splitting_idx) %>%
+    append(sprintf("CHAR_LENGTH(%s)", column))
+  sql <- lapply(
+    seq(length(pos) - 1),
+    function(i) {
+      from <- sprintf("%s + 1", pos[[i]])
+      len <- sprintf("%s - %s", pos[[i + 1]], pos[[i]])
+
+      dplyr::sql(sprintf("SUBSTR(%s, %s, %s)", column, from, len))
+    }
+  )
+  names(sql) <- into
+
+  sql[!is.na(into)]
+}
+
+str_split_fixed_to_sql <- function(substr_arr_col, column, sep, n, extra, fill, impl) {
+  if (identical(extra, "error")) {
+    rlang::warn("`extra = \"error\"` is deprecated. Please use `extra = \"warn\"` instead")
+    extra <- "warn"
+  }
+
+  extra <- rlang::arg_match(extra, c("warn", "merge", "drop"))
+  fill <- rlang::arg_match(fill, c("warn", "left", "right"))
+
+  sep <- dbplyr::translate_sql_(list(sep), con = dbplyr::simulate_dbi())
+  limit <- if (identical(extra, "merge")) n else -1L
+  sql <- list(dplyr::sql(sprintf("%s(%s, %s, %d)", impl, column, sep, limit)))
+  names(sql) <- substr_arr_col
+
+  sql
+}
+
+str_separate <- function(data, column, into, sep, extra = "warn", fill = "warn") {
+  if (!is.character(into)) {
+    rlang::abort("`into` must be a character vector")
+  }
+  sc <- spark_connection(data)
+
+  if (is.numeric(sep)) {
+    sql <- strsep_to_sql(column, into, sep)
+    out <- data %>>% dplyr::mutate %@% sql
+  } else if (rlang::is_character(sep)) {
+    substr_arr_col <- random_string("__tidyr_separate_tmp_")
+    n <- length(into)
+    split_str_sql <- str_split_fixed_to_sql(
+      substr_arr_col = substr_arr_col,
+      column = column,
+      sep = sep,
+      n = n,
+      extra = extra,
+      fill = fill,
+      impl = if (spark_version(sc) >= "3.0.0") "SPLIT" else "SPARKLYR_STR_SPLIT"
+    )
+    substr_arr_col <- quote_sql_name(substr_arr_col)
+    fill_left <- identical(fill, "left")
+    assign_results_sql <- lapply(
+      seq_along(into),
+      function(idx) {
+        dplyr::sql(
+          if (fill_left) {
+            sprintf(
+              "IF(%s, NULL, %s)",
+              sprintf("%d <= %d - SIZE(%s)", idx, n, substr_arr_col),
+              sprintf(
+                "ELEMENT_AT(%s, %d - ARRAY_MAX(ARRAY(0, %d - SIZE(%s))))",
+                substr_arr_col,
+                idx,
+                n,
+                substr_arr_col
+              )
+            )
+          } else {
+            sprintf(
+              "IF(%d <= SIZE(%s), ELEMENT_AT(%s, %d), NULL)",
+              idx,
+              substr_arr_col,
+              substr_arr_col,
+              idx
+            )
+          }
+        )
+      }
+    )
+    names(assign_results_sql) <- into
+    assign_results_sql <- assign_results_sql[!is.na(into)]
+    out <- data %>>%
+      dplyr::mutate %@% split_str_sql %>%
+      process_warnings(substr_arr_col, n, extra, fill) %>>%
+      dplyr::mutate %@% assign_results_sql
+  } else {
+    rlang::abort("`sep` must be either numeric or character")
+  }
+
+  out
 }
