@@ -70,7 +70,8 @@ process_warnings <- function(out, substr_arr_col, n, extra, fill) {
     row_num <- random_string("__tidyr_separate_row_num_")
     row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY (SELECT 0))"))
     names(row_num_sql) <- row_num
-    out <- do.call(dplyr::mutate, append(list(out), row_num_sql)) %>%
+    out <- out %>>%
+      dplyr::mutate %@% row_num_sql %>%
       dplyr::compute(name = tmp_tbl_name)
     substr_arr_col_sql <- sprintf(
       "%s.%s",
@@ -133,7 +134,7 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
   col <- quote_sql_name(var)
   if (is.numeric(sep)) {
     sql <- strsep_to_sql(col, into, sep)
-    out <- do.call(dplyr::mutate, append(list(data), sql))
+    out <- data %>>% dplyr::mutate %@% sql
   } else {
     substr_arr_col <- random_string("__tidyr_separate_tmp_")
     n <- length(into)
@@ -178,16 +179,18 @@ separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
     )
     names(assign_results_sql) <- into
     assign_results_sql <- assign_results_sql[!is.na(into)]
-    out <- do.call(dplyr::mutate, append(list(data), split_str_sql)) %>%
-      process_warnings(substr_arr_col, n, extra, fill)
-    out <- do.call(dplyr::mutate, append(list(out), assign_results_sql))
+    out <- data %>>%
+      dplyr::mutate %@% split_str_sql %>%
+      process_warnings(substr_arr_col, n, extra, fill) %>>%
+      dplyr::mutate %@% assign_results_sql
   }
 
   preserved <- setdiff(dplyr::group_vars(data), into)
   preserved <- setdiff(preserved, var)
   output_cols <- if (remove) into else union(colnames(data), into)
   output_cols <- union(preserved, output_cols)
-  out <- update_group_vars(data, out, preserved)
   output_cols <- output_cols %>% lapply(as.symbol)
-  do.call(dplyr::select, append(list(out), output_cols))
+
+  update_group_vars(data, out, preserved) %>>%
+    dplyr::select %@% output_cols
 }

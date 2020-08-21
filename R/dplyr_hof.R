@@ -23,7 +23,7 @@ translate_formula <- function(f) {
   var_z <- as.name(random_string("z_"))
   # renaming variables because Spark SQL cannot handle lambda variable name
   # starting with '.'
-  f <- do.call(substitute, list(f, list(.x = var_x, .y = var_y, .z = var_z)))
+  f <- f %>>% substitute %@% list(list(.x = var_x, .y = var_y, .z = var_z))
   vars <- stringr::str_sort(all.vars(f))
   params_sql <- (
     if (length(vars) > 1) {
@@ -94,11 +94,10 @@ process_dest_col <- function(expr, dest_col) {
 #' @export
 `%->%` <- function(params, body) {
   `.` <- function(...) {
-    params <- do.call(
-      paste,
-      c(lapply(rlang::ensyms(...), as.character), sep = ", ")
-    )
-    paste0("(", params, ")")
+    rlang::ensyms(...) %>%
+      lapply(as.character) %>>%
+      paste %@% list(collapse = ", ") %>%
+      paste0("(", ., ")")
   }
   process_params <- function(x) {
     if ("call" %in% class(x)) {
@@ -131,7 +130,8 @@ do.mutate <- function(x, dest_col_name, sql, ...) {
   args <- list(dbplyr::sql(sql))
   names(args) <- as.character(dest_col_name)
 
-  do.call(dplyr::mutate, c(list(x), args, list(...)))
+  x %>>%
+    dplyr::mutate %@% c(args, list(...))
 }
 
 #' Transform Array Column
@@ -277,7 +277,8 @@ hof_aggregate <- function(
     ")"
   )))
 
-  do.call(do.mutate, c(list(x, as.character(dest_col), sql), args))
+  x %>>%
+    do.mutate %@% c(list(as.character(dest_col), sql), args)
 }
 
 #' Determine Whether Some Element Exists in an Array Column
