@@ -137,6 +137,8 @@ spark_connect <- function(master,
   }
   hadoop_version <- list(...)$hadoop_version
 
+  # ensure app_name is part of the spark-submit args
+  config$`sparklyr.shell.name` <- config$`sparklyr.shell.name` %||% app_name
   master_override <- spark_config_value(config, "sparklyr.connect.master", NULL)
   if (!is.null(master_override)) master <- master_override
 
