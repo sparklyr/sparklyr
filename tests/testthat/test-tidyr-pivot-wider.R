@@ -128,6 +128,7 @@ test_that("can sort column names", {
 
 test_that("can override default keys", {
   test_requires_version("2.3.0")
+  skip_databricks_connect()
 
   sdf <- copy_to(
     sc,
