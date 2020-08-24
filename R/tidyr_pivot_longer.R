@@ -1,115 +1,44 @@
+#' @include tidyr_pivot_utils.R
 #' @include tidyr_utils.R
 NULL
 
-_strsep <- function(x, sep) {
-  nchar <- nchar(x)
-  pos <- purrr::map(sep, function(i) {
-    if (i >= 0) return(i)
-    pmax(0, nchar + i)
-  })
-  pos <- c(list(0), pos, list(nchar))
-
-  purrr::map(1:(length(pos) - 1), function(i) {
-    substr(x, pos[[i]] + 1, pos[[i + 1]])
-  })
-}
-
-_slice_match <- function(x, i) {
-  structure(
-    x[i],
-    match.length = attr(x, "match.length")[i],
-    index.type = attr(x, "index.type"),
-    useBytes = attr(x, "useBytes")
+#' @importFrom tidyr pivot_longer
+#' @export
+pivot_longer.tbl_spark <- function(data,
+                                   cols,
+                                   names_to = "name",
+                                   names_prefix = NULL,
+                                   names_sep = NULL,
+                                   names_pattern = NULL,
+                                   names_ptypes = list(),
+                                   names_transform = list(),
+                                   names_repair = "check_unique",
+                                   values_to = "value",
+                                   values_drop_na = FALSE,
+                                   values_ptypes = list(),
+                                   values_transform = list(),
+                                   ...) {
+  cols <- rlang::enquo(cols)
+  spec <- build_longer_spec(
+    data,
+    !!cols,
+    names_to = names_to,
+    values_to = values_to,
+    names_prefix = names_prefix,
+    names_sep = names_sep,
+    names_pattern = names_pattern,
+    names_ptypes = names_ptypes,
+    names_transform = names_transform
   )
-}
 
-_str_split_n <- function(x, pattern, n_max = -1) {
-  m <- gregexpr(pattern, x, perl = TRUE)
-  if (n_max > 0) {
-    m <- lapply(m, function(x) _slice_match(x, seq_along(x) < n_max))
-  }
-  regmatches(x, m, invert = TRUE)
-}
-
-_list_indices <- function(x, max = 20) {
-  if (length(x) > max) {
-    x <- c(x[seq_len(max)], "...")
-  }
-
-  paste(x, collapse = ", ")
-}
-
-_str_split_fixed <- function(value, sep, n, extra = "warn", fill = "warn") {
-  if (extra == "error") {
-    rlang::warn(glue::glue(
-      "`extra = \"error\"` is deprecated. \\
-       Please use `extra = \"warn\"` instead"
-    ))
-    extra <- "warn"
-  }
-
-  extra <- arg_match(extra, c("warn", "merge", "drop"))
-  fill <- arg_match(fill, c("warn", "left", "right"))
-
-  n_max <- if (extra == "merge") n else -1L
-# TODO:
-
-# e.g.,
-# tidyr:::str_split_n(c("a.b", "c.d.e"), pattern = "\\.")
-# [[1]]
-# [1] "a" "b"
-#
-# [[2]]
-# [1] "c" "d" "e"
-
-# AND
-# tidyr:::str_split_n(c("a.b", "c.d.e"), pattern = "\\.", n_max = 2)
-# [[1]]
-# [1] "a" "b"
-#
-# [[2]]
-# [1] "c"   "d.e"
-
-
-  pieces <- _str_split_n(value, sep, n_max = n_max)
-
-# TODO: implement _simplifyPieces
-  simp <- _simplifyPieces(pieces, n, fill == "left")
-
-  n_big <- length(simp$too_big)
-  if (extra == "warn" && n_big > 0) {
-    idx <- _list_indices(simp$too_big)
-    rlang::warn(glue::glue("Expected {n} pieces. Additional pieces discarded in {n_big} rows [{idx}]."))
-  }
-
-  n_sml <- length(simp$too_sml)
-  if (fill == "warn" && n_sml > 0) {
-    idx <- _list_indices(simp$too_sml)
-    warn(glue("Expected {n} pieces. Missing pieces filled with `NA` in {n_sml} rows [{idx}]."))
-  }
-
-  simp$strings
-}
-
-_str_separate <- function(x, into, sep, convert = FALSE, extra = "warn", fill = "warn") {
-  if (!is.character(into)) {
-    rlang::abort("`into` must be a character vector")
-  }
-
-  if (is.numeric(sep)) {
-    out <- _strsep(x, sep)
-  } else if (is_character(sep)) {
-    out <- _str_split_fixed(x, sep, length(into), extra = extra, fill = fill)
-  } else {
-    rlang::abort("`sep` must be either numeric or character")
-  }
-
-  names(out) <- rlang::as_utf8_character(into)
-  out <- out[!is.na(names(out))]
-  if (convert) {
-    out[] <- purrr::map(out, type.convert, as.is = TRUE)
-  }
-  tibble::as_tibble(out)
+  sdf_pivot_longer(
+    data,
+    spec,
+    names_repair = names_repair,
+    values_drop_na = values_drop_na,
+    values_ptypes = values_ptypes,
+    values_transform = values_transform
+  )
 }
 
 build_longer_spec <- function(data,
@@ -122,16 +51,16 @@ build_longer_spec <- function(data,
                               names_ptypes = NULL,
                               names_transform = NULL) {
   colnames_df <- replicate_colnames(data)
-  cols <- tidyselect::eval_select(rlang::enquo(cols), colnames_df)
+  cols <- names(tidyselect::eval_select(rlang::enquo(cols), colnames_df))
 
   if (length(cols) == 0) {
     rlang::abort(glue::glue("`cols` must select at least one column."))
   }
 
   if (is.null(names_prefix)) {
-    names <- cols
+    output_names <- cols
   } else {
-    names <- gsub(paste0("^", names_prefix), "", cols)
+    output_names <- gsub(paste0("^", names_prefix), "", cols)
   }
 
   if (length(names_to) > 1) {
@@ -143,44 +72,287 @@ build_longer_spec <- function(data,
     }
 
     if (!is.null(names_sep)) {
-      names <- _str_separate(names, names_to, sep = names_sep)
+      output_names <- .str_separate(output_names, names_to, sep = names_sep)
     } else {
-      names <- str_extract(names, names_to, regex = names_pattern)
+      output_names <- stringr::str_extract(output_names, names_to, regex = names_pattern)
     }
   } else if (length(names_to) == 0) {
-    names <- tibble::new_tibble(x = list(), nrow = length(names))
+    output_names <- tibble::new_tibble(x = list(), nrow = length(output_names))
   } else {
     if (!is.null(names_sep)) {
-      abort("`names_sep` can not be used with length-1 `names_to`")
+      rlang::abort("`names_sep` can not be used with `names_to` of length 1")
     }
     if (!is.null(names_pattern)) {
-      names <- str_extract(names, names_to, regex = names_pattern)[[1]]
+      output_names <- stringr::str_extract(output_names, names_to, regex = names_pattern)[[1]]
     }
 
-    names <- tibble(!!names_to := names)
+    output_names <- tibble::tibble(!!names_to := output_names)
   }
 
   if (".value" %in% names_to) {
     values_to <- NULL
   } else {
-    vec_assert(values_to, ptype = character(), size = 1)
+    vctrs::vec_assert(values_to, ptype = character(), size = 1)
   }
 
   # optionally, cast variables generated from columns
-  cast_cols <- intersect(names(names), names(names_ptypes))
+  cast_cols <- intersect(names(output_names), names(names_ptypes))
   for (col in cast_cols) {
-    names[[col]] <- vec_cast(names[[col]], names_ptypes[[col]])
+    output_names[[col]] <- vctrs::vec_cast(output_names[[col]], names_ptypes[[col]])
   }
 
   # transform cols
-  coerce_cols <- intersect(names(names), names(names_transform))
+  coerce_cols <- intersect(names(output_names), names(names_transform))
   for (col in coerce_cols) {
     f <- as_function(names_transform[[col]])
-    names[[col]] <- f(names[[col]])
+    output_names[[col]] <- f(output_names[[col]])
   }
 
-  out <- tibble(.name = names(cols))
+  out <- tibble::tibble(.name = cols)
   out[[".value"]] <- values_to
-  out <- vec_cbind(out, names)
+  out <- vctrs::vec_cbind(out, output_names)
   out
+}
+
+sdf_pivot_longer <- function(data,
+                             spec,
+                             names_repair = "check_unique",
+                             values_drop_na = FALSE,
+                             values_ptypes = list(),
+                             values_transform = list()) {
+  sc <- spark_connection(data)
+  if (spark_version(sc) < "2.0.0") {
+    rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.-.0 or higher")
+  }
+
+  data <- data %>% dplyr::compute()
+  spec <- spec %>%
+    canonicalize_spec() %>%
+    deduplicate_spec(data)
+
+  # Quick hack to ensure that split() preserves order
+  v_fct <- factor(spec$.value, levels = unique(spec$.value))
+  values <- split(spec$.name, v_fct)
+  value_keys <- split(spec[-(1:2)], v_fct)
+  keys <- vctrs::vec_unique(spec[-(1:2)])
+
+  vals <- rlang::set_names(
+    vctrs::vec_init(list(), length(values)), names(values)
+  )
+
+  for (value in names(values)) {
+    cols <- values[[value]]
+    value_key <- value_keys[[value]]
+
+    stack_expr <- lapply(
+      seq_along(cols),
+      function(idx) {
+        key_tuple <- value_key[idx,] %>%
+          as.list() %>%
+          dbplyr::translate_sql_(con = dbplyr::simulate_dbi()) %>%
+          lapply(as.character) %>%
+          unlist()
+
+        c(quote_sql_name(cols[[idx]]), key_tuple) %>% paste0(collapse = ", ")
+      }
+    ) %>%
+      paste0(collapse = ", ") %>%
+        sprintf(
+          "STACK(%d, %s) AS (%s)",
+          length(cols),
+          .,
+          paste0(
+            lapply(c(value, names(value_key)), quote_sql_name), collapse = ", "
+          )
+        )
+    stacked_sdf <- data %>%
+      spark_dataframe() %>%
+      invoke("selectExpr", list(stack_expr)) %>%
+      sdf_register()
+print(stacked_sdf)
+
+    vals[[value]] <- stacked_sdf
+  }
+
+  # TODO:
+  print(vals)
+}
+
+# Ensure that there's a one-to-one match from spec to data by adding
+# a special .seq variable which is automatically removed after pivotting.
+deduplicate_spec <- function(spec, data) {
+
+  # Ensure each .name has a unique output identifier
+  key <- spec[setdiff(names(spec), ".name")]
+  if (vctrs::vec_duplicate_any(key)) {
+    pos <- vctrs::vec_group_loc(key)$loc
+    seq <- vector("integer", length = nrow(spec))
+    for (i in seq_along(pos)) {
+      seq[pos[[i]]] <- seq_along(pos[[i]])
+    }
+    spec$.seq <- seq
+  }
+
+  # Match spec to data, handling duplicated column names
+  col_id <- vctrs::vec_match(colnames(data), spec$.name)
+  has_match <- !is.na(col_id)
+
+  if (!vctrs::vec_duplicate_any(col_id[has_match])) {
+    return(spec)
+  }
+
+  spec <- vctrs::vec_slice(spec, col_id[has_match])
+  # Need to use numeric indices because names only match first
+  num_rows <- data %>% spark_dataframe() %>% invoke("count")
+  spec$.name <- seq(num_rows)[has_match]
+
+  pieces <- vctrs::vec_split(seq_len(nrow(spec)), col_id[has_match])
+  copy <- integer(nrow(spec))
+  for (i in seq_along(pieces$val)) {
+    idx <- pieces$val[[i]]
+    copy[idx] <- seq_along(idx)
+  }
+
+  spec$.seq <- copy
+  spec
+}
+
+.strsep <- function(x, sep) {
+  nchar <- nchar(x)
+  pos <- purrr::map(sep, function(i) {
+    if (i >= 0) return(i)
+    pmax(0, nchar + i)
+  })
+  pos <- c(list(0), pos, list(nchar))
+
+  purrr::map(1:(length(pos) - 1), function(i) {
+    substr(x, pos[[i]] + 1, pos[[i + 1]])
+  })
+}
+
+.slice_match <- function(x, i) {
+  structure(
+    x[i],
+    match.length = attr(x, "match.length")[i],
+    index.type = attr(x, "index.type"),
+    useBytes = attr(x, "useBytes")
+  )
+}
+
+.str_split_n <- function(x, pattern, n_max = -1) {
+  m <- gregexpr(pattern, x, perl = TRUE)
+  if (n_max > 0) {
+    m <- lapply(m, function(x) .slice_match(x, seq_along(x) < n_max))
+  }
+  regmatches(x, m, invert = TRUE)
+}
+
+.list_indices <- function(x, max = 20) {
+  if (length(x) > max) {
+    x <- c(x[seq_len(max)], "...")
+  }
+
+  paste(x, collapse = ", ")
+}
+
+.simplify_pieces <- function(pieces, p, fill_left) {
+  too_sml <- NULL
+  too_big <- NULL
+  n <- length(pieces)
+
+  out <- lapply(seq(p), function(x) rep(NA, n))
+  for (i in seq_along(pieces)) {
+    x <- pieces[[i]]
+    if (!(length(x) == 1 && is.na(x[[1]]))) {
+      if (length(x) > p) {
+        too_big <- c(too_big, i)
+
+        for (j in seq(p)) {
+          out[[j]][[i]] <- x[[j]]
+        }
+      } else if (length(x) < p) {
+        too_sml <- c(too_sml, i)
+
+        gap <- p - length(x)
+        for (j in seq(p)) {
+          if (fill_left) {
+            out[[j]][[i]] <- (
+              if (j >= gap) x[[j - gap]] else NA
+            )
+          } else {
+            out[[j]][[i]] <- (
+              if (j < length(x)) x[[j]] else NA
+            )
+          }
+        }
+      } else {
+        for (j in seq(p)) {
+          out[[j]][[i]] <- x[[j]]
+        }
+      }
+    }
+  }
+
+  structure(list(
+    strings = out,
+    too_big = too_big,
+    too_sml = too_sml
+  ))
+}
+
+.str_split_fixed <- function(value, sep, n, extra = "warn", fill = "warn") {
+  if (extra == "error") {
+    rlang::warn(glue::glue(
+      "`extra = \"error\"` is deprecated. \\
+       Please use `extra = \"warn\"` instead"
+    ))
+    extra <- "warn"
+  }
+
+  extra <- rlang::arg_match(extra, c("warn", "merge", "drop"))
+  fill <- rlang::arg_match(fill, c("warn", "left", "right"))
+
+  n_max <- if (extra == "merge") n else -1L
+  pieces <- .str_split_n(value, sep, n_max = n_max)
+
+  simp <- .simplify_pieces(pieces, n, fill == "left")
+
+  n_big <- length(simp$too_big)
+  if (extra == "warn" && n_big > 0) {
+    idx <- .list_indices(simp$too_big)
+    rlang::warn(glue::glue(
+      "Expected {n} pieces. ",
+      "Additional pieces discarded in {n_big} rows [{idx}]."
+    ))
+  }
+
+  n_sml <- length(simp$too_sml)
+  if (fill == "warn" && n_sml > 0) {
+    idx <- .list_indices(simp$too_sml)
+    rlang::warn(glue::glue(
+      "Expected {n} pieces. ",
+      "Missing pieces filled with `NA` in {n_sml} rows [{idx}]."
+    ))
+  }
+
+  simp$strings
+}
+
+.str_separate <- function(x, into, sep, extra = "warn", fill = "warn") {
+  if (!is.character(into)) {
+    rlang::abort("`into` must be a character vector")
+  }
+
+  if (is.numeric(sep)) {
+    out <- .strsep(x, sep)
+  } else if (rlang::is_character(sep)) {
+    out <- .str_split_fixed(x, sep, length(into), extra = extra, fill = fill)
+  } else {
+    rlang::abort("`sep` must be either numeric or character")
+  }
+
+  names(out) <- rlang::as_utf8_character(into)
+  out <- out[!is.na(names(out))]
+
+  tibble::as_tibble(out)
 }

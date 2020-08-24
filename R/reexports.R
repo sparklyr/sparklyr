@@ -42,3 +42,21 @@ dplyr::right_join
 
 #' @export
 dplyr::full_join
+
+#' @export
+tidyr::nest
+
+#' @export
+tidyr::unnest
+
+#' @export
+tidyr::separate
+
+#' @export
+tidyr::unite
+
+#' @export
+tidyr::pivot_wider
+
+#' @export
+tidyr::pivot_longer

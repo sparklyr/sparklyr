@@ -1,3 +1,5 @@
+#' @include sdf_interface.R
+#' @include tidyr_pivot_utils.R
 #' @include tidyr_utils.R
 NULL
 
@@ -86,7 +88,7 @@ sdf_pivot_wider <- function(data,
                             values_fn = NULL) {
   sc <- spark_connection(data)
   if (spark_version(sc) < "2.3.0") {
-    rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.1.0 or higher")
+    rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.3.0 or higher")
   }
 
   spec <- canonicalize_spec(spec)
