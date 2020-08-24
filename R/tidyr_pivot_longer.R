@@ -125,20 +125,23 @@ sdf_pivot_longer <- function(data,
     rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.-.0 or higher")
   }
 
-  data <- data %>% dplyr::compute()
-  spec <- spec %>%
-    canonicalize_spec() %>%
-    deduplicate_spec(data)
+  id_col <- random_string("__row_id")
+  id_sql <- list(dplyr::sql("monotonically_increasing_id()"))
+  names(id_sql) <- id_col
+
+  data <- data %>>%
+    dplyr::mutate %@% id_sql %>%
+    dplyr::compute()
+  spec <- canonicalize_spec(spec)
 
   # Quick hack to ensure that split() preserves order
   v_fct <- factor(spec$.value, levels = unique(spec$.value))
   values <- split(spec$.name, v_fct)
   value_keys <- split(spec[-(1:2)], v_fct)
-  keys <- vctrs::vec_unique(spec[-(1:2)])
 
-  vals <- rlang::set_names(
-    vctrs::vec_init(list(), length(values)), names(values)
-  )
+  out <- data %>>%
+    dplyr::select %@% setdiff(colnames(data), spec$.name) %>%
+    spark_dataframe()
 
   for (value in names(values)) {
     cols <- values[[value]]
@@ -151,70 +154,39 @@ sdf_pivot_longer <- function(data,
           as.list() %>%
           dbplyr::translate_sql_(con = dbplyr::simulate_dbi()) %>%
           lapply(as.character) %>%
-          unlist()
+          unlist() %>%
+          c(id_col)
 
-        c(quote_sql_name(cols[[idx]]), key_tuple) %>% paste0(collapse = ", ")
+        c(quote_sql_name(cols[[idx]]), key_tuple) %>%
+          paste0(collapse = ", ")
       }
     ) %>%
       paste0(collapse = ", ") %>%
-        sprintf(
-          "STACK(%d, %s) AS (%s)",
-          length(cols),
-          .,
-          paste0(
-            lapply(c(value, names(value_key)), quote_sql_name), collapse = ", "
-          )
+      sprintf(
+        "STACK(%d, %s) AS (%s)",
+        length(cols),
+        .,
+        paste0(
+          lapply(c(value, names(value_key), id_col), quote_sql_name), collapse = ", "
         )
+      )
     stacked_sdf <- data %>%
       spark_dataframe() %>%
-      invoke("selectExpr", list(stack_expr)) %>%
-      sdf_register()
-print(stacked_sdf)
+      invoke("selectExpr", list(stack_expr))
 
-    vals[[value]] <- stacked_sdf
+    join_cols <- intersect(
+      out %>% invoke("columns"),
+      c(value, names(value_key), id_col)
+    ) %>%
+      as.list()
+    out <- out %>% invoke("join", stacked_sdf, join_cols, "left_outer")
   }
 
-  # TODO:
-  print(vals)
-}
-
-# Ensure that there's a one-to-one match from spec to data by adding
-# a special .seq variable which is automatically removed after pivotting.
-deduplicate_spec <- function(spec, data) {
-
-  # Ensure each .name has a unique output identifier
-  key <- spec[setdiff(names(spec), ".name")]
-  if (vctrs::vec_duplicate_any(key)) {
-    pos <- vctrs::vec_group_loc(key)$loc
-    seq <- vector("integer", length = nrow(spec))
-    for (i in seq_along(pos)) {
-      seq[pos[[i]]] <- seq_along(pos[[i]])
-    }
-    spec$.seq <- seq
-  }
-
-  # Match spec to data, handling duplicated column names
-  col_id <- vctrs::vec_match(colnames(data), spec$.name)
-  has_match <- !is.na(col_id)
-
-  if (!vctrs::vec_duplicate_any(col_id[has_match])) {
-    return(spec)
-  }
-
-  spec <- vctrs::vec_slice(spec, col_id[has_match])
-  # Need to use numeric indices because names only match first
-  num_rows <- data %>% spark_dataframe() %>% invoke("count")
-  spec$.name <- seq(num_rows)[has_match]
-
-  pieces <- vctrs::vec_split(seq_len(nrow(spec)), col_id[has_match])
-  copy <- integer(nrow(spec))
-  for (i in seq_along(pieces$val)) {
-    idx <- pieces$val[[i]]
-    copy[idx] <- seq_along(idx)
-  }
-
-  spec$.seq <- copy
-  spec
+  key_cols <- colnames(spec[-(1:2)])
+  out %>%
+    invoke("sort", id_col, as.list(key_cols)) %>%
+    invoke("drop", id_col) %>%
+    sdf_register()
 }
 
 .strsep <- function(x, sep) {
