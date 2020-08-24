@@ -3,6 +3,8 @@ context("tidyr-pivot-longer")
 sc <- testthat_spark_connection()
 
 test_that("can pivot all cols to long", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(sc, tibble::tibble(x = 1:2, y = 3:4))
   pv <- tidyr::pivot_longer(sdf, x:y) %>% collect()
 
@@ -16,6 +18,8 @@ test_that("can pivot all cols to long", {
 })
 
 test_that("values interleaved correctly", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(
     sc,
     tibble::tibble(x = c(1, 2), y = c(10, 20), z = c(100, 200))
@@ -32,6 +36,8 @@ test_that("values interleaved correctly", {
 })
 
 test_that("can drop missing values", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(sc, tibble::tibble(x = c(1, NA), y = c(NA, 2)))
   pv <- tidyr::pivot_longer(sdf, x:y, values_drop_na = TRUE) %>% collect()
 
@@ -39,6 +45,8 @@ test_that("can drop missing values", {
 })
 
 test_that("preserves original keys", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(sc, tibble::tibble(x = 1:2, y = 2L, z = 1:2))
   pv <- tidyr::pivot_longer(sdf, y:z) %>% collect()
 
@@ -53,6 +61,8 @@ test_that("preserves original keys", {
 })
 
 test_that("can handle missing combinations", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(
     sc,
     tibble::tribble(
@@ -79,6 +89,8 @@ test_that("can handle missing combinations", {
 })
 
 test_that("can override default output column type", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(sc, tibble::tibble(x = 1L, y = 2L))
   pv <- tidyr::pivot_longer(
     sdf, x:y, values_transform = list(value = as.character)
@@ -92,6 +104,8 @@ test_that("can override default output column type", {
 })
 
 test_that("original col order is preserved", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(
     sc,
     tibble::tribble(

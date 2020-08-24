@@ -74,7 +74,7 @@ build_longer_spec <- function(data,
     if (!is.null(names_sep)) {
       output_names <- .str_separate(output_names, names_to, sep = names_sep)
     } else {
-      output_names <- stringr::str_extract(output_names, names_to, regex = names_pattern)
+      output_names <- .str_extract(output_names, names_to, regex = names_pattern)
     }
   } else if (length(names_to) == 0) {
     output_names <- tibble::new_tibble(x = list(), nrow = length(output_names))
@@ -135,6 +135,7 @@ sdf_pivot_longer <- function(data,
     dplyr::mutate %@% id_sql %>%
     dplyr::compute()
   spec <- canonicalize_spec(spec)
+# TODO: deduplicate spec
 
   # Quick hack to ensure that split() preserves order
   v_fct <- factor(spec$.value, levels = unique(spec$.value))
@@ -360,4 +361,62 @@ sdf_pivot_longer <- function(data,
   out <- out[!is.na(names(out))]
 
   tibble::as_tibble(out)
+}
+
+.str_extract <- function(x, into, regex, convert = FALSE) {
+  stopifnot(
+    rlang::is_string(regex),
+    rlang::is_character(into)
+  )
+
+  out <- .str_match_first(x, regex)
+  if (length(out) != length(into)) {
+    stop(
+      "`regex` should define ", length(into), " groups; ", ncol(matches), " found.",
+      call. = FALSE
+    )
+  }
+
+  # Handle duplicated names
+  if (anyDuplicated(into)) {
+    pieces <- split(out, into)
+    into <- names(pieces)
+    out <- purrr::map(pieces, pmap_chr, paste0, sep = "")
+  }
+
+  into <- rlang::as_utf8_character(into)
+
+  non_na_into <- !is.na(into)
+  out <- out[non_na_into]
+  names(out) <- into[non_na_into]
+
+  out <- tibble::as_tibble(out)
+
+  if (convert) {
+    out[] <- purrr::map(out, type.convert, as.is = TRUE)
+  }
+
+  out
+}
+
+.str_match_first <- function(string, regex) {
+  loc <- regexpr(regex, string, perl = TRUE)
+  loc <- .group_loc(loc)
+
+  out <- lapply(
+    seq_len(loc$matches),
+    function(i) substr(string, loc$start[, i], loc$end[, i])
+  )
+  out[-1]
+}
+
+.group_loc <- function(x) {
+  start <- cbind(as.vector(x), attr(x, "capture.start"))
+  end <- start + cbind(attr(x, "match.length"), attr(x, "capture.length")) - 1L
+
+  no_match <- start == -1L
+  start[no_match] <- NA
+  end[no_match] <- NA
+
+  list(matches = ncol(start), start = start, end = end)
 }
