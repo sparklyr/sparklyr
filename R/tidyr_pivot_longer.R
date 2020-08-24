@@ -121,6 +121,7 @@ sdf_pivot_longer <- function(data,
                              values_ptypes = list(),
                              values_transform = list()) {
   sc <- spark_connection(data)
+  # TODO: < 2.0.0 may be OK!!!!
   if (spark_version(sc) < "2.0.0") {
     rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.-.0 or higher")
   }
@@ -176,6 +177,13 @@ sdf_pivot_longer <- function(data,
       spark_dataframe() %>%
       invoke("selectExpr", list(stack_expr))
 
+    if (values_drop_na) {
+      cond <- invoke_new(sc, "org.apache.spark.sql.Column", value) %>%
+        invoke_static(sc, "org.apache.spark.sql.functions", "isnull", .) %>%
+        invoke_static(sc, "org.apache.spark.sql.functions", "not", .)
+      stacked_sdf <- stacked_sdf %>% invoke("filter", cond)
+    }
+
     join_cols <- intersect(
       out %>% invoke("columns"),
       c(value, names(value_key), id_col)
@@ -185,12 +193,17 @@ sdf_pivot_longer <- function(data,
   }
 
   key_cols <- colnames(spec[-(1:2)])
+  output_cols <- c(
+    setdiff(colnames(data), c(spec$.name, id_col)),
+    key_cols,
+    names(values)
+  )
+  # TODO: dedup and names_repair (???)
   out <- out %>%
     invoke("sort", id_col, as.list(key_cols)) %>%
     invoke("drop", id_col) %>%
-    sdf_register()
-
-  out %>>%
+    sdf_register() %>>%
+    dplyr::select %@% lapply(output_cols, as.symbol) %>>%
     dplyr::group_by %@% intersect(group_vars, colnames(out))
 }
 
