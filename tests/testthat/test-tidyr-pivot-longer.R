@@ -90,3 +90,29 @@ test_that("can override default output column type", {
     tibble::tibble(name = c("x", "y"), value = c("1", "2"))
   )
 })
+
+test_that("original col order is preserved", {
+  sdf <- copy_to(
+    sc,
+    tibble::tribble(
+      ~id, ~z_1, ~y_1, ~x_1, ~z_2,  ~y_2, ~x_2,
+      "A",    1,    2,    3,     4,    5,    6,
+      "B",    7,    8,    9,    10,   11,   12,
+    )
+  )
+  pv <- tidyr::pivot_longer(
+    sdf, -id, names_to = c(".value", "n"), names_sep = "_"
+  ) %>%
+    collect()
+
+  expect_equivalent(
+    pv,
+    tibble::tribble(
+      ~id,  ~n, ~z, ~y, ~x,
+      "A", "1",  1,  2,  3,
+      "A", "2",  4,  5,  6,
+      "B", "1",  7,  8,  9,
+      "B", "2", 10, 11, 12,
+    )
+  )
+})
