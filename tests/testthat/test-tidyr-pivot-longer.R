@@ -51,3 +51,29 @@ test_that("preserves original keys", {
     )
   )
 })
+
+test_that("can handle missing combinations", {
+  sdf <- copy_to(
+    sc,
+    tibble::tribble(
+      ~id, ~x_1, ~x_2, ~y_2,
+      "A",    1,    2,  "a",
+      "B",    3,    4,  "b",
+    )
+  )
+  pv <- tidyr::pivot_longer(
+    sdf, -id, names_to = c(".value", "n"), names_sep = "_"
+  ) %>%
+    collect()
+
+  expect_equivalent(
+    pv,
+    tibble::tribble(
+      ~id,  ~n, ~x,  ~y,
+      "A", "1",  1,  NA,
+      "A", "2",  2, "a",
+      "B", "1",  3,  NA,
+      "B", "2",  4, "b",
+    )
+  )
+})
