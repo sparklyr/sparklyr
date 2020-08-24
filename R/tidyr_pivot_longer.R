@@ -129,7 +129,9 @@ sdf_pivot_longer <- function(data,
   id_sql <- list(dplyr::sql("monotonically_increasing_id()"))
   names(id_sql) <- id_col
 
-  data <- data %>>%
+  group_vars <- dplyr::group_vars(data)
+  data <- data %>%
+    dplyr::ungroup() %>>%
     dplyr::mutate %@% id_sql %>%
     dplyr::compute()
   spec <- canonicalize_spec(spec)
@@ -183,10 +185,13 @@ sdf_pivot_longer <- function(data,
   }
 
   key_cols <- colnames(spec[-(1:2)])
-  out %>%
+  out <- out %>%
     invoke("sort", id_col, as.list(key_cols)) %>%
     invoke("drop", id_col) %>%
     sdf_register()
+
+  out %>>%
+    dplyr::group_by %@% intersect(group_vars, colnames(out))
 }
 
 .strsep <- function(x, sep) {
