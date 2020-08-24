@@ -77,3 +77,16 @@ test_that("can handle missing combinations", {
     )
   )
 })
+
+test_that("can override default output column type", {
+  sdf <- copy_to(sc, tibble::tibble(x = 1L, y = 2L))
+  pv <- tidyr::pivot_longer(
+    sdf, x:y, values_transform = list(value = as.character)
+  ) %>%
+    collect()
+
+  expect_equivalent(
+    pv,
+    tibble::tibble(name = c("x", "y"), value = c("1", "2"))
+  )
+})

@@ -121,7 +121,6 @@ sdf_pivot_longer <- function(data,
                              values_ptypes = list(),
                              values_transform = list()) {
   sc <- spark_connection(data)
-  # TODO: < 2.0.0 may be OK!!!!
   if (spark_version(sc) < "2.0.0") {
     rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.-.0 or higher")
   }
@@ -176,6 +175,22 @@ sdf_pivot_longer <- function(data,
     stacked_sdf <- data %>%
       spark_dataframe() %>%
       invoke("selectExpr", list(stack_expr))
+
+    if (rlang::has_name(values_transform, value)) {
+      transform_args <- list(
+        do.call(dplyr::vars, list(as.symbol(value))), values_transform[[value]]
+      )
+      transformed_vals <- stacked_sdf %>%
+        invoke("select", value, list()) %>%
+        sdf_register() %>%
+        dplyr::group_by() %>>%
+        dplyr::summarize_at %@% transform_args
+      stacked_sdf <- stacked_sdf %>%
+        invoke("drop", value) %>%
+        sdf_register() %>%
+        sdf_bind_cols(transformed_vals) %>%
+        spark_dataframe()
+    }
 
     if (values_drop_na) {
       cond <- invoke_new(sc, "org.apache.spark.sql.Column", value) %>%
