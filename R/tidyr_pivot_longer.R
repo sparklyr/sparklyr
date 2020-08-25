@@ -122,7 +122,7 @@ sdf_pivot_longer <- function(data,
                              values_transform = list()) {
   sc <- spark_connection(data)
   if (spark_version(sc) < "2.0.0") {
-    rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.-.0 or higher")
+    rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.0.0 or higher")
   }
 
   id_col <- random_string("__row_id")
