@@ -136,6 +136,8 @@ test_that("original col order is preserved", {
 })
 
 test_that("can pivot duplicated names to .value", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(sc, tibble::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4))
   pv <- lapply(
     list(
@@ -151,6 +153,8 @@ test_that("can pivot duplicated names to .value", {
 })
 
 test_that(".value can be at any position in `names_to`", {
+  test_requires_version("2.0.0")
+
   samp_sdf <- copy_to(
     sc,
     tibble::tibble(
@@ -185,6 +189,8 @@ test_that(".value can be at any position in `names_to`", {
 })
 
 test_that("reporting data type mismatch", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(sc, tibble::tibble(abc = 1, xyz = "b"))
   err <- capture_error(tidyr::pivot_longer(sdf, tidyr::everything()))
 
@@ -192,6 +198,8 @@ test_that("reporting data type mismatch", {
 })
 
 test_that("grouping is preserved", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(sc, tibble::tibble(g = 1, x1 = 1, x2 = 2))
   out <- sdf %>%
     dplyr::group_by(g) %>%
@@ -201,6 +209,8 @@ test_that("grouping is preserved", {
 })
 
 test_that("names repair preserves grouping vars and pivot longer spec", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(
     sc,
     tibble::tibble(
@@ -230,6 +240,8 @@ test_that("names repair preserves grouping vars and pivot longer spec", {
 # spec --------------------------------------------------------------------
 
 test_that("validates inputs", {
+  test_requires_version("2.0.0")
+
   expect_error(
     build_longer_spec(trivial_sdf, x_y, values_to = letters[1:2]),
     class = "vctrs_error_assert"
@@ -237,6 +249,8 @@ test_that("validates inputs", {
 })
 
 test_that("no names doesn't generate names", {
+  test_requires_version("2.0.0")
+
   expect_equal(
     colnames(build_longer_spec(trivial_sdf, x_y, names_to = character())),
     c(".name", ".value")
@@ -244,6 +258,8 @@ test_that("no names doesn't generate names", {
 })
 
 test_that("multiple names requires names_sep/names_pattern", {
+  test_requires_version("2.0.0")
+
   expect_error(
     build_longer_spec(trivial_sdf, x_y, names_to = c("a", "b")),
     "multiple names"
@@ -260,6 +276,8 @@ test_that("multiple names requires names_sep/names_pattern", {
 })
 
 test_that("names_sep generates correct spec", {
+  test_requires_version("2.0.0")
+
   sp <- build_longer_spec(
     trivial_sdf, x_y, names_to = c("a", "b"), names_sep = "_"
   )
@@ -269,6 +287,8 @@ test_that("names_sep generates correct spec", {
 })
 
 test_that("names_sep fails with single name", {
+  test_requires_version("2.0.0")
+
   expect_error(
     build_longer_spec(trivial_sdf, x_y, names_to = "x", names_sep = "_"),
     "`names_sep`"
@@ -276,6 +296,8 @@ test_that("names_sep fails with single name", {
 })
 
 test_that("names_pattern generates correct spec", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(sc, tibble::tibble(zx_y = 1))
   sp <- build_longer_spec(
     sdf, zx_y, names_to = c("a", "b"), names_pattern = "z(.)_(.)"
@@ -290,6 +312,8 @@ test_that("names_pattern generates correct spec", {
 })
 
 test_that("names_to can override value_to", {
+  test_requires_version("2.0.0")
+
   sp <- build_longer_spec(
     trivial_sdf, x_y, names_to = c("a", ".value"), names_sep = "_"
   )
@@ -298,6 +322,8 @@ test_that("names_to can override value_to", {
 })
 
 test_that("names_prefix strips off from beginning", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(sc, tibble::tibble(zzyz = 1))
   sp <- build_longer_spec(sdf, zzyz, names_prefix = "z")
 
@@ -305,6 +331,8 @@ test_that("names_prefix strips off from beginning", {
 })
 
 test_that("can cast to custom type", {
+  test_requires_version("2.0.0")
+
   sdf <- copy_to(sc, tibble::tibble(w1 = 1))
   sp <- build_longer_spec(
     sdf,
@@ -317,6 +345,8 @@ test_that("can cast to custom type", {
 })
 
 test_that("Error if the `col` can't be selected.", {
+  test_requires_version("2.0.0")
+
   expect_error(
     tidyr::pivot_longer(trivial_sdf, tidyr::matches("foo")),
     "select at least one"
