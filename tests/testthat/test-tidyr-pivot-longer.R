@@ -130,3 +130,15 @@ test_that("original col order is preserved", {
     )
   )
 })
+
+test_that("can pivot duplicated names to .value", {
+  sdf <- copy_to(sc, tibble::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4))
+  pvs <- list(
+    tidyr::pivot_longer(sdf, -x, names_to = c(".value", NA), names_sep = "_"),
+    tidyr::pivot_longer(sdf, -x, names_to = c(".value", NA), names_pattern = "(.)_(.)"),
+    tidyr::pivot_longer(sdf, -x, names_to = ".value", names_pattern = "(.)_.")
+  )
+  for (pv in pvs) {
+    expect_equivalent(pv %>% collect(), tibble::tibble(x = 1, a = 1:2, b = 3:4))
+  }
+})

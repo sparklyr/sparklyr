@@ -83,7 +83,7 @@ build_longer_spec <- function(data,
       rlang::abort("`names_sep` can not be used with `names_to` of length 1")
     }
     if (!is.null(names_pattern)) {
-      output_names <- stringr::str_extract(output_names, names_to, regex = names_pattern)[[1]]
+      output_names <- .str_extract(output_names, names_to, regex = names_pattern)[[1]]
     }
 
     output_names <- tibble::tibble(!!names_to := output_names)
@@ -134,13 +134,29 @@ sdf_pivot_longer <- function(data,
     dplyr::ungroup() %>>%
     dplyr::mutate %@% id_sql %>%
     dplyr::compute()
-  spec <- canonicalize_spec(spec)
-# TODO: deduplicate spec
+  spec <- spec %>%
+    canonicalize_spec() %>%
+    deduplicate_longer_spec()
 
   # Quick hack to ensure that split() preserves order
   v_fct <- factor(spec$.value, levels = unique(spec$.value))
   values <- split(spec$.name, v_fct)
   value_keys <- split(spec[-(1:2)], v_fct)
+
+  if (".seq" %in% colnames(spec)) {
+    seq_col <- random_string("__seq")
+    rename_arg <- list(as.symbol(".seq"))
+    names(rename_arg) <- seq_col
+    spec <- spec %>>% dplyr::rename %@% rename_arg
+    for (v in names(value_keys)) {
+      if (".seq" %in% colnames(value_keys[[v]])) {
+        value_keys[[v]] <- value_keys[[v]] %>>%
+          dplyr::rename %@% rename_arg
+      }
+    }
+  } else {
+    seq_col <- NULL
+  }
 
   out <- data %>>%
     dplyr::select %@% setdiff(colnames(data), spec$.name) %>%
@@ -214,13 +230,30 @@ sdf_pivot_longer <- function(data,
     key_cols,
     names(values)
   )
-  # TODO: dedup and names_repair (???)
+  # TODO: names_repair (???)
+  output_cols <- setdiff(output_cols, c(id_col, seq_col))
   out <- out %>%
     invoke("sort", id_col, as.list(key_cols)) %>%
-    invoke("drop", id_col) %>%
     sdf_register() %>>%
     dplyr::select %@% lapply(output_cols, as.symbol) %>>%
     dplyr::group_by %@% intersect(group_vars, colnames(out))
+}
+
+# Ensure that there's a one-to-one match from spec to data by adding
+# a special .seq variable which is automatically removed after pivotting.
+deduplicate_longer_spec <- function(spec) {
+  # Ensure each .name has a unique output identifier
+  key <- spec[setdiff(names(spec), ".name")]
+  if (vctrs::vec_duplicate_any(key)) {
+    pos <- vctrs::vec_group_loc(key)$loc
+    seq <- vector("integer", length = nrow(spec))
+    for (i in seq_along(pos)) {
+      seq[pos[[i]]] <- seq_along(pos[[i]])
+    }
+    spec$.seq <- seq
+  }
+
+  spec
 }
 
 .strsep <- function(x, sep) {
