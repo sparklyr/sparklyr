@@ -1,3 +1,5 @@
+#' @include sdf_interface.R
+#' @include tidyr_pivot_utils.R
 #' @include tidyr_utils.R
 NULL
 
@@ -86,7 +88,7 @@ sdf_pivot_wider <- function(data,
                             values_fn = NULL) {
   sc <- spark_connection(data)
   if (spark_version(sc) < "2.3.0") {
-    rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.1.0 or higher")
+    rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.3.0 or higher")
   }
 
   spec <- canonicalize_spec(spec)
@@ -167,7 +169,7 @@ sdf_pivot_wider <- function(data,
   }
   key_vars <- key_vars_renamed
 
-  summarized_data_id_col <- random_string("sdf_pivot_id")
+  summarized_data_id_col <- random_string("__row_id")
   summarized_data_id_col_args <- list(dplyr::sql("monotonically_increasing_id()"))
   names(summarized_data_id_col_args) <- summarized_data_id_col
   summarized_data <- summarized_data %>>%
@@ -177,7 +179,7 @@ sdf_pivot_wider <- function(data,
   value_specs <- unname(split(spec, spec$.value))
   out <- NULL
 
-  pivot_col <- random_string("sdf_pivot")
+  pivot_col <- random_string("__pivot")
   for (value_spec in value_specs) {
     value <- value_spec$.value[[1]]
 
@@ -197,7 +199,7 @@ sdf_pivot_wider <- function(data,
     rhs_select_args <- append(rhs_select_args, lapply(names_from, as.symbol))
     rhs <- value_spec %>>%
       dplyr::select %@% rhs_select_args %>%
-      copy_to(sc, ., name = random_string("pivot_wider_spec_sdf"))
+      copy_to(sc, ., name = random_string("__pivot_wider_spec_sdf"))
     combined <- spark_dataframe(lhs) %>%
       invoke("join", spark_dataframe(rhs), as.list(names_from), "inner") %>%
       invoke("drop", as.list(names_from))
