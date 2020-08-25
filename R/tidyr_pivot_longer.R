@@ -104,7 +104,7 @@ build_longer_spec <- function(data,
   # transform cols
   coerce_cols <- intersect(names(output_names), names(names_transform))
   for (col in coerce_cols) {
-    f <- as_function(names_transform[[col]])
+    f <- rlang::as_function(names_transform[[col]])
     output_names[[col]] <- f(output_names[[col]])
   }
 
@@ -231,12 +231,14 @@ sdf_pivot_longer <- function(data,
     names(values)
   )
   # TODO: names_repair (???)
+
   output_cols <- setdiff(output_cols, c(id_col, seq_col))
+  group_vars <- intersect(group_vars, output_cols)
   out <- out %>%
     invoke("sort", id_col, as.list(key_cols)) %>%
     sdf_register() %>>%
     dplyr::select %@% lapply(output_cols, as.symbol) %>>%
-    dplyr::group_by %@% intersect(group_vars, colnames(out))
+    dplyr::group_by %@% lapply(group_vars, as.symbol)
 }
 
 # Ensure that there's a one-to-one match from spec to data by adding
