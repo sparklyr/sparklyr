@@ -200,6 +200,33 @@ test_that("grouping is preserved", {
   expect_equal(dplyr::group_vars(out), "g")
 })
 
+test_that("names repair preserves grouping vars and pivot longer spec", {
+  sdf <- copy_to(
+    sc,
+    tibble::tibble(
+      a = 1, b = 2,
+      x_a_1 = c(1, 3), x_a_2 = c(2, 4), x_b_1 = c(1, 2), x_b_2 = c(3, 4)
+    )
+  )
+  pv <- sdf %>%
+    dplyr::group_by(a) %>%
+    tidyr::pivot_longer(
+      cols = tidyr::starts_with("x_"),
+      names_to = c(".value", "b"),
+      names_pattern = "x_(.)_(.)",
+      names_repair = "universal"
+    )
+
+  expect_equal(dplyr::group_vars(pv), "a___1")
+  expect_equivalent(
+    pv %>% collect(),
+    tibble::tibble(
+      a___1 = 1, b___2 = 2, b___5 = c("1", "2", "1", "2"),
+      a___3 = c(1, 2, 3, 4), b___4 = c(1, 3, 2, 4)
+    )
+  )
+})
+
 # spec --------------------------------------------------------------------
 
 test_that("validates inputs", {

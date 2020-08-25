@@ -130,6 +130,9 @@ sdf_pivot_longer <- function(data,
   names(id_sql) <- id_col
 
   group_vars <- dplyr::group_vars(data)
+  all_cols <- setdiff(colnames(data), spec$.name)
+  group_vars_idxes <- vctrs::vec_match(group_vars, all_cols)
+
   data <- data %>%
     dplyr::ungroup() %>>%
     dplyr::mutate %@% id_sql %>%
@@ -142,6 +145,45 @@ sdf_pivot_longer <- function(data,
   v_fct <- factor(spec$.value, levels = unique(spec$.value))
   values <- split(spec$.name, v_fct)
   value_keys <- split(spec[-(1:2)], v_fct)
+
+  # Perform name repair and map all column names to what they are after the
+  # name-repair
+  unpivoted_cols <- all_cols
+  unpivoted_cols_idxes <- seq(length(all_cols))
+
+  val_idxes <- seq(length(all_cols) + 1, length(all_cols) + length(names(values)))
+  all_cols <- c(all_cols, names(values))
+
+  all_keys <- unique(unname(lapply(value_keys, names)))
+  key_idxes <- seq(length(all_cols) + 1, length(all_cols) + length(all_keys))
+  all_cols <- c(all_cols, all_keys)
+
+  all_cols <- repair_names(all_cols, names_repair)
+
+  if (length(unpivoted_cols) > 0) {
+    rename_unpivoted_cols_args <- unpivoted_cols
+    names(rename_unpivoted_cols_args) <- all_cols[unpivoted_cols_idxes]
+    data <- data %>>% dplyr::rename %@% rename_unpivoted_cols_args
+  }
+
+  if (length(group_vars) > 0) {
+    group_vars <- all_cols[group_vars_idxes]
+  }
+
+  if (length(values) > 0) {
+    names(values) <- all_cols[val_idxes]
+    names(value_keys) <- all_cols[val_idxes]
+  }
+
+  if (length(key_idxes) > 0) {
+    key_renames <- as.list(all_cols[key_idxes])
+    names(key_renames) <- all_keys
+    key_renames[[".seq"]] <- ".seq"
+    for (v in names(values)) {
+      names(value_keys[[v]]) <- unlist(key_renames[names(value_keys[[v]])])
+    }
+    names(spec) <- c(".name", ".value", unlist(key_renames[names(spec[-(1:2)])]))
+  }
 
   if (".seq" %in% colnames(spec)) {
     seq_col <- random_string("__seq")
@@ -230,7 +272,6 @@ sdf_pivot_longer <- function(data,
     key_cols,
     names(values)
   )
-  # TODO: names_repair (???)
 
   output_cols <- setdiff(output_cols, c(id_col, seq_col))
   group_vars <- intersect(group_vars, output_cols)
