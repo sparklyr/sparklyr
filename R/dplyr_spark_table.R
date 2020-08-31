@@ -25,7 +25,7 @@ sample_n.tbl_spark <- function(tbl,
   add_op_single("sample_n", .data = tbl, args = list(
     size = size,
     replace = replace,
-    weight = weight,
+    weight = rlang::enquo(weight),
     .env = .env
   ))
 }
@@ -45,7 +45,7 @@ sample_frac.tbl_spark <- function(tbl,
   add_op_single("sample_frac", .data = tbl, args = list(
     size = size,
     replace = replace,
-    weight = weight,
+    weight = rlang::enquo(weight),
     .env = .env
   ))
 }
