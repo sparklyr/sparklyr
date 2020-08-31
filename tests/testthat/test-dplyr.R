@@ -131,10 +131,62 @@ test_that("the implementation of 'sample_frac' functions returns a sample", {
   )
 
   expect_lt(
+    iris_tbl %>% sample_frac(0.2, weight = Petal_Length) %>%
+      collect() %>% nrow(),
+    nrow(iris)
+  )
+
+  expect_lt(
+    iris_tbl %>% sample_frac(0.2, weight = Petal_Length, replace = TRUE) %>%
+      collect() %>% nrow(),
+    nrow(iris)
+  )
+
+  expect_lt(
     iris_tbl %>% select(Petal_Length) %>%
       sample_n(10) %>% collect() %>% nrow(),
     nrow(iris)
   )
+
+  expect_lt(
+    iris_tbl %>% select(Petal_Length) %>%
+      sample_n(10, weight = Petal_Length) %>% collect() %>% nrow(),
+    nrow(iris)
+  )
+
+  expect_lt(
+    iris_tbl %>% select(Petal_Length) %>%
+      sample_n(10, weight = Petal_Length, replace = TRUE) %>% collect() %>% nrow(),
+    nrow(iris)
+  )
+})
+
+test_that("'sample_frac' and 'sample_n' work as expected for weighted sampling use cases", {
+  test_requires_version("2.0.0", "sample_n() support")
+  test_requires("dplyr")
+
+  sdf <- copy_to(sc, tibble::tibble(x = seq(10), w = abs(rnorm(10))))
+
+  expect_equal(
+    sdf %>% sample_n(5, weight = w, replace = FALSE) %>% collect() %>%
+      distinct(x) %>% nrow(),
+    5
+  )
+  expect_equal(
+    sdf %>% sample_frac(0.5, weight = w, replace = FALSE) %>% collect() %>%
+      distinct(x) %>% nrow(),
+    5
+  )
+
+  rs <- sdf %>% filter(x == 3L) %>%
+    sample_n(5, weight = w, replace = TRUE) %>% collect()
+  expect_equal(nrow(rs), 5)
+  expect_equal(nrow(rs %>% distinct(x)), 1)
+
+  rs <- sdf %>% filter(x == 3L) %>%
+    sample_frac(5, weight = w, replace = TRUE) %>% collect()
+  expect_equal(nrow(rs), 5)
+  expect_equal(nrow(rs %>% distinct(x)), 1)
 })
 
 test_that("'sample_n' and 'sample_frac' work in nontrivial queries (#1299)", {
@@ -143,6 +195,11 @@ test_that("'sample_n' and 'sample_frac' work in nontrivial queries (#1299)", {
 
   expect_lt(
     iris_tbl %>% sample_n(10) %>% collect() %>% nrow(),
+    nrow(iris)
+  )
+
+  expect_lt(
+    iris_tbl %>% sample_frac(0.2) %>% collect() %>% nrow(),
     nrow(iris)
   )
 })
