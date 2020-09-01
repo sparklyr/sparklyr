@@ -57,6 +57,44 @@ build_longer_spec <- function(data,
     rlang::abort(glue::glue("`cols` must select at least one column."))
   }
 
+  output_names <- build_output_names(
+    cols = cols,
+    names_to = names_to,
+    names_prefix = names_prefix,
+    names_sep = names_sep,
+    names_pattern = names_pattern
+  )
+
+  if (".value" %in% names_to) {
+    values_to <- NULL
+  } else {
+    vctrs::vec_assert(values_to, ptype = character(), size = 1)
+  }
+
+  # optionally, cast variables generated from columns
+  cast_cols <- intersect(names(output_names), names(names_ptypes))
+  for (col in cast_cols) {
+    output_names[[col]] <- vctrs::vec_cast(output_names[[col]], names_ptypes[[col]])
+  }
+
+  # transform cols
+  coerce_cols <- intersect(names(output_names), names(names_transform))
+  for (col in coerce_cols) {
+    f <- rlang::as_function(names_transform[[col]])
+    output_names[[col]] <- f(output_names[[col]])
+  }
+
+  out <- tibble::tibble(.name = cols)
+  out[[".value"]] <- values_to
+  out <- vctrs::vec_cbind(out, output_names)
+  out
+}
+
+build_output_names <- function(cols,
+                               names_to,
+                               names_prefix,
+                               names_sep,
+                               names_pattern) {
   if (is.null(names_prefix)) {
     output_names <- cols
   } else {
@@ -89,29 +127,7 @@ build_longer_spec <- function(data,
     output_names <- tibble::tibble(!!names_to := output_names)
   }
 
-  if (".value" %in% names_to) {
-    values_to <- NULL
-  } else {
-    vctrs::vec_assert(values_to, ptype = character(), size = 1)
-  }
-
-  # optionally, cast variables generated from columns
-  cast_cols <- intersect(names(output_names), names(names_ptypes))
-  for (col in cast_cols) {
-    output_names[[col]] <- vctrs::vec_cast(output_names[[col]], names_ptypes[[col]])
-  }
-
-  # transform cols
-  coerce_cols <- intersect(names(output_names), names(names_transform))
-  for (col in coerce_cols) {
-    f <- rlang::as_function(names_transform[[col]])
-    output_names[[col]] <- f(output_names[[col]])
-  }
-
-  out <- tibble::tibble(.name = cols)
-  out[[".value"]] <- values_to
-  out <- vctrs::vec_cbind(out, output_names)
-  out
+  output_names
 }
 
 sdf_pivot_longer <- function(data,
