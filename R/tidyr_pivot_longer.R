@@ -202,7 +202,7 @@ sdf_pivot_longer <- function(data,
     out <- out %>% invoke("join", stacked_sdf, join_cols, "left_outer")
   }
 
-  .postprocess_output(data, group_vars, spec, values, id_col, seq_col)(out)
+  .postprocess_pivot_longer_output(data, group_vars, spec, values, id_col, seq_col)(out)
 }
 
 # Perform name repair and update column names
@@ -280,7 +280,7 @@ sdf_pivot_longer <- function(data,
   lapply(
     seq_along(value_cols),
     function(idx) {
-      key_tuple <- value_key[idx,] %>%
+      key_tuple <- value_key[idx, ] %>%
         as.list() %>%
         dbplyr::translate_sql_(con = dbplyr::simulate_dbi()) %>%
         lapply(as.character) %>%
@@ -297,12 +297,13 @@ sdf_pivot_longer <- function(data,
       length(value_cols),
       .,
       paste0(
-        lapply(c(value, names(value_key), id_col), quote_sql_name), collapse = ", "
+        lapply(c(value, names(value_key), id_col), quote_sql_name),
+        collapse = ", "
       )
     )
 }
 
-.postprocess_output <- function(data, group_vars, spec, values, id_col, seq_col) {
+.postprocess_pivot_longer_output <- function(data, group_vars, spec, values, id_col, seq_col) {
   key_cols <- colnames(spec[-(1:2)])
   output_cols <- c(
     setdiff(colnames(data), c(spec$.name, id_col)),
@@ -343,7 +344,9 @@ deduplicate_longer_spec <- function(spec) {
 .strsep <- function(x, sep) {
   nchar <- nchar(x)
   pos <- purrr::map(sep, function(i) {
-    if (i >= 0) return(i)
+    if (i >= 0) {
+      return(i)
+    }
     pmax(0, nchar + i)
   })
   pos <- c(list(0), pos, list(nchar))
