@@ -141,29 +141,80 @@ sdf_pivot_longer <- function(data,
     rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.0.0 or higher")
   }
 
-  id_col <- random_string("__row_id")
-  id_sql <- list(dplyr::sql("monotonically_increasing_id()"))
-  names(id_sql) <- id_col
-
   group_vars <- dplyr::group_vars(data)
-  all_cols <- setdiff(colnames(data), spec$.name)
-  group_vars_idxes <- vctrs::vec_match(group_vars, all_cols)
+  data <- data %>% dplyr::ungroup()
 
-  data <- data %>%
-    dplyr::ungroup() %>>%
-    dplyr::mutate %@% id_sql %>%
-    dplyr::compute()
   spec <- spec %>%
     canonicalize_spec() %>%
     deduplicate_longer_spec()
 
+  list(data, group_vars, spec, values, value_keys) %<-%
+    .apply_pivot_longer_names_repair(data, group_vars, spec, names_repair)
+
+  id_col <- random_string("__row_id")
+  id_sql <- list(dplyr::sql("MONOTONICALLY_INCREASING_ID()"))
+  names(id_sql) <- id_col
+  data <- data %>>% dplyr::mutate %@% id_sql %>% dplyr::compute()
+
+  list(spec, value_keys, seq_col) %<-% .rename_seq_col(spec, value_keys)
+
+  out <- data %>>%
+    dplyr::select %@% setdiff(colnames(data), spec$.name) %>%
+    spark_dataframe()
+
+  for (value in names(values)) {
+    value_key <- value_keys[value]
+    cols <- values[[value]]
+
+    stack_expr <- .build_stack_expr(value_key, cols, key_tuple, id_col)
+    stacked_sdf <- data %>%
+      spark_dataframe() %>%
+      invoke("selectExpr", list(stack_expr))
+
+    if (rlang::has_name(values_transform, value)) {
+      transform_args <- list(
+        do.call(dplyr::vars, list(as.symbol(value))), values_transform[[value]]
+      )
+      transformed_vals <- stacked_sdf %>%
+        invoke("select", value, list()) %>%
+        sdf_register() %>%
+        dplyr::group_by() %>>%
+        dplyr::summarize_at %@% transform_args
+      stacked_sdf <- stacked_sdf %>%
+        invoke("drop", value) %>%
+        sdf_register() %>%
+        sdf_bind_cols(transformed_vals) %>%
+        spark_dataframe()
+    }
+
+    if (values_drop_na) {
+      cond <- invoke_new(sc, "org.apache.spark.sql.Column", value) %>%
+        invoke_static(sc, "org.apache.spark.sql.functions", "isnull", .) %>%
+        invoke_static(sc, "org.apache.spark.sql.functions", "not", .)
+      stacked_sdf <- stacked_sdf %>% invoke("filter", cond)
+    }
+
+    join_cols <- intersect(
+      out %>% invoke("columns"),
+      c(value, names(value_key[[1]]), id_col)
+    ) %>%
+      as.list()
+    out <- out %>% invoke("join", stacked_sdf, join_cols, "left_outer")
+  }
+
+  .postprocess_output(data, group_vars, spec, values, id_col, seq_col)(out)
+}
+
+# Perform name repair and update column names
+.apply_pivot_longer_names_repair <- function(data, group_vars, spec, names_repair) {
   # Quick hack to ensure that split() preserves order
   v_fct <- factor(spec$.value, levels = unique(spec$.value))
   values <- split(spec$.name, v_fct)
   value_keys <- split(spec[-(1:2)], v_fct)
 
-  # Perform name repair and map all column names to what they are after the
-  # name-repair
+  all_cols <- setdiff(colnames(data), spec$.name)
+  group_vars_idxes <- vctrs::vec_match(group_vars, all_cols)
+
   unpivoted_cols <- all_cols
   unpivoted_cols_idxes <- seq(length(all_cols))
 
@@ -201,6 +252,10 @@ sdf_pivot_longer <- function(data,
     names(spec) <- c(".name", ".value", unlist(key_renames[names(spec[-(1:2)])]))
   }
 
+  list(data, group_vars, spec, values, value_keys)
+}
+
+.rename_seq_col <- function(spec, value_keys) {
   if (".seq" %in% colnames(spec)) {
     seq_col <- random_string("__seq")
     rename_arg <- list(as.symbol(".seq"))
@@ -216,86 +271,56 @@ sdf_pivot_longer <- function(data,
     seq_col <- NULL
   }
 
-  out <- data %>>%
-    dplyr::select %@% setdiff(colnames(data), spec$.name) %>%
-    spark_dataframe()
+  list(spec, value_keys, seq_col)
+}
 
-  for (value in names(values)) {
-    cols <- values[[value]]
-    value_key <- value_keys[[value]]
+.build_stack_expr <- function(value_key, value_cols, key_tuple, id_col) {
+  value <- names(value_key)
+  value_key <- value_key[[1]]
+  lapply(
+    seq_along(value_cols),
+    function(idx) {
+      key_tuple <- value_key[idx,] %>%
+        as.list() %>%
+        dbplyr::translate_sql_(con = dbplyr::simulate_dbi()) %>%
+        lapply(as.character) %>%
+        unlist() %>%
+        c(id_col)
 
-    stack_expr <- lapply(
-      seq_along(cols),
-      function(idx) {
-        key_tuple <- value_key[idx,] %>%
-          as.list() %>%
-          dbplyr::translate_sql_(con = dbplyr::simulate_dbi()) %>%
-          lapply(as.character) %>%
-          unlist() %>%
-          c(id_col)
-
-        c(quote_sql_name(cols[[idx]]), key_tuple) %>%
-          paste0(collapse = ", ")
-      }
-    ) %>%
-      paste0(collapse = ", ") %>%
-      sprintf(
-        "STACK(%d, %s) AS (%s)",
-        length(cols),
-        .,
-        paste0(
-          lapply(c(value, names(value_key), id_col), quote_sql_name), collapse = ", "
-        )
-      )
-    stacked_sdf <- data %>%
-      spark_dataframe() %>%
-      invoke("selectExpr", list(stack_expr))
-
-    if (rlang::has_name(values_transform, value)) {
-      transform_args <- list(
-        do.call(dplyr::vars, list(as.symbol(value))), values_transform[[value]]
-      )
-      transformed_vals <- stacked_sdf %>%
-        invoke("select", value, list()) %>%
-        sdf_register() %>%
-        dplyr::group_by() %>>%
-        dplyr::summarize_at %@% transform_args
-      stacked_sdf <- stacked_sdf %>%
-        invoke("drop", value) %>%
-        sdf_register() %>%
-        sdf_bind_cols(transformed_vals) %>%
-        spark_dataframe()
+      c(quote_sql_name(value_cols[[idx]]), key_tuple) %>%
+        paste0(collapse = ", ")
     }
+  ) %>%
+    paste0(collapse = ", ") %>%
+    sprintf(
+      "STACK(%d, %s) AS (%s)",
+      length(value_cols),
+      .,
+      paste0(
+        lapply(c(value, names(value_key), id_col), quote_sql_name), collapse = ", "
+      )
+    )
+}
 
-    if (values_drop_na) {
-      cond <- invoke_new(sc, "org.apache.spark.sql.Column", value) %>%
-        invoke_static(sc, "org.apache.spark.sql.functions", "isnull", .) %>%
-        invoke_static(sc, "org.apache.spark.sql.functions", "not", .)
-      stacked_sdf <- stacked_sdf %>% invoke("filter", cond)
-    }
-
-    join_cols <- intersect(
-      out %>% invoke("columns"),
-      c(value, names(value_key), id_col)
-    ) %>%
-      as.list()
-    out <- out %>% invoke("join", stacked_sdf, join_cols, "left_outer")
-  }
-
+.postprocess_output <- function(data, group_vars, spec, values, id_col, seq_col) {
   key_cols <- colnames(spec[-(1:2)])
   output_cols <- c(
     setdiff(colnames(data), c(spec$.name, id_col)),
     key_cols,
     names(values)
   )
-
   output_cols <- setdiff(output_cols, c(id_col, seq_col))
   group_vars <- intersect(group_vars, output_cols)
-  out <- out %>%
-    invoke("sort", id_col, as.list(key_cols)) %>%
-    sdf_register() %>>%
-    dplyr::select %@% lapply(output_cols, as.symbol) %>>%
-    dplyr::group_by %@% lapply(group_vars, as.symbol)
+
+  impl <- function(out) {
+    out %>%
+      invoke("sort", id_col, as.list(key_cols)) %>%
+      sdf_register() %>>%
+      dplyr::select %@% lapply(output_cols, as.symbol) %>>%
+      dplyr::group_by %@% lapply(group_vars, as.symbol)
+  }
+
+  impl
 }
 
 # Ensure that there's a one-to-one match from spec to data by adding

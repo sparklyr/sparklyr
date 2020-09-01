@@ -274,7 +274,7 @@ is.tbl_spark <- function(x) {
   if (length(dest) != length(value)) stop("Assignment must contain same number of elements")
 
   for (i in seq_along(dest)) {
-    assign(dest[i], value[i], envir = sys.frame(which = sys.parent(n = 1)))
+    assign(dest[[i]], value[[i]], envir = sys.frame(which = sys.parent(n = 1)))
   }
 
   invisible(NULL)
