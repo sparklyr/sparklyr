@@ -8,7 +8,7 @@ NULL
 
 # throw an error if f is not a valid lambda expression
 validate_lambda <- function(f) {
-  if (!"spark_sql_lambda" %in% class(f) && !"formula" %in% class(f)) {
+  if (!"spark_sql_lambda" %in% class(f) && !rlang::is_formula(f)) {
     stop(
       "Expected 'f' to be a lambda expression (e.g., 'a %->% (a + 1)' or ",
       "'.(a, b) %->% (a + b + 1)') or a formula (e.g., '~ .x + 1' or ",
