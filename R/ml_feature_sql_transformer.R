@@ -96,6 +96,10 @@ ft_extract_sql <- function(x) {
 #' @export
 ft_dplyr_transformer <- function(x, tbl,
                                  uid = random_string("dplyr_transformer_"), ...) {
+  if (identical(attributes(tbl)$sampled, TRUE)) {
+    rlang::abort("ft_dplyr_transformer on a sampled table is unsupported")
+  }
+
   UseMethod("ft_dplyr_transformer")
 }
 

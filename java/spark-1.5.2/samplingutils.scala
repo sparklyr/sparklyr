@@ -26,7 +26,7 @@ object SamplingUtils {
         val pq = new BoundedPriorityQueue[Sample](k)
 
         for (row <- iter) {
-          var weight = row.getAs[Double](weightColumn)
+          var weight = extractWeightValue(row, weightColumn)
           if (weight > 0) {
             val sample = Sample(genSamplePriority(weight, random), row)
             pq += sample
@@ -68,7 +68,7 @@ object SamplingUtils {
           Sample(Double.NegativeInfinity, null)
         )
         for (row <- iter) {
-          var weight = row.getAs[Double](weightColumn)
+          var weight = extractWeightValue(row, weightColumn)
           if (weight > 0)
             Range(0, k).foreach(idx => {
               val replacement = Sample(genSamplePriority(weight, random), row)
@@ -102,5 +102,19 @@ object SamplingUtils {
   // source of randomness
   def genSamplePriority(weight: Double, random: Random): Double = {
     scala.math.log(random.nextDouble) / weight
+  }
+
+  def extractWeightValue(row: Row, weightCol: String): Double = {
+    var weight = row.get(row.fieldIndex(weightCol))
+    if (weight.isInstanceOf[java.lang.Integer] || weight.isInstanceOf[Int])
+      weight.asInstanceOf[Int].toDouble
+    else if (weight.isInstanceOf[java.lang.Long] || weight.isInstanceOf[Long])
+      weight.asInstanceOf[Long].toDouble
+    else if (weight.isInstanceOf[java.lang.Double] || weight.isInstanceOf[Double])
+      weight.asInstanceOf[Double]
+    else if (weight.isInstanceOf[java.math.BigDecimal])
+      weight.asInstanceOf[java.math.BigDecimal].doubleValue
+    else
+      Double.NaN
   }
 }

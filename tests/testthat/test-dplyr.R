@@ -108,100 +108,63 @@ test_that("the implementation of 'left_join' functions as expected", {
   )
 })
 
-test_that("the implementation of 'sample_n' functions as expected", {
-  test_requires_version("2.0.0", "sample_n() not supported")
+test_that("'sample_n' works as expected", {
+  test_requires_version("2.0.0")
   test_requires("dplyr")
 
-  # As of Spark 2.1.0, sampling functions are not exact.
-  expect_lt(
-    iris_tbl %>% sample_n(10) %>% collect() %>% nrow(),
-    nrow(iris)
-  )
+  for (weight in list(NULL, rlang::sym("Petal_Length"))) {
+    for (replace in list(FALSE, TRUE)) {
+      sample_sdf <- iris_tbl %>%
+        sample_n(10, weight = !!weight, replace = replace)
+      expect_equal(colnames(sample_sdf), colnames(iris_tbl))
+      expect_equal(sample_sdf %>% collect() %>% nrow(), 10)
+
+      sample_sdf <- iris_tbl %>%
+        select(Petal_Length) %>%
+        sample_n(10, weight = !!weight, replace = replace)
+      expect_equal(colnames(sample_sdf), "Petal_Length")
+      expect_equal(sample_sdf %>% collect() %>% nrow(), 10)
+    }
+  }
 })
 
-test_that("the implementation of 'sample_frac' functions returns a sample", {
-  test_requires_version("2.0.0", "sample_n() support")
+test_that("'sample_frac' works as expected", {
+  test_requires_version("2.0.0")
   test_requires("dplyr")
 
-  # As of Spark 2.1.0, sampling functions are not exact.
-  expect_lt(
-    iris_tbl %>% select(Petal_Length) %>%
-      sample_frac(0.2) %>% collect() %>% nrow(),
-    nrow(iris)
-  )
+  for (weight in list(NULL, rlang::sym("Petal_Length"))) {
+    for (replace in list(FALSE, TRUE)) {
+      sample_sdf <- iris_tbl %>%
+        sample_frac(0.2, weight = !!weight, replace = replace)
+      expect_equal(colnames(sample_sdf), colnames(iris_tbl))
+      expect_equal(sample_sdf %>% collect() %>% nrow(), round(0.2 * nrow(iris)))
 
-  expect_lt(
-    iris_tbl %>% sample_frac(0.2, weight = Petal_Length) %>%
-      collect() %>% nrow(),
-    nrow(iris)
-  )
-
-  expect_lt(
-    iris_tbl %>% sample_frac(0.2, weight = Petal_Length, replace = TRUE) %>%
-      collect() %>% nrow(),
-    nrow(iris)
-  )
-
-  expect_lt(
-    iris_tbl %>% select(Petal_Length) %>%
-      sample_n(10) %>% collect() %>% nrow(),
-    nrow(iris)
-  )
-
-  expect_lt(
-    iris_tbl %>% select(Petal_Length) %>%
-      sample_n(10, weight = Petal_Length) %>% collect() %>% nrow(),
-    nrow(iris)
-  )
-
-  expect_lt(
-    iris_tbl %>% select(Petal_Length) %>%
-      sample_n(10, weight = Petal_Length, replace = TRUE) %>% collect() %>% nrow(),
-    nrow(iris)
-  )
+      sample_sdf <- iris_tbl %>%
+        select(Petal_Length) %>%
+        sample_frac(0.2, weight = !!weight, replace = replace)
+      expect_equal(colnames(sample_sdf), "Petal_Length")
+      expect_equal(sample_sdf %>% collect() %>% nrow(), round(0.2 * nrow(iris)))
+    }
+  }
 })
 
-test_that("'sample_frac' and 'sample_n' work as expected for weighted sampling use cases", {
-  test_requires_version("2.0.0", "sample_n() support")
+test_that("weighted sampling works as expected with integer weight columns", {
+  test_requires_version("2.0.0")
   test_requires("dplyr")
 
-  sdf <- copy_to(sc, tibble::tibble(x = seq(10), w = abs(rnorm(10))))
+  sdf <- copy_to(sc, tibble::tibble(id = seq(100), weight = seq(100)))
 
-  expect_equal(
-    sdf %>% sample_n(5, weight = w, replace = FALSE) %>% collect() %>%
-      distinct(x) %>% nrow(),
-    5
-  )
-  expect_equal(
-    sdf %>% sample_frac(0.5, weight = w, replace = FALSE) %>% collect() %>%
-      distinct(x) %>% nrow(),
-    5
-  )
+  for (replace in list(FALSE, TRUE)) {
+    sample_sdf <- sdf %>%
+      sample_n(20, weight = weight, replace = replace)
+    expect_equal(colnames(sample_sdf), colnames(sdf))
+    expect_equal(sample_sdf %>% collect() %>% nrow(), 20)
 
-  rs <- sdf %>% filter(x == 3L) %>%
-    sample_n(5, weight = w, replace = TRUE) %>% collect()
-  expect_equal(nrow(rs), 5)
-  expect_equal(nrow(rs %>% distinct(x)), 1)
-
-  rs <- sdf %>% filter(x == 3L) %>%
-    sample_frac(5, weight = w, replace = TRUE) %>% collect()
-  expect_equal(nrow(rs), 5)
-  expect_equal(nrow(rs %>% distinct(x)), 1)
-})
-
-test_that("'sample_n' and 'sample_frac' work in nontrivial queries (#1299)", {
-  test_requires_version("2.0.0", "sample_n() support")
-  test_requires("dplyr")
-
-  expect_lt(
-    iris_tbl %>% sample_n(10) %>% collect() %>% nrow(),
-    nrow(iris)
-  )
-
-  expect_lt(
-    iris_tbl %>% sample_frac(0.2) %>% collect() %>% nrow(),
-    nrow(iris)
-  )
+    sample_sdf <- sdf %>%
+      sample_frac(0.2, weight = weight, replace = replace)
+    expect_equal(colnames(sample_sdf), colnames(sdf))
+    expect_equal(sample_sdf %>% collect() %>% nrow(), 20)
+  }
 })
 
 test_that("'sdf_broadcast' forces broadcast hash join", {

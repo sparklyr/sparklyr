@@ -27,7 +27,8 @@ sample_n.tbl_spark <- function(tbl,
     replace = replace,
     weight = rlang::enquo(weight),
     .env = .env
-  ))
+  )) %>%
+    sampled_tbl()
 }
 
 #' @export
@@ -47,7 +48,14 @@ sample_frac.tbl_spark <- function(tbl,
     replace = replace,
     weight = rlang::enquo(weight),
     .env = .env
-  ))
+  )) %>%
+    sampled_tbl()
+}
+
+sampled_tbl <- function(tbl) {
+  attributes(tbl)$sampled <- TRUE
+
+  tbl
 }
 
 #' @export
