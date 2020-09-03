@@ -1,3 +1,6 @@
+#' @include dplyr_hof.R
+NULL
+
 #' @export
 #' @importFrom dplyr sql_escape_ident
 #' @importFrom dbplyr sql_quote
@@ -86,14 +89,90 @@ sql_translate_env.spark_connection <- function(con) {
       paste = function(..., sep = " ") dbplyr::build_sql("CONCAT_WS", list(sep, ...)),
       paste0 = function(...) dbplyr::build_sql("CONCAT", list(...)),
       xor = function(x, y) dbplyr::build_sql(x, " ^ ", y),
-      or = function(x, y) dbplyr::build_sql(x, " or ", y),
-      and = function(x, y) dbplyr::build_sql(x, " and ", y),
+      or = function(x, y) dbplyr::build_sql(x, " OR ", y),
+      and = function(x, y) dbplyr::build_sql(x, " AND ", y),
       pmin = function(...) build_sql_if_compare(..., con = con, compare = "<="),
       pmax = function(...) build_sql_if_compare(..., con = con, compare = ">="),
-      `%like%` = function(x, y) dbplyr::build_sql(x, " like ", y),
-      `%rlike%` = function(x, y) dbplyr::build_sql(x, " rlike ", y),
-      `%regexp%` = function(x, y) dbplyr::build_sql(x, " regexp ", y),
-      grepl = function(x, y) dbplyr::build_sql(y, " rlike ", x)
+      `%like%` = function(x, y) dbplyr::build_sql(x, " LIKE ", y),
+      `%rlike%` = function(x, y) dbplyr::build_sql(x, " RLIKE ", y),
+      `%regexp%` = function(x, y) dbplyr::build_sql(x, " REGEXP ", y),
+      grepl = function(x, y) dbplyr::build_sql(y, " RLIKE ", x),
+      transform = function(expr, func) {
+        sprintf(
+          "TRANSFORM(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+        ) %>%
+          dbplyr::sql()
+      },
+      filter = function(expr, func) {
+        sprintf(
+          "FILTER(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+        ) %>%
+          dbplyr::sql()
+      },
+      aggregate = function(expr, start, merge, finish = ~ .x) {
+        sprintf(
+          "AGGREGATE(%s, %s, %s, %s)",
+          dbplyr::build_sql(expr),
+          dbplyr::build_sql(start),
+          build_sql_fn(merge),
+          build_sql_fn(finish)
+        ) %>%
+          dbplyr::sql()
+      },
+      exists = function(expr, pred) {
+        sprintf(
+          "EXISTS(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(pred)
+        ) %>%
+          dbplyr::sql()
+      },
+      zip_with = function(left, right, func) {
+        sprintf(
+          "ZIP_WITH(%s, %s, %s)",
+          dbplyr::build_sql(left),
+          dbplyr::build_sql(right),
+          build_sql_fn(func)
+        ) %>%
+          dbplyr::sql()
+      },
+      array_sort = function(expr, func = ~ as.integer(sign(.x - .y))) {
+        sprintf(
+          "ARRAY_SORT(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+        ) %>%
+          dbplyr::sql()
+      },
+      map_filter = function(expr, func) {
+        sprintf(
+          "MAP_FILTER(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+        ) %>%
+          dbplyr::sql()
+      },
+      forall = function(expr, pred) {
+        sprintf(
+          "FORALL(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(pred)
+        ) %>%
+          dbplyr::sql()
+      },
+      transform_keys = function(expr, func) {
+        sprintf(
+          "TRANSFORM_KEYS(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+        ) %>%
+          dbplyr::sql()
+      },
+      transform_values = function(expr, func) {
+        sprintf(
+          "TRANSFORM_VALUES(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+        ) %>%
+          dbplyr::sql()
+      },
+      map_zip_with = function(map1, map2, func) {
+        sprintf(
+          "MAP_ZIP_WITH(%s, %s, %s)",
+          dbplyr::build_sql(map1),
+          dbplyr::build_sql(map2),
+          build_sql_fn(func)
+        ) %>%
+          dbplyr::sql()
+      }
     ),
 
     aggregate = dbplyr::sql_translator(
@@ -171,6 +250,16 @@ sql_translate_env.spark_connection <- function(con) {
         )
       }
     )
+  )
+}
+
+build_sql_fn <- function(fn) {
+  as.character(
+    if (rlang::is_formula(fn)) {
+      process_lambda(fn)
+    } else {
+      fn
+    }
   )
 }
 
