@@ -1451,7 +1451,7 @@ test_that("map_zip_with() works through dbplyr", {
                   ~ CONCAT(.x, "_", .y, "_", .z))
   ) {
     res <- map_zip_with_test_tbl %>%
-      dbplyr::mutate(z = map_zip_with(m1, m2, fn)) %>%
+      dplyr::mutate(z = map_zip_with(m1, m2, fn)) %>%
       dplyr::mutate(m1 = to_json(m1), m2 = to_json(m2), z = to_json(z)) %>%
       collect()
 
