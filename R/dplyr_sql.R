@@ -49,7 +49,7 @@ sql_build.op_sample <- function(op, con, frac, replace) {
     weight_col = weight_col,
     k = sample_size,
     replacement = replace,
-    seed = NULL
+    seed = gen_prng_seed()
   ) %>>%
     dplyr::select %@% lapply(cols, as.symbol)
 
@@ -74,7 +74,7 @@ sql_build.op_weighted_sample <- function(op, con, frac) {
     weight_col = weight,
     k = sample_size,
     replacement = op$args$replace,
-    seed = NULL
+    seed = gen_prng_seed()
   )
 
   sample_sdf %>% dbplyr::remote_query()
@@ -95,6 +95,14 @@ to_sdf <- function(op, con) {
       as.character() %>%
       paste0(collapse = "")
   )
+}
+
+gen_prng_seed <- function() {
+  if (is.null(get0(".Random.seed"))) {
+    NULL
+  } else {
+    as.integer(sample.int(.Machine$integer.max, size = 1L))
+  }
 }
 
 check_frac <- function(size, replace = FALSE) {
