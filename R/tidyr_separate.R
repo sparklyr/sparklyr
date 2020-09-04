@@ -17,9 +17,12 @@ validate_args <- function(into, sep) {
 
 #' @importFrom tidyr separate
 #' @export
-separate.tbl_spark <- function(data, col, into, sep = "[^0-9A-Za-z]+",
+separate.tbl_spark <- function(data, col, into, sep = "[^[:alnum:]]+",
                                remove = TRUE, extra = "warn", fill = "warn", ...) {
   check_present(col)
+  if (rlang::is_character(sep)) {
+    sep <- pcre_to_java(sep)
+  }
   validate_args(into, sep)
 
   sc <- spark_connection(data)
