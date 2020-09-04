@@ -60,3 +60,6 @@ tidyr::pivot_wider
 
 #' @export
 tidyr::pivot_longer
+
+#' @export
+tidyr::fill

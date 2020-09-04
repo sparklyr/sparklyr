@@ -1,5 +1,3 @@
-#' Helper functions to support dplyr sql operations
-#'
 #' @include sdf_interface.R
 #' @include sdf_sql.R
 #' @include utils.R
