@@ -1,3 +1,66 @@
+# Sparklyr 1.4.0
+
+### Connections
+
+- RAPIDS GPU acceleration plugin can now be enabled with
+  `spark_connect(..., package = "rapids")` and configured with `spark_config`
+  options prefixed with "spark.rapids."
+
+- Enabled support for http{,s} proxy plus additional CURL options for Livy
+  connections
+
+- In sparklyr error message, suggest `options(sparklyr.log.console = TRUE)` as a
+  trouble-shooting step whenever the "sparklyr gateway not responding" error
+  occurs
+
+- Addressed an inter-op issue with Livy + Spark 2.4
+  (https://github.com/sparklyr/sparklyr/issues/2641)
+
+- Added configurable retries for Gateway ports query
+  (https://github.com/sparklyr/sparklyr/pull/2654)
+
+- App name setting now takes effect as expected in YARN cluster mode
+  (https://github.com/sparklyr/sparklyr/pull/2675)
+
+### Data
+
+- Support for newly introduced higher-order functions in Spark 3.0 (e.g.,
+  `array_sort`, `map_filter`, `map_zip_with`, and many others)
+
+- Implemented parallelizable weighted sampling methods for sampling from a Spark
+  data frames with and without replacement using exponential variates
+
+- Replaced `dplyr::sample_*` implementations based on `TABLESAMPLE` with
+  alternative implementation that can return exactly the number of rows or
+  fraction specified and also properly support sampling with-replacement,
+  without-replacement, and repeatable sampling use cases
+
+- All higher-order functions and sampling methods are made directly accessible
+  through `dplyr` verbs
+
+- Tidyr verbs such as `pivot_wider`, `pivot_longer`, `nest`, `unnest`,
+  `separate`, `unite`, and `fill` now have specialized implementations in
+  `sparklyr` for working with Spark data frames
+
+- Made `dplyr::inner_join`, `dplyr::left_join`, `dplyr::right_join`, and
+  `dplyr::full_join` replace `'.'` with `'_'` in `suffix` parameter when working
+  with Spark data frames (https://github.com/sparklyr/sparklyr/issues/2648)
+
+### Distributed R
+
+- Fixed an issue with global variables in `registerDoSpark`
+  (https://github.com/sparklyr/sparklyr/pull/2608)
+
+- Revised `spark_read_compat_param` to avoid collision on names assigned to
+  different Spark data frames
+
+### Misc
+
+- Fixed a rendering issue with HTML reference pages
+
+- Made test reporting in Github CI workflows more informative
+  (https://github.com/sparklyr/sparklyr/pull/2672)
+
 # Sparklyr 1.3.1
 
 ### Distributed R
