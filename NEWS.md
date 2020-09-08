@@ -38,6 +38,8 @@
 - All higher-order functions and sampling methods are made directly accessible
   through `dplyr` verbs
 
+- Made `grepl` part of the `dplyr` interface for Spark data frames
+
 - Tidyr verbs such as `pivot_wider`, `pivot_longer`, `nest`, `unnest`,
   `separate`, `unite`, and `fill` now have specialized implementations in
   `sparklyr` for working with Spark data frames
