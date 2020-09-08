@@ -16,6 +16,7 @@
 \alias{unite}
 \alias{pivot_wider}
 \alias{pivot_longer}
+\alias{fill}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -27,6 +28,6 @@ below to see their documentation.
 
   \item{generics}{\code{\link[generics]{augment}}, \code{\link[generics]{glance}}, \code{\link[generics]{tidy}}}
 
-  \item{tidyr}{\code{\link[tidyr]{nest}}, \code{\link[tidyr]{pivot_longer}}, \code{\link[tidyr]{pivot_wider}}, \code{\link[tidyr]{separate}}, \code{\link[tidyr]{unite}}, \code{\link[tidyr:nest]{unnest}}}
+  \item{tidyr}{\code{\link[tidyr]{fill}}, \code{\link[tidyr]{nest}}, \code{\link[tidyr]{pivot_longer}}, \code{\link[tidyr]{pivot_wider}}, \code{\link[tidyr]{separate}}, \code{\link[tidyr]{unite}}, \code{\link[tidyr:nest]{unnest}}}
 }}
 
