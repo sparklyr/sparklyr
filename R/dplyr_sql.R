@@ -8,7 +8,7 @@ NULL
 #' @importFrom dbplyr select_query
 sql_build.op_sample_n <- function(op, con, ...) {
   if (rlang::quo_is_null(op$args$weight)) {
-    sql_build.op_sample(op, con, frac = FALSE, op$args$replace)
+    sql_build.op_sample(op, con, frac = FALSE)
   } else {
     sql_build.op_weighted_sample(op, con, frac = FALSE)
   }
@@ -19,20 +19,15 @@ sql_build.op_sample_n <- function(op, con, ...) {
 #' @importFrom dbplyr select_query
 sql_build.op_sample_frac <- function(op, con, ...) {
   if (rlang::quo_is_null(op$args$weight)) {
-    sql_build.op_sample(op, con, frac = TRUE, op$args$replace)
+    sql_build.op_sample(op, con, frac = TRUE)
   } else {
     sql_build.op_weighted_sample(op, con, frac = TRUE)
   }
 }
 
-sql_build.op_sample <- function(op, con, frac, replace) {
+sql_build.op_sample <- function(op, con, frac) {
   sdf <- to_sdf(op, con)
   cols <- colnames(sdf)
-
-  weight_col <- random_string("__wgt")
-  weight_sql <- list(1)
-  names(weight_sql) <- weight_col
-  sdf <- sdf %>>% dplyr::mutate %@% weight_sql
 
   sample_size <- (
     if (frac) {
@@ -44,10 +39,10 @@ sql_build.op_sample <- function(op, con, frac, replace) {
   )
   sample_sdf <- sdf_weighted_sample(
     x = sdf,
-    weight_col = weight_col,
+    weight_col = NULL,
     k = sample_size,
-    replacement = replace,
-    seed = gen_prng_seed()
+    replacement = op$args$replace,
+    seed = op$args$seed
   ) %>>%
     dplyr::select %@% lapply(cols, as.symbol)
 
@@ -72,7 +67,7 @@ sql_build.op_weighted_sample <- function(op, con, frac) {
     weight_col = weight,
     k = sample_size,
     replacement = op$args$replace,
-    seed = gen_prng_seed()
+    seed = op$args$seed
   )
 
   sample_sdf %>% dbplyr::remote_query()
@@ -93,14 +88,6 @@ to_sdf <- function(op, con) {
       as.character() %>%
       paste0(collapse = "")
   )
-}
-
-gen_prng_seed <- function() {
-  if (is.null(get0(".Random.seed"))) {
-    NULL
-  } else {
-    as.integer(sample.int(.Machine$integer.max, size = 1L))
-  }
 }
 
 check_frac <- function(size, replace = FALSE) {

@@ -1,3 +1,7 @@
+#' @include ml_feature_sql_transformer_utils.R
+#' @include prng_utils.R
+NULL
+
 #' @export
 #' @importFrom dplyr collect
 collect.spark_jobj <- function(x, ...) {
@@ -22,13 +26,16 @@ sample_n.tbl_spark <- function(tbl,
     stop("sample_n() is not supported until Spark 2.0 or later. Use sdf_sample instead.")
   }
 
-  add_op_single("sample_n", .data = tbl, args = list(
+  args <- list(
     size = size,
     replace = replace,
     weight = rlang::enquo(weight),
+    seed = gen_prng_seed(),
     .env = .env
-  )) %>%
-    sampled_tbl()
+  )
+
+  add_op_single("sample_n", .data = tbl, args = args) %>%
+    as_sampled_tbl(frac = FALSE, args = args)
 }
 
 #' @export
@@ -43,17 +50,22 @@ sample_frac.tbl_spark <- function(tbl,
     stop("sample_frac() is not supported until Spark 2.0 or later.")
   }
 
-  add_op_single("sample_frac", .data = tbl, args = list(
+  args <- list(
     size = size,
     replace = replace,
     weight = rlang::enquo(weight),
+    seed = gen_prng_seed(),
     .env = .env
-  )) %>%
-    sampled_tbl()
+  )
+  add_op_single("sample_frac", .data = tbl, args = args) %>%
+    as_sampled_tbl(frac = TRUE, args = args)
 }
 
-sampled_tbl <- function(tbl) {
-  attributes(tbl)$sampled <- TRUE
+as_sampled_tbl <- function(tbl, frac, args) {
+  attributes(tbl)$sampling_params <- structure(list(
+    frac = frac,
+    args = args
+  ))
 
   tbl
 }
