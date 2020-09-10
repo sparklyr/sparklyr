@@ -123,6 +123,8 @@ test_that("handling names_repair correctly", {
 })
 
 test_that("unnest() supports ptype", {
+  test_requires_version("2.0.0")
+
   sdf.nested <- copy_to(
     sc, tibble::tibble(g = c(1.0, 4.0, 9.0), x = seq(3))
   ) %>%
