@@ -14,9 +14,6 @@ unnest.tbl_spark <- function(data,
                              .id = "DEPRECATED",
                              .sep = "DEPRECATED",
                              .preserve = "DEPRECATED") {
-  if (!is.null(ptype))
-    rlang::abort("`ptype` is unsupported for Spark data frame")
-
   cols <- tidyselect::eval_select(
     rlang::enquo(cols), replicate_colnames(data)
   ) %>%
@@ -132,7 +129,9 @@ unnest.tbl_spark <- function(data,
 
   group_vars <- intersect(setdiff(group_vars, cols), output_cols)
 
-  do.call(sdf_fast_bind_cols, unnested_cols) %>>%
+  out <- do.call(sdf_fast_bind_cols, unnested_cols) %>>%
     dplyr::select %@% lapply(output_cols, as.symbol) %>>%
     dplyr::group_by %@% lapply( group_vars, as.symbol)
+
+  apply_ptype(out, ptype)
 }

@@ -121,3 +121,19 @@ test_that("handling names_repair correctly", {
     )
   )
 })
+
+test_that("unnest() supports ptype", {
+  sdf.nested <- copy_to(
+    sc, tibble::tibble(g = c(1.0, 4.0, 9.0), x = seq(3))
+  ) %>%
+    tidyr::nest(x = x)
+
+  expect_equivalent(
+    tidyr::unnest(
+      sdf.nested, x, ptype = tibble::tibble(g = integer(), x = character())
+    ) %>%
+      collect() %>%
+      dplyr::arrange(x),
+    tibble::tibble(g = c(1L, 4L, 9L), x = as.character(seq(3)))
+  )
+})
