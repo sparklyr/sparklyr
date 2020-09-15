@@ -71,7 +71,7 @@ ensure_tmp_view <- function(x) {
   dbplyr::remote_name(x) %||% {
     sc <- spark_connection(x)
     sdf <- spark_dataframe(x)
-    data_tmp_view_name <- sparklyr:::random_string("sparklyr_tmp_")
+    data_tmp_view_name <- random_string("sparklyr_tmp_")
     if (spark_version(sc) < "2.0.0") {
       invoke(sdf, "registerTempTable", data_tmp_view_name)
     } else {

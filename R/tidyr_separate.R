@@ -18,7 +18,10 @@ validate_args <- function(into, sep) {
 #' @importFrom tidyr separate
 #' @export
 separate.tbl_spark <- function(data, col, into, sep = "[^[:alnum:]]+",
-                               remove = TRUE, extra = "warn", fill = "warn", ...) {
+                               remove = TRUE, convert = FALSE, extra = "warn", fill = "warn", ...) {
+  if (!identical(convert, FALSE)) {
+    rlang::warn("`convert` will be ignored for Spark dataframes!")
+  }
   check_present(col)
   if (rlang::is_character(sep)) {
     sep <- pcre_to_java(sep)
