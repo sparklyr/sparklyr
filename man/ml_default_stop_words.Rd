@@ -28,7 +28,7 @@ Loads the default stop words for the given language.
 \details{
 Supported languages: danish, dutch, english, finnish, french,
   german, hungarian, italian, norwegian, portuguese, russian, spanish,
-  swedish, turkish. Defaults to English. See \url{http://anoncvs.postgresql.org/cvsweb.cgi/pgsql/src/backend/snowball/stopwords/}
+  swedish, turkish. Defaults to English. See \url{https://anoncvs.postgresql.org/cvsweb.cgi/pgsql/src/backend/snowball/stopwords/}
   for more details
 }
 \seealso{

@@ -185,7 +185,7 @@ website.
 
 It’s also possible to execute SQL queries directly against tables within
 a Spark cluster. The `spark_connection` object implements a
-[DBI](https://github.com/rstats-db/DBI) interface for Spark, so you can
+[DBI](https://github.com/r-dbi/DBI) interface for Spark, so you can
 use `dbGetQuery` to execute SQL and return the result as an R data
 frame:
 
@@ -462,7 +462,7 @@ Release](https://www.rstudio.com/products/rstudio/download/preview/).
 ## Using H2O
 
 [rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN
-package from [H2O](http://h2o.ai) that extends
+package from [H2O](http://www.h2o.ai) that extends
 [sparklyr](http://spark.rstudio.com) to provide an interface into
 [Sparkling Water](https://github.com/h2oai/sparkling-water). For
 instance, the following example installs, configures and runs
