@@ -57,6 +57,7 @@ Imports:
     stringr,
     tibble,
     tidyr,
+    tidyselect,
     vctrs,
     uuid,
     withr,
