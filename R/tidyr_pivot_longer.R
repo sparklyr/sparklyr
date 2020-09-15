@@ -166,7 +166,7 @@ sdf_pivot_longer <- function(data,
     value_key <- value_keys[value]
     cols <- values[[value]]
 
-    stack_expr <- .build_stack_expr(value_key, cols, key_tuple, id_col)
+    stack_expr <- .build_stack_expr(value_key, cols, id_col)
     stacked_sdf <- data %>%
       spark_dataframe() %>%
       invoke("selectExpr", list(stack_expr))
@@ -274,7 +274,7 @@ sdf_pivot_longer <- function(data,
   list(spec, value_keys, seq_col)
 }
 
-.build_stack_expr <- function(value_key, value_cols, key_tuple, id_col) {
+.build_stack_expr <- function(value_key, value_cols, id_col) {
   value <- names(value_key)
   value_key <- value_key[[1]]
   lapply(

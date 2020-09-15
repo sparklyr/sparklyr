@@ -44,7 +44,7 @@ unite.tbl_spark <- function(data, col, ..., sep = "_", remove = TRUE, na.rm = FA
 
   data %>>%
     dplyr::mutate %@% sql %>%
-    ungroup(setdiff(colnames(data), output_cols)) %>%
+    dplyr::ungroup(setdiff(colnames(data), output_cols)) %>%
     update_group_vars(data, ., output_cols) %>>%
     dplyr::select %@% lapply(output_cols, as.symbol)
 }
