@@ -24,7 +24,7 @@ Description: R interface to Apache Spark, a fast and general engine for big data
     and provides an interface to Spark's built-in machine learning algorithms.
 License: Apache License 2.0 | file LICENSE
 SystemRequirements: Spark: 1.6.x or 2.x
-URL: http://spark.rstudio.com
+URL: https://spark.rstudio.com/
 BugReports: https://github.com/sparklyr/sparklyr/issues
 LazyData: TRUE
 RoxygenNote: 7.1.1
