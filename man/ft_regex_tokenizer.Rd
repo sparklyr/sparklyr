@@ -86,6 +86,7 @@ Other feature transformers:
 \code{\link{ft_polynomial_expansion}()},
 \code{\link{ft_quantile_discretizer}()},
 \code{\link{ft_r_formula}()},
+\code{\link{ft_robust_scaler}()},
 \code{\link{ft_sql_transformer}()},
 \code{\link{ft_standard_scaler}()},
 \code{\link{ft_stop_words_remover}()},
