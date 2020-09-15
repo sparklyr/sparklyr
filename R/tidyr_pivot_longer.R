@@ -501,7 +501,7 @@ deduplicate_longer_spec <- function(spec) {
   if (anyDuplicated(into)) {
     pieces <- split(out, into)
     into <- names(pieces)
-    out <- purrr::map(pieces, pmap_chr, paste0, sep = "")
+    out <- purrr::map(pieces, purrr::pmap_chr, paste0, sep = "")
   }
 
   into <- rlang::as_utf8_character(into)
