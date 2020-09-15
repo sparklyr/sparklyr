@@ -187,6 +187,7 @@ Collate:
     'ml_feature_quantile_discretizer.R'
     'ml_feature_r_formula.R'
     'ml_feature_regex_tokenizer.R'
+    'ml_feature_robust_scaler.R'
     'ml_feature_standard_scaler.R'
     'ml_feature_stop_words_remover.R'
     'ml_feature_string_indexer.R'
