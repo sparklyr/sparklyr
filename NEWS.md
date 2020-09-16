@@ -55,6 +55,8 @@
 
 - Revised `spark_read_compat_param` to avoid collision on names assigned to
   different Spark data frames
+  
+- `sdf_quantile()` now supports calculation for multiple columns.
 
 ### Misc
 
