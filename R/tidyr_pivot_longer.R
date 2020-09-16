@@ -148,6 +148,8 @@ sdf_pivot_longer <- function(data,
     canonicalize_spec() %>%
     deduplicate_longer_spec()
 
+  values <- NULL
+  value_keys <- NULL
   list(data, group_vars, spec, values, value_keys) %<-%
     .apply_pivot_longer_names_repair(data, group_vars, spec, names_repair)
 
@@ -156,6 +158,7 @@ sdf_pivot_longer <- function(data,
   names(id_sql) <- id_col
   data <- data %>>% dplyr::mutate %@% id_sql %>% dplyr::compute()
 
+  seq_col <- NULL
   list(spec, value_keys, seq_col) %<-% .rename_seq_col(spec, value_keys)
 
   out <- data %>>%
