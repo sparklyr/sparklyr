@@ -11,6 +11,8 @@ test_that("sdf_crosstab() works", {
 })
 
 test_that("sdf_quantile() works for a single column", {
+  test_requires_version("2.0.0", "approxQuantile() is only supported in Spark 2.0.0 or above")
+
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
   quantiles <- mtcars_tbl %>%
