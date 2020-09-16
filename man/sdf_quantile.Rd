@@ -14,7 +14,8 @@ sdf_quantile(
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
-\item{column}{The column for which quantiles should be computed.}
+\item{column}{The column(s) for which quantiles should be computed.
+Multiple columns are only supported in Spark 2.0+.}
 
 \item{probabilities}{A numeric vector of probabilities, for
 which quantiles should be computed.}

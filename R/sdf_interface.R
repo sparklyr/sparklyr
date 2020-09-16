@@ -365,7 +365,8 @@ sdf_last_index <- function(x, id = "id") {
 #' approximate quantiles (to some relative error).
 #'
 #' @template roxlate-ml-x
-#' @param column The column for which quantiles should be computed.
+#' @param column The column(s) for which quantiles should be computed.
+#' Multiple columns are only supported in Spark 2.0+.
 #' @param probabilities A numeric vector of probabilities, for
 #'   which quantiles should be computed.
 #' @param relative.error The relative error -- lower values imply more
@@ -378,17 +379,31 @@ sdf_quantile <- function(x,
                          relative.error = 1E-5) {
   sdf <- spark_dataframe(x)
 
+  if (length(column) > 1) {
+    if (package_version(sdf$connection$home_version) <
+        package_version("2.0.0")) {
+      stop("Spark 2.0+ is required when length(column) > 1")
+    }
+  }
+
   nm <-
     names(probabilities) %||%
     paste(signif(probabilities * 100, 3), "%", sep = "")
 
-  column <- cast_string(column)
+  column <- lapply(column, cast_string)
   probabilities <- as.list(as.numeric(probabilities))
   relative.error <- cast_scalar_double(relative.error)
 
   stat <- invoke(sdf, "stat")
   quantiles <- invoke(stat, "approxQuantile", column, probabilities, relative.error)
-  names(quantiles) <- nm
+
+  if (length(column) == 1) {
+    quantiles <- unlist(quantiles)
+    names(quantiles) <- nm
+  } else {
+    names(quantiles) <- column
+    quantiles <- lapply(quantiles, `names<-`, nm)
+  }
 
   quantiles
 }
