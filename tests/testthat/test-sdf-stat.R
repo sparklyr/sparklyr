@@ -10,7 +10,7 @@ test_that("sdf_crosstab() works", {
   expect_setequal(df[, 1, drop = TRUE], c("8.0", "4.0", "6.0"))
 })
 
-test_that("sdf_quantile() works", {
+test_that("sdf_quantile() works for a single column", {
   sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
   quantiles <- mtcars_tbl %>%
@@ -23,6 +23,13 @@ test_that("sdf_quantile() works", {
                     `75%` = 318,
                     `100%` = 472
                   ))
+
+})
+
+test_that("sdf_quantile() works for multiple column", {
+  sc <- testthat_spark_connection()
+  test_requires_version("2.0.0", "multicolumn quantile requires 2.0+")
+  mtcars_tbl <- testthat_tbl("mtcars")
 
   quantiles <- mtcars_tbl %>%
     sdf_quantile(column = c("disp", "drat"))
