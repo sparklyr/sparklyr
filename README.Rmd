@@ -20,7 +20,7 @@ knitr::opts_chunk$set(fig.path = "tools/readme/", dev = "png")
 - Use [dplyr](https://spark.rstudio.com/dplyr/) to filter and aggregate Spark datasets and [streams](https://spark.rstudio.com/guides/streaming/) then bring them into R for analysis and visualization.
 - Use [MLlib](http://spark.apache.org/docs/latest/mllib-guide.html), [H2O](https://spark.rstudio.com/guides/h2o/), [XGBoost](https://github.com/rstudio/sparkxgb) and [GraphFrames](https://github.com/rstudio/graphframes) to train models at scale in Spark.
 - Create interoperable machine learning [pipelines](https://spark.rstudio.com/guides/pipelines/) and productionize them with [MLeap](https://spark.rstudio.com/guides/mleap/).
-- Create [extensions](http://spark.rstudio.com/extensions.html) that call the full Spark API or run [distributed R](https://spark.rstudio.com/guides/distributed-r/) code to support new functionality.
+- Create [extensions](https://spark.rstudio.com/extensions.html) that call the full Spark API or run [distributed R](https://spark.rstudio.com/guides/distributed-r/) code to support new functionality.
 
 ## Installation
 
@@ -55,7 +55,7 @@ sc <- spark_connect(master = "local")
 
 The returned Spark connection (`sc`) provides a remote dplyr data source to the Spark cluster.
 
-For more information on connecting to remote Spark clusters see the [Deployment](http://spark.rstudio.com/deployment.html) section of the sparklyr website.
+For more information on connecting to remote Spark clusters see the [Deployment](https://spark.rstudio.com/deployment.html) section of the sparklyr website.
 
 ## Using dplyr
 
@@ -112,7 +112,7 @@ batting_tbl %>%
   filter(min_rank(desc(H)) <= 2 & H > 0)
 ```
 
-For additional documentation on using dplyr with Spark see the [dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr website.
+For additional documentation on using dplyr with Spark see the [dplyr](https://spark.rstudio.com/dplyr.html) section of the sparklyr website.
 
 ## Using SQL
 
@@ -220,7 +220,7 @@ count_lines(sc, tempfile)
 ```
 
 
-To learn more about creating extensions see the [Extensions](http://spark.rstudio.com/extensions.html) section of the sparklyr website.
+To learn more about creating extensions see the [Extensions](https://spark.rstudio.com/extensions.html) section of the sparklyr website.
 
 
 ## Table Utilities
@@ -260,7 +260,7 @@ Finally, we disconnect from Spark:
 
 ## RStudio IDE
 
-The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/download/preview/) of the RStudio IDE includes integrated support for Spark and the sparklyr package, including tools for:
+The latest RStudio [Preview Release](https://rstudio.com/products/rstudio/download/preview/) of the RStudio IDE includes integrated support for Spark and the sparklyr package, including tools for:
 
 - Creating and managing Spark connections
 - Browsing the tables and columns of Spark DataFrames
@@ -280,11 +280,11 @@ You can also connect to Spark through [Livy](http://livy.io) through a new conne
 
 <div style="margin-bottom: 15px;"></div>
 
-The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
+The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://rstudio.com/products/rstudio/download/preview/).
 
 ## Using H2O
 
-[rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN package from [H2O](http://h2o.ai) that extends [sparklyr](http://spark.rstudio.com) to provide an interface into [Sparkling Water](https://github.com/h2oai/sparkling-water). For instance, the following example installs, configures and runs [h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
+[rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN package from [H2O](https://h2o.ai/) that extends [sparklyr](https://spark.rstudio.com/) to provide an interface into [Sparkling Water](https://github.com/h2oai/sparkling-water). For instance, the following example installs, configures and runs [h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
 
 ```{r results='hide', message=FALSE, eval=FALSE}
 library(rsparkling)

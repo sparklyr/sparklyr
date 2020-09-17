@@ -148,6 +148,8 @@ sdf_pivot_longer <- function(data,
     canonicalize_spec() %>%
     deduplicate_longer_spec()
 
+  values <- NULL
+  value_keys <- NULL
   list(data, group_vars, spec, values, value_keys) %<-%
     .apply_pivot_longer_names_repair(data, group_vars, spec, names_repair)
 
@@ -156,6 +158,7 @@ sdf_pivot_longer <- function(data,
   names(id_sql) <- id_col
   data <- data %>>% dplyr::mutate %@% id_sql %>% dplyr::compute()
 
+  seq_col <- NULL
   list(spec, value_keys, seq_col) %<-% .rename_seq_col(spec, value_keys)
 
   out <- data %>>%
@@ -166,7 +169,7 @@ sdf_pivot_longer <- function(data,
     value_key <- value_keys[value]
     cols <- values[[value]]
 
-    stack_expr <- .build_stack_expr(value_key, cols, key_tuple, id_col)
+    stack_expr <- .build_stack_expr(value_key, cols, id_col)
     stacked_sdf <- data %>%
       spark_dataframe() %>%
       invoke("selectExpr", list(stack_expr))
@@ -274,7 +277,7 @@ sdf_pivot_longer <- function(data,
   list(spec, value_keys, seq_col)
 }
 
-.build_stack_expr <- function(value_key, value_cols, key_tuple, id_col) {
+.build_stack_expr <- function(value_key, value_cols, id_col) {
   value <- names(value_key)
   value_key <- value_key[[1]]
   lapply(
@@ -501,7 +504,7 @@ deduplicate_longer_spec <- function(spec) {
   if (anyDuplicated(into)) {
     pieces <- split(out, into)
     into <- names(pieces)
-    out <- purrr::map(pieces, pmap_chr, paste0, sep = "")
+    out <- purrr::map(pieces, purrr::pmap_chr, paste0, sep = "")
   }
 
   into <- rlang::as_utf8_character(into)

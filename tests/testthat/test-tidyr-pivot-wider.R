@@ -217,7 +217,7 @@ test_that("values_fill only affects missing cells", {
     tibble::tibble(g = c(1, 2), names = c("x", "y"), value = c(1, NA))
   )
   out <- sdf %>%
-    tidyr::pivot_wider(names_from = names, values_from = value, values_fill = 0 ) %>%
+    tidyr::pivot_wider(names_from = names, values_from = value, values_fill = 0) %>%
     collect() %>%
     dplyr::arrange(g)
 
@@ -247,4 +247,16 @@ test_that("can pivot from multiple measure cols using all keys", {
     collect()
 
   expect_equivalent(pv, tibble::tibble(a_x = 1, a_y = 2, b_x = 3, b_y = 4))
+})
+
+test_that("default `names_from` and `values_from` works as expected", {
+  test_requires_version("2.3.0")
+
+  sdf <- copy_to(
+    sc,
+    tibble::tibble(name = c("x", "y"), value = c(1, 2))
+  )
+  pv <- sdf %>% tidyr::pivot_wider() %>% collect()
+
+  expect_equivalent(pv, tibble::tibble(x = 1, y = 2))
 })

@@ -7,13 +7,13 @@ NULL
 #' @export
 pivot_wider.tbl_spark <- function(data,
                                   id_cols = NULL,
-                                  names_from = name,
+                                  names_from = !!as.name("name"),
                                   names_prefix = "",
                                   names_sep = "_",
                                   names_glue = NULL,
                                   names_sort = FALSE,
                                   names_repair = "check_unique",
-                                  values_from = value,
+                                  values_from = !!as.name("value"),
                                   values_fill = NULL,
                                   values_fn = NULL,
                                   ...) {
@@ -41,8 +41,8 @@ pivot_wider.tbl_spark <- function(data,
 }
 
 sdf_build_wider_spec <- function(data,
-                                 names_from = name,
-                                 values_from = value,
+                                 names_from,
+                                 values_from,
                                  names_prefix = "",
                                  names_sep = "_",
                                  names_glue = NULL,

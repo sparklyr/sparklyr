@@ -65,6 +65,11 @@
 - Made test reporting in Github CI workflows more informative
   (https://github.com/sparklyr/sparklyr/pull/2672)
 
+### Spark ML
+
+- `ft_robust_scaler` was created as the R interface for the `RobustScaler`
+  functionality in Spark 3 or above
+
 # Sparklyr 1.3.1
 
 ### Distributed R

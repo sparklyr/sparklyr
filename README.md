@@ -28,7 +28,7 @@ https://gitter.im/sparklyr/sparklyr](https://badges.gitter.im/sparklyr/sparklyr.
     [pipelines](https://spark.rstudio.com/guides/pipelines/) and
     productionize them with
     [MLeap](https://spark.rstudio.com/guides/mleap/).
-  - Create [extensions](http://spark.rstudio.com/extensions.html) that
+  - Create [extensions](https://spark.rstudio.com/extensions.html) that
     call the full Spark API or run [distributed
     R](https://spark.rstudio.com/guides/distributed-r/) code to support
     new functionality.
@@ -74,7 +74,7 @@ The returned Spark connection (`sc`) provides a remote dplyr data source
 to the Spark cluster.
 
 For more information on connecting to remote Spark clusters see the
-[Deployment](http://spark.rstudio.com/deployment.html) section of the
+[Deployment](https://spark.rstudio.com/deployment.html) section of the
 sparklyr website.
 
 ## Using dplyr
@@ -178,14 +178,14 @@ batting_tbl %>%
     ## # … with more rows
 
 For additional documentation on using dplyr with Spark see the
-[dplyr](http://spark.rstudio.com/dplyr.html) section of the sparklyr
+[dplyr](https://spark.rstudio.com/dplyr.html) section of the sparklyr
 website.
 
 ## Using SQL
 
 It’s also possible to execute SQL queries directly against tables within
 a Spark cluster. The `spark_connection` object implements a
-[DBI](https://github.com/rstats-db/DBI) interface for Spark, so you can
+[DBI](https://github.com/r-dbi/DBI) interface for Spark, so you can
 use `dbGetQuery` to execute SQL and return the result as an R data
 frame:
 
@@ -374,7 +374,7 @@ count_lines(sc, tempfile)
     ## [1] 336777
 
 To learn more about creating extensions see the
-[Extensions](http://spark.rstudio.com/extensions.html) section of the
+[Extensions](https://spark.rstudio.com/extensions.html) section of the
 sparklyr website.
 
 ## Table Utilities
@@ -425,7 +425,7 @@ Finally, we disconnect from Spark:
 ## RStudio IDE
 
 The latest RStudio [Preview
-Release](https://www.rstudio.com/products/rstudio/download/preview/) of
+Release](https://rstudio.com/products/rstudio/download/preview/) of
 the RStudio IDE includes integrated support for Spark and the sparklyr
 package, including tools for:
 
@@ -457,13 +457,13 @@ new connection dialog:
 
 The RStudio IDE features for sparklyr are available now as part of the
 [RStudio Preview
-Release](https://www.rstudio.com/products/rstudio/download/preview/).
+Release](https://rstudio.com/products/rstudio/download/preview/).
 
 ## Using H2O
 
 [rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN
-package from [H2O](http://h2o.ai) that extends
-[sparklyr](http://spark.rstudio.com) to provide an interface into
+package from [H2O](https://www.h2o.ai/) that extends
+[sparklyr](https://spark.rstudio.com/) to provide an interface into
 [Sparkling Water](https://github.com/h2oai/sparkling-water). For
 instance, the following example installs, configures and runs
 [h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
