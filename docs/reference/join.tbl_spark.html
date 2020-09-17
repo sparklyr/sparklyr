@@ -1,0 +1,149 @@
+---
+title: "Join Spark tbls."
+aliases:
+  - reference/sparklyr/latest/join.tbl_spark.html
+---
+
+    <div>
+
+    <div>
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+    </ul>
+    </div>
+
+    <div>
+
+    <p>These functions are wrappers around their `dplyr` equivalents that set
+Spark SQL-compliant values for the `suffix` argument by replacing dots (`.`)
+with underscores (`_`). See [join] for a description of the general purpose
+of the functions.</p>
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># S3 method for tbl_spark</span>
+<span class='fu'><a href='inner_join.html'>inner_join</a></span>(
+  <span class='no'>x</span>,
+  <span class='no'>y</span>,
+  <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"_x"</span>, <span class='st'>"_y"</span>),
+  <span class='kw'>auto_index</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>sql_on</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
+
+<span class='co'># S3 method for tbl_spark</span>
+<span class='fu'><a href='left_join.html'>left_join</a></span>(
+  <span class='no'>x</span>,
+  <span class='no'>y</span>,
+  <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"_x"</span>, <span class='st'>"_y"</span>),
+  <span class='kw'>auto_index</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>sql_on</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
+
+<span class='co'># S3 method for tbl_spark</span>
+<span class='fu'><a href='right_join.html'>right_join</a></span>(
+  <span class='no'>x</span>,
+  <span class='no'>y</span>,
+  <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"_x"</span>, <span class='st'>"_y"</span>),
+  <span class='kw'>auto_index</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>sql_on</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
+
+<span class='co'># S3 method for tbl_spark</span>
+<span class='fu'><a href='full_join.html'>full_join</a></span>(
+  <span class='no'>x</span>,
+  <span class='no'>y</span>,
+  <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"_x"</span>, <span class='st'>"_y"</span>),
+  <span class='kw'>auto_index</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>sql_on</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)</code></pre></div>
+
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>x</td>
+      <td><p>A pair of data frames, data frame extensions (e.g. a tibble), or
+lazy data frames (e.g. from dbplyr or dtplyr). See <em>Methods</em>, below, for
+more details.</p></td>
+    </tr>
+    <tr>
+      <td>y</td>
+      <td><p>A pair of data frames, data frame extensions (e.g. a tibble), or
+lazy data frames (e.g. from dbplyr or dtplyr). See <em>Methods</em>, below, for
+more details.</p></td>
+    </tr>
+    <tr>
+      <td>by</td>
+      <td><p>A character vector of variables to join by.</p>
+<p>If <code>NULL</code>, the default, <code>*_join()</code> will perform a natural join, using all
+variables in common across <code>x</code> and <code>y</code>. A message lists the variables so that you
+can check they're correct; suppress the message by supplying <code>by</code> explicitly.</p>
+<p>To join by different variables on <code>x</code> and <code>y</code>, use a named vector.
+For example, <code>by = c("a" = "b")</code> will match <code>x$a</code> to <code>y$b</code>.</p>
+<p>To join by multiple variables, use a vector with length &gt; 1.
+For example, <code>by = c("a", "b")</code> will match <code>x$a</code> to <code>y$a</code> and <code>x$b</code> to
+<code>y$b</code>. Use a named vector to match different variables in <code>x</code> and <code>y</code>.
+For example, <code>by = c("a" = "b", "c" = "d")</code> will match <code>x$a</code> to <code>y$b</code> and
+<code>x$c</code> to <code>y$d</code>.</p>
+<p>To perform a cross-join, generating all combinations of <code>x</code> and <code>y</code>,
+use <code>by = character()</code>.</p></td>
+    </tr>
+    <tr>
+      <td>copy</td>
+      <td><p>If <code>x</code> and <code>y</code> are not from the same data source,
+and <code>copy</code> is <code>TRUE</code>, then <code>y</code> will be copied into a
+temporary table in same database as <code>x</code>. <code>*_join()</code> will automatically
+run <code>ANALYZE</code> on the created table in the hope that this will make
+you queries as efficient as possible by giving more data to the query
+planner.</p>
+<p>This allows you to join tables across srcs, but it's potentially expensive
+operation so you must opt into it.</p></td>
+    </tr>
+    <tr>
+      <td>suffix</td>
+      <td><p>If there are non-joined duplicate variables in <code>x</code> and
+<code>y</code>, these suffixes will be added to the output to disambiguate them.
+Should be a character vector of length 2.</p></td>
+    </tr>
+    <tr>
+      <td>auto_index</td>
+      <td><p>if <code>copy</code> is <code>TRUE</code>, automatically create
+indices for the variables in <code>by</code>. This may speed up the join if
+there are matching indexes in <code>x</code>.</p></td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td><p>Other parameters passed onto methods.</p></td>
+    </tr>
+    <tr>
+      <td>sql_on</td>
+      <td><p>A custom join predicate as an SQL expression. The SQL
+can refer to the <code>LHS</code> and <code>RHS</code> aliases to disambiguate
+column names.</p></td>
+    </tr>
+    </table>
+
+
+
+    </div>
+
+    </div>
+
+
+
+

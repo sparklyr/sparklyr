@@ -9,24 +9,17 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
-    
     <li><a href="#value">Value</a></li>
-
     <li><a href="#details">Details</a></li>
-
     <li><a href="#parameter-details">Parameter details</a></li>
-
     <li><a href="#see-also">See also</a></li>
-    
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
-    
     <p>Latent Dirichlet Allocation (LDA), a topic model designed for text documents.</p>
-    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ml_lda</span>(
   <span class='no'>x</span>,
@@ -56,7 +49,7 @@ aliases:
 <span class='fu'>ml_log_perplexity</span>(<span class='no'>model</span>, <span class='no'>dataset</span>)
 
 <span class='fu'>ml_topics_matrix</span>(<span class='no'>model</span>)</code></pre></div>
-    
+
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -152,7 +145,7 @@ reproducible across repeated calls.</p></td>
       <td><p>test corpus to use for calculating log likelihood or log perplexity</p></td>
     </tr>
     </table>
-    
+
     <h2 id="value">Value</h2>
 
     <p>The object returned depends on the class of <code>x</code>.</p>
@@ -174,7 +167,6 @@ reproducible across repeated calls.</p></td>
 <p><code>ml_describe_topics</code> returns a DataFrame with topics and their top-weighted terms.</p>
 <p><code>ml_log_likelihood</code> calculates a lower bound on the log likelihood of
   the entire corpus</p>
-    
     <h2 id="details">Details</h2>
 
     <p>For `ml_lda.tbl_spark` with the formula interface, you can specify named arguments in `...` that will
@@ -189,7 +181,6 @@ reproducible across repeated calls.</p></td>
 
 <p>Original LDA paper (journal version): Blei, Ng, and Jordan. "Latent Dirichlet Allocation." JMLR, 2003.</p>
 <p>Input data (<code>features_col</code>): LDA is given a collection of documents as input data, via the <code>features_col</code> parameter. Each document is specified as a Vector of length <code>vocab_size</code>, where each entry is the count for the corresponding term (word) in the document. Feature transformers such as <code><a href='ft_tokenizer.html'>ft_tokenizer</a></code> and <code><a href='ft_count_vectorizer.html'>ft_count_vectorizer</a></code> can be useful for converting text to word count vectors</p>
-    
     <h2 id="parameter-details">Parameter details</h2>
 
     
@@ -235,7 +226,6 @@ reproducible across repeated calls.</p></td>
 <h3><code>topic_distribution_col</code></h3>
 <p>This uses a variational approximation following Hoffman et al. (2010), where the approximate distribution is called "gamma." Technically, this method returns this approximation "gamma" for each document.</p>
 
-    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for
@@ -244,7 +234,6 @@ reproducible across repeated calls.</p></td>
 <code><a href='ml_bisecting_kmeans.html'>ml_bisecting_kmeans</a>()</code>,
 <code><a href='ml_gaussian_mixture.html'>ml_gaussian_mixture</a>()</code>,
 <code><a href='ml_kmeans.html'>ml_kmeans</a>()</code></p></div>
-    
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -278,6 +267,7 @@ reproducible across repeated calls.</p></td>
 <span class='co'># vocabulary and topics</span>
 <span class='fu'><a href='https://rdrr.io/pkg/generics/man/tidy.html'>tidy</a></span>(<span class='no'>lda_model</span>)
 }</div></code></pre></div>
+
     </div>
 
     </div>

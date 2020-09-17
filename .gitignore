@@ -54,4 +54,3 @@ tests/testthat/test\.json
 tests/testthat/batch\.csv/
 tests/testthat/iris-in/
 tests/testthat/iris-out/
-.Rproj.user

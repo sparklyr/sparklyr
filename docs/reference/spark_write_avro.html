@@ -9,21 +9,18 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
-    
     <li><a href="#see-also">See also</a></li>
-        </ul>
+    </ul>
     </div>
 
     <div>
 
-    
     <p>Serialize a Spark DataFrame into Apache Avro format.
 Notice this functionality requires the Spark connection <code>sc</code> to be instantiated with either
 an explicitly specified Spark version (i.e.,
 <code>spark_connect(..., version = &lt;version&gt;, packages = c("avro", &lt;other package(s)&gt;), ...)</code>)
 or a specific version of Spark avro package to use (e.g.,
 <code>spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0", &lt;other package(s)&gt;), ...)</code>).</p>
-    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_write_avro</span>(
   <span class='no'>x</span>,
@@ -34,7 +31,7 @@ or a specific version of Spark avro package to use (e.g.,
   <span class='kw'>compression</span> <span class='kw'>=</span> <span class='st'>"snappy"</span>,
   <span class='kw'>partition_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</code></pre></div>
-    
+
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -73,7 +70,7 @@ Supports the <samp>"hdfs://"</samp>, <samp>"s3a://"</samp> and <samp>"file://"</
       <td><p>A <code>character</code> vector. Partitions the output by the given columns on the file system.</p></td>
     </tr>
     </table>
-    
+
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>Other Spark serialization routines: 
@@ -100,7 +97,7 @@ Supports the <samp>"hdfs://"</samp>, <samp>"s3a://"</samp> and <samp>"file://"</
 <code><a href='spark_write_source.html'>spark_write_source</a>()</code>,
 <code><a href='spark_write_table.html'>spark_write_table</a>()</code>,
 <code><a href='spark_write_text.html'>spark_write_text</a>()</code></p></div>
-    
+
 
     </div>
 

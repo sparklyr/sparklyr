@@ -9,22 +9,18 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
-    
     <li><a href="#transforming-spark-dataframes">Transforming Spark DataFrames</a></li>
-
     <li><a href="#see-also">See also</a></li>
-        </ul>
+    </ul>
     </div>
 
     <div>
 
-    
     <p>Draw a random sample of rows (with or without replacement)
 from a Spark DataFrame.</p>
-    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>sdf_sample</span>(<span class='no'>x</span>, <span class='kw'>fraction</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>replacement</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</code></pre></div>
-    
+
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -50,7 +46,7 @@ from a Spark DataFrame.</p>
       <td><p>An (optional) integer seed.</p></td>
     </tr>
     </table>
-    
+
     <h2 id="transforming-spark-dataframes">Transforming Spark DataFrames</h2>
 
     
@@ -65,7 +61,6 @@ the underlying Spark DataFrame <em>does</em> execute its operations lazily, so
 that even though the pending set of operations (currently) are not exposed at
 the <span style="R">R</span> level, these operations will only be executed when you explicitly
 <code><a href='collect.html'>collect()</a></code> the table.</p>
-    
     <h2 id="see-also">See also</h2>
 
     <div class='dont-index'><p>Other Spark data frames: 
@@ -73,8 +68,8 @@ the <span style="R">R</span> level, these operations will only be executed when 
 <code><a href='sdf_random_split.html'>sdf_random_split</a>()</code>,
 <code><a href='sdf_register.html'>sdf_register</a>()</code>,
 <code><a href='sdf_sort.html'>sdf_sort</a>()</code>,
-<code>sdf_weighted_sample()</code></p></div>
-    
+<code><a href='sdf_weighted_sample.html'>sdf_weighted_sample</a>()</code></p></div>
+
 
     </div>
 

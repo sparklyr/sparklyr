@@ -9,23 +9,20 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
-        
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
-    
     <p>Run a custom R function on Spark worker to write a Spark DataFrame
 into file(s). If Spark's speculative execution feature is enabled (i.e.,
 `spark.speculation` is true), then each write task may be executed more than
 once and the user-defined writer function will need to ensure no concurrent
 writes happen to the same file path (e.g., by appending UUID to each file name).</p>
-    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>spark_write</span>(<span class='no'>x</span>, <span class='no'>writer</span>, <span class='no'>paths</span>, <span class='kw'>packages</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</code></pre></div>
-    
+
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -58,7 +55,7 @@ number of partition(s) in <code>x</code> is not equal to <code><a href='https://
 a list of packages to distribute, or a package bundle created with</p></td>
     </tr>
     </table>
-    
+
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -89,6 +86,7 @@ a list of packages to distribute, or a package bundle created with</p></td>
   <span class='kw'>paths</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"file:///tmp/all_rows"</span>)
 )
 }</div></code></pre></div>
+
     </div>
 
     </div>

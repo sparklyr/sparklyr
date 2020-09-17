@@ -9,22 +9,19 @@ aliases:
     <div>
     <ul data-gumshoe>
     <li><a href="#arguments">Arguments</a></li>
-        
     <li><a href="#examples">Examples</a></li>
     </ul>
     </div>
 
     <div>
 
-    
     <p>Applies an element-wise function to combine elements from 2 array columns
 (this is essentially a dplyr wrapper for the
 <code>zip_with(array&lt;T&gt;, array&lt;U&gt;, function&lt;T, U, R&gt;): array&lt;R&gt;</code>
 built-in function in Spark SQL)</p>
-    
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>hof_zip_with</span>(<span class='no'>x</span>, <span class='no'>func</span>, <span class='kw'>dest_col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>left</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>right</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</code></pre></div>
-    
+
     <h2 id="arguments">Arguments</h2>
     <table class="ref-arguments">
 
@@ -61,7 +58,7 @@ built-in function in Spark SQL)</p>
       <td><p>Additional params to dplyr::mutate</p></td>
     </tr>
     </table>
-    
+
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -75,10 +72,12 @@ built-in function in Spark SQL)</p>
   <span class='kw pkg'>tibble</span><span class='kw ns'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span>(
     <span class='kw'>left</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>1</span>:<span class='fl'>5</span>, <span class='fl'>21</span>:<span class='fl'>25</span>),
     <span class='kw'>right</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>6</span>:<span class='fl'>10</span>, <span class='fl'>16</span>:<span class='fl'>20</span>),
-    <span class='kw'>res</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0</span>))
+    <span class='kw'>res</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0</span>)
+  )
 ) <span class='kw'>%&gt;%</span>
   <span class='fu'>hof_zip_with</span>(~ <span class='no'>.x</span> * <span class='no'>.y</span>)
 }</div></code></pre></div>
+
     </div>
 
     </div>
