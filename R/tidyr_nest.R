@@ -74,7 +74,8 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::depr
 
   dplyr::ungroup(.data) %>>%
     dplyr::group_by %@% lapply(non_nested_cols, as.symbol) %>>%
-    dplyr::summarize %@% nesting_sql %>>%
+    dplyr::summarize %@% nesting_sql %>%
+    dplyr::ungroup() %>>%
     dplyr::group_by %@% lapply(group_vars, as.symbol) %>>%
     dplyr::mutate %@% handle_empty_lists_sql %>>%
     dplyr::select %@% lapply(output_cols, as.symbol)
