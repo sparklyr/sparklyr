@@ -9,6 +9,7 @@ simple_sdf_2 <- testthat_tbl(
   name = "tidyr_nest_simple_sdf_2",
   data = tibble::tibble(x = 1:3, y = c("B", "A", "A"))
 )
+mtcars_tbl <- testthat_tbl("mtcars")
 
 test_that("nest turns grouped values into one list-df", {
   test_requires_version("2.0.0")
@@ -44,6 +45,29 @@ test_that("provided grouping vars override grouped defaults", {
     out %>% collect(),
     tibble::tibble(x = 1, z = 3, data = list(list(y = 2)))
   )
+})
+
+test_that("no additional grouping var is created", {
+  test_requires_version("2.0.0")
+
+  mtcars_tbl_nested <- mtcars_tbl %>%
+    dplyr::group_by(am) %>%
+    tidyr::nest(perf = c(hp, mpg, disp, qsec))
+
+  expect_equal(
+    colnames(mtcars_tbl_nested),
+    c("am", "cyl", "drat", "wt", "vs", "gear", "carb", "perf")
+  )
+  expect_equal(mtcars_tbl_nested %>% dplyr::group_vars(), "am")
+
+  mtcars_tbl_nested <- mtcars_tbl %>%
+    tidyr::nest(perf = c(hp, mpg, disp, qsec))
+
+  expect_equal(
+    colnames(mtcars_tbl_nested),
+    c("cyl", "drat", "wt", "vs", "am", "gear", "carb", "perf")
+  )
+  expect_equal(mtcars_tbl_nested %>% dplyr::group_vars(), character())
 })
 
 test_that("puts data into the correct row", {

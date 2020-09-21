@@ -131,7 +131,7 @@ unnest.tbl_spark <- function(data,
 
   out <- do.call(sdf_fast_bind_cols, unnested_cols) %>>%
     dplyr::select %@% lapply(output_cols, as.symbol) %>>%
-    dplyr::group_by %@% lapply( group_vars, as.symbol)
+    dplyr::group_by %@% lapply(group_vars, as.symbol)
 
   apply_ptype(out, ptype)
 }
