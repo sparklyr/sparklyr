@@ -69,7 +69,6 @@ spark_apply_bundle_file <- function(packages, base_path, session_id) {
 spark_apply_bundle <- function(packages = TRUE, base_path = getwd(), session_id = NULL) {
   # If session_id is not provied use a random string to avoid file name collision.
   session_id <- session_id %||% uuid::UUIDgenerate(use.time = TRUE)
-  }
 
   packages <- if (is.character(packages)) spark_apply_packages(packages) else packages
 
