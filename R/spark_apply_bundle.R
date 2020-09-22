@@ -69,7 +69,8 @@ spark_apply_bundle_file <- function(packages, base_path, session_id) {
 spark_apply_bundle <- function(packages = TRUE, base_path = getwd(), session_id = NULL) {
   # If session_id is not provied use a random string to avoid file name collision.
   if (is.null(session_id)) {
-    session_id <- digest::digest(paste(Sys.time(), collapse = "-"), algo = "sha256"),
+    session_id <- substr(
+      digest::digest(paste(Sys.time(), collapse = "-"), algo = "sha256"),
       start = 1,
       stop = 7
     )
