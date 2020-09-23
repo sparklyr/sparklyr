@@ -14,6 +14,10 @@ Authors@R: c(
     person("Andy", "Zhang", role = "aut", email = "yue.zhang@databricks.com"),
     person("Yitao", "Li", role = c("aut", "cre"), email = "yitao@rstudio.com",
            comment = c(ORCID = "0000-0002-1261-905X")),
+    person("Jozef", "Hajnala", role = "ctb", email = "jozef.hajnala@gmail.com"),
+    person("Maciej", "Szymkiewicz", role = "ctb", email = "mszymkiewicz@gmail.com",
+          comment = c(ORCID = "0000-0003-1469-9396")),
+    person("Wil", "Davis", role = "ctb", email = "william.davis@worthingtonindustries.com"),
     person(family = "RStudio", role = c("cph")),
     person(family = "The Apache Software Foundation", role = c("aut", "cph"))
     )
@@ -23,7 +27,7 @@ Description: R interface to Apache Spark, a fast and general engine for big data
     local and remote Apache Spark clusters, provides a 'dplyr' compatible back-end,
     and provides an interface to Spark's built-in machine learning algorithms.
 License: Apache License 2.0 | file LICENSE
-SystemRequirements: Spark: 1.6.x or 2.x
+SystemRequirements: Spark: 1.6.x, 2.x, or 3.x
 URL: https://spark.rstudio.com/
 BugReports: https://github.com/sparklyr/sparklyr/issues
 LazyData: TRUE
