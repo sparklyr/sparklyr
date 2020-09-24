@@ -1,5 +1,6 @@
-template:
-  path: inst/pkgdown/templates
+# TODO: make template files actually work with `pkgdown::build_site()`
+# template:
+#   path: inst/pkgdown/templates
 reference:
   - title: Spark Operations
     contents:
@@ -25,6 +26,9 @@ reference:
     - spark_extension
     - spark_load_table
     - spark_read_libsvm
+    - list_sparklyr_jars
+    - spark_config_packages
+    - spark_connection
   - title: Spark Data
     contents:
     - spark_read
@@ -58,6 +62,7 @@ reference:
     - tbl_uncache
   - title: Spark DataFrames
     contents:
+    - copy_to.spark_connection
     - sdf_along
     - sdf_bind_cols
     - sdf_bind_rows
@@ -106,6 +111,31 @@ reference:
     - sdf_sql
     - sdf_transform
     - sdf_with_sequential_id
+    - join.tbl_spark
+    - separate
+    - unite
+    - nest
+    - unnest
+    - pivot_wider
+    - pivot_longer
+    - fill
+    - left_join
+    - right_join
+    - inner_join
+    - full_join
+    - hof_aggregate
+    - hof_array_sort
+    - hof_exists
+    - hof_filter
+    - hof_forall
+    - hof_map_filter
+    - hof_map_zip_with
+    - hof_transform
+    - hof_transform_keys
+    - hof_transform_values
+    - hof_zip_with
+    - sdf_weighted_sample
+    - transform_sdf
   - title: Spark Machine Learning
     contents:
     - ml_decision_tree
@@ -224,6 +254,7 @@ reference:
     - ft_vector_indexer
     - ft_vector_slicer
     - ft_word2vec
+    - ft_robust_scaler
   - title: Spark Machine Learning Utilities
     contents:
     - ml_binary_classification_eval
