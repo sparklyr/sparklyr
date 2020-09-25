@@ -309,6 +309,6 @@ stream_watermark <- function(x, column = "timestamp", threshold = "10 minutes") 
   }
 
   sdf %>%
-    invoke("withWatermark", "timestamp", threshold) %>%
+    invoke("withWatermark", column, threshold) %>%
     sdf_register()
 }
