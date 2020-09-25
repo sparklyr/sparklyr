@@ -101,6 +101,7 @@ test_that("spark_read_text() and spark_write_text() read and write basic files",
 })
 
 test_that("spark_write_table() can append data", {
+  skip_databricks_connect()
   if (spark_version(sc) < "2.0.0") skip("tables not supported before 2.0.0")
   test_requires("dplyr")
 
