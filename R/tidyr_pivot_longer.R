@@ -1,3 +1,4 @@
+#' @include mutation.R
 #' @include tidyr_pivot_utils.R
 #' @include tidyr_utils.R
 NULL
