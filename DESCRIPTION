@@ -270,6 +270,7 @@ Collate:
     'sdf_sequence.R'
     'sdf_stat.R'
     'sdf_streaming.R'
+    'sdf_unnest_longer.R'
     'sdf_wrapper.R'
     'sdf_unnest_wider.R'
     'sdf_utils.R'

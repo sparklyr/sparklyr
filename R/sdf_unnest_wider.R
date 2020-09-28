@@ -29,7 +29,7 @@ NULL
 #' @examples
 #' \dontrun{
 #' library(sparklyr)
-#' sc <- spark_connect(master = "local", version = "2.4")
+#' sc <- spark_connect(master = "local", version = "2.4.0")
 #'
 #' sdf <- copy_to(
 #'   sc,
@@ -64,6 +64,7 @@ sdf_unnest_wider <- function(
     stop(sprintf("`%s` must be a struct column.", col))
   }
   field_names <- col_data_type %>% invoke("fieldNames")
+  col_sql_name <- quote_sql_name(col)
 
   srcs <- list()
   dsts <- NULL
@@ -75,7 +76,7 @@ sdf_unnest_wider <- function(
       for (field_name in field_names) {
         srcs <- append(
           srcs,
-          sprintf("%s.%s", quote_sql_name(col), quote_sql_name(field_name)) %>%
+          sprintf("%s.%s", col_sql_name, quote_sql_name(field_name)) %>%
             dplyr::sql() %>%
             list()
         )
@@ -93,33 +94,9 @@ sdf_unnest_wider <- function(
   dsts <- repair_names(dsts, names_repair)
   names(srcs) <- dsts
 
-  out <- data %>>%
+  data %>>%
     dplyr::mutate %@% srcs %>>%
     dplyr::select %@% lapply(dsts, as.symbol) %>%
-    apply_ptype(ptype)
-
-  if (length(names(transform)) > 0) {
-    tbls <- list()
-    non_transformed_cols <- setdiff(colnames(out), names(transform))
-    if (length(non_transformed_cols) > 0) {
-      tbls <- append(
-        tbls,
-        list(out %>>% dplyr::select %@% lapply(non_transformed_cols, as.symbol))
-      )
-    }
-    for (i in seq_along(transform)) {
-      tgt <- names(transform[i])
-      transform_args <- list(
-        do.call(dplyr::vars, list(as.symbol(tgt))), transform[[i]]
-      )
-      tbls <- append(
-        tbls,
-        list(out %>>% dplyr::summarize_at %@% transform_args)
-      )
-    }
-    do.call(cbind, tbls) %>>%
-      dplyr::select %@% lapply(colnames(out), as.symbol)
-  } else {
-    out
-  }
+    apply_ptype(ptype) %>%
+    apply_transform(transform)
 }

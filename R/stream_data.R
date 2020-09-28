@@ -864,7 +864,7 @@ stream_write_console <- function(x,
 #' \dontrun{
 #'
 #' library(sparklyr)
-#' sc <- spark_connect(master = "local", version = "2.4", packages = "delta")
+#' sc <- spark_connect(master = "local", version = "2.4.0", packages = "delta")
 #'
 #' sdf_len(sc, 5) %>% spark_write_delta(path = "delta-test")
 #'
@@ -909,7 +909,7 @@ stream_read_delta <- function(sc,
 #' \dontrun{
 #'
 #' library(sparklyr)
-#' sc <- spark_connect(master = "local", version = "2.4", packages = "delta")
+#' sc <- spark_connect(master = "local", version = "2.4.0", packages = "delta")
 #'
 #' dir.create("text-in")
 #' writeLines("A text entry", "text-in/text.txt")

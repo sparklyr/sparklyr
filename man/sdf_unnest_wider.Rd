@@ -44,7 +44,7 @@ similar what to tidyr::unnest_wider does to an R dataframe
 \examples{
 \dontrun{
 library(sparklyr)
-sc <- spark_connect(master = "local", version = "2.4")
+sc <- spark_connect(master = "local", version = "2.4.0")
 
 sdf <- copy_to(
   sc,

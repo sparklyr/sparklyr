@@ -29,7 +29,7 @@ package by setting the \code{packages} parameter to \code{"delta"} in \code{spar
 \dontrun{
 
 library(sparklyr)
-sc <- spark_connect(master = "local", version = "2.4", packages = "delta")
+sc <- spark_connect(master = "local", version = "2.4.0", packages = "delta")
 
 sdf_len(sc, 5) \%>\% spark_write_delta(path = "delta-test")
 
