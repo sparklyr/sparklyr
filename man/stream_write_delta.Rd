@@ -40,7 +40,7 @@ package by setting the \code{packages} parameter to \code{"delta"} in \code{spar
 \dontrun{
 
 library(sparklyr)
-sc <- spark_connect(master = "local", version = "2.4", packages = "delta")
+sc <- spark_connect(master = "local", version = "2.4.0", packages = "delta")
 
 dir.create("text-in")
 writeLines("A text entry", "text-in/text.txt")
