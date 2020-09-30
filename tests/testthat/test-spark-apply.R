@@ -132,7 +132,11 @@ test_that("'spark_apply' supports nested lists as return type", {
         tibble::tibble(
           person = lapply(
             df$json,
-            function(x) rjson::fromJSON(x)
+            function(x) {
+              jsonlite::fromJSON(
+                x, simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+              )
+            }
           )
         )
       }

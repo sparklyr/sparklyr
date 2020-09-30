@@ -223,7 +223,10 @@ spark_data_copy <- function(
   if ("list" %in% sapply(df, class)) {
     for (column in colnames(df)) {
       if (class(df[[column]]) == "list") {
-        df[[column]] <- sapply(df[[column]], function(e) rjson::toJSON(as.list(e)))
+        df[[column]] <- sapply(
+          df[[column]],
+          function(e) jsonlite::toJSON(as.list(e), auto_unbox = TRUE, digits = NA)
+        )
         additional_struct_columns <- append(additional_struct_columns, column)
       }
     }

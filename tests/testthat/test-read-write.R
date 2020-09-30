@@ -334,7 +334,7 @@ test_that("spark_write() works as expected", {
   }
 })
 
-test_avro_schema <- rjson::toJSON(list(
+test_avro_schema <- list(
   type = "record",
   name = "topLevelRecord",
   fields = list(
@@ -342,7 +342,9 @@ test_avro_schema <- rjson::toJSON(list(
     list(name = "b", type = list("int", "null")),
     list(name = "c", type = list("string", "null"))
   )
-))
+) %>%
+  jsonlite::toJSON(auto_unbox = TRUE) %>%
+  as.character()
 
 test_that("spark_read_avro() works as expected", {
   test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
