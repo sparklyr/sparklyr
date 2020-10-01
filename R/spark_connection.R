@@ -211,9 +211,23 @@ spark_web <- function(sc, ...) {
 
 #' @export
 spark_web.default <- function(sc, ...) {
-  stop("Invalid class passed to spark_web")
-}
+  url <- tryCatch({
+    invoke(spark_context(sc), "%>%", list("uiWebUrl"), list("get"))
+  }, error = function(e) {
+    default_url <- "http://localhost:4040"
+    warning(
+      "Unable to retrieve Spark UI URL through SparkContext, ",
+      sprintf("will boldly assume it's '%s'", default_url)
+    )
 
+    default_url
+  })
+  if (!identical(substr(url, nchar(url), nchar(url)), "/")) {
+    url <- paste0(url, "/")
+  }
+
+  structure(sprintf("%sjobs/", url), class = "spark_web_url")
+}
 
 #' @export
 print.spark_web_url <- function(x, ...) {
