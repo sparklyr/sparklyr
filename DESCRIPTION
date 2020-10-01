@@ -54,7 +54,6 @@ Imports:
     purrr,
     r2d3,
     rappdirs,
-    rjson (>= 0.2.20),
     rlang (>= 0.1.4),
     rprojroot,
     rstudioapi (>= 0.10),

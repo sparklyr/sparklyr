@@ -47,7 +47,7 @@ test_that("sdf_collect() works with nested named lists", {
   df <- tibble::tibble(
     x = list(c(a = 1, b = 2), c(a = 3, b = 4), c(a = 5, b = 6)),
     y = list(c(a = "foo", b = "bar"), c(a = "a", b = "b"), c(a = "", b = "")),
-    z = list(list(a = list(c = "foo", d = "bar", e = list("e", NULL)), b = "b"))
+    z = list(list(a = list(c = "foo", d = "bar", e = list("e")), b = "b"))
   )
   sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
   res <- sdf_collect(sdf)
@@ -71,16 +71,16 @@ test_that("sdf_collect() works with structs inside arrays", {
 
   expected <- list(
     list(
-      begin = 0,
-      end = 58,
-      metadata = list(embeddings = c(1, 2, 3), sentence = 1),
+      begin = 0L,
+      end = 58L,
+      metadata = list(embeddings = c(1L, 2L, 3L), sentence = 1L),
       result = "French",
       type = "document1"
     ),
     list(
-      begin = 59,
-      end = 118,
-      metadata = list(embeddings = c(4, 5, 6), sentence = 2),
+      begin = 59L,
+      end = 118L,
+      metadata = list(embeddings = c(4L, 5L, 6L), sentence = 2L),
       result = "English",
       type = "document2"
     )

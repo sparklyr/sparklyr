@@ -169,7 +169,9 @@ readTypedObject <- function(con, type) {
     "f" = readFastStringArray(con),
     "n" = NULL,
     "j" = getJobj(con, readString(con)),
-    "J" = rjson::fromJSON(readString(con)),
+    "J" = jsonlite::fromJSON(
+      readString(con), simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+    ),
     stop(paste("Unsupported type for deserialization", type))
   )
 }
@@ -1348,7 +1350,10 @@ spark_worker_maybe_serialize_list_cols_as_json <- function(config, result) {
         result,
         function(x) {
           if (is.list(x)) {
-            x <- sapply(x, function(e) rjson::toJSON(e))
+            x <- sapply(
+              x,
+              function(e) jsonlite::toJSON(e, auto_unbox = TRUE, digits = NA)
+            )
             class(x) <- c(class(x), "list_col_as_json")
           }
           x
