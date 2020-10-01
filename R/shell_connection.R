@@ -579,32 +579,6 @@ spark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
 }
 
 #' @export
-spark_web.spark_shell_connection <- function(sc, ...) {
-  lines <- spark_log(sc, n = 200)
-
-  uiLine <- grep("Started SparkUI at ", lines, perl = TRUE, value = TRUE)
-  if (length(uiLine) > 0) {
-    matches <- regexpr("http://.*", uiLine)
-    match <- regmatches(uiLine, matches)
-    if (length(match) > 0) {
-      return(structure(match, class = "spark_web_url"))
-    }
-  }
-
-  uiLine <- grep(".*Bound SparkUI to.*", lines, perl = TRUE, value = TRUE)
-  if (length(uiLine) > 0) {
-    matches <- regexec(".*Bound SparkUI to.*and started at (http.*)", uiLine)
-    match <- regmatches(uiLine, matches)
-    if (length(match) > 0 && length(match[[1]]) > 1) {
-      return(structure(match[[1]][[2]], class = "spark_web_url"))
-    }
-  }
-
-  warning("Spark UI URL not found in logs, attempting to guess.")
-  structure("http://localhost:4040", class = "spark_web_url")
-}
-
-#' @export
 invoke_method.spark_shell_connection <- function(sc, static, object, method, ...) {
   core_invoke_method(sc, static, object, method, ...)
 }
