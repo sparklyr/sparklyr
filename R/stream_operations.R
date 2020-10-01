@@ -312,3 +312,81 @@ stream_watermark <- function(x, column = "timestamp", threshold = "10 minutes") 
     invoke("withWatermark", column, threshold) %>%
     sdf_register()
 }
+
+#' Apply lag function to columns of a Spark Streaming DataFrame
+#'
+#' Given a streaming Spark dataframe as input, this function will return another
+#' streaming dataframe that contains all columns in the input and column(s) that
+#' are shifted behind by the offset(s) specified in `...` (see example)
+#'
+#' @param x An object coercable to a Spark Streaming DataFrame.
+#' @param ... A list of expressions of the form
+#'   <destination column> = <source column> ~ <offset>
+#'   (e.g., `prev_value = value ~ 1` will create a new column `prev_value`
+#'   containing all values from the source column `value` shifted behind by 1
+#'
+#' @examples
+#' \dontrun{
+#'
+#' library(sparklyr)
+#'
+#' sc <- spark_connect(master = "local", version = "2.2.0")
+#'
+#' streaming_path <- tempfile("days_df_")
+#' days_df <- tibble::tibble(
+#'   today = weekdays(as.Date(seq(7), origin = "1970-01-01"))
+#' )
+#' num_iters <- 7
+#' stream_generate_test(
+#'   df = days_df,
+#'   path = streaming_path,
+#'   distribution = rep(nrow(days_df), num_iters),
+#'   iterations = num_iters
+#' )
+#'
+#' stream_read_csv(sc, streaming_path) %>%
+#'   stream_lag(yesterday = today ~ 1, two_days_ago = today ~ 2) %>%
+#'   collect() %>%
+#'   print(n = 10L)
+#' }
+#'
+#' @export
+stream_lag <- function(x, ...) {
+  sc <- spark_connection(x)
+  if (spark_version(sc) < "2.0.0") {
+    stop("`stream_lag()` requires Spark 2.0.0 or above")
+  }
+  if (!sdf_is_streaming(x)) {
+    stop("expected a streaming dataframe as input")
+  }
+
+  exprs <- rlang::enexprs(...)
+  src_cols <- NULL
+  offsets <- NULL
+  dst_cols <- NULL
+  for (i in seq_along(exprs)) {
+    dst <- names(exprs[i])
+
+    expr <- exprs[[i]]
+    if (length(expr) != 3 || as.character(expr[[1]]) != "~" ||
+        !is.numeric(expr[[3]])) {
+      stop("expected `...` to be a comma-separated list of expressions of form",
+           "<destination column> = <source column> ~ <offset>")
+    }
+
+    src_cols <- c(src_cols, as.character(expr[[2]]))
+    offsets <- c(offsets, as.integer(expr[[3]]))
+    dst_cols <- c(dst_cols, dst)
+  }
+
+  invoke_static(
+    sc,
+    "sparklyr.StreamUtils",
+    "lag",
+    x %>% spark_dataframe(),
+    as.list(src_cols),
+    as.list(offsets),
+    as.list(dst_cols)
+  ) %>%
+    sdf_register()
+}
