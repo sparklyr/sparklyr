@@ -107,20 +107,49 @@ test_stream("stream_lag() works as expected", {
   weekdays_sdf <- stream_read_csv(sc, get_sample_data_path("weekdays"))
   expect_true(weekdays_sdf %>% sdf_is_streaming())
 
+  expected <- tibble::tribble(
+    ~day,         ~x,   ~yesterday, ~two_days_ago,
+    "Monday",     1L,           NA,            NA,
+    "Tuesday",    1L,     "Monday",            NA,
+    "Wednesday",  2L,    "Tuesday",      "Monday",
+    "Thursday",   3L,  "Wednesday",     "Tuesday",
+    "Friday",     3L,   "Thursday",   "Wednesday",
+    "Saturday",   3L,     "Friday",    "Thursday",
+    "Sunday",     6L,   "Saturday",      "Friday",
+  )
   output_sdf <- weekdays_sdf %>%
-    stream_lag(yesterday = day ~ 1, two_days_ago = day ~ 2)
+    stream_lag(cols = c(yesterday = day ~ 1, two_days_ago = day ~ 2))
+  expect_true(output_sdf %>% sdf_is_streaming())
+  expect_equivalent(output_sdf %>% collect(), expected)
+
+  expected <- tibble::tribble(
+    ~day,         ~x,   ~yesterday, ~two_days_ago,
+    "Monday",     1L,           NA,            NA,
+    "Tuesday",    1L,     "Monday",            NA,
+    "Wednesday",  2L,    "Tuesday",      "Monday",
+    "Thursday",   3L,  "Wednesday",            NA,
+    "Friday",     3L,   "Thursday",   "Wednesday",
+    "Saturday",   3L,     "Friday",    "Thursday",
+    "Sunday",     6L,           NA,            NA,
+  )
+  output_sdf <- weekdays_sdf %>%
+    stream_lag(
+      cols = c(yesterday = day ~ 1, two_days_ago = day ~ 2),
+      thresholds = c(x = 1L)
+    )
+  expect_true(output_sdf %>% sdf_is_streaming())
+  expect_equivalent(output_sdf %>% collect(), expected)
+  weekdays_sdf <- stream_read_csv(sc, get_sample_data_path("weekdays")) %>%
+    dplyr::mutate(x = dplyr::sql("CAST (`x` AS TIMESTAMP)"))
+  expect_true(weekdays_sdf %>% sdf_is_streaming())
+  output_sdf <- weekdays_sdf %>%
+    stream_lag(
+      cols = c(yesterday = day ~ 1, two_days_ago = day ~ 2),
+      thresholds = c(x = "1s")
+    )
   expect_true(output_sdf %>% sdf_is_streaming())
   expect_equivalent(
     output_sdf %>% collect(),
-    tibble::tribble(
-      ~day,         ~x,   ~yesterday, ~two_days_ago,
-      "Monday",     1L,           NA,            NA,
-      "Tuesday",    2L,     "Monday",            NA,
-      "Wednesday",  3L,    "Tuesday",      "Monday",
-      "Thursday",   4L,  "Wednesday",     "Tuesday",
-      "Friday",     5L,   "Thursday",   "Wednesday",
-      "Saturday",   6L,     "Friday",    "Thursday",
-      "Sunday",     7L,   "Saturday",      "Friday",
-    )
+    expected %>% dplyr::mutate(x = as.POSIXct(x, origin = "1970-01-01"))
   )
 })

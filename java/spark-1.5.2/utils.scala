@@ -406,4 +406,100 @@ object Utils {
   def collectIter(iter: Iterator[Row], dtypes: Array[Any], size: Int, separator: String): Array[_] = {
     collectRows(iter, dtypes.map(x => x.asInstanceOf[(String, String)]).toArray, separator, size)
   }
+
+  def extractValue(row: Row, colIdx: Int) = {
+    val dtype = row.schema.fields(colIdx).dataType
+
+    dtype match {
+      case _: ByteType => row.getByte(colIdx)
+      case _: ShortType => row.getShort(colIdx)
+      case _: IntegerType => row.getInt(colIdx)
+      case _: LongType => row.getLong(colIdx)
+      case _: FloatType => row.getFloat(colIdx)
+      case _: DoubleType => row.getDouble(colIdx)
+      case _: DecimalType => row.getDecimal(colIdx)
+      case _: StringType => row.getString(colIdx)
+      case _: BinaryType => row.getAs[Array[Byte]](colIdx)
+      case _: TimestampType => row.getTimestamp(colIdx)
+      case _: DateType => row.getDate(colIdx)
+      case _: ArrayType => row.getAs[scala.collection.Seq[Any]](colIdx)
+      case _: MapType => row.getAs[scala.collection.Map[Any, Any]](colIdx)
+      case _: StructType => row.getAs[Row](colIdx)
+      case _ => row.getString(colIdx)
+    }
+  }
+
+  def as(dtype: DataType) = {
+    (value: Any) => {
+      dtype match {
+        case _: ByteType => value.asInstanceOf[Byte]
+        case _: ShortType => value.asInstanceOf[Short]
+        case _: IntegerType => value.asInstanceOf[Int]
+        case _: LongType => value.asInstanceOf[Long]
+        case _: FloatType => value.asInstanceOf[Float]
+        case _: DoubleType => value.asInstanceOf[Double]
+        case _: DecimalType => value.asInstanceOf[java.math.BigDecimal]
+        case _: StringType => value.asInstanceOf[String]
+        case _: BinaryType => value.asInstanceOf[Array[Byte]]
+        case _: TimestampType => value.asInstanceOf[java.sql.Timestamp]
+        case _: DateType => value.asInstanceOf[java.sql.Date]
+        case _: ArrayType => value.asInstanceOf[scala.collection.Seq[Any]]
+        case _: MapType => value.asInstanceOf[scala.collection.Map[Any, Any]]
+        case _: StructType => value.asInstanceOf[Row]
+        case _ => value.asInstanceOf[String]
+      }
+    }
+  }
+
+  def asDouble(x: Any): Double = {
+    if (x.isInstanceOf[Int]) {
+      x.asInstanceOf[Int].toDouble
+    } else if (x.isInstanceOf[Long]) {
+      x.asInstanceOf[Long].toDouble
+    } else if (x.isInstanceOf[Double]) {
+      x.asInstanceOf[Double]
+    } else if (x.isInstanceOf[Float]) {
+      x.asInstanceOf[Float].toDouble
+    } else if (x.isInstanceOf[java.math.BigDecimal]) {
+      x.asInstanceOf[java.math.BigDecimal].doubleValue
+    } else if (x.isInstanceOf[Short]) {
+      x.asInstanceOf[Short].doubleValue
+    } else if (x.isInstanceOf[Byte]) {
+      x.asInstanceOf[Byte].doubleValue
+    } else if (x.isInstanceOf[java.sql.Timestamp]) {
+      x.asInstanceOf[java.sql.Timestamp].getTime
+    } else if (x.isInstanceOf[java.sql.Date]) {
+      x.asInstanceOf[java.sql.Date].getTime
+    } else if (x.isInstanceOf[java.util.Date]) {
+      x.asInstanceOf[java.util.Date].getTime
+    } else {
+      Double.NaN
+    }
+  }
+
+  def asLong(x: Any): Long = {
+    if (x.isInstanceOf[Int]) {
+      x.asInstanceOf[Int].toLong
+    } else if (x.isInstanceOf[Long]) {
+      x.asInstanceOf[Long]
+    } else if (x.isInstanceOf[Double]) {
+      x.asInstanceOf[Double].toLong
+    } else if (x.isInstanceOf[Float]) {
+      x.asInstanceOf[Float].toLong
+    } else if (x.isInstanceOf[java.math.BigDecimal]) {
+      x.asInstanceOf[java.math.BigDecimal].longValue
+    } else if (x.isInstanceOf[Short]) {
+      x.asInstanceOf[Short].toLong
+    } else if (x.isInstanceOf[Byte]) {
+      x.asInstanceOf[Byte].toLong
+    } else if (x.isInstanceOf[java.sql.Timestamp]) {
+      x.asInstanceOf[java.sql.Timestamp].getTime
+    } else if (x.isInstanceOf[java.sql.Date]) {
+      x.asInstanceOf[java.sql.Date].getTime
+    } else if (x.isInstanceOf[java.util.Date]) {
+      x.asInstanceOf[java.util.Date].getTime
+    } else {
+      throw new IllegalArgumentException("unsupported input type")
+    }
+  }
 }
