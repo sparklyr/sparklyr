@@ -52,6 +52,10 @@ new_flights_model
 tests/testthat/test\.csv
 tests/testthat/test\.json
 tests/testthat/batch\.csv/
+tests/testthat/checkpoints/
+tests/testthat/json-in/
+tests/testthat/orc-in/
+tests/testthat/parquet-in/
 tests/testthat/iris-in/
 tests/testthat/iris-out/
 .Rproj.user

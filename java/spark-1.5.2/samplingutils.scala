@@ -108,18 +108,7 @@ object SamplingUtils {
     if (null == weightColumn || weightColumn.isEmpty) {
       1.0
     } else {
-      var weight = row.get(row.fieldIndex(weightColumn))
-      if (weight.isInstanceOf[java.lang.Integer] || weight.isInstanceOf[Int]) {
-        weight.asInstanceOf[Int].toDouble
-      } else if (weight.isInstanceOf[java.lang.Long] || weight.isInstanceOf[Long]) {
-        weight.asInstanceOf[Long].toDouble
-      } else if (weight.isInstanceOf[java.lang.Double] || weight.isInstanceOf[Double]) {
-        weight.asInstanceOf[Double]
-      } else if (weight.isInstanceOf[java.math.BigDecimal]) {
-        weight.asInstanceOf[java.math.BigDecimal].doubleValue
-      } else {
-        Double.NaN
-      }
+      Utils.asDouble(row.get(row.fieldIndex(weightColumn)))
     }
   }
 }
