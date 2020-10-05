@@ -15,6 +15,10 @@ install:
 
 platform: x64
 
+branches:
+  only:
+    - main
+
 environment:
   global:
     R_ARCH: x64
