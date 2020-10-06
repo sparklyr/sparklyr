@@ -12,7 +12,7 @@ capture.output(
       {
         dbutils.widgets.removeAll()
         dbutils.widgets.text("Github repo", "sparklyr/sparklyr")
-        dbutils.widgets.text("Commit ref", "master")
+        dbutils.widgets.text("Commit ref", "main")
 
         print(dbutils.widgets.get("Github repo"))
         print(dbutils.widgets.get("Commit ref"))
