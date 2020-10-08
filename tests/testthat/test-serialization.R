@@ -258,6 +258,8 @@ test_that("collect() can retrieve NULL data types as NAs", {
 })
 
 test_that("collect() can retrieve date types successfully", {
+  skip_on_windows()
+
   df <- data.frame(
     date = c(
       as.Date("1961-01-20"),
