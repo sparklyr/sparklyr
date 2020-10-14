@@ -5,7 +5,6 @@ NULL
 
 #' @export
 #' @importFrom dbplyr sql_build
-#' @importFrom dbplyr select_query
 sql_build.op_sample_n <- function(op, con, ...) {
   if (rlang::quo_is_null(op$args$weight)) {
     sql_build.op_sample(op, con, frac = FALSE)
@@ -16,7 +15,6 @@ sql_build.op_sample_n <- function(op, con, ...) {
 
 #' @export
 #' @importFrom dbplyr sql_build
-#' @importFrom dbplyr select_query
 sql_build.op_sample_frac <- function(op, con, ...) {
   if (rlang::quo_is_null(op$args$weight)) {
     sql_build.op_sample(op, con, frac = TRUE)
@@ -73,18 +71,100 @@ sql_build.op_weighted_sample <- function(op, con, frac) {
   sample_sdf %>% dbplyr::remote_query()
 }
 
+#' @export
+#' @importFrom dplyr distinct
+distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
+  if (rlang::dots_n(...) > 0) {
+    dots <- rlang::enexprs(...)
+    .data <- .data %>% dplyr::mutate(...)
+    distinct_cols <- lapply(
+      seq_along(dots),
+      function(i) {
+        x <- dots[i]
+        if (identical(names(x), "")) {
+          rlang::as_name(dots[[i]])
+        } else {
+          names(x)
+        }
+      }
+    ) %>%
+      unlist()
+  } else {
+    distinct_cols <- colnames(.data)
+  }
+  distinct_cols <- union(dplyr::group_vars(.data), distinct_cols)
+  all_cols <- colnames(.data)
+
+  row_num <- random_string("__row_num")
+  row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY NULL)"))
+  names(row_num_sql) <- row_num
+  .data <- .data %>>% dplyr::mutate %@% row_num_sql
+  args <- list(
+    .keep_all = .keep_all,
+    .row_num = row_num,
+    .all_cols = all_cols,
+    .distinct_cols = distinct_cols
+  )
+
+  add_op_single("tbl_spark_distinct", .data, args = args)
+}
+
+#' @export
+op_vars.tbl_spark_distinct <- function(op) {
+  c(dbplyr::op_grps(op$x), dbplyr::op_vars(op$x))
+}
+
+#' @export
+#' @importFrom dbplyr sql_build
+sql_build.op_tbl_spark_distinct <- function(op, con, ...) {
+  output_cols <- (
+    if (op$args$.keep_all) {
+      op$args$.all_cols
+    } else {
+      op$args$.distinct_cols
+    }
+  )
+  sql <- lapply(
+    c(op$args$.row_num, output_cols),
+    function(x) {
+      x <- quote_sql_name(x, con)
+      sprintf("FIRST(%s, FALSE) AS %s", x, x)
+    }
+  ) %>%
+    paste(collapse = ", ") %>%
+    dbplyr::sql()
+
+  dbplyr::select_query(
+    from = dbplyr::sql_build(op$x, con = con),
+    select = sql,
+    group_by = op$args$.distinct_cols %>%
+      lapply(function(x) quote_sql_name(x, con)) %>%
+      paste(collapse = ", ") %>%
+      dbplyr::sql(),
+    order_by = quote_sql_name(op$args$.row_num, con) %>% dbplyr::sql()
+  ) %>%
+    dbplyr::select_query(
+      from = .,
+      select = output_cols %>%
+        lapply(function(x) quote_sql_name(x, con)) %>%
+        paste(collapse = ", ") %>%
+        dbplyr::sql(),
+      order_by = quote_sql_name(op$args$.row_num, con) %>% dbplyr::sql()
+    )
+}
+
 to_sdf <- function(op, con) {
   sdf_sql(
     con,
-    select_query(
-      from = sql(
-        sql_render(sql_build(op$x, con = con), con = con),
+    dbplyr::select_query(
+      from = dbplyr::sql(
+        dbplyr::sql_render(dbplyr::sql_build(op$x, con = con), con = con),
         con = con
       ),
-      select = build_sql("*", con = con)
+      select = dbplyr::build_sql("*", con = con)
     ) %>%
-      sql_render(con = con) %>%
-      sql() %>%
+      dbplyr::sql_render(con = con) %>%
+      dbplyr::sql() %>%
       as.character() %>%
       paste0(collapse = "")
   )

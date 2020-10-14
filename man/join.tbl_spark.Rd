@@ -53,13 +53,9 @@
 )
 }
 \arguments{
-\item{x}{A pair of data frames, data frame extensions (e.g. a tibble), or
-lazy data frames (e.g. from dbplyr or dtplyr). See \emph{Methods}, below, for
-more details.}
+\item{x}{A pair of lazy data frames backed by database queries.}
 
-\item{y}{A pair of data frames, data frame extensions (e.g. a tibble), or
-lazy data frames (e.g. from dbplyr or dtplyr). See \emph{Methods}, below, for
-more details.}
+\item{y}{A pair of lazy data frames backed by database queries.}
 
 \item{by}{A character vector of variables to join by.
 
@@ -99,9 +95,11 @@ there are matching indexes in \code{x}.}
 
 \item{...}{Other parameters passed onto methods.}
 
-\item{sql_on}{A custom join predicate as an SQL expression. The SQL
-can refer to the \code{LHS} and \code{RHS} aliases to disambiguate
-column names.}
+\item{sql_on}{A custom join predicate as an SQL expression.
+Usually joins use column equality, but you can perform more complex
+queries by supply \code{sql_on} which should be a SQL expression that
+uses \code{LHS} and \code{RHS} aliases to refer to the left-hand side or
+right-hand side of the join respectively.}
 }
 \description{
 These functions are wrappers around their `dplyr` equivalents that set
