@@ -51,9 +51,11 @@ sdf_build_wider_spec <- function(data,
   names_from <- names(tidyselect::eval_select(rlang::enquo(names_from), colnames_df))
   values_from <- names(tidyselect::eval_select(rlang::enquo(values_from), colnames_df))
 
-  row_ids <- data %>>%
+  row_ids <- data %>%
+    dplyr::ungroup() %>>%
     dplyr::distinct %@% lapply(names_from, as.symbol) %>%
     collect()
+
   if (names_sort) {
     row_ids <- vctrs::vec_sort(row_ids)
   }
