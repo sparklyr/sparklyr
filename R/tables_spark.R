@@ -49,7 +49,7 @@ tbl_cache_sql <- function(sc, name, force) {
 #' @export
 tbl_cache <- function(sc, name, force = TRUE) {
   countColumns <- function(sc, name) {
-    sql <- paste("SELECT * FROM ", tbl_quote_name(sc, name))
+    sql <- sprintf("SELECT * FROM %s LIMIT 0", tbl_quote_name(sc, name))
     sdf <- invoke(hive_context(sc), "sql", sql)
 
     length(invoke(sdf, "columns"))

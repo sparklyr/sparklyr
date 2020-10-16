@@ -10,54 +10,10 @@ import java.util.TimeZone
 import scala.collection.JavaConverters._
 import scala.collection.mutable.WrappedArray
 
-class Serializer(tracker: JVMObjectTracker) {
-  type ReadObject = (DataInputStream, Char) => Object
-  type WriteObject = (DataOutputStream, Object) => Boolean
-
-  var sqlSerDe: (ReadObject, WriteObject) = _
-
-  def registerSqlSerDe(sqlSerDe: (ReadObject, WriteObject)): Unit = {
-    this.sqlSerDe = sqlSerDe
-  }
-
+object Serializer {
   def readObjectType(dis: DataInputStream): Char = {
     dis.readByte().toChar
   }
-
-  def readObject(dis: DataInputStream): Object = {
-    val dataType = readObjectType(dis)
-    readTypedObject(dis, dataType)
-  }
-
-  def readTypedObject(
-    dis: DataInputStream,
-    dataType: Char): Object = {
-      dataType match {
-        case 'n' => null
-        case 'i' => new java.lang.Integer(readInt(dis))
-        case 'd' => new java.lang.Double(readDouble(dis))
-        case 'b' => new java.lang.Boolean(readBoolean(dis))
-        case 'c' => readString(dis)
-        case 'e' => readMap(dis)
-        case 'r' => readBytes(dis)
-        case 'a' => readArray(dis)
-        case 'l' => readList(dis)
-        case 'D' => readDate(dis)
-        case 't' => readTime(dis)
-        case 'j' => tracker.getObject(readString(dis))
-        case _ =>
-          if (sqlSerDe == null || sqlSerDe._1 == null) {
-            throw new IllegalArgumentException (s"Invalid type $dataType")
-          } else {
-            val obj = (sqlSerDe._1)(dis, dataType)
-            if (obj == null) {
-              throw new IllegalArgumentException (s"Invalid type $dataType")
-            } else {
-              obj
-            }
-          }
-      }
-    }
 
   def readBytes(in: DataInputStream): Array[Byte] = {
     val len = readInt(in)
@@ -129,16 +85,6 @@ class Serializer(tracker: JVMObjectTracker) {
     (0 until len).map(_ => readString(in)).toArray
   }
 
-  def readArrayArr(in: DataInputStream): Array[_] = {
-    val len = readInt(in)
-    (0 until len).map(_ => readArray(in)).toArray
-  }
-
-  def readListArr(in: DataInputStream): Array[_] = {
-    val len = readInt(in)
-    (0 until len).map(_ => readList(in)).toArray
-  }
-
   def readDateArr(in: DataInputStream): Array[Date] = {
     val len = readInt(in)
     (0 until len).map(_ => readDate(in)).toArray
@@ -147,53 +93,6 @@ class Serializer(tracker: JVMObjectTracker) {
   def readTimeArr(in: DataInputStream): Array[Timestamp] = {
     val len = readInt(in)
     (0 until len).map(_ => readTime(in)).toArray
-  }
-
-  def readArray(dis: DataInputStream): Array[_] = {
-    val arrType = readObjectType(dis)
-    arrType match {
-      case 'i' => readIntArr(dis)
-      case 'c' => readStringArr(dis)
-      case 'd' => readDoubleArr(dis)
-      case 'b' => readBooleanArr(dis)
-      case 'j' => readStringArr(dis).map(x => tracker.getObject(x))
-      case 'r' => readBytesArr(dis)
-      case 'a' => readArrayArr(dis)
-      case 'l' => readListArr(dis)
-      case 'D' => readDateArr(dis)
-      case 't' => readTimeArr(dis)
-      case _ =>
-        if (sqlSerDe == null || sqlSerDe._1 == null) {
-          throw new IllegalArgumentException (s"Invalid array type $arrType")
-        } else {
-          val len = readInt(dis)
-          (0 until len).map { _ =>
-            val obj = (sqlSerDe._1)(dis, arrType)
-            if (obj == null) {
-              throw new IllegalArgumentException (s"Invalid array type $arrType")
-            } else {
-              obj
-            }
-          }.toArray
-        }
-    }
-  }
-
-  def readList(dis: DataInputStream): Array[Object] = {
-    val len = readInt(dis)
-    (0 until len).map(_ => readObject(dis)).toArray
-  }
-
-  def readMap(in: DataInputStream): Map[_, _] = {
-    val len = readInt(in)
-    if (len > 0) {
-      val keys = readArray(in)
-      val values = readList(in)
-
-      keys.zip(values).toMap
-    } else {
-      Map()
-    }
   }
 
   def writeType(dos: DataOutputStream, typeStr: String): Unit = {
@@ -214,146 +113,6 @@ class Serializer(tracker: JVMObjectTracker) {
       case "json"      => dos.writeByte('J')
       case "sparkapplybinaryresult" => dos.writeByte('$')
       case _ => throw new IllegalArgumentException(s"Invalid type $typeStr")
-    }
-  }
-
-  private def writeKeyValue(dos: DataOutputStream, key: Object, value: Object): Unit = {
-    if (key == null) {
-      throw new IllegalArgumentException("Key in map can't be null.")
-    } else if (!key.isInstanceOf[String]) {
-      throw new IllegalArgumentException(s"Invalid map key type: ${key.getClass.getName}")
-    }
-
-    writeString(dos, key.asInstanceOf[String])
-    writeObject(dos, value)
-  }
-
-  def writeObject(dos: DataOutputStream, obj: Object): Unit = {
-    if (obj == null) {
-      writeType(dos, "void")
-    } else {
-      val value = if (obj.isInstanceOf[WrappedArray[_]]) {
-        obj.asInstanceOf[WrappedArray[_]].toArray
-      } else if (obj.isInstanceOf[scala.collection.convert.Wrappers.SeqWrapper[_]]) {
-        obj.asInstanceOf[scala.collection.convert.Wrappers.SeqWrapper[_]].toArray
-      } else {
-        obj
-      }
-
-      value match {
-        case v: java.lang.Character =>
-          writeType(dos, "character")
-          writeString(dos, v.toString)
-        case v: java.lang.String =>
-          writeType(dos, "character")
-          writeString(dos, v)
-        case v: java.lang.Long =>
-          writeType(dos, "double")
-          writeDouble(dos, v.toDouble)
-        case v: java.lang.Float =>
-          writeType(dos, "double")
-          writeDouble(dos, v.toDouble)
-        case v: java.math.BigDecimal =>
-          writeType(dos, "double")
-          writeDouble(dos, scala.math.BigDecimal(v).toDouble)
-        case v: java.lang.Double =>
-          writeType(dos, "double")
-          writeDouble(dos, v)
-        case v: java.lang.Byte =>
-          writeType(dos, "integer")
-          writeInt(dos, v.toInt)
-        case v: java.lang.Short =>
-          writeType(dos, "integer")
-          writeInt(dos, v.toInt)
-        case v: java.lang.Integer =>
-          writeType(dos, "integer")
-          writeInt(dos, v)
-        case v: java.lang.Boolean =>
-          writeType(dos, "logical")
-          writeBoolean(dos, v)
-        case v: java.sql.Date =>
-          writeType(dos, "date")
-          writeDate(dos, v)
-        case v: java.sql.Time =>
-          writeType(dos, "time")
-          writeTime(dos, v)
-        case v: java.sql.Timestamp =>
-          writeType(dos, "time")
-          writeTime(dos, v)
-        case v: StructTypeAsJSON =>
-          writeType(dos, "json")
-          writeString(dos, v.json)
-        case v: org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema =>
-          writeType(dos, "list")
-          writeInt(dos, v.length)
-          v.toSeq.foreach(elem => writeObject(dos, elem.asInstanceOf[AnyRef]))
-        case v: Array[Byte] =>
-          writeType(dos, "raw")
-          writeBytes(dos, v)
-        case v: Array[Char] =>
-          writeType(dos, "array")
-          writeStringArr(dos, v.map(_.toString))
-        case v: Array[Short] =>
-          writeType(dos, "array")
-          writeIntArr(dos, v.map(_.toInt))
-        case v: Array[Int] =>
-          writeType(dos, "array")
-          writeIntArr(dos, v)
-        case v: Array[Long] =>
-          writeType(dos, "array")
-          writeDoubleArr(dos, v.map(_.toDouble))
-        case v: Array[Float] =>
-          writeType(dos, "array")
-          writeDoubleArr(dos, v.map(_.toDouble))
-        case v: Array[Double] =>
-          writeType(dos, "array")
-          writeDoubleArr(dos, v)
-        case v: Array[Boolean] =>
-          writeType(dos, "array")
-          writeBooleanArr(dos, v)
-        case v: Array[Timestamp] =>
-          writeType(dos, "array")
-          writeTimestampArr(dos, v)
-        case v: Array[Date] =>
-          writeType(dos, "array")
-          writeDateArr(dos, v)
-        case v: Array[String] =>
-          writeType(dos, "strarray")
-          writeFastStringArr(dos, v)
-        case v: Array[Object] =>
-          writeType(dos, "list")
-          writeInt(dos, v.length)
-          v.foreach(elem => writeObject(dos, elem))
-        case v: Tuple3[String, String, Any] =>
-          // Tuple3
-          writeType(dos, "list")
-          writeInt(dos, v.productArity)
-          v.productIterator.foreach(elem => writeObject(dos, elem.asInstanceOf[Object]))
-        case v: java.util.Properties =>
-          writeType(dos, "jobj")
-          writeJObj(dos, value)
-        case v: java.util.Map[_, _] =>
-          writeType(dos, "map")
-          writeInt(dos, v.size)
-          val iter = v.entrySet.iterator
-          while(iter.hasNext) {
-            val entry = iter.next
-            val key = entry.getKey
-            val value = entry.getValue
-            writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
-          }
-        case v: scala.collection.Map[_, _] =>
-          writeType(dos, "map")
-          writeInt(dos, v.size)
-          v.foreach { case (key, value) =>
-            writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
-          }
-        case _ =>
-          if (sqlSerDe == null || sqlSerDe._2 == null || !(sqlSerDe._2)(dos, value)) {
-            writeType(dos, "jobj")
-            writeJObj(dos, value)
-          }
-      }
     }
   }
 
@@ -413,11 +172,6 @@ class Serializer(tracker: JVMObjectTracker) {
     out.write(value)
   }
 
-  def writeJObj(out: DataOutputStream, value: Object): Unit = {
-    val objId = tracker.put(value)
-    writeString(out, objId)
-  }
-
   def writeIntArr(out: DataOutputStream, value: Array[Int]): Unit = {
     writeType(out, "integer")
     out.writeInt(value.length)
@@ -458,5 +212,253 @@ class Serializer(tracker: JVMObjectTracker) {
   def writeFastStringArr(out: DataOutputStream, value: Array[String]): Unit = {
     val all = value.mkString("\u0019")
     writeString(out, all)
+  }
+}
+
+class Serializer(tracker: JVMObjectTracker) {
+  type ReadObject = (DataInputStream, Char) => Object
+  type WriteObject = (DataOutputStream, Object) => Boolean
+
+  var sqlSerDe: (ReadObject, WriteObject) = _
+
+  def registerSqlSerDe(sqlSerDe: (ReadObject, WriteObject)): Unit = {
+    this.sqlSerDe = sqlSerDe
+  }
+
+  def readObject(dis: DataInputStream): Object = {
+    val dataType = Serializer.readObjectType(dis)
+    readTypedObject(dis, dataType)
+  }
+
+  def readList(dis: DataInputStream): Array[Object] = {
+    val len = Serializer.readInt(dis)
+    (0 until len).map(_ => readObject(dis)).toArray
+  }
+
+  def readTypedObject(
+    dis: DataInputStream,
+    dataType: Char): Object = {
+      dataType match {
+        case 'n' => null
+        case 'i' => new java.lang.Integer(Serializer.readInt(dis))
+        case 'd' => new java.lang.Double(Serializer.readDouble(dis))
+        case 'b' => new java.lang.Boolean(Serializer.readBoolean(dis))
+        case 'c' => Serializer.readString(dis)
+        case 'e' => readMap(dis)
+        case 'r' => Serializer.readBytes(dis)
+        case 'a' => readArray(dis)
+        case 'l' => readList(dis)
+        case 'D' => Serializer.readDate(dis)
+        case 't' => Serializer.readTime(dis)
+        case 'j' => tracker.getObject(Serializer.readString(dis))
+        case _ =>
+          if (sqlSerDe == null || sqlSerDe._1 == null) {
+            throw new IllegalArgumentException (s"Invalid type $dataType")
+          } else {
+            val obj = (sqlSerDe._1)(dis, dataType)
+            if (obj == null) {
+              throw new IllegalArgumentException (s"Invalid type $dataType")
+            } else {
+              obj
+            }
+          }
+      }
+    }
+
+  def readArray(dis: DataInputStream): Array[_] = {
+    val arrType = Serializer.readObjectType(dis)
+    arrType match {
+      case 'i' => Serializer.readIntArr(dis)
+      case 'c' => Serializer.readStringArr(dis)
+      case 'd' => Serializer.readDoubleArr(dis)
+      case 'b' => Serializer.readBooleanArr(dis)
+      case 'j' => Serializer.readStringArr(dis).map(x => tracker.getObject(x))
+      case 'r' => Serializer.readBytesArr(dis)
+      case 'a' => readArrayArr(dis)
+      case 'l' => readListArr(dis)
+      case 'D' => Serializer.readDateArr(dis)
+      case 't' => Serializer.readTimeArr(dis)
+      case _ =>
+        if (sqlSerDe == null || sqlSerDe._1 == null) {
+          throw new IllegalArgumentException (s"Invalid array type $arrType")
+        } else {
+          val len = Serializer.readInt(dis)
+          (0 until len).map { _ =>
+            val obj = (sqlSerDe._1)(dis, arrType)
+            if (obj == null) {
+              throw new IllegalArgumentException (s"Invalid array type $arrType")
+            } else {
+              obj
+            }
+          }.toArray
+        }
+    }
+  }
+
+  def readListArr(in: DataInputStream): Array[_] = {
+    val len = Serializer.readInt(in)
+    (0 until len).map(_ => readList(in)).toArray
+  }
+
+  def readMap(in: DataInputStream): Map[_, _] = {
+    val len = Serializer.readInt(in)
+    if (len > 0) {
+      val keys = readArray(in)
+      val values = readList(in)
+
+      keys.zip(values).toMap
+    } else {
+      Map()
+    }
+  }
+
+  def readArrayArr(in: DataInputStream): Array[_] = {
+    val len = Serializer.readInt(in)
+    (0 until len).map(_ => readArray(in)).toArray
+  }
+
+  private def writeKeyValue(dos: DataOutputStream, key: Object, value: Object): Unit = {
+    if (key == null) {
+      throw new IllegalArgumentException("Key in map can't be null.")
+    } else if (!key.isInstanceOf[String]) {
+      throw new IllegalArgumentException(s"Invalid map key type: ${key.getClass.getName}")
+    }
+
+    Serializer.writeString(dos, key.asInstanceOf[String])
+    writeObject(dos, value)
+  }
+
+  def writeObject(dos: DataOutputStream, obj: Object): Unit = {
+    if (obj == null) {
+      Serializer.writeType(dos, "void")
+    } else {
+      val value = if (obj.isInstanceOf[WrappedArray[_]]) {
+        obj.asInstanceOf[WrappedArray[_]].toArray
+      } else if (obj.isInstanceOf[scala.collection.convert.Wrappers.SeqWrapper[_]]) {
+        obj.asInstanceOf[scala.collection.convert.Wrappers.SeqWrapper[_]].toArray
+      } else {
+        obj
+      }
+
+      value match {
+        case v: java.lang.Character =>
+          Serializer.writeType(dos, "character")
+          Serializer.writeString(dos, v.toString)
+        case v: java.lang.String =>
+          Serializer.writeType(dos, "character")
+          Serializer.writeString(dos, v)
+        case v: java.lang.Long =>
+          Serializer.writeType(dos, "double")
+          Serializer.writeDouble(dos, v.toDouble)
+        case v: java.lang.Float =>
+          Serializer.writeType(dos, "double")
+          Serializer.writeDouble(dos, v.toDouble)
+        case v: java.math.BigDecimal =>
+          Serializer.writeType(dos, "double")
+          Serializer.writeDouble(dos, scala.math.BigDecimal(v).toDouble)
+        case v: java.lang.Double =>
+          Serializer.writeType(dos, "double")
+          Serializer.writeDouble(dos, v)
+        case v: java.lang.Byte =>
+          Serializer.writeType(dos, "integer")
+          Serializer.writeInt(dos, v.toInt)
+        case v: java.lang.Short =>
+          Serializer.writeType(dos, "integer")
+          Serializer.writeInt(dos, v.toInt)
+        case v: java.lang.Integer =>
+          Serializer.writeType(dos, "integer")
+          Serializer.writeInt(dos, v)
+        case v: java.lang.Boolean =>
+          Serializer.writeType(dos, "logical")
+          Serializer.writeBoolean(dos, v)
+        case v: java.sql.Date =>
+          Serializer.writeType(dos, "date")
+          Serializer.writeDate(dos, v)
+        case v: java.sql.Time =>
+          Serializer.writeType(dos, "time")
+          Serializer.writeTime(dos, v)
+        case v: java.sql.Timestamp =>
+          Serializer.writeType(dos, "time")
+          Serializer.writeTime(dos, v)
+        case v: StructTypeAsJSON =>
+          Serializer.writeType(dos, "json")
+          Serializer.writeString(dos, v.json)
+        case v: org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema =>
+          Serializer.writeType(dos, "list")
+          Serializer.writeInt(dos, v.length)
+          v.toSeq.foreach(elem => writeObject(dos, elem.asInstanceOf[AnyRef]))
+        case v: Array[Byte] =>
+          Serializer.writeType(dos, "raw")
+          Serializer.writeBytes(dos, v)
+        case v: Array[Char] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeStringArr(dos, v.map(_.toString))
+        case v: Array[Short] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeIntArr(dos, v.map(_.toInt))
+        case v: Array[Int] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeIntArr(dos, v)
+        case v: Array[Long] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeDoubleArr(dos, v.map(_.toDouble))
+        case v: Array[Float] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeDoubleArr(dos, v.map(_.toDouble))
+        case v: Array[Double] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeDoubleArr(dos, v)
+        case v: Array[Boolean] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeBooleanArr(dos, v)
+        case v: Array[Timestamp] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeTimestampArr(dos, v)
+        case v: Array[Date] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeDateArr(dos, v)
+        case v: Array[String] =>
+          Serializer.writeType(dos, "strarray")
+          Serializer.writeFastStringArr(dos, v)
+        case v: Array[Object] =>
+          Serializer.writeType(dos, "list")
+          Serializer.writeInt(dos, v.length)
+          v.foreach(elem => writeObject(dos, elem))
+        case v: Tuple3[String, String, Any] =>
+          // Tuple3
+          Serializer.writeType(dos, "list")
+          Serializer.writeInt(dos, v.productArity)
+          v.productIterator.foreach(elem => writeObject(dos, elem.asInstanceOf[Object]))
+        case v: java.util.Properties =>
+          Serializer.writeType(dos, "jobj")
+          writeJObj(dos, value)
+        case v: java.util.Map[_, _] =>
+          Serializer.writeType(dos, "map")
+          Serializer.writeInt(dos, v.size)
+          val iter = v.entrySet.iterator
+          while(iter.hasNext) {
+            val entry = iter.next
+            val key = entry.getKey
+            val value = entry.getValue
+            writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
+          }
+        case v: scala.collection.Map[_, _] =>
+          Serializer.writeType(dos, "map")
+          Serializer.writeInt(dos, v.size)
+          v.foreach { case (key, value) =>
+            writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
+          }
+        case _ =>
+          if (sqlSerDe == null || sqlSerDe._2 == null || !(sqlSerDe._2)(dos, value)) {
+            Serializer.writeType(dos, "jobj")
+            writeJObj(dos, value)
+          }
+      }
+    }
+  }
+
+  def writeJObj(out: DataOutputStream, value: Object): Unit = {
+    val objId = tracker.put(value)
+    Serializer.writeString(out, objId)
   }
 }
