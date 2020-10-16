@@ -27,10 +27,10 @@ class BackendHandler(
     val bos = new ByteArrayOutputStream()
     val dos = new DataOutputStream(bos)
 
-    val objId = serializer.readString(dis)
-    val isStatic = serializer.readBoolean(dis)
-    val methodName = serializer.readString(dis)
-    val numArgs = serializer.readInt(dis)
+    val objId = Serializer.readString(dis)
+    val isStatic = Serializer.readBoolean(dis)
+    val methodName = Serializer.readString(dis)
+    val numArgs = Serializer.readInt(dis)
 
     var needsReply: Boolean = true
     var reply: Array[Byte] = null
@@ -39,15 +39,15 @@ class BackendHandler(
       do {
         objId match {
           case "stopBackend" =>
-              serializer.writeInt(dos, 0)
-              serializer.writeType(dos, "void")
+              Serializer.writeInt(dos, 0)
+              Serializer.writeType(dos, "void")
               close()
 
               reply = bos.toByteArray
               break
           case "terminateBackend" =>
-              serializer.writeInt(dos, 0)
-              serializer.writeType(dos, "void")
+              Serializer.writeInt(dos, 0)
+              Serializer.writeType(dos, "void")
               close()
 
               System.exit(0)

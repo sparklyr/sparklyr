@@ -10,13 +10,15 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.{SparkEnv, SparkException}
+import org.apache.spark.sql.catalyst.InternalRow
 
 import scala.collection.JavaConverters._
 import scala.util.Try
 
 object Utils {
   /**
-   * Utilities for collecting columns / Datasets back to R
+   * Utilities for importing data from R to Spark and for collecting columns /
+   * Datasets back to R
    */
 
   def collectColumnBoolean(df: DataFrame, colName: String): Array[Boolean] = {
@@ -232,7 +234,52 @@ object Utils {
     }
   }
 
-  def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {
+  def parallelize(
+    sc: SparkContext,
+    num_rows: Int,
+    serialized_cols: Array[Array[Byte]],
+    timestamp_col_idxes: Seq[Int],
+    string_col_idxes: Seq[Int],
+    partitions: Int
+  ): RDD[InternalRow] = {
+    if (serialized_cols.isEmpty) {
+      throw new IllegalArgumentException("Serialized columns byte array is empty.")
+    }
+    val cols = serialized_cols.par.map(
+      serialized_col => {
+        val bis = new ByteArrayInputStream(serialized_col)
+        val dis = new DataInputStream(bis)
+
+        RUtils.validateSerializationFormat(dis)
+        RUtils.unserializeColumn(dis)
+      }
+    ).toArray
+    for (c <- timestamp_col_idxes) {
+      cols(c) = cols(c).asInstanceOf[Array[_]].par.map(
+        x => x.asInstanceOf[Double].longValue * 1000000
+      ).toArray
+    }
+    for (c <- string_col_idxes) {
+      cols(c) = cols(c).asInstanceOf[Array[_]].par.map(
+        x => org.apache.spark.unsafe.types.UTF8String.fromString(x.asInstanceOf[String])
+      ).toArray
+    }
+    val rows = (0 until num_rows).par.map(r => {
+      new org.apache.spark.sql.catalyst.expressions.GenericInternalRow(
+        (0 until cols.length).map(c => cols(c).asInstanceOf[Array[_]](r)).toArray
+      )
+    }).toArray
+
+    val x: RDD[InternalRow] = sc.parallelize(rows, partitions)
+
+    x
+  }
+
+  def createDataFrame(
+    sc: SparkContext,
+    rows: Array[_],
+    partitions: Int
+  ): RDD[Row] = {
     var data = rows.map(o => {
       val r = o.asInstanceOf[Array[_]]
       org.apache.spark.sql.Row.fromSeq(r)
