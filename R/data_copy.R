@@ -1,121 +1,58 @@
 #' @include spark_data_build_types.R
 
-spark_serialize_csv_file <- function(sc, df, columns, repartition) {
+spark_serialize_rdd <- function(sc, df, columns, repartition) {
+  num_rows <- nrow(df)
 
-  # generate a CSV file from the associated data frame
-  # note that these files need to live for the R session
-  # duration so we don't clean these up eagerly
-  # write file based on hash to avoid writing too many files
-  # on repeated import calls
-  hash <- digest::digest(df, algo = "sha256")
-  filename <- paste("spark_serialize_", hash, ".csv", sep = "")
-  tempfile <- file.path(tempdir(), filename)
-
-  if (!file.exists(tempfile)) {
-    write.csv(df, tempfile, row.names = FALSE, na = "")
-  }
-
-  df <- spark_csv_read(
-    sc,
-    paste("file:///", tempfile, sep = ""),
-    csvOptions = list(
-      header = "true"
-    ),
-    columns = columns
-  )
-
-  if (repartition > 0) {
-    df <- invoke(df, "repartition", as.integer(repartition))
-  }
-
-  df
-}
-
-spark_serialize_csv_string <- function(sc, df, columns, repartition) {
-  structType <- spark_data_build_types(sc, columns)
-
-  # Map date and time columns as standard doubles or strings
-  df <- as.data.frame(lapply(df, function(e) {
-    if (inherits(e, "POSIXt")) {
-      sapply(e, function(t) {
-        class(t) <- NULL
-        t
-      })
-    } else if (inherits(e, "Date")) {
-      sapply(e, function(t) {
-        as.character(t)
-      })
-    } else {
-      e
+  timestamp_col_idxes <- seq(ncol(df))[
+    lapply(seq(ncol(df)), function(i) inherits(df[[i]], "POSIXt")) %>% unlist()
+  ] - 1L
+  internal_rows <- lapply(
+    seq(num_rows),
+    function(n) {
+      invoke_static(
+        sc,
+        "sparklyr.Utils",
+        "toInternalRow",
+        as.list(timestamp_col_idxes),
+        unname(as.list(df[n,])) %>% lapply(
+          function(x) {
+            if (inherits(x, "Date")) {
+              as.integer(x)
+            } else if (inherits(x, "POSIXt")) {
+              as.numeric(x)
+            } else if (inherits(x, "character") || inherits(x, "factor")) {
+              invoke_static(
+                sc,
+                "org.apache.spark.unsafe.types.UTF8String",
+                "fromString",
+                as.character(x)
+              )
+            } else {
+              x
+            }
+          }
+        )
+      )
     }
-  }), optional = TRUE)
-
-  separator <- split_separator(sc)
-
-  tempFile <- tempfile(fileext = ".csv")
-  write.table(df, tempFile, sep = separator$plain, col.names = FALSE, row.names = FALSE, quote = FALSE)
-  textData <- as.list(readLines(tempFile))
-
+  )
   rdd <- invoke_static(
     sc,
     "sparklyr.Utils",
-    "createDataFrameFromText",
+    "parallelize",
     spark_context(sc),
-    textData,
-    columns,
-    as.integer(if (repartition <= 0) 1 else repartition),
-    separator$regexp
+    internal_rows,
+    if (repartition > 0) as.integer(repartition) else 1L
   )
+  schema <- spark_data_build_types(sc, columns)
 
-  invoke(hive_context(sc), "createDataFrame", rdd, structType)
-}
-
-spark_serialize_csv_scala <- function(sc, df, columns, repartition) {
-  structType <- spark_data_build_types(sc, columns)
-
-  # Map date and time columns as standard doubles or strings
-  df <- as.data.frame(lapply(df, function(e) {
-    if (inherits(e, "POSIXt")) {
-      sapply(e, function(t) {
-        class(t) <- NULL
-        t
-      })
-    } else if (inherits(e, "Date")) {
-      sapply(e, function(t) {
-        as.character(t)
-      })
-    } else {
-      e
-    }
-  }), optional = TRUE)
-
-  separator <- split_separator(sc)
-
-  # generate a CSV file from the associated data frame
-  # note that these files need to live for the R session
-  # duration so we don't clean these up eagerly
-  # write file based on hash to avoid writing too many files
-  # on repeated import calls
-  hash <- digest::digest(df, algo = "sha256")
-  filename <- paste("spark_serialize_", hash, ".csv", sep = "")
-  tempfile <- file.path(tempdir(), filename)
-
-  if (!file.exists(tempfile)) {
-    write.table(df, tempfile, sep = separator$plain, col.names = FALSE, row.names = FALSE, quote = FALSE)
-  }
-
-  rdd <- invoke_static(
+  invoke_static(
     sc,
-    "sparklyr.Utils",
-    "createDataFrameFromCsv",
-    spark_context(sc),
-    tempfile,
-    columns,
-    as.integer(if (repartition <= 0) 1 else repartition),
-    separator$regexp
+    "org.apache.spark.sql.SQLUtils",
+    "createDataFrame",
+    hive_context(sc),
+    rdd,
+    schema
   )
-
-  invoke(hive_context(sc), "createDataFrame", rdd, structType)
 }
 
 spark_serialize_arrow <- function(sc, df, columns, repartition) {
@@ -233,24 +170,10 @@ spark_data_copy <- function(
   }
   struct_columns <- union(struct_columns, additional_struct_columns)
 
-  serializer <- ifelse(
-    is.null(serializer),
-    ifelse(
-      arrow_enabled(sc, df),
-      "arrow",
-      ifelse(
-        spark_connection_in_driver(sc),
-        "csv_file_scala",
-        getOption("sparklyr.copy.serializer", "csv_string")
-      )
-    ),
-    serializer
-  )
+  serializer <- serializer %||% ifelse(arrow_enabled(sc, df), "arrow", "rdd")
 
   serializers <- list(
-    "csv_file" = spark_serialize_csv_file,
-    "csv_string" = spark_serialize_csv_string,
-    "csv_file_scala" = spark_serialize_csv_scala,
+    "rdd" = spark_serialize_rdd,
     "arrow" = spark_serialize_arrow
   )
 

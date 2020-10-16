@@ -10,14 +10,28 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.{SparkEnv, SparkException}
+import org.apache.spark.sql.catalyst.InternalRow
 
 import scala.collection.JavaConverters._
 import scala.util.Try
 
 object Utils {
   /**
-   * Utilities for collecting columns / Datasets back to R
+   * Utilities for importing data from R to Spark and for collecting columns /
+   * Datasets back to R
    */
+
+  def toInternalRow(
+    timestamp_col_idxes: Seq[Int],
+    vals: Seq[Any]
+  ) : org.apache.spark.sql.catalyst.InternalRow = {
+    val arr = vals.toArray
+    for (i <- timestamp_col_idxes) {
+      arr(i) = arr(i).asInstanceOf[Double].longValue * 1000000
+    }
+
+    new org.apache.spark.sql.catalyst.expressions.GenericInternalRow(arr)
+  }
 
   def collectColumnBoolean(df: DataFrame, colName: String): Array[Boolean] = {
     df.select(colName).rdd.map(row => row(0).asInstanceOf[Boolean]).collect()
@@ -230,6 +244,14 @@ object Utils {
         throw new IllegalArgumentException("unhandled type '" + typeName + "'")
       }
     }
+  }
+
+  def parallelize(
+    sc: SparkContext,
+    rows: Seq[InternalRow],
+    partitions: Int
+  ): RDD[InternalRow] = {
+    sc.parallelize(rows, partitions)
   }
 
   def createDataFrame(sc: SparkContext, rows: Array[_], partitions: Int): RDD[Row] = {
