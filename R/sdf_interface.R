@@ -113,7 +113,7 @@ sdf_import.default <- function(x,
   )
 
   if (memory && !class(x)[[1]] %in% c("iterator", "list")) {
-    tbl_cache(sc, name)
+    tbl_cache_sdf(sc, name, force = FALSE)
   }
 
   on_connection_updated(sc, name)

@@ -27,10 +27,10 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
     val bos = new ByteArrayOutputStream()
     val dos = new DataOutputStream(bos)
 
-    val objId = serializer.readString(dis)
-    val isStatic = serializer.readBoolean(dis)
-    val methodName = serializer.readString(dis)
-    val numArgs = serializer.readInt(dis)
+    val objId = Serializer.readString(dis)
+    val isStatic = Serializer.readBoolean(dis)
+    val methodName = Serializer.readString(dis)
+    val numArgs = Serializer.readInt(dis)
 
     if (objId == "Handler") {
       methodName match {
@@ -38,24 +38,24 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
           val args = readArgs(numArgs, dis)
           if (numArgs != 1) throw new IllegalArgumentException("echo should take a single argument")
 
-          serializer.writeInt(dos, 0)
+          Serializer.writeInt(dos, 0)
           serializer.writeObject(dos, args(0))
         case "rm" =>
           try {
-            if (serializer.readObjectType(dis) != 'a' || serializer.readObjectType(dis) != 'c')
+            if (Serializer.readObjectType(dis) != 'a' || Serializer.readObjectType(dis) != 'c')
               throw new IllegalArgumentException("object removal expects a string array")
-            val objsToRemove = serializer.readStringArr(dis)
+            val objsToRemove = Serializer.readStringArr(dis)
             for (obj <- objsToRemove) tracker.remove(obj)
           } catch {
             case e: Exception =>
               logger.logError("failed to remove objects", e)
           }
         case "getHostContext" =>
-          serializer.writeInt(dos, 0)
+          Serializer.writeInt(dos, 0)
           serializer.writeObject(dos, hostContext.asInstanceOf[AnyRef])
         case _ =>
           dos.writeInt(-1)
-          serializer.writeString(dos, s"Error: unknown method $methodName")
+          Serializer.writeString(dos, s"Error: unknown method $methodName")
       }
     } else {
       handleMethodCall(isStatic, objId, methodName, numArgs, dis, dos, classMap, logger)
@@ -135,7 +135,7 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
         } else {
           res = invoke.invoke(cls, objId, obj, methodName, args, logger)
         }
-        serializer.writeInt(dos, 0)
+        Serializer.writeInt(dos, 0)
         serializer.writeObject(dos, res.asInstanceOf[AnyRef])
       } catch {
         case e: Exception =>
@@ -143,12 +143,12 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
             if (e.getCause == null) e else e.getCause
           )
           logger.logError(s"failed calling $methodName on $objId: " + cause)
-          serializer.writeInt(dos, -1)
-          serializer.writeString(dos, cause)
+          Serializer.writeInt(dos, -1)
+          Serializer.writeString(dos, cause)
         case e: NoClassDefFoundError =>
           logger.logError(s"failed calling $methodName on $objId with no class found error")
-          serializer.writeInt(dos, -1)
-          serializer.writeString(dos, exceptionString(
+          Serializer.writeInt(dos, -1)
+          Serializer.writeString(dos, exceptionString(
             if (e.getCause == null) e else e.getCause
           ))
       }
