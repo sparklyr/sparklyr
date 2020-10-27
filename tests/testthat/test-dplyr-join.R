@@ -12,10 +12,10 @@ test_that("left_join works as expected", {
   d1 <- copy_to(sc, s1, overwrite = TRUE)
   d2 <- copy_to(sc, s2, overwrite = TRUE)
 
-  j1 <- left_join(d1, d2, by = "x") %>% collect()
+  j1 <- left_join(d1, d2, by = "x") %>% dplyr::arrange(x) %>% collect()
   j2 <- left_join(s1, s2, by = "x")
 
-  expect_equivalent(j1, j2)
+  expect_equivalent(j1, j2) %>% dplyr::arrange(x)
 })
 
 test_that("left_join works with default suffixes", {
