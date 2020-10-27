@@ -103,8 +103,8 @@ test_that("the implementation of 'left_join' functions as expected", {
   test_requires("dplyr")
 
   expect_equivalent(
-    left_join(df1, df2),
-    left_join(df1_tbl, df2_tbl) %>% collect()
+    left_join(df1, df2) %>% dplyr::arrange(b),
+    left_join(df1_tbl, df2_tbl) %>% dplyr::arrange(b) %>% collect()
   )
 })
 
