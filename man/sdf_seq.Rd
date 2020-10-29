@@ -9,7 +9,7 @@ sdf_seq(
   from = 1L,
   to = 1L,
   by = 1L,
-  repartition = type,
+  repartition = NULL,
   type = c("integer", "integer64")
 )
 }
@@ -21,7 +21,7 @@ sdf_seq(
 \item{by}{The increment of the sequence.}
 
 \item{repartition}{The number of partitions to use when distributing the
-data across the Spark cluster.}
+data across the Spark cluster. Defaults to the minimum number of partitions.}
 
 \item{type}{The data type to use for the index, either \code{"integer"} or \code{"integer64"}.}
 }

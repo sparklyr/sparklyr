@@ -21,11 +21,11 @@ sdf_len <- function(sc, length, repartition = NULL, type = c("integer", "integer
 #' @param from,to The start and end to use as a range
 #' @param by The increment of the sequence.
 #' @param repartition The number of partitions to use when distributing the
-#'   data across the Spark cluster.
+#'   data across the Spark cluster. Defaults to the minimum number of partitions.
 #' @param type The data type to use for the index, either \code{"integer"} or \code{"integer64"}.
 #'
 #' @export
-sdf_seq <- function(sc, from = 1L, to = 1L, by = 1L, repartition = type, type = c("integer", "integer64")) {
+sdf_seq <- function(sc, from = 1L, to = 1L, by = 1L, repartition = NULL, type = c("integer", "integer64")) {
   from <- cast_scalar_integer(from)
   to <- cast_scalar_integer(to + 1)
   by <- cast_scalar_integer(by)
