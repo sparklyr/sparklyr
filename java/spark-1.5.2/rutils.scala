@@ -12,6 +12,7 @@ object RUtils {
   private[this] val REALSXP = 14
   private[this] val STRSXP = 16
   private[this] val VECSXP = 19
+  private[this] val RAWSXP = 24
   private[this] val NILVALUE_SXP = 254
   private[this] val NA_INTEGER = Integer.MIN_VALUE
 
@@ -61,50 +62,57 @@ object RUtils {
         } else {
           val num_elems = readLength(dis)
 
-          if (1 != num_elems)
-            throw new IllegalArgumentException(
-              s"Unexpected number of elements: $num_elems"
-            )
+          if (RAWSXP == elem_dtype) {
+            val bytes = new Array[Byte](num_elems.intValue)
+            dis.readFully(bytes)
 
-          elem_dtype match {
-            case LGLSXP => {
-              val v = Serializer.readInt(dis)
-              if (NA_INTEGER == v) null else v != 0
-            }
-            case INTSXP => {
-              val v = Serializer.readInt(dis)
-              if (NA_INTEGER == v) null else v
-            }
-            case REALSXP => {
-              val bytes = new Array[Byte](8)
-              dis.readFully(bytes)
-              val hw: Long = extractInt(bytes, 0) & 0x00000000FFFFFFFFL
-              val lw: Long = extractInt(bytes, 4) & 0x00000000FFFFFFFFL
-              if (hw == 0x7FF00000L && lw == 1954L)
-                null
-              else
-                java.lang.Double.longBitsToDouble((hw << 32) | lw)
-            }
-            case STRSXP => {
-              val ctype = readDataType(dis)
-              if (CHARSXP != ctype)
-                logger.logWarning(
-                  s"Unexpected character type $ctype found in string expression"
-                )
+            bytes
+          } else {
+            if (1 != num_elems)
+              throw new IllegalArgumentException(
+                s"Unexpected number of elements: $num_elems"
+              )
 
-              /* these are currently limited to 2^31 -1 bytes */
-              val strlen = Serializer.readInt(dis)
-              if (-1L == strlen) {
-                null
-              } else {
-                val bytes = new Array[Byte](strlen.intValue)
-                dis.readFully(bytes)
-
-                new String(bytes, StandardCharsets.UTF_8)
+            elem_dtype match {
+              case LGLSXP => {
+                val v = Serializer.readInt(dis)
+                if (NA_INTEGER == v) null else v != 0
               }
+              case INTSXP => {
+                val v = Serializer.readInt(dis)
+                if (NA_INTEGER == v) null else v
+              }
+              case REALSXP => {
+                val bytes = new Array[Byte](8)
+                dis.readFully(bytes)
+                val hw: Long = extractInt(bytes, 0) & 0x00000000FFFFFFFFL
+                val lw: Long = extractInt(bytes, 4) & 0x00000000FFFFFFFFL
+                if (hw == 0x7FF00000L && lw == 1954L)
+                  null
+                else
+                  java.lang.Double.longBitsToDouble((hw << 32) | lw)
+              }
+              case STRSXP => {
+                val ctype = readDataType(dis)
+                if (CHARSXP != ctype)
+                  logger.logWarning(
+                    s"Unexpected character type $ctype found in string expression"
+                  )
+
+                /* these are currently limited to 2^31 -1 bytes */
+                val strlen = Serializer.readInt(dis)
+                if (-1L == strlen) {
+                  null
+                } else {
+                  val bytes = new Array[Byte](strlen.intValue)
+                  dis.readFully(bytes)
+
+                  new String(bytes, StandardCharsets.UTF_8)
+                }
+              }
+              case _ =>
+                throw new IllegalArgumentException(s"Invalid type $elem_dtype")
             }
-            case _ =>
-              throw new IllegalArgumentException(s"Invalid type $elem_dtype")
           }
         }
       }.asInstanceOf[Any]
@@ -135,9 +143,15 @@ object RUtils {
     val x = Serializer.readInt(dis)
     val len = (
       if (-1 == x) {
-        val upper: Long = Serializer.readInt(dis)
-        val lower: Long = Serializer.readInt(dis)
-        (upper << 32) + lower
+        // TODO: if necessary, find a reasonably simple way to support
+        // array with more than INT_MAX elements in Scala
+
+        // val upper: Long = Serializer.readInt(dis)
+        // val lower: Long = Serializer.readInt(dis)
+        // (upper << 32) + lower
+        throw new IllegalArgumentException(
+          "Vector with length greater than INT_MAX (i.e., 'LONG_VECTOR') is not supported yet"
+        )
       } else {
         x
       }

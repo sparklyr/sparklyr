@@ -76,3 +76,23 @@ test_that("sdf_copy_to can preserve list columns", {
   res <- sdf_collect(sdf)
   expect_equivalent(df$a, res$a)
 })
+
+test_that("sdf_copy_to supports raw columns", {
+  expected <- list(
+    list(3L, 5.5, NULL, "foo", NaN, "", foo = "foo", NA, bar = "bar"),
+    list(a = 3L, "", NA, list(b = 4L, NaN, list(c = 5L))),
+    seq(1:100),
+    NULL,
+    NaN,
+    NA
+  )
+  sdf <- sdf_copy_to(
+    sc,
+    tibble::tibble(x = lapply(expected, function(x) serialize(x, NULL)))
+  )
+
+  res <- sdf_collect(sdf)
+  actual <- lapply(res$x, unserialize)
+
+  expect_equal(actual, expected)
+})
