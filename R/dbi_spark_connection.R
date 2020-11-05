@@ -55,11 +55,15 @@ dbi_ensure_no_backtick <- function(x) {
 }
 
 setMethod("dbQuoteIdentifier", c("spark_connection", "character"), function(conn, x, ...) {
-  dbi_ensure_no_backtick(x)
+  if (length(x) == 0L) {
+    x
+  } else {
+    dbi_ensure_no_backtick(x)
 
-  y <- paste("`", x, "`", sep = "")
+    y <- paste("`", x, "`", sep = "")
 
-  SQL(y)
+    SQL(y)
+  }
 })
 
 setMethod("dbQuoteString", c("spark_connection", "character"), function(conn, x, ...) {
