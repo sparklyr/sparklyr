@@ -342,15 +342,8 @@ livy_statement_compose <- function(sc, static, class, method, ...) {
 
   var_name <- livy_code_new_return_var(sc)
 
-  invoke_var <- paste(
-    "var ", var_name, " = ",
-    paste0(
-      livy_map_class(sc, "sparklyr.LivyUtils.invokeFromBase64"),
-      "("
-    ),
-    last_var,
-    ")",
-    sep = ""
+  invoke_var <- paste0(
+    "var ", var_name, " = sparklyr.LivyUtils.invokeFromBase64(", last_var, ")"
   )
 
   code <- paste(
@@ -588,10 +581,9 @@ livy_connection_not_used_warn <- function(value, default = NULL, name = deparse(
 }
 
 livy_connection_jars <- function(config, version, scala_version) {
-  livy_jars <- spark_config_value(config, "sparklyr.livy.jar", NULL)
-  livy_jars <- if (is.null(livy_jars)) list() else list(livy_jars)
+  livy_jars <- as.list(spark_config_value(config, "sparklyr.livy.jar", NULL))
 
-  if (length(livy_jars) == 0 && !spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
+  if (length(livy_jars) == 0) {
     major_version <- gsub("\\.$", "", version)
 
     livy_jars <- livy_available_jars()
@@ -620,13 +612,16 @@ livy_connection_jars <- function(config, version, scala_version) {
 
     livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "feature/sparklyr-1.4.0")
 
-    livy_jars <- list(paste0(
-      "https://github.com/sparklyr/sparklyr/blob/",
-      livy_branch,
-      "/inst/java/",
-      target_jar,
-      "?raw=true"
-    ))
+    livy_jars <- c(
+      livy_jars,
+      paste0(
+        "https://github.com/sparklyr/sparklyr/blob/",
+        livy_branch,
+        "/inst/java/",
+        target_jar,
+        "?raw=true"
+      )
+    )
   }
 
   livy_jars
@@ -656,15 +651,12 @@ livy_connection <- function(master,
 
   livy_validate_master(master, config)
 
-  if (!spark_config_value(config, "sparklyr.livy.sources", FALSE)) {
-    extensions <- spark_dependencies_from_extensions(version, scala_version, extensions, config)
+  extensions <- spark_dependencies_from_extensions(version, scala_version, extensions, config)
 
-    config$livy.jars <- as.character(c(livy_connection_jars(config, version, scala_version), extensions$catalog_jars))
+  config$livy.jars <- as.character(c(livy_connection_jars(config, version, scala_version), extensions$catalog_jars))
 
-    config[["sparklyr.livy.sources"]] <- FALSE
-    config[["spark.jars.packages"]] <- paste(c(config[["spark.jars.packages"]], extensions$packages), collapse = ",")
-    config[["spark.jars.repositories"]] <- paste(c(config[["spark.jars.repositories"]], extensions$repositories), collapse = ",")
-  }
+  config[["spark.jars.packages"]] <- paste(c(config[["spark.jars.packages"]], extensions$packages), collapse = ",")
+  config[["spark.jars.repositories"]] <- paste(c(config[["spark.jars.repositories"]], extensions$repositories), collapse = ",")
 
   session <- livy_create_session(master, config)
 
@@ -764,16 +756,6 @@ spark_disconnect.livy_connection <- function(sc, ...) {
   }
 }
 
-livy_map_class <- function(sc, class) {
-  if (spark_config_value(sc$config, "sparklyr.livy.sources", TRUE)) {
-    gsub("sparklyr.", "", class)
-  }
-  else {
-    # if sources are provided as a jar, sources contain spakrlyr as proper package
-    class
-  }
-}
-
 #' @export
 print_jobj.livy_connection <- print_jobj.spark_shell_connection
 
@@ -784,15 +766,11 @@ invoke.livy_jobj <- function(jobj, method, ...) {
 
 #' @export
 invoke_static.livy_connection <- function(sc, class, method, ...) {
-  classMapped <- livy_map_class(sc, class)
-
-  livy_invoke_statement_fetch(sc, TRUE, classMapped, method, ...)
+  livy_invoke_statement_fetch(sc, TRUE, class, method, ...)
 }
 
 #' @export
 invoke_new.livy_connection <- function(sc, class, ...) {
-  class <- livy_map_class(sc, class)
-
   livy_invoke_statement_fetch(sc, TRUE, class, "<init>", ...)
 }
 
@@ -800,91 +778,10 @@ invoke_raw <- function(sc, code, ...) {
   livy_post_statement(sc, code)
 }
 
-livy_load_scala_sources <- function(sc) {
-  livySources <- c(
-    "utils.scala",
-    "dfutils.scala",
-    "sqlutils.scala",
-    "logger.scala",
-    "invoke.scala",
-    "tracker.scala",
-    "serializer.scala",
-    "stream.scala",
-    "repartition.scala",
-    "arrowhelper.scala",
-    "arrowbatchstreamwriter.scala",
-    "arrowconverters.scala",
-    "applyutils.scala",
-    "classutils.scala",
-    "fileutils.scala",
-    "sources.scala",
-    "rscript.scala",
-    "workercontext.scala",
-    "handler.scala",
-    "channel.scala",
-    "shell.scala",
-    "backend.scala",
-    "workerapply.scala",
-    "workerrdd.scala",
-    "workerhelper.scala",
-    "mlutils.scala",
-    "mlutils2.scala",
-    "bucketizerutils.scala",
-    "rddbarrier.scala",
-    # LivyUtils should be the last file to include to map classes correctly
-    "livyutils.scala"
-  )
-
-  livySourcesFiles <- system.file("livy", package = "sparklyr") %>%
-    list.files(pattern = "scala$", full.names = TRUE, recursive = TRUE)
-
-  sourceOrder <- livySourcesFiles %>%
-    basename() %>%
-    match(livySources) %>%
-    order()
-
-  livySparkVersion <- livy_post_statement(sc, "sc.version") %>%
-    gsub("^.+= |[\n\r \t]", "", .) %>%
-    spark_version_clean() %>%
-    numeric_version()
-
-  livySourcesFiles <- livySourcesFiles[sourceOrder] %>%
-    Filter(function(x) {
-      requiredVersion <- x %>%
-        dirname() %>%
-        basename() %>%
-        gsub("^spark-", "", .) %>%
-        spark_version_clean() %>%
-        numeric_version()
-      requiredVersion <= livySparkVersion
-    }, .)
-
-  lapply(livySourcesFiles, function(sourceFile) {
-    tryCatch(
-      {
-        subpath_name <- file.path(basename(dirname(sourceFile)), basename(sourceFile))
-        if (spark_config_value(sc$config, "sparklyr.verbose", FALSE)) message("Loading ", subpath_name)
-
-        sources <- paste(readLines(sourceFile), collapse = "\n")
-
-        statement <- livy_statement_new(sources, NULL)
-        livy_invoke_statement(sc, statement)
-      },
-      error = function(e) {
-        stop("Failed to load ", basename(sourceFile), ": ", e$message)
-      }
-    )
-  })
-}
-
 #' @export
 initialize_connection.livy_connection <- function(sc) {
   withCallingHandlers(
     {
-      if (spark_config_value(sc$config, "sparklyr.livy.sources", TRUE)) {
-        livy_load_scala_sources(sc)
-      }
-
       session <- tryCatch(
         {
           invoke_static(
