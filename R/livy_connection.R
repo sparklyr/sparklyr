@@ -612,15 +612,12 @@ livy_connection_jars <- function(config, version, scala_version) {
 
     livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "feature/sparklyr-1.4.0")
 
-    livy_jars <- c(
-      livy_jars,
-      paste0(
-        "https://github.com/sparklyr/sparklyr/blob/",
-        livy_branch,
-        "/inst/java/",
-        target_jar,
-        "?raw=true"
-      )
+    livy_jars <- paste0(
+      "https://github.com/sparklyr/sparklyr/blob/",
+      livy_branch,
+      "/inst/java/",
+      target_jar,
+      "?raw=true"
     )
   }
 
