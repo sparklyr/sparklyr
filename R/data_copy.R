@@ -72,7 +72,7 @@ spark_data_translate_columns <- function(df) {
   })
 }
 
-spark_data_perform_copy <- function(sc, serializer, df_data, repartition) {
+spark_data_perform_copy <- function(sc, serializer, df_data, repartition, raw_columns = list()) {
   if (identical(class(df_data), "iterator")) {
     df <- df_data()
   }
@@ -96,6 +96,9 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition) {
 
     names(df) <- spark_sanitize_names(names(df), sc$config)
     columns <- spark_data_translate_columns(df)
+    for (row_column in raw_columns) {
+      columns[[row_column]] = "raw"
+    }
     sdf_current <- serializer(sc, df, columns, repartition)
     sdf_list[[i]] <- sdf_current
 
@@ -138,7 +141,8 @@ spark_data_copy <- function(
                             name,
                             repartition,
                             serializer = NULL,
-                            struct_columns = list()) {
+                            struct_columns = list(),
+                            raw_columns = list()) {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
   }
@@ -152,18 +156,24 @@ spark_data_copy <- function(
   }
 
   additional_struct_columns <- list()
+  additional_raw_columns <- list()
   if ("list" %in% sapply(df, class)) {
     for (column in colnames(df)) {
       if (class(df[[column]]) == "list") {
-        df[[column]] <- sapply(
-          df[[column]],
-          function(e) jsonlite::toJSON(as.list(e), auto_unbox = TRUE, digits = NA)
-        )
-        additional_struct_columns <- append(additional_struct_columns, column)
+        if ("raw" %in% lapply(df$x, class)) {
+          additional_raw_columns <- append(additional_raw_columns, column)
+        } else {
+          df[[column]] <- sapply(
+            df[[column]],
+            function(e) jsonlite::toJSON(as.list(e), auto_unbox = TRUE, digits = NA)
+          )
+          additional_struct_columns <- append(additional_struct_columns, column)
+        }
       }
     }
   }
   struct_columns <- union(struct_columns, additional_struct_columns)
+  raw_columns <- union(raw_columns, additional_raw_columns)
 
   serializer <- serializer %||% ifelse(arrow_enabled(sc, df), "arrow", "rds")
 
@@ -173,7 +183,7 @@ spark_data_copy <- function(
   )
 
 
-  df <- spark_data_perform_copy(sc, serializers[[serializer]], df, repartition)
+  df <- spark_data_perform_copy(sc, serializers[[serializer]], df, repartition, raw_columns)
 
   if (length(struct_columns) > 0 && spark_version(sc) >= "2.4") {
     df <- invoke_static(
