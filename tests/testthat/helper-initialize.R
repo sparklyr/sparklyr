@@ -73,6 +73,7 @@ testthat_shell_connection <- function(method = "shell") {
 
   if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
     options(sparkinstall.verbose = TRUE)
+    options(timeout = 600)
     spark_install(version)
   }
 
