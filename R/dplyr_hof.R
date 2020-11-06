@@ -32,7 +32,7 @@ translate_formula <- function(f) {
       as.character(vars)
     }
   )
-  body_sql <- dbplyr::translate_sql_(list(f[[2]]), con = dbplyr::simulate_dbi())
+  body_sql <- dbplyr::translate_sql(!!f[[2]])
   lambda <- dbplyr::sql(paste(params_sql, "->", body_sql))
 
   lambda
@@ -92,7 +92,7 @@ process_dest_col <- function(expr, dest_col) {
 #' .(a, b) %->% (a < 1 && b > 1) # translates to <SQL> `a`,`b` -> (`a` < 1.0 AND `b` > 1.0)
 #' }
 #' @export
-`%->%` <- function(params, body) {
+`%->%` <- function(params, ...) {
   `.` <- function(...) {
     rlang::ensyms(...) %>%
       lapply(as.character) %>>%
@@ -115,10 +115,7 @@ process_dest_col <- function(expr, dest_col) {
     c(sep = ",") %>%
     do.call(paste, .)
 
-  body_sql <- dbplyr::translate_sql_(
-    rlang::enexprs(body),
-    con = dbplyr::simulate_dbi()
-  )
+  body_sql <- dbplyr::translate_sql(...)
 
   lambda <- dbplyr::sql(paste(params_sql, "->", body_sql))
   class(lambda) <- c(class(lambda), "spark_sql_lambda")

@@ -80,13 +80,12 @@ test_that("ml_kmeans() works properly", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, k = 5, seed = 11)
-  expect_equal(
-    ml_predict(iris_kmeans, iris_tbl) %>%
-      dplyr::distinct(prediction) %>%
-      dplyr::arrange(prediction) %>%
-      dplyr::pull(prediction),
-    0:4
-  )
+  rs <- ml_predict(iris_kmeans, iris_tbl) %>%
+    dplyr::distinct(prediction) %>%
+    dplyr::arrange(prediction) %>%
+    dplyr::collect()
+
+  expect_equal(rs$prediction, 0:4)
 })
 
 test_that("ml_compute_cost() for kmeans", {
