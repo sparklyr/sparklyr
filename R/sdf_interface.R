@@ -1,4 +1,6 @@
 #' @include avro_utils.R
+#' @include tables_spark.R
+#' @include utils.R
 NULL
 
 #' Copy an Object into Spark
@@ -36,8 +38,11 @@ NULL
 #'
 #' @examples
 #'
+#' \dontrun{
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #' sdf_copy_to(sc, iris)
+#'}
+#'
 #' @name sdf_copy_to
 #' @export
 sdf_copy_to <- function(sc,
@@ -671,4 +676,102 @@ sdf_from_avro <- function(x, cols) {
       )
     }
   )
+}
+
+#' Create a Spark dataframe containing all combinations of inputs
+#'
+#' Given one or more R vectors/factors or single-column Spark dataframes,
+#' perform an expand.grid operation on all of them and store the result in
+#' a Spark dataframe
+#'
+#' @param ... Each input variable can be either a R vector/factor or a Spark
+#'   dataframe. Unnamed inputs will assume the default names of 'Var1', 'Var2',
+#'   etc in the result, similar to what `expand.grid` does for unnamed inputs.
+#' @param broadcast_vars Indicates which input(s) should be broadcasted to all
+#'   nodes of the Spark cluster during the join process (default: none).
+#' @param memory Boolean; whether the resulting Spark dataframe should be
+#'   cached into memory (default: TRUE)
+#' @param repartition Number of partitions the resulting Spark dataframe should
+#'   have
+#' @param partition_by Vector of column names used for partitioning the
+#'   resulting Spark dataframe, only supported for Spark 2.0+
+#'
+#' @examples
+#'
+#' \dontrun{
+#' sc <- spark_connect(master = "local")
+#' grid_sdf <- sdf_expand_grid(sc, seq(5), rnorm(10), letters)
+#' }
+#'
+#' @export
+sdf_expand_grid <- function(
+                            sc,
+                            ...,
+                            broadcast_vars = NULL,
+                            memory = TRUE,
+                            repartition = NULL,
+                            partition_by = NULL) {
+  vars <- list(...)
+  if (length(vars) == 0) {
+    invoke(spark_session(sc), "emptyDataFrame") %>% sdf_register()
+  } else {
+    if (is.null(names(vars))) {
+      names(vars) <- rep("", length(vars))
+    }
+    for (i in seq_along(vars)) {
+      var_name <- names(vars[i])
+      if (is.null(var_name) || identical(var_name, "")) {
+        names(vars)[[i]] <- sprintf("Var%d", i)
+      }
+      if (!"tbl_spark" %in% class(vars[[i]])) {
+        vars[[i]] <- sdf_copy_to(
+          sc, data.frame(vars[i]), name = random_string("sdf_expand_grid_tmp")
+        )
+      }
+    }
+    if (!rlang::is_null(broadcast_vars)) {
+      broadcast_vars <- rlang::enexpr(broadcast_vars) %>%
+        (
+          function(exprs) {
+            if (length(exprs) > 1) {
+              as.list(exprs)[-1]
+            } else {
+              as.list(exprs)[1]
+            }
+          }
+        ) %>%
+          lapply(rlang::as_string) %>%
+          unlist()
+    }
+    for (x in broadcast_vars) {
+      idxes <- which (names(vars) %in% x)
+      if (length(idx) > 0) {
+        for (idx in idxes) {
+          vars[[idx]] <- sdf_broadcast(vars[[idx]])
+        }
+      } else {
+        warning(
+          sprintf("Broadcast variable '%s'", x),
+          " is not among the list of input variable(s)! It will be ignored."
+        )
+      }
+    }
+
+    grid_sdf <- spark_dataframe(vars[[1]])
+    for (i in seq(2, length(vars))) {
+      grid_sdf <- invoke(grid_sdf, "crossJoin", spark_dataframe(vars[[i]]))
+    }
+
+    grid_sdf <- grid_sdf %>% sdf_register()
+
+    if (!is.null(repartition) || !is.null(partition_by)) {
+      grid_sdf <- grid_sdf %>% sdf_repartition(repartition, partition_by)
+    }
+
+    if (memory) {
+      invoke(spark_dataframe(grid_sdf), "cache")
+    }
+
+    grid_sdf
+  }
 }
