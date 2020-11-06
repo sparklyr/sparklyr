@@ -77,7 +77,7 @@ test_that("sdf_copy_to can preserve list columns", {
   expect_equivalent(df$a, res$a)
 })
 
-test_that("sdf_copy_to supports raw columns", {
+test_that("sdf_copy_to supports binary columns", {
   expected <- list(
     list(3L, 5.5, NULL, "foo", NaN, "", foo = "foo", NA, bar = "bar"),
     list(a = 3L, "", NA, list(b = 4L, NaN, list(c = 5L))),
