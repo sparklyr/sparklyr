@@ -157,18 +157,16 @@ spark_data_copy <- function(
 
   additional_struct_columns <- list()
   additional_raw_columns <- list()
-  if ("list" %in% sapply(df, class)) {
-    for (column in colnames(df)) {
-      if (class(df[[column]]) == "list") {
-        if ("raw" %in% lapply(df$x, class)) {
-          additional_raw_columns <- append(additional_raw_columns, column)
-        } else {
-          df[[column]] <- sapply(
-            df[[column]],
-            function(e) jsonlite::toJSON(as.list(e), auto_unbox = TRUE, digits = NA)
-          )
-          additional_struct_columns <- append(additional_struct_columns, column)
-        }
+  for (column in colnames(df)) {
+    if ("list" %in% class(df[[column]])) {
+      if ("raw" %in% lapply(df[[column]], class)) {
+        additional_raw_columns <- append(additional_raw_columns, column)
+      } else {
+        df[[column]] <- sapply(
+          df[[column]],
+          function(e) jsonlite::toJSON(as.list(e), auto_unbox = TRUE, digits = NA)
+        )
+        additional_struct_columns <- append(additional_struct_columns, column)
       }
     }
   }

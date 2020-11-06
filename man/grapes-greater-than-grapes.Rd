@@ -4,7 +4,7 @@
 \alias{\%->\%}
 \title{Infix operator for composing a lambda expression}
 \usage{
-params \%->\% body
+params \%->\% ...
 }
 \arguments{
 \item{params}{Parameter(s) of the lambda expression, can be either a single

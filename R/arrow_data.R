@@ -1,28 +1,45 @@
 #' @include spark_data_build_types.R
+NULL
 
 arrow_enabled <- function(sc, object) {
-  enabled <- spark_config_value(sc, "sparklyr.arrow", "package:arrow" %in% search())
-  if (!enabled) {
-    enabled
-  }
-  else {
+  has_arrow <- "package:arrow" %in% search()
+  spark_config_value(sc, "sparklyr.arrow", has_arrow) &&
     arrow_enabled_object(object)
-  }
 }
 
+#' Determine whether arrow is able to serialize the given R object
+#'
+#' If the given R object is not serializable by arrow due to some known
+#' limitations of arrow, then return FALSE, otherwise return TRUE
+#'
+#' @param object The object to be serialized
+#'
+#' @keywords internal
+#' @examples
+#' \dontrun{
+#'
+#' df <- tibble::tibble(x = seq(5))
+#' arrow_enabled_object(df)
+#'
+#' }
+#'
+#' @export
 arrow_enabled_object <- function(object) {
   UseMethod("arrow_enabled_object")
 }
 
+#' @export
 arrow_enabled_object.default <- function(object) {
   TRUE
 }
 
+#' @export
 arrow_enabled_object.tbl_spark <- function(object) {
   sdf <- spark_dataframe(object)
   arrow_enabled_object(sdf)
 }
 
+#' @export
 arrow_enabled_object.spark_jobj <- function(object) {
   unsupported_expr <- ".Vector|StructType"
 
@@ -39,19 +56,28 @@ arrow_enabled_object.spark_jobj <- function(object) {
   enabled
 }
 
-arrow_enabled_dataframe_schema <- function(types) {
-  unsupported_expr <- "^$"
-  unsupported <- Filter(function(e) grepl(unsupported_expr, e), types)
-
-  enabled <- length(unsupported) == 0
-  if (!enabled) warning("Arrow disabled due to columns: ", paste(names(unsupported), collapse = ", "))
+#' @export
+arrow_enabled_object.data.frame <- function(object) {
+  unsupported <- NULL
+  enabled <- TRUE
+  for (column in colnames(object)) {
+    if ("list" %in% class(object[[column]]) &&
+        "raw" %in% lapply(object[[column]], class)) {
+      unsupported <- c(unsupported, column)
+      enabled <- FALSE
+    }
+  }
+  if (!enabled) {
+    warning(
+      "Arrow disabled due to columns: ", paste(unsupported, collapse = ", ")
+    )
+  }
 
   enabled
 }
 
-arrow_enabled_object.data.frame <- function(object) {
-  arrow_enabled_dataframe_schema(sapply(object, function(e) class(e)[[1]]))
-}
+#' @export
+arrow_enabled_object.tbl_df <- arrow_enabled_object.data.frame
 
 arrow_read_stream <- function(stream) {
   reader <- arrow_record_stream_reader(stream)
