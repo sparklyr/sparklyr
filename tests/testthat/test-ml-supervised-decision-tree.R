@@ -24,6 +24,7 @@ test_that("thresholds parameter behaves as expected", {
     x %>%
       count(prediction) %>%
       arrange(desc(n)) %>%
+      collect() %>%
       pull(prediction) %>%
       first()
   }
