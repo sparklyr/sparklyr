@@ -1,0 +1,69 @@
+context("sdf-expand-grid")
+
+sc <- testthat_spark_connection()
+
+var1 <- seq(26)
+var2 <- letters
+var3 <- c(1.111, 3.3, 2.22222, NaN, 4.4444, 5.5)
+var4 <- c("foo", NA, "bar", "", "baz", NA)
+
+test_that("sdf_expand_grid works with R vectors", {
+  expect_equivalent(
+    sdf_expand_grid(sc, var1, var2, var3, var4) %>%
+      collect() %>%
+      dplyr::arrange(Var1, Var2, Var3, Var4),
+    expand.grid(var1, var2, var3, var4, stringsAsFactors = FALSE) %>%
+      dplyr::arrange(Var1, Var2, Var3, Var4)
+  )
+
+  expect_equivalent(
+    sdf_expand_grid(sc, x = var1, var2, y = var3, var4) %>%
+      collect() %>%
+      dplyr::arrange(x, Var2, y, Var4),
+    expand.grid(x = var1, var2, y = var3, var4, stringsAsFactors = FALSE) %>%
+      dplyr::arrange(x, Var2, y, Var4)
+  )
+
+  expect_equivalent(
+    sdf_expand_grid(sc, x = var1, y = var2, z = var3, w = var4) %>%
+      collect() %>%
+      dplyr::arrange(x, y, z, w),
+    expand.grid(x = var1, y = var2, z = var3, w = var4, stringsAsFactors = FALSE) %>%
+      dplyr::arrange(x, y, z, w)
+  )
+})
+
+test_that("sdf_expand_grid works Spark dataframes", {
+  df1 <- tibble::tibble(x = var1, y = var2)
+  df2 <- tibble::tibble(z = var3, w = var4)
+
+  expect_equivalent(
+    sdf_expand_grid(
+      sc,
+      copy_to(sc, df1, name = random_string("tmp")),
+      copy_to(sc, df2, name = random_string("tmp"))
+    ) %>%
+      collect() %>%
+      dplyr::arrange(x, y, z, w),
+    merge(df1, df2, all = TRUE) %>%
+      dplyr::arrange(x, y, z, w)
+  )
+})
+
+test_that("sdf_expand_grid works with a mixture of R vectors and Spark dataframes", {
+  df1 <- tibble::tibble(y = var1, z = var2)
+
+  expect_equivalent(
+    sdf_expand_grid(
+      sc,
+      x = var3,
+      copy_to(sc, df1, name = random_string("tmp")),
+      var4
+    ) %>%
+      collect() %>%
+      dplyr::arrange(x, y, z, Var3),
+    merge(tibble::tibble(x = var3), df1, all = TRUE) %>%
+      merge(tibble::tibble(Var3 = var4), all = TRUE) %>%
+      dplyr::arrange(x, y, z, Var3)
+  )
+})
