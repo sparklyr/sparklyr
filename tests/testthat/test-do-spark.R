@@ -51,14 +51,16 @@ test_that("doSpark preserves exception error message", {
     foreach(x = 1:10) %dopar% {
       if (x == 10) stop("runtime error")
     },
-    regexp = "task 10 failed - \"runtime error\""
+    regexp = "\"runtime error\""
   )
 })
 
 test_that("doSpark loads required packages", {
-  foreach(x = 1:10) %dopar% {
-    expect_true("testthat" %in% (.packages()))
+  rs <- foreach(x = 1:10) %dopar% {
+    "testthat" %in% (.packages())
   }
+
+  expect_equal(rs %>% unlist(), rep(TRUE, 10))
 })
 
 test_that("num workers greater than 1", {

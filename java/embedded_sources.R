@@ -1200,6 +1200,7 @@ worker_config_serialize <- function(config) {
     if (isTRUE(config$schema)) "TRUE" else "FALSE",
     if (isTRUE(config$arrow)) "TRUE" else "FALSE",
     if (isTRUE(config$fetch_result_as_sdf)) "TRUE" else "FALSE",
+    if (isTRUE(config$single_binary_column)) "TRUE" else "FALSE",
     config$spark_version,
     sep = ";"
   )
@@ -1216,7 +1217,8 @@ worker_config_deserialize <- function(raw) {
     schema = as.logical(parts[[5]]),
     arrow = as.logical(parts[[6]]),
     fetch_result_as_sdf = as.logical(parts[[7]]),
-    spark_version = parts[[8]]
+    single_binary_column = as.logical(parts[[8]]),
+    spark_version = parts[[9]]
   )
 }
 # nocov start
@@ -1582,27 +1584,35 @@ spark_worker_apply <- function(sc, config) {
     # serialized groups are wrapped over single lists
     data <- group_entry[[1]]
 
-    df <- do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
+    df <- (
+      if (config$single_binary_column) {
+        tibble::tibble(encoded = lapply(data, function(x) x[[1]]))
+      } else {
+        do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
+      }
+    )
 
-    # rbind removes Date classes so we re-assign them here
-    if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0) {
-      if (any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
-        first_row <- data[[1]]
-        for (idx in seq_along(first_row)) {
-          first_class <- class(first_row[[idx]])[[1]]
-          if (identical(first_class, "Date")) {
-            df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
-          } else if (identical(first_class, "POSIXct")) {
-            df[[idx]] <- as.POSIXct(df[[idx]], origin = "1970-01-01")
+    if (!config$single_binary_column) {
+      # rbind removes Date classes so we re-assign them here
+      if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0) {
+        if (any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
+          first_row <- data[[1]]
+          for (idx in seq_along(first_row)) {
+            first_class <- class(first_row[[idx]])[[1]]
+            if (identical(first_class, "Date")) {
+              df[[idx]] <- as.Date(df[[idx]], origin = "1970-01-01")
+            } else if (identical(first_class, "POSIXct")) {
+              df[[idx]] <- as.POSIXct(df[[idx]], origin = "1970-01-01")
+            }
           }
         }
-      }
 
-      # cast column to correct type, for instance, when dealing with NAs.
-      for (i in 1:ncol(df)) {
-        target_type <- funcContext$column_types[[i]]
-        if (!is.null(target_type) && class(df[[i]]) != target_type) {
-          df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
+        # cast column to correct type, for instance, when dealing with NAs.
+        for (i in 1:ncol(df)) {
+          target_type <- funcContext$column_types[[i]]
+          if (!is.null(target_type) && class(df[[i]]) != target_type) {
+            df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
+          }
         }
       }
     }

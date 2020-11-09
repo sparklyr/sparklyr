@@ -1,5 +1,6 @@
 #' @include spark_apply_bundle.R
 #' @include spark_schema_from_rdd.R
+NULL
 
 spark_apply_worker_config <- function(
                                       sc,
@@ -7,7 +8,8 @@ spark_apply_worker_config <- function(
                                       profile,
                                       schema = FALSE,
                                       arrow = FALSE,
-                                      fetch_result_as_sdf = TRUE) {
+                                      fetch_result_as_sdf = TRUE,
+                                      single_binary_column = FALSE) {
   worker_config_serialize(
     c(
       list(
@@ -16,7 +18,8 @@ spark_apply_worker_config <- function(
         schema = isTRUE(schema),
         arrow = isTRUE(arrow),
         fetch_result_as_sdf = isTRUE(fetch_result_as_sdf),
-        spark_version = spark_version(sc)
+        spark_version = spark_version(sc),
+        single_binary_column = single_binary_column
       ),
       sc$config
     )
@@ -327,7 +330,8 @@ spark_apply <- function(x,
           args$debug,
           args$profile,
           arrow = arrow,
-          fetch_result_as_sdf = fetch_result_as_sdf
+          fetch_result_as_sdf = fetch_result_as_sdf,
+          single_binary_column = args$single_binary_column
         ),
         as.integer(worker_port),
         as.list(group_by),
@@ -350,7 +354,8 @@ spark_apply <- function(x,
           args$debug,
           args$profile,
           arrow = arrow,
-          fetch_result_as_sdf = fetch_result_as_sdf
+          fetch_result_as_sdf = fetch_result_as_sdf,
+          single_binary_column = args$single_binary_column
         ),
         as.integer(worker_port),
         as.list(sdf_columns),
@@ -396,7 +401,8 @@ spark_apply <- function(x,
           args$profile,
           schema = TRUE,
           arrow = arrow,
-          fetch_result_as_sdf = fetch_result_as_sdf
+          fetch_result_as_sdf = fetch_result_as_sdf,
+          single_binary_column = args$single_binary_column
         ),
         as.integer(worker_port),
         as.list(sdf_columns),
@@ -442,7 +448,8 @@ spark_apply <- function(x,
         args$debug,
         args$profile,
         arrow = arrow,
-        fetch_result_as_sdf = fetch_result_as_sdf
+        fetch_result_as_sdf = fetch_result_as_sdf,
+        single_binary_column = args$single_binary_column
       ),
       as.integer(worker_port),
       as.list(sdf_columns),

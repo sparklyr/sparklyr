@@ -74,7 +74,6 @@ registerDoSpark <- function(spark_conn, ...) {
 
   # internal function called by foreach
   .doSpark <- function(obj, expr, envir, data) {
-    obj$packages <- unique(c(obj$packages, (.packages())))
     # internal function to compile an expression if possible
     .compile <- function(expr, ...) {
       if (getRversion() < "2.13.0" || isTRUE(.globals$do_spark$options$nocompile)) {
@@ -90,17 +89,18 @@ registerDoSpark <- function(spark_conn, ...) {
     # therefore the ~33% space overhead from base64 encode is still acceptable.
     # If this assumption were not true, then base64 would need to be replaced with another
     # more efficient binary-to-text encoding such as yEnc (which has only 1-2% space overhead).
-    .encode_item <- function(item) list(encoded = base64enc::base64encode(serialize(item, NULL)))
-    .decode_item <- function(item) unserialize(base64enc::base64decode(item))
+    .encode_item <- function(item) serialize(item, NULL)
+    .decode_item <- function(item) unserialize(item)
 
     expr_globals <- globals::globalsOf(expr, envir = envir, recursive = TRUE, mustExist = FALSE)
 
     # internal function to process spark data frames
-    .process_spark_items <- function(...) {
-      # load necessary packages
-      for (p in obj$packages) library(p, character.only = TRUE)
-
-      f <- function(item) {
+    .process_spark_items <- function(spark_items, ...) {
+      pkgs_to_attach <- (.packages())
+      worker_fn <- function(items) {
+        for (pkg in pkgs_to_attach) {
+          library(pkg, character.only = TRUE)
+        }
         enclos <- envir
         expr_globals <- as.list(expr_globals)
         for (k in names(expr_globals)) {
@@ -119,19 +119,20 @@ registerDoSpark <- function(spark_conn, ...) {
         # needed for evaluating `expr`
         tryCatch(
           {
-            res <- eval(
-              expr,
-              envir = as.list(.decode_item(item$encoded)),
-              enclos = enclos
+            lapply(
+              items$encoded,
+              function(item) {
+                eval(expr, envir = as.list(.decode_item(item)), enclos = enclos)
+              }
             )
-            list(res)
           },
           error = function(ex) {
             list(ex)
           }
         )
       }
-      spark_apply(spark_items, f, ...)
+
+      spark_apply(spark_items, worker_fn, ...)
     }
 
     if (!inherits(obj, "foreach")) {
@@ -141,12 +142,14 @@ registerDoSpark <- function(spark_conn, ...) {
     spark_conn <- data$spark_conn
     spark_apply_args <- data$spark_apply_args
     spark_apply_args$fetch_result_as_sdf <- FALSE
+    spark_apply_args$single_binary_column <- TRUE
+    spark_apply_args$packages <- obj$packages
 
     it <- iterators::iter(obj)
     accumulator <- foreach::makeAccum(it)
-    items <- it %>%
-      as.list() %>%
-      lapply(.encode_item)
+    items <- tibble::tibble(
+      encoded = it %>% as.list() %>% lapply(.encode_item)
+    )
     spark_items <- sdf_copy_to(
       spark_conn,
       items,
@@ -154,7 +157,9 @@ registerDoSpark <- function(spark_conn, ...) {
       repartition = num_spark_workers
     )
     expr <- .compile(expr)
-    res <- do.call(.process_spark_items, spark_apply_args)
+    res <- do.call(
+      .process_spark_items, append(list(spark_items), as.list(spark_apply_args))
+    )
     tryCatch(
       accumulator(res, seq(along = res)),
       error = function(e) {

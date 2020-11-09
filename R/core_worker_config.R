@@ -7,6 +7,7 @@ worker_config_serialize <- function(config) {
     if (isTRUE(config$schema)) "TRUE" else "FALSE",
     if (isTRUE(config$arrow)) "TRUE" else "FALSE",
     if (isTRUE(config$fetch_result_as_sdf)) "TRUE" else "FALSE",
+    if (isTRUE(config$single_binary_column)) "TRUE" else "FALSE",
     config$spark_version,
     sep = ";"
   )
@@ -23,6 +24,7 @@ worker_config_deserialize <- function(raw) {
     schema = as.logical(parts[[5]]),
     arrow = as.logical(parts[[6]]),
     fetch_result_as_sdf = as.logical(parts[[7]]),
-    spark_version = parts[[8]]
+    single_binary_column = as.logical(parts[[8]]),
+    spark_version = parts[[9]]
   )
 }
