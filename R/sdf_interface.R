@@ -729,8 +729,9 @@ sdf_expand_grid <- function(
         )
       }
     }
+    broadcast_vars <- rlang::enexpr(broadcast_vars)
     if (!rlang::is_null(broadcast_vars)) {
-      broadcast_vars <- rlang::enexpr(broadcast_vars) %>%
+      broadcast_vars <- broadcast_vars %>%
         (
           function(exprs) {
             if (length(exprs) > 1) {
@@ -745,7 +746,7 @@ sdf_expand_grid <- function(
     }
     for (x in broadcast_vars) {
       idxes <- which (names(vars) %in% x)
-      if (length(idx) > 0) {
+      if (length(idxes) > 0) {
         for (idx in idxes) {
           vars[[idx]] <- sdf_broadcast(vars[[idx]])
         }

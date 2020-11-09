@@ -67,3 +67,23 @@ test_that("sdf_expand_grid works with a mixture of R vectors and Spark dataframe
       dplyr::arrange(x, y, z, Var3)
   )
 })
+
+test_that("sdf_expand_grid works with broadcast joins", {
+  df1 <- tibble::tibble(y = var1, z = var2)
+  sdf1 <- copy_to(sc, df1, name = random_string("tmp"))
+
+  expect_equivalent(
+    sdf_expand_grid(
+      sc,
+      x = var3,
+      y = sdf1,
+      var4,
+      broadcast_vars = c(x, y)
+    ) %>%
+      collect() %>%
+      dplyr::arrange(x, y, z, Var3),
+    merge(tibble::tibble(x = var3), df1, all = TRUE) %>%
+      merge(tibble::tibble(Var3 = var4), all = TRUE) %>%
+      dplyr::arrange(x, y, z, Var3)
+  )
+})
