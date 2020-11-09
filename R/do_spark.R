@@ -20,6 +20,22 @@ NULL
 #'
 #' @export
 registerDoSpark <- function(spark_conn, ...) {
+  num_spark_workers <- tryCatch(
+    {
+      spark_context(spark_conn) %>%
+        invoke("%>%",
+          list("getConf"),
+          # return an integer value greater than 1 as number of workers if
+          # "spark.executor.instances" is not set
+          list("getInt", "spark.executor.instances", as.integer(4))
+        )
+    },
+    # return 0 as number of workers if there is an exception
+    error = function(e) {
+      0L
+    }
+  )
+
   # internal function to process registerDoSpark options
   .processOpts <- function(...) {
     opts <- list(...)
@@ -134,7 +150,8 @@ registerDoSpark <- function(spark_conn, ...) {
     spark_items <- sdf_copy_to(
       spark_conn,
       items,
-      name = random_string("spark_apply")
+      name = random_string("spark_apply"),
+      repartition = num_spark_workers
     )
     expr <- .compile(expr)
     res <- do.call(.process_spark_items, spark_apply_args)
@@ -161,18 +178,7 @@ registerDoSpark <- function(spark_conn, ...) {
     switch(item,
       name = pkgName,
       version = packageDescription(pkgName, fields = "Version"),
-      workers = tryCatch(
-        {
-          spark_conf <- invoke(data$spark_conn$state$spark_context, "getConf")
-          # return an integer value greater than 1 as number of workers if
-          # "spark.executor.instances" is not set
-          invoke(spark_conf, "getInt", "spark.executor.instances", as.integer(2))
-        },
-        # return 0 as number of workers if there is an exception
-        error = function(e) {
-          0
-        }
-      ),
+      workers = num_spark_workers,
       NULL
     )
   }
