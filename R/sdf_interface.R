@@ -711,6 +711,10 @@ sdf_expand_grid <- function(
                             memory = TRUE,
                             repartition = NULL,
                             partition_by = NULL) {
+  if (spark_version(sc) < "2.0.0") {
+    stop("`sdf_expand_grid()` requires Spark 2.0.0 or above")
+  }
+
   vars <- list(...)
   if (length(vars) == 0) {
     invoke(spark_session(sc), "emptyDataFrame") %>% sdf_register()
