@@ -8,6 +8,8 @@ var3 <- c(1.111, 3.3, 2.22222, NaN, 4.4444, 5.5)
 var4 <- c("foo", NA, "bar", "", "baz", NA)
 
 test_that("sdf_expand_grid works with R vectors", {
+  test_requires_version("2.0.0")
+
   expect_equivalent(
     sdf_expand_grid(sc, var1, var2, var3, var4) %>%
       collect() %>%
@@ -34,6 +36,8 @@ test_that("sdf_expand_grid works with R vectors", {
 })
 
 test_that("sdf_expand_grid works Spark dataframes", {
+  test_requires_version("2.0.0")
+
   df1 <- tibble::tibble(x = var1, y = var2)
   df2 <- tibble::tibble(z = var3, w = var4)
 
@@ -51,6 +55,8 @@ test_that("sdf_expand_grid works Spark dataframes", {
 })
 
 test_that("sdf_expand_grid works with a mixture of R vectors and Spark dataframes", {
+  test_requires_version("2.0.0")
+
   df1 <- tibble::tibble(y = var1, z = var2)
 
   expect_equivalent(
