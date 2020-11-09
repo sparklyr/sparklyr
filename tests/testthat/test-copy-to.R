@@ -96,3 +96,15 @@ test_that("sdf_copy_to supports binary columns", {
 
   expect_equal(actual, expected)
 })
+
+test_that("sdf_copy_to preserves NA_real_ correctly", {
+  sdf <- sdf_copy_to(
+    sc,
+    tibble::tibble(x = c(NA_real_, 1.1, 2.2))
+  )
+
+  expect_equal(
+    sdf %>% dplyr::mutate(x = is.na(x)) %>% dplyr::pull(x),
+    c(TRUE, FALSE, FALSE)
+  )
+})
