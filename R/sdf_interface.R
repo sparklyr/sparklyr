@@ -758,12 +758,20 @@ sdf_expand_grid <- function(
       }
     }
 
+    vars_ordering <- lapply(vars, colnames) %>% unlist()
+    # reverse ordering of variables so that the 1st variable in the input is the
+    # one varying the fastest, 2nd one varying the 2nd fastest, etc in the cross
+    # join output
+    vars <- rev(vars)
+
     grid_sdf <- spark_dataframe(vars[[1]])
     for (i in seq(2, length(vars))) {
       grid_sdf <- invoke(grid_sdf, "crossJoin", spark_dataframe(vars[[i]]))
     }
 
-    grid_sdf <- grid_sdf %>% sdf_register()
+    grid_sdf <- grid_sdf %>%
+      invoke("select", vars_ordering[[1]], as.list(vars_ordering[-1])) %>%
+      sdf_register()
 
     if (!is.null(repartition) || !is.null(partition_by)) {
       grid_sdf <- grid_sdf %>% sdf_repartition(repartition, partition_by)

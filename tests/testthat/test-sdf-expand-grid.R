@@ -9,27 +9,18 @@ var4 <- c("foo", NA, "bar", "", "baz", NA)
 
 test_that("sdf_expand_grid works with R vectors", {
   expect_equivalent(
-    sdf_expand_grid(sc, var1, var2, var3, var4) %>%
-      collect() %>%
-      dplyr::arrange(Var1, Var2, Var3, Var4),
-    expand.grid(var1, var2, var3, var4, stringsAsFactors = FALSE) %>%
-      dplyr::arrange(Var1, Var2, Var3, Var4)
+    sdf_expand_grid(sc, var1, var2, var3, var4) %>% collect(),
+    expand.grid(var1, var2, var3, var4, stringsAsFactors = FALSE)
   )
 
   expect_equivalent(
-    sdf_expand_grid(sc, x = var1, var2, y = var3, var4) %>%
-      collect() %>%
-      dplyr::arrange(x, Var2, y, Var4),
-    expand.grid(x = var1, var2, y = var3, var4, stringsAsFactors = FALSE) %>%
-      dplyr::arrange(x, Var2, y, Var4)
+    sdf_expand_grid(sc, x = var1, var2, y = var3, var4) %>% collect(),
+    expand.grid(x = var1, var2, y = var3, var4, stringsAsFactors = FALSE)
   )
 
   expect_equivalent(
-    sdf_expand_grid(sc, x = var1, y = var2, z = var3, w = var4) %>%
-      collect() %>%
-      dplyr::arrange(x, y, z, w),
-    expand.grid(x = var1, y = var2, z = var3, w = var4, stringsAsFactors = FALSE) %>%
-      dplyr::arrange(x, y, z, w)
+    sdf_expand_grid(sc, x = var1, y = var2, z = var3, w = var4) %>% collect(),
+    expand.grid(x = var1, y = var2, z = var3, w = var4, stringsAsFactors = FALSE)
   )
 })
 
@@ -43,10 +34,8 @@ test_that("sdf_expand_grid works Spark dataframes", {
       copy_to(sc, df1, name = random_string("tmp")),
       copy_to(sc, df2, name = random_string("tmp"))
     ) %>%
-      collect() %>%
-      dplyr::arrange(x, y, z, w),
-    merge(df1, df2, all = TRUE) %>%
-      dplyr::arrange(x, y, z, w)
+      collect(),
+    merge(df1, df2, all = TRUE)
   )
 })
 
@@ -60,11 +49,9 @@ test_that("sdf_expand_grid works with a mixture of R vectors and Spark dataframe
       copy_to(sc, df1, name = random_string("tmp")),
       var4
     ) %>%
-      collect() %>%
-      dplyr::arrange(x, y, z, Var3),
+      collect(),
     merge(tibble::tibble(x = var3), df1, all = TRUE) %>%
-      merge(tibble::tibble(Var3 = var4), all = TRUE) %>%
-      dplyr::arrange(x, y, z, Var3)
+      merge(tibble::tibble(Var3 = var4), all = TRUE)
   )
 })
 
