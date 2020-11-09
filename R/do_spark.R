@@ -1,3 +1,6 @@
+#' @include utils.R
+NULL
+
 #' Register a Prallel Backend
 #'
 #' Registers a parallel backend using the \code{foreach} package.
@@ -128,7 +131,11 @@ registerDoSpark <- function(spark_conn, ...) {
     items <- it %>%
       as.list() %>%
       lapply(.encode_item)
-    spark_items <- sdf_copy_to(spark_conn, items, overwrite = TRUE)
+    spark_items <- sdf_copy_to(
+      spark_conn,
+      items,
+      name = random_string("spark_apply")
+    )
     expr <- .compile(expr)
     res <- do.call(.process_spark_items, spark_apply_args)
     tryCatch(
