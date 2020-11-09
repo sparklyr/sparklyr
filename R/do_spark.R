@@ -105,15 +105,14 @@ registerDoSpark <- function(spark_conn, ...) {
               envir = as.list(.decode_item(item$encoded)),
               enclos = enclos
             )
-            .encode_item(res)
+            list(res)
           },
           error = function(ex) {
-            .encode_item(ex)
+            list(ex)
           }
         )
       }
-      encoded_res <- sdf_collect(spark_items %>% spark_apply(f, ...))[[1]]
-      lapply(encoded_res, .decode_item)
+      spark_apply(spark_items, f, ...)
     }
 
     if (!inherits(obj, "foreach")) {
@@ -122,6 +121,7 @@ registerDoSpark <- function(spark_conn, ...) {
 
     spark_conn <- data$spark_conn
     spark_apply_args <- data$spark_apply_args
+    spark_apply_args$fetch_result_as_sdf <- FALSE
 
     it <- iterators::iter(obj)
     accumulator <- foreach::makeAccum(it)
