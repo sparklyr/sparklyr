@@ -9,6 +9,7 @@ import java.util.TimeZone
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.WrappedArray
+import scala.Option
 
 object Serializer {
   def readObjectType(dis: DataInputStream): Char = {
@@ -124,6 +125,15 @@ object Serializer {
     out.writeDouble(value)
   }
 
+  def writeNumeric(out: DataOutputStream, x: Numeric): Unit = {
+    if (x.value.isEmpty) {
+      out.writeInt(0x7FF00000)
+      out.writeInt(1954)
+    } else {
+      writeDouble(out, x.value.get)
+    }
+  }
+
   def writeBoolean(out: DataOutputStream, value: Boolean): Unit = {
     val intValue = if (value) 1 else 0
     out.writeInt(intValue)
@@ -182,6 +192,12 @@ object Serializer {
     writeType(out, "double")
     out.writeInt(value.length)
     value.foreach(v => out.writeDouble(v))
+  }
+
+  def writeNumericArr(out: DataOutputStream, value: Array[Numeric]): Unit = {
+    writeType(out, "double")
+    out.writeInt(value.length)
+    value.foreach(v => Serializer.writeNumeric(out, v))
   }
 
   def writeBooleanArr(out: DataOutputStream, value: Array[Boolean]): Unit = {
@@ -359,6 +375,9 @@ class Serializer(tracker: JVMObjectTracker) {
         case v: java.lang.Double =>
           Serializer.writeType(dos, "double")
           Serializer.writeDouble(dos, v)
+        case v: Numeric =>
+          Serializer.writeType(dos, "double")
+          Serializer.writeNumeric(dos, v)
         case v: java.lang.Byte =>
           Serializer.writeType(dos, "integer")
           Serializer.writeInt(dos, v.toInt)
@@ -408,6 +427,9 @@ class Serializer(tracker: JVMObjectTracker) {
         case v: Array[Double] =>
           Serializer.writeType(dos, "array")
           Serializer.writeDoubleArr(dos, v)
+        case v: Array[Numeric] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeNumericArr(dos, v)
         case v: Array[Boolean] =>
           Serializer.writeType(dos, "array")
           Serializer.writeBooleanArr(dos, v)

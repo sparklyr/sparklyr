@@ -2,7 +2,10 @@ package sparklyr
 
 import org.apache.spark.sql._
 
+import scala.Option
 import scala.util.Try
+
+case class Numeric(value: Option[Double])
 
 object Collectors {
   def collectBoolean(row: Row, idx: Int): Int = {
@@ -29,15 +32,30 @@ object Collectors {
     ).toArray
   }
 
-  def collectDouble(row: Row, idx: Int): Double = {
+  def collectNumeric(row: Row, idx: Int): Numeric = {
     val el = row(idx)
-    if (el.isInstanceOf[Double]) el.asInstanceOf[Double] else scala.Double.NaN
+    new Numeric(
+      if (null == el) {
+        None
+      } else if (el.isInstanceOf[Double]) {
+        Some(el.asInstanceOf[Double])
+      } else {
+        Some(scala.Double.NaN)
+      }
+    )
   }
 
-  def collectDoubleArr(row: Row, idx: Int): Array[Double] = {
+  def collectNumericArr(row: Row, idx: Int): Array[Numeric] = {
     val el = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
     el.map(e =>
-      if (e.isInstanceOf[Double]) e.asInstanceOf[Double] else scala.Double.NaN
+      new Numeric(
+        if (null == e) {
+          None
+        } else if (e.isInstanceOf[Double])
+          Some(e.asInstanceOf[Double])
+        else
+          Some(scala.Double.NaN)
+      )
     ).toArray
   }
 
@@ -200,7 +218,7 @@ object Collectors {
     colType match {
       case "BooleanType"          => newColumnCtx[Int](Collectors.collectBoolean)
       case "IntegerType"          => newColumnCtx[Int](Collectors.collectInteger)
-      case "DoubleType"           => newColumnCtx[Double](Collectors.collectDouble)
+      case "DoubleType"           => newColumnCtx[Numeric](Collectors.collectNumeric)
       case "StringType"           => newColumnCtx[String](Collectors.collectString)
       case "LongType"             => newColumnCtx[Double](Collectors.collectLong)
 
@@ -219,7 +237,7 @@ object Collectors {
 
       case "ArrayType(BooleanType,true)"           => newColumnCtx[Array[Int]](Collectors.collectBooleanArr)
       case "ArrayType(IntegerType,true)"           => newColumnCtx[Array[Int]](Collectors.collectIntegerArr)
-      case "ArrayType(DoubleType,true)"            => newColumnCtx[Array[Double]](Collectors.collectDoubleArr)
+      case "ArrayType(DoubleType,true)"            => newColumnCtx[Array[Numeric]](Collectors.collectNumericArr)
       case "ArrayType(StringType,true)"            => newColumnCtx[Array[String]](Collectors.collectStringArr)
       case "ArrayType(LongType,true)"              => newColumnCtx[Array[Double]](Collectors.collectLongArr)
       case "ArrayType(ByteType,true)"              => newColumnCtx[Array[Int]](Collectors.collectByteArr)
@@ -232,7 +250,7 @@ object Collectors {
 
       case "ArrayType(BooleanType,false)"          => newColumnCtx[Array[Int]](Collectors.collectBooleanArr)
       case "ArrayType(IntegerType,false)"          => newColumnCtx[Array[Int]](Collectors.collectIntegerArr)
-      case "ArrayType(DoubleType,false)"           => newColumnCtx[Array[Double]](Collectors.collectDoubleArr)
+      case "ArrayType(DoubleType,false)"           => newColumnCtx[Array[Numeric]](Collectors.collectNumericArr)
       case "ArrayType(StringType,false)"           => newColumnCtx[Array[String]](Collectors.collectStringArr)
       case "ArrayType(LongType,false)"             => newColumnCtx[Array[Double]](Collectors.collectLongArr)
       case "ArrayType(ByteType,false)"             => newColumnCtx[Array[Int]](Collectors.collectByteArr)

@@ -204,3 +204,10 @@ test_that("sdf_collect() supports callback expression", {
     row_count
   )
 })
+
+test_that("sdf_collect() preserves NA_real_", {
+  df <- tibble::tibble(x = c(NA_real_, 3.14, 0.142857))
+  sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
+
+  expect_equal(sdf %>% collect(), df)
+})
