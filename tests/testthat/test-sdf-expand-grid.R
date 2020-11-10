@@ -62,6 +62,8 @@ test_that("sdf_expand_grid works with a mixture of R vectors and Spark dataframe
 })
 
 test_that("sdf_expand_grid works with broadcast joins", {
+  test_requires_version("2.0.0")
+
   df1 <- tibble::tibble(y = var1, z = var2)
   sdf1 <- copy_to(sc, df1, name = random_string("tmp"))
 
