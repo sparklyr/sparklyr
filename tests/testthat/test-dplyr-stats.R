@@ -63,27 +63,29 @@ test_that("cor, cov, sd and var works as expected over groups", {
 test_that("cumprod works as expected", {
   test_requires("dplyr")
 
-  stats <- data.frame(
-    id = 1:10,
-    x = c(1:3, -4, 5, -6, 7, 0, 0, 10)
-  )
-  stats_tbl <- copy_to(sc, stats, overwrite = TRUE)
+  for (stats in list(
+                     data.frame(id = 1:10, x = c(1:3, -4, 5, -6, 7, 0, 0, 10)),
+                     data.frame(id = 1:10, x = c(1:3, -4, 5, -6, 7, NA, 0, 10)),
+                     data.frame(id = 1:10, x = c(1:3, -4, 5, -6, 7, 0, NA, 10))
+                    )) {
+    stats_tbl <- copy_to(sc, stats, overwrite = TRUE)
 
-  s1 <- stats %>%
-    arrange(id) %>%
-    mutate(
-      cumprod = cumprod(x)
-    )
+    expected <- stats %>%
+      arrange(id) %>%
+      mutate(
+        cumprod = cumprod(x)
+      )
 
-  s2 <- stats_tbl %>%
-    arrange(id) %>%
-    mutate(
-      cumprod = cumprod(x)
-    ) %>%
-    collect() %>%
-    as.data.frame()
+    actual <- stats_tbl %>%
+      arrange(id) %>%
+      mutate(
+        cumprod = cumprod(x)
+      ) %>%
+      collect() %>%
+      as.data.frame()
 
-  expect_equal(s1, s2)
+    expect_equal(actual, expected)
+  }
 })
 
 test_that("count() works in grouped mutate", {
