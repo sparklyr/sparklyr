@@ -214,20 +214,20 @@ sql_translate_env.spark_connection <- function(con) {
 
     window = dbplyr::sql_translator(
       .parent = dbplyr::base_win,
-      lag = function(x, n = 1L, default = NA, order = NULL) {
+      lag = function(x, n = 1L, default = NA, order_by = NULL) {
         dbplyr::base_win$lag(
           x = x,
           n = as.integer(n),
           default = default,
-          order = order
+          order = order_by
         )
       },
-      lead = function(x, n = 1L, default = NA, order = NULL) {
+      lead = function(x, n = 1L, default = NA, order_by = NULL) {
         dbplyr::base_win$lead(
           x = x,
           n = as.integer(n),
           default = default,
-          order = order
+          order = order_by
         )
       },
       count = function() {

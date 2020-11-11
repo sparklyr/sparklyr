@@ -16,10 +16,6 @@ setMethod("dbDataType", "spark_connection", function(dbObj, obj) {
   get_data_type(obj)
 })
 
-setMethod("dbDataType", "spark_connection", function(dbObj, obj) {
-  get_data_type(obj)
-})
-
 setMethod("sqlParseVariables", "spark_connection", function(conn, sql, ...) {
   method <- getMethod("sqlParseVariables", "DBIConnection")
   method(conn, sql, ...)
