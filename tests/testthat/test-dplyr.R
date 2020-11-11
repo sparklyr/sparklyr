@@ -47,6 +47,20 @@ test_that("the implementation of 'filter' functions as expected", {
   )
 })
 
+test_that("if_else works as expected", {
+  sdf <- copy_to(sc, tibble::tibble(x = c(0.9, NA_real_, 1.1)))
+
+  expect_equal(
+    sdf %>% dplyr::mutate(x = ifelse(x > 1, "good", "bad")) %>% dplyr::pull(x),
+    c("bad", NA, "good")
+  )
+  expect_equal(
+    sdf %>% dplyr::mutate(x = ifelse(x > 1, "good", "bad", "unknown")) %>%
+      dplyr::pull(x),
+    c("bad", "unknown", "good")
+  )
+})
+
 test_that("grepl works as expected", {
   test_requires("dplyr")
 
