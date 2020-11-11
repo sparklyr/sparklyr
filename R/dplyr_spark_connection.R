@@ -77,6 +77,8 @@ sql_translate_env.spark_connection <- function(con) {
   }
 
   weighted_mean_sql <- function(x, w) {
+    x <- dbplyr::build_sql(x)
+    w <- dbplyr::build_sql(w)
     dbplyr::sql(
       paste(
         "CAST(SUM(IF(ISNULL(", w, "), 0, ", w, ") * IF(ISNULL(", x, "), 0, ", x, ")) AS DOUBLE)",

@@ -107,6 +107,15 @@ test_that("weighted.mean works as expected", {
       ) %>%
       dplyr::pull(wm)
   )
+  expect_equal(
+    sdf %>% dplyr::summarize(wm = weighted.mean(x ^ 3, w ^ 2)) %>% dplyr::pull(wm),
+    df %>%
+      dplyr::summarize(
+        wm = sum(w ^ 2 * x ^ 3, na.rm = TRUE) /
+             sum(w ^ 2 * as.numeric(!is.na(x)), na.rm = TRUE)
+      ) %>%
+      dplyr::pull(wm)
+  )
 })
 
 test_that("'head' uses 'limit' clause", {
