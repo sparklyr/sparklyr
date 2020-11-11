@@ -75,6 +75,15 @@ sql_translate_env.spark_connection <- function(con) {
       )
     }
   }
+  sql_if_else <- function(cond, if_true, if_false, if_missing = NULL) {
+    dbplyr::build_sql(
+      "IF(ISNULL(", cond, "), ",
+      if_missing %||% dbplyr::sql("NULL"),
+      ", IF(", cond %||% dbplyr::sql("NULL"),
+      ", ", if_true %||% dbplyr::sql("NULL"), ", ",
+      if_false %||% dbplyr::sql("NULL"), "))"
+    )
+  }
 
   weighted_mean_sql <- function(x, w) {
     x <- dbplyr::build_sql(x)
@@ -108,6 +117,8 @@ sql_translate_env.spark_connection <- function(con) {
       `%like%` = function(x, y) dbplyr::build_sql(x, " LIKE ", y),
       `%rlike%` = function(x, y) dbplyr::build_sql(x, " RLIKE ", y),
       `%regexp%` = function(x, y) dbplyr::build_sql(x, " REGEXP ", y),
+      ifelse = sql_if_else,
+      if_else = sql_if_else,
       grepl = function(x, y) dbplyr::build_sql(y, " RLIKE ", x),
       transform = function(expr, func) {
         sprintf(
