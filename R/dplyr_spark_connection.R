@@ -76,6 +76,16 @@ sql_translate_env.spark_connection <- function(con) {
     }
   }
 
+  weighted_mean_sql <- function(x, w) {
+    dbplyr::sql(
+      paste(
+        "CAST(SUM(IF(ISNULL(", w, "), 0, ", w, ") * IF(ISNULL(", x, "), 0, ", x, ")) AS DOUBLE)",
+        "/",
+        "CAST(SUM(IF(ISNULL(", w, "), 0, ", w, ") * IF(ISNULL(", x, "), 0, 1)) AS DOUBLE)"
+      )
+    )
+  }
+
   dbplyr::sql_variant(
     scalar = dbplyr::sql_translator(
       .parent = dbplyr::base_scalar,
@@ -177,13 +187,16 @@ sql_translate_env.spark_connection <- function(con) {
 
     aggregate = dbplyr::sql_translator(
       .parent = dbplyr::base_agg,
-      n = function() dbplyr::sql("count(*)"),
-      count = function() dbplyr::sql("count(*)"),
-      n_distinct = function(...) dbplyr::build_sql("count(DISTINCT", list(...), ")"),
-      cor = dbplyr::sql_prefix("corr"),
-      cov = dbplyr::sql_prefix("covar_samp"),
-      sd = dbplyr::sql_prefix("stddev_samp"),
-      var = dbplyr::sql_prefix("var_samp")
+      n = function() dbplyr::sql("COUNT(*)"),
+      count = function() dbplyr::sql("COUNT(*)"),
+      n_distinct = function(...) dbplyr::build_sql("COUNT(DISTINCT", list(...), ")"),
+      cor = dbplyr::sql_prefix("CORR"),
+      cov = dbplyr::sql_prefix("COVAR_SAMP"),
+      sd = dbplyr::sql_prefix("STDDEV_SAMP"),
+      var = dbplyr::sql_prefix("VAR_SAMP"),
+      weighted.mean = function(x, w) {
+        weighted_mean_sql(x, w)
+      }
     ),
 
     window = dbplyr::sql_translator(
@@ -247,6 +260,12 @@ sql_translate_env.spark_connection <- function(con) {
             partition = dbplyr::win_current_group(),
             order = dbplyr::win_current_order()
           ), "= 0, 0, 1)"
+        )
+      },
+      weighted.mean = function(x, w) {
+        dbplyr::win_over(
+          weighted_mean_sql(x, w),
+          partition = dbplyr::win_current_group()
         )
       }
     )
