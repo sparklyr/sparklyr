@@ -88,6 +88,41 @@ test_that("grepl works as expected", {
   }
 })
 
+test_that("rowSums works as expected", {
+  df <- do.call(
+    tibble::tibble,
+    lapply(
+      seq(6L),
+      function(x) {
+        column <- list(runif(100))
+        names(column) <- paste0("col", x)
+        column
+      }
+    ) %>%
+      unlist(recursive = FALSE)
+  )
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+  expect_row_sums_eq <- function(x) {
+    expected <- df %>% dplyr::mutate(row_sum = rowSums(.[x]))
+
+    expect_equivalent(
+      expected,
+      sdf %>% dplyr::mutate(row_sum = rowSums(.[x])) %>% collect()
+    )
+    expect_equivalent(
+      expected,
+      sdf %>% dplyr::mutate(row_sum = rowSums(sdf[x])) %>% collect()
+    )
+  }
+  test_cases <- list(
+    4L, 2:4, 4:2, -3L, -2:-4, c(2L, 4L), "col5", c("col1", "col3", "col6"), NULL
+  )
+
+  for (x in test_cases) {
+    expect_row_sums_eq(x)
+  }
+})
+
 test_that("weighted.mean works as expected", {
   df <- tibble::tibble(
     x = c(NA_real_, 3.1, 2.2, NA_real_, 3.3, 4),

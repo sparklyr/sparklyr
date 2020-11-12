@@ -328,3 +328,17 @@ pcre_to_java <- function(regex) {
     gsub("\\[:word:\\]", "A-Za-z0-9_", .) %>%
     gsub("\\[:xdigit:\\]", "0-9a-fA-F", .)
 }
+
+# helper method returning a minimal R dataframe containing the same set of
+# column names as `sdf` does
+replicate_colnames <- function(sdf) {
+  columns <- lapply(
+    colnames(sdf),
+    function(column) {
+      v <- list(NA)
+      names(v) <- column
+      v
+    }
+  )
+  do.call(data.frame, columns)
+}

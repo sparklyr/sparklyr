@@ -12,20 +12,6 @@ check_present <- function(x) {
   }
 }
 
-# helper method returning a minimal R dataframe containing the same set of
-# column names as `sdf` does
-replicate_colnames <- function(sdf) {
-  columns <- lapply(
-    colnames(sdf),
-    function(column) {
-      v <- list(NA)
-      names(v) <- column
-      v
-    }
-  )
-  do.call(data.frame, columns)
-}
-
 # helper method for updating dplyr group variables
 update_group_vars <- function(input, output, preserved) {
   incl <- dplyr::group_vars(input)
