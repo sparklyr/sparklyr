@@ -788,3 +788,34 @@ sdf_expand_grid <- function(
     grid_sdf
   }
 }
+
+#' Compute the number of records within each partition of a Spark DataFrame
+#'
+#' @template roxlate-ml-x
+#'
+#' @examples
+#'
+#' \dontrun{
+#' library(sparklyr)
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#' example_sdf <- sdf_len(sc, 100L, repartition = 10L)
+#' example_sdf %>% sdf_partition_sizes() %>% print()
+#'}
+#'
+#' @export
+sdf_partition_sizes <- function(x) {
+  sc <- spark_connection(x)
+
+  rs <- invoke_static(
+    sc,
+    "sparklyr.PartitionUtils",
+    "computePartitionSizes",
+    spark_dataframe(x)
+  )
+
+  data.frame(
+    partition_index = lapply(rs, function(p) p[[1]]) %>% unlist(),
+    partition_size = lapply(rs, function(p) p[[2]]) %>% unlist()
+  ) %>%
+    dplyr::arrange(partition_index)
+}
