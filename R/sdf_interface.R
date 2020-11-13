@@ -819,3 +819,39 @@ sdf_partition_sizes <- function(x) {
   ) %>%
     dplyr::arrange(partition_index)
 }
+
+#' Subsetting operator for Spark dataframe
+#'
+#' Susetting operator for Spark dataframe allowing a subset of column(s) to be
+#' selected using syntaxes similar to those supported by R dataframes
+#'
+#' @param sdf The Spark dataframe
+#' @param i Expression specifying subset of column(s) to include or exclude
+#'   from the result (e.g., `["col1"]`, `[c("col1", "col2")]`, `[1:10]`, `[-1]`,
+#'   `[NULL]`, or `[]`)
+#'
+#' @examples
+#'
+#' \dontrun{
+#' library(sparklyr)
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#' example_sdf <- copy_to(sc, tibble::tibble(a = 1, b = 2))
+#' example_sdf["a"] %>% print()
+#'}
+#'
+#' @export
+`[.tbl_spark` <- function(x, i) {
+  if (missing(i)) {
+    x
+  } else if (is.null(i)) {
+    x %>%
+      spark_connection() %>%
+      spark_session() %>%
+      invoke("emptyDataFrame")
+  } else {
+    rx <- replicate_colnames(x)
+    cols <- colnames(rx[i])
+
+    x %>>% dplyr::select %@% lapply(cols, as.symbol)
+  }
+}

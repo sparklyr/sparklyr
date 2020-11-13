@@ -1,4 +1,5 @@
 #' @include dplyr_hof.R
+#' @include utils.R
 NULL
 
 #' @export
@@ -120,6 +121,36 @@ sql_translate_env.spark_connection <- function(con) {
       ifelse = sql_if_else,
       if_else = sql_if_else,
       grepl = function(x, y) dbplyr::build_sql(y, " RLIKE ", x),
+      rowSums = function(x) {
+        x <- rlang::enexpr(x)
+        x <- rlang::eval_tidy(x)
+        if (!"tbl_spark" %in% class(x)) {
+          "unsupported subsetting expression"
+        }
+        col_names <- x %>% colnames()
+
+        if (length(col_names) == 0) {
+          dbplyr::sql("0")
+        } else {
+          sum_expr <- list(dbplyr::sql("(")) %>%
+            append(
+              lapply(
+                col_names[-length(col_names)],
+                function(x) {
+                  list(dbplyr::ident(x), dbplyr::sql(" + "))
+                }
+              ) %>%
+                unlist(rec = FALSE)
+            ) %>%
+            append(
+              list(dbplyr::ident(col_names[length(col_names)]), dbplyr::sql(")"))
+            ) %>%
+            lapply(function(x)  dbplyr::escape(x, con = con))
+          args <- append(sum_expr, list(con = con))
+
+          do.call(dbplyr::build_sql, args)
+        }
+      },
       transform = function(expr, func) {
         sprintf(
           "TRANSFORM(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
