@@ -1,6 +1,34 @@
 #' @include dplyr_hof.R
 NULL
 
+fix_na_real_values <- function(dots) {
+  for (i in seq_along(dots)) {
+    if (identical(rlang::quo_get_expr(dots[[i]]), rlang::expr(NA_real_))) {
+      dots[[i]] <- rlang::quo(dbplyr::sql("CAST(NULL AS DOUBLE)"))
+    }
+  }
+
+  dots
+}
+
+#' @export
+#' @importFrom dplyr transmute
+transmute.tbl_spark <- function (.data, ...) {
+  dots <- rlang::enquos(..., .named = TRUE) %>%
+    fix_na_real_values()
+
+  do.call(NextMethod, dots)
+}
+
+#' @export
+#' @importFrom dplyr mutate
+mutate.tbl_spark <- function (.data, ...) {
+  dots <- rlang::enquos(..., .named = TRUE) %>%
+    fix_na_real_values()
+
+  do.call(NextMethod, dots)
+}
+
 #' @export
 #' @importFrom dplyr sql_escape_ident
 #' @importFrom dbplyr sql_quote

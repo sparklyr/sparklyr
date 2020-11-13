@@ -274,3 +274,21 @@ test_that("can compute() over tables", {
 
   succeed()
 })
+
+test_that("mutate creates NA_real_ column correctly", {
+  sdf <- sdf_len(sc, 5L) %>% dplyr::mutate(z = NA_real_, sq = id * id)
+
+  expect_equivalent(
+    sdf %>% collect(),
+    tibble::tibble(id = seq(5), z = NA_real_, sq = id * id)
+  )
+})
+
+test_that("transmute creates NA_real_ column correctly", {
+  sdf <- sdf_len(sc, 5L) %>% dplyr::transmute(z = NA_real_, sq = id * id)
+
+  expect_equivalent(
+    sdf %>% collect(),
+    tibble::tibble(z = NA_real_, sq = seq(5) * seq(5))
+  )
+})
