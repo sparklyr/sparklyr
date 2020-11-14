@@ -110,11 +110,6 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
 }
 
 #' @export
-op_vars.tbl_spark_distinct <- function(op) {
-  c(dbplyr::op_grps(op$x), dbplyr::op_vars(op$x))
-}
-
-#' @export
 #' @importFrom dbplyr sql_build
 sql_build.op_tbl_spark_distinct <- function(op, con, ...) {
   output_cols <- (
