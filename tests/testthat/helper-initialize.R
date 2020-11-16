@@ -32,7 +32,7 @@ spark_install_winutils <- function(version) {
 
 testthat_spark_connection <- function() {
   if (!exists(".testthat_latest_spark", envir = .GlobalEnv)) {
-    assign(".testthat_latest_spark", "2.3.0", envir = .GlobalEnv)
+    assign(".testthat_latest_spark", "3.0.0", envir = .GlobalEnv)
   }
 
   livy_branch <- Sys.getenv("SPARKLYR_LIVY_BRANCH")
@@ -43,7 +43,7 @@ testthat_spark_connection <- function() {
   livy_version <- Sys.getenv("LIVY_VERSION")
   test_databricks_connect <- Sys.getenv("TEST_DATABRICKS_CONNECT")
 
-  if (nchar(livy_version) > 0) {
+  if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
     testthat_livy_connection()
   } else if (test_databricks_connect == "true") {
     testthat_shell_connection(method = "databricks")
@@ -334,7 +334,8 @@ output_file <- function(filename) file.path("output", filename)
 
 skip_livy <- function() {
   livy_version <- Sys.getenv("LIVY_VERSION")
-  if (nchar(livy_version) > 0) skip("Test unsupported under Livy.")
+  if (nchar(livy_version) > 0 && !identical(livy_version, "NONE"))
+    skip("Test unsupported under Livy.")
 }
 
 check_params <- function(test_args, params) {

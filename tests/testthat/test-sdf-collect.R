@@ -36,7 +36,7 @@ test_that("sdf_collect() works with nested lists", {
   res <- sdf_collect(sdf)
 
   expect_equivalent(df$a, res$a)
-  expect_equivalent(df$b, sapply(res$b, function(e) do.call(c, e)))
+  expect_equivalent(df$b, sapply(res$b, function(x) do.call(c, as.list(x))))
 })
 
 test_that("sdf_collect() works with nested named lists", {
