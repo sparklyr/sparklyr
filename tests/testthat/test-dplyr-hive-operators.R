@@ -3,6 +3,7 @@ context("hive operators")
 sc <- testthat_spark_connection()
 
 test_that("regex relational operators work", {
+  skip_databricks_connect()
   test_requires("dplyr")
 
   hello <- tibble(hello = c(
