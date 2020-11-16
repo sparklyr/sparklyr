@@ -20,24 +20,28 @@ jobs:
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.2.1'
+              LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'oraclejdk8'
           - name: 'Spark 2.3.2 (R release, oraclejdk8)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.3.2'
+              LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'oraclejdk8'
           - name: 'Spark 2.4.4 (R release, oraclejdk8)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.4.4'
+              LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'oraclejdk8'
           - name: 'Spark 2.4.4 (R release, oraclejdk8, CODE_COVERAGE=true)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.4.4'
+              LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'oraclejdk8'
               CODE_COVERAGE: 'true'
           - name: 'Spark 3.0.0 (R release, oraclejdk8)'
@@ -45,44 +49,52 @@ jobs:
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '3.0.0'
+              LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'oraclejdk8'
           - name: 'Spark 3.0.0 (R release, openjdk11)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '3.0.0'
+              LIVY_VERSION: 'NONE'
               JAVA_URL: 'https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_linux_hotspot_11.0.1_13.tar.gz'
           - name: 'Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
-              LIVY_VERSION: '0.5.0'
               SPARK_VERSION: '2.3.0'
+              LIVY_VERSION: '0.5.0'
               JAVA_VERSION: 'oraclejdk8'
               SPARKLYR_LIVY_BRANCH: 'feature/sparklyr-1.5.0'
           - name: 'Livy 0.5.0 (R release, oraclejdk8, Spark 2.4.0)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
-              LIVY_VERSION: '0.5.0'
               SPARK_VERSION: '2.4.0'
+              LIVY_VERSION: '0.5.0'
               JAVA_VERSION: 'oraclejdk8'
               SPARKLYR_LIVY_BRANCH: 'feature/sparklyr-1.5.0'
           - name: 'Arrow (release)'
             r: 'release'
             env:
               ARROW_ENABLED: 'true'
+              SPARK_VERSION: '3.0.0'
+              LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'oraclejdk8'
           - name: 'Arrow (nightly)'
             r: 'release'
             env:
               ARROW_ENABLED: 'true'
               ARROW_VERSION: 'devel'
+              SPARK_VERSION: '3.0.0'
+              LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'oraclejdk8'
           - name: 'Deps Devel (tidyverse, r-lib, forge)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
+              SPARK_VERSION: '3.0.0'
+              LIVY_VERSION: 'NONE'
               R_DEVEL_PACKAGES: 'true'
     env:
       ${{ matrix.env }}
@@ -128,6 +140,13 @@ jobs:
           path: ${{ env.R_LIBS_USER }}
           key: sparklyr-${{ runner.os }}-r-${{ matrix.r }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('DESCRIPTION') }}-${{ hashFiles('ci/install_r_dependencies.sh') }}
           restore-keys: sparklyr-${{ runner.os }}-r-${{ matrix.r }}
+      - name: Cache Spark & Livy installations
+        if: runner.os != 'Windows'
+        uses: actions/cache@master
+        with:
+          path: ~/spark
+          key: sparklyr-apache-spark-${{ runner.os }}-${{ env.SPARK_VERSION }}-${{ env.LIVY_VERSION }}
+          restore-keys: sparklyr-apache-spark-${{ runner.os }}-${{ env.SPARK_VERSION }}
       - name: Install system dependencies
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libcurl4-gnutls-dev procps socat

@@ -136,7 +136,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   test_filter <- NULL
 
   livy_version <- Sys.getenv("LIVY_VERSION")
-  if (nchar(livy_version) > 0) {
+  if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
     livy_tests <- c(
       "^dplyr$",
       "^dbi$",
