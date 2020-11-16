@@ -5,7 +5,7 @@ spark_versions_file_pattern <- function() {
 }
 
 spark_versions_url <- function() {
-  "https://raw.githubusercontent.com/sparklyr/sparklyr/master/inst/extdata/versions.json"
+  "https://raw.githubusercontent.com/sparklyr/sparklyr/main/inst/extdata/versions.json"
 }
 
 #' @importFrom jsonlite fromJSON
