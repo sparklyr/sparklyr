@@ -241,6 +241,46 @@ sdf_weighted_sample <- function(x, weight_col, k, replacement = TRUE, seed = NUL
     sdf_register()
 }
 
+#' Perform Stratified Random Sampling on a Spark DataFrame
+#'
+#' Draw a random sample of rows (with or without replacement) from a Spark
+#' DataFrame
+#' If the sampling is done without replacement, then it will be conceptually
+#' equivalent to an iterative process such that in each step the probability of
+#' adding a row to the sample set is equal to its weight divided by summation of
+#' weights of all rows that are not in the sample set yet in that step.
+#'
+#' @template roxlate-sdf
+#'
+#' @param x An object coercable to a Spark DataFrame.
+#' @param weight_col Name of the weight column
+#' @param k Sample set size
+#' @param replacement Whether to sample with replacement
+#' @param seed An (optional) integer seed
+#' @family Spark data frames
+#'
+#' @export
+sdf_weighted_sample <- function(x, weight_col, k, replacement = TRUE, seed = NULL) {
+  sdf <- spark_dataframe(x)
+  sc <- spark_connection(sdf)
+  schema <- invoke(sdf, "schema")
+  seed <- seed %||% Sys.time()
+
+  sdf %>%
+    invoke("rdd") %>%
+    invoke_static(
+      sc,
+      "sparklyr.SamplingUtils",
+      ifelse(replacement, "sampleWithReplacement", "sampleWithoutReplacement"),
+      .,
+      weight_col,
+      as.integer(k),
+      as.integer(seed)
+    ) %>%
+    invoke(hive_context(sc), "createDataFrame", ., schema) %>%
+    sdf_register()
+}
+
 #' Sort a Spark DataFrame
 #'
 #' Sort a Spark DataFrame by one or more columns, with each column
