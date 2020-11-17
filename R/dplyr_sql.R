@@ -1,5 +1,6 @@
 #' @include sdf_interface.R
 #' @include sdf_sql.R
+#' @include stratified_sample.R
 #' @include utils.R
 NULL
 
@@ -24,6 +25,7 @@ sql_build.op_sample_frac <- function(op, con, ...) {
 }
 
 sql_build.op_sample <- function(op, con, frac) {
+  grps <- dbplyr::op_grps(op)
   sdf <- to_sdf(op, con)
   cols <- colnames(sdf)
 
@@ -35,19 +37,32 @@ sql_build.op_sample <- function(op, con, frac) {
       op$args$size
     }
   )
-  sample_sdf <- sdf_weighted_sample(
-    x = sdf,
-    weight_col = NULL,
-    k = sample_size,
-    replacement = op$args$replace,
-    seed = op$args$seed
-  ) %>>%
-    dplyr::select %@% lapply(cols, as.symbol)
+  sample_sdf <- (
+    if (length(grps) > 0) {
+      sdf_stratified_sample(
+        x = sdf,
+        grps = grps,
+        k = sample_size,
+        weight = NULL,
+        replace = op$args$replace,
+        op$args$seed
+      )
+    } else {
+      sdf_weighted_sample(
+        x = sdf,
+        weight_col = NULL,
+        k = sample_size,
+        replacement = op$args$replace,
+        seed = op$args$seed
+      )
+    }
+  )
 
   sample_sdf %>% dbplyr::remote_query()
 }
 
 sql_build.op_weighted_sample <- function(op, con, frac) {
+  grps <- dbplyr::op_grps(op)
   sdf <- to_sdf(op, con)
 
   sample_size <- (
@@ -60,12 +75,25 @@ sql_build.op_weighted_sample <- function(op, con, frac) {
   )
   weight <- rlang::as_name(op$args$weight)
 
-  sample_sdf <- sdf_weighted_sample(
-    x = sdf,
-    weight_col = weight,
-    k = sample_size,
-    replacement = op$args$replace,
-    seed = op$args$seed
+  sample_sdf <- (
+    if (length(grps) > 0) {
+      sdf_stratified_sample(
+        x = sdf,
+        grps = grps,
+        k = sample_size,
+        weight = weight,
+        replace = op$args$replace,
+        op$args$seed
+      )
+    } else {
+      sdf_weighted_sample(
+        x = sdf,
+        weight_col = weight,
+        k = sample_size,
+        replacement = op$args$replace,
+        seed = op$args$seed
+      )
+    }
   )
 
   sample_sdf %>% dbplyr::remote_query()

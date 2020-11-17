@@ -5,7 +5,7 @@ import org.apache.spark.sql.Row
 import scala.util.Random
 
 object SamplingUtils {
-  case class Sample(val priority: Double, val row: Row) extends Ordered[Sample] {
+  private[sparklyr] case class Sample(val priority: Double, val row: Row) extends Ordered[Sample] {
     override def compare(that: Sample): Int = {
       scala.math.signum(priority - that.priority).toInt
     }
@@ -100,11 +100,11 @@ object SamplingUtils {
 
   // generate a sampling priority for a row given the sampling weight and
   // source of randomness
-  def genSamplePriority(weight: Double, random: Random): Double = {
+  private[sparklyr] def genSamplePriority(weight: Double, random: Random): Double = {
     scala.math.log(random.nextDouble) / weight
   }
 
-  def extractWeightValue(row: Row, weightColumn: String): Double = {
+  private[sparklyr] def extractWeightValue(row: Row, weightColumn: String): Double = {
     if (null == weightColumn || weightColumn.isEmpty) {
       1.0
     } else {
