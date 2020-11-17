@@ -6,8 +6,6 @@ NULL
 #' Registers a parallel backend using the \code{foreach} package.
 #'
 #' @param spark_conn spark connection to use
-#' @param min_executors Minimum number of Spark executors that is expected to be
-#'   available
 #' @param ... additional options for sparklyr parallel backend
 #'   (currently only the only valid option is nocompile = {T, F})
 #'
@@ -21,19 +19,9 @@ NULL
 #' }
 #'
 #' @export
-registerDoSpark <- function(spark_conn, min_executors = 0L, ...) {
-  num_spark_workers <- tryCatch(
-    {
-      num_workers <- spark_context(spark_conn) %>%
-        invoke("%>%",
-          list("getConf"),
-          # return an integer value greater than 1 as number of workers if
-          # "spark.executor.instances" is not set
-          list("getInt", "spark.executor.instances", 2L)
-        )
-
-      max(num_workers, min_executors)
-    },
+registerDoSpark <- function(spark_conn, ...) {
+  default_parallelism <- tryCatch(
+    spark_context(spark_conn) %>% invoke("defaultParallelism"),
     # return 0 as number of workers if there is an exception
     error = function(e) {
       0L
@@ -158,7 +146,7 @@ registerDoSpark <- function(spark_conn, min_executors = 0L, ...) {
       spark_conn,
       items,
       name = random_string("spark_apply"),
-      repartition = num_spark_workers
+      repartition = default_parallelism
     )
     expr <- .compile(expr)
     res <- do.call(
@@ -187,7 +175,7 @@ registerDoSpark <- function(spark_conn, min_executors = 0L, ...) {
     switch(item,
       name = pkgName,
       version = packageDescription(pkgName, fields = "Version"),
-      workers = num_spark_workers,
+      workers = default_parallelism,
       NULL
     )
   }
