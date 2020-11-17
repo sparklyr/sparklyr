@@ -1,6 +1,9 @@
 library(sparklyr)
 library(dplyr)
 
+# timeout for downloading Spark/Livy releases
+options(timeout = 3600)
+
 if (isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))) {
   library(arrow)
 }
@@ -73,7 +76,6 @@ testthat_shell_connection <- function(method = "shell") {
 
   if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
     options(sparkinstall.verbose = TRUE)
-    options(timeout = 600)
     spark_install(version)
   }
 
