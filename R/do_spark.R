@@ -1,11 +1,15 @@
 #' @include utils.R
 NULL
 
-#' Register a Prallel Backend
+#' Register a Parallel Backend
 #'
 #' Registers a parallel backend using the \code{foreach} package.
 #'
-#' @param spark_conn spark connection to use
+#' @param spark_conn Spark connection to use
+#' @param parallelism Level of parallelism to use for task execution
+#'   (if unspecified, then it will take the value of
+#'    `SparkContext.defaultParallelism()` which by default is the number
+#'    of cores available to the `sparklyr` application)
 #' @param ... additional options for sparklyr parallel backend
 #'   (currently only the only valid option is nocompile = {T, F})
 #'
@@ -19,13 +23,16 @@ NULL
 #' }
 #'
 #' @export
-registerDoSpark <- function(spark_conn, ...) {
-  default_parallelism <- tryCatch(
-    spark_context(spark_conn) %>% invoke("defaultParallelism"),
-    # return 0 as number of workers if there is an exception
-    error = function(e) {
-      0L
-    }
+registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
+  do_spark_parallelism <- as.integer(
+    parallelism %||%
+      tryCatch(
+        spark_context(spark_conn) %>% invoke("defaultParallelism"),
+        # return 0 as number of workers if there is an exception
+        error = function(e) {
+          0L
+        }
+      )
   )
 
   # internal function to process registerDoSpark options
@@ -146,7 +153,7 @@ registerDoSpark <- function(spark_conn, ...) {
       spark_conn,
       items,
       name = random_string("spark_apply"),
-      repartition = default_parallelism
+      repartition = do_spark_parallelism
     )
     expr <- .compile(expr)
     res <- do.call(
@@ -175,7 +182,7 @@ registerDoSpark <- function(spark_conn, ...) {
     switch(item,
       name = pkgName,
       version = packageDescription(pkgName, fields = "Version"),
-      workers = default_parallelism,
+      workers = do_spark_parallelism,
       NULL
     )
   }
