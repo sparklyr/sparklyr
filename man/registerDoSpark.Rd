@@ -4,13 +4,10 @@
 \alias{registerDoSpark}
 \title{Register a Prallel Backend}
 \usage{
-registerDoSpark(spark_conn, min_executors = 0L, ...)
+registerDoSpark(spark_conn, ...)
 }
 \arguments{
 \item{spark_conn}{spark connection to use}
-
-\item{min_executors}{Minimum number of Spark executors that is expected to be
-available}
 
 \item{...}{additional options for sparklyr parallel backend
 (currently only the only valid option is nocompile = {T, F})}
