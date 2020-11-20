@@ -83,13 +83,13 @@ object StratifiedSamplingUtils {
       override def zero: SamplesPQ = new SamplesPQ(k)
 
       override def reduce(b: SamplesPQ, a: Row): SamplesPQ = {
-        val sampleSeed = seed +
-          groupVars
-            .map(c => { a.get(a.fieldIndex(c)).hashCode })
-            .sum
         var weight = SamplingUtils.extractWeightValue(a, weightColumn)
         if (weight > 0) {
-          val random = prngMap.computeIfAbsent(
+          val sampleSeed = seed +
+            groupVars
+              .map(c => { a.get(a.fieldIndex(c)).hashCode })
+              .sum
+          val random = prngState.computeIfAbsent(
             sampleSeed,
             x => new Random(x)
           )
@@ -120,7 +120,7 @@ object StratifiedSamplingUtils {
         Encoders.kryo[SamplesPQ]
       }
 
-      private[this] val prngMap = new ConcurrentHashMap[Long, Random]
+      private[this] val prngState = new ConcurrentHashMap[Long, Random]
     }
   }
 
@@ -136,13 +136,13 @@ object StratifiedSamplingUtils {
       )
 
       override def reduce(b: SamplesArray, a: Row): SamplesArray = {
-        val sampleSeed = seed +
-          groupVars
-            .map(c => { a.get(a.fieldIndex(c)).hashCode })
-            .sum
         var weight = SamplingUtils.extractWeightValue(a, weightColumn)
         if (weight > 0) {
-          val random = prngMap.computeIfAbsent(
+          val sampleSeed = seed +
+            groupVars
+              .map(c => { a.get(a.fieldIndex(c)).hashCode })
+              .sum
+          val random = prngState.computeIfAbsent(
             sampleSeed,
             x => new Random(x)
           )
@@ -183,7 +183,7 @@ object StratifiedSamplingUtils {
         Encoders.kryo[SamplesArray]
       }
 
-      private[this] val prngMap = new ConcurrentHashMap[Long, Random]
+      private[this] val prngState = new ConcurrentHashMap[Long, Random]
     }
   }
 }
