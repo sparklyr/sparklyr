@@ -17,7 +17,7 @@ object SamplingUtils {
     }
   }
 
-  private[this] case class instantiatePRNGState() extends java.util.function.Function[Long, Random] {
+  private[this] case class PRNG() extends java.util.function.Function[Long, Random] {
     override def apply(x: Long): Random = new Random(x)
   }
 
@@ -41,7 +41,7 @@ object SamplingUtils {
             val sampleSeed = seed + TaskContext.getPartitionId
             val random = prngState.computeIfAbsent(
               sampleSeed,
-              new instantiatePRNGState
+              new PRNG
             )
             val sample = Sample(genSamplePriority(weight, random), row)
             pq += sample
