@@ -5,8 +5,6 @@
 \title{Perform Weighted Random Sampling on a Spark DataFrame}
 \usage{
 sdf_weighted_sample(x, weight_col, k, replacement = TRUE, seed = NULL)
-
-sdf_weighted_sample(x, weight_col, k, replacement = TRUE, seed = NULL)
 }
 \arguments{
 \item{x}{An object coercable to a Spark DataFrame.}
@@ -26,27 +24,8 @@ If the sampling is done without replacement, then it will be conceptually
 equivalent to an iterative process such that in each step the probability of
 adding a row to the sample set is equal to its weight divided by summation of
 weights of all rows that are not in the sample set yet in that step.
-
-Draw a random sample of rows (with or without replacement) from a Spark
-DataFrame
-If the sampling is done without replacement, then it will be conceptually
-equivalent to an iterative process such that in each step the probability of
-adding a row to the sample set is equal to its weight divided by summation of
-weights of all rows that are not in the sample set yet in that step.
 }
 \section{Transforming Spark DataFrames}{
-
-
-The family of functions prefixed with \code{sdf_} generally access the Scala
-Spark DataFrame API directly, as opposed to the \code{dplyr} interface which
-uses Spark SQL. These functions will 'force' any pending SQL in a
-\code{dplyr} pipeline, such that the resulting \code{tbl_spark} object
-returned will no longer have the attached 'lazy' SQL operations. Note that
-the underlying Spark DataFrame \emph{does} execute its operations lazily, so
-that even though the pending set of operations (currently) are not exposed at
-the \R level, these operations will only be executed when you explicitly
-\code{collect()} the table.
-
 
 
 The family of functions prefixed with \code{sdf_} generally access the Scala
@@ -61,13 +40,6 @@ the \R level, these operations will only be executed when you explicitly
 }
 
 \seealso{
-Other Spark data frames: 
-\code{\link{sdf_copy_to}()},
-\code{\link{sdf_random_split}()},
-\code{\link{sdf_register}()},
-\code{\link{sdf_sample}()},
-\code{\link{sdf_sort}()}
-
 Other Spark data frames: 
 \code{\link{sdf_copy_to}()},
 \code{\link{sdf_random_split}()},
