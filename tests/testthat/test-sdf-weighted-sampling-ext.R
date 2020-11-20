@@ -3,33 +3,34 @@ context("sdf-weighted-sampling-ext")
 test_requires("dplyr")
 
 weighted_sampling_octal_test_data <- data.frame(
-  x = rep(seq(0, 7), 100),
-  weight = 1 + (seq(800) * 7 + 11) %% 17
+  x = rep(seq(0L, 7L), 100L),
+  weight = 1L + (seq(800L) * 7L + 11L) %% 17L
 )
 sdf <- testthat_tbl(
   name = "weighted_sampling_octal_test_data",
   repartition = 4L
 )
 
-num_sampling_iters <- 1000
+num_sampling_iters <- 1000L
 alpha <- 0.05
 
-sample_sz <- 3
+sample_sz <- 3L
 
 # map each possible outcome to an octal value
 to_oct <- function(sample) {
-  sum(8^seq(0, sample_sz - 1) * sample$x)
+  sum(8L^seq(0L, sample_sz - 1L) * sample$x)
 }
 
 max_possible_outcome <- to_oct(list(x = rep(7, sample_sz)))
 
 verify_distribution <- function(replacement) {
-  expected_dist <- rep(0, max_possible_outcome + 1)
-  actual_dist <- rep(0, max_possible_outcome + 1)
+  expected_dist <- rep(0L, max_possible_outcome + 1L)
+  actual_dist <- rep(0L, max_possible_outcome + 1L)
 
   for (x in seq(num_sampling_iters)) {
-    seed <- x * 97
+    seed <- x * 97L
     set.seed(seed)
+
     sample <- weighted_sampling_octal_test_data %>%
       dplyr::slice_sample(
         n = sample_sz,
@@ -37,7 +38,7 @@ verify_distribution <- function(replacement) {
         replace = replacement
       ) %>%
       to_oct()
-    expected_dist[[sample + 1]] <- expected_dist[[sample + 1]] + 1
+    expected_dist[[sample + 1L]] <- expected_dist[[sample + 1L]] + 1L
 
     sample <- sdf %>%
       sdf_weighted_sample(
@@ -48,7 +49,7 @@ verify_distribution <- function(replacement) {
       ) %>%
       collect() %>%
       to_oct()
-    actual_dist[[sample + 1]] <- actual_dist[[sample + 1]] + 1
+    actual_dist[[sample + 1L]] <- actual_dist[[sample + 1L]] + 1L
   }
 
   res <- ks.test(x = actual_dist, y = expected_dist)

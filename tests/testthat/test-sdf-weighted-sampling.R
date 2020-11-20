@@ -2,8 +2,8 @@ context("sdf-weighted-sampling")
 
 test_requires("dplyr")
 
-sample_space_sz <- 100
-num_zeroes <- 50
+sample_space_sz <- 100L
+num_zeroes <- 50L
 
 weighted_sampling_test_data <- data.frame(
   id = seq(sample_space_sz + num_zeroes),
@@ -21,18 +21,18 @@ sdf <- testthat_tbl(
   repartition = 5L
 )
 
-sample_sz <- 20
-num_sampling_iters <- 100
+sample_sz <- 20L
+num_sampling_iters <- 100L
 alpha <- 0.05
 
 verify_distribution <- function(replacement) {
-  expected_dist <- rep(0, sample_space_sz)
-  actual_dist <- rep(0, sample_space_sz)
-
-  seed <- 142857L
-  set.seed(seed)
+  expected_dist <- rep(0L, sample_space_sz)
+  actual_dist <- rep(0L, sample_space_sz)
 
   for (x in seq(num_sampling_iters)) {
+    seed <- 142857L + x
+    set.seed(seed)
+
     sample <- weighted_sampling_test_data %>%
       dplyr::slice_sample(
         n = sample_sz,
@@ -40,7 +40,7 @@ verify_distribution <- function(replacement) {
         replace = replacement
       )
     for (id in sample$id) {
-      expected_dist[[id]] <- expected_dist[[id]] + 1
+      expected_dist[[id]] <- expected_dist[[id]] + 1L
     }
 
     sample <- sdf %>%
@@ -52,7 +52,7 @@ verify_distribution <- function(replacement) {
       ) %>%
       collect()
     for (id in sample$id) {
-      actual_dist[[id]] <- actual_dist[[id]] + 1
+      actual_dist[[id]] <- actual_dist[[id]] + 1L
     }
   }
 
@@ -70,7 +70,7 @@ test_that("sdf_weighted_sample with replacement works as expected", {
 })
 
 test_that("sdf_weighted_sample returns repeatable results from a fixed PRNG seed", {
-  seed <- 142857
+  seed <- 142857L
   for (replacement in c(TRUE, FALSE)) {
     samples <- lapply(
       seq(2),
