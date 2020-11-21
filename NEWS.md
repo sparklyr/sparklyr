@@ -1,3 +1,98 @@
+# Sparklyr 1.5.0
+
+### Connections
+
+- `spark_web()` has been revised to work correctly in environments such as
+  RStudio Server or RStudio Cloud where the Spark web UI URLs such as
+  "http://localhost:4040/jobs/" needs to be translated with
+  `rstudioapi::translateLocalUrl()` to be accessible.
+
+- The problem with bundle file name collisions when `session_id` is not provided
+  has been fixed in `spark_apply_bundle()`.
+
+- Support for `sparklyr.livy.sources` is removed completely as it is no longer
+  needed as a workaround when Spark version is specified.
+
+### Data
+
+- `stream_lag()` is implemented to provide the equivalent functionality of
+  `dplyr::lag()` for streaming Spark dataframes while also supporting additional
+  filtering of "outdated" records based on timestamp threshold.
+
+- A specialized version of `dplyr::distinct()` is implemented for Spark
+  dataframes that supports `.keep_all = TRUE` and correctly satisfies the "rows
+  are a subset of the input but appear in the same order" requirement stated in
+  the `dplyr` documentation.
+
+- The default value for the `repartition` parameter of `sdf_seq()` has been
+  corrected.
+
+- Some implementation detail was revised to make `sparklyr` 1.5 fully compatible
+  with `dbplyr` 2.0.
+
+- `sdf_expand_grid()` was implemented to support roughly the equivalent of
+  `expand.grid()` for Spark dataframes while also offering additional Spark-
+  specific options such as broadcast hash joins, repartitioning, and caching of
+  the resulting Spark dataframe in memory.
+
+- `sdf_quantile()` now supports calculation for multiple columns.
+
+- Both `lead()` and `lag()` methods for dplyr interface of `sparklyr` are fixed
+  to correctly accept the `order_by` parameter.
+
+- The `cumprod()` window aggregation function for dplyr was reimplemented to
+  correctly handle null values in Spark dataframes.
+
+- Support for `missing` parameter is implemented for the `ifelse()`/`if_else()`
+  function for dplyr.
+
+- A `weighted.mean()` summarizer was implemented for dplyr interface of
+  `sparklyr`.
+
+- A workaround was created to ensure `NA_real_` is handled correctly within the
+  contexts of `dplyr::mutate()` and `dplyr::transmute()` methods (e.g.,
+  `sdf %>% dplyr::mutate(z = NA_real_)` should result in a column named "z" with
+  double-precision SQL type)
+
+- Support for R-like subsetting operator (`[`) was implemented for selecting a
+  subset of columns from a Spark dataframe.
+
+- The `rowSums()` function was implemented for dplyr interface of `sparklyr`.
+
+- The `sdf_partition_sizes()` function was created to enable efficient query of
+  partition sizes within a Spark dataframe.
+
+- Stratified sampling for Spark dataframes has been implemented and can be
+  expressed using dplyr grammar as
+  `<spark dataframe> %>% dplyr::group_by(<columns>) %>% dplyr::sample_n(...)` or
+  `<spark dataframe> %>% dplyr::group_by(<columns>) %>% dplyr::sample_frac(...)`
+  where `<columns>` is a list of grouping column(s) defining the strata
+  (i.e., the sampling specified by `dplyr::sample_n()` or `dplyr::sample_frac()`
+  will be applied to each group defined by `dplyr::group_by(<columns>)`)
+
+- The implementations of `dplyr::sample_n()` and `dplyr::sample_frac()` have
+  been revised to first perform aggregations on individual partitions before
+  merging aggregated results from all partitions, which is more efficient than
+  `mapPartitions()` followed by `reduce()`.
+
+### Serialization
+
+- `copy_to()` now serializes R dataframes into RDS format instead of CSV format
+  if `arrow` is unavailable. RDS serialization is approximately 48% faster than
+  CSV and allows multiple correctness issues related to CSV serialization to be
+  fixed easily in `sparklyr`.
+
+- `copy_to()` and `collect()` now correctly preserve `NA_real_` (`NA_real_` from
+  a R dataframe, once translated as `null` in a Spark dataframe, used to be
+  incorrectly collected as `NaN` in previous versions of `sparklyr`).
+
+- `copy_to()` can now distinguish `"NA"` from `NA` as expected.
+
+- `copy_to()` now supports importing binary columns from R dataframes to Spark.
+
+- Reduced serialization overhead in Spark-based `foreach` parallel backend
+  created with `registerDoSpark()`.
+
 # Sparklyr 1.4.0
 
 ### Connections
@@ -55,8 +150,6 @@
 
 - Revised `spark_read_compat_param` to avoid collision on names assigned to
   different Spark data frames
-  
-- `sdf_quantile()` now supports calculation for multiple columns.
 
 ### Misc
 
