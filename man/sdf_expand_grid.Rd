@@ -14,6 +14,8 @@ sdf_expand_grid(
 )
 }
 \arguments{
+\item{sc}{The associated Spark connection.}
+
 \item{...}{Each input variable can be either a R vector/factor or a Spark
 dataframe. Unnamed inputs will assume the default names of 'Var1', 'Var2',
 etc in the result, similar to what `expand.grid` does for unnamed inputs.}

@@ -82,7 +82,7 @@ process_dest_col <- function(expr, dest_col) {
 #' @param params Parameter(s) of the lambda expression, can be either a single
 #'   parameter or a comma separated listed of parameters in the form of
 #'   \code{.(param1, param2, ... )} (see examples)
-#' @param body Body of the lambda expression, *must be within parentheses*
+#' @param ... Body of the lambda expression, *must be within parentheses*
 #'
 #' @examples
 #' \dontrun{

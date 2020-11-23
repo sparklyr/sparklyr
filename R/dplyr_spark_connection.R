@@ -168,7 +168,7 @@ sql_translate_env.spark_connection <- function(con) {
                   list(dbplyr::ident(x), dbplyr::sql(" + "))
                 }
               ) %>%
-                unlist(rec = FALSE)
+                unlist(recursive = FALSE)
             ) %>%
             append(
               list(dbplyr::ident(col_names[length(col_names)]), dbplyr::sql(")"))

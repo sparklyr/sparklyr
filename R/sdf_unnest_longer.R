@@ -16,6 +16,9 @@ NULL
 #' @param include_indices Whether to include an index column. An index column
 #'   will be included by default if `col` is a struct column. It will also be
 #'   included if `indices_to` is not `NULL`.
+#' @param names_repair Strategy for fixing duplicate column names (the semantic
+#'   will be exactly identical to that of `.name_repair` option in
+#'   \code{\link[tibble:tibble]{tibble}})
 #' @param ptype Optionally, supply an R data frame prototype for the output.
 #'   Each column of the unnested result will be casted based on the Spark
 #'   equivalent of the type of the column with the same name within `ptype`,
