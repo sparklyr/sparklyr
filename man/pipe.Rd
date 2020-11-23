@@ -3,9 +3,6 @@
 \name{\%>\%}
 \alias{\%>\%}
 \title{Pipe operator}
-\usage{
-lhs \%>\% rhs
-}
 \description{
 See \code{\link[dplyr:reexports]{\%>\%}} for more details.
 }

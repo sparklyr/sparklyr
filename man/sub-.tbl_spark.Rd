@@ -7,11 +7,11 @@
 \method{[}{tbl_spark}(x, i)
 }
 \arguments{
+\item{x}{The Spark dataframe}
+
 \item{i}{Expression specifying subset of column(s) to include or exclude
 from the result (e.g., `["col1"]`, `[c("col1", "col2")]`, `[1:10]`, `[-1]`,
 `[NULL]`, or `[]`)}
-
-\item{sdf}{The Spark dataframe}
 }
 \description{
 Susetting operator for Spark dataframe allowing a subset of column(s) to be

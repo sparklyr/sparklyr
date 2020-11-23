@@ -11,7 +11,7 @@ params \%->\% ...
 parameter or a comma separated listed of parameters in the form of
 \code{.(param1, param2, ... )} (see examples)}
 
-\item{body}{Body of the lambda expression, *must be within parentheses*}
+\item{...}{Body of the lambda expression, *must be within parentheses*}
 }
 \description{
 Infix operator that allows a lambda expression to be composed in R and be

@@ -22,7 +22,6 @@ NULL
 #' @keywords internal
 #' @export
 #' @importFrom dplyr %>%
-#' @usage lhs \%>\% rhs
 NULL
 
 #' Copy To

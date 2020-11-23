@@ -684,6 +684,7 @@ sdf_from_avro <- function(x, cols) {
 #' perform an expand.grid operation on all of them and store the result in
 #' a Spark dataframe
 #'
+#' @param sc The associated Spark connection.
 #' @param ... Each input variable can be either a R vector/factor or a Spark
 #'   dataframe. Unnamed inputs will assume the default names of 'Var1', 'Var2',
 #'   etc in the result, similar to what `expand.grid` does for unnamed inputs.
@@ -825,7 +826,7 @@ sdf_partition_sizes <- function(x) {
 #' Susetting operator for Spark dataframe allowing a subset of column(s) to be
 #' selected using syntaxes similar to those supported by R dataframes
 #'
-#' @param sdf The Spark dataframe
+#' @param x The Spark dataframe
 #' @param i Expression specifying subset of column(s) to include or exclude
 #'   from the result (e.g., `["col1"]`, `[c("col1", "col2")]`, `[1:10]`, `[-1]`,
 #'   `[NULL]`, or `[]`)
