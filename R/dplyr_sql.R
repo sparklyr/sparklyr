@@ -29,25 +29,36 @@ sql_build.op_sample <- function(op, con, frac) {
   sdf <- to_sdf(op, con)
   cols <- colnames(sdf)
 
-  sample_size <- (
-    if (frac) {
-      cnt <- sdf %>% spark_dataframe() %>% invoke("count")
-      round(cnt * check_frac(op$args$size, replace = op$args$replace))
-    } else {
-      op$args$size
-    }
-  )
   sample_sdf <- (
     if (length(grps) > 0) {
-      sdf_stratified_sample(
-        x = sdf,
-        grps = grps,
-        k = sample_size,
-        weight = NULL,
-        replace = op$args$replace,
-        op$args$seed
-      )
+      if (frac) {
+        sdf_stratified_sample_frac(
+          x = sdf,
+          grps = grps,
+          frac = op$args$size,
+          weight = NULL,
+          replace = op$args$replace,
+          op$args$seed
+        )
+      } else {
+        sdf_stratified_sample_n(
+          x = sdf,
+          grps = grps,
+          k = op$args$size,
+          weight = NULL,
+          replace = op$args$replace,
+          op$args$seed
+        )
+      }
     } else {
+      sample_size <- (
+        if (frac) {
+          cnt <- sdf %>% spark_dataframe() %>% invoke("count")
+          round(cnt * check_frac(op$args$size, replace = op$args$replace))
+        } else {
+          op$args$size
+        }
+      )
       sdf_weighted_sample(
         x = sdf,
         weight_col = NULL,
@@ -65,27 +76,38 @@ sql_build.op_weighted_sample <- function(op, con, frac) {
   grps <- dbplyr::op_grps(op)
   sdf <- to_sdf(op, con)
 
-  sample_size <- (
-    if (frac) {
-      cnt <- sdf %>% spark_dataframe() %>% invoke("count")
-      round(cnt * check_frac(op$args$size, replace = op$args$replace))
-    } else {
-      op$args$size
-    }
-  )
   weight <- rlang::as_name(op$args$weight)
 
   sample_sdf <- (
     if (length(grps) > 0) {
-      sdf_stratified_sample(
-        x = sdf,
-        grps = grps,
-        k = sample_size,
-        weight = weight,
-        replace = op$args$replace,
-        op$args$seed
-      )
+      if (frac) {
+        sdf_stratified_sample_frac(
+          x = sdf,
+          grps = grps,
+          frac = op$args$size,
+          weight = weight,
+          replace = op$args$replace,
+          op$args$seed
+        )
+      } else {
+        sdf_stratified_sample_n(
+          x = sdf,
+          grps = grps,
+          k = op$args$size,
+          weight = weight,
+          replace = op$args$replace,
+          op$args$seed
+        )
+      }
     } else {
+      sample_size <- (
+        if (frac) {
+          cnt <- sdf %>% spark_dataframe() %>% invoke("count")
+          round(cnt * check_frac(op$args$size, replace = op$args$replace))
+        } else {
+          op$args$size
+        }
+      )
       sdf_weighted_sample(
         x = sdf,
         weight_col = weight,
