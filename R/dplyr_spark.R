@@ -46,7 +46,7 @@ tbl_vars.spark_jobj <- function(x) {
 #' @export
 #' @importFrom dbplyr tbl_sql
 tbl.src_spark <- function(src, from, ...) {
-  tbl_sql("spark", src = src, from = from, ...)
+  tbl_sql("spark", src = src, from = process_tbl_name(from), ...)
 }
 
 #' @export
@@ -54,9 +54,21 @@ tbl.src_spark <- function(src, from, ...) {
 #' @importFrom dbplyr tbl_sql
 tbl.spark_connection <- function(src, from, ...) {
   src <- src_sql("spark", src)
-  tbl_sql("spark", src = src, from = from, ...)
+  tbl_sql("spark", src = src, from = process_tbl_name(from), ...)
 }
 
+process_tbl_name <- function(x) {
+  components <- strsplit(x, "\\.")
+  num_components <- length(components)
+
+  if (identical(num_components, 1L)) {
+    x
+  } else if (identical(num_components, 2L)) {
+    dbplyr::in_schema(components[[1]], components[[2]])
+  } else {
+    stop("expected input to be <table name> or <schema name>.<table name>")
+  }
+}
 
 #' @export
 #' @importFrom dplyr src_tbls
