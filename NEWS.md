@@ -13,6 +13,10 @@
 - Support for `sparklyr.livy.sources` is removed completely as it is no longer
   needed as a workaround when Spark version is specified.
 
+- A bug in how multiple `--conf` values were handled in some scenarios within
+  the spark-submit shell args which was introduced in sparklyr 1.4 has been
+  fixed now.
+
 ### Data
 
 - `stream_lag()` is implemented to provide the equivalent functionality of

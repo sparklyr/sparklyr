@@ -94,7 +94,8 @@ spark_config_shell_args <- function(config, master) {
   unlist(lapply(seq_along(shell_args), function(idx) {
     name <- names(shell_args)[[idx]]
     value <- shell_args[[idx]]
-    list(paste0("--", name), value)
+
+    lapply(as.list(value), function(x) list(paste0("--", name), x))
   }))
 }
 
