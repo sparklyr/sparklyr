@@ -814,6 +814,9 @@ sdf_partition_sizes <- function(x) {
     spark_dataframe(x)
   )
 
+  # workaround to make CRAN happy
+  partition_index <- NULL
+
   data.frame(
     partition_index = lapply(rs, function(p) p[[1]]) %>% unlist(),
     partition_size = lapply(rs, function(p) p[[2]]) %>% unlist()
