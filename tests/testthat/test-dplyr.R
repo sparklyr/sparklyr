@@ -327,3 +327,9 @@ test_that("transmute creates NA_real_ column correctly", {
     tibble::tibble(z = NA_real_, sq = seq(5) * seq(5))
   )
 })
+
+test_that("process_tbl_name works as expected", {
+  expect_equal(sparklyr:::process_tbl_name("a"), "a")
+  expect_equal(sparklyr:::process_tbl_name("xyz"), "xyz")
+  expect_equal(sparklyr:::process_tbl_name("x.y"), dbplyr::in_schema("x", "y"))
+})

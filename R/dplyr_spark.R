@@ -58,7 +58,7 @@ tbl.spark_connection <- function(src, from, ...) {
 }
 
 process_tbl_name <- function(x) {
-  components <- strsplit(x, "\\.")
+  components <- strsplit(x, "\\.")[[1]]
   num_components <- length(components)
 
   if (identical(num_components, 1L)) {
