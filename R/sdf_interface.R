@@ -851,7 +851,8 @@ sdf_partition_sizes <- function(x) {
     x %>%
       spark_connection() %>%
       spark_session() %>%
-      invoke("emptyDataFrame")
+      invoke("emptyDataFrame") %>%
+      sdf_register()
   } else {
     rx <- replicate_colnames(x)
     cols <- colnames(rx[i])
