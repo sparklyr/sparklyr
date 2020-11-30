@@ -591,6 +591,27 @@ sc <- spark_connect(master = "<address>", method = "livy", config = config)
 spark_disconnect(sc)
 ```
 
+To connect to remote `livy` clusters with Kerberos authentication, you
+should first get a valid Kerberos ticket on the local client, then:
+
+``` r
+config <- livy_config(negotiate=TRUE, custom_headers=list("X-Requested-By"="<user>"))
+sc <- spark_connect(master = "<address>", method = "livy", config = config)
+spark_disconnect(sc)
+```
+
+The remote `livy` cluster will require outgoing connection to GitHub in 
+order to download `sparklyr` jars. You can avoid this by uploading the 
+required jar to HDFS and connect as:
+
+``` r
+config <- livy_config(...)
+config$sparklyr.livy.jar = "hdfs://path/to/sparklyr-X.X-Y.Y.jar"
+sc <- spark_connect(master = "<address>", method = "livy", config = config)
+spark_disconnect(sc)
+```
+
+
 ## Connecting through Databricks Connect
 
 [Databricks

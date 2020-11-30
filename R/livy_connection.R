@@ -74,6 +74,7 @@ livy_available_jars <- function() {
 #'   \item{\code{queue}}{The name of the YARN queue to which submitted}
 #'   \item{\code{name}}{The name of this session}
 #'   \item{\code{heartbeat_timeout}}{Timeout in seconds to which session be orphaned}
+#'   \item{\code{conf}}{Spark configuration properties (Map of key=value)}
 #' }
 #'
 #' Note that \code{queue} is supported only by version 0.4.0 of Livy or newer.
@@ -109,34 +110,8 @@ livy_config <- function(config = spark_config(),
 
   if (!is.null(curl_opts)) config[["sparklyr.livy.curl_opts"]] <- curl_opts
 
-  # Params need to be restrictued or livy will complain about unknown parameters
-  allowed_params <- c(
-    "proxy_user",
-    "jars",
-    "py_files",
-    "files",
-    "driver_memory",
-    "driver_cores",
-    "executor_memory",
-    "executor_cores",
-    "num_executors",
-    "archives",
-    "queue",
-    "name",
-    "heartbeat_timeout",
-    "conf"
-  )
-
   if (length(additional_params) > 0) {
-    valid_params <- names(additional_params) %in% allowed_params
-    if (!all(valid_params)) {
-      stop(paste0(names(additional_params[!valid_params]), sep = ", "), " are not valid session parameters. Valid parameters are: ", paste0(allowed_params, sep = ", "))
-    }
-    singleValues <- c("proxy_user", "driver_memory", "driver_cores", "executor_memory", "executor_cores", "num_executors", "queue", "name", "heartbeat_timeout")
-    singleValues <- singleValues[singleValues %in% names(additional_params)]
-    additional_params[singleValues] <- lapply(additional_params[singleValues], unbox)
-
-    # snake_case to camelCase mapping
+    # snake_case to camelCase mapping for allowed Livy params
     params_map <- c(
       proxy_user = "proxyUser",
       jars = "jars",
@@ -153,6 +128,18 @@ livy_config <- function(config = spark_config(),
       heartbeat_timeout = "heartbeatTimeoutInSecond",
       conf = "conf"
     )
+
+    # Params need to be restricted or livy will complain about unknown parameters
+    allowed_params <- names(params_map)
+
+    valid_params <- names(additional_params) %in% allowed_params
+    if (!all(valid_params)) {
+      stop(paste0(names(additional_params[!valid_params]), sep = ", "), " are not valid session parameters. Valid parameters are: ", paste0(allowed_params, sep = ", "))
+    }
+    singleValues <- c("proxy_user", "driver_memory", "driver_cores", "executor_memory", "executor_cores", "num_executors", "queue", "name", "heartbeat_timeout")
+    singleValues <- singleValues[singleValues %in% names(additional_params)]
+    additional_params[singleValues] <- lapply(additional_params[singleValues], unbox)
+
 
     for (l in names(additional_params)) {
       # Parse the params names from snake_case to camelCase
@@ -650,7 +637,11 @@ livy_connection <- function(master,
 
   extensions <- spark_dependencies_from_extensions(version, scala_version, extensions, config)
 
-  config$livy.jars <- as.character(c(livy_connection_jars(config, version, scala_version), extensions$catalog_jars))
+  config[["livy.jars"]] <- unique(as.character(c(
+    config[["livy.jars"]],
+    livy_connection_jars(config, version, scala_version),
+    extensions$catalog_jars
+  )))
 
   config[["spark.jars.packages"]] <- paste(c(config[["spark.jars.packages"]], extensions$packages), collapse = ",")
   config[["spark.jars.repositories"]] <- paste(c(config[["spark.jars.repositories"]], extensions$repositories), collapse = ",")
