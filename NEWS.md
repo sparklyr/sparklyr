@@ -6,6 +6,8 @@
   the spark-submit shell args which was introduced in sparklyr 1.4 has been
   fixed now.
 
+- A bug with `livy.jars` configuration was fixed (#2843)
+
 ### Data
 
 - `tbl()` methods were revised to be compatible with `dbplyr` 2.0 when handling
