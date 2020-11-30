@@ -63,6 +63,7 @@ Additional parameters for Livy sessions are:
   \item{\code{queue}}{The name of the YARN queue to which submitted}
   \item{\code{name}}{The name of this session}
   \item{\code{heartbeat_timeout}}{Timeout in seconds to which session be orphaned}
+  \item{\code{conf}}{Spark configuration properties (Map of key=value)}
 }
 
 Note that \code{queue} is supported only by version 0.4.0 of Livy or newer.

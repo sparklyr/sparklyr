@@ -92,8 +92,9 @@ Scala 2.12)}
 These routines allow you to manage your connections to Spark.
 }
 \details{
-When using \code{method = "livy"}, jars are downloaded from GitHub but the path
-to a local \code{sparklyr} JAR can also be specified through the \code{livy.jars} setting.
+By default, when using \code{method = "livy"}, jars are downloaded from GitHub. But
+an alternative path (local to Livy server or on HDFS or HTTP(s)) to \code{sparklyr}
+JAR can also be specified through the \code{sparklyr.livy.jar} setting.
 }
 \examples{
 
