@@ -637,7 +637,11 @@ livy_connection <- function(master,
 
   extensions <- spark_dependencies_from_extensions(version, scala_version, extensions, config)
 
-  config$livy.jars <- as.character(c(livy_connection_jars(config, version, scala_version), extensions$catalog_jars))
+  config[["livy.jars"]] <- unique(as.character(c(
+    config[["livy.jars"]],
+    livy_connection_jars(config, version, scala_version),
+    extensions$catalog_jars
+  )))
 
   config[["spark.jars.packages"]] <- paste(c(config[["spark.jars.packages"]], extensions$packages), collapse = ",")
   config[["spark.jars.repositories"]] <- paste(c(config[["spark.jars.repositories"]], extensions$repositories), collapse = ",")
