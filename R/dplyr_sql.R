@@ -162,13 +162,7 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
 #' @export
 #' @importFrom dbplyr sql_build
 sql_build.op_tbl_spark_distinct <- function(op, con, ...) {
-  output_cols <- (
-    if (op$args$.keep_all) {
-      op$args$.all_cols
-    } else {
-      op$args$.distinct_cols
-    }
-  )
+  output_cols <- op_vars(op)
   sql <- lapply(
     c(op$args$.row_num, output_cols),
     function(x) {
@@ -196,6 +190,16 @@ sql_build.op_tbl_spark_distinct <- function(op, con, ...) {
         dbplyr::sql(),
       order_by = quote_sql_name(op$args$.row_num, con) %>% dbplyr::sql()
     )
+}
+
+#' @export
+#' @importFrom dbplyr op_vars
+op_vars.op_tbl_spark_distinct <- function(op) {
+  if (op$args$.keep_all) {
+    op$args$.all_cols
+  } else {
+    op$args$.distinct_cols
+  }
 }
 
 to_sdf <- function(op, con) {
