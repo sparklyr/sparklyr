@@ -53,6 +53,7 @@ ft_dplyr_transformer.spark_connection <- function(x, tbl,
           }
         ),
         list("setReplace", sampling_params$args$replace),
+        list("setGroupBy", as.list(sampling_params$group_by)),
         list("setSeed", as.integer(sampling_params$args$seed %||% Sys.time()))
       )
 

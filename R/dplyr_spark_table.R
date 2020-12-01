@@ -64,7 +64,8 @@ sample_frac.tbl_spark <- function(tbl,
 as_sampled_tbl <- function(tbl, frac, args) {
   attributes(tbl)$sampling_params <- structure(list(
     frac = frac,
-    args = args
+    args = args,
+    group_by = dbplyr::op_grps(tbl)
   ))
 
   tbl
