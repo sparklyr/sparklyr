@@ -28,7 +28,14 @@ test_that("ft_dplyr_transformer() works", {
 test_that("ft_dplyr_transformer() supports all sampling use cases", {
   test_requires_version("2.0.0", "sample_frac() requires Spark 2.0+")
 
-  sdf <- copy_to(sc, tibble::tibble(id = seq(1000), weight = rep(seq(5), 200)))
+  sdf <- copy_to(
+    sc,
+    tibble::tibble(
+      id = seq(1000),
+      grp = c(rep(0L, 250), rep(1L, 250), rep(2L, 250), rep(3L, 250)),
+      weight = rep(seq(5), 200)
+    )
+  )
 
   reset_prng_state <- function() { set.seed(142857L) }
 
@@ -85,6 +92,24 @@ test_that("ft_dplyr_transformer() supports all sampling use cases", {
       if (repeatable) {
         expect_equivalent(transformed %>% collect(), sampled)
       }
+    }
+  }
+
+  if (spark_version(sc) >= "3.0.0") {
+    for (replace in list(FALSE, TRUE)) {
+      reset_prng_state()
+
+      transformed <- sdf %>% dplyr::group_by(grp) %>% dplyr::sample_n(5, replace = replace)
+      expect_equivalent(
+        sdf %>% ft_dplyr_transformer(transformed) %>% collect(),
+        transformed %>% collect()
+      )
+
+      transformed <- sdf %>% dplyr::group_by(grp) %>% dplyr::sample_frac(0.1, replace = replace)
+      expect_equivalent(
+        sdf %>% ft_dplyr_transformer(transformed) %>% collect(),
+        transformed %>% collect()
+      )
     }
   }
 })
