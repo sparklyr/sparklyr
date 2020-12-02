@@ -112,3 +112,28 @@ test_that("distinct preserves grouping", {
   expect_equivalent(out %>% collect(), tibble::tibble(x = c(3, 4)))
   expect_equal(out %>% dplyr::group_vars(), "x")
 })
+
+test_that("distinct followed by another lazy op works as expected", {
+  sdf <- copy_to(
+    sc,
+    tibble::tibble(
+      x = 1,
+      y = c(1, 1, 2, 2, 1),
+      z = c(1, 2, 1, 2, 1)
+    )
+  )
+
+  expect_equivalent(
+    sdf %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(r = 1) %>%
+      dplyr::arrange(y, z) %>%
+      collect(),
+    tibble::tibble(
+      x = 1,
+      y = c(1, 1, 2, 2),
+      z = c(1, 2, 1, 2),
+      r = 1
+    )
+  )
+})
