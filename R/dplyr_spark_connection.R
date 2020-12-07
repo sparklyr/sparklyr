@@ -149,7 +149,7 @@ sql_translate_env.spark_connection <- function(con) {
       ifelse = sql_if_else,
       if_else = sql_if_else,
       grepl = function(x, y) dbplyr::build_sql(y, " RLIKE ", x),
-      rowSums = function(x) {
+      rowSums = function(x, na.rm = FALSE) {
         x <- rlang::enexpr(x)
         x <- rlang::eval_tidy(x)
         if (!"tbl_spark" %in% class(x)) {
@@ -160,19 +160,33 @@ sql_translate_env.spark_connection <- function(con) {
         if (length(col_names) == 0) {
           dbplyr::sql("0")
         } else {
+          as_summand <- function(column) {
+            if (!na.rm) {
+              list(dbplyr::ident(column))
+            } else {
+              list(
+                dbplyr::sql("IF(ISNULL("),
+                dbplyr::ident(column),
+                dbplyr::sql("), 0, "),
+                dbplyr::ident(column),
+                dbplyr::sql(")")
+              )
+            }
+          }
           sum_expr <- list(dbplyr::sql("(")) %>%
             append(
               lapply(
                 col_names[-length(col_names)],
                 function(x) {
-                  list(dbplyr::ident(x), dbplyr::sql(" + "))
+                  append(as_summand(x), list(dbplyr::sql(" + ")))
                 }
               ) %>%
                 unlist(recursive = FALSE)
             ) %>%
             append(
-              list(dbplyr::ident(col_names[length(col_names)]), dbplyr::sql(")"))
+              as_summand(col_names[[length(col_names)]])
             ) %>%
+            append(list(dbplyr::sql(")"))) %>%
             lapply(function(x)  dbplyr::escape(x, con = con))
           args <- append(sum_expr, list(con = con))
 
