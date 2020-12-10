@@ -137,14 +137,19 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
 
   livy_version <- Sys.getenv("LIVY_VERSION")
   if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
-    livy_tests <- c(
-      "^dplyr$",
-      "^dbi$",
-      "^copy-to$",
-      "^spark-apply$",
-      "^ml-clustering-kmeans$",
-      "^livy-config$",
-      "^livy-proxy$"
+    livy_tests <- (
+      if (identical(Sys.getenv("RUN_SPARK_APPLY_TESTS"), "true")) {
+        "^spark-apply$"
+      } else {
+        c(
+          "^dplyr$",
+          "^dbi$",
+          "^spark-apply$",
+          "^ml-clustering-kmeans$",
+          "^livy-config$",
+          "^livy-proxy$"
+        )
+      }
     )
 
     test_filter <- paste(livy_tests, collapse = "|")
