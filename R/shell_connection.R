@@ -533,6 +533,7 @@ stop_shell <- function(sc, terminate = FALSE) {
 
   close(sc$backend)
   close(sc$gateway)
+  close(sc$monitoring)
 }
 
 #' @export
