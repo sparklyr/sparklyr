@@ -8,7 +8,7 @@
 | Kevin Ushey       |        RStudio         |           kevin@rstudio.com             |     kevinushey      |
 | J.J. Allaire      |        RStudio         |             jj@rstudio.com              |     jjallaire       |
 | Samuel Macedo     |         IFPE           |     samuelmacedo@recife.ifpe.edu.br     |   samuelmacedo83    |
-| Edgar Ruiz        |        RStudio         |           edgar@rstudio.com             |     edgararuiz      |
+| Edgar Ruiz        |                        |                                         |     edgararuiz      |
 | Lu Wang           |       Databricks       |         lu.wang@databricks.com          |     lu-wang-dl      |
 | Jozef Hajnala     |        jozef.io        |        jozef.hajnala@gmail.com          |    jozefhajnala     |
 | Maciej Szymkiewicz|       zero323.net      |         mszymkiewicz@gmail.com          |      zero323        |
@@ -18,7 +18,7 @@
 
 | Name              |   Company    |              Email              | GitHub ID           |
 | ----------------- | :----------: | :-----------------------------: | ------------------- |
-| Javier Luraschi   |   RStudio    |       javier@rstudio.com        |   javierluraschi    |
+| Javier Luraschi   |              |       jluraschi@gmail.com       |   javierluraschi    |
 | Hossein Falaki    |  Databricks  |     hossein@databricks.com      |       falaki        |
 | Vipul Modi        |   Qubole     |       vipulm@qubole.com         |      vipul1409      |
 | Yitao Li          |   RStudio    |        yitao@rstudio.com        |      yitao-li       |
@@ -29,5 +29,4 @@
 
 | Name              |   Company    |           Email           | GitHub ID           |
 | ----------------- | :----------: | :-----------------------: | ------------------- |
-| Javier Luraschi   |   RStudio    |    javier@rstudio.com     |   javierluraschi    |
 | Yitao Li          |   RStudio    |     yitao@rstudio.com     |      yitao-li       |
