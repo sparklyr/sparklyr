@@ -139,12 +139,15 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
     livy_tests <- (
       if (identical(Sys.getenv("RUN_SPARK_APPLY_TESTS"), "true")) {
-        "^spark-apply$"
+        c(
+          "^spark-apply$",
+          "^spark-apply-bundle$",
+          "^spark-apply-ext$"
+        )
       } else {
         c(
           "^dplyr$",
           "^dbi$",
-          "^spark-apply$",
           "^ml-clustering-kmeans$",
           "^livy-config$",
           "^livy-proxy$"
