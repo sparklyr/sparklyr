@@ -1,37 +1,72 @@
-Package: sparklyr
 Type: Package
+Package: sparklyr
 Title: R Interface to Apache Spark
 Version: 1.5.2
-Authors@R: c(
-    person("Javier", "Luraschi", email = "jluraschi@gmail.com", role = "aut"),
-    person("Kevin", "Kuo", role = "aut", email = "kevin.kuo@rstudio.com",
-           comment = c(ORCID = "0000-0001-7803-7901")),
-    person("Kevin", "Ushey", role = "aut", email = "kevin@rstudio.com"),
-    person("JJ", "Allaire", role = "aut", email = "jj@rstudio.com"),
-    person("Samuel", "Macedo", role = "ctb", email = "samuelmacedo@recife.ifpe.edu.br"),
-    person("Hossein", "Falaki", role = "aut", email = "hossein@databricks.com"),
-    person("Lu", "Wang", role = "aut", email = "lu.wang@databricks.com"),
-    person("Andy", "Zhang", role = "aut", email = "yue.zhang@databricks.com"),
-    person("Yitao", "Li", role = c("aut", "cre"), email = "yitao@rstudio.com",
-           comment = c(ORCID = "0000-0002-1261-905X")),
-    person("Jozef", "Hajnala", role = "ctb", email = "jozef.hajnala@gmail.com"),
-    person("Maciej", "Szymkiewicz", role = "ctb", email = "mszymkiewicz@gmail.com",
-          comment = c(ORCID = "0000-0003-1469-9396")),
-    person("Wil", "Davis", role = "ctb", email = "william.davis@worthingtonindustries.com"),
-    person(family = "RStudio", role = c("cph")),
-    person(family = "The Apache Software Foundation", role = c("aut", "cph"))
-    )
+Authors@R: 
+    c(person(given = "Javier",
+             family = "Luraschi",
+             role = "aut",
+             email = "jluraschi@gmail.com"),
+      person(given = "Kevin",
+             family = "Kuo",
+             role = "aut",
+             email = "kevin.kuo@rstudio.com",
+             comment = c(ORCID = "0000-0001-7803-7901")),
+      person(given = "Kevin",
+             family = "Ushey",
+             role = "aut",
+             email = "kevin@rstudio.com"),
+      person(given = "JJ",
+             family = "Allaire",
+             role = "aut",
+             email = "jj@rstudio.com"),
+      person(given = "Samuel",
+             family = "Macedo",
+             role = "ctb",
+             email = "samuelmacedo@recife.ifpe.edu.br"),
+      person(given = "Hossein",
+             family = "Falaki",
+             role = "aut",
+             email = "hossein@databricks.com"),
+      person(given = "Lu",
+             family = "Wang",
+             role = "aut",
+             email = "lu.wang@databricks.com"),
+      person(given = "Andy",
+             family = "Zhang",
+             role = "aut",
+             email = "yue.zhang@databricks.com"),
+      person(given = "Yitao",
+             family = "Li",
+             role = c("aut", "cre"),
+             email = "yitao@rstudio.com",
+             comment = c(ORCID = "0000-0002-1261-905X")),
+      person(given = "Jozef",
+             family = "Hajnala",
+             role = "ctb",
+             email = "jozef.hajnala@gmail.com"),
+      person(given = "Maciej",
+             family = "Szymkiewicz",
+             role = "ctb",
+             email = "mszymkiewicz@gmail.com",
+             comment = c(ORCID = "0000-0003-1469-9396")),
+      person(given = "Wil",
+             family = "Davis",
+             role = "ctb",
+             email = "william.davis@worthingtonindustries.com"),
+      person(family = "RStudio",
+             role = "cph"),
+      person(family = "The Apache Software Foundation",
+             role = c("aut", "cph")))
 Maintainer: Yitao Li <yitao@rstudio.com>
-Description: R interface to Apache Spark, a fast and general engine for big data
-    processing, see <http://spark.apache.org>. This package supports connecting to
-    local and remote Apache Spark clusters, provides a 'dplyr' compatible back-end,
-    and provides an interface to Spark's built-in machine learning algorithms.
+Description: R interface to Apache Spark, a fast and general
+    engine for big data processing, see <http://spark.apache.org>. This
+    package supports connecting to local and remote Apache Spark clusters,
+    provides a 'dplyr' compatible back-end, and provides an interface to
+    Spark's built-in machine learning algorithms.
 License: Apache License 2.0 | file LICENSE
-SystemRequirements: Spark: 1.6.x, 2.x, or 3.x
 URL: https://spark.rstudio.com/
 BugReports: https://github.com/sparklyr/sparklyr/issues
-LazyData: TRUE
-RoxygenNote: 7.1.1
 Depends:
     R (>= 3.2)
 Imports:
@@ -39,9 +74,10 @@ Imports:
     base64enc,
     config (>= 0.2),
     DBI (>= 0.6-1),
-    dplyr (>= 0.7.2),
     dbplyr (>= 1.1.0),
     digest,
+    dplyr (>= 0.7.2),
+    ellipsis (>= 0.1.0),
     forge,
     generics,
     globals,
@@ -61,11 +97,10 @@ Imports:
     tibble,
     tidyr,
     tidyselect,
-    vctrs,
     uuid,
+    vctrs,
     withr,
-    xml2,
-    ellipsis (>= 0.1.0)
+    xml2
 Suggests:
     arrow (>= 0.14.0),
     broom,
@@ -83,6 +118,10 @@ Suggests:
     reshape2,
     shiny (>= 1.0.1),
     testthat
+Encoding: UTF-8
+LazyData: TRUE
+RoxygenNote: 7.1.1
+SystemRequirements: Spark: 1.6.x, 2.x, or 3.x
 Collate:
     'spark_data_build_types.R'
     'arrow_data.R'
