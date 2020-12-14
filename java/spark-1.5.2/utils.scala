@@ -11,6 +11,9 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.{SparkEnv, SparkException}
 import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.expressions.UnsafeRow
+import org.apache.spark.unsafe.Platform;
+import org.apache.spark.unsafe.types.UTF8String
 
 import scala.collection.JavaConverters._
 import scala.util.Try
@@ -245,7 +248,7 @@ object Utils {
     if (serialized_cols.isEmpty) {
       throw new IllegalArgumentException("Serialized columns byte array is empty.")
     }
-    val cols = serialized_cols.par.map(
+    val cols = serialized_cols.map(
       serialized_col => {
         val bis = new ByteArrayInputStream(serialized_col)
         val dis = new DataInputStream(bis)
@@ -254,25 +257,83 @@ object Utils {
         RUtils.unserializeColumn(dis)
       }
     ).toArray
+    val num_cols = cols.length
     for (c <- timestamp_col_idxes) {
-      cols(c) = cols(c).asInstanceOf[Array[_]].par.map(
+      cols(c) = cols(c).asInstanceOf[Array[_]].map(
         x => x.asInstanceOf[Double].longValue * 1000000
       ).toArray
     }
     for (c <- string_col_idxes) {
-      cols(c) = cols(c).asInstanceOf[Array[_]].par.map(
-        x => org.apache.spark.unsafe.types.UTF8String.fromString(x.asInstanceOf[String])
+      cols(c) = cols(c).asInstanceOf[Array[_]].map(
+        x => UTF8String.fromString(x.asInstanceOf[String])
       ).toArray
     }
     val rows = (0 until num_rows).par.map(r => {
-      new org.apache.spark.sql.catalyst.expressions.GenericInternalRow(
-        (0 until cols.length).map(c => cols(c).asInstanceOf[Array[_]](r)).toArray
-      )
+      val variableLengthBytes = (0 until num_cols).map(c =>
+        if (cols(c)(r).isInstanceOf[UTF8String]) {
+          cols(c)(r).asInstanceOf[UTF8String].numBytes
+        } else if (cols(c)(r).isInstanceOf[RawSXP]) {
+          cols(c)(r).asInstanceOf[RawSXP].buf.length
+        } else {
+          0
+        }
+      ).sum
+      var variableLengthOffset = UnsafeRow.calculateBitSetWidthInBytes(cols.length) + 8 * num_cols
+      val row = UnsafeRow.createFromByteArray(variableLengthOffset + variableLengthBytes, num_cols)
+      (0 until num_cols).map(c => {
+        if (cols(c)(r) == null) {
+          row.setNullAt(c)
+        } else if (cols(c)(r).isInstanceOf[Boolean]) {
+          row.setBoolean(c, cols(c)(r).asInstanceOf[Boolean])
+        } else if (cols(c)(r).isInstanceOf[Integer]) {
+          row.setInt(c, cols(c)(r).asInstanceOf[Integer])
+        } else if (cols(c)(r).isInstanceOf[Double]) {
+          row.setDouble(c, cols(c)(r).asInstanceOf[Double])
+        } else if (cols(c)(r).isInstanceOf[Long]) {
+          row.setLong(c, cols(c)(r).asInstanceOf[Long])
+        } else if (cols(c)(r).isInstanceOf[UTF8String]) {
+          variableLengthOffset = writeVariableLengthField(
+            variableLengthOffset,
+            row,
+            c,
+            cols(c)(r).asInstanceOf[UTF8String].getBytes
+          )
+        } else if (cols(c)(r).isInstanceOf[RawSXP]) {
+          variableLengthOffset = writeVariableLengthField(
+            variableLengthOffset,
+            row,
+            c,
+            cols(c)(r).asInstanceOf[RawSXP].buf
+          )
+        } else {
+          throw new IllegalArgumentException("Unsupported column type")
+        }
+      })
+
+      row
     }).toArray
 
     val x: RDD[InternalRow] = sc.parallelize(rows, partitions)
 
     x
+  }
+
+  private[this] def writeVariableLengthField(
+    variableLengthOffset: Int,
+    row: UnsafeRow,
+    ordinal: Int,
+    buf: Array[Byte]
+  ) : Int = {
+    row.setLong(ordinal, (variableLengthOffset.toLong << 32) | buf.length.toLong)
+    Platform.copyMemory(
+      buf,
+      Platform.BYTE_ARRAY_OFFSET,
+      row.getBaseObject,
+      row.getBaseOffset + variableLengthOffset,
+      buf.length
+    )
+
+    variableLengthOffset + buf.length
   }
 
   def createDataFrame(
