@@ -1,3 +1,18 @@
+# Sparklyr 1.5.2
+
+### Connections
+
+- Fixed `op_vars()` specification in `dplyr::distinct()` verb for Spark
+  dataframes
+
+- `spark_disconnect()` now closes the Spark monitoring connection correctly
+
+### Data
+
+- Implement support for stratified sampling in `ft_dplyr_transformer()`
+
+- Added support for `na.rm` in dplyr `rowSums()` function for Spark dataframes
+
 # Sparklyr 1.5.1
 
 ### Connections
