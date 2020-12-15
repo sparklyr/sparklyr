@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.nio.charset.StandardCharsets
 
+case class RawSXP(val buf: Array[Byte])
+
 object RUtils {
   private[this] val XDR_FORMAT = 'X'
   private[this] val CHARSXP = 9
@@ -66,7 +68,7 @@ object RUtils {
             val bytes = new Array[Byte](num_elems.intValue)
             dis.readFully(bytes)
 
-            bytes
+            RawSXP(bytes)
           } else {
             if (1 != num_elems)
               throw new IllegalArgumentException(
