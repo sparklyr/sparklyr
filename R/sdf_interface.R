@@ -1,4 +1,5 @@
 #' @include avro_utils.R
+#' @include dplyr_spark.R
 #' @include tables_spark.R
 #' @include utils.R
 NULL

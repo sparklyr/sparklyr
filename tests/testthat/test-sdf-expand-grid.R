@@ -76,10 +76,10 @@ test_that("sdf_expand_grid works with broadcast joins", {
       broadcast_vars = c(x, y)
     ) %>%
       collect() %>%
-      dplyr::arrange(x, y, z, Var3),
+      dplyr::arrange(dplyr::across()),
     merge(tibble::tibble(x = var3), df1, all = TRUE) %>%
       merge(tibble::tibble(Var3 = var4), all = TRUE) %>%
-      dplyr::arrange(x, y, z, Var3)
+      dplyr::arrange(dplyr::across())
   )
 
   expect_equivalent(
@@ -94,6 +94,6 @@ test_that("sdf_expand_grid works with broadcast joins", {
       dplyr::arrange(x, y, z, Var3),
     merge(tibble::tibble(x = var3), df1, all = TRUE) %>%
       merge(tibble::tibble(Var3 = var4), all = TRUE) %>%
-      dplyr::arrange(x, y, z, Var3)
+      dplyr::arrange(dplyr::across())
   )
 })
