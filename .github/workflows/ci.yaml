@@ -166,7 +166,7 @@ jobs:
           restore-keys: sparklyr-apache-spark-${{ runner.os }}-${{ env.SPARK_VERSION }}
       - name: Install system dependencies
         run: |
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libcurl4-gnutls-dev procps socat
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libcurl4-gnutls-dev libgit2-dev procps socat
       - name: Install dependencies
         run: source ./ci/install_r_dependencies.sh
         continue-on-error: true
