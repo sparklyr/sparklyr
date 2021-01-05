@@ -1,3 +1,7 @@
+#' @include spark_dataframe.R
+#' @include spark_sql.R
+NULL
+
 #' @export
 spark_connection.tbl_spark <- function(x, ...) {
   spark_connection(x$src)
@@ -17,30 +21,63 @@ spark_connection.src_spark <- function(x, ...) {
   x$con
 }
 
-#' @export
-#' @importFrom dplyr db_desc
+#' @rawNamespace
+#' if (utils::packageVersion("dbplyr") < "2") {
+#'   importFrom(dplyr, db_desc)
+#'   S3method(db_desc, src_spark)
+#' } else {
+#'   importFrom(dbplyr, db_connection_describe)
+#'   S3method(db_connection_describe, src_spark)
+#' }
+
 db_desc.src_spark <- function(x) {
-  sc <- spark_connection(x)
-  paste(
-    "spark connection",
-    paste("master", sc$master, sep = "="),
-    paste("app", sc$app_name, sep = "="),
-    paste("local", spark_connection_is_local(sc), sep = "=")
-  )
+  spark_db_desc(x)
 }
 
-#' @export
-#' @importFrom dplyr db_explain
+db_connection_describe.src_spark <- function(con) {
+  spark_db_desc(con)
+}
+
+#' @rawNamespace
+#' if (utils::packageVersion("dbplyr") < "2") {
+#'   importFrom(dplyr, db_explain)
+#'   S3method(db_explain, spark_connection)
+#' } else {
+#'   importFrom(dbplyr, sql_query_explain)
+#'   S3method(sql_query_explain, spark_connection)
+#' }
+
 db_explain.spark_connection <- function(con, sql, ...) {
-  explained <- DBI::dbGetQuery(con, paste("EXPLAIN", sql))
+  explain_sql <- spark_sql_query_explain(con, sql, ...)
+  explained <- DBI::dbGetQuery(con, explain_sql)
 
   message(explained$plan)
+}
+
+sql_query_explain.spark_connection <- function(con, sql, ...) {
+  spark_sql_query_explain(con, sql, ...)
 }
 
 #' @export
 #' @importFrom dplyr tbl_vars
 tbl_vars.spark_jobj <- function(x) {
-  as.character(invoke(x, "columns"))
+  spark_dataframe_cols(x)
+}
+
+#' @export
+#' @importFrom dplyr tbl_vars
+tbl_vars.tbl_spark <- function(x) {
+  spark_dataframe_cols(spark_dataframe(x))
+}
+
+#' @export
+#' @importFrom dbplyr op_vars
+op_vars.tbl_spark <- function(x) {
+  spark_dataframe_cols(spark_dataframe(x))
+}
+
+spark_dataframe_cols <- function(sdf) {
+  as.character(invoke(sdf, "columns") %>% unlist())
 }
 
 #' @export
@@ -126,40 +163,49 @@ copy_to.src_spark <- function(dest, df, name, overwrite, ...) {
 }
 
 #' @export
-#' @importFrom dplyr db_desc
 print.src_spark <- function(x, ...) {
-  cat(db_desc(x))
+  cat(spark_db_desc(x))
   cat("\n\n")
 
   spark_log(spark_connection(x))
 }
 
-#' @export
-#' @importFrom dplyr db_save_query
-db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
-  df <- spark_dataframe(con, sql)
-  sdf_register(df, name)
+#' @rawNamespace
+#' if (utils::packageVersion("dbplyr") < "2") {
+#'   importFrom(dplyr, db_save_query)
+#'   S3method(db_save_query, spark_connection)
+#' } else {
+#'   importFrom(dbplyr, sql_query_save)
+#'   S3method(sql_query_save, spark_connection)
+#' }
 
-  # compute() is expected to preserve the query, cache as the closest mapping.
-  tbl_cache(con, name)
+db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
+  create_temp_view_sql <- spark_sql_query_save(con, sql, name, temporary, ...)
+  DBI::dbGetQuery(con, create_temp_view_sql)
 
   # dbplyr expects db_save_query to retrieve the table name
   name
 }
 
-#' @export
-#' @importFrom dplyr db_analyze
-#' @importFrom dbplyr build_sql
-#' @importFrom DBI dbExecute
-db_analyze.spark_connection <- function(con, table, ...) {
-  if (spark_version(con) < "2.0.0") {
-    return(NULL)
-  }
+sql_query_save.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
+  spark_sql_query_save(con, sql, name, temporary, ...)
+}
 
-  info <- dbGetQuery(con, build_sql("SHOW TABLES LIKE", table, con = con))
-  if (nrow(info) > 0 && identical(info$isTemporary, FALSE)) {
-    dbExecute(con, build_sql("ANALYZE TABLE", table, "COMPUTE STATISTICS", con = con))
-  }
+#' @rawNamespace
+#' if (utils::packageVersion("dbplyr") < "2") {
+#'   importFrom(dplyr, db_analyze)
+#'   S3method(db_analyze, spark_connection)
+#' } else {
+#'   importFrom(dbplyr, sql_table_analyze)
+#'   S3method(sql_table_analyze, spark_connection)
+#' }
+
+db_analyze.spark_connection <- function(con, table, ...) {
+  spark_db_analyze(con, table, ...)
+}
+
+sql_table_analyze.spark_connection <- function (con, table, ...) {
+  spark_db_analyze(con, table, ...)
 }
 
 #' @export

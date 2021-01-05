@@ -1,4 +1,5 @@
 #' @include dplyr_hof.R
+#' @include spark_sql.R
 #' @include utils.R
 NULL
 
@@ -82,14 +83,29 @@ build_sql_if_compare <- function(..., con, compare) {
   build_sql_if_parts(conditions, args)
 }
 
-#' @export
-#' @importFrom dplyr sql_translate_env
+#' @rawNamespace
+#' if (utils::packageVersion("dbplyr") < "2") {
+#'   importFrom(dplyr, sql_translate_env)
+#'   S3method(sql_translate_env, spark_connection)
+#' } else {
+#'   importFrom(dbplyr, sql_translation)
+#'   S3method(sql_translation, spark_connection)
+#' }
+
+sql_translate_env.spark_connection <- function(con) {
+  spark_sql_translation(con)
+}
+
+sql_translation.spark_connection <- function(con) {
+  spark_sql_translation(con)
+}
+
 #' @importFrom dbplyr build_sql
 #' @importFrom dbplyr win_over
 #' @importFrom dbplyr sql
 #' @importFrom dbplyr win_current_group
 #' @importFrom dbplyr win_current_order
-sql_translate_env.spark_connection <- function(con) {
+spark_sql_translation<- function(con) {
   win_recycled_params <- function(prefix) {
     function(x, y) {
       # Use win_current_frame() once exported form `dbplyr`
@@ -276,10 +292,10 @@ sql_translate_env.spark_connection <- function(con) {
       n = function() dbplyr::sql("COUNT(*)"),
       count = function() dbplyr::sql("COUNT(*)"),
       n_distinct = function(...) dbplyr::build_sql("COUNT(DISTINCT", list(...), ")"),
-      cor = dbplyr::sql_prefix("CORR"),
-      cov = dbplyr::sql_prefix("COVAR_SAMP"),
-      sd = dbplyr::sql_prefix("STDDEV_SAMP"),
-      var = dbplyr::sql_prefix("VAR_SAMP"),
+      cor = dbplyr::sql_aggregate_2("CORR"),
+      cov = dbplyr::sql_aggregate_2("COVAR_SAMP"),
+      sd = dbplyr::sql_aggregate("STDDEV_SAMP", "sd"),
+      var = dbplyr::sql_aggregate("VAR_SAMP", "var"),
       weighted.mean = function(x, w) {
         weighted_mean_sql(x, w)
       }
@@ -305,18 +321,18 @@ sql_translate_env.spark_connection <- function(con) {
       },
       count = function() {
         dbplyr::win_over(
-          dbplyr::sql("count(*)"),
+          dbplyr::sql("COUNT(*)"),
           partition = dbplyr::win_current_group()
         )
       },
-      n_distinct = dbplyr::win_absent("distinct"),
-      cor = win_recycled_params("corr"),
-      cov = win_recycled_params("covar_samp"),
-      sd = dbplyr::win_recycled("stddev_samp"),
-      var = dbplyr::win_recycled("var_samp"),
+      n_distinct = dbplyr::win_absent("DISTINCT"),
+      cor = win_recycled_params("CORR"),
+      cov = win_recycled_params("COVAR_SAMP"),
+      sd = dbplyr::win_recycled("STDDEV_SAMP"),
+      var = dbplyr::win_recycled("VAR_SAMP"),
       cumprod = function(x) {
         dbplyr::win_over(
-          dbplyr::build_sql("sparklyr_cumprod(", x, ")"),
+          dbplyr::build_sql("SPARKLYR_CUMPROD(", x, ")"),
           partition = dbplyr::win_current_group(),
           order = dbplyr::win_current_order()
         )
@@ -341,41 +357,54 @@ build_sql_fn <- function(fn) {
   )
 }
 
-#' @export
-#' @importFrom dplyr sql_set_op
-#' @importFrom dbplyr build_sql
-#' @importFrom dbplyr sql
+#' @rawNamespace
+#' if (utils::packageVersion("dbplyr") < "2") {
+#'   importFrom(dplyr, sql_set_op)
+#'   S3method(sql_set_op, spark_connection)
+#' } else {
+#'   importFrom(dbplyr, sql_query_set_op)
+#'   S3method(sql_query_set_op, spark_connection)
+#' }
+
 #' @keywords internal
 sql_set_op.spark_connection <- function(con, x, y, method) {
-  if (spark_version(con) < "2.0.0") {
-    # Spark 1.6 does not allow parentheses
-    build_sql(
-      x,
-      "\n", sql(method), "\n",
-      y
-    )
+  sql <- spark_sql_set_op(con, x, y, method)
+
+  if (!is.null(sql)) {
+    sql
   } else {
     class(con) <- class(con)[class(con) != "spark_connection"]
-    sql_set_op(con, x, y, method)
+    NextMethod()
   }
 }
 
-#' @export
-#' @importFrom dplyr db_query_fields
-#' @importFrom dplyr sql_select
-#' @importFrom dplyr sql_subquery
+#' @keywords internal
+sql_query_set_op.spark_connection <- function(con, x, y, method, ..., all = FALSE) {
+  sql <- spark_sql_set_op(con, x, y, method)
+
+  if (!is.null(sql)) {
+    sql
+  } else {
+    class(con) <- class(con)[class(con) != "spark_connection"]
+    NextMethod()
+  }
+}
+
+#' @rawNamespace
+#' if (utils::packageVersion("dbplyr") < "2") {
+#'   importFrom(dplyr, db_query_fields)
+#'   S3method(db_query_fields, spark_connection)
+#' } else {
+#'   importFrom(dbplyr, sql_query_fields)
+#'   S3method(sql_query_fields, spark_connection)
+#' }
+
 #' @keywords internal
 db_query_fields.spark_connection <- function(con, sql, ...) {
-  sqlFields <- sql_select(
-    con,
-    sql("*"),
-    sql_subquery(con, sql),
-    where = sql("0 = 1")
-  )
+  spark_db_query_fields(con, sql)
+}
 
-  hive_context(con) %>%
-    invoke("sql", as.character(sqlFields)) %>%
-    invoke("schema") %>%
-    invoke("fieldNames") %>%
-    as.character()
+#' @keywords internal
+sql_query_fields.spark_connection <- function(con, sql, ...) {
+  spark_sql_query_fields(con, sql, ...)
 }

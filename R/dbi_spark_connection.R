@@ -1,4 +1,3 @@
-
 # DBISparkConnection and methods.
 
 setMethod("dbGetInfo", "spark_connection", function(dbObj, ...) {
@@ -78,3 +77,12 @@ setMethod("dbSetProperty", c("spark_connection", "character", "character"), func
     )
   )
 })
+
+#' @rawNamespace
+#' if (utils::packageVersion("dbplyr") >= "2") {
+#'   importFrom(dbplyr, dbplyr_edition)
+#'   S3method(dbplyr_edition, spark_connection)
+#' }
+dbplyr_edition.spark_connection <- function(con) {
+  2L
+}
