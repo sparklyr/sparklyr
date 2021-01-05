@@ -138,16 +138,19 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   livy_version <- Sys.getenv("LIVY_VERSION")
   if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
     livy_tests <- (
-      if (identical(Sys.getenv("RUN_SPARK_APPLY_TESTS"), "true")) {
+      if (identical(Sys.getenv("LIVY_RUN_SPARK_APPLY_TESTS"), "true")) {
         c(
           "^spark-apply$",
           "^spark-apply-bundle$",
           "^spark-apply-ext$"
         )
-      } else {
+      } else if (identical(Sys.getenv("LIVY_RUN_DPLYR_AND_DBI_TESTS"), "true")) {
         c(
           "^dplyr$",
-          "^dbi$",
+          "^dbi$"
+        )
+      } else {
+        c(
           "^ml-clustering-kmeans$",
           "^livy-config$",
           "^livy-proxy$"
