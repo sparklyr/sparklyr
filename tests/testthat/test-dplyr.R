@@ -213,6 +213,7 @@ test_that("the implementation of 'left_join' functions as expected", {
 
 test_that("'sample_n' works as expected", {
   test_requires_version("2.0.0")
+  skip_livy()
   test_requires("dplyr")
 
   for (weight in list(NULL, rlang::sym("Petal_Length"))) {
@@ -233,6 +234,7 @@ test_that("'sample_n' works as expected", {
 
 test_that("'sample_frac' works as expected", {
   test_requires_version("2.0.0")
+  skip_livy()
   test_requires("dplyr")
 
   for (weight in list(NULL, rlang::sym("Petal_Length"))) {
@@ -253,6 +255,7 @@ test_that("'sample_frac' works as expected", {
 
 test_that("weighted sampling works as expected with integer weight columns", {
   test_requires_version("2.0.0")
+  skip_livy()
   test_requires("dplyr")
 
   sdf <- copy_to(sc, tibble::tibble(id = seq(100), weight = seq(100)))
@@ -272,6 +275,7 @@ test_that("weighted sampling works as expected with integer weight columns", {
 
 test_that("set.seed makes sampling outcomes deterministic", {
   test_requires_version("2.0.0")
+  skip_livy()
   test_requires("dplyr")
 
   sdf <- copy_to(sc, tibble::tibble(id = seq(1000), weight = rep(seq(5), 200)))

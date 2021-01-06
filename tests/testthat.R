@@ -133,57 +133,71 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   # enforce all configuration settings are described
   options(sparklyr.test.enforce.config = TRUE)
 
-  test_filter <- NULL
-
   livy_version <- Sys.getenv("LIVY_VERSION")
+  is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
+
+  test_filters <- list(NULL)
   if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
-    livy_tests <- (
-      if (identical(Sys.getenv("RUN_SPARK_APPLY_TESTS"), "true")) {
+    test_filters <- lapply(
+      list(
         c(
           "^spark-apply$",
           "^spark-apply-bundle$",
           "^spark-apply-ext$"
-        )
-      } else {
+        ),
+        "^dplyr$",
+        "^dbi$",
         c(
-          "^dplyr$",
-          "^dbi$",
           "^ml-clustering-kmeans$",
           "^livy-config$",
           "^livy-proxy$"
         )
-      }
+      ),
+      function(x) paste(x, collapse = "|")
     )
-
-    test_filter <- paste(livy_tests, collapse = "|")
+  } else if (is_arrow_devel) {
+    test_filters <- list(
+      paste(
+        c("^binds$",
+          "^connect-shell$",
+          "^dplyr.*",
+          "^dbi$",
+          "^copy-to$",
+          "^read-write$",
+          "^sdf-collect$",
+          "^serialization$",
+          "^spark-apply.*",
+          "^ml-clustering.*kmeans$"
+        ),
+        collapse = "|"
+      )
+    )
   }
 
-  is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
-  if (is_arrow_devel) {
-    arrow_devel_tests <- c(
-      "^binds$",
-      "^connect-shell$",
-      "^dplyr.*",
-      "^dbi$",
-      "^copy-to$",
-      "^read-write$",
-      "^sdf-collect$",
-      "^serialization$",
-      "^spark-apply.*",
-      "^ml-clustering.*kmeans$"
+  reporter <- MultiReporter$new(
+    reporters = list(
+      SummaryReporter$new(
+        max_reports = 100L,
+        show_praise = FALSE,
+        omit_dots = TRUE
+      ),
+      PerformanceReporter$new()
     )
+  )
 
-    test_filter <- paste(arrow_devel_tests, collapse = "|")
+  run_tests <- function(test_filter) {
+    on.exit({
+      spark_disconnect_all()
+      tryCatch(livy_service_stop(), error = function(e) {})
+
+      remove(".testthat_spark_connection", envir = .GlobalEnv)
+      remove(".testthat_livy_connection", envir = .GlobalEnv)
+    })
+
+    test_check("sparklyr", filter = test_filter, reporter = reporter)
   }
 
-  on.exit({
-    spark_disconnect_all()
-    tryCatch(livy_service_stop(), error = function(e) {})
-  })
-
-  reporter <- MultiReporter$new(reporters = list(
-   SummaryReporter$new(max_reports = 100L, show_praise = FALSE, omit_dots = TRUE),
-   PerformanceReporter$new()
-  ))
-  test_check("sparklyr", filter = test_filter, reporter = reporter)
+  for (test_filter in test_filters) {
+    run_tests(test_filter = test_filter)
+  }
 }
