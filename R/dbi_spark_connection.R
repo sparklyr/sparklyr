@@ -84,5 +84,5 @@ setMethod("dbSetProperty", c("spark_connection", "character", "character"), func
 #'   S3method(dbplyr_edition, spark_connection)
 #' }
 dbplyr_edition.spark_connection <- function(con) {
-  2L
+  as.integer(spark_config_value(con$config, "sparklyr.dbplyr.edition", 2L))
 }

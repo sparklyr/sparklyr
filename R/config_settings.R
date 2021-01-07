@@ -26,6 +26,7 @@ spark_config_settings <- function() {
     sparklyr.connect.ondisconnect = "R function to call after spark_disconnect().",
     sparklyr.connect.sparksubmit = "Command executed instead of spark-submit when connecting.",
     sparklyr.connect.timeout = "Total seconds before giving up connecting to the sparklyr gateway while initializing.",
+    sparklyr.dbplyr.edition = "Edition of dbplyr API to use with spark connections.",
     sparklyr.dplyr.period.splits = "Should 'dplyr' split column names into database and table?",
     sparklyr.extensions.catalog = "Catalog PATH where extension JARs are located. Defaults to 'TRUE', 'FALSE' to disable.",
     sparklyr.gateway.address = "The address of the driver machine.",

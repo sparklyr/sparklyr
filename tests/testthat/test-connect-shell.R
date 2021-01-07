@@ -115,3 +115,15 @@ test_that("'spark_connect' can allow Hive support to be disabled", {
 
   succeed()
 })
+
+test_that("spark_connection reports correct dbplyr edition", {
+  dbplyr_version <- Sys.getenv("DBPLYR_VERSION")
+  if (!identical(dbplyr_version, "") && dbplyr_version < "2") {
+    skip("test case is not applicable for dbplyr 1.x")
+  }
+
+  expect_equal(
+    dbplyr::dbplyr_edition(sc),
+    ifelse(identical(Sys.getenv("DBPLYR_API_EDITION"), "1"), 1L, 2L)
+  )
+})

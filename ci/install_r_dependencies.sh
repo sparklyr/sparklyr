@@ -24,8 +24,8 @@ SEP='"\\s+"'
 
 R_REMOTES_NO_ERRORS_FROM_WARNINGS=true Rscript <(
 cat << _RSCRIPT_EOF_
-  install.packages("devtools")
-  devtools::install_deps(dependencies = c("Imports"))
+  install.packages("remotes")
+  remotes::install_deps(dependencies = c("Imports"))
 
   test_deps <- strsplit("$TEST_DEPS", $SEP)[[1]]
   for (pkg in test_deps)
@@ -37,6 +37,9 @@ cat << _RSCRIPT_EOF_
       options(repos = c("https://dl.bintray.com/ursalabs/arrow-r", getOption("repos")))
     }
     install.packages("arrow")
+  }
+  if (!identical(Sys.getenv("DBPLYR_VERSION"), "")) {
+    remotes::install_version("dbplyr", version = Sys.getenv("DBPLYR_VERSION"))
   }
 _RSCRIPT_EOF_
 )
