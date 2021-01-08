@@ -1,4 +1,9 @@
 Sys.setenv("R_TESTS" = "")
+
+if (identical(Sys.getenv("DBPLYR_API_EDITION"), "1")) {
+  options(sparklyr.dbplyr.edition = 1L)
+}
+
 library(testthat)
 library(sparklyr)
 
