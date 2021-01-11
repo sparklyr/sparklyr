@@ -176,10 +176,10 @@ spark_sanitize_names <- function(names, config) {
 # another process that has a different current working directory)
 spark_normalize_single_path <- function(path) {
   # don't normalize paths that are urls
-  if (grepl("[a-zA-Z]+://", path)) {
+  parsed <- httr::parse_url(path)
+  if (!is.null(parsed$scheme)) {
     path
-  }
-  else {
+  } else {
     normalizePath(path, mustWork = FALSE)
   }
 }
