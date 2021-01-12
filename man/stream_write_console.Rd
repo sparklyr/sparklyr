@@ -9,6 +9,7 @@ stream_write_console(
   mode = c("append", "complete", "update"),
   options = list(),
   trigger = stream_trigger_interval(),
+  partition_by = NULL,
   ...
 )
 }
@@ -23,6 +24,8 @@ stream_write_console(
 \item{trigger}{The trigger for the stream query, defaults to micro-batches runnnig
 every 5 seconds. See \code{\link{stream_trigger_interval}} and
 \code{\link{stream_trigger_continuous}}.}
+
+\item{partition_by}{Partitions the output by the given list of columns.}
 
 \item{...}{Optional arguments; currently unused.}
 }

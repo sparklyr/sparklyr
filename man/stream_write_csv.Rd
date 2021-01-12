@@ -17,6 +17,7 @@ stream_write_csv(
   charset = "UTF-8",
   null_value = NULL,
   options = list(),
+  partition_by = NULL,
   ...
 )
 }
@@ -49,6 +50,8 @@ information to guarantee end-to-end fault-tolerance.}
 \item{null_value}{The character to use for default values, defaults to \code{NULL}.}
 
 \item{options}{A list of strings with additional options.}
+
+\item{partition_by}{Partitions the output by the given list of columns.}
 
 \item{...}{Optional arguments; currently unused.}
 }

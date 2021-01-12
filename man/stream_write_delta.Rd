@@ -10,6 +10,7 @@ stream_write_delta(
   mode = c("append", "complete", "update"),
   checkpoint = file.path("checkpoints", random_string("")),
   options = list(),
+  partition_by = NULL,
   ...
 )
 }
@@ -26,6 +27,8 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 information to guarantee end-to-end fault-tolerance.}
 
 \item{options}{A list of strings with additional options.}
+
+\item{partition_by}{Partitions the output by the given list of columns.}
 
 \item{...}{Optional arguments; currently unused.}
 }
