@@ -11,12 +11,21 @@ df2 <- tibble(b = letters[1:3], c = letters[24:26])
 df1_tbl <- testthat_tbl("df1")
 df2_tbl <- testthat_tbl("df2")
 
+test_that("'select' works with where(...) predicate", {
+  test_requires("dplyr")
+
+  expect_equal(
+    iris %>% select(where(is.numeric)) %>% tbl_vars() %>% gsub("\\.", "_", .),
+    iris_tbl %>% select(where(is.numeric)) %>% collect() %>% tbl_vars()
+  )
+})
+
 test_that("the implementation of 'mutate' functions as expected", {
   test_requires("dplyr")
 
-  expect_equivalent(
-    iris %>% mutate(x = Species) %>% tbl_vars() %>% length(),
-    iris_tbl %>% mutate(x = Species) %>% collect() %>% tbl_vars() %>% length()
+  expect_equal(
+    iris %>% mutate(x = Species) %>% tbl_vars() %>% gsub("\\.", "_", .),
+    iris_tbl %>% mutate(x = Species) %>% collect() %>% tbl_vars()
   )
 })
 

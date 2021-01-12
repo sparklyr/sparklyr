@@ -1,18 +1,3 @@
-#' @include dplyr_join.R
-#' @include dplyr_spark.R
-#' @include dplyr_spark_table.R
-#' @include dplyr_sql.R
-#' @include sdf_interface.R
-#' @include test_connection.R
-#' @include tidyr_fill.R
-#' @include tidyr_nest.R
-#' @include tidyr_pivot_longer.R
-#' @include tidyr_pivot_wider.R
-#' @include tidyr_separate.R
-#' @include tidyr_unite.R
-#' @include tidyr_unnest.R
-NULL
-
 #' Pipe operator
 #'
 #' See \code{\link[dplyr:reexports]{\%>\%}} for more details.
@@ -150,4 +135,13 @@ NULL
 #' @name distinct
 #' @export
 #' @importFrom dplyr distinct
+NULL
+
+#' Select
+#'
+#' See \code{\link[dplyr:select]{select}} for more details.
+#'
+#' @name select
+#' @export
+#' @importFrom dplyr select
 NULL

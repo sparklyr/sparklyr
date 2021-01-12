@@ -32,6 +32,27 @@ mutate.tbl_spark <- function (.data, ...) {
 }
 
 #' @export
+#' @importFrom dplyr select
+select.tbl_spark <- function(.data, ...) {
+  sim_data <- simulate_vars(.data)
+  loc <- tidyselect::eval_select(
+    rlang::expr(c(...)),
+    sim_data,
+    include = dbplyr::op_grps(.data$ops)
+  )
+  new_vars <- rlang::set_names(rlang::syms(names(sim_data)[loc]), names(loc))
+  .class <- class(.data)
+  class(.data) <- setdiff(class(.data), "tbl_spark")
+  .data <- do.call(
+    select,
+    append(list(.data), as.list(new_vars))
+  )
+  class(.data) <- .class
+
+  .data
+}
+
+#' @export
 #' @importFrom dplyr sql_escape_ident
 #' @importFrom dbplyr sql_quote
 sql_escape_ident.spark_connection <- function(con, x) {
