@@ -12,6 +12,8 @@ import scala.collection.mutable.WrappedArray
 import scala.Option
 
 object Serializer {
+  private[this] val dateFormat = new ThreadLocal[SimpleDateFormat]
+
   def readObjectType(dis: DataInputStream): Char = {
     dis.readByte().toChar
   }
@@ -145,8 +147,12 @@ object Serializer {
       if (null == value)
         ""
       else {
-        val fmt = new SimpleDateFormat("yyyy-MM-dd")
-        fmt.setTimeZone(TimeZone.getTimeZone("UTC"))
+        var fmt = dateFormat.get
+        if (null == dateFormat.get) {
+          fmt = new SimpleDateFormat("yyyy-MM-dd")
+          dateFormat.set(fmt)
+          fmt.setTimeZone(TimeZone.getTimeZone("UTC"))
+        }
         fmt.format(value)
       }
     )
