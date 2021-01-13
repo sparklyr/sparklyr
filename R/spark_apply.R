@@ -1,5 +1,6 @@
 #' @include spark_apply_bundle.R
 #' @include spark_schema_from_rdd.R
+#' @include utils.R
 NULL
 
 spark_apply_worker_config <- function(
@@ -24,23 +25,6 @@ spark_apply_worker_config <- function(
       sc$config
     )
   )
-}
-
-spark_apply_colum_types <- function(sdf) {
-  type_map <- list(
-    IntegerType = "integer",
-    FloatType = "numeric",
-    DoubleType = "numeric",
-    LongType = "numeric",
-    StringType = "character",
-    BinaryType = "raw",
-    BooleanType = "logical",
-    TimestampType = "POSIXct",
-    DateType = "Date",
-    DateType = "date"
-  )
-
-  lapply(sdf_schema(sdf), function(e) type_map[[e$type]])
 }
 
 #' Apply an R Function in Spark
@@ -259,7 +243,7 @@ spark_apply <- function(x,
 
   # inject column types and partition_index_param to context
   context <- list(
-    column_types = spark_apply_colum_types(x),
+    column_types = translate_spark_column_types(x),
     partition_index_param = partition_index_param,
     user_context = context
   )

@@ -342,3 +342,58 @@ replicate_colnames <- function(sdf) {
   )
   do.call(data.frame, columns)
 }
+
+translate_spark_column_types <- function(sdf) {
+  type_map <- list(
+    BooleanType = "logical",
+    ByteType = "integer",
+    ShortType = "integer",
+    IntegerType = "integer",
+    FloatType = "numeric",
+    DoubleType = "numeric",
+    LongType = "numeric",
+    StringType = "character",
+    BinaryType = "raw",
+    TimestampType = "POSIXct",
+    DateType = "Date",
+    CalendarIntervalType = "character",
+    NullType = "NULL"
+  )
+
+  sdf %>%
+    sdf_schema() %>%
+    lapply(
+      function(e) {
+        if (e$type %in% names(type_map)) {
+          type_map[[e$type]]
+        } else if (grepl("^(Array|Struct|Map)Type\\(.*\\)$", e$type)) {
+          "list"
+        } else if (grepl("^DecimalType\\(.*\\)$", e$type)) {
+          "numeric"
+        } else {
+          "unknown"
+        }
+      }
+    )
+}
+
+simulate_vars <- function(sdf) {
+  translate_spark_column_types(sdf) %>%
+    lapply(
+      function(x) {
+        fn <- tryCatch(
+          get(paste0("as.", x), envir = parent.frame()),
+          error = function(e) {
+            NULL
+          }
+        )
+
+        if (is.null(fn)) {
+          list()
+        } else {
+          fn(NA)
+        }
+      }
+    ) %>%
+    tibble::as_tibble()
+}
