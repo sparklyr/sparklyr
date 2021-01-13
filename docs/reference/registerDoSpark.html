@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Register a Prallel Backend — registerDoSpark • sparklyr</title>
+<title>Register a Parallel Backend — registerDoSpark • sparklyr</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Register a Prallel Backend — registerDoSpark" />
+<meta property="og:title" content="Register a Parallel Backend — registerDoSpark" />
 <meta property="og:description" content="Registers a parallel backend using the foreach package." />
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -94,7 +94,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/sparklyr/sparklyr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -111,7 +111,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Register a Prallel Backend</h1>
+    <h1>Register a Parallel Backend</h1>
     <small class="dont-index">Source: <a href='https://github.com/sparklyr/sparklyr/blob/master/R/do_spark.R'><code>R/do_spark.R</code></a></small>
     <div class="hidden name"><code>registerDoSpark.Rd</code></div>
     </div>
@@ -120,14 +120,21 @@
     <p>Registers a parallel backend using the <code>foreach</code> package.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>registerDoSpark</span><span class='op'>(</span><span class='va'>spark_conn</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>registerDoSpark</span><span class='op'>(</span><span class='va'>spark_conn</span>, parallelism <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>spark_conn</th>
-      <td><p>spark connection to use</p></td>
+      <td><p>Spark connection to use</p></td>
+    </tr>
+    <tr>
+      <th>parallelism</th>
+      <td><p>Level of parallelism to use for task execution
+(if unspecified, then it will take the value of
+ `SparkContext.defaultParallelism()` which by default is the number
+ of cores available to the `sparklyr` application)</p></td>
     </tr>
     <tr>
       <th>...</th>
