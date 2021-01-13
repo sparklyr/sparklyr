@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -94,7 +94,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/sparklyr/sparklyr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -125,7 +125,7 @@
   from <span class='op'>=</span> <span class='fl'>1L</span>,
   to <span class='op'>=</span> <span class='fl'>1L</span>,
   by <span class='op'>=</span> <span class='fl'>1L</span>,
-  repartition <span class='op'>=</span> <span class='va'>type</span>,
+  repartition <span class='op'>=</span> <span class='cn'>NULL</span>,
   type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"integer"</span>, <span class='st'>"integer64"</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
@@ -147,7 +147,7 @@
     <tr>
       <th>repartition</th>
       <td><p>The number of partitions to use when distributing the
-data across the Spark cluster.</p></td>
+data across the Spark cluster. Defaults to the minimum number of partitions.</p></td>
     </tr>
     <tr>
       <th>type</th>
