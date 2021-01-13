@@ -86,7 +86,7 @@ stream_read_generic <- function(sc,
   tbl(sc, name)
 }
 
-stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, stream_options) {
+stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, partition_by, stream_options) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
   sdf <- spark_dataframe(x)
@@ -99,6 +99,10 @@ stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, strea
 
   streamOptions <- invoke(sdf, "writeStream") %>%
     invoke("format", type)
+
+  if (!is.null(partition_by)) {
+    streamOptions <- streamOptions %>% invoke("partitionBy", as.list(partition_by))
+  }
 
   stream_options$path <- path
 
@@ -213,6 +217,7 @@ stream_read_csv <- function(sc,
 #'   \code{\link{stream_trigger_continuous}}.
 #' @param checkpoint The location where the system will write all the checkpoint
 #' information to guarantee end-to-end fault-tolerance.
+#' @param partition_by Partitions the output by the given list of columns.
 #'
 #' @family Spark stream serialization
 #'
@@ -244,6 +249,7 @@ stream_write_csv <- function(x,
                              charset = "UTF-8",
                              null_value = NULL,
                              options = list(),
+                             partition_by = NULL,
                              ...) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
@@ -264,6 +270,7 @@ stream_write_csv <- function(x,
     mode = mode,
     trigger = trigger,
     checkpoint = checkpoint,
+    partition_by = partition_by,
     stream_options = streamOptions
   )
 }
@@ -275,6 +282,7 @@ stream_write_csv <- function(x,
 #' @inheritParams stream_write_csv
 #'
 #' @param name The name to assign to the newly generated stream.
+#' @param partition_by Partitions the output by the given list of columns.
 #'
 #' @family Spark stream serialization
 #'
@@ -300,6 +308,7 @@ stream_write_memory <- function(x,
                                 trigger = stream_trigger_interval(),
                                 checkpoint = file.path("checkpoints", name, random_string("")),
                                 options = list(),
+                                partition_by = NULL,
                                 ...) {
   sc <- spark_connection(x)
   spark_require_version(sc, "2.0.0", "Spark streaming")
@@ -334,6 +343,7 @@ stream_write_memory <- function(x,
     mode = mode,
     trigger = trigger,
     checkpoint = checkpoint,
+    partition_by = partition_by,
     stream_options = options
   )
 }
@@ -387,6 +397,7 @@ stream_read_text <- function(sc,
 #' @inheritParams stream_write_memory
 #' @param path The destination path. Needs to be accessible from the cluster.
 #'   Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.
+#' @param partition_by Partitions the output by the given list of columns.
 #'
 #' @family Spark stream serialization
 #'
@@ -412,6 +423,7 @@ stream_write_text <- function(x,
                               trigger = stream_trigger_interval(),
                               checkpoint = file.path(path, "checkpoints", random_string("")),
                               options = list(),
+                              partition_by = NULL,
                               ...) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
@@ -423,6 +435,7 @@ stream_write_text <- function(x,
     mode = mode,
     trigger = trigger,
     checkpoint = checkpoint,
+    partition_by = partition_by,
     stream_options = options
   )
 }
@@ -500,6 +513,7 @@ stream_write_json <- function(x,
                               trigger = stream_trigger_interval(),
                               checkpoint = file.path(path, "checkpoints", random_string("")),
                               options = list(),
+                              partition_by = NULL,
                               ...) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
@@ -511,6 +525,7 @@ stream_write_json <- function(x,
     mode = mode,
     trigger = trigger,
     checkpoint = checkpoint,
+    partition_by = partition_by,
     stream_options = options
   )
 }
@@ -582,6 +597,7 @@ stream_write_parquet <- function(x,
                                  trigger = stream_trigger_interval(),
                                  checkpoint = file.path(path, "checkpoints", random_string("")),
                                  options = list(),
+                                 partition_by = NULL,
                                  ...) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
@@ -593,6 +609,7 @@ stream_write_parquet <- function(x,
     mode = mode,
     trigger = trigger,
     checkpoint = checkpoint,
+    partition_by = partition_by,
     stream_options = options
   )
 }
@@ -664,6 +681,7 @@ stream_write_orc <- function(x,
                              trigger = stream_trigger_interval(),
                              checkpoint = file.path(path, "checkpoints", random_string("")),
                              options = list(),
+                             partition_by = NULL,
                              ...) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
@@ -675,6 +693,7 @@ stream_write_orc <- function(x,
     mode = mode,
     trigger = trigger,
     checkpoint = checkpoint,
+    partition_by = partition_by,
     stream_options = options
   )
 }
@@ -755,6 +774,7 @@ stream_write_kafka <- function(x,
                                trigger = stream_trigger_interval(),
                                checkpoint = file.path("checkpoints", random_string("")),
                                options = list(),
+                               partition_by = NULL,
                                ...) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
@@ -766,6 +786,7 @@ stream_write_kafka <- function(x,
     mode = mode,
     trigger = trigger,
     checkpoint = checkpoint,
+    partition_by = partition_by,
     stream_options = options
   )
 }
@@ -834,6 +855,7 @@ stream_write_console <- function(x,
                                  mode = c("append", "complete", "update"),
                                  options = list(),
                                  trigger = stream_trigger_interval(),
+                                 partition_by = NULL,
                                  ...) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
@@ -845,6 +867,7 @@ stream_write_console <- function(x,
     mode = mode,
     trigger = trigger,
     checkpoint = NULL,
+    partition_by = partition_by,
     stream_options = options
   )
 }
@@ -927,6 +950,7 @@ stream_write_delta <- function(x,
                                mode = c("append", "complete", "update"),
                                checkpoint = file.path("checkpoints", random_string("")),
                                options = list(),
+                               partition_by = NULL,
                                ...) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
@@ -938,6 +962,7 @@ stream_write_delta <- function(x,
     mode = mode,
     trigger = FALSE,
     checkpoint = checkpoint,
+    partition_by = partition_by,
     stream_options = options
   )
 }

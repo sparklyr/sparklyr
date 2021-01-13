@@ -11,6 +11,7 @@ stream_write_json(
   trigger = stream_trigger_interval(),
   checkpoint = file.path(path, "checkpoints", random_string("")),
   options = list(),
+  partition_by = NULL,
   ...
 )
 }
@@ -31,6 +32,8 @@ every 5 seconds. See \code{\link{stream_trigger_interval}} and
 information to guarantee end-to-end fault-tolerance.}
 
 \item{options}{A list of strings with additional options.}
+
+\item{partition_by}{Partitions the output by the given list of columns.}
 
 \item{...}{Optional arguments; currently unused.}
 }

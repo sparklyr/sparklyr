@@ -4,8 +4,9 @@ skip_databricks_connect()
 test_requires("dplyr")
 sc <- testthat_spark_connection()
 
-iris_in <- paste0("file:///", file.path(getwd(), "iris-in"))
-iris_out <- paste0("file:///", file.path(getwd(), "iris-out"))
+iris_in <- paste0("file://", file.path(getwd(), "iris-in"))
+iris_out_dir <- file.path(getwd(), "iris-out")
+iris_out <- paste0("file://", iris_out_dir)
 
 test_stream <- function(description, test) {
   if (!dir.exists("iris-in")) dir.create("iris-in")
@@ -152,4 +153,19 @@ test_stream("stream_lag() works as expected", {
     output_sdf %>% collect(),
     expected %>% dplyr::mutate(x = as.POSIXct(x, origin = "1970-01-01"))
   )
+})
+
+test_stream("stream write handles partitioning columns correctly", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    stream_write_csv(iris_out, partition_by = "Species")
+
+  stream_stop(stream)
+
+  sub_dirs <- dir(iris_out_dir)
+
+  for (partition in c("Species=setosa", "Species=versicolor", "Species=virginica")) {
+    expect_true(partition %in% sub_dirs)
+  }
 })
