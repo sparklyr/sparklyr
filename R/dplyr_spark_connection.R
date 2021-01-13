@@ -1,4 +1,5 @@
 #' @include dplyr_hof.R
+#' @include partial_eval.R
 #' @include spark_sql.R
 #' @include utils.R
 NULL
@@ -50,6 +51,48 @@ select.tbl_spark <- function(.data, ...) {
   class(.data) <- .class
 
   .data
+}
+
+#' @export
+#' @importFrom dplyr summarise
+#' @importFrom dbplyr add_op_single
+#' @importFrom dbplyr op_vars
+summarise.tbl_spark <- function(.data, ...) {
+  # NOTE: this is mostly copy-pasted from
+  # https://github.com/tidyverse/dbplyr/blob/master/R/verb-summarise.R
+  # except for minor changes (see "partial-eval.R") to make use cases such as
+  # `summarise(across(where(is.numeric), mean))` work as expected for Spark
+  # dataframes
+  dots <- rlang::quos(..., .named = TRUE)
+  dots <- partial_eval_dots(dots, sim_data = simulate_vars(.data))
+
+  all_names <- function(x) {
+    if (is.name(x)) return(as.character(x))
+    if (rlang::is_quosure(x)) return(all_names(rlang::quo_get_expr(x)))
+    if (!is.call(x)) return(NULL)
+
+    unique(unlist(lapply(x[-1], all_names), use.names = FALSE))
+  }
+  # For each expression, check if it uses any newly created variables
+  check_summarise_vars <- function(dots) {
+    for (i in seq_along(dots)) {
+      used_vars <- all_names(rlang::get_expr(dots[[i]]))
+      cur_vars <- names(dots)[seq_len(i - 1)]
+
+      if (any(used_vars %in% cur_vars)) {
+        stop(
+          "`", names(dots)[[i]],
+          "` refers to a variable created earlier in this summarise().\n",
+          "Do you need an extra mutate() step?",
+          call. = FALSE
+        )
+      }
+    }
+  }
+
+  check_summarise_vars(dots)
+
+  add_op_single("summarise", .data, dots = dots)
 }
 
 #' @export
