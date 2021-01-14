@@ -151,6 +151,13 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
           "^spark-apply-ext$"
         ),
         "^dplyr$",
+        "^dplyr-join$",
+        "^dplyr-stats$",
+        c(
+          "^dplyr-sample$",
+          "^dplyr-sample-n$",
+          "^dplyr-sample-frac$"
+        ),
         "^dbi$",
         c(
           "^ml-clustering-kmeans$",
