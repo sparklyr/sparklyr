@@ -167,6 +167,7 @@ Collate:
     'spark_sql.R'
     'spark_dataframe.R'
     'dplyr_spark.R'
+    'partial_eval.R'
     'dplyr_spark_connection.R'
     'dplyr_spark_data.R'
     'prng_utils.R'

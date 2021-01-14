@@ -20,6 +20,25 @@ test_that("'select' works with where(...) predicate", {
   )
 })
 
+test_that("'summarize' works with where(...) predicate", {
+  test_requires("dplyr")
+
+  expect_equivalent(
+    iris %>% summarize(across(where(is.numeric), mean)),
+    iris_tbl %>% summarize(across(where(is.numeric), mean)) %>% collect()
+  )
+
+  expect_equivalent(
+    iris %>% summarize(across(starts_with("Petal"), mean)),
+    iris_tbl %>% summarize(across(starts_with("Petal"), mean)) %>% collect()
+  )
+
+  expect_equivalent(
+    iris %>% summarize(across(where(is.factor), n_distinct)),
+    iris_tbl %>% summarize(across(where(is.character), n_distinct)) %>% collect()
+  )
+})
+
 test_that("the implementation of 'mutate' functions as expected", {
   test_requires("dplyr")
 
