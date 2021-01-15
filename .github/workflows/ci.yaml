@@ -8,9 +8,6 @@ on:
 
 name: CI
 
-env:
-  SPARKLYR_LIVY_BRANCH: 'feature/sparklyr-1.5.0'
-
 jobs:
   CI:
     runs-on: ubuntu-latest

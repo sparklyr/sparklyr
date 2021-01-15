@@ -38,11 +38,6 @@ testthat_spark_connection <- function() {
     assign(".testthat_latest_spark", "3.0.0", envir = .GlobalEnv)
   }
 
-  livy_branch <- Sys.getenv("SPARKLYR_LIVY_BRANCH")
-  if (nchar(livy_branch) > 0) {
-    options(sparklyr.livy.branch = livy_branch)
-  }
-
   livy_version <- Sys.getenv("LIVY_VERSION")
   test_databricks_connect <- Sys.getenv("TEST_DATABRICKS_CONNECT")
 
