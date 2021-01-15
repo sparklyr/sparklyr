@@ -47,7 +47,7 @@ test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits and
   df_s <- sdf_residuals(s) %>%
     collect() %>%
     as.data.frame()
-  expect_equal(df_r, df_s)
+  expect_equivalent(df_r, df_s)
 
   beaver_tbl <- testthat_tbl("beaver2")
 
