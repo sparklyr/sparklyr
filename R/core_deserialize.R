@@ -190,7 +190,7 @@ readArray <- function(con) {
 
   if (len > 0) {
     l <- vector("list", len)
-    for (i in 1:len) {
+    for (i in seq_len(len)) {
       l[[i]] <- readTypedObject(con, type)
     }
     l
@@ -205,7 +205,7 @@ readList <- function(con) {
   len <- readInt(con)
   if (len > 0) {
     l <- vector("list", len)
-    for (i in 1:len) {
+    for (i in seq_len(len)) {
       elem <- readObject(con)
       if (is.null(elem)) {
         elem <- NA
@@ -222,7 +222,7 @@ readEnv <- function(con) {
   env <- new.env()
   len <- readInt(con)
   if (len > 0) {
-    for (i in 1:len) {
+    for (i in seq_len(len)) {
       key <- readString(con)
       value <- readObject(con)
       env[[key]] <- value

@@ -15,7 +15,7 @@ tidy.ml_model_multilayer_perceptron_classification <- function(x,
   weight_param <- NULL
 
   # how many parameters in each layer
-  weight_param <- purrr::map_dbl(1:(num_layers - 1), function(e) {
+  weight_param <- purrr::map_dbl(seq_len(num_layers - 1), function(e) {
     (x$model$layers[e] + 1) * x$model$layers[e + 1]
   })
 
@@ -25,7 +25,7 @@ tidy.ml_model_multilayer_perceptron_classification <- function(x,
   # transform the vector x$model$weights in a list of
   # matrix
   weight_matrix <- list()
-  weight_matrix <- purrr::map(1:(length(weight_param) - 1), function(e) {
+  weight_matrix <- purrr::map(seq_len(length(weight_param) - 1), function(e) {
     matrix(x$model$weights[(weight_param[e] + 1):weight_param[e + 1]],
       nrow = x$model$layers[e] + 1,
       ncol = x$model$layers[e + 1],
@@ -33,7 +33,7 @@ tidy.ml_model_multilayer_perceptron_classification <- function(x,
     )
   })
 
-  layers <- purrr::map_chr(1:(num_layers - 1), function(e) {
+  layers <- purrr::map_chr(seq_len(num_layers - 1), function(e) {
     paste0("layer_", e)
   })
 

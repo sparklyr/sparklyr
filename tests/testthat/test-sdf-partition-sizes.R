@@ -4,7 +4,7 @@ sc <- testthat_spark_connection()
 
 test_that("sdf_partition_sizes works as expected", {
   num_rows <- 100L
-  num_partitions = 10L
+  num_partitions <- 10L
 
   sdf <- sdf_len(sc, num_rows, repartition = num_partitions)
   rs <- sdf_partition_sizes(sdf)

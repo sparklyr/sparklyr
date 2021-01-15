@@ -119,7 +119,7 @@ sdf_bind_rows <- function(..., id = NULL) {
   sdf_augment <- function(x, schema_complement) {
     sdf <- spark_dataframe(x)
     if (nrow(schema_complement) > 0L) {
-      for (i in 1:nrow(schema_complement)) {
+      for (i in seq_len(nrow(schema_complement))) {
         new_col <- invoke_static(
           sc,
           "org.apache.spark.sql.functions",

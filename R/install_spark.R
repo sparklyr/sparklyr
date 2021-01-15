@@ -19,7 +19,7 @@ spark_install_version_expand <- function(version, installed_only) {
     versions <- spark_installed_versions()$spark
   }
   else {
-    versions <- spark_available_versions(show_minor = T)$spark
+    versions <- spark_available_versions(show_minor = TRUE)$spark
   }
 
   versions <- versions[grepl(version, versions)]

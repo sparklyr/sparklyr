@@ -47,6 +47,7 @@ ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col =
 
 #' @export
 ft_vector_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
+                                          handle_invalid = "error",
                                           max_categories = 20,
                                           uid = random_string("vector_indexer_"), ...) {
   stage <- ft_vector_indexer.spark_connection(
@@ -62,6 +63,7 @@ ft_vector_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
 
 #' @export
 ft_vector_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
+                                        handle_invalid = "error",
                                         max_categories = 20,
                                         uid = random_string("vector_indexer_"), ...) {
   stage <- ft_vector_indexer.spark_connection(

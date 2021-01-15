@@ -8,7 +8,7 @@ test_that("top_n works as expected", {
   test_requires("dplyr")
 
   test_data <- c()
-  for (i in 1:length(LETTERS))
+  for (i in seq_along(LETTERS))
   {
     test_data <- c(test_data, rep.int(LETTERS[i], times = i * 10))
   }
