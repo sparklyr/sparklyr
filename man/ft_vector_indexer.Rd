@@ -8,6 +8,7 @@ ft_vector_indexer(
   x,
   input_col = NULL,
   output_col = NULL,
+  handle_invalid = "error",
   max_categories = 20,
   uid = random_string("vector_indexer_"),
   ...
@@ -19,6 +20,10 @@ ft_vector_indexer(
 \item{input_col}{The name of the input column.}
 
 \item{output_col}{The name of the output column.}
+
+\item{handle_invalid}{(Spark 2.1.0+) Param for how to handle invalid entries. Options are
+'skip' (filter out rows with invalid values), 'error' (throw an error), or
+'keep' (keep invalid values in a special additional bucket). Default: "error"}
 
 \item{max_categories}{Threshold for the number of values a categorical feature can take. If a feature is found to have > \code{max_categories} values, then it is declared continuous. Must be greater than or equal to 2. Defaults to 20.}
 
