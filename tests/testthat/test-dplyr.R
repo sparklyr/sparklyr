@@ -48,6 +48,26 @@ test_that("the implementation of 'mutate' functions as expected", {
   )
 })
 
+test_that("'mutate' works with `where(...)` predicate", {
+  test_requires("dplyr")
+  # Arrow currently throws java.lang.UnsupportedOperationException for this type
+  # of query
+  skip_on_arrow()
+
+  df <- tibble::tibble(
+    x = seq(3),
+    y = letters[1:3],
+    t = as.POSIXct(seq(3), origin = "1970-01-01"),
+    z = seq(3) + 5L
+  )
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+
+  expect_equivalent(
+    sdf %>% mutate(across(where(is.numeric), exp)) %>% collect(),
+    df %>% mutate(across(where(is.numeric), exp))
+  )
+})
+
 test_that("the implementation of 'filter' functions as expected", {
   test_requires("dplyr")
 

@@ -1,3 +1,4 @@
+#' @include dbplyr_utils.R
 #' @include dplyr_hof.R
 #' @include partial_eval.R
 #' @include spark_sql.R
@@ -27,9 +28,10 @@ transmute.tbl_spark <- function (.data, ...) {
 #' @importFrom dplyr mutate
 mutate.tbl_spark <- function (.data, ...) {
   dots <- rlang::enquos(..., .named = TRUE) %>%
-    fix_na_real_values()
+    fix_na_real_values() %>%
+    partial_eval_dots(sim_data = simulate_vars(.data))
 
-  do.call(NextMethod, dots)
+  nest_vars(.data, dots, union(dbplyr::op_vars(.data), dbplyr::op_grps(.data)))
 }
 
 #' @export
@@ -66,13 +68,6 @@ summarise.tbl_spark <- function(.data, ...) {
   dots <- rlang::quos(..., .named = TRUE)
   dots <- partial_eval_dots(dots, sim_data = simulate_vars(.data))
 
-  all_names <- function(x) {
-    if (is.name(x)) return(as.character(x))
-    if (rlang::is_quosure(x)) return(all_names(rlang::quo_get_expr(x)))
-    if (!is.call(x)) return(NULL)
-
-    unique(unlist(lapply(x[-1], all_names), use.names = FALSE))
-  }
   # For each expression, check if it uses any newly created variables
   check_summarise_vars <- function(dots) {
     for (i in seq_along(dots)) {

@@ -435,15 +435,22 @@ spark_master_is_gateway <- function(master) {
   grepl("sparklyr://.*", master)
 }
 
+#' Terminate all Spark connections
+#'
+#' Call `spark_disconnect()` on each open Spark connection
+#'
+#' @param ... Additional params to be passed to each `spark_disconnect()` call
+#'    (e.g., `terminate = TRUE`)
+#'
 #' @name spark-connections
 #' @export
-spark_disconnect_all <- function() {
+spark_disconnect_all <- function(...) {
   scons <- spark_connection_find_scon(function(e) {
     connection_is_open(e)
   })
 
   length(lapply(scons, function(e) {
-    spark_disconnect(e)
+    spark_disconnect(e, ...)
   }))
 }
 

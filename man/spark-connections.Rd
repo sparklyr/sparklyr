@@ -26,7 +26,7 @@ spark_connection_is_open(sc)
 
 spark_disconnect(sc, ...)
 
-spark_disconnect_all()
+spark_disconnect_all(...)
 
 spark_submit(
   master,
@@ -82,7 +82,8 @@ by default assume Spark 2.4 on current host is built with Scala 2.11, and theref
 `scala_version = '2.12'` is needed if sparklyr is connecting to Spark 2.4 built with
 Scala 2.12)}
 
-\item{...}{Optional arguments; currently unused.}
+\item{...}{Additional params to be passed to each `spark_disconnect()` call
+(e.g., `terminate = TRUE`)}
 
 \item{sc}{A \code{spark_connection}.}
 
@@ -90,6 +91,8 @@ Scala 2.12)}
 }
 \description{
 These routines allow you to manage your connections to Spark.
+
+Call `spark_disconnect()` on each open Spark connection
 }
 \details{
 By default, when using \code{method = "livy"}, jars are downloaded from GitHub. But
