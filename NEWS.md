@@ -4,10 +4,11 @@
 
 - Made `sparklyr` compatible with both dbplyr edition 1 and edition 2 APIs
 
-- `dplyr::select()`, `dplyr::mutate()`, and `dplyr::summarize()` for Spark
-  dataframes can now accept `where()` predicates for selecting columns
+- Revised `sparklyr`'s integration with `dbplyr` API so that `dplyr::select()`,
+  `dplyr::mutate()`, and `dplyr::summarize()` verbs on Spark dataframes
+  involving `where()` predicates can be correctly translated to Spark SQL
   (e.g., one can have `sdf %>% select(where(is.numeric))` and
-   `sdf %>% summarize(across(starts_with("Petal"), mean))`, etc)
+  `sdf %>% summarize(across(starts_with("Petal"), mean))`, etc)
 
 - Added support for `partition_by` option in `stream_write_*` methods
 
