@@ -43,7 +43,7 @@
 #' family_link <- data.frame(family_link, rmse = 0)
 #'
 #' # Train the models
-#' for (i in 1:nrow(family_link)) {
+#' for (i in seq_len(nrow(family_link))) {
 #'   glm_model <- mtcars_training %>%
 #'     ml_generalized_linear_regression(mpg ~ .,
 #'       family = family_link[i, 1],

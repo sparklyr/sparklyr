@@ -95,7 +95,7 @@ spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE, sh
 
   versions <- unique(subset(versions, select = selection))
 
-  rownames(versions) <- 1:nrow(versions)
+  rownames(versions) <- seq_len(nrow(versions))
 
   if (!show_minor) versions$spark <- gsub("\\.[0-9]+$", "", versions$spark)
 

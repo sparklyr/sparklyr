@@ -322,7 +322,7 @@ livy_statement_compose <- function(sc, static, class, method, ...) {
   else {
     last_var <- "builder.toString"
     chunk_vars <- c(chunk_vars, "val builder = StringBuilder.newBuilder")
-    for (i in 1:length(chunks)) {
+    for (i in seq_along(chunks)) {
       chunk_vars <- c(chunk_vars, paste("builder.append(\"", chunks[i], "\") == \"\"", sep = ""))
     }
   }

@@ -355,7 +355,7 @@ deduplicate_longer_spec <- function(spec) {
   })
   pos <- c(list(0), pos, list(nchar))
 
-  purrr::map(1:(length(pos) - 1), function(i) {
+  purrr::map(seq_len(length(pos) - 1), function(i) {
     substr(x, pos[[i]] + 1, pos[[i + 1]])
   })
 }

@@ -278,7 +278,7 @@ readArray <- function(con) {
 
   if (len > 0) {
     l <- vector("list", len)
-    for (i in 1:len) {
+    for (i in seq_len(len)) {
       l[[i]] <- readTypedObject(con, type)
     }
     l
@@ -293,7 +293,7 @@ readList <- function(con) {
   len <- readInt(con)
   if (len > 0) {
     l <- vector("list", len)
-    for (i in 1:len) {
+    for (i in seq_len(len)) {
       elem <- readObject(con)
       if (is.null(elem)) {
         elem <- NA
@@ -310,7 +310,7 @@ readEnv <- function(con) {
   env <- new.env()
   len <- readInt(con)
   if (len > 0) {
-    for (i in 1:len) {
+    for (i in seq_len(len)) {
       key <- readString(con)
       value <- readObject(con)
       env[[key]] <- value
@@ -1336,7 +1336,7 @@ spark_worker_execute_closure <- function(
 
 spark_worker_clean_factors <- function(result) {
   if (any(sapply(result, is.factor))) {
-    result <- as.data.frame(lapply(result, function(x) if (is.factor(x)) as.character(x) else x), stringsAsFactors = F)
+    result <- as.data.frame(lapply(result, function(x) if (is.factor(x)) as.character(x) else x), stringsAsFactors = FALSE)
   }
 
   result
@@ -1481,7 +1481,7 @@ spark_worker_apply_arrow <- function(sc, config) {
     result <- NULL
 
     if (!is.null(df)) {
-      colnames(df) <- columnNames[1:length(colnames(df))]
+      colnames(df) <- columnNames[seq_along(colnames(df))]
 
       result <- spark_worker_execute_closure(
         closure,
@@ -1608,7 +1608,7 @@ spark_worker_apply <- function(sc, config) {
         }
 
         # cast column to correct type, for instance, when dealing with NAs.
-        for (i in 1:ncol(df)) {
+        for (i in seq_along(df)) {
           target_type <- funcContext$column_types[[i]]
           if (!is.null(target_type) && class(df[[i]]) != target_type) {
             df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
@@ -1617,7 +1617,7 @@ spark_worker_apply <- function(sc, config) {
       }
     }
 
-    colnames(df) <- columnNames[1:length(colnames(df))]
+    colnames(df) <- columnNames[seq_along(colnames(df))]
 
     result <- spark_worker_execute_closure(
       closure,
@@ -1643,7 +1643,7 @@ spark_worker_apply <- function(sc, config) {
   if (!is.null(all_results) && nrow(all_results) > 0) {
     worker_log("updating ", nrow(all_results), " rows")
 
-    all_data <- lapply(1:nrow(all_results), function(i) as.list(all_results[i, ]))
+    all_data <- lapply(seq_len(nrow(all_results)), function(i) as.list(all_results[i, ]))
 
     worker_invoke(context, "setResultArraySeq", all_data)
     worker_log("updated ", nrow(all_results), " rows")

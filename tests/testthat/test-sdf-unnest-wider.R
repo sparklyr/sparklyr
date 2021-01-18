@@ -49,7 +49,7 @@ test_that("`names_repair` works as expected", {
 test_that("`ptype` works as expected", {
   test_requires_version("2.4.0")
 
-  ptype = data.frame(x = numeric(), a = character(), b = integer())
+  ptype <- data.frame(x = numeric(), a = character(), b = integer())
 
   expect_equivalent(
     sdf %>% sdf_unnest_wider(y, ptype = ptype) %>% collect(),
@@ -60,7 +60,7 @@ test_that("`ptype` works as expected", {
 test_that("`transform` works as expected", {
   test_requires_version("2.4.0")
 
-  transform = list(x = as.character, a = as.integer)
+  transform <- list(x = as.character, a = as.integer)
 
   expect_equivalent(
     sdf %>% sdf_unnest_wider(y, transform = transform) %>% collect(),

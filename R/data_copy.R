@@ -97,7 +97,7 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition, raw_co
     names(df) <- spark_sanitize_names(names(df), sc$config)
     columns <- spark_data_translate_columns(df)
     for (row_column in raw_columns) {
-      columns[[row_column]] = "raw"
+      columns[[row_column]] <- "raw"
     }
     sdf_current <- serializer(sc, df, columns, repartition)
     sdf_list[[i]] <- sdf_current
