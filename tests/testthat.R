@@ -153,11 +153,9 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
         "^dplyr$",
         "^dplyr-join$",
         "^dplyr-stats$",
-        c(
-          "^dplyr-sample$",
-          "^dplyr-sample-n$",
-          "^dplyr-sample-frac$"
-        ),
+        "^dplyr-row-sums$",
+        "^dplyr-weighted-mean$",
+        "^dplyr-sample.*$",
         "^dbi$",
         c(
           "^ml-clustering-kmeans$",
@@ -186,17 +184,6 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     )
   }
 
-  reporter <- MultiReporter$new(
-    reporters = list(
-      SummaryReporter$new(
-        max_reports = 100L,
-        show_praise = FALSE,
-        omit_dots = TRUE
-      ),
-      PerformanceReporter$new()
-    )
-  )
-
   run_tests <- function(test_filter) {
     on.exit({
       spark_disconnect_all()
@@ -205,6 +192,17 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
       remove(".testthat_spark_connection", envir = .GlobalEnv)
       remove(".testthat_livy_connection", envir = .GlobalEnv)
     })
+
+    reporter <- MultiReporter$new(
+      reporters = list(
+        SummaryReporter$new(
+          max_reports = 100L,
+          show_praise = FALSE,
+          omit_dots = TRUE
+        ),
+        PerformanceReporter$new()
+      )
+    )
 
     test_check("sparklyr", filter = test_filter, reporter = reporter)
   }
