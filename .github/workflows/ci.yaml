@@ -81,6 +81,15 @@ jobs:
               SPARK_VERSION: '2.3.0'
               LIVY_VERSION: '0.5.0'
               JAVA_VERSION: 'oraclejdk8'
+              LIVY_TEST_CASES_SUBSET: '1'
+          - name: 'Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)'
+            r: 'release'
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '2.3.0'
+              LIVY_VERSION: '0.5.0'
+              JAVA_VERSION: 'oraclejdk8'
+              LIVY_TEST_CASES_SUBSET: '2'
           - name: 'Livy 0.5.0 (R release, oraclejdk8, Spark 2.4.0)'
             r: 'release'
             env:
@@ -88,6 +97,15 @@ jobs:
               SPARK_VERSION: '2.4.0'
               LIVY_VERSION: '0.5.0'
               JAVA_VERSION: 'oraclejdk8'
+              LIVY_TEST_CASES_SUBSET: '1'
+          - name: 'Livy 0.5.0 (R release, oraclejdk8, Spark 2.4.0)'
+            r: 'release'
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '2.4.0'
+              LIVY_VERSION: '0.5.0'
+              JAVA_VERSION: 'oraclejdk8'
+              LIVY_TEST_CASES_SUBSET: '2'
           - name: 'Arrow (release)'
             r: 'release'
             env:
