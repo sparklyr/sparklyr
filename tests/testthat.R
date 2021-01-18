@@ -143,19 +143,13 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
 
   test_filters <- list(NULL)
   if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
-    test_filters <- lapply(
+    test_cases <- list(
       list(
         c(
           "^spark-apply$",
           "^spark-apply-bundle$",
           "^spark-apply-ext$"
         ),
-        "^dplyr$",
-        "^dplyr-join$",
-        "^dplyr-stats$",
-        "^dplyr-row-sums$",
-        "^dplyr-weighted-mean$",
-        "^dplyr-sample.*$",
         "^dbi$",
         c(
           "^ml-clustering-kmeans$",
@@ -163,6 +157,18 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
           "^livy-proxy$"
         )
       ),
+      list(
+        c(
+          "^dplyr$",
+          "^dplyr-join$",
+          "^dplyr-stats$",
+          "^dplyr-sample.*$",
+          "^dplyr-weighted-mean$"
+        )
+      )
+    )
+    test_filters <- lapply(
+      test_cases[[as.integer(Sys.getenv("LIVY_TEST_CASES_SUBSET"))]],
       function(x) paste(x, collapse = "|")
     )
   } else if (is_arrow_devel) {
