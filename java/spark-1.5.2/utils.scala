@@ -349,66 +349,8 @@ object Utils {
     sc.parallelize(data, partitions)
   }
 
-  def createDataFrameFromText(
-    sc: SparkContext,
-    rows: Array[String],
-    columns: Array[String],
-    partitions: Int,
-    separator: String): RDD[Row] = {
-
-    var data = rows.map(o => {
-      val r = o.split(separator, -1)
-      var typed = (Array.range(0, r.length)).map(idx => {
-        val column = columns(idx)
-        val value = r(idx)
-
-        parseCsvField(column, value)
-      })
-
-      org.apache.spark.sql.Row.fromSeq(typed)
-    })
-
-    sc.parallelize(data, partitions)
-  }
-
   def classExists(name: String): Boolean = {
     scala.util.Try(Class.forName(name)).isSuccess
-  }
-
-  def parseCsvField(column: String, value: String) = {
-    column match {
-      case "integer"   => Try(value.toInt).getOrElse(null)
-      case "double"    => Try(value.toDouble).getOrElse(null)
-      case "logical"   => Try(value.toBoolean).getOrElse(null)
-      case "timestamp" => Try(new java.sql.Timestamp(value.toLong * 1000)).getOrElse(null)
-      case "date" => Try(java.sql.Date.valueOf(value)).getOrElse(null)
-      case _ => if (value == "NA") null else value
-    }
-  }
-
-  def createDataFrameFromCsv(
-    sc: SparkContext,
-    path: String,
-    columns: Array[String],
-    partitions: Int,
-    separator: String): RDD[Row] = {
-
-    val lines = scala.io.Source.fromFile(path).getLines.toIndexedSeq
-    val rddRows: RDD[String] = sc.parallelize(lines, partitions);
-
-    val data: RDD[Row] = rddRows.map(o => {
-      val r = o.split(separator, -1)
-      var typed = (Array.range(0, r.length)).map(idx => {
-        val column = columns(idx)
-        val value = r(idx)
-
-        parseCsvField(column, value)
-      })
-
-      org.apache.spark.sql.Row.fromSeq(typed)
-    })
-
-    data
   }
 
   /**
