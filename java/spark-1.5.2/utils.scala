@@ -4,6 +4,8 @@ import java.io._
 import java.net.{InetAddress, ServerSocket}
 import java.util.Arrays
 
+import org.apache.hadoop.fs.FileSystem
+import org.apache.hadoop.fs.Path
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
@@ -446,6 +448,21 @@ object Utils {
     sc.wholeTextFiles(inputPath).map {
       l => Row(l._1, l._2)
     }
+  }
+
+  private[this] def writeBytes(
+    sc: SparkContext,
+    outputPath: String,
+    bytes: Array[Byte]
+  ): Unit = {
+    // create a binary file on HDFS if we are connected to a Spark cluster, or
+    // on local file system if Spark is running in local mode
+    val fs = FileSystem.get(sc.hadoopConfiguration)
+    val output = fs.create(new Path(outputPath))
+    val bos = new BufferedOutputStream(output)
+    bos.write(bytes)
+    bos.close
+    fs.close
   }
 
   def unionRdd(context: org.apache.spark.SparkContext, rdds: Seq[org.apache.spark.rdd.RDD[org.apache.spark.sql.Row]]):
