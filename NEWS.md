@@ -1,3 +1,27 @@
+# Sparklyr 1.5.2.9001
+
+### Data
+
+- Made `sparklyr` compatible with both dbplyr edition 1 and edition 2 APIs
+
+- Revised `sparklyr`'s integration with `dbplyr` API so that `dplyr::select()`,
+  `dplyr::mutate()`, and `dplyr::summarize()` verbs on Spark dataframes
+  involving `where()` predicates can be correctly translated to Spark SQL
+  (e.g., one can have `sdf %>% select(where(is.numeric))` and
+  `sdf %>% summarize(across(starts_with("Petal"), mean))`, etc)
+
+- Added support for `partition_by` option in `stream_write_*` methods
+
+- Fixed a bug with URI handling affecting all `spark_read_*` methods
+
+- Avoided repeated creations of SimpleDataFormat objects and setTimeZone calls
+  while collecting Data columns from a Spark dataframe
+
+### Spark ML
+
+- The `handle_invalid` option is added to `ft_vector_indexer()` (supported by
+  Spark 2.3 or above)
+
 # Sparklyr 1.5.2
 
 ### Connections
