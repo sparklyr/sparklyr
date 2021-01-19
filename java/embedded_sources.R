@@ -170,7 +170,8 @@ readTypedObject <- function(con, type) {
     "n" = NULL,
     "j" = getJobj(con, readString(con)),
     "J" = jsonlite::fromJSON(
-      readString(con), simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      readString(con),
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     stop(paste("Unsupported type for deserialization", type))
   )
@@ -1589,8 +1590,7 @@ spark_worker_apply <- function(sc, config) {
         tibble::tibble(encoded = lapply(data, function(x) x[[1]]))
       } else {
         do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
-      }
-    )
+      })
 
     if (!config$single_binary_column) {
       # rbind removes Date classes so we re-assign them here

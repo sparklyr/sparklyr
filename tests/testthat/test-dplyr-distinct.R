@@ -51,7 +51,6 @@ test_that("unless .keep_all = TRUE", {
     sdf %>% dplyr::distinct(x, .keep_all = TRUE) %>% collect(),
     tibble::tibble(x = 1, y = 3L)
   )
-
 })
 
 test_that("distinct doesn't duplicate columns", {
@@ -69,7 +68,9 @@ test_that("distinct doesn't duplicate columns", {
 
 test_that("grouped distinct always includes group cols", {
   sdf <- copy_to(sc, tibble::tibble(g = c(1, 2), x = c(1, 2)))
-  out <- sdf %>% group_by(g) %>% distinct(x)
+  out <- sdf %>%
+    group_by(g) %>%
+    distinct(x)
 
   expect_equivalent(out %>% collect(), tibble::tibble(g = c(1, 2), x = c(1, 2)))
   expect_equal(dplyr::group_vars(out), "g")
@@ -78,8 +79,14 @@ test_that("grouped distinct always includes group cols", {
 test_that("empty grouped distinct equivalent to empty ungrouped", {
   sdf <- copy_to(sc, tibble::tibble(g = c(1, 2), x = c(1, 2)))
 
-  df1 <- sdf %>% distinct() %>% group_by(g) %>% collect()
-  df2 <- sdf %>% group_by(g) %>% distinct() %>% collect()
+  df1 <- sdf %>%
+    distinct() %>%
+    group_by(g) %>%
+    collect()
+  df2 <- sdf %>%
+    group_by(g) %>%
+    distinct() %>%
+    collect()
 
   expect_equal(df1, df2)
 })

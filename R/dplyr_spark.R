@@ -204,7 +204,7 @@ db_analyze.spark_connection <- function(con, table, ...) {
   spark_db_analyze(con, table, ...)
 }
 
-sql_table_analyze.spark_connection <- function (con, table, ...) {
+sql_table_analyze.spark_connection <- function(con, table, ...) {
   spark_db_analyze(con, table, ...)
 }
 

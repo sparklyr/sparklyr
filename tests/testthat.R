@@ -174,7 +174,8 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   } else if (is_arrow_devel) {
     test_filters <- list(
       paste(
-        c("^binds$",
+        c(
+          "^binds$",
           "^connect-shell$",
           "^dplyr.*",
           "^dbi$",

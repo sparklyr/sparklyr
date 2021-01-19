@@ -68,8 +68,7 @@ ml_gbt_classifier.spark_connection <- function(x, formula = NULL, max_iter = 20,
         probability_col = .args[["probability_col"]],
         raw_prediction_col = .args[["raw_prediction_col"]]
       )
-    }
-  ) %>% (
+    }) %>% (
     function(obj) {
       do.call(
         invoke,

@@ -42,15 +42,13 @@ spark_db_query_fields_sql <- function(con, query) {
       dplyr::sql_select
     } else {
       dbplyr::sql_query_select
-    }
-  )
+    })
   sql_subquery_impl <- (
     if (utils::packageVersion("dbplyr") < "2") {
       dplyr::sql_subquery
     } else {
       dbplyr::sql_query_wrap
-    }
-  )
+    })
 
   sql_select_impl(
     con,

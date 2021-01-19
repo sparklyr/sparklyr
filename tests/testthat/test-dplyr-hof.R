@@ -1279,37 +1279,43 @@ test_that("'hof_transform_keys' creating a new column", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = 2, "4" = 3, "6" = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("6" = 5, "4" = 3, "1" = 2)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$transformed_m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$transformed_m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c(k_1_v_2 = 2, k_4_v_3 = 3, k_6_v_5 = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$transformed_m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$transformed_m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7)
   )
@@ -1331,25 +1337,29 @@ test_that("'hof_transform_keys' overwriting an existing column", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c(k_1_v_2 = 2, k_4_v_3 = 3, k_6_v_5 = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("6" = 5, "4" = 3, "1" = 2)
   )
@@ -1391,37 +1401,43 @@ test_that("'hof_transform_keys' works with formula", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = 2, "4" = 3, "6" = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("6" = 5, "4" = 3, "1" = 2)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$transformed_m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$transformed_m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c(k_1_v_2 = 2, k_4_v_3 = 3, k_6_v_5 = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$transformed_m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$transformed_m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7)
   )
@@ -1440,25 +1456,29 @@ test_that("'hof_transform_keys' works with default args", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = 2, "4" = 3, "6" = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c(k_2_v_1 = 1, k_3_v_4 = 4, k_8_v_7 = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c(k_6_v_5 = 5, k_4_v_3 = 3, k_1_v_2 = 2)
   )
@@ -1485,25 +1505,29 @@ test_that("transform_keys() works through dbplyr", {
 
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m1[[1]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("1" = 2, "4" = 3, "6" = 5)
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m1[[2]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("2" = 1, "3" = 4, "8" = 7)
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m2[[1]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("2" = 1, "3" = 4, "8" = 7)
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m2[[2]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("6" = 5, "4" = 3, "1" = 2)
     )
@@ -1544,37 +1568,43 @@ test_that("'hof_transform_values' creating a new column", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = 2, "4" = 3, "6" = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("6" = 5, "4" = 3, "1" = 2)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$transformed_m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$transformed_m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = "k_1_v_2", "4" = "k_4_v_3", "6" = "k_6_v_5")
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$transformed_m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$transformed_m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7")
   )
@@ -1596,25 +1626,29 @@ test_that("'hof_transform_values' overwriting an existing column", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = "k_1_v_2", "4" = "k_4_v_3", "6" = "k_6_v_5")
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7")
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("6" = 5, "4" = 3, "1" = 2)
   )
@@ -1634,7 +1668,8 @@ test_that("'hof_transform_values' works with map(...) expression", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m, simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m,
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = "k_1_v_2", "4" = "k_4_v_3", "7" = "k_7_v_8", "6" = "k_6_v_5")
   )
@@ -1658,37 +1693,43 @@ test_that("'hof_transform_values' works with formula", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = 2, "4" = 3, "6" = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "3" = 4, "8" = 7)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("6" = 5, "4" = 3, "1" = 2)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$transformed_m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$transformed_m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = "k_1_v_2", "4" = "k_4_v_3", "6" = "k_6_v_5")
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$transformed_m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$transformed_m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7")
   )
@@ -1705,13 +1746,15 @@ test_that("'hof_transform_values' works with default args", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = "k_2_v_1", "3" = "k_3_v_4", "8" = "k_8_v_7")
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("6" = "k_6_v_5", "4" = "k_4_v_3", "1" = "k_1_v_2")
   )
@@ -1736,25 +1779,29 @@ test_that("transform_values() works through dbplyr", {
 
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m1[[1]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("1" = 2, "4" = 3, "6" = 5)
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m1[[2]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("2" = 1, "3" = 4, "8" = 7)
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m2[[1]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("2" = 1, "3" = 4, "8" = 7)
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m2[[2]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("6" = 5, "4" = 3, "1" = 2)
     )
@@ -1792,37 +1839,43 @@ test_that("'hof_map_zip_with' creating a new column", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = 2, "3" = 4, "5" = 6)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "4" = 3, "6" = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = 1, "3" = 3, "5" = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 2, "4" = 4, "6" = 6)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$z[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$z[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5")
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$z[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$z[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6")
   )
@@ -1842,25 +1895,29 @@ test_that("'hof_map_zip_with' overwriting an existing column", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = 2, "3" = 4, "5" = 6)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "4" = 3, "6" = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5")
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6")
   )
@@ -1882,7 +1939,8 @@ test_that("'hof_map_zip_with' works with map(...) expression", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m, simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m,
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = "1_2_1", "4" = "4_3_4", "7" = "7_8_7", "6" = "6_5_6")
   )
@@ -1902,25 +1960,29 @@ test_that("'hof_map_zip_with' works with formula", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = 2, "3" = 4, "5" = 6)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "4" = 3, "6" = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5")
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6")
   )
@@ -1936,25 +1998,29 @@ test_that("'hof_map_zip_with' works with default args", {
 
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = 2, "3" = 4, "5" = 6)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m1[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = 1, "4" = 3, "6" = 5)
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[1]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5")
   )
   expect_equivalent(
     jsonlite::fromJSON(
-      res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      res$m2[[2]],
+      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
     ),
     c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6")
   )
@@ -1975,37 +2041,43 @@ test_that("map_zip_with() works through dbplyr", {
 
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m1[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m1[[1]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("1" = 2, "3" = 4, "5" = 6)
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m1[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m1[[2]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("2" = 1, "4" = 3, "6" = 5)
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m2[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m2[[1]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("1" = 1, "3" = 3, "5" = 5)
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$m2[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$m2[[2]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("2" = 2, "4" = 4, "6" = 6)
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$z[[1]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$z[[1]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("1" = "1_2_1", "3" = "3_4_3", "5" = "5_6_5")
     )
     expect_equivalent(
       jsonlite::fromJSON(
-        res$z[[2]], simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+        res$z[[2]],
+        simplifyDataFrame = FALSE, simplifyMatrix = FALSE
       ),
       c("2" = "2_1_2", "4" = "4_3_4", "6" = "6_5_6")
     )

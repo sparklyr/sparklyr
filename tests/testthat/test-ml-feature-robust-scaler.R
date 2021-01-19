@@ -16,10 +16,12 @@ test_that("ft_robust_scaler() works properly", {
       ft_vector_assembler(paste0("V", 1:2), "features") %>%
       ft_robust_scaler("features", "scaled") %>%
       pull(scaled),
-    list(c(-1, 1),
-         c(-0.5, 0.5),
-         c(0, 0),
-         c(0.5, -0.5),
-         c(1, -1))
+    list(
+      c(-1, 1),
+      c(-0.5, 0.5),
+      c(0, 0),
+      c(0.5, -0.5),
+      c(1, -1)
+    )
   )
 })

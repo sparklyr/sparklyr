@@ -49,7 +49,7 @@ ft_dplyr_transformer.spark_connection <- function(x, tbl,
           if (rlang::quo_is_null(sampling_params$args$weight)) {
             ""
           } else {
-             rlang::as_name(sampling_params$args$weight)
+            rlang::as_name(sampling_params$args$weight)
           }
         ),
         list("setReplace", sampling_params$args$replace),

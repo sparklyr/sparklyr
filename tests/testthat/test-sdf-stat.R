@@ -17,15 +17,16 @@ test_that("sdf_quantile() works for a single column", {
   mtcars_tbl <- testthat_tbl("mtcars")
   quantiles <- mtcars_tbl %>%
     sdf_quantile(column = "disp")
-  expect_mapequal(quantiles,
-                  c(
-                    `0%` = 71.1,
-                    `25%` = 120.3,
-                    `50%` = 167.6,
-                    `75%` = 318,
-                    `100%` = 472
-                  ))
-
+  expect_mapequal(
+    quantiles,
+    c(
+      `0%` = 71.1,
+      `25%` = 120.3,
+      `50%` = 167.6,
+      `75%` = 318,
+      `100%` = 472
+    )
+  )
 })
 
 test_that("sdf_quantile() works for multiple column", {
@@ -36,20 +37,24 @@ test_that("sdf_quantile() works for multiple column", {
   quantiles <- mtcars_tbl %>%
     sdf_quantile(column = c("disp", "drat"))
   expect_named(quantiles, c("disp", "drat"))
-  expect_mapequal(quantiles[["disp"]],
-                  c(
-                    `0%` = 71.1,
-                    `25%` = 120.3,
-                    `50%` = 167.6,
-                    `75%` = 318,
-                    `100%` = 472
-                  ))
-  expect_mapequal(quantiles[["drat"]],
-                  c(
-                    `0%` = 2.76,
-                    `25%` = 3.08,
-                    `50%` = 3.69,
-                    `75%` = 3.92,
-                    `100%` = 4.93
-                  ))
+  expect_mapequal(
+    quantiles[["disp"]],
+    c(
+      `0%` = 71.1,
+      `25%` = 120.3,
+      `50%` = 167.6,
+      `75%` = 318,
+      `100%` = 472
+    )
+  )
+  expect_mapequal(
+    quantiles[["drat"]],
+    c(
+      `0%` = 2.76,
+      `25%` = 3.08,
+      `50%` = 3.69,
+      `75%` = 3.92,
+      `100%` = 4.93
+    )
+  )
 })

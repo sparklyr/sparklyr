@@ -62,8 +62,7 @@ spark_dependencies_from_extensions <- function(spark_version, scala_version, ext
         scala_version <- "2.11"
       } else {
         scala_version <- "2.12"
-      }
-    )
+      })
   )
   jars <- character()
   packages <- character()
@@ -161,8 +160,7 @@ sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
       "2.11"
     } else {
       "2.12"
-    }
-  )
+    })
   spark_major_minor <- spark_version[1, 1:2]
 
   exact_jar <- sprintf("sparklyr-%s-%s.jar", spark_major_minor, scala_version)

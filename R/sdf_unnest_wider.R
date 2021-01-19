@@ -56,7 +56,9 @@ sdf_unnest_wider <- function(
   }
   check_present(col)
   col <- tidyselect::vars_pull(colnames(data), !!rlang::enquo(col))
-  schema <- data %>% spark_dataframe() %>% invoke("schema")
+  schema <- data %>%
+    spark_dataframe() %>%
+    invoke("schema")
   col_idx <- schema %>% invoke("fieldIndex", col)
   col_data_type <- schema %>%
     invoke("%>%", list("apply", col_idx), list("dataType"))

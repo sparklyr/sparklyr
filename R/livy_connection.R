@@ -588,8 +588,7 @@ livy_connection_jars <- function(config, version, scala_version) {
         paste0("sparklyr-", target_version)
       } else {
         paste0("sparklyr-", target_version, "-", scala_version)
-      }
-    )
+      })
     target_jar <- dir(system.file("java", package = "sparklyr"), pattern = target_jar_pattern)
     # Select the jar file built with the lowest version of Scala in case there is no
     # requirement for Scala version compatibility

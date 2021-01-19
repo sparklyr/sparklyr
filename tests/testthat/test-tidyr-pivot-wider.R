@@ -7,7 +7,8 @@ test_that("can pivot all cols to wide", {
 
   sdf <- copy_to(sc, tibble::tibble(key = c("x", "y", "z"), val = 1:3))
   pv <- tidyr::pivot_wider(
-    sdf, names_from = key, values_from = val, names_sort = TRUE
+    sdf,
+    names_from = key, values_from = val, names_sort = TRUE
   ) %>%
     collect()
 
@@ -19,7 +20,8 @@ test_that("non-pivoted cols are preserved", {
 
   sdf <- copy_to(sc, tibble::tibble(a = 1, key = c("x", "y"), val = 1:2))
   pv <- tidyr::pivot_wider(
-    sdf, names_from = key, values_from = val, names_sort = TRUE
+    sdf,
+    names_from = key, values_from = val, names_sort = TRUE
   ) %>%
     collect()
 
@@ -31,10 +33,11 @@ test_that("implicit missings turn into explicit missings", {
 
   sdf <- copy_to(sc, tibble::tibble(a = 1:2, key = c("x", "y"), val = 1:2))
   pv <- tidyr::pivot_wider(
-    sdf, names_from = key, values_from = val, names_sort = TRUE
+    sdf,
+    names_from = key, values_from = val, names_sort = TRUE
   ) %>%
     collect() %>%
-     dplyr::arrange(a)
+    dplyr::arrange(a)
 
   expect_equivalent(pv, tibble::tibble(a = 1:2, x = c(1, NaN), y = c(NaN, 2)))
 })
@@ -119,7 +122,8 @@ test_that("can sort column names", {
 
   expect_equivalent(
     tidyr::pivot_wider(
-      sdf, names_from = days, values_from = int, names_sort = TRUE
+      sdf,
+      names_from = days, values_from = int, names_sort = TRUE
     ) %>%
       collect(),
     tibble::tibble(Mon = 1, Tues = 3, Wed = 2)
@@ -133,10 +137,10 @@ test_that("can override default keys", {
   sdf <- copy_to(
     sc,
     tibble::tribble(
-      ~row, ~name, ~var,     ~value,
-      1,    "Sam", "age",    10,
-      2,    "Sam", "height", 1.5,
-      3,    "Bob", "age",    20,
+      ~row, ~name, ~var, ~value,
+      1, "Sam", "age", 10,
+      2, "Sam", "height", 1.5,
+      3, "Bob", "age", 20,
     )
   )
 
@@ -146,8 +150,8 @@ test_that("can override default keys", {
       collect(),
     tibble::tribble(
       ~name, ~age, ~height,
-      "Sam", 10,   1.5,
-      "Bob", 20,   NaN,
+      "Sam", 10, 1.5,
+      "Bob", 20, NaN,
     )
   )
 })
@@ -160,7 +164,8 @@ test_that("values_fn can be a single function", {
     tibble::tibble(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
   )
   pv <- tidyr::pivot_wider(
-    sdf, names_from = key, values_from = val, values_fn = sum
+    sdf,
+    names_from = key, values_from = val, values_fn = sum
   ) %>%
     collect() %>%
     dplyr::arrange(a)
@@ -256,7 +261,9 @@ test_that("default `names_from` and `values_from` works as expected", {
     sc,
     tibble::tibble(name = c("x", "y"), value = c(1, 2))
   )
-  pv <- sdf %>% tidyr::pivot_wider() %>% collect()
+  pv <- sdf %>%
+    tidyr::pivot_wider() %>%
+    collect()
 
   expect_equivalent(pv, tibble::tibble(x = 1, y = 2))
 })

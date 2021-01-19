@@ -16,8 +16,13 @@ to_string <- function(utf8) {
 }
 
 expect_split <- function(x, sep, expected) {
-  sep <- sep %>% pcre_to_java() %>% as_utf8()
-  actual <- x %>% as_utf8() %>% invoke("split", sep, -1L) %>% lapply(to_string)
+  sep <- sep %>%
+    pcre_to_java() %>%
+    as_utf8()
+  actual <- x %>%
+    as_utf8() %>%
+    invoke("split", sep, -1L) %>%
+    lapply(to_string)
 
   expect_equal(actual, expected)
 }
@@ -120,10 +125,11 @@ test_that("pcre_to_java converts [:punct:] correctly", {
   test_requires_version("2.0.0")
 
   for (delim in c(
-                  "!", "\"", "#", "$", "%", "&", "'", "(",
-                  ")", "*", "+", ",", "-", ".", "/", ":",
-                  ";", "<", "=", ">", "?", "@", "[", "\\",
-                  "]", "^", "_", "'", "{", "|", "}", "~")
+    "!", "\"", "#", "$", "%", "&", "'", "(",
+    ")", "*", "+", ",", "-", ".", "/", ":",
+    ";", "<", "=", ">", "?", "@", "[", "\\",
+    "]", "^", "_", "'", "{", "|", "}", "~"
+  )
   ) {
     expect_split(
       sprintf("a%sb%sc", delim, delim), "[[:punct:]]", list("a", "b", "c")
@@ -168,9 +174,11 @@ test_that("pcre_to_java converts [:word:] correctly", {
 test_that("pcre_to_java converts [:xdigits:] correctly", {
   test_requires_version("2.0.0")
 
-  for (delim in c(as.character(seq(0, 9)),
-                  "a", "b", "c", "d", "e", "f",
-                  "A", "B", "C", "D", "E", "F")
+  for (delim in c(
+    as.character(seq(0, 9)),
+    "a", "b", "c", "d", "e", "f",
+    "A", "B", "C", "D", "E", "F"
+  )
   ) {
     expect_split(sprintf("g%sh", delim), "[[:xdigit:]]", list("g", "h"))
     expect_split(sprintf("G%sH|I", delim), "[|[:xdigit:]]", list("G", "H", "I"))

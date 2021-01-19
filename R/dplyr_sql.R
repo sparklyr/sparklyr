@@ -53,12 +53,13 @@ sql_build.op_sample <- function(op, con, frac) {
     } else {
       sample_size <- (
         if (frac) {
-          cnt <- sdf %>% spark_dataframe() %>% invoke("count")
+          cnt <- sdf %>%
+            spark_dataframe() %>%
+            invoke("count")
           round(cnt * check_frac(op$args$size, replace = op$args$replace))
         } else {
           op$args$size
-        }
-      )
+        })
       sdf_weighted_sample(
         x = sdf,
         weight_col = NULL,
@@ -66,8 +67,7 @@ sql_build.op_sample <- function(op, con, frac) {
         replacement = op$args$replace,
         seed = op$args$seed
       )
-    }
-  )
+    })
 
   sample_sdf %>% dbplyr::remote_query()
 }
@@ -102,12 +102,13 @@ sql_build.op_weighted_sample <- function(op, con, frac) {
     } else {
       sample_size <- (
         if (frac) {
-          cnt <- sdf %>% spark_dataframe() %>% invoke("count")
+          cnt <- sdf %>%
+            spark_dataframe() %>%
+            invoke("count")
           round(cnt * check_frac(op$args$size, replace = op$args$replace))
         } else {
           op$args$size
-        }
-      )
+        })
       sdf_weighted_sample(
         x = sdf,
         weight_col = weight,
@@ -115,8 +116,7 @@ sql_build.op_weighted_sample <- function(op, con, frac) {
         replacement = op$args$replace,
         seed = op$args$seed
       )
-    }
-  )
+    })
 
   sample_sdf %>% dbplyr::remote_query()
 }
@@ -221,9 +221,12 @@ to_sdf <- function(op, con) {
 }
 
 check_frac <- function(size, replace = FALSE) {
-  if (size <= 1 || replace) return(invisible(size))
+  if (size <= 1 || replace) {
+    return(invisible(size))
+  }
 
-  rlang::abort("size", "of sampled fraction must be less or equal to one, ",
+  rlang::abort(
+    "size", "of sampled fraction must be less or equal to one, ",
     "set `replace` = TRUE to use sampling with replacement"
   )
 }

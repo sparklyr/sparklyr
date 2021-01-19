@@ -11,7 +11,8 @@ test_that("can keep empty rows", {
       a = seq(3), b = seq(3), c = seq(3), d = seq(3), e = seq(3)
     )
   )
-  sdf.nested <- sdf %>% tidyr::nest(n1 = c(b, c), n2 = c(d, e)) %>%
+  sdf.nested <- sdf %>%
+    tidyr::nest(n1 = c(b, c), n2 = c(d, e)) %>%
     dplyr::mutate(
       n1 = dplyr::sql("IF(`a` == 1, NULL, `n1`)"),
       n2 = dplyr::sql("IF(`a` == 3, NULL, `n2`)")
@@ -132,7 +133,8 @@ test_that("unnest() supports ptype", {
 
   expect_equivalent(
     tidyr::unnest(
-      sdf.nested, x, ptype = tibble::tibble(g = integer(), x = character())
+      sdf.nested, x,
+      ptype = tibble::tibble(g = integer(), x = character())
     ) %>%
       collect() %>%
       dplyr::arrange(x),

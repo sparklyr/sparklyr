@@ -49,7 +49,8 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::depr
         lapply(seq_along(fields), function(idx) {
           dst_name <- names(fields)[[idx]]
           src_name <- fields[[idx]]
-          sprintf("%s, %s",
+          sprintf(
+            "%s, %s",
             dbplyr::translate_sql_(list(dst_name), con = dbplyr::simulate_dbi()),
             quote_sql_name(src_name)
           )

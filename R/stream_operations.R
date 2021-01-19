@@ -424,9 +424,11 @@ stream_lag <- function(x, cols, thresholds = NULL) {
 
     expr <- exprs[[i]]
     if (length(expr) != 3 || as.character(expr[[1]]) != "~" ||
-        !is.numeric(expr[[3]])) {
-      stop("expected `...` to be a comma-separated list of expressions of form",
-           "<destination column> = <source column> ~ <offset>")
+      !is.numeric(expr[[3]])) {
+      stop(
+        "expected `...` to be a comma-separated list of expressions of form",
+        "<destination column> = <source column> ~ <offset>"
+      )
     }
 
     src_cols <- c(src_cols, as.character(expr[[2]]))
