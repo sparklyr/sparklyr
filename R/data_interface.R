@@ -1,4 +1,5 @@
 #' @include avro_utils.R
+#' @include sdf_interface.R
 #' @include spark_apply.R
 
 gen_sdf_name <- function(path, config) {
@@ -1211,6 +1212,70 @@ spark_read <- function(sc,
     sdf_register()
 
   sdf
+}
+
+#' Write Spark DataFrame to RDS files
+#'
+#' Write Spark dataframe to RDS files. Each partition of the dataframe will be
+#' exported to a separate RDS file so that all partitions can be processed in
+#' parallel.
+#'
+#' @param x A Spark DataFrame to be exported
+#' @param dest_uri  Can be a URI template containing "{partitionId}" (e.g.,
+#'   "hdfs://my_data_part_{partitionId}.rds") where "{partitionId}" will be
+#'   substituted with ID of each partition using `glue`, or a list of URIs
+#'   to be assigned to RDS output from all partitions (e.g.,
+#'   "hdfs://my_data_part_0.rds", "hdfs://my_data_part_1.rds", and so on)
+#'   If working with a Spark instance running locally, then all URIs should be
+#'   in "file://<local file path>" form. Otherwise the scheme of the URI should
+#'   reflect the underlying file system the Spark instance is working with
+#'   (e.g., "hdfs://"). If the resulting list of URI(s) does not contain unique
+#'   values, then it will be post-processed with `make.unique()` to ensure
+#'   uniqueness.
+#'
+#' @return A tibble containing partition ID and RDS file location for each
+#'   partition of the input Spark dataframe.
+#'
+#' @export
+spark_write_rds <- function(x, dest_uri) {
+  sc <- spark_connection(x)
+  if (spark_version(sc) < "2.0.0") {
+    stop("`spark_write_rds()` is only supported in Spark 2.0 or above")
+  }
+
+  num_partitions <- sdf_num_partitions(x)
+  if (length(dest_uri) == 1) {
+    dest_uri <- lapply(
+      seq(num_partitions) - 1,
+      function(part_id) {
+        glue::glue(dest_uri, partitionId = part_id)
+      }
+    ) %>%
+      unlist()
+  }
+  dest_uri <- dest_uri %>% make.unique()
+  if (num_partitions != length(dest_uri)) {
+    stop(
+      "Number of destination URI(s) does not match the number of partitions ",
+      "in input Spark dataframe (",
+      length(dest_uri),
+      " vs. ",
+      num_partitions
+    )
+  }
+
+  invoke_static(
+    spark_connection(x),
+    "sparklyr.RDSCollector",
+    "collect",
+    spark_dataframe(x),
+    as.list(dest_uri)
+  )
+
+  tibble::tibble(
+    partition_id = seq(num_partitions) - 1,
+    uri = dest_uri
+  )
 }
 
 #' Write Spark DataFrame to file using a custom writer

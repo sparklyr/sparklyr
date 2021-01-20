@@ -8,6 +8,20 @@ import scala.util.Try
 case class Numeric(value: Option[Double])
 
 object Collectors {
+  val ReDecimalType = "(^DecimalType(\\(.*\\)?)$)".r
+  val ReVectorType  = "(.*VectorUDT.*)".r
+  val ReBooleanArrayType = "(^ArrayType\\(BooleanType,(true|false)\\)$)".r
+  val ReByteArrayType = "(^ArrayType\\(ByteType,(true|false)\\)$)".r
+  val ReShortArrayType = "(^ArrayType\\(ShortType,(true|false)\\)$)".r
+  val ReIntegerArrayType = "(^ArrayType\\(IntegerType,(true|false)\\)$)".r
+  val ReLongArrayType = "(^ArrayType\\(LongType,(true|false)\\)$)".r
+  val ReDecimalArrayType = "(^ArrayType\\(DecimalType(\\(.*\\)?),(true|false)\\)$)".r
+  val ReFloatArrayType = "(^ArrayType\\(FloatType,(true|false)\\)$)".r
+  val ReDoubleArrayType = "(^ArrayType\\(DoubleType,(true|false)\\)$)".r
+  val ReStringArrayType = "(^ArrayType\\(StringType,(true|false)\\)$)".r
+  val ReTimestampArrayType = "(^ArrayType\\(TimestampType,(true|false)\\)$)".r
+  val ReDateArrayType = "(^ArrayType\\(DateType,(true|false)\\)$)".r
+
   def collectBoolean(row: Row, idx: Int): Int = {
     val el = row(idx)
     if (el.isInstanceOf[Boolean]) if (el.asInstanceOf[Boolean]) 1 else 0 else scala.Int.MinValue
@@ -208,58 +222,41 @@ object Collectors {
 
   def mkColumnCtx(colType: String, numRows: Int) = {
 
-    val ReDecimalType = "(DecimalType.*)".r
-    val ReVectorType  = "(.*VectorUDT.*)".r
-
     def newColumnCtx[T <: Any : Manifest](collector: (Row, Int) => T) = {
       new ColumnCtx[T](collector, numRows)
     }
 
     colType match {
       case "BooleanType"          => newColumnCtx[Int](Collectors.collectBoolean)
+      case "ByteType"             => newColumnCtx[Int](Collectors.collectByte)
+      case "ShortType"            => newColumnCtx[Int](Collectors.collectShort)
       case "IntegerType"          => newColumnCtx[Int](Collectors.collectInteger)
+      case "LongType"             => newColumnCtx[Double](Collectors.collectLong)
+      case "Decimal"              => newColumnCtx[String](Collectors.collectForceString)
+      case ReDecimalType(_*)      => newColumnCtx[Double](Collectors.collectDecimal)
+      case "FloatType"            => newColumnCtx[Double](Collectors.collectFloat)
       case "DoubleType"           => newColumnCtx[Numeric](Collectors.collectNumeric)
       case "StringType"           => newColumnCtx[String](Collectors.collectString)
-      case "LongType"             => newColumnCtx[Double](Collectors.collectLong)
-
-      case "ByteType"             => newColumnCtx[Int](Collectors.collectByte)
-      case "FloatType"            => newColumnCtx[Double](Collectors.collectFloat)
-      case "ShortType"            => newColumnCtx[Int](Collectors.collectShort)
-      case "Decimal"              => newColumnCtx[String](Collectors.collectForceString)
-
       case "TimestampType"        => newColumnCtx[java.sql.Timestamp](Collectors.collectTimestamp)
       case "CalendarIntervalType" => newColumnCtx[String](Collectors.collectForceString)
       case "DateType"             => newColumnCtx[java.sql.Date](Collectors.collectDate)
-
-      case ReDecimalType(_)       => newColumnCtx[Double](Collectors.collectDecimal)
-      case ReVectorType(_)        => newColumnCtx[Any](Collectors.collectVector)
+      case ReVectorType(_*)       => newColumnCtx[Any](Collectors.collectVector)
       case StructTypeAsJSON.DType => newColumnCtx[Any](Collectors.collectJSON)
 
-      case "ArrayType(BooleanType,true)"           => newColumnCtx[Array[Int]](Collectors.collectBooleanArr)
-      case "ArrayType(IntegerType,true)"           => newColumnCtx[Array[Int]](Collectors.collectIntegerArr)
-      case "ArrayType(DoubleType,true)"            => newColumnCtx[Array[Numeric]](Collectors.collectNumericArr)
-      case "ArrayType(StringType,true)"            => newColumnCtx[Array[String]](Collectors.collectStringArr)
-      case "ArrayType(LongType,true)"              => newColumnCtx[Array[Double]](Collectors.collectLongArr)
-      case "ArrayType(ByteType,true)"              => newColumnCtx[Array[Int]](Collectors.collectByteArr)
-      case "ArrayType(FloatType,true)"             => newColumnCtx[Array[Double]](Collectors.collectFloatArr)
-      case "ArrayType(ShortType,true)"             => newColumnCtx[Array[Int]](Collectors.collectShortArr)
-      case "ArrayType(DecimalType,true)"           => newColumnCtx[Array[Double]](Collectors.collectDecimalArr)
-      case "ArrayType(TimestampType,true)"         => newColumnCtx[Array[java.sql.Timestamp]](Collectors.collectTimestampArr)
+      case ReBooleanArrayType(_*)   => newColumnCtx[Array[Int]](Collectors.collectBooleanArr)
+      case ReByteArrayType(_*)      => newColumnCtx[Array[Int]](Collectors.collectByteArr)
+      case ReShortArrayType(_*)     => newColumnCtx[Array[Int]](Collectors.collectShortArr)
+      case ReIntegerArrayType(_*)   => newColumnCtx[Array[Int]](Collectors.collectIntegerArr)
+      case ReLongArrayType(_*)      => newColumnCtx[Array[Double]](Collectors.collectLongArr)
+      case ReDecimalArrayType(_*)   => newColumnCtx[Array[Double]](Collectors.collectDecimalArr)
+      case ReFloatArrayType(_*)     => newColumnCtx[Array[Double]](Collectors.collectFloatArr)
+      case ReDoubleArrayType(_*)    => newColumnCtx[Array[Numeric]](Collectors.collectNumericArr)
+      case ReStringArrayType(_*)    => newColumnCtx[Array[String]](Collectors.collectStringArr)
+      case ReTimestampArrayType(_*) => newColumnCtx[Array[java.sql.Timestamp]](Collectors.collectTimestampArr)
+      case ReDateArrayType(_*)      => newColumnCtx[Array[java.sql.Date]](Collectors.collectDateArr)
       case "ArrayType(CalendarIntervalType,true)"  => newColumnCtx[Array[String]](Collectors.collectForceStringArr)
-      case "ArrayType(DateType,true)"              => newColumnCtx[Array[java.sql.Date]](Collectors.collectDateArr)
 
-      case "ArrayType(BooleanType,false)"          => newColumnCtx[Array[Int]](Collectors.collectBooleanArr)
-      case "ArrayType(IntegerType,false)"          => newColumnCtx[Array[Int]](Collectors.collectIntegerArr)
-      case "ArrayType(DoubleType,false)"           => newColumnCtx[Array[Numeric]](Collectors.collectNumericArr)
-      case "ArrayType(StringType,false)"           => newColumnCtx[Array[String]](Collectors.collectStringArr)
-      case "ArrayType(LongType,false)"             => newColumnCtx[Array[Double]](Collectors.collectLongArr)
-      case "ArrayType(ByteType,false)"             => newColumnCtx[Array[Int]](Collectors.collectByteArr)
-      case "ArrayType(FloatType,false)"            => newColumnCtx[Array[Double]](Collectors.collectFloatArr)
-      case "ArrayType(ShortType,false)"            => newColumnCtx[Array[Int]](Collectors.collectShortArr)
-      case "ArrayType(DecimalType,false)"          => newColumnCtx[Array[Double]](Collectors.collectDecimalArr)
-      case "ArrayType(TimestampType,false)"        => newColumnCtx[Array[java.sql.Timestamp]](Collectors.collectTimestampArr)
       case "ArrayType(CalendarIntervalType,false)" => newColumnCtx[Array[String]](Collectors.collectForceStringArr)
-      case "ArrayType(DateType,false)"             => newColumnCtx[Array[java.sql.Date]](Collectors.collectDateArr)
 
       case "NullType"             => newColumnCtx[String](Collectors.collectForceString)
 
