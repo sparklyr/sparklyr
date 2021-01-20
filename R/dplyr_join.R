@@ -22,11 +22,12 @@ inner_join.tbl_spark <-
            auto_index = FALSE,
            ...,
            sql_on = NULL) {
-
     if (any(grepl("\\.", suffix))) {
       suffix <- gsub("\\.", "_", suffix)
-      message("Replacing '.' with '_' in suffixes. New suffixes: ",
-              paste(suffix, collapse = ", "))
+      message(
+        "Replacing '.' with '_' in suffixes. New suffixes: ",
+        paste(suffix, collapse = ", ")
+      )
     }
 
     NextMethod(suffix = suffix)
@@ -44,11 +45,12 @@ left_join.tbl_spark <-
            auto_index = FALSE,
            ...,
            sql_on = NULL) {
-
     if (any(grepl("\\.", suffix))) {
       suffix <- gsub("\\.", "_", suffix)
-      message("Replacing '.' with '_' in suffixes. New suffixes: ",
-              paste(suffix, collapse = ", "))
+      message(
+        "Replacing '.' with '_' in suffixes. New suffixes: ",
+        paste(suffix, collapse = ", ")
+      )
     }
 
     NextMethod(suffix = suffix)
@@ -66,11 +68,12 @@ right_join.tbl_spark <-
            auto_index = FALSE,
            ...,
            sql_on = NULL) {
-
     if (any(grepl("\\.", suffix))) {
       suffix <- gsub("\\.", "_", suffix)
-      message("Replacing '.' with '_' in suffixes. New suffixes: ",
-              paste(suffix, collapse = ", "))
+      message(
+        "Replacing '.' with '_' in suffixes. New suffixes: ",
+        paste(suffix, collapse = ", ")
+      )
     }
 
     NextMethod(suffix = suffix)
@@ -88,11 +91,12 @@ full_join.tbl_spark <-
            auto_index = FALSE,
            ...,
            sql_on = NULL) {
-
     if (any(grepl("\\.", suffix))) {
       suffix <- gsub("\\.", "_", suffix)
-      message("Replacing '.' with '_' in suffixes. New suffixes: ",
-              paste(suffix, collapse = ", "))
+      message(
+        "Replacing '.' with '_' in suffixes. New suffixes: ",
+        paste(suffix, collapse = ", ")
+      )
     }
 
     NextMethod(suffix = suffix)

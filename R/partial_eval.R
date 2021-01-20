@@ -194,12 +194,14 @@ fun_name <- function(fun) {
   known <- c(ls(dbplyr::base_agg), ls(dbplyr::base_scalar))
 
   for (x in known) {
-    if (!rlang::env_has(pkg_env, x, inherit = TRUE))
+    if (!rlang::env_has(pkg_env, x, inherit = TRUE)) {
       next
+    }
 
     fun_x <- rlang::env_get(pkg_env, x, inherit = TRUE)
-    if (identical(fun, fun_x))
+    if (identical(fun, fun_x)) {
       return(x)
+    }
   }
 
   NULL

@@ -98,7 +98,9 @@ test_that("preserves empty rows", {
   test_requires_version("2.4.0")
 
   sdf <- copy_to(sc, tibble::tibble(x = 1:3, y = list(1, NULL, NULL)))
-  out <- sdf %>% sdf_unnest_longer(y) %>% collect()
+  out <- sdf %>%
+    sdf_unnest_longer(y) %>%
+    collect()
 
   expect_equal(nrow(out), 3)
 })

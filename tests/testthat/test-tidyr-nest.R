@@ -151,7 +151,9 @@ test_that("can nest multiple columns", {
   test_requires_version("2.0.0")
 
   sdf <- copy_to(sc, tibble::tibble(x = 1, a1 = 1, a2 = 2, b1 = 1, b2 = 2))
-  out <- sdf %>% tidyr::nest(a = c(a1, a2), b = c(b1, b2)) %>% collect()
+  out <- sdf %>%
+    tidyr::nest(a = c(a1, a2), b = c(b1, b2)) %>%
+    collect()
 
   expect_equivalent(
     out,

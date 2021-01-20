@@ -20,7 +20,6 @@ arrow_enabled <- function(sc, object) {
 #'
 #' df <- tibble::tibble(x = seq(5))
 #' arrow_enabled_object(df)
-#'
 #' }
 #'
 #' @export
@@ -62,7 +61,7 @@ arrow_enabled_object.data.frame <- function(object) {
   enabled <- TRUE
   for (column in colnames(object)) {
     if ("list" %in% class(object[[column]]) &&
-        "raw" %in% lapply(object[[column]], class)) {
+      "raw" %in% lapply(object[[column]], class)) {
       unsupported <- c(unsupported, column)
       enabled <- FALSE
     }

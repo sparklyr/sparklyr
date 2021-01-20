@@ -31,7 +31,7 @@ nest_vars <- function(.data, dots, all_vars) {
   .data
 }
 
-op_select <- function (x, vars) {
+op_select <- function(x, vars) {
   if (inherits(x, "op_select")) {
     prev_vars <- x$args$vars
     if (purrr::every(vars, is.symbol)) {
@@ -42,17 +42,17 @@ op_select <- function (x, vars) {
     else if (purrr::every(prev_vars, is.symbol)) {
       sel_vars <- purrr::map_chr(prev_vars, rlang::as_string)
       if (all(names(sel_vars) == sel_vars)) {
-          x <- x$x
+        x <- x$x
       }
     }
   }
   new_op_select(x, vars)
 }
 
-new_op_select <- function (x, vars) {
-    stopifnot(inherits(x, "op"))
-    stopifnot(is.list(vars))
-    dbplyr::op_single("select", x, dots = list(), args = list(vars = vars))
+new_op_select <- function(x, vars) {
+  stopifnot(inherits(x, "op"))
+  stopifnot(is.list(vars))
+  dbplyr::op_single("select", x, dots = list(), args = list(vars = vars))
 }
 
 carry_over <- function(sel = character(), act = list()) {
@@ -75,9 +75,15 @@ carry_over <- function(sel = character(), act = list()) {
 }
 
 all_names <- function(x) {
-  if (is.name(x)) return(as.character(x))
-  if (rlang::is_quosure(x)) return(all_names(rlang::quo_get_expr(x)))
-  if (!is.call(x)) return(NULL)
+  if (is.name(x)) {
+    return(as.character(x))
+  }
+  if (rlang::is_quosure(x)) {
+    return(all_names(rlang::quo_get_expr(x)))
+  }
+  if (!is.call(x)) {
+    return(NULL)
+  }
 
   unique(unlist(lapply(x[-1], all_names), use.names = FALSE))
 }

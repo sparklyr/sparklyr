@@ -17,7 +17,9 @@ test_that("set.seed makes sampling outcomes deterministic", {
         seq(2),
         function(i) {
           set.seed(142857L)
-          sdf %>% sample_n(200, weight = weight, replace = replace) %>% collect()
+          sdf %>%
+            sample_n(200, weight = weight, replace = replace) %>%
+            collect()
         }
       )
 
@@ -27,7 +29,9 @@ test_that("set.seed makes sampling outcomes deterministic", {
         seq(2),
         function(i) {
           set.seed(142857L)
-          sdf %>% sample_frac(0.2, weight = weight, replace = replace) %>% collect()
+          sdf %>%
+            sample_frac(0.2, weight = weight, replace = replace) %>%
+            collect()
         }
       )
 

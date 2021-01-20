@@ -200,8 +200,7 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
           "com.nvidia:rapids-4-spark_2.12:0.1.0-databricks"
         } else {
           "com.nvidia:rapids-4-spark_2.12:0.1.0"
-        }
-      ),
+        }),
       "ai.rapids:cudf:0.14"
     )
 

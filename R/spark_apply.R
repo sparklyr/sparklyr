@@ -474,8 +474,7 @@ spark_apply <- function(x,
       (
         function(x) {
           lapply(x$spark_apply_binary_result, function(res) unserialize(res[[1]]))
-        }
-      )
+        })
   } else {
     registered
   }

@@ -45,4 +45,3 @@ test_that("weighted sampling works as expected with integer weight columns", {
     expect_equal(sample_sdf %>% collect() %>% nrow(), 20)
   }
 })
-

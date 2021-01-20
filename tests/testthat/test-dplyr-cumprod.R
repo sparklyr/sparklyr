@@ -7,10 +7,10 @@ test_that("cumprod works as expected", {
   test_requires("dplyr")
 
   for (stats in list(
-                     data.frame(id = 1:10, x = c(1:3, -4, 5, -6, 7, 0, 0, 10)),
-                     data.frame(id = 1:10, x = c(1:3, -4, 5, -6, 7, NA, 0, 10)),
-                     data.frame(id = 1:10, x = c(1:3, -4, 5, -6, 7, 0, NA, 10))
-                    )) {
+    data.frame(id = 1:10, x = c(1:3, -4, 5, -6, 7, 0, 0, 10)),
+    data.frame(id = 1:10, x = c(1:3, -4, 5, -6, 7, NA, 0, 10)),
+    data.frame(id = 1:10, x = c(1:3, -4, 5, -6, 7, 0, NA, 10))
+  )) {
     stats_tbl <- copy_to(sc, stats, overwrite = TRUE)
 
     expected <- stats %>%
@@ -30,4 +30,3 @@ test_that("cumprod works as expected", {
     expect_equal(actual, expected)
   }
 })
-

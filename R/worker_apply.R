@@ -366,8 +366,7 @@ spark_worker_apply <- function(sc, config) {
         tibble::tibble(encoded = lapply(data, function(x) x[[1]]))
       } else {
         do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
-      }
-    )
+      })
 
     if (!config$single_binary_column) {
       # rbind removes Date classes so we re-assign them here

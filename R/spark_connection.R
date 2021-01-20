@@ -224,9 +224,11 @@ spark_web.default <- function(sc, ...) {
 
 #' @export
 print.spark_web_url <- function(x, ...) {
-  tryCatch({
-    browse_url(x)
-  }, error = NULL
+  tryCatch(
+    {
+      browse_url(x)
+    },
+    error = NULL
   )
 }
 

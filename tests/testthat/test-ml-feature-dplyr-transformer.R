@@ -37,7 +37,9 @@ test_that("ft_dplyr_transformer() supports all sampling use cases", {
     )
   )
 
-  reset_prng_state <- function() { set.seed(142857L) }
+  reset_prng_state <- function() {
+    set.seed(142857L)
+  }
 
   sample_n_impl <- function(..., repeatable) {
     if (repeatable) {
@@ -57,36 +59,47 @@ test_that("ft_dplyr_transformer() supports all sampling use cases", {
 
   for (repeatable in c(FALSE, TRUE)) {
     for (transformed in
-         list(
-           sdf %>% sample_n_impl(
-             100, replace = FALSE, repeatable = repeatable
-           ),
-           sdf %>% sample_n_impl(
-             100, replace = TRUE, repeatable = repeatable
-           ),
-           sdf %>% sample_frac_impl(
-             0.1, replace = FALSE, repeatable = repeatable
-           ),
-           sdf %>% sample_frac_impl(
-             0.1, replace = TRUE, repeatable = repeatable
-           ),
-           sdf %>% sample_n_impl(
-             100, weight = weight, replace = FALSE, repeatable = repeatable
-           ),
-           sdf %>% sample_n_impl(
-             100, weight = weight, replace = TRUE, repeatable = repeatable
-           ),
-           sdf %>% sample_frac_impl(
-             0.1, weight = weight, replace = FALSE, repeatable = repeatable
-           ),
-           sdf %>% sample_frac_impl(
-             0.1, weight = weight, replace = TRUE, repeatable = repeatable)
-          )
+      list(
+        sdf %>% sample_n_impl(
+          100,
+          replace = FALSE, repeatable = repeatable
+        ),
+        sdf %>% sample_n_impl(
+          100,
+          replace = TRUE, repeatable = repeatable
+        ),
+        sdf %>% sample_frac_impl(
+          0.1,
+          replace = FALSE, repeatable = repeatable
+        ),
+        sdf %>% sample_frac_impl(
+          0.1,
+          replace = TRUE, repeatable = repeatable
+        ),
+        sdf %>% sample_n_impl(
+          100,
+          weight = weight, replace = FALSE, repeatable = repeatable
+        ),
+        sdf %>% sample_n_impl(
+          100,
+          weight = weight, replace = TRUE, repeatable = repeatable
+        ),
+        sdf %>% sample_frac_impl(
+          0.1,
+          weight = weight, replace = FALSE, repeatable = repeatable
+        ),
+        sdf %>% sample_frac_impl(
+          0.1,
+          weight = weight, replace = TRUE, repeatable = repeatable
+        )
+      )
     ) {
       if (repeatable) {
         reset_prng_state()
       }
-      sampled <- sdf %>% ft_dplyr_transformer(transformed) %>% collect()
+      sampled <- sdf %>%
+        ft_dplyr_transformer(transformed) %>%
+        collect()
 
       expect_equal(sampled %>% nrow(), 100)
       if (repeatable) {
@@ -99,13 +112,17 @@ test_that("ft_dplyr_transformer() supports all sampling use cases", {
     for (replace in list(FALSE, TRUE)) {
       reset_prng_state()
 
-      transformed <- sdf %>% dplyr::group_by(grp) %>% dplyr::sample_n(5, replace = replace)
+      transformed <- sdf %>%
+        dplyr::group_by(grp) %>%
+        dplyr::sample_n(5, replace = replace)
       expect_equivalent(
         sdf %>% ft_dplyr_transformer(transformed) %>% collect(),
         transformed %>% collect()
       )
 
-      transformed <- sdf %>% dplyr::group_by(grp) %>% dplyr::sample_frac(0.1, replace = replace)
+      transformed <- sdf %>%
+        dplyr::group_by(grp) %>%
+        dplyr::sample_frac(0.1, replace = replace)
       expect_equivalent(
         sdf %>% ft_dplyr_transformer(transformed) %>% collect(),
         transformed %>% collect()

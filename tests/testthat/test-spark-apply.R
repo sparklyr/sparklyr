@@ -134,7 +134,8 @@ test_that("'spark_apply' supports nested lists as return type", {
             df$json,
             function(x) {
               jsonlite::fromJSON(
-                x, simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+                x,
+                simplifyDataFrame = FALSE, simplifyMatrix = FALSE
               )
             }
           )

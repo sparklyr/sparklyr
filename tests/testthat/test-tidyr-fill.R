@@ -43,10 +43,10 @@ test_that("missings are filled correctly", {
   out <- tidyr::fill(sdf, x, .direction = "up") %>% collect()
   expect_equal(out$x, c(1, 1, 2, 2, NA, NA))
 
-  out <- tidyr::fill(sdf, x, .direction = 'downup') %>% collect()
+  out <- tidyr::fill(sdf, x, .direction = "downup") %>% collect()
   expect_equal(out$x, c(1, 1, 1, 2, 2, 2))
 
-  out <- tidyr::fill(sdf, x, .direction = 'updown') %>% collect()
+  out <- tidyr::fill(sdf, x, .direction = "updown") %>% collect()
   expect_equal(out$x, c(1, 1, 2, 2, 2, 2))
 })
 
@@ -65,7 +65,9 @@ test_that("missings filled down for each atomic vector", {
   ) %>% dplyr::mutate(
     arr = dplyr::sql("IF(lgl, array(1, 2, 3, 4, 5), NULL)")
   )
-  out <- sdf %>% tidyr::fill(tidyselect::everything()) %>% collect()
+  out <- sdf %>%
+    tidyr::fill(tidyselect::everything()) %>%
+    collect()
 
   expect_equal(out$lgl, c(TRUE, TRUE))
   expect_equal(out$int, c(1L, 1L))
@@ -104,6 +106,9 @@ test_that("fill respects grouping", {
   test_requires_version("2.0.0")
 
   sdf <- copy_to(sc, tibble::tibble(x = c(1, 1, 2), y = c(1, NA, NA)))
-  out <- sdf %>% dplyr::group_by(x) %>% tidyr::fill(y) %>% collect()
+  out <- sdf %>%
+    dplyr::group_by(x) %>%
+    tidyr::fill(y) %>%
+    collect()
   expect_equal(out$y, c(1, 1, NA))
 })

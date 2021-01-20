@@ -43,7 +43,7 @@ ft_robust_scaler.spark_connection <- function(x, input_col = NULL, output_col = 
     with_scaling = with_scaling,
     relative_error = relative_error,
     uid = uid
-  )%>%
+  ) %>%
     c(rlang::dots_list(...)) %>%
     validator_ml_robust_scaler()
 
@@ -66,7 +66,6 @@ ft_robust_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
                                          lower = 0.25, upper = 0.75, with_centering = TRUE,
                                          with_scaling = TRUE, relative_error = 0.001,
                                          uid = random_string("ft_robust_scaler_"), ...) {
-
   stage <- ft_robust_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -85,9 +84,9 @@ ft_robust_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
 
 #' @export
 ft_robust_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                        lower = 0.25, upper = 0.75, with_centering = TRUE,
-                                        with_scaling = TRUE, relative_error = 0.001,
-                                        uid = random_string("ft_robust_scaler_"), ...) {
+                                       lower = 0.25, upper = 0.75, with_centering = TRUE,
+                                       with_scaling = TRUE, relative_error = 0.001,
+                                       uid = random_string("ft_robust_scaler_"), ...) {
   stage <- ft_robust_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -101,10 +100,11 @@ ft_robust_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
     ...
   )
 
-  if (is_ml_transformer(stage))
+  if (is_ml_transformer(stage)) {
     ml_transform(stage, x)
-  else
+  } else {
     ml_fit_and_transform(stage, x)
+  }
 }
 
 new_ml_robust_scaler <- function(jobj) {

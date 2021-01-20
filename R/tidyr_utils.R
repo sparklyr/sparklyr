@@ -234,9 +234,13 @@ str_separate <- function(data, column, into, sep, extra = "warn", fill = "warn")
 
 extract_field_dtypes <- function(schema) {
   fields <- schema %>% invoke("fields")
-  field_dtypes <- lapply(fields, function(field) { invoke(field, "dataType") })
+  field_dtypes <- lapply(fields, function(field) {
+    invoke(field, "dataType")
+  })
   names(field_dtypes) <- lapply(
-    fields, function(field) { invoke(field, "name") }
+    fields, function(field) {
+      invoke(field, "name")
+    }
   ) %>%
     unlist()
 
@@ -258,14 +262,20 @@ apply_ptype <- function(sdf, ptype) {
       colnames(sdf),
       function(col) {
         dtype <- (
-          if (col %in% names(dtypes)) { dtypes[[col]] } else { sdf_dtypes[[col]] }
-        )
+          if (col %in% names(dtypes)) {
+            dtypes[[col]]
+          } else {
+            sdf_dtypes[[col]]
+          })
         invoke_new(sc, "org.apache.spark.sql.Column", col) %>%
           invoke("cast", dtype)
       }
     )
 
-    sdf %>% spark_dataframe() %>% invoke("select", cols) %>% sdf_register()
+    sdf %>%
+      spark_dataframe() %>%
+      invoke("select", cols) %>%
+      sdf_register()
   }
 }
 

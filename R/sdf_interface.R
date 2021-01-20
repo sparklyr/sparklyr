@@ -42,7 +42,7 @@ NULL
 #' \dontrun{
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #' sdf_copy_to(sc, iris)
-#'}
+#' }
 #'
 #' @name sdf_copy_to
 #' @export
@@ -387,7 +387,7 @@ sdf_quantile <- function(x,
 
   if (length(column) > 1) {
     if (package_version(sdf$connection$home_version) <
-        package_version("2.0.0")) {
+      package_version("2.0.0")) {
       stop("Spark 2.0+ is required when length(column) > 1")
     }
   }
@@ -731,7 +731,8 @@ sdf_expand_grid <- function(
       }
       if (!"tbl_spark" %in% class(vars[[i]])) {
         vars[[i]] <- sdf_copy_to(
-          sc, data.frame(vars[i]), name = random_string("sdf_expand_grid_tmp")
+          sc, data.frame(vars[i]),
+          name = random_string("sdf_expand_grid_tmp")
         )
       }
     }
@@ -745,13 +746,12 @@ sdf_expand_grid <- function(
             } else {
               as.list(exprs)[1]
             }
-          }
-        ) %>%
-          lapply(rlang::as_string) %>%
-          unlist()
+          }) %>%
+        lapply(rlang::as_string) %>%
+        unlist()
     }
     for (x in broadcast_vars) {
-      idxes <- which (names(vars) %in% x)
+      idxes <- which(names(vars) %in% x)
       if (length(idxes) > 0) {
         for (idx in idxes) {
           vars[[idx]] <- sdf_broadcast(vars[[idx]])
@@ -801,8 +801,10 @@ sdf_expand_grid <- function(
 #' library(sparklyr)
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #' example_sdf <- sdf_len(sc, 100L, repartition = 10L)
-#' example_sdf %>% sdf_partition_sizes() %>% print()
-#'}
+#' example_sdf %>%
+#'   sdf_partition_sizes() %>%
+#'   print()
+#' }
 #'
 #' @export
 sdf_partition_sizes <- function(x) {
@@ -842,7 +844,7 @@ sdf_partition_sizes <- function(x) {
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #' example_sdf <- copy_to(sc, tibble::tibble(a = 1, b = 2))
 #' example_sdf["a"] %>% print()
-#'}
+#' }
 #'
 #' @export
 `[.tbl_spark` <- function(x, i) {

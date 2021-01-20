@@ -331,8 +331,9 @@ output_file <- function(filename) file.path("output", filename)
 
 skip_livy <- function() {
   livy_version <- Sys.getenv("LIVY_VERSION")
-  if (nchar(livy_version) > 0 && !identical(livy_version, "NONE"))
+  if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
     skip("Test unsupported under Livy.")
+  }
 }
 
 check_params <- function(test_args, params) {

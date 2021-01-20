@@ -17,7 +17,7 @@ fix_na_real_values <- function(dots) {
 
 #' @export
 #' @importFrom dplyr transmute
-transmute.tbl_spark <- function (.data, ...) {
+transmute.tbl_spark <- function(.data, ...) {
   dots <- rlang::enquos(..., .named = TRUE) %>%
     fix_na_real_values()
 
@@ -26,7 +26,7 @@ transmute.tbl_spark <- function (.data, ...) {
 
 #' @export
 #' @importFrom dplyr mutate
-mutate.tbl_spark <- function (.data, ...) {
+mutate.tbl_spark <- function(.data, ...) {
   dots <- rlang::enquos(..., .named = TRUE) %>%
     fix_na_real_values() %>%
     partial_eval_dots(sim_data = simulate_vars(.data))
@@ -164,7 +164,7 @@ sql_translation.spark_connection <- function(con) {
 #' @importFrom dbplyr sql
 #' @importFrom dbplyr win_current_group
 #' @importFrom dbplyr win_current_order
-spark_sql_translation<- function(con) {
+spark_sql_translation <- function(con) {
   win_recycled_params <- function(prefix) {
     function(x, y) {
       # Use win_current_frame() once exported form `dbplyr`
@@ -262,7 +262,7 @@ spark_sql_translation<- function(con) {
               as_summand(col_names[[length(col_names)]])
             ) %>%
             append(list(dbplyr::sql(")"))) %>%
-            lapply(function(x)  dbplyr::escape(x, con = con))
+            lapply(function(x) dbplyr::escape(x, con = con))
           args <- append(sum_expr, list(con = con))
 
           do.call(dbplyr::build_sql, args)
@@ -280,7 +280,7 @@ spark_sql_translation<- function(con) {
         ) %>%
           dbplyr::sql()
       },
-      aggregate = function(expr, start, merge, finish = ~ .x) {
+      aggregate = function(expr, start, merge, finish = ~.x) {
         sprintf(
           "AGGREGATE(%s, %s, %s, %s)",
           dbplyr::build_sql(expr),

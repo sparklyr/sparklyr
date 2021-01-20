@@ -76,7 +76,8 @@ test_that("can handle missing combinations", {
     )
   )
   pv <- tidyr::pivot_longer(
-    sdf, -id, names_to = c(".value", "n"), names_sep = "_"
+    sdf, -id,
+    names_to = c(".value", "n"), names_sep = "_"
   ) %>%
     collect()
 
@@ -97,7 +98,8 @@ test_that("can override default output column type", {
 
   sdf <- copy_to(sc, tibble::tibble(x = 1L, y = 2L))
   pv <- tidyr::pivot_longer(
-    sdf, x:y, values_transform = list(value = as.character)
+    sdf, x:y,
+    values_transform = list(value = as.character)
   ) %>%
     collect()
 
@@ -113,13 +115,14 @@ test_that("original col order is preserved", {
   sdf <- copy_to(
     sc,
     tibble::tribble(
-      ~id, ~z_1, ~y_1, ~x_1, ~z_2,  ~y_2, ~x_2,
-      "A",    1,    2,    3,     4,    5,    6,
-      "B",    7,    8,    9,    10,   11,   12,
+      ~id, ~z_1, ~y_1, ~x_1, ~z_2, ~y_2, ~x_2,
+      "A", 1, 2, 3, 4, 5, 6,
+      "B", 7, 8, 9, 10, 11, 12,
     )
   )
   pv <- tidyr::pivot_longer(
-    sdf, -id, names_to = c(".value", "n"), names_sep = "_"
+    sdf, -id,
+    names_to = c(".value", "n"), names_sep = "_"
   ) %>%
     collect()
 
@@ -176,10 +179,12 @@ test_that(".value can be at any position in `names_to`", {
   pv <- lapply(
     list(
       tidyr::pivot_longer(
-        samp_sdf, -i, names_to = c(".value", "time"), names_sep = "_"
+        samp_sdf, -i,
+        names_to = c(".value", "time"), names_sep = "_"
       ),
       tidyr::pivot_longer(
-        samp_sdf2, -i, names_to = c("time", ".value"), names_sep = "_"
+        samp_sdf2, -i,
+        names_to = c("time", ".value"), names_sep = "_"
       )
     ),
     collect
@@ -279,7 +284,8 @@ test_that("names_sep generates correct spec", {
   test_requires_version("2.0.0")
 
   sp <- build_longer_spec(
-    trivial_sdf, x_y, names_to = c("a", "b"), names_sep = "_"
+    trivial_sdf, x_y,
+    names_to = c("a", "b"), names_sep = "_"
   )
 
   expect_equal(sp$a, "x")
@@ -300,13 +306,15 @@ test_that("names_pattern generates correct spec", {
 
   sdf <- copy_to(sc, tibble::tibble(zx_y = 1))
   sp <- build_longer_spec(
-    sdf, zx_y, names_to = c("a", "b"), names_pattern = "z(.)_(.)"
+    sdf, zx_y,
+    names_to = c("a", "b"), names_pattern = "z(.)_(.)"
   )
   expect_equal(sp$a, "x")
   expect_equal(sp$b, "y")
 
   sp <- build_longer_spec(
-    sdf, zx_y, names_to = "a", names_pattern = "z(.)"
+    sdf, zx_y,
+    names_to = "a", names_pattern = "z(.)"
   )
   expect_equal(sp$a, "x")
 })
@@ -315,7 +323,8 @@ test_that("names_to can override value_to", {
   test_requires_version("2.0.0")
 
   sp <- build_longer_spec(
-    trivial_sdf, x_y, names_to = c("a", ".value"), names_sep = "_"
+    trivial_sdf, x_y,
+    names_to = c("a", ".value"), names_sep = "_"
   )
 
   expect_equal(sp$.value, "y")
