@@ -61,7 +61,11 @@ test_that("sdf_copy_to can preserve list columns", {
   }
 
   df <- tibble::tibble(
-    a = list(c(11.0, 111.0), c(22.0, 222.0), c(33.0, 333.0)),
+    a = list(
+      c(11.2, -222.345, NaN, 6.78901234),
+      c(22.3333, NA_real_, 333.456789),
+      c(NA_real_, 33.4566, -777.899)
+    ),
     b = list(list(c = 1, d = "a"), list(c = 2, d = "b"), list(c = 3, d = "c"))
   )
   sdf <- sdf_copy_to(sc, df, overwrite = TRUE)

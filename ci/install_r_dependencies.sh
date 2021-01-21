@@ -18,6 +18,7 @@ TEST_DEPS="broom \
            RCurl \
            reshape2 \
            shiny \
+           sparklyr.nested \
            stringr \
            testthat"
 SEP='"\\s+"'
