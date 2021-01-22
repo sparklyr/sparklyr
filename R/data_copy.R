@@ -164,7 +164,14 @@ spark_data_copy <- function(
       } else {
         df[[column]] <- sapply(
           df[[column]],
-          function(e) jsonlite::toJSON(as.list(e), auto_unbox = TRUE, digits = NA)
+          function(e) {
+            jsonlite::toJSON(
+              as.list(e),
+              na = "null",
+              auto_unbox = TRUE,
+              digits = NA
+            )
+          }
         )
         additional_struct_columns <- append(additional_struct_columns, column)
       }
