@@ -2,7 +2,16 @@ package sparklyr
 
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.math.BigDecimal
+import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
+import scala.collection.Iterator
+
+import scala.collection.mutable.ListBuffer
+
+import org.apache.spark.sql.Column
+import org.apache.spark.sql.Row
 
 case class RawSXP(val buf: Array[Byte])
 
@@ -173,5 +182,321 @@ object RUtils {
     ).reduce(
       (p, q) => p | q
     )
+  }
+
+  private[this] def rVersion(v: Int, p: Int, s: Int): Int = {
+    v * 65536 + p * 256 + s
+  }
+
+  def writeXdrHeader(dos: DataOutputStream): Unit = {
+    // serialization format
+    dos.writeByte(XDR_FORMAT)
+    // 2nd byte should be '\n' per convention
+    dos.writeByte('\n')
+    // serialization format version
+    dos.writeInt(2)
+    // R version (bogus)
+    dos.writeInt(rVersion(1, 4, 0))
+    // Min reader version
+    dos.writeInt(rVersion(1, 4, 0))
+  }
+
+  def writeDataFrameHeader(
+    dos: DataOutputStream,
+    dtypes: Seq[(String, String)]
+  ): Unit = {
+    // NOTE: strictly speaking this just writes the following:
+    // List of length 5
+    //   |_ List of column name(s)
+    //   |_ List of 1-based timestamp column index(s)
+    //   |_ List of 1-based date column index(s)
+    //   |_ List of 1-based struct column index(s)
+    //   |_ List of column(s), where each column is a vector of element(s)
+    writeFlags(dos, dtype = VECSXP)
+    writeLength(dos, 5)
+
+    writeStringValues(dos, dtypes.map(x => x._1))
+
+    val timestampColIdxes = ListBuffer[Int]()
+    val dateColIdxes = ListBuffer[Int]()
+    val structColIdxes = ListBuffer[Int]()
+    (1 to dtypes.length).map(
+      idx => {
+        val colType = dtypes(idx - 1)._2
+
+        colType match {
+          case "TimestampType"                     => timestampColIdxes += idx
+          case "DateType"                          => dateColIdxes += idx
+          case Collectors.ReTimestampArrayType(_*) => timestampColIdxes += idx
+          case Collectors.ReDateArrayType(_*)      => dateColIdxes += idx
+          case StructTypeAsJSON.DType              => structColIdxes += idx
+          case _                                   =>
+        }
+      }
+    )
+    writeIntValues(dos, timestampColIdxes)
+    writeIntValues(dos, dateColIdxes)
+    writeIntValues(dos, structColIdxes)
+
+    writeFlags(dos, dtype = VECSXP)
+    writeLength(dos, dtypes.length)
+  }
+
+  def writeColumn(
+    dos: DataOutputStream,
+    numRows: Int,
+    colIter: Iterator[Row],
+    dtype: String
+  ): Unit = {
+    val writer = (
+      dtype match {
+        case "BooleanType" => booleanColumnWriter()
+        case "ByteType" => integralColumnWriter[Byte]()
+        case "ShortType" => integralColumnWriter[Short]()
+        case "IntegerType" => integralColumnWriter[Int]()
+        case "FloatType" => numericColumnWriter[Float]()
+        case "LongType" => numericColumnWriter[Long]()
+        case "DoubleType" => numericColumnWriter[Double]()
+        case Collectors.ReDecimalType(_*) => decimalColumnWriter()
+        case "StringType" => stringColumnWriter()
+        case "TimestampType" => timestampColumnWriter()
+        case "DateType" => dateColumnWriter()
+        case Collectors.ReBooleanArrayType(_*) =>
+          arrayColumnWriter(LGLSXP, writeLglValue)
+        case Collectors.ReByteArrayType(_*) =>
+          arrayColumnWriter(INTSXP, writeIntegralValue[Byte])
+        case Collectors.ReShortArrayType(_*) =>
+          arrayColumnWriter(INTSXP, writeIntegralValue[Short])
+        case Collectors.ReIntegerArrayType(_*) =>
+          arrayColumnWriter(INTSXP, writeIntegralValue[Int])
+        case Collectors.ReLongArrayType(_*) =>
+          arrayColumnWriter(REALSXP, writeNumericValue[Long])
+        case Collectors.ReDecimalArrayType(_*) =>
+          arrayColumnWriter(REALSXP, writeDecimalValue)
+        case Collectors.ReFloatArrayType(_*) =>
+          arrayColumnWriter(REALSXP, writeNumericValue[Float])
+        case Collectors.ReDoubleArrayType(_*) =>
+          arrayColumnWriter(REALSXP, writeNumericValue[Double])
+        case Collectors.ReStringArrayType(_*) =>
+          arrayColumnWriter(STRSXP, writeStringValue)
+        case Collectors.ReTimestampArrayType(_*) =>
+          arrayColumnWriter(REALSXP, writeTimestampValue)
+        case Collectors.ReDateArrayType(_*) =>
+          arrayColumnWriter(STRSXP, writeDateValue)
+        case StructTypeAsJSON.DType => stringColumnWriter()
+        case _ => {
+          throw new IllegalArgumentException(
+            s"Serializing Spark dataframe column of type '$dtype' to RDS is unsupported"
+          )
+        }
+      }
+    )
+
+    writer(dos, numRows, colIter)
+  }
+
+  private[this] def booleanColumnWriter(): (DataOutputStream, Int, Iterator[Row]) => Unit = {
+    (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
+      writeFlags(dos, dtype = LGLSXP)
+      writeLength(dos, numRows)
+      colIter.foreach(row => writeLglValue(dos, row.get(0)))
+    }
+  }
+
+  private[this] def writeLglValue(dos: DataOutputStream, v: Any): Unit = {
+    dos.writeInt({
+      if (null == v) {
+        NA_INTEGER
+      } else {
+        val b = v.asInstanceOf[Boolean]
+        b.compare(false)
+      }}
+    )
+  }
+
+  private[this] def integralColumnWriter[SrcType : scala.math.Integral](): (DataOutputStream, Int, Iterator[Row]) => Unit = {
+    (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
+      writeFlags(dos, dtype = INTSXP)
+      writeLength(dos, numRows)
+      colIter.foreach(row => writeIntegralValue(dos, row.get(0)))
+    }
+  }
+
+  private[this] def writeIntValues(dos: DataOutputStream, vals: Seq[Int]): Unit = {
+    writeFlags(dos, dtype = INTSXP)
+    writeLength(dos, vals.length)
+    vals.map(x => writeIntegralValue[Int](dos, x))
+  }
+
+  private[this] def writeIntegralValue[SrcType : scala.math.Integral](
+    dos: DataOutputStream,
+    v: Any
+  ): Unit = {
+    dos.writeInt({
+      if (null == v) {
+        NA_INTEGER
+      } else {
+        implicitly[scala.math.Integral[SrcType]].toInt(
+          v.asInstanceOf[SrcType]
+        )
+      }
+    })
+  }
+
+  private[this] def numericColumnWriter[SrcType : scala.math.Numeric](): (DataOutputStream, Int, Iterator[Row]) => Unit = {
+    (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
+      writeFlags(dos, dtype = REALSXP)
+      writeLength(dos, numRows)
+      colIter.foreach(row => writeNumericValue[SrcType](dos, row.get(0)))
+    }
+  }
+
+  private[this] def writeNumericValue[SrcType : scala.math.Numeric](
+    dos: DataOutputStream,
+    v: Any
+  ): Unit = {
+    Serializer.writeNumeric(
+      dos,
+      Numeric(
+        if (null == v) {
+          None
+        } else {
+          Some(
+            implicitly[scala.math.Numeric[SrcType]].toDouble(
+              v.asInstanceOf[SrcType]
+            )
+          )
+        }
+      )
+    )
+  }
+
+  private[this] def decimalColumnWriter(): (DataOutputStream, Int, Iterator[Row]) => Unit = {
+    (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
+      writeFlags(dos, dtype = REALSXP)
+      writeLength(dos, numRows)
+      colIter.foreach(row => writeDecimalValue(dos, row.get(0)))
+    }
+  }
+
+  private[this] def writeDecimalValue(dos: DataOutputStream, v: Any): Unit = {
+    Serializer.writeNumeric(
+      dos,
+      Numeric(
+        if (v.isInstanceOf[BigDecimal]) {
+          Some(v.asInstanceOf[BigDecimal].doubleValue)
+        } else {
+          None
+        }
+      )
+    )
+  }
+
+  private[this] def stringColumnWriter(): (DataOutputStream, Int, Iterator[Row]) => Unit = {
+    (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
+      writeFlags(dos, dtype = STRSXP)
+      writeLength(dos, numRows)
+      colIter.foreach(row => writeStringValue(dos, row.get(0)))
+    }
+  }
+
+  private[this] def timestampColumnWriter(): (DataOutputStream, Int, Iterator[Row]) => Unit = {
+    (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
+      writeFlags(dos, dtype = REALSXP)
+      writeLength(dos, numRows)
+      colIter.foreach(row => writeTimestampValue(dos, row.get(0)))
+    }
+  }
+
+  private[this] def writeTimestampValue(dos: DataOutputStream, v: Any): Unit = {
+    dos.writeDouble(
+      if (v.isInstanceOf[java.util.Date]) {
+        Serializer.timestampToSeconds(v.asInstanceOf[java.util.Date])
+      } else {
+        Double.NaN
+      }
+    )
+  }
+
+  private[this] def dateColumnWriter(): (DataOutputStream, Int, Iterator[Row]) => Unit = {
+    (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
+      writeFlags(dos, dtype = STRSXP)
+      writeLength(dos, numRows)
+      colIter.foreach(row => writeDateValue(dos, row.get(0)))
+    }
+  }
+
+  private[this] def writeDateValue(dos: DataOutputStream, v: Any): Unit = {
+    writeStringValue(
+      dos,
+      if (v.isInstanceOf[java.sql.Date]) {
+        Serializer.dateFormat.get.format(v.asInstanceOf[java.sql.Date])
+      } else {
+        ""
+      }
+    )
+  }
+
+  private[this] def writeStringValues(
+    dos: DataOutputStream,
+    vals: Seq[String]
+  ): Unit = {
+    writeFlags(dos, dtype = STRSXP)
+    writeLength(dos, vals.length)
+    vals.map(x => writeStringValue(dos, x))
+  }
+
+  private[this] def writeStringValue(dos: DataOutputStream, v: Any): Unit = {
+    writeFlags(dos, dtype = CHARSXP)
+    if (v.isInstanceOf[String]) {
+      Serializer.writeString(dos, v.asInstanceOf[String])
+    } else {
+      writeLength(dos, -1)
+    }
+  }
+
+  private[this] def arrayColumnWriter(
+    elemType: Int,
+    elemWriter: (DataOutputStream, Any) => Unit
+  ): (DataOutputStream, Int, Iterator[Row]) => Unit = {
+    (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
+      writeFlags(dos, dtype = VECSXP)
+      writeLength(dos, numRows)
+      colIter.foreach(
+        row => {
+          val v = row.get(0)
+          if (null == v) {
+            writeFlags(dos, dtype = NILVALUE_SXP)
+          } else {
+            val arr = v.asInstanceOf[scala.collection.mutable.WrappedArray[_]]
+            writeFlags(dos, dtype = elemType)
+            writeLength(dos, arr.length)
+            arr.map(b => elemWriter(dos, b))
+          }
+        }
+      )
+    }
+  }
+
+  private[this] def writeFlags(
+    dos: DataOutputStream,
+    dtype: Int,
+    levels: Int = 0,
+    isObj: Boolean = false,
+    hasAttr: Boolean = false,
+    hasTag: Boolean = false
+  ): Unit = {
+    dos.writeInt(
+      (dtype & 0xFF) |
+      (isObj.compare(false) << 8) |
+      (hasAttr.compare(false) << 9) |
+      (hasTag.compare(false) << 10) |
+      (levels << 12)
+    )
+  }
+
+  private[this] def writeLength(dos: DataOutputStream, length: Int): Unit = {
+    // For now we only support length up to INT_MAX
+    dos.writeInt(length)
   }
 }

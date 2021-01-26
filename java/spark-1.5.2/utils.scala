@@ -461,6 +461,7 @@ object Utils {
     val dtype = row.schema.fields(colIdx).dataType
 
     dtype match {
+      case _: BooleanType => row.getBoolean(colIdx)
       case _: ByteType => row.getByte(colIdx)
       case _: ShortType => row.getShort(colIdx)
       case _: IntegerType => row.getInt(colIdx)

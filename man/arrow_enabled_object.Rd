@@ -18,7 +18,6 @@ limitations of arrow, then return FALSE, otherwise return TRUE
 
 df <- tibble::tibble(x = seq(5))
 arrow_enabled_object(df)
-
 }
 
 }

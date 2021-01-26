@@ -18,7 +18,9 @@ Compute the number of records within each partition of a Spark DataFrame
 library(sparklyr)
 sc <- spark_connect(master = "spark://HOST:PORT")
 example_sdf <- sdf_len(sc, 100L, repartition = 10L)
-example_sdf \%>\% sdf_partition_sizes() \%>\% print()
+example_sdf \%>\%
+  sdf_partition_sizes() \%>\%
+  print()
 }
 
 }
