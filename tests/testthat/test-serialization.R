@@ -401,3 +401,25 @@ test_that("collect() can retrieve nested list efficiently", {
 
   expect_equal(nrow(collect(nested)), 2)
 })
+
+test_that("array of temporal values are preserved with Spark 3.0+", {
+  test_requires_version("3.0.0")
+
+  df <- tibble::tibble(
+    char = c("one", "two"),
+    int = c(3L, 4L),
+    int_arr = list(seq(5), seq(10)),
+    date_arr = list(
+      as.Date(seq(5) * 700, origin = "1970-01-01"),
+      as.Date(seq(7) * 100, origin = "1970-01-01")
+    ),
+    timestamp_arr = list(
+      as.POSIXct(seq(5) * 700000, origin = "1970-01-01"),
+      as.POSIXct(seq(7) * 1000000, origin = "1970-01-01")
+    ),
+    char_arr = list(letters[1:13], letters[14:26])
+  )
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+
+  expect_equivalent(sdf %>% collect(), df)
+})
