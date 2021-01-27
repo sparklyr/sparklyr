@@ -173,7 +173,9 @@ livy_versions_file_pattern <- function() {
 #' @rdname livy_install
 #' @export
 livy_install_dir <- function() {
-  getOption("livy.install.dir", rappdirs::app_dir("livy", "rstudio")$cache())
+  normalizePath(
+    getOption("livy.install.dir", rappdirs::app_dir("livy", "rstudio")$cache())
+  )
 }
 
 #' @rdname livy_install
