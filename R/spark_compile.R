@@ -116,7 +116,7 @@ spark_compile <- function(jar_name,
   on.exit(Sys.setenv(CLASSPATH = classpath), add = TRUE)
   scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
   optflag <- ifelse(grepl("2.12", scalac_version), "-opt:l:default", "-optimise")
-  status <- execute(shQuote(scalac), optflag, "-deprecation", scala_files_quoted)
+  status <- execute(shQuote(scalac), optflag, "-deprecation", "-feature", scala_files_quoted)
   if (status) {
     stop("==> failed to compile Scala source files")
   }

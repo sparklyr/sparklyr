@@ -1,7 +1,9 @@
 package sparklyr
 
-import org.apache.spark.ml._
+import scala.language.existentials
 import scala.util.{Try, Success, Failure}
+
+import org.apache.spark.ml._
 import org.apache.spark.ml.param._
 import org.apache.spark.ml.tuning._
 import org.apache.spark.ml.param.Params
@@ -13,11 +15,9 @@ object MLUtils {
   }
 
   def wrapInPipeline(pipelineStage: PipelineStage): Pipeline = {
-    if (pipelineStage.isInstanceOf[Pipeline]) {
-      pipelineStage.asInstanceOf[Pipeline]
-    } else {
-      new Pipeline()
-      .setStages(Array(pipelineStage))
+    pipelineStage match {
+      case p: Pipeline => p
+      case _ => new Pipeline().setStages(Array(pipelineStage))
     }
   }
 
@@ -32,10 +32,9 @@ object MLUtils {
   }
 
   def getStages(stage: PipelineStage): Array[_ <: PipelineStage] = {
-    if (stage.isInstanceOf[PipelineModel]) {
-      stage.asInstanceOf[PipelineModel].stages
-    } else {
-      stage.asInstanceOf[Pipeline].getStages
+    stage match {
+      case m: PipelineModel => m.stages
+      case _ => stage.asInstanceOf[Pipeline].getStages
     }
   }
 

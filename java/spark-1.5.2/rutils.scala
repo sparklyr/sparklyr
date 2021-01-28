@@ -383,10 +383,9 @@ object RUtils {
     Serializer.writeNumeric(
       dos,
       Numeric(
-        if (v.isInstanceOf[BigDecimal]) {
-          Some(v.asInstanceOf[BigDecimal].doubleValue)
-        } else {
-          None
+        v match {
+          case d: BigDecimal => Some(d.doubleValue)
+          case _ => None
         }
       )
     )
@@ -410,10 +409,9 @@ object RUtils {
 
   private[this] def writeTimestampValue(dos: DataOutputStream, v: Any): Unit = {
     dos.writeDouble(
-      if (v.isInstanceOf[java.util.Date]) {
-        Serializer.timestampToSeconds(v.asInstanceOf[java.util.Date])
-      } else {
-        Double.NaN
+      v match {
+        case d: java.util.Date => Serializer.timestampToSeconds(d)
+        case _ => Double.NaN
       }
     )
   }
@@ -429,10 +427,9 @@ object RUtils {
   private[this] def writeDateValue(dos: DataOutputStream, v: Any): Unit = {
     writeStringValue(
       dos,
-      if (v.isInstanceOf[java.sql.Date]) {
-        Serializer.dateFormat.get.format(v.asInstanceOf[java.sql.Date])
-      } else {
-        ""
+      v match {
+        case d: java.sql.Date => Serializer.dateFormat.get.format(d)
+        case _ => ""
       }
     )
   }
@@ -448,10 +445,10 @@ object RUtils {
 
   private[this] def writeStringValue(dos: DataOutputStream, v: Any): Unit = {
     writeFlags(dos, dtype = CHARSXP)
-    if (v.isInstanceOf[String]) {
-      Serializer.writeString(dos, v.asInstanceOf[String])
-    } else {
-      writeLength(dos, -1)
+
+    v match {
+      case s: String => Serializer.writeString(dos, s)
+      case _ => writeLength(dos, -1)
     }
   }
 
