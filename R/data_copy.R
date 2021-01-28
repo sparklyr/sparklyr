@@ -1,4 +1,6 @@
 #' @include spark_data_build_types.R
+#' @include sql_utils.R
+#' @include utils.R
 
 spark_serialize_rds <- function(sc, df, columns, repartition) {
   num_rows <- nrow(df)
@@ -155,8 +157,43 @@ spark_data_copy <- function(
     stop("Parameter 'struct_columns' requires Spark 2.4+")
   }
 
+  temporal_array_columns <- new.env(parent = emptyenv())
+  temporal_array_columns$date_array_columns <- list()
+  temporal_array_columns$timestamp_array_columns <- list()
   additional_struct_columns <- list()
   additional_raw_columns <- list()
+
+  if (spark_version(sc) >= "3.0") {
+    process_column <- function(col) {
+      for (arr in df[[col]]) {
+        if (is.null(arr)) {
+          next
+        }
+        if ("Date" %in% class(arr)) {
+          temporal_array_columns$date_array_columns <- append(
+            temporal_array_columns$date_array_columns, list(col)
+          )
+          break
+        }
+        if ("POSIXct" %in% class(arr)) {
+          temporal_array_columns$timestamp_array_columns <- append(
+            temporal_array_columns$date_array_columns, list(col)
+          )
+          break
+        }
+        # If current element is not NULL and is not an array of temporal values
+        # then we assume the rest of the column does not contain array of
+        # temporal values either
+        break
+      }
+    }
+    for (column in colnames(df)) {
+      if ("list" %in% class(df[[column]])) {
+        process_column(column)
+      }
+    }
+  }
+
   for (column in colnames(df)) {
     if ("list" %in% class(df[[column]])) {
       if ("raw" %in% lapply(df[[column]], class)) {
@@ -200,9 +237,24 @@ spark_data_copy <- function(
     )
   }
 
+  if ((length(temporal_array_columns$date_array_columns) > 0 ||
+       length(temporal_array_columns$timestamp_array_columns) > 0) &&
+       spark_version(sc) >= "3.0"){
+    df <- invoke_static(
+      sc,
+      "sparklyr.TemporalArrayColumnUtils",
+      "transformTemporalArrayColumns",
+      df,
+      temporal_array_columns$date_array_columns,
+      temporal_array_columns$timestamp_array_columns
+    )
+  }
+
   if (spark_version(sc) < "2.0.0") {
     invoke(df, "registerTempTable", name)
   } else {
     invoke(df, "createOrReplaceTempView", name)
   }
+
+  df
 }
