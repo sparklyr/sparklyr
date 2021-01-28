@@ -17,10 +17,34 @@
 - Avoided repeated creations of SimpleDataFormat objects and setTimeZone calls
   while collecting Data columns from a Spark dataframe
 
+### Serialization
+
+- `spark_write_rds()` was implemented to support exporting all partitions of a
+  Spark dataframe in parallel into RDS (version 2) files. Such RDS files will be
+  written to the default file system of the Spark instance (i.e., local file if
+  the Spark instance is running locally, or a distributed file system such as
+  HDFS if the Spark instance is deployed over a cluster). The resulting RDS
+  files, once downloaded onto the local file system, should be deserialized into
+  R dataframes using `collect_from_rds()` (which calls `readRDS()` internally
+  and also performs some important post-processing steps to support timestamp
+  columns, date columns, and struct columns properly in R).
+
+- `copy_to()` can now import list columns of temporal values within a R
+  dataframe as arrays of Spark SQL date/timestamp types when working with Spark
+  3.0 or above
+
+- Fixed a bug with `copy_to()`'s handling of NA values in list columns of a R
+  dataframe
+
 ### Spark ML
 
 - The `handle_invalid` option is added to `ft_vector_indexer()` (supported by
   Spark 2.3 or above)
+
+### Misc
+
+- Fixed a bug with `~` within some path components not being normalized in
+  `sparklyr::livy_install()`
 
 # Sparklyr 1.5.2
 
