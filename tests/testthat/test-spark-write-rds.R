@@ -12,6 +12,7 @@ test_rds_output <- "/tmp/test.rds"
 test_that("spark_write_rds() works as expected with non-array columns", {
   test_requires_version("2.4.0")
   skip_on_arrow()
+  skip_databricks_connect()
 
   test_lgl_vals <- c(TRUE, NA, FALSE, NA, TRUE, NA, FALSE, NA)
   test_int_vals <- c(NA_integer_, -2147483647L, -2L, -1L, 0L, 1L, 2L, 2147483647L)
@@ -124,6 +125,7 @@ test_that("spark_write_rds() works as expected with non-array columns", {
 test_that("spark_write_rds() works as expected with array columns", {
   test_requires_version("2.4.0")
   skip_on_arrow()
+  skip_databricks_connect()
 
   test_lgl_arr = list(
     TRUE,
@@ -245,6 +247,7 @@ test_that("spark_write_rds() works as expected with array columns", {
 test_that("spark_write_rds() works as expected with multiple Spark dataframe partitions", {
   test_requires_version("2.0.0")
   skip_on_arrow()
+  skip_databricks_connect()
 
   test_requires("nycflights13")
 
