@@ -8,6 +8,7 @@ import java.util.Calendar
 import java.util.TimeZone
 
 import scala.collection.JavaConverters._
+import scala.collection.convert.Wrappers.SeqWrapper
 import scala.collection.mutable.WrappedArray
 import scala.Option
 
@@ -357,13 +358,16 @@ class Serializer(tracker: JVMObjectTracker) {
     if (obj == null) {
       Serializer.writeType(dos, "void")
     } else {
-      val value = if (obj.isInstanceOf[WrappedArray[_]]) {
-        obj.asInstanceOf[WrappedArray[_]].toArray
-      } else if (obj.isInstanceOf[scala.collection.convert.Wrappers.SeqWrapper[_]]) {
-        obj.asInstanceOf[scala.collection.convert.Wrappers.SeqWrapper[_]].toArray
-      } else {
-        obj
-      }
+      val value = (
+        if (obj.isInstanceOf[WrappedArray[_]]) {
+          obj.asInstanceOf[WrappedArray[_]].toArray
+        } else {
+          obj match {
+            case s @ SeqWrapper(_) => s.toArray
+            case _ => obj
+          }
+        }
+      )
 
       value match {
         case v: java.lang.Character =>
@@ -455,7 +459,7 @@ class Serializer(tracker: JVMObjectTracker) {
           Serializer.writeType(dos, "list")
           Serializer.writeInt(dos, v.length)
           v.foreach(elem => writeObject(dos, elem))
-        case v: Tuple3[String, String, Any] =>
+        case v @ Tuple3(_: String, _: String, _: Any) =>
           // Tuple3
           Serializer.writeType(dos, "list")
           Serializer.writeInt(dos, v.productArity)
