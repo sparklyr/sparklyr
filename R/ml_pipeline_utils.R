@@ -112,8 +112,12 @@ spark_pipeline_stage <- function(sc, class, uid, features_col = NULL, label_col 
                                  probability_col = NULL, raw_prediction_col = NULL,
                                  k = NULL, max_iter = NULL, seed = NULL, input_col = NULL, input_cols = NULL,
                                  output_col = NULL, output_cols = NULL) {
-  uid <- cast_string(uid)
-  invoke_new(sc, class, uid) %>%
+  args <- list(sc, class)
+  if (!is.null(uid)) {
+    uid <- cast_string(uid)
+    args <- append(args, list(uid))
+  }
+  do.call(invoke_new, args) %>%
     jobj_set_ml_params(
       features_col = features_col,
       label_col = label_col,
