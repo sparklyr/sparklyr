@@ -9,8 +9,8 @@ ml_power_iteration(
   k = 4,
   max_iter = 20,
   init_mode = "random",
-  srcCol = "src",
-  dstCol = "dst",
+  src_col = "src",
+  dst_col = "dst",
   weight_col = "weight",
   ...
 )
@@ -24,9 +24,9 @@ ml_power_iteration(
 
 \item{init_mode}{This can be either “random”, which is the default, to use a random vector as vertex properties, or “degree” to use normalized sum similarities.}
 
-\item{srcCol}{Column in the input Spark dataframe containing 0-based indexes of all source vertices in the affinity matrix described in the PIC paper.}
+\item{src_col}{Column in the input Spark dataframe containing 0-based indexes of all source vertices in the affinity matrix described in the PIC paper.}
 
-\item{dstCol}{Column in the input Spark dataframe containing 0-based indexes of all destination vertices in the affinity matrix described in the PIC paper.}
+\item{dst_col}{Column in the input Spark dataframe containing 0-based indexes of all destination vertices in the affinity matrix described in the PIC paper.}
 
 \item{weight_col}{Column in the input Spark dataframe containing non-negative edge weights in the affinity matrix described in the PIC paper.}
 
@@ -124,7 +124,7 @@ gen_pic_data <- function() {
 
 pic_data <- copy_to(sc, gen_pic_data())
 
-clusters <- ml_power_iteration(pic_data, srcCol = "src", dstCol = "dst", weight_col = "sim", k = 2, max_iter = 40)
+clusters <- ml_power_iteration(pic_data, src_col = "src", dst_col = "dst", weight_col = "sim", k = 2, max_iter = 40)
 print(clusters)
 
 }

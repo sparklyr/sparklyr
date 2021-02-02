@@ -98,5 +98,7 @@
   "metricName": "metric_name",
   "collectSubModels": "collect_sub_models",
   "numFolds": "num_folds",
-  "trainRatio": "train_ratio"
+  "trainRatio": "train_ratio",
+  "srcCol": "src_col",
+  "dstCol": "dst_col"
 }

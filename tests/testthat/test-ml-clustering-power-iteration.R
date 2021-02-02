@@ -78,8 +78,8 @@ test_that("ml_power_iteration() param setting", {
     k = 3,
     max_iter = 30,
     init_mode = "random",
-    srcCol = "src_vertex",
-    dstCol = "dst_vertex",
+    src_col = "src_vertex",
+    dst_col = "dst_vertex",
     weight_col = "gaussian_similarity"
   )
   test_param_setting(sc, ml_power_iteration, test_args, is_ml_pipeline = FALSE)
@@ -93,8 +93,8 @@ test_that("ml_power_iteration() works as expected with 'random' initialization m
     k = 2,
     max_iter = 40,
     init_mode = "random",
-    srcCol = "src",
-    dstCol = "dst",
+    src_col = "src",
+    dst_col = "dst",
     weight_col = "sim"
   )
 
@@ -109,8 +109,8 @@ test_that("ml_power_iteration() works as expected with 'degree' initialization m
     k = 2,
     max_iter = 10,
     init_mode = "degree",
-    srcCol = "src",
-    dstCol = "dst",
+    src_col = "src",
+    dst_col = "dst",
     weight_col = "sim"
   )
 
