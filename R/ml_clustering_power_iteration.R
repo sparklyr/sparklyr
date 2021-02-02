@@ -11,8 +11,8 @@ NULL
 #' @template roxlate-ml-clustering-params
 #' @template roxlate-ml-prediction-col
 #' @param init_mode This can be either “random”, which is the default, to use a random vector as vertex properties, or “degree” to use normalized sum similarities.
-#' @param srcCol Column in the input Spark dataframe containing 0-based indexes of all source vertices in the affinity matrix described in the PIC paper.
-#' @param dstCol Column in the input Spark dataframe containing 0-based indexes of all destination vertices in the affinity matrix described in the PIC paper.
+#' @param src_col Column in the input Spark dataframe containing 0-based indexes of all source vertices in the affinity matrix described in the PIC paper.
+#' @param dst_col Column in the input Spark dataframe containing 0-based indexes of all destination vertices in the affinity matrix described in the PIC paper.
 #' @param weight_col Column in the input Spark dataframe containing non-negative edge weights in the affinity matrix described in the PIC paper.
 #' @return A 2-column R dataframe with columns named "id" and "cluster" describing the resulting cluster assignments
 #'
@@ -73,14 +73,14 @@ NULL
 #'
 #' pic_data <- copy_to(sc, gen_pic_data())
 #'
-#' clusters <- ml_power_iteration(pic_data, srcCol = "src", dstCol = "dst", weight_col = "sim", k = 2, max_iter = 40)
+#' clusters <- ml_power_iteration(pic_data, src_col = "src", dst_col = "dst", weight_col = "sim", k = 2, max_iter = 40)
 #' print(clusters)
 #'
 #' }
 #'
 #' @export
 ml_power_iteration <- function(x, k = 4, max_iter = 20, init_mode = "random",
-                               srcCol = "src", dstCol = "dst", weight_col = "weight",
+                               src_col = "src", dst_col = "dst", weight_col = "weight",
                                ...) {
   check_dots_used()
   UseMethod("ml_power_iteration")
@@ -89,7 +89,7 @@ ml_power_iteration <- function(x, k = 4, max_iter = 20, init_mode = "random",
 #' @export
 ml_power_iteration.spark_connection <- function(x, k = 4, max_iter = 20,
                                                 init_mode = "random",
-                                                srcCol = "src", dstCol = "dst", weight_col = "weight",
+                                                src_col = "src", dst_col = "dst", weight_col = "weight",
                                                 ...) {
   if (spark_version(x) < "2.4") {
     stop("`ml_power_iteration()` is only supported in Spark 2.4 or above.")
@@ -99,8 +99,8 @@ ml_power_iteration.spark_connection <- function(x, k = 4, max_iter = 20,
     k = k,
     max_iter = max_iter,
     init_mode = init_mode,
-    srcCol = srcCol,
-    dstCol = dstCol,
+    src_col = src_col,
+    dst_col = dst_col,
     weight_col = weight_col
   ) %>%
     c(rlang::dots_list(...)) %>%
@@ -112,8 +112,8 @@ ml_power_iteration.spark_connection <- function(x, k = 4, max_iter = 20,
     k = .args[["k"]], max_iter = .args[["max_iter"]]
   ) %>%
     invoke("setInitMode", .args[["init_mode"]]) %>%
-    invoke("setSrcCol", .args[["srcCol"]]) %>%
-    invoke("setDstCol", .args[["dstCol"]]) %>%
+    invoke("setSrcCol", .args[["src_col"]]) %>%
+    invoke("setDstCol", .args[["dst_col"]]) %>%
     invoke("setWeightCol", .args[["weight_col"]])
 
   new_ml_power_iteration(jobj)
@@ -122,7 +122,7 @@ ml_power_iteration.spark_connection <- function(x, k = 4, max_iter = 20,
 #' @export
 ml_power_iteration.tbl_spark <- function(x, k = 4, max_iter = 20,
                                          init_mode = "random",
-                                         srcCol = "src", dstCol = "dst", weight_col = "weight",
+                                         src_col = "src", dst_col = "dst", weight_col = "weight",
                                          ...) {
   sc <- spark_connection(x)
   stage <- ml_power_iteration.spark_connection(
@@ -130,8 +130,8 @@ ml_power_iteration.tbl_spark <- function(x, k = 4, max_iter = 20,
     k = k,
     max_iter = max_iter,
     init_mode = init_mode,
-    srcCol = srcCol,
-    dstCol = dstCol,
+    src_col = src_col,
+    dst_col = dst_col,
     weight_col = weight_col,
     ...
   )
@@ -156,8 +156,8 @@ ml_power_iteration.tbl_spark <- function(x, k = 4, max_iter = 20,
 validator_ml_power_iteration <- function(.args) {
   .args[["k"]] <- cast_integer(.args[["k"]])
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
-  .args[["srcCol"]] <- cast_string(.args[["srcCol"]])
-  .args[["dstCol"]] <- cast_string(.args[["dstCol"]])
+  .args[["src_col"]] <- cast_string(.args[["src_col"]])
+  .args[["dst_col"]] <- cast_string(.args[["dst_col"]])
   .args[["weight_col"]] <- cast_string(.args[["weight_col"]])
   .args
 }
