@@ -1,3 +1,6 @@
+#' @include ml_clustering.R
+NULL
+
 #' @rdname ml_gradient_boosted_trees
 #' @template roxlate-ml-probabilistic-classifier-params
 #' @export

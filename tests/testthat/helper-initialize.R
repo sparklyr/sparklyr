@@ -343,21 +343,23 @@ check_params <- function(test_args, params) {
   )
 }
 
-test_param_setting <- function(sc, fn, test_args) {
+test_param_setting <- function(sc, fn, test_args, is_ml_pipeline = TRUE) {
   collapse_sublists <- function(x) purrr::map_if(x, rlang::is_bare_list, unlist)
 
   params1 <- do.call(fn, c(list(x = sc), test_args)) %>%
     ml_params() %>%
     collapse_sublists()
 
-  params2 <- do.call(fn, c(list(x = ml_pipeline(sc)), test_args)) %>%
-    ml_stage(1) %>%
-    ml_params() %>%
-    collapse_sublists()
+  expected <- collapse_sublists(test_args)
+  check_params(expected, params1)
 
-  test_args <- collapse_sublists(test_args)
-  check_params(test_args, params1)
-  check_params(test_args, params2)
+  if (is_ml_pipeline) {
+    params2 <- do.call(fn, c(list(x = ml_pipeline(sc)), test_args)) %>%
+      ml_stage(1) %>%
+      ml_params() %>%
+      collapse_sublists()
+    check_params(expected, params2)
+  }
 }
 
 test_default_args <- function(sc, fn) {

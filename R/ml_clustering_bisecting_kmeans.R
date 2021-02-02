@@ -1,3 +1,8 @@
+#' @include ml_clustering.R
+#' @include ml_model_helpers.R
+#' @include utils.R
+NULL
+
 #' Spark ML -- Bisecting K-Means Clustering
 #'
 #' A bisecting k-means algorithm based on the paper "A comparison of document clustering techniques" by Steinbach, Karypis, and Kumar, with modification to fit Spark. The algorithm starts from a single cluster that contains all points. Iteratively it finds divisible clusters on the bottom level and bisects each of them using k-means, until there are k leaf clusters in total or no leaf clusters are divisible. The bisecting steps of clusters on the same level are grouped together to increase parallelism. If bisecting all divisible clusters on the bottom level would result more than k leaf clusters, larger clusters get higher priority.

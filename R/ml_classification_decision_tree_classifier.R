@@ -1,3 +1,6 @@
+#' @include ml_clustering.R
+NULL
+
 #' @rdname ml_decision_tree
 #' @template roxlate-ml-probabilistic-classifier-params
 #' @export

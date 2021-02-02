@@ -1,3 +1,8 @@
+#' @include ml_clustering.R
+#' @include ml_model_helpers.R
+#' @include utils.R
+NULL
+
 #' Spark ML -- Latent Dirichlet Allocation
 #'
 #' Latent Dirichlet Allocation (LDA), a topic model designed for text documents.
