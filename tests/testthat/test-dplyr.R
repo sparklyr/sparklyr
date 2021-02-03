@@ -148,6 +148,28 @@ test_that("'head' uses 'limit' clause", {
   )
 })
 
+test_that("'all' works as expected", {
+  test_requires("dplyr")
+
+  expect_equal(
+    sdf_len(sc, 20) %>%
+      filter(all(id > 5, id < 19, id %% 3 == 1)) %>%
+      pull(id),
+    c(7L, 10L, 13L, 16L)
+  )
+})
+
+test_that("'any' works as expected", {
+  test_requires("dplyr")
+
+  expect_equal(
+    sdf_len(sc, 20) %>%
+      filter(any(id < 5, id > 16, id %% 7 == 1)) %>%
+      pull(id),
+    c(seq(4), 8L, 15L, seq(17, 20))
+  )
+})
+
 test_that("'sdf_broadcast' forces broadcast hash join", {
   query_plan <- df1_tbl %>%
     sdf_broadcast() %>%
