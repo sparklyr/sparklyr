@@ -142,22 +142,6 @@ build_sql_if_compare <- function(..., con, compare) {
   build_sql_if_parts(conditions, args)
 }
 
-#' @importFrom dbplyr sql
-build_sql_infix_op <- function(..., con, op) {
-  preds <- list(...)
-  build_sql_args <- list()
-  for (i in seq(1, length(preds) - 1)) {
-    build_sql_args <- append(
-      build_sql_args,
-      list(preds[[i]], sprintf(" %s ", op))
-    )
-  }
-  build_sql_args <- append(build_sql_args, list(preds[[length(preds)]]))
-  build_sql_args <- append(build_sql_args, list(con = con))
-
-  do.call(dbplyr::build_sql, build_sql_args)
-}
-
 #' @rawNamespace
 #' if (utils::packageVersion("dbplyr") < "2") {
 #'   importFrom(dplyr, sql_translate_env)
@@ -232,12 +216,6 @@ spark_sql_translation <- function(con) {
       xor = function(x, y) dbplyr::build_sql(x, " ^ ", y),
       or = function(x, y) dbplyr::build_sql(x, " OR ", y),
       and = function(x, y) dbplyr::build_sql(x, " AND ", y),
-      all = function(...) {
-        build_sql_infix_op(..., con = con, op = "AND")
-      },
-      any = function(...) {
-        build_sql_infix_op(..., con = con, op = "OR")
-      },
       pmin = function(...) build_sql_if_compare(..., con = con, compare = "<="),
       pmax = function(...) build_sql_if_compare(..., con = con, compare = ">="),
       `%like%` = function(x, y) dbplyr::build_sql(x, " LIKE ", y),
