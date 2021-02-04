@@ -183,14 +183,14 @@ test_that("ml_validation_metrics() works properly", {
   tvs_model <- ml_fit(tvs, iris_tbl)
   tvs_metrics <- ml_validation_metrics(tvs_model)
 
-  expect_identical(
+  expect_setequal(
     names(cv_metrics),
     c("f1", "elastic_net_param_1", "reg_param_1")
   )
 
   expect_identical(nrow(cv_metrics), 1L)
 
-  expect_identical(
+  expect_setequal(
     names(tvs_metrics),
     c("f1", "elastic_net_param_1", "reg_param_1")
   )

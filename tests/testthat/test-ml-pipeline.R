@@ -60,10 +60,12 @@ test_that("ml_transformer.ml_pipeline() works as expected", {
 
   p1_params <- p1 %>%
     ml_stages() %>%
-    lapply(ml_param_map)
+    lapply(ml_param_map) %>%
+    lapply(as.environment)
   p2_params <- p2 %>%
     ml_stages() %>%
-    lapply(ml_param_map)
+    lapply(ml_param_map) %>%
+    lapply(as.environment)
   expect_equal(p1_params, p2_params)
   expect_equal(class(p2)[1], "ml_pipeline")
 })
