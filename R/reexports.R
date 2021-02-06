@@ -145,3 +145,21 @@ NULL
 #' @export
 #' @importFrom dplyr select
 NULL
+
+#' Mutate
+#'
+#' See \code{\link[dplyr:mutate]{mutate}} for more details.
+#'
+#' @name mutate
+#' @export
+#' @importFrom dplyr mutate
+NULL
+
+#' Filter
+#'
+#' See \code{\link[dplyr:filter]{filter}} for more details.
+#'
+#' @name filter
+#' @export
+#' @importFrom dplyr filter
+NULL

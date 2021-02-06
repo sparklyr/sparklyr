@@ -108,6 +108,10 @@ partial_eval_call <- function(call, sim_data, env) {
     }
   } else if (rlang::is_call(call, "across")) {
     partial_eval_across(call, sim_data, env)
+  } else if (rlang::is_call(call, "if_all")) {
+    partial_eval_if_all(call, sim_data, env)
+  } else if (rlang::is_call(call, "if_any")) {
+    partial_eval_if_any(call, sim_data, env)
   } else {
     # Process call arguments recursively, unless user has manually called
     # remote/local
@@ -155,6 +159,26 @@ partial_eval_across <- function(call, sim_data, env) {
   .names <- eval(call$.names, env)
   names(out) <- across_names(cols, names(funs), .names, env)
   out
+}
+
+partial_eval_if_all <- function(call, sim_data, env) {
+  if_all <- function(.cols) {}
+  call <- match.call(if_all, call, expand.dots = FALSE, envir = env)
+  vars <- colnames(sim_data)
+
+  cols <- rlang::syms(vars)[tidyselect::eval_select(call$.cols, sim_data, allow_rename = TRUE)]
+
+  rlang::expr(!array_contains(array(!!!cols), FALSE))
+}
+
+partial_eval_if_any <- function(call, sim_data, env) {
+  if_any <- function(.cols) {}
+  call <- match.call(if_any, call, expand.dots = FALSE, envir = env)
+  vars <- colnames(sim_data)
+
+  cols <- rlang::syms(vars)[tidyselect::eval_select(call$.cols, sim_data, allow_rename = TRUE)]
+
+  rlang::expr(array_contains(array(!!!cols), TRUE))
 }
 
 across_names <- function(cols, funs, names = NULL, env = parent.frame()) {
