@@ -42,13 +42,15 @@ test_that("one can program with ft_ function (.spark_connection)", {
   bin3 <- foo3(sc, 0.3)
 
   for (binarizer in list(bin1, bin2, bin3)) {
-    expect_identical(
-      ml_param_map(binarizer),
+    expect_equivalent(
+      ml_param_map(binarizer) %>%
+        as.environment(),
       list(
         output_col = "is_big",
         threshold = 0.3,
         input_col = "Petal_Width"
-      )
+      ) %>%
+        as.environment()
     )
   }
 })

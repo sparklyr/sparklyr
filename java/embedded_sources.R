@@ -164,7 +164,7 @@ readTypedObject <- function(con, type) {
     "t" = readTime(con),
     "a" = readArray(con),
     "l" = readList(con),
-    "e" = readEnv(con),
+    "e" = readMap(con),
     "s" = readStruct(con),
     "f" = readFastStringArray(con),
     "n" = NULL,
@@ -307,17 +307,18 @@ readList <- function(con) {
   }
 }
 
-readEnv <- function(con) {
-  env <- new.env()
+readMap <- function(con) {
+  map <- list()
   len <- readInt(con)
   if (len > 0) {
     for (i in seq_len(len)) {
       key <- readString(con)
       value <- readObject(con)
-      env[[key]] <- value
+      map[[key]] <- value
     }
   }
-  env
+
+  map
 }
 
 # Convert a named list to struct so that

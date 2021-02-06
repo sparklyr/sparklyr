@@ -42,7 +42,7 @@ test_that("we can train a regression with train-validation-split", {
     seed = 1
   )
 
-  expect_identical(
+  expect_setequal(
     names(tvsm$validation_metrics_df),
     c("f1", "elastic_net_param_1", "reg_param_1")
   )
