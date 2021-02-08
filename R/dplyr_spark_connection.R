@@ -35,6 +35,18 @@ mutate.tbl_spark <- function(.data, ...) {
 }
 
 #' @export
+#' @importFrom dplyr filter
+filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
+  if (!identical(.preserve, FALSE)) {
+    stop("`.preserve` is not supported on database backends", call. = FALSE)
+  }
+
+  dots <- rlang::quos(...)
+  dots <- partial_eval_dots(dots, sim_data = simulate_vars(.data))
+  dbplyr::add_op_single("filter", .data, dots = dots)
+}
+
+#' @export
 #' @importFrom dplyr select
 select.tbl_spark <- function(.data, ...) {
   sim_data <- simulate_vars(.data)

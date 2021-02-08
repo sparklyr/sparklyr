@@ -109,6 +109,33 @@ test_that("if_else works as expected", {
   )
 })
 
+test_that("if_all and if_any work as expected", {
+  df <- tibble::tibble(
+    row_num = seq(4),
+    b_a = c(FALSE, FALSE, TRUE, TRUE),
+    b_b = c(FALSE, TRUE, FALSE, TRUE),
+    ba = FALSE,
+    bb= TRUE
+  )
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+
+  expect_equivalent(
+    sdf %>%
+      filter(if_any(starts_with("b_"))) %>%
+      collect(),
+    df %>%
+      filter(if_any(starts_with("b_")))
+  )
+
+  expect_equivalent(
+    sdf %>%
+      filter(if_all(starts_with("b_"))) %>%
+      collect(),
+    df %>%
+      filter(if_all(starts_with("b_")))
+  )
+})
+
 test_that("grepl works as expected", {
   test_requires("dplyr")
 
