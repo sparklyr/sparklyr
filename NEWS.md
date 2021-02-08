@@ -10,6 +10,9 @@
   (e.g., one can have `sdf %>% select(where(is.numeric))` and
   `sdf %>% summarize(across(starts_with("Petal"), mean))`, etc)
 
+- Implemented `dplyr::if_all()` and `dplyr::if_any()` support for Spark
+  dataframes
+
 - Added support for `partition_by` option in `stream_write_*` methods
 
 - Fixed a bug with URI handling affecting all `spark_read_*` methods
@@ -36,7 +39,12 @@
 - Fixed a bug with `copy_to()`'s handling of NA values in list columns of a R
   dataframe
 
+- Spark map type will be collected as list instead of environment in R in order
+  to support empty string as key
+
 ### Spark ML
+
+- Implemented R interface for Power Iteration Clustering
 
 - The `handle_invalid` option is added to `ft_vector_indexer()` (supported by
   Spark 2.3 or above)
