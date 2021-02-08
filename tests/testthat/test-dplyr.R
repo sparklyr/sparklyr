@@ -11,6 +11,26 @@ df2 <- tibble(b = letters[1:3], c = letters[24:26])
 df1_tbl <- testthat_tbl("df1")
 df2_tbl <- testthat_tbl("df2")
 
+scalars_df <- tibble::tibble(
+  row_num = seq(4),
+  b_a = c(FALSE, FALSE, TRUE, TRUE),
+  b_b = c(FALSE, TRUE, FALSE, TRUE),
+  ba = FALSE,
+  bb= TRUE,
+  n_a = c(2, 3, 6, 7),
+  n_b = c(3, 6, 2, 7),
+  c_a = c("aa", "ab", "ca", "dd"),
+  c_b = c("ab", "bc", "ac", "ad")
+)
+scalars_sdf <- copy_to(sc, scalars_df, overwrite = TRUE)
+
+arrays_df <- tibble::tibble(
+  row_num = seq(4),
+  a_a = list(1:4, 2:5, 3:6, 4:7),
+  a_b = list(4:7, 3:6, 2:5, 1:4)
+)
+arrays_sdf <- copy_to(sc, arrays_df, overwrite = TRUE)
+
 test_that("'select' works with where(...) predicate", {
   test_requires("dplyr")
 
@@ -110,29 +130,92 @@ test_that("if_else works as expected", {
 })
 
 test_that("if_all and if_any work as expected", {
-  df <- tibble::tibble(
-    row_num = seq(4),
-    b_a = c(FALSE, FALSE, TRUE, TRUE),
-    b_b = c(FALSE, TRUE, FALSE, TRUE),
-    ba = FALSE,
-    bb= TRUE
-  )
-  sdf <- copy_to(sc, df, overwrite = TRUE)
-
   expect_equivalent(
-    sdf %>%
+    scalars_sdf %>%
       filter(if_any(starts_with("b_"))) %>%
       collect(),
-    df %>%
+    scalars_df %>%
       filter(if_any(starts_with("b_")))
   )
 
   expect_equivalent(
-    sdf %>%
+    scalars_sdf %>%
       filter(if_all(starts_with("b_"))) %>%
       collect(),
-    df %>%
+    scalars_df %>%
       filter(if_all(starts_with("b_")))
+  )
+})
+
+test_that("if_all and if_any work as expected with boolean predicates", {
+  test_requires_version("2.4.0")
+  if (packageVersion("dbplyr") < "2") {
+    skip("This feature is only supported by dbplyr 2.0 or above")
+  }
+  skip_on_arrow()
+
+  expect_equivalent(
+    scalars_sdf %>%
+      filter(if_all(starts_with("n_"), ~ .x > 5)) %>%
+      collect(),
+    scalars_df %>% filter(if_all(starts_with("n_"), ~ .x > 5))
+  )
+
+  expect_equivalent(
+    scalars_sdf %>%
+      filter(if_any(starts_with("n_"), ~ .x > 5)) %>%
+      collect(),
+    scalars_df %>% filter(if_any(starts_with("n_"), ~ .x > 5))
+  )
+
+  expect_equivalent(
+    scalars_sdf %>%
+      filter(if_all(starts_with("n_"), c(~ .x > 5, ~ .x < 3))) %>%
+      collect(),
+    scalars_df %>% filter(if_all(starts_with("n_"), c(~ .x > 5, ~ .x < 3)))
+  )
+
+  expect_equivalent(
+    scalars_sdf %>%
+      filter(if_any(starts_with("n_"), c(~ .x > 6, ~ .x < 3))) %>%
+      collect(),
+    scalars_df %>% filter(if_any(starts_with("n_"), c(~ .x > 6, ~ .x < 3)))
+  )
+
+  expect_equivalent(
+    scalars_sdf %>%
+      dplyr::filter(if_all(starts_with("c_"), grepl, "caabac")) %>%
+      pull(row_num),
+    c(1L, 3L)
+  )
+
+  expect_equivalent(
+    scalars_sdf %>%
+      dplyr::filter(if_any(starts_with("c_"), grepl, "aac")) %>%
+      pull(row_num),
+    c(1L, 3L)
+  )
+
+  expect_equivalent(
+    scalars_sdf %>%
+      dplyr::filter(if_any(starts_with("c_"), grepl, "bcad")) %>%
+      pull(row_num),
+    c(2L, 3L, 4L)
+  )
+
+
+  expect_equivalent(
+    arrays_sdf %>%
+      filter(if_all(starts_with("a_"), ~ array_contains(.x, 5L))) %>%
+      pull(row_num),
+    c(2L, 3L)
+  )
+
+  expect_equivalent(
+    arrays_sdf %>%
+      filter(if_any(starts_with("a_"), ~ array_contains(.x, 7L))) %>%
+      pull(row_num),
+    c(1L, 4L)
   )
 })
 

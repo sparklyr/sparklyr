@@ -142,7 +142,7 @@ partial_eval_across <- function(call, sim_data, env) {
   } else if (is.character(.fns)) {
     # as is
   } else {
-    rlang::abort("Unsupported `.fns` for dbplyr::across()")
+    rlang::abort("Unsupported `.fns` for dplyr::across()")
   }
   funs <- rlang::set_names(rlang::syms(.fns), .fns)
 
@@ -162,23 +162,60 @@ partial_eval_across <- function(call, sim_data, env) {
 }
 
 partial_eval_if_all <- function(call, sim_data, env) {
-  if_all <- function(.cols) {}
-  call <- match.call(if_all, call, expand.dots = FALSE, envir = env)
-  vars <- colnames(sim_data)
+  expr <- partial_eval_apply_fns(call, sim_data, env, "dplyr::if_all()")
 
-  cols <- rlang::syms(vars)[tidyselect::eval_select(call$.cols, sim_data, allow_rename = TRUE)]
-
-  rlang::expr(!array_contains(array(!!!cols), FALSE))
+  rlang::expr(!array_contains(!!expr, FALSE))
 }
 
 partial_eval_if_any <- function(call, sim_data, env) {
-  if_any <- function(.cols) {}
-  call <- match.call(if_any, call, expand.dots = FALSE, envir = env)
+  expr <- partial_eval_apply_fns(call, sim_data, env, "dplyr::if_any()")
+
+  rlang::expr(array_contains(!!expr, TRUE))
+}
+
+partial_eval_apply_fns <- function(call, sim_data, env, what) {
+  signature_fn <- function(.cols, .fns = NULL, ..., .names = NULL) {}
+  call <- match.call(signature_fn, call, expand.dots = FALSE, envir = env)
+  if (!is.null(call$.names)) {
+    stop(".names is unsupported for Spark dataframes.")
+  }
   vars <- colnames(sim_data)
-
   cols <- rlang::syms(vars)[tidyselect::eval_select(call$.cols, sim_data, allow_rename = TRUE)]
+  fns <- c(eval(call$.fns, env))
+  if (is.null(fns)) {
+    rlang::expr(array(!!!cols))
+  } else {
+    sub_exprs <- vector("list", length(fns))
+    for (i in seq_along(fns)) {
+      sub_exprs[[i]] <- (
+        if (is.null(fns[[i]])) {
+          rlang::expr(array(!!!cols))
+        } else {
+          fn <- (
+            if (rlang::is_formula(fns[[i]])) {
+              fns[[i]]
+            } else if (rlang::is_function(fns[[i]])) {
+              rlang::expr(~ (!!rlang::sym(find_fun(fns[[i]])))(.x, !!!call$...))
+            } else {
+              rlang::abort(sprintf("Unsupported `.fns` for %s", what))
+            }
+          )
 
-  rlang::expr(array_contains(array(!!!cols), TRUE))
+          rlang::expr(transform(array(!!!cols), !!fn))
+        }
+      )
+    }
+
+    rlang::expr(concat(!!!sub_exprs))
+  }
+}
+
+process_fn <- function(fn, what) {
+  if (rlang::is_function(call$.fns)) {
+  } else if (rlang::is_formula(call$.fns)) {
+  } else {
+    rlang::abort("Unsupported `.fns` for dbplyr::across()")
+  }
 }
 
 across_names <- function(cols, funs, names = NULL, env = parent.frame()) {
@@ -215,7 +252,13 @@ find_fun <- function(fun) {
 
 fun_name <- function(fun) {
   pkg_env <- rlang::env_parent(rlang::global_env())
-  known <- c(ls(dbplyr::base_agg), ls(dbplyr::base_scalar))
+  sparklyr_fns <- spark_sql_translation(dbplyr::simulate_dbi())
+  known <- c(
+    ls(dbplyr::base_agg),
+    ls(dbplyr::base_scalar),
+    ls(sparklyr_fns$aggregate),
+    ls(sparklyr_fns$scalar)
+  )
 
   for (x in known) {
     if (!rlang::env_has(pkg_env, x, inherit = TRUE)) {
