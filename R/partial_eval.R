@@ -135,29 +135,54 @@ partial_eval_across <- function(call, sim_data, env) {
 
   .fns <- eval(call$.fns, env)
 
-  if (is.function(.fns)) {
-    .fns <- find_fun(.fns)
-  } else if (is.list(.fns)) {
-    .fns <- purrr::map_chr(.fns, find_fun)
-  } else if (is.character(.fns)) {
+  if (rlang::is_formula(.fns)) {
     # as is
+    funs <- .fns
   } else {
-    rlang::abort("Unsupported `.fns` for dplyr::across()")
+    if (is.function(.fns)) {
+      .fns <- find_fun(.fns)
+    } else if (is.list(.fns)) {
+      .fns <- purrr::map_chr(.fns, find_fun)
+    } else if (is.character(.fns)) {
+      # as is
+    } else {
+      rlang::abort("Unsupported `.fns` for dplyr::across()")
+    }
+    funs <- rlang::set_names(rlang::syms(.fns), .fns)
   }
-  funs <- rlang::set_names(rlang::syms(.fns), .fns)
 
   # Generate grid of expressions
-  out <- vector("list", length(cols) * length(.fns))
-  k <- 1
-  for (i in seq_along(cols)) {
-    for (j in seq_along(funs)) {
-      out[[k]] <- rlang::expr((!!funs[[j]])(!!cols[[i]], !!!call$...))
-      k <- k + 1
+  if (rlang::is_formula(funs)) {
+    if (length(call$...) > 0) {
+      rlang::abort("Formula with additional parameters is unsupported")
+    }
+    out <- vector("list", length(cols))
+    for (i in seq_along(cols)) {
+      out[[i]] <- rlang::expr(element_at(transform(array(!!cols[[i]]), !!funs), 1L))
+    }
+  } else {
+    out <- vector("list", length(cols) * length(.fns))
+    k <- 1
+    for (i in seq_along(cols)) {
+      for (j in seq_along(funs)) {
+        out[[k]] <- rlang::expr((!!funs[[j]])(!!cols[[i]], !!!call$...))
+        k <- k + 1
+      }
     }
   }
 
   .names <- eval(call$.names, env)
-  names(out) <- across_names(cols, names(funs), .names, env)
+  names(out) <- across_names(
+    cols,
+    if (rlang::is_formula(funs)) {
+      "formula"
+    } else {
+      names(funs)
+    },
+    .names,
+    env
+  )
+
   out
 }
 

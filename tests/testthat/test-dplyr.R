@@ -11,6 +11,14 @@ df2 <- tibble(b = letters[1:3], c = letters[24:26])
 df1_tbl <- testthat_tbl("df1")
 df2_tbl <- testthat_tbl("df2")
 
+dplyr_across_test_cases_df <- tibble(
+  x = seq(3),
+  y = letters[1:3],
+  t = as.POSIXct(seq(3), origin = "1970-01-01"),
+  z = seq(3) + 5L
+)
+dplyr_across_test_cases_tbl <- testthat_tbl("dplyr_across_test_cases_df")
+
 scalars_df <- tibble::tibble(
   row_num = seq(4),
   b_a = c(FALSE, FALSE, TRUE, TRUE),
@@ -74,17 +82,22 @@ test_that("'mutate' works with `where(...)` predicate", {
   # of query
   skip_on_arrow()
 
-  df <- tibble::tibble(
-    x = seq(3),
-    y = letters[1:3],
-    t = as.POSIXct(seq(3), origin = "1970-01-01"),
-    z = seq(3) + 5L
+  expect_equivalent(
+    dplyr_across_test_cases_tbl %>% mutate(across(where(is.numeric), exp)) %>% collect(),
+    dplyr_across_test_cases_df %>% mutate(across(where(is.numeric), exp))
   )
-  sdf <- copy_to(sc, df, overwrite = TRUE)
+})
+
+test_that("'across()' works with formula syntax", {
+  test_requires("dplyr")
+  test_requires_version("2.4.0")
+  # Arrow currently throws java.lang.UnsupportedOperationException for this type
+  # of query
+  skip_on_arrow()
 
   expect_equivalent(
-    sdf %>% mutate(across(where(is.numeric), exp)) %>% collect(),
-    df %>% mutate(across(where(is.numeric), exp))
+    dplyr_across_test_cases_tbl %>% mutate(across(where(is.numeric), ~ sin(.x ^ 3 + .x))) %>% collect(),
+    dplyr_across_test_cases_df %>% mutate(across(where(is.numeric), ~ sin(.x ^ 3 + .x)))
   )
 })
 
