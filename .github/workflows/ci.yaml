@@ -15,57 +15,57 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Spark 2.2.1 (R oldrel, oraclejdk8)'
+          - name: 'Spark 2.2.1 (R oldrel, openjdk8)'
             r: 'oldrel'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.2.1'
               LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'oraclejdk8'
-          - name: 'Spark 2.3.2 (R release, oraclejdk8)'
+              JAVA_VERSION: 'openjdk8'
+          - name: 'Spark 2.3.2 (R release, openjdk8)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.3.2'
               LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'oraclejdk8'
-          - name: 'Spark 2.4.4 (R release, oraclejdk8)'
+              JAVA_VERSION: 'openjdk8'
+          - name: 'Spark 2.4.4 (R release, openjdk8)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.4.4'
               LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'oraclejdk8'
-          - name: 'Spark 2.4.4 (R release, oraclejdk8, CODE_COVERAGE=true)'
+              JAVA_VERSION: 'openjdk8'
+          - name: 'Spark 2.4.4 (R release, openjdk8, CODE_COVERAGE=true)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.4.4'
               LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'oraclejdk8'
+              JAVA_VERSION: 'openjdk8'
               CODE_COVERAGE: 'true'
-          - name: 'Spark 3.0.0 (R release, oraclejdk8)'
+          - name: 'Spark 3.0.0 (R release, openjdk8)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'oraclejdk8'
-          - name: 'Spark 3.0.0 (R release, oraclejdk8, dbplyr 1.4.4)'
+              JAVA_VERSION: 'openjdk8'
+          - name: 'Spark 3.0.0 (R release, openjdk8, dbplyr 1.4.4)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'oraclejdk8'
+              JAVA_VERSION: 'openjdk8'
               DBPLYR_VERSION: '1.4.4'
-          - name: 'Spark 3.0.0 (R release, oraclejdk8, dbplyr API edition 1)'
+          - name: 'Spark 3.0.0 (R release, openjdk8, dbplyr API edition 1)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'oraclejdk8'
+              JAVA_VERSION: 'openjdk8'
               DBPLYR_API_EDITION: '1'
           - name: 'Spark 3.0.0 (R release, openjdk11)'
             r: 'release'
@@ -74,37 +74,37 @@ jobs:
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
               JAVA_URL: 'https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_linux_hotspot_11.0.1_13.tar.gz'
-          - name: 'Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)'
+          - name: 'Livy 0.5.0 (R release, openjdk8, Spark 2.3.0)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.3.0'
               LIVY_VERSION: '0.5.0'
-              JAVA_VERSION: 'oraclejdk8'
+              JAVA_VERSION: 'openjdk8'
               LIVY_TEST_CASES_SUBSET: '1'
-          - name: 'Livy 0.5.0 (R release, oraclejdk8, Spark 2.3.0)'
+          - name: 'Livy 0.5.0 (R release, openjdk8, Spark 2.3.0)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.3.0'
               LIVY_VERSION: '0.5.0'
-              JAVA_VERSION: 'oraclejdk8'
+              JAVA_VERSION: 'openjdk8'
               LIVY_TEST_CASES_SUBSET: '2'
-          - name: 'Livy 0.5.0 (R release, oraclejdk8, Spark 2.4.0)'
+          - name: 'Livy 0.5.0 (R release, openjdk8, Spark 2.4.0)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.4.0'
               LIVY_VERSION: '0.5.0'
-              JAVA_VERSION: 'oraclejdk8'
+              JAVA_VERSION: 'openjdk8'
               LIVY_TEST_CASES_SUBSET: '1'
-          - name: 'Livy 0.5.0 (R release, oraclejdk8, Spark 2.4.0)'
+          - name: 'Livy 0.5.0 (R release, openjdk8, Spark 2.4.0)'
             r: 'release'
             env:
               ARROW_ENABLED: 'false'
               SPARK_VERSION: '2.4.0'
               LIVY_VERSION: '0.5.0'
-              JAVA_VERSION: 'oraclejdk8'
+              JAVA_VERSION: 'openjdk8'
               LIVY_TEST_CASES_SUBSET: '2'
           - name: 'Arrow (release)'
             r: 'release'
@@ -112,7 +112,7 @@ jobs:
               ARROW_ENABLED: 'true'
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'oraclejdk8'
+              JAVA_VERSION: 'openjdk8'
           - name: 'Arrow (nightly)'
             r: 'release'
             env:
@@ -120,7 +120,7 @@ jobs:
               ARROW_VERSION: 'devel'
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'oraclejdk8'
+              JAVA_VERSION: 'openjdk8'
           - name: 'Deps Devel (tidyverse, r-lib, forge)'
             r: 'release'
             env:
@@ -128,6 +128,7 @@ jobs:
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
               R_DEVEL_PACKAGES: 'true'
+              JAVA_VERSION: 'openjdk8'
     env:
       ${{ matrix.env }}
     steps:
@@ -148,18 +149,22 @@ jobs:
         with:
           r-version: ${{ matrix.r }}
       - name: Install Java
+        id: install-java
         run: |
-          if [[ ! -z "$JAVA_VERSION" ]]; then
-            wget https://raw.githubusercontent.com/michaelklishin/jdk_switcher/master/jdk_switcher.sh
-            source ./jdk_switcher.sh use "$JAVA_VERSION";
-          fi
+          sudo apt-get -y remove --purge default-jdk adoptopenjdk-11-hotspot || :
 
           if [[ ! -z "$JAVA_URL" ]]; then
             wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
             source ./install-jdk.sh --url $JAVA_URL
+          else
+            sudo apt-get -y install openjdk-8-jdk
+            wget https://raw.githubusercontent.com/michaelklishin/jdk_switcher/master/jdk_switcher.sh
+            . ./jdk_switcher.sh
+            jdk_switcher use openjdk8;
           fi
 
-          echo $JAVA_HOME
+          echo "${JAVA_HOME}"
+          echo "::set-output name=JAVA_HOME::${JAVA_HOME}"
       - name: Install Spark master if necessary
         run: |
           if [[ $SPARK_VERSION == 'master' ]]; then
@@ -170,8 +175,8 @@ jobs:
         uses: actions/cache@master
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: sparklyr-${{ runner.os }}-r-${{ matrix.r }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('DESCRIPTION') }}-${{ hashFiles('ci/install_r_dependencies.sh') }}
-          restore-keys: sparklyr-${{ runner.os }}-r-${{ matrix.r }}
+          key: sparklyr-ci-${{ runner.os }}-R-${{ matrix.r }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('DESCRIPTION') }}-${{ hashFiles('ci/install_r_dependencies.sh') }}
+          restore-keys: sparklyr-ci-${{ runner.os }}-R-${{ matrix.r }}
       - name: Cache Spark & Livy installations
         if: runner.os != 'Windows'
         uses: actions/cache@master
@@ -201,6 +206,7 @@ jobs:
       - name: Run tests
         run: |
           export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
+          export JAVA_HOME="${{ steps.install-java.outputs.JAVA_HOME }}"
 
           sudo timedatectl set-timezone America/Los_Angeles
           export TZ='America/Los_Angeles'
