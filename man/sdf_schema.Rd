@@ -4,13 +4,15 @@
 \alias{sdf_schema}
 \title{Read the Schema of a Spark DataFrame}
 \usage{
-sdf_schema(x, expand_nested_cols = FALSE)
+sdf_schema(x, expand_nested_cols = FALSE, expand_struct_cols = FALSE)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
 \item{expand_nested_cols}{Whether to expand columns containing nested array
 of structs (which are usually created by tidyr::nest on a Spark data frame)}
+
+\item{expand_struct_cols}{Whether to expand columns containing structs}
 }
 \value{
 An \R \code{list}, with each \code{list} element describing the

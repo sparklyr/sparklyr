@@ -55,6 +55,53 @@ test_that("spark_read_json() can load data using column types", {
   expect_true(is.list(df$Other))
 })
 
+test_that("spark_read_json() can load nested structs using column types", {
+  jsonPath <- get_sample_data_path(
+    "spark-read-json-can-load-nested-structs-using-column-types.json"
+  )
+  columns <- list(
+    a = "integer",
+    b = "double",
+    d = "date",
+    s = list(
+      a = "integer",
+      b = "double",
+      d = "date",
+      s = "string",
+      i = list(
+        x = "integer"
+      )
+    )
+  )
+  sdf <- spark_read_json(
+    sc,
+    path = jsonPath,
+    columns = columns
+  )
+
+  expect_equal(
+    sdf %>% sdf_schema(expand_struct_cols = TRUE),
+    list(
+      a = list(name = "a", type = "IntegerType"),
+      b = list(name = "b", type = "DoubleType"),
+      d = list(name = "d", type = "DateType"),
+      s = list(
+        name = "s",
+        type = list(
+          a = list(name = "a", type = "IntegerType"),
+          b = list(name = "b", type = "DoubleType"),
+          d = list(name = "d", type = "DateType"),
+          s = list(name = "s", type = "StringType"),
+          i = list(
+            name = "i",
+            type = list(x = list(name = "x", type = "IntegerType"))
+          )
+        )
+      )
+    )
+  )
+})
+
 test_that("spark_read_csv() can read long decimals", {
   csvPath <- get_sample_data_path(
     "spark-read-csv-can-read-long-decimals.csv"

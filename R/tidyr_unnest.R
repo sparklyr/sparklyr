@@ -32,7 +32,8 @@ unnest.tbl_spark <- function(data,
 
   struct_fields <- list()
   for (col in cols) {
-    if (!is.list(schema[[col]]$type)) {
+    dtype <- schema[[col]]$type
+    if (!identical(as.character(dtype), "array")) {
       paste0(
         "`unnest.tbl_spark` is only supported for columns of type ",
         "`array<struct<.*>>` (i.e., a column produced by a previous ",
@@ -42,7 +43,8 @@ unnest.tbl_spark <- function(data,
         rlang::abort()
     }
 
-    nested_cols <- lapply(schema[[col]]$type, function(field) field$name) %>%
+    nested_cols <- attributes(dtype)$element_type %>%
+      lapply(function(field) field$name) %>%
       list()
     names(nested_cols) <- col
     struct_fields <- append(struct_fields, nested_cols)
@@ -57,8 +59,7 @@ unnest.tbl_spark <- function(data,
             nested_col
           } else {
             paste0(col, names_sep, nested_col)
-          }
-        )
+          })
         output_cols <- append(output_cols, dest_col)
       }
     } else {

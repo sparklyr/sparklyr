@@ -29,17 +29,29 @@ spark_dataframe.spark_connection <- function(x, sql = NULL, ...) {
 #' @param expand_nested_cols Whether to expand columns containing nested array
 #' of structs (which are usually created by tidyr::nest on a Spark data frame)
 #'
+#' @param expand_struct_cols Whether to expand columns containing structs
+#'
 #' @return An \R \code{list}, with each \code{list} element describing the
 #'   \code{name} and \code{type} of a column.
 #'
 #' @template roxlate-ml-x
 #'
 #' @export
-sdf_schema <- function(x, expand_nested_cols = FALSE) {
+sdf_schema <- function(x,
+                       expand_nested_cols = FALSE,
+                       expand_struct_cols = FALSE) {
   x %>%
     spark_dataframe() %>%
     invoke("schema") %>%
-    struct_type_to_schema(expand_nested_cols)
+    struct_type_to_schema(
+      expand_nested_cols = expand_nested_cols,
+      expand_struct_cols = expand_struct_cols
+    )
+}
+
+is_struct_type <- function(data_type_obj) {
+  invoke(data_type_obj, "catalogString") %>%
+    grepl("^struct<.*>$", ., ignore.case = TRUE)
 }
 
 is_struct_type_arr <- function(data_type_obj) {
@@ -47,13 +59,26 @@ is_struct_type_arr <- function(data_type_obj) {
     grepl("^array<struct<.*>>$", ., ignore.case = TRUE)
 }
 
-struct_type_to_schema <- function(x, expand_nested_cols) {
+struct_type_to_schema <- function(x, expand_nested_cols, expand_struct_cols) {
   fields <- invoke(x, "fields")
   fields_list <- lapply(fields, function(field) {
     type <- {
       data_type_obj <- invoke(field, "dataType")
-      if (expand_nested_cols && is_struct_type_arr(data_type_obj)) {
-        struct_type_to_schema(data_type_obj %>% invoke("elementType"), TRUE)
+      if (expand_struct_cols && is_struct_type(data_type_obj)) {
+        struct_type_to_schema(
+          data_type_obj,
+          expand_nested_cols = expand_nested_cols,
+          expand_struct_cols = expand_struct_cols
+        )
+      } else if (expand_nested_cols && is_struct_type_arr(data_type_obj)) {
+        dtype <- "array"
+        attributes(dtype)$element_type <- struct_type_to_schema(
+          data_type_obj %>% invoke("elementType"),
+          expand_nested_cols = expand_nested_cols,
+          expand_struct_cols = expand_struct_cols
+        )
+
+        dtype
       } else {
         invoke(data_type_obj, "toString")
       }
@@ -199,7 +224,7 @@ collect_from_rds <- function(path) {
                 )
               }
             )
-          }
+        }
       )
   }
 
