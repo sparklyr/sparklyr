@@ -368,7 +368,7 @@ sdf_last_index <- function(x, id = "id") {
 #' Compute (Approximate) Quantiles with a Spark DataFrame
 #'
 #' Given a numeric column within a Spark DataFrame, compute
-#' approximate quantiles (to some relative error).
+#' approximate quantiles.
 #'
 #' @template roxlate-ml-x
 #' @param column The column(s) for which quantiles should be computed.
@@ -403,6 +403,59 @@ sdf_quantile <- function(x,
   stat <- invoke(sdf, "stat")
   quantiles <- invoke(stat, "approxQuantile", column, probabilities, relative.error)
 
+  if (length(column) == 1) {
+    quantiles <- unlist(quantiles)
+    names(quantiles) <- nm
+  } else {
+    names(quantiles) <- column
+    quantiles <- lapply(quantiles, `names<-`, nm)
+  }
+
+  quantiles
+}
+
+#' Compute (Approximate) Weighted Quantiles with a Spark DataFrame
+#'
+#' Given a value column within a Spark DataFrame and a weight column containing
+#' relative weight for each value, compute approximate weighted quantiles.
+#'
+#' @template roxlate-ml-x
+#' @param column The column(s) for which quantiles should be computed.
+#' @param weightColumn The column containing relative weight for each data point.
+#' @param probabilities A numeric vector of probabilities, for
+#'   which quantiles should be computed.
+#' @param max.error The maximal possible difference between the actual
+#'   percentile of a result and its expected percentile (e.g., if `max.error` is
+#'   0.01 and `probabilities` is 0.95, then any value between the 94th and 96th
+#'   weighted percentile will be considered an acceptable approximation).
+#'
+#' @export
+sdf_weighted_quantile <- function(x,
+                                  column,
+                                  weightColumn,
+                                  probabilities = c(0.00, 0.25, 0.50, 0.75, 1.00),
+                                  max.error = 0.01) {
+  sdf <- spark_dataframe(x)
+
+  nm <-
+    names(probabilities) %||%
+    paste(signif(probabilities * 100, 3), "%", sep = "")
+
+  column <- lapply(column, cast_string)
+  probabilities <- as.list(as.numeric(probabilities))
+  max.error <- cast_scalar_double(max.error)
+
+  sc <- spark_connection(x)
+  quantiles <- invoke_static(
+    sc,
+    "sparklyr.WeightedQuantileSummaries",
+    "approxWeightedQuantile",
+    sdf,
+    column,
+    weightColumn,
+    probabilities,
+    max.error
+  )
   if (length(column) == 1) {
     quantiles <- unlist(quantiles)
     names(quantiles) <- nm
