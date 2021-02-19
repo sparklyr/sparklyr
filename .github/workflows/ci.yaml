@@ -170,13 +170,26 @@ jobs:
           if [[ $SPARK_VERSION == 'master' ]]; then
             source ./ci/spark-master-install.sh;
           fi
+      - name: Query dependencies
+        run: |
+          print(R.version)
+          install.packages("remotes")
+          saveRDS(remotes::dev_package_deps(".", dependencies = TRUE), ".github/deps.Rds", version = 2)
+          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+        shell: Rscript {0}
+      - name: Get OS name
+        id: os-name
+        run: |
+          # `os_name` will be like "Ubuntu-20.04.1-LTS"
+          OS_NAME=$(lsb_release -ds | sed 's/\s/-/g')
+          echo "::set-output name=os-name::$OS_NAME"
       - name: Cache R packages
         if: runner.os != 'Windows'
         uses: actions/cache@master
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: sparklyr-ci-${{ runner.os }}-R-${{ matrix.r }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('DESCRIPTION') }}-${{ hashFiles('ci/install_r_dependencies.sh') }}
-          restore-keys: sparklyr-ci-${{ runner.os }}-R-${{ matrix.r }}
+          key: sparklyr-ci-${{ steps.os-name.outputs.os-name }}-${{ hashFiles('.github/R-version') }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('.github/deps.Rds') }}
+          restore-keys: sparklyr-ci-${{ steps.os-name.outputs.os-name }}-${{ hashFiles('.github/R-version') }}
       - name: Cache Spark & Livy installations
         if: runner.os != 'Windows'
         uses: actions/cache@master
@@ -188,7 +201,8 @@ jobs:
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libcurl4-gnutls-dev libgit2-dev procps socat
       - name: Install dependencies
-        run: source ./ci/install_r_dependencies.sh
+        run: remotes::install_deps(".", dependencies = TRUE, upgrade = FALSE)
+        shell: Rscript {0}
         continue-on-error: true
       - name: Build
         env:
