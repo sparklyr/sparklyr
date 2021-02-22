@@ -20,6 +20,16 @@
 - Avoided repeated creations of SimpleDataFormat objects and setTimeZone calls
   while collecting Data columns from a Spark dataframe
 
+- Schema specification for struct columns in `spark_read_*()` methods are now
+  supported (e.g.,
+  `spark_read_json(sc, path, columns = list(s = list(a = "integer, b = "double")))`
+  says expect a struct column named `s` with each element containing a field
+  named `a` and a field named `b`)
+
+- Implemented `sdf_weighted_quantile()` for approximating weighted quantiles
+  using a modified version of the Greenwald-Khanna algorithm that will take
+  relative weight of each data point into account
+
 ### Serialization
 
 - `spark_write_rds()` was implemented to support exporting all partitions of a
