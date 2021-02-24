@@ -26,9 +26,9 @@
   says expect a struct column named `s` with each element containing a field
   named `a` and a field named `b`)
 
-- Implemented `sdf_weighted_quantile()` for approximating weighted quantiles
-  using a modified version of the Greenwald-Khanna algorithm that will take
-  relative weight of each data point into account
+- `sdf_quantile()` and `ft_quantile_discretizer()` now support approximation of
+  weighted quantiles using a modified version of the Greenwald-Khanna algorithm
+  that takes relative weight of each data point into consideration.
 
 ### Serialization
 
