@@ -8,7 +8,8 @@ sdf_quantile(
   x,
   column,
   probabilities = c(0, 0.25, 0.5, 0.75, 1),
-  relative.error = 1e-05
+  relative.error = 1e-05,
+  weight.column = NULL
 )
 }
 \arguments{
@@ -20,8 +21,17 @@ Multiple columns are only supported in Spark 2.0+.}
 \item{probabilities}{A numeric vector of probabilities, for
 which quantiles should be computed.}
 
-\item{relative.error}{The relative error -- lower values imply more
-precision in the computed quantiles.}
+\item{relative.error}{The maximal possible difference between the actual
+percentile of a result and its expected percentile (e.g., if
+`relative.error` is 0.01 and `probabilities` is 0.95, then any value
+between the 94th and 96th percentile will be considered an acceptable
+approximation).}
+
+\item{weight.column}{If not NULL, then a generalized version of the Greenwald-
+Khanna algorithm will be run to compute weighted percentiles, with each
+sample from `column` having a relative weight specified by the corresponding
+value in `weight.column`. The weights can be considered as relative
+frequencies of sample data points.}
 }
 \description{
 Given a numeric column within a Spark DataFrame, compute
