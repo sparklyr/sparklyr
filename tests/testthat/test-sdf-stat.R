@@ -1,7 +1,8 @@
 context("sdf stat")
 
+sc <- testthat_spark_connection()
+
 test_that("sdf_crosstab() works", {
-  sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
   df <- mtcars_tbl %>%
     sdf_crosstab("cyl", "gear") %>%
@@ -13,7 +14,6 @@ test_that("sdf_crosstab() works", {
 test_that("sdf_quantile() works for a single column", {
   test_requires_version("2.0.0", "approxQuantile() is only supported in Spark 2.0.0 or above")
 
-  sc <- testthat_spark_connection()
   mtcars_tbl <- testthat_tbl("mtcars")
   quantiles <- mtcars_tbl %>%
     sdf_quantile(column = "disp")
@@ -30,7 +30,6 @@ test_that("sdf_quantile() works for a single column", {
 })
 
 test_that("sdf_quantile() works for multiple column", {
-  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "multicolumn quantile requires 2.0+")
   mtcars_tbl <- testthat_tbl("mtcars")
 
@@ -57,4 +56,30 @@ test_that("sdf_quantile() works for multiple column", {
       `100%` = 4.93
     )
   )
+})
+
+test_that("sdf_quantile() approximates weighted quantiles correctly", {
+  set.seed(31415926L)
+  range <- seq(-4, 4, 5e-6)
+
+  sdf <- copy_to(
+    sc,
+    tibble::tibble(
+      v = range,
+      w = sapply(range, dnorm)
+    )[sample(length(range)), ],
+    repartition = 1000L
+  )
+
+  pct <- seq(0, 1, 0.001)
+
+  for (max_error in c(0.1, 0.05, 0.01, 0.001)) {
+    pct_values <- sdf_quantile(sdf, "v", pct, max_error, "w")
+    approx_pct <- purrr::map_dbl(pct_values, pnorm)
+
+    expect_equal(length(approx_pct), length(pct))
+    for (i in seq_along(pct)) {
+      expect_equal(pct[[i]], approx_pct[[i]], tol = max_error, scale = 1)
+    }
+  }
 })
