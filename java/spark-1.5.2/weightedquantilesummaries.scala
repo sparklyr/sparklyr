@@ -207,7 +207,8 @@ class WeightedQuantileSummaries(
       minRank += currentSample.l
       rightSum -= currentSample.s
       val maxRank = totalWeight - rightSum
-      if (minRank >= targetRank - tol && maxRank <= targetRank + tol) {
+      if (targetRank - tol <= minRank + currentSample.s &&
+          maxRank - currentSample.s <= targetRank + tol) {
         return Some(currentSample.x)
       }
       minRank += currentSample.s

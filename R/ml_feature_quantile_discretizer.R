@@ -41,13 +41,17 @@
 #'   org.apache.spark.sql.DataFrameStatFunctions.approxQuantile
 #'   \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions}{here}
 #'   for description). Must be in the range [0, 1]. default: 0.001
+#' @param weight_col If not NULL, then a generalized version of the Greenwald-Khanna algorithm will be run to compute
+#'   weighted percentiles, with each input having a relative weight specified by the corresponding value in `weight_column`.
+#'   The weights can be considered as relative frequencies of sample inputs.
 #'
 #' @seealso \code{\link{ft_bucketizer}}
 #' @export
 ft_quantile_discretizer <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
                                     input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
                                     handle_invalid = "error", relative_error = 0.001,
-                                    uid = random_string("quantile_discretizer_"), ...) {
+                                    uid = random_string("quantile_discretizer_"),
+                                    weight_column = NULL, ...) {
   check_dots_used()
   UseMethod("ft_quantile_discretizer")
 }
@@ -58,7 +62,12 @@ ml_quantile_discretizer <- ft_quantile_discretizer
 ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
                                                      input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
                                                      handle_invalid = "error", relative_error = 0.001,
-                                                     uid = random_string("quantile_discretizer_"), ...) {
+                                                     uid = random_string("quantile_discretizer_"),
+                                                     weight_column = NULL, ...) {
+  if (!is.null(weight_column) && spark_version(x) < "3.0.0") {
+    stop("Weighted quantile discretizer is only supported in Spark 3.0 or above.")
+  }
+
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -68,19 +77,29 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
     num_buckets_array = num_buckets_array,
     handle_invalid = handle_invalid,
     relative_error = relative_error,
-    uid = uid
+    uid = uid,
+    weight_column = weight_column
   ) %>%
     c(rlang::dots_list(...)) %>%
     validator_ml_quantile_discretizer()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.QuantileDiscretizer",
+    x,
+    if (is.null(weight_column)) {
+      "org.apache.spark.ml.feature.QuantileDiscretizer"
+    } else {
+      "org.apache.spark.ml.feature.WeightedQuantileDiscretizer"
+    },
     input_col = .args[["input_col"]], output_col = .args[["output_col"]],
     input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]],
     uid = .args[["uid"]]
   ) %>%
     jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
     jobj_set_param("setRelativeError", .args[["relative_error"]], "2.0.0", 0.001)
+  if (!is.null(weight_column)) {
+    jobj <- jobj %>%
+      jobj_set_param("setWeightCol", .args[["weight_column"]], "2.3.0", NULL)
+  }
 
   if (!is.null(input_col) && !is.null(output_col)) {
     jobj <- jobj %>%
