@@ -34,6 +34,24 @@ spark_write_jdbc(
 \description{
 Writes a Spark DataFrame into a JDBC table.
 }
+\examples{
+\dontrun{
+sc <- spark_connect(
+  master = "local",
+  config = list(sparklyr.shell.packages = "mysql:mysql-connector-java:5.1.44")
+)
+spark_write_jdbc(
+  sdf_len(sc, 10),
+  name = "my_sql_table",
+  options = list(
+    url = "jdbc:mysql://localhost:3306/my_sql_schema",
+    user = "me",
+    password = "******",
+    dbtable = "my_sql_table"
+  )
+)
+}
+}
 \seealso{
 Other Spark serialization routines: 
 \code{\link{collect_from_rds}()},
