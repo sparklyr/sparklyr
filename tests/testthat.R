@@ -141,7 +141,6 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   livy_version <- Sys.getenv("LIVY_VERSION")
   is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
 
-  test_filters <- list(NULL)
   if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
     test_cases <- list(
       list(
@@ -189,6 +188,11 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
         collapse = "|"
       )
     )
+  } else {
+    test_filters <- list(
+      "^(?!spark-dynamic-config).*",
+      "^spark-dynamic-config$"
+    )
   }
 
   run_tests <- function(test_filter) {
@@ -211,7 +215,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
       )
     )
 
-    test_check("sparklyr", filter = test_filter, reporter = reporter)
+    test_check("sparklyr", filter = test_filter, reporter = reporter, perl = TRUE)
   }
 
   for (test_filter in test_filters) {
