@@ -16,6 +16,7 @@ spark_apply(
   barrier = NULL,
   fetch_result_as_sdf = TRUE,
   partition_index_param = "",
+  arrow_max_records_per_batch = NULL,
   ...
 )
 }
@@ -87,6 +88,9 @@ specify the column types. The sample size is configurable using the
   NOTE: when \code{fetch_result_as_sdf} is set to \code{FALSE}, object returned from the
   transformation function also must be serializable by the \code{base::serialize}
   function in R.}
+
+\item{arrow_max_records_per_batch}{Maximum size of each Arrow record batch,
+ignored if Arrow serialization is not enabled.}
 
 \item{...}{Optional arguments; currently unused.}
 }
