@@ -3,7 +3,7 @@ NULL
 
 arrow_enabled <- function(sc, object) {
   has_arrow <- "package:arrow" %in% search()
-  spark_config_value(sc, "sparklyr.arrow", has_arrow) &&
+  spark_config_value(sc$config, "sparklyr.arrow", has_arrow) &&
     arrow_enabled_object(object)
 }
 
