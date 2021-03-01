@@ -15,6 +15,7 @@ ft_quantile_discretizer(
   handle_invalid = "error",
   relative_error = 0.001,
   uid = random_string("quantile_discretizer_"),
+  weight_column = NULL,
   ...
 )
 }
@@ -47,6 +48,10 @@ for description). Must be in the range [0, 1]. default: 0.001}
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
 \item{...}{Optional arguments; currently unused.}
+
+\item{weight_col}{If not NULL, then a generalized version of the Greenwald-Khanna algorithm will be run to compute
+weighted percentiles, with each input having a relative weight specified by the corresponding value in `weight_column`.
+The weights can be considered as relative frequencies of sample inputs.}
 }
 \value{
 The object returned depends on the class of \code{x}.
