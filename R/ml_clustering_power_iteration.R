@@ -6,14 +6,14 @@ NULL
 #' Spark ML -- Power Iteration Clustering
 #'
 #' Power iteration clustering (PIC) is a scalable and efficient algorithm for clustering vertices of a graph given pairwise similarities as edge properties, described in the paper "Power Iteration Clustering" by Frank Lin and William W. Cohen. It computes a pseudo-eigenvector of the normalized affinity matrix of the graph via power iteration and uses it to cluster vertices. spark.mllib includes an implementation of PIC using GraphX as its backend. It takes an RDD of (srcId, dstId, similarity) tuples and outputs a model with the clustering assignments. The similarities must be nonnegative. PIC assumes that the similarity measure is symmetric. A pair (srcId, dstId) regardless of the ordering should appear at most once in the input data. If a pair is missing from input, their similarity is treated as zero.
-#'
-#' @template roxlate-ml-clustering-algo
-#' @template roxlate-ml-clustering-params
-#' @template roxlate-ml-prediction-col
+#' @param x A ‘spark_connection’  or a ‘tbl_spark’.
+#' @param k The number of clusters to create.
+#' @param max_iter The maximum number of iterations to run.
 #' @param init_mode This can be either “random”, which is the default, to use a random vector as vertex properties, or “degree” to use normalized sum similarities.
 #' @param src_col Column in the input Spark dataframe containing 0-based indexes of all source vertices in the affinity matrix described in the PIC paper.
 #' @param dst_col Column in the input Spark dataframe containing 0-based indexes of all destination vertices in the affinity matrix described in the PIC paper.
 #' @param weight_col Column in the input Spark dataframe containing non-negative edge weights in the affinity matrix described in the PIC paper.
+#' @param ... Optional arguments. Currently unused.
 #' @return A 2-column R dataframe with columns named "id" and "cluster" describing the resulting cluster assignments
 #'
 #' @examples
@@ -73,7 +73,9 @@ NULL
 #'
 #' pic_data <- copy_to(sc, gen_pic_data())
 #'
-#' clusters <- ml_power_iteration(pic_data, src_col = "src", dst_col = "dst", weight_col = "sim", k = 2, max_iter = 40)
+#' clusters <- ml_power_iteration(
+#'   pic_data, src_col = "src", dst_col = "dst", weight_col = "sim", k = 2, max_iter = 40
+#' )
 #' print(clusters)
 #'
 #' }
@@ -149,8 +151,8 @@ ml_power_iteration.tbl_spark <- function(x, k = 4, max_iter = 20,
     lapply(unlist)
   names(clusters) <- c("id", "cluster")
 
-  tibble::as_tibble(clusters) %>%
-    dplyr::arrange(id)
+  clusters_df <- tibble::as_tibble(clusters)
+  clusters_df[order(clusters_df$id), ]
 }
 
 validator_ml_power_iteration <- function(.args) {

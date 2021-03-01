@@ -41,7 +41,7 @@
 #'   org.apache.spark.sql.DataFrameStatFunctions.approxQuantile
 #'   \href{https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.DataFrameStatFunctions}{here}
 #'   for description). Must be in the range [0, 1]. default: 0.001
-#' @param weight_col If not NULL, then a generalized version of the Greenwald-Khanna algorithm will be run to compute
+#' @param weight_column If not NULL, then a generalized version of the Greenwald-Khanna algorithm will be run to compute
 #'   weighted percentiles, with each input having a relative weight specified by the corresponding value in `weight_column`.
 #'   The weights can be considered as relative frequencies of sample inputs.
 #'

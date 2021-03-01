@@ -16,11 +16,11 @@ ml_power_iteration(
 )
 }
 \arguments{
-\item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
+\item{x}{A ‘spark_connection’  or a ‘tbl_spark’.}
 
-\item{k}{The number of clusters to create}
+\item{k}{The number of clusters to create.}
 
-\item{max_iter}{The maximum number of iterations to use.}
+\item{max_iter}{The maximum number of iterations to run.}
 
 \item{init_mode}{This can be either “random”, which is the default, to use a random vector as vertex properties, or “degree” to use normalized sum similarities.}
 
@@ -30,38 +30,9 @@ ml_power_iteration(
 
 \item{weight_col}{Column in the input Spark dataframe containing non-negative edge weights in the affinity matrix described in the PIC paper.}
 
-\item{...}{Optional arguments, see Details.}
-
-\item{uid}{A character string used to uniquely identify the ML estimator.}
-
-\item{seed}{A random seed. Set this value if you need your results to be
-reproducible across repeated calls.}
-
-\item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
-
-\item{prediction_col}{Prediction column name.}
+\item{...}{Optional arguments. Currently unused.}
 }
 \value{
-The object returned depends on the class of \code{x}.
-
-\itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
-  a Spark \code{Estimator} object and can be used to compose
-  \code{Pipeline} objects.
-
-  \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
-  the clustering estimator appended to the pipeline.
-
-  \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, an estimator is constructed then
-  immediately fit with the input \code{tbl_spark}, returning a clustering model.
-
-  \item \code{tbl_spark}, with \code{formula} or \code{features} specified: When \code{formula}
-    is specified, the input \code{tbl_spark} is first transformed using a
-    \code{RFormula} transformer before being fit by
-    the estimator. The object returned in this case is a \code{ml_model} which is a
-    wrapper of a \code{ml_pipeline_model}. This signature does not apply to \code{ml_lda()}.
-}
-
 A 2-column R dataframe with columns named "id" and "cluster" describing the resulting cluster assignments
 }
 \description{
@@ -124,20 +95,11 @@ gen_pic_data <- function() {
 
 pic_data <- copy_to(sc, gen_pic_data())
 
-clusters <- ml_power_iteration(pic_data, src_col = "src", dst_col = "dst", weight_col = "sim", k = 2, max_iter = 40)
+clusters <- ml_power_iteration(
+  pic_data, src_col = "src", dst_col = "dst", weight_col = "sim", k = 2, max_iter = 40
+)
 print(clusters)
 
 }
 
 }
-\seealso{
-See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
-  more information on the set of clustering algorithms.
-
-Other ml clustering algorithms: 
-\code{\link{ml_bisecting_kmeans}()},
-\code{\link{ml_gaussian_mixture}()},
-\code{\link{ml_kmeans}()},
-\code{\link{ml_lda}()}
-}
-\concept{ml clustering algorithms}

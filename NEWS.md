@@ -1,4 +1,4 @@
-# Sparklyr 1.5.2.9001
+# Sparklyr 1.6.0
 
 ### Data
 
@@ -51,6 +51,14 @@
 
 - Spark map type will be collected as list instead of environment in R in order
   to support empty string as key
+
+### Connections
+
+- Created convenience functions for working with Spark runtime configurations
+
+- Implemented spark-apply-specific configuration option for Arrow max records
+  per batch, which can be different from the
+  `spark.sql.execution.arrow.maxRecordsPerBatch` value from Spark session config
 
 ### Spark ML
 
