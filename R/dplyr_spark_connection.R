@@ -21,7 +21,7 @@ transmute.tbl_spark <- function(.data, ...) {
   dots <- rlang::enquos(..., .named = TRUE) %>%
     fix_na_real_values()
 
-  do.call(NextMethod, dots)
+  do.call(NextMethod, list(dots))
 }
 
 #' @export
@@ -31,7 +31,7 @@ mutate.tbl_spark <- function(.data, ...) {
     fix_na_real_values() %>%
     partial_eval_dots(sim_data = simulate_vars(.data))
 
-  nest_vars(.data, dots, union(dbplyr::op_vars(.data), dbplyr::op_grps(.data)))
+  nest_vars(.data, list(dots), union(dbplyr::op_vars(.data), dbplyr::op_grps(.data)))
 }
 
 #' @export
