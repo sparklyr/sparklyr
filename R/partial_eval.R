@@ -127,6 +127,7 @@ partial_eval_call <- function(call, sim_data, env) {
   }
 }
 
+utils::globalVariables(c("array_contains", "concat", "element_at"))
 partial_eval_across <- function(call, sim_data, env) {
   call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
   vars <- colnames(sim_data)
