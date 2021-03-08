@@ -19,9 +19,10 @@ fix_na_real_values <- function(dots) {
 #' @importFrom dplyr transmute
 transmute.tbl_spark <- function(.data, ...) {
   dots <- rlang::enquos(..., .named = TRUE) %>%
-    fix_na_real_values()
+    fix_na_real_values() %>%
+    partial_eval_dots(sim_data = simulate_vars(.data))
 
-  do.call(NextMethod, dots)
+  nest_vars(.data, dots, character())
 }
 
 #' @export

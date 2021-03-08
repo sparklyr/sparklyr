@@ -30,6 +30,9 @@
   weighted quantiles using a modified version of the Greenwald-Khanna algorithm
   that takes relative weight of each data point into consideration.
 
+- Fixed a problem of some expressions being evaluated twice in
+  `transmute.tbl_spark()` (see tidyverse/dbplyr#605)
+
 ### Serialization
 
 - `spark_write_rds()` was implemented to support exporting all partitions of a
@@ -52,13 +55,17 @@
 - Spark map type will be collected as list instead of environment in R in order
   to support empty string as key
 
-### Connections
-
-- Created convenience functions for working with Spark runtime configurations
+- Fixed a configuration-related bug in `sparklyr:::arrow_enabled()`
 
 - Implemented spark-apply-specific configuration option for Arrow max records
   per batch, which can be different from the
   `spark.sql.execution.arrow.maxRecordsPerBatch` value from Spark session config
+
+### Connections
+
+- Created convenience functions for working with Spark runtime configurations
+
+- Fixed buggy exit code from the `spark-submit` process launched by sparklyr
 
 ### Spark ML
 

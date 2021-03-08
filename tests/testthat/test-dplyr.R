@@ -3,6 +3,7 @@ context("dplyr")
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
+mtcars_tbl <- testthat_tbl("mtcars")
 test_requires("dplyr")
 
 df1 <- tibble(a = 1:3, b = letters[1:3])
@@ -67,7 +68,7 @@ test_that("'summarize' works with where(...) predicate", {
   )
 })
 
-test_that("the implementation of 'mutate' functions as expected", {
+test_that("'mutate' works as expected", {
   test_requires("dplyr")
 
   expect_equal(
@@ -98,6 +99,20 @@ test_that("'across()' works with formula syntax", {
   expect_equivalent(
     dplyr_across_test_cases_tbl %>% mutate(across(where(is.numeric), ~ sin(.x ^ 3 + .x))) %>% collect(),
     dplyr_across_test_cases_df %>% mutate(across(where(is.numeric), ~ sin(.x ^ 3 + .x)))
+  )
+})
+
+test_that("'mutate' and 'transmute' work with NSE", {
+  test_requires("dplyr")
+  col <- "mpg"
+
+  expect_equivalent(
+    mtcars_tbl %>% mutate(!!col := !!rlang::sym(col) * 2) %>% collect(),
+    mtcars %>% mutate(!!col := !!rlang::sym(col) * 2)
+  )
+  expect_equivalent(
+    mtcars_tbl %>% transmute(!!col := !!rlang::sym(col) * 2) %>% collect(),
+    mtcars %>% transmute(!!col := !!rlang::sym(col) * 2)
   )
 })
 
