@@ -76,6 +76,7 @@ diamonds_tbl \%>\% sdf_random_split(weights = weights)
 \seealso{
 Other Spark data frames: 
 \code{\link{sdf_copy_to}()},
+\code{\link{sdf_distinct}()},
 \code{\link{sdf_register}()},
 \code{\link{sdf_sample}()},
 \code{\link{sdf_sort}()},
