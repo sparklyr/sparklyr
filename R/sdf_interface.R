@@ -464,8 +464,9 @@ sdf_quantile <- function(x,
 #' @param storage.level The storage level to be used. Please view the
 #'   \href{http://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence}{Spark Documentation}
 #'   for information on what storage levels are accepted.
+#' @param name A name to assign this table. Passed to [sdf_register()].
 #' @export
-sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
+sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK", name = NULL) {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
@@ -479,7 +480,7 @@ sdf_persist <- function(x, storage.level = "MEMORY_AND_DISK") {
 
   sdf %>%
     invoke("persist", sl) %>%
-    sdf_register()
+    sdf_register(name = name)
 }
 
 #' Checkpoint a Spark DataFrame
