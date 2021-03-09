@@ -4,7 +4,7 @@
 \alias{sdf_persist}
 \title{Persist a Spark DataFrame}
 \usage{
-sdf_persist(x, storage.level = "MEMORY_AND_DISK")
+sdf_persist(x, storage.level = "MEMORY_AND_DISK", name = NULL)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -12,6 +12,8 @@ sdf_persist(x, storage.level = "MEMORY_AND_DISK")
 \item{storage.level}{The storage level to be used. Please view the
 \href{http://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence}{Spark Documentation}
 for information on what storage levels are accepted.}
+
+\item{name}{A name to assign this table. Passed to [sdf_register()].}
 }
 \description{
 Persist a Spark DataFrame, forcing any pending computations and (optionally)
