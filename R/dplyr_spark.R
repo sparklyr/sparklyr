@@ -95,15 +95,20 @@ tbl.spark_connection <- function(src, from, ...) {
 }
 
 process_tbl_name <- function(x) {
-  components <- strsplit(x, "\\.")[[1]]
-  num_components <- length(components)
-
-  if (identical(num_components, 1L)) {
+  tbl_name <- Filter(function(str) nchar(str) > 0, strsplit(x, "\\s+")[[1]])
+  if (length(tbl_name) != 1) {
     x
-  } else if (identical(num_components, 2L)) {
-    dbplyr::in_schema(components[[1]], components[[2]])
   } else {
-    stop("expected input to be <table name> or <schema name>.<table name>")
+    components <- strsplit(tbl_name, "\\.")[[1]]
+    num_components <- length(components)
+
+    if (identical(num_components, 1L)) {
+      x
+    } else if (identical(num_components, 2L)) {
+      dbplyr::in_schema(components[[1]], components[[2]])
+    } else {
+      stop("expected input to be <table name> or <schema name>.<table name>")
+    }
   }
 }
 
