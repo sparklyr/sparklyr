@@ -303,6 +303,7 @@ Collate:
     'qubole_connection.R'
     'reexports.R'
     'sdf_dim.R'
+    'sdf_distinct.R'
     'sdf_ml.R'
     'sdf_saveload.R'
     'sdf_sequence.R'
