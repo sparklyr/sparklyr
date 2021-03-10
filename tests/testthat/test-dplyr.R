@@ -323,6 +323,26 @@ test_that("transmute creates NA_real_ column correctly", {
   )
 })
 
+test_that("overwriting a temp view", {
+  temp_view_name <- uuid::UUIDgenerate()
+
+  sdf <- sdf_len(sc, 5L) %>%
+    dplyr::mutate(foo = "foo") %>%
+    dplyr::compute(name = temp_view_name)
+  sdf <- sdf %>%
+    dplyr::select(-foo) %>%
+    dplyr::compute(name = temp_view_name)
+
+  expect_equivalent(
+    sdf %>% collect(),
+    tibble::tibble(id = seq(5))
+  )
+  expect_equivalent(
+    dplyr::tbl(sc, temp_view_name) %>% collect(),
+    tibble::tibble(id = seq(5))
+  )
+})
+
 test_that("process_tbl_name works as expected", {
   expect_equal(sparklyr:::process_tbl_name("a"), "a")
   expect_equal(sparklyr:::process_tbl_name("xyz"), "xyz")

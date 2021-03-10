@@ -97,7 +97,7 @@ spark_sql_query_fields <- function(con, query, ...) {
 #' @importFrom dbplyr sql
 spark_sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
   build_sql(
-    "CREATE ", if (temporary) sql("TEMPORARY "), "VIEW \n",
+    "CREATE OR REPLACE ", if (temporary) sql("TEMPORARY "), "VIEW \n",
     as.sql(name), " AS ", sql,
     con = con
   )
