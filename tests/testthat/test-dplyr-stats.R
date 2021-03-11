@@ -69,11 +69,13 @@ test_that("count() works in grouped mutate", {
     mutate(n = count()) %>%
     select(Species, n) %>%
     distinct() %>%
-    collect()
+    collect() %>%
+    arrange(Species)
   c2 <- iris_tbl %>%
     group_by(Species) %>%
     count() %>%
-    collect()
+    collect() %>%
+    arrange(Species)
 
   expect_equal(c1, c2)
 })
