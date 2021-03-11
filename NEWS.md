@@ -1,3 +1,30 @@
+# Sparklyr 1.6.1
+
+### Data
+
+- `sdf_distinct()` is implemented to be an R interface for `distinct()` operation
+  on Spark dataframes (NOTE: this is different from the `dplyr::distinct()`
+  operation, as `dplyr::distinct()` operation on a Spark dataframe now supports
+  `.keep_all = TRUE` and has more complex ordering requirements)
+
+- Fixed a problem of some expressions being evaluated twice in
+  `transmute.tbl_spark()` (see tidyverse/dbplyr#605)
+
+- `dbExistsTable()` now performs case insensitive comparison with table names to
+  be consistent with how table names are handled by Spark catalog API
+
+- Fixed a bug with `sql_query_save()` not overwriting a temp table with identical
+  name
+
+- Revised `sparklyr:::process_tbl_name()` to correctly handle inputs that are not
+  table names
+
+- Bug fix: `db_save_query.spark_connection()` should also cache the view it
+  created in Spark
+
+- Fixed a problem with `fill.tbl_spark()` filling all columns instead of a
+  subset of columns specified by the tidy select expression
+
 # Sparklyr 1.6.0
 
 ### Data
@@ -38,9 +65,6 @@
   `dplyr::distinct()` implementation to a basic one that only adds ‘DISTINCT’
   clause to the current Spark SQL query, does not support the `.keep_all = TRUE`
   option, and (3) does not have any ordering guarantee for the output.
-
-- Bug fix: `db_save_query.spark_connection()` should also cache the view that
-  was created in Spark
 
 ### Serialization
 
