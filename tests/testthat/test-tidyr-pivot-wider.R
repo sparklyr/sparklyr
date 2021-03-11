@@ -147,11 +147,12 @@ test_that("can override default keys", {
   expect_equivalent(
     sdf %>%
       tidyr::pivot_wider(id_cols = name, names_from = var, values_from = value) %>%
-      collect(),
+      collect() %>%
+      dplyr::arrange(name),
     tibble::tribble(
       ~name, ~age, ~height,
-      "Sam", 10, 1.5,
       "Bob", 20, NaN,
+      "Sam", 10, 1.5,
     )
   )
 })
