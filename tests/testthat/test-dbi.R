@@ -37,6 +37,14 @@ test_that("dbGetQuery works with parameterized queries", {
   expect_equal(nrow(virginica), 50)
 })
 
+test_that("dbExistsTable performs case-insensitive comparisons on table names", {
+  sdf <- copy_to(sc, data.frame(a = 1, b = 2), name = "testTempView")
+
+  expect_true(dbExistsTable(sc, "testTempView"))
+  expect_true(dbExistsTable(sc, "TESTTEMPVIEW"))
+  expect_true(dbExistsTable(sc, "testtempview"))
+})
+
 teardown({
   dbRemoveTable(sc, persisted_table_name)
   dbRemoveTable(sc, temp_table_name)

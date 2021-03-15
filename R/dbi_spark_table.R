@@ -47,7 +47,7 @@ setMethod("dbListTables", "spark_connection", function(conn) {
 
 
 setMethod("dbExistsTable", c("spark_connection", "character"), function(conn, name) {
-  name %in% dbListTables(conn)
+  tolower(name) %in% tolower(dbListTables(conn))
 })
 
 
