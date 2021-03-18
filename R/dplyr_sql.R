@@ -124,39 +124,43 @@ sql_build.op_weighted_sample <- function(op, con, frac) {
 #' @export
 #' @importFrom dplyr distinct
 distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
-  if (rlang::dots_n(...) > 0) {
-    dots <- rlang::enexprs(...)
-    .data <- .data %>% dplyr::mutate(...)
-    distinct_cols <- lapply(
-      seq_along(dots),
-      function(i) {
-        x <- dots[i]
-        if (identical(names(x), "")) {
-          rlang::as_name(dots[[i]])
-        } else {
-          names(x)
-        }
-      }
-    ) %>%
-      unlist()
+  if (identical(getOption("sparklyr.dplyr_distinct.impl"), "tbl_lazy")) {
+    NextMethod()
   } else {
-    distinct_cols <- colnames(.data)
+    if (rlang::dots_n(...) > 0) {
+      dots <- rlang::enexprs(...)
+      .data <- .data %>% dplyr::mutate(...)
+      distinct_cols <- lapply(
+        seq_along(dots),
+        function(i) {
+          x <- dots[i]
+          if (identical(names(x), "")) {
+            rlang::as_name(dots[[i]])
+          } else {
+            names(x)
+          }
+        }
+      ) %>%
+        unlist()
+    } else {
+      distinct_cols <- colnames(.data)
+    }
+    distinct_cols <- union(dplyr::group_vars(.data), distinct_cols)
+    all_cols <- colnames(.data)
+
+    row_num <- random_string("__row_num")
+    row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY NULL)"))
+    names(row_num_sql) <- row_num
+    .data <- .data %>>% dplyr::mutate %@% row_num_sql
+    args <- list(
+      .keep_all = .keep_all,
+      .row_num = row_num,
+      .all_cols = all_cols,
+      .distinct_cols = distinct_cols
+    )
+
+    add_op_single("tbl_spark_distinct", .data, args = args)
   }
-  distinct_cols <- union(dplyr::group_vars(.data), distinct_cols)
-  all_cols <- colnames(.data)
-
-  row_num <- random_string("__row_num")
-  row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY NULL)"))
-  names(row_num_sql) <- row_num
-  .data <- .data %>>% dplyr::mutate %@% row_num_sql
-  args <- list(
-    .keep_all = .keep_all,
-    .row_num = row_num,
-    .all_cols = all_cols,
-    .distinct_cols = distinct_cols
-  )
-
-  add_op_single("tbl_spark_distinct", .data, args = args)
 }
 
 #' @export
