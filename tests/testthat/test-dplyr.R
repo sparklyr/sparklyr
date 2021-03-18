@@ -343,6 +343,28 @@ test_that("overwriting a temp view", {
   )
 })
 
+test_that("dplyr::distinct() impl is configurable", {
+  options(sparklyr.dplyr_distinct.impl = "tbl_lazy")
+  on.exit(options(sparklyr.dplyr_distinct.impl = NULL))
+
+  tbl_name <- random_string()
+  sdf <- copy_to(sc, data.frame(a = c(1, 1)), name = tbl_name)
+
+  query <- sdf %>%
+    dplyr::distinct() %>%
+    dbplyr::remote_query() %>%
+    strsplit("\\s+")
+
+  expect_equal(
+    toupper(query[[1]]),
+    c("SELECT", "DISTINCT", "*", "FROM", sprintf("`%s`", toupper(tbl_name)))
+  )
+  expect_equivalent(
+    sdf %>% dplyr::distinct() %>% collect(),
+    data.frame(a = 1)
+  )
+})
+
 test_that("process_tbl_name works as expected", {
   expect_equal(sparklyr:::process_tbl_name("a"), "a")
   expect_equal(sparklyr:::process_tbl_name("xyz"), "xyz")
