@@ -223,7 +223,6 @@ jobs:
           export JAVA_HOME="${{ steps.install-java.outputs.JAVA_HOME }}"
 
           sudo timedatectl set-timezone America/Los_Angeles
-          export TZ='America/Los_Angeles'
 
           if [[ $CODE_COVERAGE == "true" ]]; then
             Rscript ci/.ci.R --coverage || :

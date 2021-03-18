@@ -260,24 +260,23 @@ test_that("collect() can retrieve NULL data types as NAs", {
 test_that("collect() can retrieve date types successfully", {
   skip_on_windows()
 
-  df <- data.frame(
-    date = c(
-      as.Date("1961-01-20"),
-      as.Date("1970-01-01"),
-      as.Date("1981-01-20"),
-      as.Date("2001-01-20")
-    ),
-    name = c(
-      "John F. Kennedy",
-      NA,
-      "Ronald Reagan",
-      "George W. Bush"
-    ),
-    stringsAsFactors = FALSE
+  df <- tibble::tibble(
+    date = as.Date(
+      c(
+        "1000-01-01",
+        "1888-06-01",
+        "1969-12-31",
+        "1970-01-01",
+        "1970-01-02",
+        "1981-01-20",
+        "2001-01-20",
+        "3111-01-20"
+      )
+    )
   )
-  expect_equal(
-    as.list(df),
-    as.list(df %>% sdf_copy_to(sc, ., overwrite = TRUE) %>% sdf_collect())
+  expect_equivalent(
+    df,
+    df %>% sdf_copy_to(sc, ., overwrite = TRUE) %>% sdf_collect()
   )
 })
 

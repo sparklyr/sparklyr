@@ -189,21 +189,24 @@ object Collectors {
     }
   }
 
-  def collectDate(row: Row, idx: Int): java.sql.Date = {
-    extractDate(row(idx))
+  def collectDate(row: Row, idx: Int): DaysSinceEpoch = {
+    extractDaysSinceEpoch(row(idx))
   }
 
-  def collectDateArr(row: Row, idx: Int): Array[java.sql.Date] = {
+  def extractDaysSinceEpoch(x: Any): DaysSinceEpoch = {
+    DaysSinceEpoch(
+      x match {
+        case dt: java.sql.Date =>
+          Some(org.apache.spark.sql.catalyst.util.DateTimeUtils.fromJavaDate(dt))
+        case _ => None
+      }
+    )
+  }
+
+  def collectDateArr(row: Row, idx: Int): Array[DaysSinceEpoch] = {
     val arr = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-    arr.map(extractDate).toArray
-  }
-
-  private[this] def extractDate(x: Any): java.sql.Date = {
-    x match {
-      case d: java.sql.Date => d
-      case _ => null
-    }
+    arr.map(extractDaysSinceEpoch).toArray
   }
 
   def collectDefault(row: Row, idx: Int) = {
@@ -240,7 +243,7 @@ object Collectors {
       case "StringType"           => newColumnCtx[String](Collectors.collectString)
       case "TimestampType"        => newColumnCtx[java.sql.Timestamp](Collectors.collectTimestamp)
       case "CalendarIntervalType" => newColumnCtx[String](Collectors.collectForceString)
-      case "DateType"             => newColumnCtx[java.sql.Date](Collectors.collectDate)
+      case "DateType"             => newColumnCtx[DaysSinceEpoch](Collectors.collectDate)
       case ReVectorType(_*)       => newColumnCtx[Any](Collectors.collectVector)
       case StructTypeAsJSON.DType => newColumnCtx[Any](Collectors.collectJSON)
 
@@ -254,7 +257,7 @@ object Collectors {
       case ReDoubleArrayType(_*)    => newColumnCtx[Array[Numeric]](Collectors.collectNumericTypeArr[Double])
       case ReStringArrayType(_*)    => newColumnCtx[Array[String]](Collectors.collectStringArr)
       case ReTimestampArrayType(_*) => newColumnCtx[Array[java.sql.Timestamp]](Collectors.collectTimestampArr)
-      case ReDateArrayType(_*)      => newColumnCtx[Array[java.sql.Date]](Collectors.collectDateArr)
+      case ReDateArrayType(_*)      => newColumnCtx[Array[DaysSinceEpoch]](Collectors.collectDateArr)
       case "ArrayType(CalendarIntervalType,true)"  => newColumnCtx[Array[String]](Collectors.collectForceStringArr)
 
       case "ArrayType(CalendarIntervalType,false)" => newColumnCtx[Array[String]](Collectors.collectForceStringArr)

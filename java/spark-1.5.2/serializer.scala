@@ -13,16 +13,7 @@ import scala.collection.mutable.WrappedArray
 import scala.Option
 
 object Serializer {
-  val dateFormat = ThreadLocal.withInitial[SimpleDateFormat](
-    new java.util.function.Supplier[SimpleDateFormat] {
-      override def get(): SimpleDateFormat = {
-        val fmt = new SimpleDateFormat("yyyy-MM-dd")
-        fmt.setTimeZone(TimeZone.getTimeZone("UTC"))
-
-        fmt
-      }
-    }
-  )
+  private[this] val kMsPerDay: Long = 24 * 60 * 60 * 1000
 
   def readObjectType(dis: DataInputStream): Char = {
     dis.readByte().toChar
@@ -58,11 +49,16 @@ object Serializer {
 
   def readBoolean(in: DataInputStream): Boolean = {
     val intVal = in.readInt()
-    if (intVal == 0) false else true
+    intVal != 0
   }
 
   def readDate(in: DataInputStream): Date = {
-    Date.valueOf(readString(in))
+    val n = readInt(in)
+    if (n == Integer.MIN_VALUE) {
+      null
+    } else {
+      new Date(java.lang.Long.valueOf(n) * kMsPerDay)
+    }
   }
 
   def readTime(in: DataInputStream): Timestamp = {
@@ -151,14 +147,18 @@ object Serializer {
   }
 
   def writeDate(out: DataOutputStream, value: Date): Unit = {
-    writeString(
+    writeInt(
       out,
       if (null == value)
-        ""
+        Integer.MIN_VALUE
       else {
-        dateFormat.get.format(value)
+        (value.getTime / kMsPerDay).toInt
       }
     )
+  }
+
+  def writeDate(out: DataOutputStream, d: DaysSinceEpoch): Unit = {
+    writeInt(out, d.value.getOrElse(Integer.MIN_VALUE))
   }
 
   def timestampToSeconds(value: java.util.Date): Double = {
@@ -223,6 +223,13 @@ object Serializer {
   }
 
   def writeDateArr(out: DataOutputStream, value: Array[java.sql.Date]): Unit = {
+    writeType(out, "date")
+    out.writeInt(value.length)
+
+    value.foreach(v => writeDate(out, v))
+  }
+
+  def writeDateArr(out: DataOutputStream, value: Array[DaysSinceEpoch]): Unit = {
     writeType(out, "date")
     out.writeInt(value.length)
 
@@ -406,6 +413,9 @@ class Serializer(tracker: JVMObjectTracker) {
         case v: java.sql.Date =>
           Serializer.writeType(dos, "date")
           Serializer.writeDate(dos, v)
+        case v: DaysSinceEpoch =>
+          Serializer.writeType(dos, "date")
+          Serializer.writeDate(dos, v)
         case v: java.sql.Timestamp =>
           Serializer.writeType(dos, "time")
           Serializer.writeTime(dos, v)
@@ -450,6 +460,9 @@ class Serializer(tracker: JVMObjectTracker) {
           Serializer.writeType(dos, "array")
           Serializer.writeTimestampArr(dos, v)
         case v: Array[Date] =>
+          Serializer.writeType(dos, "array")
+          Serializer.writeDateArr(dos, v)
+        case v: Array[DaysSinceEpoch] =>
           Serializer.writeType(dos, "array")
           Serializer.writeDateArr(dos, v)
         case v: Array[String] =>
