@@ -33,6 +33,12 @@
 - Fixed a problem of some expressions being evaluated twice in
   `transmute.tbl_spark()` (see tidyverse/dbplyr#605)
 
+- Made `dplyr::distinct()` behavior for Spark dataframes configurable:
+  setting `options(sparklyr.dplyr_distinct.impl = "tbl_lazy)` will switch
+  `dplyr::distinct()` implementation to a basic one that only adds ‘DISTINCT’
+  clause to the current Spark SQL query, does not support the `.keep_all = TRUE`
+  option, and (3) does not have any ordering guarantee for the output.
+
 ### Serialization
 
 - `spark_write_rds()` was implemented to support exporting all partitions of a
