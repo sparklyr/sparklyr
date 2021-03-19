@@ -1,5 +1,6 @@
 #' @include spark_dataframe.R
 #' @include spark_sql.R
+#' @include tables_spark.R
 NULL
 
 #' @export
@@ -187,6 +188,7 @@ print.src_spark <- function(x, ...) {
 db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
   create_temp_view_sql <- spark_sql_query_save(con, sql, name, temporary, ...)
   DBI::dbGetQuery(con, create_temp_view_sql)
+  tbl_cache_sql(con, name = name, force = TRUE)
 
   # dbplyr expects db_save_query to retrieve the table name
   name

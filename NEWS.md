@@ -39,6 +39,9 @@
   clause to the current Spark SQL query, does not support the `.keep_all = TRUE`
   option, and (3) does not have any ordering guarantee for the output.
 
+- Bug fix: `db_save_query.spark_connection()` should also cache the view that
+  was created in Spark
+
 ### Serialization
 
 - `spark_write_rds()` was implemented to support exporting all partitions of a
