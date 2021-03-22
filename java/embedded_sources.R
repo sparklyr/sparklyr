@@ -236,13 +236,16 @@ readType <- function(con) {
 }
 
 readDate <- function(con) {
-  date_str <- readString(con)
-  if (is.null(date_str) || identical(date_str, "")) {
+  n <- readInt(con)
+  if (is.na(n)) {
     as.Date(NA)
-  } else if (getOption("sparklyr.collect.datechars", FALSE)) {
-    date_str
   } else {
-    as.Date(date_str, tz = "UTC")
+    d <- as.Date(n, origin = "1970-01-01", tz = "UTC")
+    if (getOption("sparklyr.collect.datechars", FALSE)) {
+      as.character(d)
+    } else {
+      d
+    }
   }
 }
 
@@ -1164,7 +1167,7 @@ writeEnv <- function(con, env) {
 }
 
 writeDate <- function(con, date) {
-  writeString(con, as.character(date))
+  writeInt(con, as.integer(date))
 }
 
 writeTime <- function(con, time) {

@@ -183,7 +183,7 @@ writeEnv <- function(con, env) {
 }
 
 writeDate <- function(con, date) {
-  writeString(con, as.character(date))
+  writeInt(con, as.integer(date))
 }
 
 writeTime <- function(con, time) {

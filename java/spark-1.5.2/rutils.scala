@@ -282,7 +282,7 @@ object RUtils {
         case Collectors.ReTimestampArrayType(_*) =>
           arrayColumnWriter(REALSXP, writeTimestampValue)
         case Collectors.ReDateArrayType(_*) =>
-          arrayColumnWriter(STRSXP, writeDateValue)
+          arrayColumnWriter(INTSXP, writeDateValue)
         case StructTypeAsJSON.DType => stringColumnWriter()
         case _ => {
           throw new IllegalArgumentException(
@@ -293,6 +293,13 @@ object RUtils {
     )
 
     writer(dos, numRows, colIter)
+  }
+
+  private[this] def writeDateValue(dos: DataOutputStream, v: Any): Unit = {
+    Serializer.writeDate(
+      dos,
+      Collectors.extractDaysSinceEpoch(v)
+    )
   }
 
   private[this] def booleanColumnWriter(): (DataOutputStream, Int, Iterator[Row]) => Unit = {
@@ -418,20 +425,10 @@ object RUtils {
 
   private[this] def dateColumnWriter(): (DataOutputStream, Int, Iterator[Row]) => Unit = {
     (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
-      writeFlags(dos, dtype = STRSXP)
+      writeFlags(dos, dtype = INTSXP)
       writeLength(dos, numRows)
       colIter.foreach(row => writeDateValue(dos, row.get(0)))
     }
-  }
-
-  private[this] def writeDateValue(dos: DataOutputStream, v: Any): Unit = {
-    writeStringValue(
-      dos,
-      v match {
-        case d: java.sql.Date => Serializer.dateFormat.get.format(d)
-        case _ => ""
-      }
-    )
   }
 
   private[this] def writeStringValues(
