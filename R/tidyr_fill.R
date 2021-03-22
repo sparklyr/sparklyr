@@ -15,7 +15,7 @@ fill.tbl_spark <- function(data, ..., .direction = c("down", "up", "downup", "up
   vars <- names(tidyselect::eval_select(rlang::expr(c(...)), replicate_colnames(data)))
 
   sql <- lapply(
-    cols,
+    vars,
     function(col) {
       switch(
         .direction,
@@ -35,7 +35,7 @@ fill.tbl_spark <- function(data, ..., .direction = c("down", "up", "downup", "up
         dplyr::sql()
     }
   )
-  names(sql) <- cols
+  names(sql) <- vars
 
   data %>>% dplyr::mutate %@% sql
 }
