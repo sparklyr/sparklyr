@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -254,7 +254,7 @@
 <span class='va'>iris_tbl</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sdf_copy_to.html'>sdf_copy_to</a></span><span class='op'>(</span><span class='va'>sc</span>, <span class='va'>iris</span>, name <span class='op'>=</span> <span class='st'>"iris_tbl"</span>, overwrite <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='va'>partitions</span> <span class='op'>&lt;-</span> <span class='va'>iris_tbl</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>Species</span> <span class='op'>!=</span> <span class='st'>"setosa"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='filter.html'>filter</a></span><span class='op'>(</span><span class='va'>Species</span> <span class='op'>!=</span> <span class='st'>"setosa"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='sdf_random_split.html'>sdf_random_split</a></span><span class='op'>(</span>training <span class='op'>=</span> <span class='fl'>0.7</span>, test <span class='op'>=</span> <span class='fl'>0.3</span>, seed <span class='op'>=</span> <span class='fl'>1111</span><span class='op'>)</span>
 
 <span class='va'>iris_training</span> <span class='op'>&lt;-</span> <span class='va'>partitions</span><span class='op'>$</span><span class='va'>training</span>

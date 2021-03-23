@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -244,7 +244,8 @@ E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults
 
     <p>ALS attempts to estimate the ratings matrix R as the product of two lower-rank matrices, X and Y, i.e. X * Yt = R. Typically these approximations are called 'factor' matrices. The general approach is iterative. During each iteration, one of the factor matrices is held constant, while the other is solved for using least squares. The newly-solved factor matrix is then held constant while solving for the other factor matrix.</p>
 <p>This is a blocked implementation of the ALS factorization algorithm that groups the two sets of factors (referred to as "users" and "products") into blocks and reduces communication by only sending one copy of each user vector to each product block on each iteration, and only for the product blocks that need that user's feature vector. This is achieved by pre-computing some information about the ratings matrix to determine the "out-links" of each user (which blocks of products it will contribute to) and "in-link" information for each product (which of the feature vectors it receives from each user block it will depend on). This allows us to send only an array of feature vectors between each user block and product block, and have the product block find the users' ratings and update the products based on these messages.</p>
-<p>For implicit preference data, the algorithm used is based on "Collaborative Filtering for Implicit Feedback Datasets", available at <a href='https://doi.org/10.1109/ICDM.2008.22'>https://doi.org/10.1109/ICDM.2008.22</a>, adapted for the blocked approach used here.</p>
+<p>For implicit preference data, the algorithm used is based on "Collaborative Filtering for Implicit Feedback Datasets", available at doi: <a href='https://doi.org/10.1109/ICDM.2008.22'>10.1109/ICDM.2008.22</a>
+, adapted for the blocked approach used here.</p>
 <p>Essentially instead of finding the low-rank approximations to the rating matrix R, this finds the approximations for a preference matrix P where the elements of P are 1 if r is greater than 0 and 0 if r is less than or equal to 0. The ratings then act as 'confidence' values related to strength of indicated user preferences rather than explicit ratings given to items.</p>
 <p>The object returned depends on the class of <code>x</code>.</p>
 <ul>

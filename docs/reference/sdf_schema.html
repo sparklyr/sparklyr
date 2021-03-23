@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     <p>Read the schema of a Spark DataFrame.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sdf_schema</span><span class='op'>(</span><span class='va'>x</span>, expand_nested_cols <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sdf_schema</span><span class='op'>(</span><span class='va'>x</span>, expand_nested_cols <span class='op'>=</span> <span class='cn'>FALSE</span>, expand_struct_cols <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -133,6 +133,10 @@
       <th>expand_nested_cols</th>
       <td><p>Whether to expand columns containing nested array
 of structs (which are usually created by tidyr::nest on a Spark data frame)</p></td>
+    </tr>
+    <tr>
+      <th>expand_struct_cols</th>
+      <td><p>Whether to expand columns containing structs</p></td>
     </tr>
     </table>
 

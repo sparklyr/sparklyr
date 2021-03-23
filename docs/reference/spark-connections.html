@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Manage Spark Connections — spark-connections" />
-<meta property="og:description" content="These routines allow you to manage your connections to Spark." />
+<meta property="og:description" content="These routines allow you to manage your connections to Spark.
+Call `spark_disconnect()` on each open Spark connection" />
 
 
 
@@ -72,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -118,6 +119,7 @@
 
     <div class="ref-description">
     <p>These routines allow you to manage your connections to Spark.</p>
+<p>Call `spark_disconnect()` on each open Spark connection</p>
     </div>
 
     <pre class="usage"><span class='fu'>spark_connect</span><span class='op'>(</span>
@@ -137,7 +139,7 @@
 
 <span class='fu'>spark_disconnect</span><span class='op'>(</span><span class='va'>sc</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>spark_disconnect_all</span><span class='op'>(</span><span class='op'>)</span>
+<span class='fu'>spark_disconnect_all</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
 
 <span class='fu'>spark_submit</span><span class='op'>(</span>
   <span class='va'>master</span>,
@@ -215,7 +217,8 @@ Scala 2.12)</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Optional arguments; currently unused.</p></td>
+      <td><p>Additional params to be passed to each `spark_disconnect()` call
+(e.g., `terminate = TRUE`)</p></td>
     </tr>
     <tr>
       <th>sc</th>

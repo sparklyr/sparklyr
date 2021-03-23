@@ -41,7 +41,7 @@
 
 <meta property="og:title" content="Compute (Approximate) Quantiles with a Spark DataFrame — sdf_quantile" />
 <meta property="og:description" content="Given a numeric column within a Spark DataFrame, compute
-approximate quantiles (to some relative error)." />
+approximate quantiles." />
 
 
 
@@ -73,7 +73,7 @@ approximate quantiles (to some relative error)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -119,14 +119,15 @@ approximate quantiles (to some relative error)." />
 
     <div class="ref-description">
     <p>Given a numeric column within a Spark DataFrame, compute
-approximate quantiles (to some relative error).</p>
+approximate quantiles.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sdf_quantile</span><span class='op'>(</span>
   <span class='va'>x</span>,
   <span class='va'>column</span>,
   probabilities <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0.25</span>, <span class='fl'>0.5</span>, <span class='fl'>0.75</span>, <span class='fl'>1</span><span class='op'>)</span>,
-  relative.error <span class='op'>=</span> <span class='fl'>1e-05</span>
+  relative.error <span class='op'>=</span> <span class='fl'>1e-05</span>,
+  weight.column <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -148,8 +149,19 @@ which quantiles should be computed.</p></td>
     </tr>
     <tr>
       <th>relative.error</th>
-      <td><p>The relative error -- lower values imply more
-precision in the computed quantiles.</p></td>
+      <td><p>The maximal possible difference between the actual
+percentile of a result and its expected percentile (e.g., if
+`relative.error` is 0.01 and `probabilities` is 0.95, then any value
+between the 94th and 96th percentile will be considered an acceptable
+approximation).</p></td>
+    </tr>
+    <tr>
+      <th>weight.column</th>
+      <td><p>If not NULL, then a generalized version of the Greenwald-
+Khanna algorithm will be run to compute weighted percentiles, with each
+sample from `column` having a relative weight specified by the corresponding
+value in `weight.column`. The weights can be considered as relative
+frequencies of sample data points.</p></td>
     </tr>
     </table>
 

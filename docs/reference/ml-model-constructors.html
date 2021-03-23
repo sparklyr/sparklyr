@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Constructors for `ml_model` Objects — ml-model-constructors • sparklyr</title>
+<title>Constructors for `ml_model` Objects — ml_supervised_pipeline • sparklyr</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Constructors for `ml_model` Objects — ml-model-constructors" />
+<meta property="og:title" content="Constructors for `ml_model` Objects — ml_supervised_pipeline" />
 <meta property="og:description" content="Functions for developers writing extensions for Spark ML. These functions are constructors
   for `ml_model` objects that are returned when using the formula interface." />
 
@@ -73,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -113,7 +113,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Constructors for `ml_model` Objects</h1>
-    <small class="dont-index">Source: <a href='https://github.com/sparklyr/sparklyr/blob/master/R/ml_model_constructors.R'><code>R/ml_model_constructors.R</code></a>, <a href='https://github.com/sparklyr/sparklyr/blob/master/R/ml_model_helpers.R'><code>R/ml_model_helpers.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/sparklyr/sparklyr/blob/master/R/ml_model_helpers.R'><code>R/ml_model_helpers.R</code></a>, <a href='https://github.com/sparklyr/sparklyr/blob/master/R/ml_model_constructors.R'><code>R/ml_model_constructors.R</code></a></small>
     <div class="hidden name"><code>ml-model-constructors.Rd</code></div>
     </div>
 
@@ -122,7 +122,30 @@
   for `ml_model` objects that are returned when using the formula interface.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>new_ml_model_prediction</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>ml_supervised_pipeline</span><span class='op'>(</span><span class='va'>predictor</span>, <span class='va'>dataset</span>, <span class='va'>formula</span>, <span class='va'>features_col</span>, <span class='va'>label_col</span><span class='op'>)</span>
+
+<span class='fu'>ml_clustering_pipeline</span><span class='op'>(</span><span class='va'>predictor</span>, <span class='va'>dataset</span>, <span class='va'>formula</span>, <span class='va'>features_col</span><span class='op'>)</span>
+
+<span class='fu'>ml_construct_model_supervised</span><span class='op'>(</span>
+  <span class='va'>constructor</span>,
+  <span class='va'>predictor</span>,
+  <span class='va'>formula</span>,
+  <span class='va'>dataset</span>,
+  <span class='va'>features_col</span>,
+  <span class='va'>label_col</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='fu'>ml_construct_model_clustering</span><span class='op'>(</span>
+  <span class='va'>constructor</span>,
+  <span class='va'>predictor</span>,
+  <span class='va'>formula</span>,
+  <span class='va'>dataset</span>,
+  <span class='va'>features_col</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='fu'>new_ml_model_prediction</span><span class='op'>(</span>
   <span class='va'>pipeline_model</span>,
   <span class='va'>formula</span>,
   <span class='va'>dataset</span>,
@@ -162,65 +185,42 @@
   <span class='va'>features_col</span>,
   <span class='va'>...</span>,
   class <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='op'>)</span>
-
-<span class='fu'>ml_supervised_pipeline</span><span class='op'>(</span><span class='va'>predictor</span>, <span class='va'>dataset</span>, <span class='va'>formula</span>, <span class='va'>features_col</span>, <span class='va'>label_col</span><span class='op'>)</span>
-
-<span class='fu'>ml_clustering_pipeline</span><span class='op'>(</span><span class='va'>predictor</span>, <span class='va'>dataset</span>, <span class='va'>formula</span>, <span class='va'>features_col</span><span class='op'>)</span>
-
-<span class='fu'>ml_construct_model_supervised</span><span class='op'>(</span>
-  <span class='va'>constructor</span>,
-  <span class='va'>predictor</span>,
-  <span class='va'>formula</span>,
-  <span class='va'>dataset</span>,
-  <span class='va'>features_col</span>,
-  <span class='va'>label_col</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span>
-
-<span class='fu'>ml_construct_model_clustering</span><span class='op'>(</span>
-  <span class='va'>constructor</span>,
-  <span class='va'>predictor</span>,
-  <span class='va'>formula</span>,
-  <span class='va'>dataset</span>,
-  <span class='va'>features_col</span>,
-  <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>pipeline_model</th>
-      <td><p>The pipeline model object returned by `ml_supervised_pipeline()`.</p></td>
-    </tr>
-    <tr>
-      <th>formula</th>
-      <td><p>The formula used for data preprocessing</p></td>
+      <th>predictor</th>
+      <td><p>The pipeline stage corresponding to the ML algorithm.</p></td>
     </tr>
     <tr>
       <th>dataset</th>
       <td><p>The training dataset.</p></td>
     </tr>
     <tr>
-      <th>label_col</th>
-      <td><p>Label column name. The column should be a numeric column. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
+      <th>formula</th>
+      <td><p>The formula used for data preprocessing</p></td>
     </tr>
     <tr>
       <th>features_col</th>
       <td><p>Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
     </tr>
     <tr>
-      <th>class</th>
-      <td><p>Name of the subclass.</p></td>
-    </tr>
-    <tr>
-      <th>predictor</th>
-      <td><p>The pipeline stage corresponding to the ML algorithm.</p></td>
+      <th>label_col</th>
+      <td><p>Label column name. The column should be a numeric column. Usually this column is output by <code><a href='ft_r_formula.html'>ft_r_formula</a></code>.</p></td>
     </tr>
     <tr>
       <th>constructor</th>
       <td><p>The constructor function for the `ml_model`.</p></td>
+    </tr>
+    <tr>
+      <th>pipeline_model</th>
+      <td><p>The pipeline model object returned by `ml_supervised_pipeline()`.</p></td>
+    </tr>
+    <tr>
+      <th>class</th>
+      <td><p>Name of the subclass.</p></td>
     </tr>
     </table>
 
