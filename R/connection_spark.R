@@ -106,11 +106,20 @@ no_databricks_guid <- function() {
 #' @name spark-connections
 #'
 #' @examples
+#' conf <- spark_config()
+#' conf$`sparklyr.shell.conf` <- c(
+#'   "spark.executor.extraJavaOptions=-Duser.timezone='UTC'",
+#'   "spark.driver.extraJavaOptions=-Duser.timezone='UTC'",
+#'   "spark.sql.session.timeZone='UTC'"
+#' )
 #'
-#' sc <- spark_connect(master = "spark://HOST:PORT")
+#' sc <- spark_connect(
+#'   master = "spark://HOST:PORT", config = conf
+#' )
 #' connection_is_open(sc)
 #'
 #' spark_disconnect(sc)
+#'
 #' @details
 #'
 #' By default, when using \code{method = "livy"}, jars are downloaded from GitHub. But
