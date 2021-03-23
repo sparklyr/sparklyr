@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -124,6 +124,7 @@
   <span class='va'>x</span>,
   input_col <span class='op'>=</span> <span class='cn'>NULL</span>,
   output_col <span class='op'>=</span> <span class='cn'>NULL</span>,
+  handle_invalid <span class='op'>=</span> <span class='st'>"error"</span>,
   max_categories <span class='op'>=</span> <span class='fl'>20</span>,
   uid <span class='op'>=</span> <span class='fu'><a href='random_string.html'>random_string</a></span><span class='op'>(</span><span class='st'>"vector_indexer_"</span><span class='op'>)</span>,
   <span class='va'>...</span>
@@ -143,6 +144,12 @@
     <tr>
       <th>output_col</th>
       <td><p>The name of the output column.</p></td>
+    </tr>
+    <tr>
+      <th>handle_invalid</th>
+      <td><p>(Spark 2.1.0+) Param for how to handle invalid entries. Options are
+'skip' (filter out rows with invalid values), 'error' (throw an error), or
+'keep' (keep invalid values in a special additional bucket). Default: "error"</p></td>
     </tr>
     <tr>
       <th>max_categories</th>

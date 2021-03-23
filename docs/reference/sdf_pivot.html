@@ -73,7 +73,7 @@ that from reshape2::dcast." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -119,7 +119,7 @@ that from reshape2::dcast." />
 
     <div class="ref-description">
     <p>Construct a pivot table over a Spark Dataframe, using a syntax similar to
-that from <code>reshape2::dcast</code>.</p>
+that from <code><a href='https://rdrr.io/pkg/reshape2/man/cast.html'>reshape2::dcast</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sdf_pivot</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>formula</span>, fun.aggregate <span class='op'>=</span> <span class='st'>"count"</span><span class='op'>)</span></pre>
@@ -158,14 +158,14 @@ or an <span style="R">R</span> function that is invoked on the grouped dataset.<
 
 <span class='co'># aggregating by mean</span>
 <span class='va'>iris_tbl</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>Petal_Width <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/h2o/man/h2o.ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>Petal_Width</span> <span class='op'>&gt;</span> <span class='fl'>1.5</span>, <span class='st'>"High"</span>, <span class='st'>"Low"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='mutate.html'>mutate</a></span><span class='op'>(</span>Petal_Width <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>Petal_Width</span> <span class='op'>&gt;</span> <span class='fl'>1.5</span>, <span class='st'>"High"</span>, <span class='st'>"Low"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'>sdf_pivot</span><span class='op'>(</span><span class='va'>Petal_Width</span> <span class='op'>~</span> <span class='va'>Species</span>,
     fun.aggregate <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Petal_Length <span class='op'>=</span> <span class='st'>"mean"</span><span class='op'>)</span>
   <span class='op'>)</span>
 
 <span class='co'># aggregating all observations in a list</span>
 <span class='va'>iris_tbl</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>Petal_Width <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/h2o/man/h2o.ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>Petal_Width</span> <span class='op'>&gt;</span> <span class='fl'>1.5</span>, <span class='st'>"High"</span>, <span class='st'>"Low"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='mutate.html'>mutate</a></span><span class='op'>(</span>Petal_Width <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>Petal_Width</span> <span class='op'>&gt;</span> <span class='fl'>1.5</span>, <span class='st'>"High"</span>, <span class='st'>"Low"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'>sdf_pivot</span><span class='op'>(</span><span class='va'>Petal_Width</span> <span class='op'>~</span> <span class='va'>Species</span>,
     fun.aggregate <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Petal_Length <span class='op'>=</span> <span class='st'>"collect_list"</span><span class='op'>)</span>
   <span class='op'>)</span>

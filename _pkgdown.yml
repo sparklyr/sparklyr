@@ -4,6 +4,7 @@
 reference:
   - title: Spark Operations
     contents:
+    - get_spark_sql_catalog_implementation
     - spark_config
     - spark_connect
     - spark_disconnect
@@ -29,6 +30,14 @@ reference:
     - list_sparklyr_jars
     - spark_config_packages
     - spark_connection
+    - spark_adaptive_query_execution
+    - spark_advisory_shuffle_partition_size
+    - spark_auto_broadcast_join_threshold
+    - spark_coalesce_initial_num_partitions
+    - spark_coalesce_min_num_partitions
+    - spark_coalesce_shuffle_partitions
+    - spark_connection-class
+    - spark_jobj-class
   - title: Spark Data
     contents:
     - spark_read
@@ -54,6 +63,9 @@ reference:
     - spark_write_parquet
     - spark_write_source
     - spark_write_table
+    - spark_write_rds
+    - collect_from_rds
+    - dplyr_hof
   - title: Spark Tables
     contents:
     - src_databases
@@ -70,11 +82,14 @@ reference:
     - sdf_checkpoint
     - sdf_coalesce
     - sdf_copy_to
+    - sdf_distinct
     - sdf_drop_duplicates
+    - sdf_expand_grid
     - sdf_from_avro
     - sdf_len
     - sdf_num_partitions
     - sdf_partition
+    - sdf_partition_sizes
     - sdf_pivot
     - sdf_predict
     - sdf_read_column
@@ -110,6 +125,8 @@ reference:
     - sdf_schema
     - sdf_sql
     - sdf_transform
+    - sdf_unnest_longer
+    - sdf_unnest_wider
     - sdf_with_sequential_id
     - join.tbl_spark
     - separate
@@ -196,6 +213,7 @@ reference:
     - ml_param_map
     - ml_params
     - ml_pipeline
+    - ml_power_iteration
     - ml_predict
     - ml_random_forest_classifier
     - ml_random_forest_regressor
@@ -314,6 +332,7 @@ reference:
     - stream_find
     - stream_generate_test
     - stream_id
+    - stream_lag
     - stream_name
     - stream_read_csv
     - stream_read_json

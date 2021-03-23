@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -134,6 +134,12 @@
       
       
       <tr>
+        
+        <td>
+          <p><code><a href="get_spark_sql_catalog_implementation.html">get_spark_sql_catalog_implementation()</a></code> </p>
+        </td>
+        <td><p>Retrieve the Spark connection's SQL catalog implementation property</p></td>
+      </tr><tr>
         
         <td>
           <p><code><a href="spark_config.html">spark_config()</a></code> </p>
@@ -265,6 +271,54 @@
           <p><code><a href="spark_connection.html">spark_connection()</a></code> </p>
         </td>
         <td><p>Retrieve the Spark Connection Associated with an R Object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spark_adaptive_query_execution.html">spark_adaptive_query_execution()</a></code> </p>
+        </td>
+        <td><p>Retrieves or sets status of Spark AQE</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spark_advisory_shuffle_partition_size.html">spark_advisory_shuffle_partition_size()</a></code> </p>
+        </td>
+        <td><p>Retrieves or sets advisory size of the shuffle partition</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spark_auto_broadcast_join_threshold.html">spark_auto_broadcast_join_threshold()</a></code> </p>
+        </td>
+        <td><p>Retrieves or sets the auto broadcast join threshold</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spark_coalesce_initial_num_partitions.html">spark_coalesce_initial_num_partitions()</a></code> </p>
+        </td>
+        <td><p>Retrieves or sets initial number of shuffle partitions before coalescing</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spark_coalesce_min_num_partitions.html">spark_coalesce_min_num_partitions()</a></code> </p>
+        </td>
+        <td><p>Retrieves or sets the minimum number of shuffle partitions after coalescing</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spark_coalesce_shuffle_partitions.html">spark_coalesce_shuffle_partitions()</a></code> </p>
+        </td>
+        <td><p>Retrieves or sets whether coalescing contiguous shuffle partitions is enabled</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spark_connection-class.html">spark_connection-class</a></code> </p>
+        </td>
+        <td><p>spark_connection class</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spark_jobj-class.html">spark_jobj-class</a></code> </p>
+        </td>
+        <td><p>spark_jobj class</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -416,6 +470,24 @@
           <p><code><a href="spark_write_table.html">spark_write_table()</a></code> </p>
         </td>
         <td><p>Writes a Spark DataFrame into a Spark table</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spark_write_rds.html">spark_write_rds()</a></code> </p>
+        </td>
+        <td><p>Write Spark DataFrame to RDS files</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="collect_from_rds.html">collect_from_rds()</a></code> </p>
+        </td>
+        <td><p>Collect Spark data serialized in RDS format into R</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="dplyr_hof.html">dplyr_hof</a></code> </p>
+        </td>
+        <td><p>dplyr wrappers for Apache Spark higher order functions</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -511,9 +583,21 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="sdf_distinct.html">sdf_distinct()</a></code> </p>
+        </td>
+        <td><p>Invoke distinct on a Spark DataFrame</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="sdf_drop_duplicates.html">sdf_drop_duplicates()</a></code> </p>
         </td>
         <td><p>Remove duplicates from a Spark DataFrame</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_expand_grid.html">sdf_expand_grid()</a></code> </p>
+        </td>
+        <td><p>Create a Spark dataframe containing all combinations of inputs</p></td>
       </tr><tr>
         
         <td>
@@ -538,6 +622,12 @@
           <p><code><a href="sdf_random_split.html">sdf_random_split()</a></code> <code><a href="sdf_random_split.html">sdf_partition()</a></code> </p>
         </td>
         <td><p>Partition a Spark Dataframe</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_partition_sizes.html">sdf_partition_sizes()</a></code> </p>
+        </td>
+        <td><p>Compute the number of records within each partition of a Spark DataFrame</p></td>
       </tr><tr>
         
         <td>
@@ -688,6 +778,18 @@
           <p><code><a href="sdf_sql.html">sdf_sql()</a></code> </p>
         </td>
         <td><p>Spark DataFrame from SQL</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_unnest_longer.html">sdf_unnest_longer()</a></code> </p>
+        </td>
+        <td><p>Unnest longer</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_unnest_wider.html">sdf_unnest_wider()</a></code> </p>
+        </td>
+        <td><p>Unnest wider</p></td>
       </tr><tr>
         
         <td>
@@ -998,7 +1100,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="ml-model-constructors.html">new_ml_model_prediction()</a></code> <code><a href="ml-model-constructors.html">new_ml_model()</a></code> <code><a href="ml-model-constructors.html">new_ml_model_classification()</a></code> <code><a href="ml-model-constructors.html">new_ml_model_regression()</a></code> <code><a href="ml-model-constructors.html">new_ml_model_clustering()</a></code> <code><a href="ml-model-constructors.html">ml_supervised_pipeline()</a></code> <code><a href="ml-model-constructors.html">ml_clustering_pipeline()</a></code> <code><a href="ml-model-constructors.html">ml_construct_model_supervised()</a></code> <code><a href="ml-model-constructors.html">ml_construct_model_clustering()</a></code> </p>
+          <p><code><a href="ml-model-constructors.html">ml_supervised_pipeline()</a></code> <code><a href="ml-model-constructors.html">ml_clustering_pipeline()</a></code> <code><a href="ml-model-constructors.html">ml_construct_model_supervised()</a></code> <code><a href="ml-model-constructors.html">ml_construct_model_clustering()</a></code> <code><a href="ml-model-constructors.html">new_ml_model_prediction()</a></code> <code><a href="ml-model-constructors.html">new_ml_model()</a></code> <code><a href="ml-model-constructors.html">new_ml_model_classification()</a></code> <code><a href="ml-model-constructors.html">new_ml_model_regression()</a></code> <code><a href="ml-model-constructors.html">new_ml_model_clustering()</a></code> </p>
         </td>
         <td><p>Constructors for `ml_model` Objects</p></td>
       </tr><tr>
@@ -1085,6 +1187,12 @@
           <p><code><a href="ml_pipeline.html">ml_pipeline()</a></code> </p>
         </td>
         <td><p>Spark ML -- Pipelines</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ml_power_iteration.html">ml_power_iteration()</a></code> </p>
+        </td>
+        <td><p>Spark ML -- Power Iteration Clustering</p></td>
       </tr><tr>
         
         <td>
@@ -1637,6 +1745,12 @@
           <p><code><a href="stream_id.html">stream_id()</a></code> </p>
         </td>
         <td><p>Spark Stream's Identifier</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="stream_lag.html">stream_lag()</a></code> </p>
+        </td>
+        <td><p>Apply lag function to columns of a Spark Streaming DataFrame</p></td>
       </tr><tr>
         
         <td>

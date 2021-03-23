@@ -73,7 +73,7 @@ serializing the results to disk." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -122,7 +122,7 @@ serializing the results to disk." />
 serializing the results to disk.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sdf_persist</span><span class='op'>(</span><span class='va'>x</span>, storage.level <span class='op'>=</span> <span class='st'>"MEMORY_AND_DISK"</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sdf_persist</span><span class='op'>(</span><span class='va'>x</span>, storage.level <span class='op'>=</span> <span class='st'>"MEMORY_AND_DISK"</span>, name <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -136,6 +136,10 @@ serializing the results to disk.</p>
       <td><p>The storage level to be used. Please view the
 <a href='http://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence'>Spark Documentation</a>
 for information on what storage levels are accepted.</p></td>
+    </tr>
+    <tr>
+      <th>name</th>
+      <td><p>A name to assign this table. Passed to [sdf_register()].</p></td>
     </tr>
     </table>
 

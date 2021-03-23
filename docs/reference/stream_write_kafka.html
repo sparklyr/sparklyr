@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -126,6 +126,7 @@
   trigger <span class='op'>=</span> <span class='fu'><a href='stream_trigger_interval.html'>stream_trigger_interval</a></span><span class='op'>(</span><span class='op'>)</span>,
   checkpoint <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='st'>"checkpoints"</span>, <span class='fu'><a href='random_string.html'>random_string</a></span><span class='op'>(</span><span class='st'>""</span><span class='op'>)</span><span class='op'>)</span>,
   options <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  partition_by <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -155,6 +156,10 @@ information to guarantee end-to-end fault-tolerance.</p></td>
     <tr>
       <th>options</th>
       <td><p>A list of strings with additional options.</p></td>
+    </tr>
+    <tr>
+      <th>partition_by</th>
+      <td><p>Partitions the output by the given list of columns.</p></td>
     </tr>
     <tr>
       <th>...</th>

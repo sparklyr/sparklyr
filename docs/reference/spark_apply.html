@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
       </span>
     </div>
 
@@ -132,6 +132,7 @@
   barrier <span class='op'>=</span> <span class='cn'>NULL</span>,
   fetch_result_as_sdf <span class='op'>=</span> <span class='cn'>TRUE</span>,
   partition_index_param <span class='op'>=</span> <span class='st'>""</span>,
+  arrow_max_records_per_batch <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -220,6 +221,11 @@ specify the column types. The sample size is configurable using the
 <p>NOTE: when <code>fetch_result_as_sdf</code> is set to <code>FALSE</code>, object returned from the
   transformation function also must be serializable by the <code><a href='https://rdrr.io/r/base/serialize.html'>base::serialize</a></code>
   function in R.</p></td>
+    </tr>
+    <tr>
+      <th>arrow_max_records_per_batch</th>
+      <td><p>Maximum size of each Arrow record batch,
+ignored if Arrow serialization is not enabled.</p></td>
     </tr>
     <tr>
       <th>...</th>
