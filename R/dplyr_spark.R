@@ -1,6 +1,7 @@
 #' @include spark_dataframe.R
 #' @include spark_sql.R
 #' @include tables_spark.R
+#' @include utils.R
 NULL
 
 #' @export
@@ -176,6 +177,23 @@ print.src_spark <- function(x, ...) {
   spark_log(spark_connection(x))
 }
 
+# create this alias so that the S3 method signature of compute.tbl_spark() is
+# consistent with that of dplyr::compute()
+random_table_name <- random_string
+
+#' @export
+compute.tbl_spark <- function(x, name = random_table_name(), ...) {
+  # This only creates a view with the specified name in Spark. The view is not
+  # cached yet.
+  out <- NextMethod(generic = "compute", object = x, name = name, ...)
+
+  # We then need a separate SQL query to cache the resulting view, as there is
+  # no way (yet) to both create and cache a view using a single Spark SQL query.
+  tbl_cache(sc = spark_connection(x), name = name, force = TRUE)
+
+  out
+}
+
 #' @rawNamespace
 #' if (utils::packageVersion("dbplyr") < "2") {
 #'   importFrom(dplyr, db_save_query)
@@ -188,7 +206,6 @@ print.src_spark <- function(x, ...) {
 db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
   create_temp_view_sql <- spark_sql_query_save(con, sql, name, temporary, ...)
   DBI::dbGetQuery(con, create_temp_view_sql)
-  tbl_cache_sql(con, name = name, force = TRUE)
 
   # dbplyr expects db_save_query to retrieve the table name
   name
