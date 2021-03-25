@@ -297,12 +297,61 @@ test_that("'sdf_broadcast' forces broadcast hash join", {
   expect_match(query_plan, "B|broadcast")
 })
 
-test_that("can compute() over tables", {
+test_that("compute() works as expected", {
   test_requires("dplyr")
 
-  iris_tbl %>% compute()
+  sdf <- sdf_len(sc, 10L)
+  sdf_even <- sdf %>% dplyr::filter(id %% 2 == 0)
+  sdf_odd <- sdf %>% dplyr::filter(id %% 2 == 1)
 
-  succeed()
+  expect_null(sdf_even %>% dbplyr::remote_name())
+  expect_null(sdf_odd %>% dbplyr::remote_name())
+
+  # caching Spark dataframes with random names
+  sdf_even_cached <- sdf_even %>% dplyr::compute()
+  sdf_odd_cached <- sdf_odd %>% dplyr::compute()
+
+  expect_true(grepl("^table_", sdf_even_cached %>% dbplyr::remote_name()))
+  expect_true(grepl("^table_", sdf_odd_cached %>% dbplyr::remote_name()))
+
+  expect_equivalent(
+    sdf_even_cached %>% collect(),
+    tibble::tibble(id = c(2L, 4L, 6L, 8L, 10L))
+  )
+  expect_equivalent(
+    sdf_odd_cached %>% collect(),
+    tibble::tibble(id = c(1L, 3L, 5L, 7L, 9L))
+  )
+
+  # caching Spark dataframes with pre-determined names
+  sdf_congruent_to_1_mod_3 <- sdf %>% dplyr::filter(id %% 3 == 1)
+  sdf_congruent_to_2_mod_3 <- sdf %>% dplyr::filter(id %% 3 == 2)
+
+  expect_null(sdf_congruent_to_1_mod_3 %>% dbplyr::remote_name())
+  expect_null(sdf_congruent_to_2_mod_3 %>% dbplyr::remote_name())
+
+  sdf_congruent_to_1_mod_3_cached <- sdf_congruent_to_1_mod_3 %>%
+    dplyr::compute(name = "congruent_to_1_mod_3")
+  sdf_congruent_to_2_mod_3_cached <- sdf_congruent_to_2_mod_3 %>%
+    dplyr::compute(name = "congruent_to_2_mod_3")
+
+  expect_equal(
+    sdf_congruent_to_1_mod_3_cached %>% dbplyr::remote_name(),
+    dbplyr::ident("congruent_to_1_mod_3")
+  )
+  expect_equivalent(
+    sdf_congruent_to_2_mod_3_cached %>% dbplyr::remote_name(),
+    dbplyr::ident("congruent_to_2_mod_3")
+  )
+
+  expect_equivalent(
+    sdf_congruent_to_1_mod_3_cached %>% collect(),
+    tibble::tibble(id = c(1L, 4L, 7L, 10L))
+  )
+  expect_equivalent(
+    sdf_congruent_to_2_mod_3_cached %>% collect(),
+    tibble::tibble(id = c(2L, 5L, 8L))
+  )
 })
 
 test_that("mutate creates NA_real_ column correctly", {
