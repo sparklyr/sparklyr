@@ -1,3 +1,10 @@
+# Sparklyr 1.7.0.9000
+
+### Data
+
+- Revised `tidyr::fill()` implementation to respect any 'ORDER BY' clause from
+  the input
+
 # Sparklyr 1.6.2
 
 ### Data
