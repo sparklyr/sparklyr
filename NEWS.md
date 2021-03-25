@@ -3,7 +3,8 @@
 ### Data
 
 - Revised `tidyr::fill()` implementation to respect any 'ORDER BY' clause from
-  the input
+  the input while ensuring the same 'ORDER BY' operation is never duplicated
+  twice in the generated Spark SQL query
 
 # Sparklyr 1.6.2
 
