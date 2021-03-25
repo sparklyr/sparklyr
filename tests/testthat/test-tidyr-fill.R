@@ -112,3 +112,54 @@ test_that("fill respects grouping", {
     collect()
   expect_equal(out$y, c(1, 1, NA))
 })
+
+test_that("fill respects grouping", {
+  test_requires_version("2.0.0")
+
+  df <- tibble::tibble(
+    id1 = c(1, 4, 2, 8, 5, 7),
+    id2 = c(4, 1, 7, 5, 8, 2),
+    value = c(1, NA, 2, NA, 5, NA)
+  )
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+
+  expect_equivalent(
+    sdf %>%
+      dplyr::arrange(id1) %>%
+      tidyr::fill(value, .direction = "down") %>%
+      collect(),
+    df %>%
+      dplyr::arrange(id1) %>%
+      tidyr::fill(value, .direction = "down")
+  )
+
+  expect_equivalent(
+    sdf %>%
+      dplyr::arrange(id2, id1) %>%
+      tidyr::fill(value, .direction = "up") %>%
+      collect(),
+    df %>%
+      dplyr::arrange(id2, id1) %>%
+      tidyr::fill(value, .direction = "up")
+  )
+
+  expect_equivalent(
+    sdf %>%
+      dplyr::arrange(id1 * id2, id1 + id2) %>%
+      tidyr::fill(value, .direction = "updown") %>%
+      collect(),
+    df %>%
+      dplyr::arrange(id1 * id2, id1 + id2) %>%
+      tidyr::fill(value, .direction = "updown")
+  )
+
+  expect_equivalent(
+    sdf %>%
+      dplyr::arrange(id1 + id2, id1 * id2) %>%
+      tidyr::fill(value, .direction = "downup") %>%
+      collect(),
+    df %>%
+      dplyr::arrange(id1 * id2, id1 + id2) %>%
+      tidyr::fill(value, .direction = "downup")
+  )
+})
