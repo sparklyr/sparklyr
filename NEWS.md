@@ -1,3 +1,10 @@
+# Sparklyr 1.6.2
+
+### Data
+
+- A previous bug fix related to `dplyr::compute()` caching a Spark view needed
+  to be further revised to take effect with dbplyr backend API edition 2
+
 # Sparklyr 1.6.1
 
 ### Data
