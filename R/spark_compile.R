@@ -370,7 +370,7 @@ download_scalac <- function(dest_path = NULL) {
       dir.create(dirname(dest_file), recursive = TRUE)
     }
 
-    download.file(download_url, destfile = dest_file)
+    download_file(download_url, destfile = dest_file)
 
     if (ext == "zip") {
       unzip(dest_file, exdir = dest_path)
