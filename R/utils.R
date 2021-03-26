@@ -397,3 +397,19 @@ simulate_vars <- function(sdf) {
     ) %>%
     tibble::as_tibble()
 }
+
+# wrapper for download.file()
+download_file <- function(...) {
+  min_timeout_s <- 300
+
+  # Temporarily set download.file() timeout to 300 seconds if it was
+  # previously less than that, and restore the previous timeout setting
+  # on exit.
+  prev_timeout_s <- getOption("timeout")
+  if (prev_timeout_s < min_timeout_s) {
+    on.exit(options(timeout = prev_timeout_s))
+    options(timeout = min_timeout_s)
+  }
+
+  download.file(...)
+}

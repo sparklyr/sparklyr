@@ -187,7 +187,7 @@ spark_install <- function(version = NULL,
       message(msg)
     }
 
-    status <- suppressWarnings(download.file(
+    status <- suppressWarnings(download_file(
       installInfo$packageRemotePath,
       destfile = installInfo$packageLocalPath,
       quiet = !verbose

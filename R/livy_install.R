@@ -117,7 +117,7 @@ livy_install <- function(version = "0.6.0",
     message("* Installing to:\n- ", shQuote(aliased_path(livy_path)))
   }
 
-  download.file(url, destfile = destfile)
+  download_file(url, destfile = destfile)
   if (!file.exists(destfile)) {
     stop("livy download failed")
   }
