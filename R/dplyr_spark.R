@@ -182,6 +182,7 @@ print.src_spark <- function(x, ...) {
 random_table_name <- random_string
 
 #' @export
+#' @importFrom dplyr compute
 compute.tbl_spark <- function(x, name = random_table_name(), ...) {
   # This only creates a view with the specified name in Spark. The view is not
   # cached yet.

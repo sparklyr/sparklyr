@@ -260,7 +260,7 @@ Finally, we disconnect from Spark:
 
 ## RStudio IDE
 
-The latest RStudio [Preview Release](https://rstudio.com/products/rstudio/download/preview/) of the RStudio IDE includes integrated support for Spark and the sparklyr package, including tools for:
+The latest RStudio [Preview Release](https://www.rstudio.com/products/rstudio/download/preview/) of the RStudio IDE includes integrated support for Spark and the sparklyr package, including tools for:
 
 - Creating and managing Spark connections
 - Browsing the tables and columns of Spark DataFrames
@@ -280,7 +280,7 @@ You can also connect to Spark through [Livy](http://livy.io) through a new conne
 
 <div style="margin-bottom: 15px;"></div>
 
-The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://rstudio.com/products/rstudio/download/preview/).
+The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
 
 ## Using H2O
 
