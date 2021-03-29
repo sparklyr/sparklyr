@@ -120,7 +120,6 @@ Suggests:
     shiny (>= 1.0.1),
     testthat
 Encoding: UTF-8
-LazyData: TRUE
 RoxygenNote: 7.1.1
 SystemRequirements: Spark: 1.6.x, 2.x, or 3.x
 Collate:
