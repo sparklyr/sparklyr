@@ -17,6 +17,6 @@ Path to SPARK_HOME (or \code{NULL} if the specified version
 }
 \description{
 Find the SPARK_HOME directory for a given version of Spark that
-was previously installed using \code{\link{spark_install}}.
+was previously installed using \code{\link[=spark_install]{spark_install}}.
 }
 \keyword{internal}
