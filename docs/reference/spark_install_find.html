@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Find the SPARK_HOME directory for a version of Spark — spark_home_dir • sparklyr</title>
+<title>Find a given Spark installation by version. — spark_install_find • sparklyr</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="Find the SPARK_HOME directory for a version of Spark — spark_home_dir" />
-<meta property="og:description" content="Find the SPARK_HOME directory for a given version of Spark that
-was previously installed using spark_install." />
+<meta property="og:title" content="Find a given Spark installation by version. — spark_install_find" />
+<meta property="og:description" content="Find a given Spark installation by version." />
 
 
 
@@ -112,35 +111,48 @@ was previously installed using spark_install." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Find the SPARK_HOME directory for a version of Spark</h1>
-    <small class="dont-index">Source: <a href='https://github.com/sparklyr/sparklyr/blob/master/R/spark_home.R'><code>R/spark_home.R</code></a></small>
-    <div class="hidden name"><code>spark_home_dir.Rd</code></div>
+    <h1>Find a given Spark installation by version.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sparklyr/sparklyr/blob/master/R/install_spark.R'><code>R/install_spark.R</code></a></small>
+    <div class="hidden name"><code>spark_install_find.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Find the SPARK_HOME directory for a given version of Spark that
-was previously installed using <code><a href='spark_install.html'>spark_install</a></code>.</p>
+    <p>Find a given Spark installation by version.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>spark_home_dir</span><span class='op'>(</span>version <span class='op'>=</span> <span class='cn'>NULL</span>, hadoop_version <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>spark_install_find</span><span class='op'>(</span>
+  version <span class='op'>=</span> <span class='cn'>NULL</span>,
+  hadoop_version <span class='op'>=</span> <span class='cn'>NULL</span>,
+  installed_only <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  latest <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  hint <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>version</th>
-      <td><p>Version of Spark</p></td>
+      <td><p>Version of Spark to install. See <code>spark_available_versions</code> for a list of supported versions</p></td>
     </tr>
     <tr>
       <th>hadoop_version</th>
-      <td><p>Version of Hadoop</p></td>
+      <td><p>Version of Hadoop to install. See <code>spark_available_versions</code> for a list of supported versions</p></td>
+    </tr>
+    <tr>
+      <th>installed_only</th>
+      <td><p>Search only the locally installed versions?</p></td>
+    </tr>
+    <tr>
+      <th>latest</th>
+      <td><p>Check for latest version?</p></td>
+    </tr>
+    <tr>
+      <th>hint</th>
+      <td><p>On failure should the installation code be provided?</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Path to SPARK_HOME (or <code>NULL</code> if the specified version
-  was not found).</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

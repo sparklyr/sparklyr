@@ -43,7 +43,7 @@ spark_submit(
 \arguments{
 \item{master}{Spark cluster url to connect to. Use \code{"local"} to
 connect to a local instance of Spark installed via
-\code{\link{spark_install}}.}
+\code{\link[=spark_install]{spark_install}}.}
 
 \item{spark_home}{The path to a Spark installation. Defaults to the path
 provided by the \code{SPARK_HOME} environment variable. If

@@ -1,7 +1,7 @@
 #' Find the SPARK_HOME directory for a version of Spark
 #'
 #' Find the SPARK_HOME directory for a given version of Spark that
-#' was previously installed using \code{\link{spark_install}}.
+#' was previously installed using \code{\link[=spark_install]{spark_install}}.
 #'
 #' @param version Version of Spark
 #' @param hadoop_version Version of Hadoop
