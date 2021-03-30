@@ -30,7 +30,7 @@ test_that("ml_lda() param setting", {
 
 test_that("ml_lda() works properly", {
   sc <- testthat_spark_connection()
-  sample_data_path <- get_sample_data_path("sample_lda_libsvm_data.txt")
+  sample_data_path <- get_test_data_path("sample_lda_libsvm_data.txt")
   sample_data <- spark_read_libsvm(sc, "sample_data",
     sample_data_path,
     overwrite = TRUE

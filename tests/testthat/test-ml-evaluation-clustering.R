@@ -4,7 +4,7 @@ skip_databricks_connect()
 test_that("ml_clustering_evaluator() works", {
   test_requires_version("2.3.0", "ml clustering evaluator requires spark 2.3+")
   sc <- testthat_spark_connection()
-  sample_data_path <- get_sample_data_path("sample_kmeans_data.txt")
+  sample_data_path <- get_test_data_path("sample_kmeans_data.txt")
   sample_data <- spark_read_libsvm(sc, "sample_data",
     sample_data_path,
     overwrite = TRUE

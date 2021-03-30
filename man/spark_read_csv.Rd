@@ -91,6 +91,7 @@ Other Spark serialization routines:
 \code{\link{collect_from_rds}()},
 \code{\link{spark_load_table}()},
 \code{\link{spark_read_avro}()},
+\code{\link{spark_read_binary}()},
 \code{\link{spark_read_delta}()},
 \code{\link{spark_read_jdbc}()},
 \code{\link{spark_read_json}()},

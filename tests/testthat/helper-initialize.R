@@ -437,14 +437,14 @@ random_table_name <- function(prefix) {
   paste0(prefix, paste0(floor(runif(10, 0, 10)), collapse = ""))
 }
 
-get_sample_data_path <- function(file_name) {
+get_test_data_path <- function(file_name) {
   if (Sys.getenv("TEST_DATABRICKS_CONNECT") == "true") {
-    sample_data_path <- paste0(Sys.getenv("DBFS_DATA_PATH"), "/", file_name)
+    test_data_path <- paste0(Sys.getenv("DBFS_DATA_PATH"), "/", file_name)
   } else {
-    sample_data_path <- file.path(normalizePath(getwd()), "data", file_name)
+    test_data_path <- file.path(normalizePath(getwd()), "data", file_name)
   }
 
-  sample_data_path
+  test_data_path
 }
 
 # Helper method to launch a local proxy listening on `proxy_port` and forwarding

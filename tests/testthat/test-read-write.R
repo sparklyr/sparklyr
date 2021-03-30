@@ -9,7 +9,7 @@ test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
   }
   skip_databricks_connect()
 
-  csvPath <- get_sample_data_path(
+  csvPath <- get_test_data_path(
     "spark-read-csv-column-containing-non-ascii.csv"
   )
   df <- spark_read_csv(sc,
@@ -24,7 +24,7 @@ test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
 })
 
 test_that("spark_read_json() can load data using column names", {
-  jsonPath <- get_sample_data_path(
+  jsonPath <- get_test_data_path(
     "spark-read-json-can-load-data-using-column-names.json"
   )
   df <- spark_read_json(
@@ -40,7 +40,7 @@ test_that("spark_read_json() can load data using column names", {
 test_that("spark_read_json() can load data using column types", {
   test_requires("dplyr")
 
-  jsonPath <- get_sample_data_path(
+  jsonPath <- get_test_data_path(
     "spark-read-json-can-load-data-using-column-types.json"
   )
   df <- spark_read_json(
@@ -56,7 +56,7 @@ test_that("spark_read_json() can load data using column types", {
 })
 
 test_that("spark_read_json() can load nested structs using column types", {
-  jsonPath <- get_sample_data_path(
+  jsonPath <- get_test_data_path(
     "spark-read-json-can-load-nested-structs-using-column-types.json"
   )
   columns <- list(
@@ -103,7 +103,7 @@ test_that("spark_read_json() can load nested structs using column types", {
 })
 
 test_that("spark_read_csv() can read long decimals", {
-  csvPath <- get_sample_data_path(
+  csvPath <- get_test_data_path(
     "spark-read-csv-can-read-long-decimals.csv"
   )
   df <- spark_read_csv(
@@ -183,7 +183,7 @@ test_that("spark_write_table() can write data", {
 })
 
 test_that("spark_read_csv() can rename columns", {
-  csvPath <- get_sample_data_path(
+  csvPath <- get_test_data_path(
     "spark-read-csv-can-rename-columns.csv"
   )
   df <- spark_read_csv(
@@ -203,7 +203,7 @@ test_that("spark_read_text() can read a whole file", {
   whole_tbl <- spark_read_text(
     sc,
     "whole",
-    get_sample_data_path("spark-read-text-can-read-a-whole-file.txt"),
+    get_test_data_path("spark-read-text-can-read-a-whole-file.txt"),
     overwrite = T,
     whole = TRUE
   )
@@ -217,7 +217,7 @@ test_that("spark_read_text() can read a whole file", {
 test_that("spark_read_csv() can read with no name", {
   test_requires("dplyr")
 
-  csvPath <- get_sample_data_path(
+  csvPath <- get_test_data_path(
     "spark-read-csv-can-read-with-no-name.txt"
   )
   expect_equal(colnames(spark_read_csv(sc, csvPath)), "a")
@@ -228,7 +228,7 @@ test_that("spark_read_csv() can read with no name", {
 test_that("spark_read_csv() can read with named character name", {
   test_requires("dplyr")
 
-  csvPath <- get_sample_data_path(
+  csvPath <- get_test_data_path(
     "spark-read-csv-can-read-with-named-character-name.txt"
   )
 
@@ -238,7 +238,7 @@ test_that("spark_read_csv() can read with named character name", {
 
 
 test_that("spark_read_csv() can read column types", {
-  csvPath <- get_sample_data_path(
+  csvPath <- get_test_data_path(
     "spark-read-csv-can-read-column-types.txt"
   )
   df_schema <- spark_read_csv(
@@ -260,7 +260,7 @@ test_that("spark_read_csv() can read column types", {
 })
 
 test_that("spark_read_csv() can read verbatim column types", {
-  csvPath <- get_sample_data_path(
+  csvPath <- get_test_data_path(
     "spark-read-csv-can-read-verbatim-column-types.csv"
   )
   df_schema <- spark_read_csv(
@@ -284,7 +284,7 @@ test_that("spark_read_csv() can read verbatim column types", {
 test_that("spark_read_csv() can read if embedded nuls present", {
   skip_on_arrow() # ARROW-6582
 
-  fpath <- get_sample_data_path("with_embedded_nul.csv")
+  fpath <- get_test_data_path("with_embedded_nul.csv")
   df <- spark_read_csv(sc, name = "test_embedded_nul", path = fpath)
   expect_equivalent(
     suppressWarnings(df %>% collect()),
@@ -406,7 +406,7 @@ test_that("spark_read_avro() works as expected", {
   for (avro_schema in list(NULL, test_avro_schema)) {
     actual <- spark_read_avro(
       sc,
-      path = get_sample_data_path("test_spark_read.avro"),
+      path = get_test_data_path("test_spark_read.avro"),
       avro_schema = avro_schema
     ) %>%
       sdf_collect()
@@ -478,6 +478,121 @@ test_that("spark read/write methods avoid name collision on identical file names
   }
 })
 
-teardown({
-  db_drop_table(iris_table_name)
+test_that("spark_read_binary can process input directory without partition specs", {
+  test_requires_version("3.0.0")
+
+  dir <- get_test_data_path("test_spark_read_binary")
+  sdf <- spark_read_binary(sc, dir = dir, name = random_string()) %>%
+    dplyr::arrange(path)
+  df <- sdf %>% collect()
+
+  expect_equal(colnames(df), c("path", "modificationTime", "length", "content"))
+  expect_equivalent(
+    df %>% dplyr::select(path, length, content),
+    tibble::tribble(
+      ~path,                                         ~length,          ~content,
+      paste0("file:", file.path(dir, "file0.dat")),        4, charToRaw("1234"),
+      paste0("file:", file.path(dir, "file1.dat")),        4, charToRaw("5678"),
+      paste0("file:", file.path(dir, "file2.dat")),        4, charToRaw("abcd"),
+      paste0("file:", file.path(dir, "file3.ascii")),      4, charToRaw("efgh"),
+    )
+  )
+})
+
+test_that("spark_read_binary can process input directory with flat partition specs", {
+  test_requires_version("3.0.0")
+
+  dir <- get_test_data_path("test_spark_read_binary_with_flat_partition_specs")
+  sdf <- spark_read_binary(sc, dir = dir, name = random_string()) %>%
+    dplyr::arrange(partition, path)
+  df <- sdf %>% collect()
+
+  expect_equal(
+    colnames(df),
+    c("path", "modificationTime", "length", "content", "partition")
+  )
+  expect_equivalent(
+    df %>% dplyr::select(path, length, content, partition),
+    tibble::tribble(
+      ~path,                                                       ~length,          ~content, ~partition,
+      paste0("file:", file.path(dir, "partition=0", "file0.dat")),       4, charToRaw("1234"),         0L,
+      paste0("file:", file.path(dir, "partition=1", "file1.dat")),       4, charToRaw("5678"),         1L,
+      paste0("file:", file.path(dir, "partition=2", "file2.dat")),       4, charToRaw("abcd"),         2L,
+      paste0("file:", file.path(dir, "partition=2", "file3.dat")),       4, charToRaw("efgh"),         2L,
+    )
+  )
+})
+
+test_that("spark_read_binary can process input directory with nested partition specs", {
+  test_requires_version("3.0.0")
+
+  dir <- get_test_data_path(
+    "test_spark_read_binary_with_nested_partition_specs"
+  )
+  sdf <- spark_read_binary(sc, dir = dir, name = random_string()) %>%
+    dplyr::arrange(a, b)
+  df <- sdf %>% collect()
+
+  expect_equal(
+    colnames(df),
+    c("path", "modificationTime", "length", "content", "a", "b")
+  )
+  expect_equivalent(
+    df %>% dplyr::select(path, length, content, a, b),
+    tibble::tribble(
+      ~path,                                                       ~length,          ~content, ~a, ~b,
+      paste0("file:", file.path(dir, "a=0", "b=0" , "file0.dat")),       4, charToRaw("1234"), 0L, 0L,
+      paste0("file:", file.path(dir, "a=0", "b=1" , "file2.dat")),       4, charToRaw("abcd"), 0L, 1L,
+      paste0("file:", file.path(dir, "a=1", "b=0" , "file1.dat")),       4, charToRaw("5678"), 1L, 0L,
+      paste0("file:", file.path(dir, "a=1", "b=1" , "file3.dat")),       4, charToRaw("efgh"), 1L, 1L,
+    )
+  )
+})
+
+test_that("spark_read_binary can support 'pathGlobFilter' option correctly", {
+  test_requires_version("3.0.0")
+
+  dir <- get_test_data_path("test_spark_read_binary")
+  sdf <- spark_read_binary(
+    sc, dir = dir, name = random_string(), path_glob_filter = "*.dat"
+  ) %>%
+    dplyr::arrange(path)
+  df <- sdf %>% collect()
+
+  expect_equal(
+    colnames(df),
+    c("path", "modificationTime", "length", "content")
+  )
+  expect_equivalent(
+    df %>% dplyr::select(path, length, content),
+    tibble::tribble(
+      ~path,                                        ~length,          ~content,
+      paste0("file:", file.path(dir, "file0.dat")),       4, charToRaw("1234"),
+      paste0("file:", file.path(dir, "file1.dat")),       4, charToRaw("5678"),
+      paste0("file:", file.path(dir, "file2.dat")),       4, charToRaw("abcd"),
+    )
+  )
+})
+
+test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
+  test_requires_version("3.0.0")
+
+  dir <- get_test_data_path("test_spark_read_binary_recursive_file_lookup")
+  sdf <- spark_read_binary(
+    sc, dir = dir, name = random_string(), recursive_file_lookup = TRUE
+  ) %>%
+    dplyr::arrange(path)
+  df <- sdf %>% collect()
+
+  expect_equal(colnames(df), c("path", "modificationTime", "length", "content"))
+  expect_equivalent(
+    df %>% dplyr::select(path, length, content),
+    tibble::tribble(
+      ~path,                                                      ~length,          ~content,
+      paste0("file:", file.path(dir, "a=0", "b=0", "file0.dat")),       4, charToRaw("1234"),
+      paste0("file:", file.path(dir, "a=1", "b=0", "file1.dat")),       4, charToRaw("5678"),
+      paste0("file:", file.path(dir, "b=1", "file3.dat")),              4, charToRaw("efgh"),
+      paste0("file:", file.path(dir, "file2.dat")),                     4, charToRaw("abcd"),
+    )
+  )
 })
