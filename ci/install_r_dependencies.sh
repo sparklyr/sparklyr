@@ -14,6 +14,7 @@ TEST_DEPS="broom \
            mlbench \
            nnet \
            nycflights13 \
+           qs \
            R6 \
            RCurl \
            reshape2 \

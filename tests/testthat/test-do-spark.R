@@ -2,7 +2,6 @@ context("do-spark")
 
 test_requires("foreach")
 test_requires("iterators")
-test_requires("base64enc")
 
 register_test_spark_connection <- function() {
   sc <- testthat_spark_connection()
@@ -102,4 +101,28 @@ test_that("doSpark works for loop referencing external functions and variables",
     n * seq(5)
   )
   foreach(x = 1:20, .combine = list) %test% quote(fn_2(list(x, y, z, fn_3(x)(y), fn_4(x))))
+})
+
+test_that("doSpark works with 'qs' serializer", {
+  test_requires("qs")
+
+  options(sparklyr.do_spark.serializer = "qs")
+  on.exit(options(sparklyr.do_spark.serializer = NULL))
+  foreach(x = .test_objs) %test% quote(x)
+})
+
+test_that("doSpark works with custom serializer", {
+  test_requires("qs")
+
+  options(sparklyr.do_spark.serializer = function(x) qs::qserialize(x, preset = "fast"))
+  options(sparklyr.do_spark.deserializer = function(x) qs::qdeserialize(x))
+  on.exit({
+    options(sparklyr.do_spark.serializer = NULL)
+    options(sparklyr.do_spark.deserializer = NULL)
+  })
+  foreach(x = .test_objs) %test% quote(x)
+})
+
+test_that("doSpark works with 'qs' serializer", {
+  foreach(x = .test_objs) %test% quote(x)
 })
