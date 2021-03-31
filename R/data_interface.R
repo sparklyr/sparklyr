@@ -642,11 +642,12 @@ spark_read_libsvm <- function(sc,
                               repartition = 0,
                               memory = TRUE,
                               overwrite = TRUE,
+                              options = list(),
                               ...) {
   c(name, path) %<-% spark_read_compat_param(sc, name, path)
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
-  df <- spark_data_read_generic(sc, "libsvm", "format") %>%
+  df <- spark_data_read_generic(sc, "libsvm", "format", options) %>%
     invoke("load", spark_normalize_path(path))
   spark_partition_register_df(sc, df, name, repartition, memory)
 }

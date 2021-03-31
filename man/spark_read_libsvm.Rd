@@ -11,6 +11,7 @@ spark_read_libsvm(
   repartition = 0,
   memory = TRUE,
   overwrite = TRUE,
+  options = list(),
   ...
 )
 }
@@ -30,6 +31,8 @@ is, should the table be cached?)}
 
 \item{overwrite}{Boolean; overwrite the table with the given name if it
 already exists?}
+
+\item{options}{A list of strings with additional options.}
 
 \item{...}{Optional arguments; currently unused.}
 }
