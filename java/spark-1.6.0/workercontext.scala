@@ -19,7 +19,9 @@ class WorkerContext(
   schema: StructType,
   options: Map[String, String],
   barrier: Map[String, Any],
-  partitionIndex: Int) {
+  partitionIndex: Int,
+  deserializer: Array[Byte]
+) {
 
   private var result: Array[Row] = Array[Row]()
   private var sourceArray: Option[Array[Row]] = None
@@ -74,6 +76,10 @@ class WorkerContext(
 
   def getResultArray(): Array[Row] = {
     result
+  }
+
+  def getDeserializer(): Array[Byte] = {
+    deserializer
   }
 
   def finish(): Unit = {

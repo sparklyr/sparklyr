@@ -1441,8 +1441,9 @@ spark_worker_apply_arrow <- function(sc, config) {
   context <- spark_worker_context(sc)
   spark_worker_init_packages(sc, context)
 
-  closure <- unserialize(worker_invoke(context, "getClosure"))
-  funcContext <- unserialize(worker_invoke(context, "getContext"))
+  deserialize_impl <- spark_worker_get_deserializer(sc)
+  closure <- deserialize_impl(worker_invoke(context, "getClosure"))
+  funcContext <- deserialize_impl(worker_invoke(context, "getContext"))
   grouped_by <- worker_invoke(context, "getGroupBy")
   grouped <- !is.null(grouped_by) && length(grouped_by) > 0
   columnNames <- worker_invoke(context, "getColumns")
@@ -1543,6 +1544,10 @@ spark_worker_apply_arrow <- function(sc, config) {
   worker_log("finished apply")
 }
 
+spark_worker_get_deserializer <- function(sc) {
+  unserialize(worker_invoke(spark_worker_context(sc), "getDeserializer"))
+}
+
 spark_worker_apply <- function(sc, config) {
   context <- spark_worker_context(sc)
   spark_worker_init_packages(sc, context)
@@ -1557,11 +1562,13 @@ spark_worker_apply <- function(sc, config) {
   groups <- worker_invoke(context, if (grouped) "getSourceArrayGroupedSeq" else "getSourceArraySeq")
   worker_log("retrieved ", length(groups), " rows")
 
+  deserialize_impl <- spark_worker_get_deserializer(sc)
+
   closureRaw <- worker_invoke(context, "getClosure")
-  closure <- unserialize(closureRaw)
+  closure <- deserialize_impl(closureRaw)
 
   funcContextRaw <- worker_invoke(context, "getContext")
-  funcContext <- unserialize(funcContextRaw)
+  funcContext <- deserialize_impl(funcContextRaw)
 
   closureRLangRaw <- worker_invoke(context, "getClosureRLang")
   if (length(closureRLangRaw) > 0) {

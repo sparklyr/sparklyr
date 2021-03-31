@@ -1236,12 +1236,14 @@ spark_read <- function(sc,
   )
 
   if (is.language(reader)) f <- rlang::as_closure(reader)
-  reader <- serialize(reader, NULL)
+  serialize_impl <- spark_apply_serializer()
+  deserialize_impl <- spark_apply_deserializer()
+  reader <- serialize_impl(reader)
   worker_impl <- function(df, rdr) {
-    rdr <- unserialize(rdr)
+    rdr <- deserialize_impl(rdr)
     do.call(rbind, lapply(df$path, function(path) rdr(path)))
   }
-  worker_impl <- serialize(worker_impl, NULL)
+  worker_impl <- serialize_impl(worker_impl)
 
   worker_port <- as.integer(
     spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
@@ -1252,8 +1254,8 @@ spark_read <- function(sc,
 
   bundle_path <- get_spark_apply_bundle_path(sc, packages)
 
-  serialized_worker_context <- serialize(
-    list(column_types = list("character"), user_context = reader), NULL
+  serialized_worker_context <- serialize_impl(
+    list(column_types = list("character"), user_context = reader)
   )
 
   rdd <- invoke_static(
@@ -1275,7 +1277,8 @@ spark_read <- function(sc,
     new.env(),
     as.integer(60),
     serialized_worker_context,
-    new.env()
+    new.env(),
+    serialize(deserialize_impl, NULL)
   )
   rdd <- invoke(rdd, "cache")
   schema <- spark_schema_from_rdd(sc, rdd, columns)

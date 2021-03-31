@@ -20,7 +20,8 @@ object WorkerHelper {
     customEnv: Map[_, _],
     connectionTimeout: Int,
     context: Array[Byte],
-    options: Map[_, _]
+    options: Map[_, _],
+    deserializer: Array[Byte]
   ): RDD[Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
@@ -51,7 +52,9 @@ object WorkerHelper {
       customEnvImmMap,
       connectionTimeout,
       sparkContext.broadcast(context),
-      optionsImmMap)
+      optionsImmMap,
+      sparkContext.broadcast(deserializer)
+    )
 
     computed
   }
