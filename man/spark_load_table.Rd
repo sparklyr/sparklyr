@@ -40,6 +40,7 @@ Reads from a Spark Table into a Spark DataFrame.
 Other Spark serialization routines: 
 \code{\link{collect_from_rds}()},
 \code{\link{spark_read_avro}()},
+\code{\link{spark_read_binary}()},
 \code{\link{spark_read_csv}()},
 \code{\link{spark_read_delta}()},
 \code{\link{spark_read_jdbc}()},

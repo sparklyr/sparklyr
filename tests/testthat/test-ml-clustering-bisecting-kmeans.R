@@ -23,7 +23,7 @@ test_that("ml_bisecting_kmeans() param setting", {
 test_that("ml_bisecting_kmeans() works properly", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "bisecting kmeans support")
-  sample_data_path <- get_sample_data_path("sample_libsvm_data.txt")
+  sample_data_path <- get_test_data_path("sample_libsvm_data.txt")
 
   sample_data <- spark_read_libsvm(sc, "sample_data",
     sample_data_path,

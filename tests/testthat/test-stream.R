@@ -105,7 +105,7 @@ test_stream("stream can read and write from orc", {
 test_stream("stream_lag() works as expected", {
   test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
 
-  weekdays_sdf <- stream_read_csv(sc, get_sample_data_path("weekdays"))
+  weekdays_sdf <- stream_read_csv(sc, get_test_data_path("weekdays"))
   expect_true(weekdays_sdf %>% sdf_is_streaming())
 
   expected <- tibble::tribble(
@@ -140,7 +140,7 @@ test_stream("stream_lag() works as expected", {
     )
   expect_true(output_sdf %>% sdf_is_streaming())
   expect_equivalent(output_sdf %>% collect(), expected)
-  weekdays_sdf <- stream_read_csv(sc, get_sample_data_path("weekdays")) %>%
+  weekdays_sdf <- stream_read_csv(sc, get_test_data_path("weekdays")) %>%
     dplyr::mutate(x = dplyr::sql("CAST (`x` AS TIMESTAMP)"))
   expect_true(weekdays_sdf %>% sdf_is_streaming())
   output_sdf <- weekdays_sdf %>%

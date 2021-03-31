@@ -26,7 +26,6 @@ reference:
     - spark_dependency_fallback
     - spark_extension
     - spark_load_table
-    - spark_read_libsvm
     - list_sparklyr_jars
     - spark_config_packages
     - spark_connection
@@ -42,10 +41,12 @@ reference:
     contents:
     - spark_read
     - spark_read_avro
+    - spark_read_binary
     - spark_read_csv
     - spark_read_delta
     - spark_read_jdbc
     - spark_read_json
+    - spark_read_libsvm
     - spark_read_parquet
     - spark_read_source
     - spark_read_table

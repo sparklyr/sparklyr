@@ -1114,6 +1114,59 @@ spark_write_avro <- function(x,
   )
 }
 
+#' Read binary data data into a Spark DataFrame.
+#'
+#' Read binary files within a directory and convert each file into a record
+#' within the resulting Spark dataframe. The output will be a Spark dataframe
+#' with the following columns and possibly partition columns:
+#'   \itemize{
+#'     \item{path: StringType}
+#'     \item{modificationTime: TimestampType}
+#'     \item{length: LongType}
+#'     \item{content: BinaryType}
+#'  }
+#'
+#' @inheritParams spark_read_csv
+#' @param dir Directory to read binary files from.
+#' @param path_glob_filter Glob pattern of binary files to be loaded
+#'   (e.g., "*.jpg").
+#' @param recursive_file_lookup If FALSE (default), then partition discovery
+#'   will be enabled (i.e., if a partition naming scheme is present, then
+#'   partitions specified by subdirectory names such as "date=2019-07-01" will
+#'   be created and files outside subdirectories following a partition naming
+#'   scheme will be ignored). If TRUE, then all nested directories will be
+#'   searched even if their names do not follow a partition naming scheme.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_binary <- function(sc,
+                              name = NULL,
+                              dir = name,
+                              path_glob_filter = "*",
+                              recursive_file_lookup = FALSE,
+                              repartition = 0,
+                              memory = TRUE,
+                              overwrite = TRUE) {
+  if (spark_version(sc) < "3.0.0") {
+    stop("Binary file data source is only supported in Spark 3.0 or above.")
+  }
+
+  spark_read_source(
+    sc,
+    name = name,
+    path = dir,
+    source = "binaryFile",
+    options = list(
+      pathGlobFilter = path_glob_filter,
+      recursiveFileLookup = tolower(as.character(recursive_file_lookup))
+    ),
+    repartition = repartition,
+    memory = memory,
+    overwrite = overwrite
+  )
+}
+
 #' Read file(s) into a Spark DataFrame using a custom reader
 #'
 #' Run a custom R function on Spark workers to ingest data from one or more files
