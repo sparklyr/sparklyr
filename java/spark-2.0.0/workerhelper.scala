@@ -39,19 +39,20 @@ object WorkerHelper {
 
     val customEnvImmMap = (Map() ++ customEnvMap).toMap
     val optionsImmMap = (Map() ++ optionsMap).toMap
+    val sparkContext = rdd.context
 
     val computed: RDD[Row] = new WorkerRDD(
       rdd,
-      closure,
+      sparkContext.broadcast(closure),
       columns,
       config,
       port,
       groupBy,
-      closureRLang,
+      sparkContext.broadcast(closureRLang),
       bundlePath,
       customEnvImmMap,
       connectionTimeout,
-      context,
+      sparkContext.broadcast(context),
       optionsImmMap)
 
     computed
@@ -93,18 +94,23 @@ object WorkerHelper {
     val encoder = RowEncoder(schema)
     var sourceSchema = sdf.schema
 
+    val sparkContext = sdf.sparkSession.sparkContext
+    val closureBV = sparkContext.broadcast(closure)
+    val closureRLangBV = sparkContext.broadcast(closureRLang)
+    val contextBV = sparkContext.broadcast(context)
+
     sdf.mapPartitions(rows => {
       val workerApply: WorkerApply = new WorkerApply(
-        closure,
+        closureBV,
         columns,
         config,
         port,
         groupBy,
-        closureRLang,
+        closureRLangBV,
         bundlePath,
         customEnvImmMap,
         connectionTimeout,
-        context,
+        contextBV,
         optionsImmMap,
         timeZoneId,
         sourceSchema,

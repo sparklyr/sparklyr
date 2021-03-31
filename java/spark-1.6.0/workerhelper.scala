@@ -37,19 +37,20 @@ object WorkerHelper {
 
     val customEnvImmMap = (Map() ++ customEnvMap).toMap
     val optionsImmMap = (Map() ++ optionsMap).toMap
+    val sparkContext = rdd.context
 
     val computed: RDD[Row] = new WorkerRDD(
       rdd,
-      closure,
+      sparkContext.broadcast(closure),
       columns,
       config,
       port,
       groupBy,
-      closureRLang,
+      sparkContext.broadcast(closureRLang),
       bundlePath,
       customEnvImmMap,
       connectionTimeout,
-      context,
+      sparkContext.broadcast(context),
       optionsImmMap)
 
     computed
