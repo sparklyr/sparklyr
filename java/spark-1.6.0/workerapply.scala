@@ -3,27 +3,28 @@ package sparklyr
 import java.io.{File, FileWriter}
 
 import org.apache.spark._
+import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.StructType
 
 import scala.util.Random
 
 class WorkerApply(
-  closure: Array[Byte],
+  closure: Broadcast[Array[Byte]],
   columns: Array[String],
   config: String,
   port: Int,
   groupBy: Array[String],
-  closureRLang: Array[Byte],
+  closureRLang: Broadcast[Array[Byte]],
   bundlePath: String,
   customEnv: Map[String, String],
   connectionTimeout: Int,
-  context: Array[Byte],
+  context: Broadcast[Array[Byte]],
   options: Map[String, String],
   timeZoneId: String,
   schema: StructType,
-  genBarrierMap: () => Map[String, Any],
-  genPartitionIndex: () => Int
+  barrierMapProvider: () => Map[String, Any],
+  partitionIndexProvider: () => Int
   ) extends java.io.Serializable {
 
   private[this] var exception: Option[Exception] = None
@@ -53,17 +54,17 @@ class WorkerApply(
     val workerContext = new WorkerContext(
       iterator,
       lock,
-      closure,
+      closure.value,
       columns,
       groupBy,
-      closureRLang,
+      closureRLang.value,
       bundlePath,
-      context,
+      context.value,
       timeZoneId,
       schema,
       options,
-      genBarrierMap(),
-      genPartitionIndex()
+      barrierMapProvider(),
+      partitionIndexProvider()
     )
 
     val tracker = new JVMObjectTracker()
