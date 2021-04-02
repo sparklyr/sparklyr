@@ -18,8 +18,9 @@ class WorkerRDD(
   customEnv: Map[String, String],
   connectionTimeout: Int,
   context: Broadcast[Array[Byte]],
-  options: Map[String, String]
-  ) extends RDD[Row](prev) {
+  options: Map[String, String],
+  deserializer: Broadcast[Array[Byte]]
+) extends RDD[Row](prev) {
 
   override def getPartitions = firstParent.partitions
 
@@ -40,7 +41,8 @@ class WorkerRDD(
       timeZoneId = "",
       schema = StructType(Nil),
       barrierMapProvider = () => Map(),
-      partitionIndexProvider = () => { split.index }
+      partitionIndexProvider = () => { split.index },
+      deserializer = deserializer
     )
 
     return workerApply.apply(firstParent.iterator(split, task))

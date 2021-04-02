@@ -12,19 +12,20 @@ import scala.collection.JavaConversions._
 
 object RDDBarrier {
   def transformBarrier(
-      rdd: RDD[Row],
-      closure: Array[Byte],
-      columns: Array[String],
-      config: String,
-      port: Int,
-      groupBy: Array[String],
-      closureRLang: Array[Byte],
-      bundlePath: String,
-      connectionTimeout: Int,
-      customEnv: Map[Object, Object],
-      context: Array[Byte],
-      options: Map[Object, Object]
-      ): RDD[Row] = {
+    rdd: RDD[Row],
+    closure: Array[Byte],
+    columns: Array[String],
+    config: String,
+    port: Int,
+    groupBy: Array[String],
+    closureRLang: Array[Byte],
+    bundlePath: String,
+    connectionTimeout: Int,
+    customEnv: Map[Object, Object],
+    context: Array[Byte],
+    options: Map[Object, Object],
+    deserializer: Array[Byte]
+  ): RDD[Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
     customEnv.foreach(kv => customEnvMap.put(
@@ -53,7 +54,9 @@ object RDDBarrier {
       customEnvImmMap,
       connectionTimeout,
       sparkContext.broadcast(context),
-      optionsImmMap)
+      optionsImmMap,
+      sparkContext.broadcast(deserializer)
+    )
 
     rdd.barrier.mapPartitions(workerApply.apply)
   }
@@ -69,7 +72,9 @@ object RDDBarrier {
       customEnv: Map[String, String],
       connectionTimeout: Int,
       context: Broadcast[Array[Byte]],
-      options: Map[String, String]): sparklyr.WorkerApply = {
+      options: Map[String, String],
+      deserializer: Broadcast[Array[Byte]]
+  ): sparklyr.WorkerApply = {
     val workerApply: WorkerApply = new WorkerApply(
       closure = closure,
       columns = columns,
@@ -87,7 +92,8 @@ object RDDBarrier {
       barrierMapProvider = () => Map(
         "address" -> BarrierTaskContext.get().getTaskInfos().map(e => e.address),
         "partition" -> BarrierTaskContext.get().partitionId()),
-      partitionIndexProvider = () => { BarrierTaskContext.get().partitionId() }
+      partitionIndexProvider = () => { BarrierTaskContext.get().partitionId() },
+      deserializer = deserializer
     )
 
     workerApply

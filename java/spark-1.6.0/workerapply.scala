@@ -24,8 +24,9 @@ class WorkerApply(
   timeZoneId: String,
   schema: StructType,
   barrierMapProvider: () => Map[String, Any],
-  partitionIndexProvider: () => Int
-  ) extends java.io.Serializable {
+  partitionIndexProvider: () => Int,
+  deserializer: Broadcast[Array[Byte]]
+) extends java.io.Serializable {
 
   private[this] var exception: Option[Exception] = None
   private[this] var backendPort: Int = 0
@@ -64,7 +65,8 @@ class WorkerApply(
       schema,
       options,
       barrierMapProvider(),
-      partitionIndexProvider()
+      partitionIndexProvider(),
+      deserializer.value
     )
 
     val tracker = new JVMObjectTracker()

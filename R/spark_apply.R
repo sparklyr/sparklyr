@@ -255,13 +255,25 @@ spark_apply <- function(x,
     user_context = context
   )
 
+  rlang_serialize <- spark_apply_rlang_serialize()
+  create_rlang_closure <- (rlang && !is.null(rlang_serialize))
+
   # create closure for the given function
-  closure <- if (is.function(f)) suppressWarnings(serialize(f, NULL, version = serialize_version)) else f
-  context_serialize <- serialize(context, NULL)
+  serialize_impl <- spark_apply_serializer()
+  deserialize_impl <- spark_apply_deserializer()
+  closure <- (
+    if (create_rlang_closure) {
+      serialize_impl(NULL, version = serialize_version)
+    } else if (is.function(f)) {
+      suppressWarnings(serialize_impl(f, version = serialize_version))
+    } else {
+      f
+    }
+  )
+  context_serialize <- serialize_impl(context, NULL)
 
   # create rlang closure
-  rlang_serialize <- spark_apply_rlang_serialize()
-  closure_rlang <- if (rlang && !is.null(rlang_serialize)) rlang_serialize(f) else raw()
+  closure_rlang <- if (create_rlang_closure) rlang_serialize(f) else raw()
 
   # add debug connection message
   if (isTRUE(args$debug)) {
@@ -331,7 +343,8 @@ spark_apply <- function(x,
         as.integer(60),
         as.environment(proc_env),
         context_serialize,
-        as.environment(spark_apply_options)
+        as.environment(spark_apply_options),
+        serialize(deserialize_impl, NULL, version = serialize_version)
       )
     } else {
       rdd <- invoke_static(
@@ -356,7 +369,8 @@ spark_apply <- function(x,
         as.environment(proc_env),
         as.integer(60),
         context_serialize,
-        as.environment(spark_apply_options)
+        as.environment(spark_apply_options),
+        serialize(deserialize_impl, NULL, version = serialize_version)
       )
     }
 
@@ -405,7 +419,8 @@ spark_apply <- function(x,
         context_serialize,
         as.environment(spark_apply_options),
         spark_session(sc),
-        time_zone
+        time_zone,
+        serialize(deserialize_impl, NULL, version = serialize_version)
       )
 
       columns_query <- columns_op %>% sdf_collect()
@@ -452,7 +467,8 @@ spark_apply <- function(x,
       context_serialize,
       as.environment(spark_apply_options),
       spark_session(sc),
-      time_zone
+      time_zone,
+      serialize(deserialize_impl, NULL, version = serialize_version)
     )
 
     if (spark_version(sc) >= "2.4.0" && !is.na(json_cols) && length(json_cols) > 0) {
@@ -480,7 +496,7 @@ spark_apply <- function(x,
       sdf_collect(arrow = arrow) %>%
       (
         function(x) {
-          lapply(x$spark_apply_binary_result, function(res) unserialize(res[[1]]))
+          lapply(x$spark_apply_binary_result, function(res) deserialize_impl(res[[1]]))
         })
   } else {
     registered
@@ -494,6 +510,39 @@ spark_apply_rlang_serialize <- function() {
   } else {
     rlang_serialize
   }
+}
+
+spark_apply_serializer <- function() {
+  impl <- getOption("sparklyr.spark_apply.serializer")
+  if (identical(impl, "qs")) {
+    qserialize <- core_get_package_function("qs", "qserialize")
+    if (is.null(qserialize)) {
+      stop(
+        "Unable to locate qs::qserialize(). Please ensure 'qs' is installed."
+      )
+    }
+    impl <- function(x, ...) qserialize(x)
+  } else if (is.null(impl)) {
+    impl <- function(x, version = NULL) serialize(x, NULL, version = version)
+  }
+
+  impl
+}
+
+spark_apply_deserializer <- function() {
+  impl <- getOption("sparklyr.spark_apply.serializer")
+  if (identical(impl, "qs")) {
+    impl <- core_get_package_function("qs", "qdeserialize")
+    if (is.null(impl)) {
+      stop(
+        "Unable to locate qs::qdeserialize(). Please ensure 'qs' is installed."
+      )
+    }
+  } else if (is.null(impl)) {
+    impl <- unserialize
+  }
+
+  impl
 }
 
 #' Log Writer for Spark Apply

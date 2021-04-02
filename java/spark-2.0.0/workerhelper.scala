@@ -22,9 +22,9 @@ object WorkerHelper {
     customEnv: Map[_, _],
     connectionTimeout: Int,
     context: Array[Byte],
-    options: Map[_, _]
+    options: Map[_, _],
+    deserializer: Array[Byte]
   ): RDD[Row] = {
-
     var customEnvMap = scala.collection.mutable.Map[String, String]();
     customEnv.foreach(kv => customEnvMap.put(
       kv._1.asInstanceOf[String],
@@ -53,7 +53,9 @@ object WorkerHelper {
       customEnvImmMap,
       connectionTimeout,
       sparkContext.broadcast(context),
-      optionsImmMap)
+      optionsImmMap,
+      sparkContext.broadcast(deserializer)
+    )
 
     computed
   }
@@ -73,7 +75,8 @@ object WorkerHelper {
     context: Array[Byte],
     options: Map[_, _],
     sparkSession: SparkSession,
-    timeZoneId: String
+    timeZoneId: String,
+    deserializer: Array[Byte]
   ): Dataset[Row] = {
 
     var customEnvMap = scala.collection.mutable.Map[String, String]();
@@ -98,6 +101,7 @@ object WorkerHelper {
     val closureBV = sparkContext.broadcast(closure)
     val closureRLangBV = sparkContext.broadcast(closureRLang)
     val contextBV = sparkContext.broadcast(context)
+    val deserializerBV = sparkContext.broadcast(deserializer)
 
     sdf.mapPartitions(rows => {
       val workerApply: WorkerApply = new WorkerApply(
@@ -115,7 +119,8 @@ object WorkerHelper {
         timeZoneId,
         sourceSchema,
         () => Map(),
-        () => { TaskContext.getPartitionId() }
+        () => { TaskContext.getPartitionId() },
+        deserializerBV
       )
 
       workerApply.apply(rows)
