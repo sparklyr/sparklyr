@@ -40,55 +40,43 @@ spark_dataframe.spark_connection <- function(x, sql = NULL, ...) {
 sdf_schema <- function(x,
                        expand_nested_cols = FALSE,
                        expand_struct_cols = FALSE) {
-  x %>%
-    spark_dataframe() %>%
-    invoke("schema") %>%
-    struct_type_to_schema(
-      expand_nested_cols = expand_nested_cols,
-      expand_struct_cols = expand_struct_cols
-    )
-}
+  process_struct_type <- function(x) {
+    fields <- x$fields
+    fields_list <- lapply(
+      fields,
+      function(field) {
+        name <- field$name
+        type <- (
+          if ("fields" %in% names(field$dtype)) {
+            process_struct_type(field$dtype)
+          } else if ("elementType" %in% names(field$dtype)) {
+            dtype <- "array"
+            attributes(dtype)$element_type <- process_struct_type(field$dtype$elementType)
 
-is_struct_type <- function(data_type_obj) {
-  invoke(data_type_obj, "catalogString") %>%
-    grepl("^struct<.*>$", ., ignore.case = TRUE)
-}
-
-is_struct_type_arr <- function(data_type_obj) {
-  invoke(data_type_obj, "catalogString") %>%
-    grepl("^array<struct<.*>>$", ., ignore.case = TRUE)
-}
-
-struct_type_to_schema <- function(x, expand_nested_cols, expand_struct_cols) {
-  fields <- invoke(x, "fields")
-  fields_list <- lapply(fields, function(field) {
-    type <- {
-      data_type_obj <- invoke(field, "dataType")
-      if (expand_struct_cols && is_struct_type(data_type_obj)) {
-        struct_type_to_schema(
-          data_type_obj,
-          expand_nested_cols = expand_nested_cols,
-          expand_struct_cols = expand_struct_cols
-        )
-      } else if (expand_nested_cols && is_struct_type_arr(data_type_obj)) {
-        dtype <- "array"
-        attributes(dtype)$element_type <- struct_type_to_schema(
-          data_type_obj %>% invoke("elementType"),
-          expand_nested_cols = expand_nested_cols,
-          expand_struct_cols = expand_struct_cols
+            dtype
+          } else {
+            field$dtype$repr
+          }
         )
 
-        dtype
-      } else {
-        invoke(data_type_obj, "toString")
+        list(name = name, type = type)
       }
-    }
-    name <- invoke(field, "name")
-    list(name = name, type = type)
-  })
-  names(fields_list) <- unlist(lapply(fields_list, `[[`, "name"))
+    )
+    names(fields_list) <- unlist(lapply(fields_list, `[[`, "name"))
 
-  fields_list
+    fields_list
+  }
+
+  invoke_static(
+    spark_connection(x),
+    "sparklyr.SchemaUtils",
+    "sdfSchema",
+    spark_dataframe(x),
+    expand_nested_cols,
+    expand_struct_cols
+  ) %>%
+    jsonlite::fromJSON(simplifyDataFrame = FALSE, simplifyMatrix = FALSE) %>%
+    process_struct_type()
 }
 
 sdf_deserialize_column <- function(column, sc) {
