@@ -83,3 +83,40 @@ test_that("sdf_quantile() approximates weighted quantiles correctly", {
     }
   }
 })
+
+test_that("Can generate i.i.d samples from distributions correctly", {
+  sample_sz <- 5e6
+  num_partitions <- 100L
+  seed <- 142857L
+  probs <- seq(.1, .9, 0.1)
+  test_cases <- list(
+    list(fn = "rexp", args = list(rate = 2.5)),
+    list(fn = "rgamma", args = list(shape = 1.5, rate = 0.8)),
+    list(fn = "rlnorm", args = list(meanlog = 0.1, sdlog = 1.1)),
+    list(fn = "rnorm"),
+    list(fn = "rpois", args = list(lambda = 2.5)),
+    list(fn = "runif")
+  )
+
+  set.seed(seed)
+  for (t in test_cases) {
+    fn <- t$fn
+    args <- as.list(t$args)
+    sdf_fn <- getFromNamespace(paste0("sdf_", fn), "sparklyr")
+    stats_fn <- getFromNamespace(fn, "stats")
+    stats_fn_args <- list(n = sample_sz) %>% append(args)
+    sdf_fn_args <- list(sc, n = sample_sz) %>%
+      append(args) %>%
+      append(
+        list(num_partitions = num_partitions, seed = seed, output_col = "x")
+      )
+
+    expect_equal(
+      do.call(sdf_fn, sdf_fn_args) %>% dplyr::pull(x) %>% quantile(probs),
+      do.call(stats_fn, stats_fn_args) %>% quantile(probs),
+      tolerance = 1e-2,
+      scale = 1,
+      info = fn
+    )
+  }
+})

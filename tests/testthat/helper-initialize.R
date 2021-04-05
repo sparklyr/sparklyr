@@ -246,7 +246,12 @@ testthat_livy_connection <- function() {
       file.path(livy_conf_dir, "log4j.properties")
     )
     writeLines(
-      "client.connect.timeout=60s",
+      c(
+        "livy.rsc.rpc.server.address = localhost",
+        "livy.client.http.connection.timeout = 60s",
+        "livy.rsc.server.connect.timeout = 60s",
+        "livy.rsc.client.connect.timeout = 60s"
+      ),
       file.path(livy_conf_dir, "livy-client.conf")
     )
   }
