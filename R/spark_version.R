@@ -140,6 +140,17 @@ spark_version_latest <- function(version = NULL) {
   if (is.null(version)) {
     versions[length(versions)]
   } else {
-    max(versions[grepl(version, versions, fixed = TRUE)])
+    # suppress 'no non-missing arguments, returning NA' warnings (handled below)
+    version <- suppressWarnings(
+      max(versions[grepl(version, versions, fixed = TRUE)])
+    )
+
+    if (is.na(version)) {
+      # If the user-supplied version does not match any of the known version numbers,
+      # then return the highest Spark version we know so far.
+      versions[length(versions)]
+    } else {
+      version
+    }
   }
 }
