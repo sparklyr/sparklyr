@@ -4,6 +4,9 @@ if (identical(Sys.getenv("DBPLYR_API_EDITION"), "1")) {
   options(sparklyr.dbplyr.edition = 1L)
 }
 
+# timeout for downloading Spark/Livy releases
+options(timeout = 3600)
+
 library(testthat)
 library(sparklyr)
 

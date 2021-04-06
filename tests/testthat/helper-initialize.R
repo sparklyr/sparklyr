@@ -1,9 +1,6 @@
 library(sparklyr)
 library(dplyr)
 
-# timeout for downloading Spark/Livy releases
-options(timeout = 3600)
-
 if (isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))) {
   library(arrow)
 }
