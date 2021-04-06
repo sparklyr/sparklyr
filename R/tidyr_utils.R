@@ -232,49 +232,19 @@ str_separate <- function(data, column, into, sep, extra = "warn", fill = "warn")
   out
 }
 
-extract_field_dtypes <- function(schema) {
-  fields <- schema %>% invoke("fields")
-  field_dtypes <- lapply(fields, function(field) {
-    invoke(field, "dataType")
-  })
-  names(field_dtypes) <- lapply(
-    fields, function(field) {
-      invoke(field, "name")
-    }
-  ) %>%
-    unlist()
-
-  field_dtypes
-}
-
 apply_ptype <- function(sdf, ptype) {
   if (is.null(ptype)) {
     sdf
   } else {
     sc <- spark_connection(sdf)
     schema <- spark_data_build_types(sc, lapply(ptype, class))
-    dtypes <- extract_field_dtypes(schema)
-    sdf_dtypes <- sdf %>%
-      spark_dataframe() %>%
-      invoke("schema") %>%
-      extract_field_dtypes()
-    cols <- lapply(
-      colnames(sdf),
-      function(col) {
-        dtype <- (
-          if (col %in% names(dtypes)) {
-            dtypes[[col]]
-          } else {
-            sdf_dtypes[[col]]
-          })
-        invoke_new(sc, "org.apache.spark.sql.Column", col) %>%
-          invoke("cast", dtype)
-      }
-    )
-
-    sdf %>%
-      spark_dataframe() %>%
-      invoke("select", cols) %>%
+    invoke_static(
+      sc,
+      "sparklyr.SchemaUtils",
+      "castColumns",
+      spark_dataframe(sdf),
+      schema
+    ) %>%
       sdf_register()
   }
 }

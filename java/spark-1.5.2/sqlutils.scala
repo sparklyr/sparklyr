@@ -86,4 +86,18 @@ object SQLUtils {
   def createStructField(name: String, struct: StructType): StructField = {
     StructField(name, struct, true)
   }
+
+  def createStructFields(specs: Seq[Any]): Array[StructField] = {
+    specs.map(
+      x => {
+        val spec = x.asInstanceOf[Array[Object]]
+
+        createStructField(
+          name = spec(0).asInstanceOf[String],
+          dataType = spec(1).asInstanceOf[String],
+          nullable = spec(2).asInstanceOf[Boolean]
+        )
+      }
+    ).toArray
+  }
 }
