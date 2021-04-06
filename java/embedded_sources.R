@@ -1281,6 +1281,7 @@ spark_worker_init_packages <- function(sc, context) {
 }
 
 spark_worker_execute_closure <- function(
+                                         sc,
                                          closure,
                                          df,
                                          funcContext,
@@ -1299,7 +1300,6 @@ spark_worker_execute_closure <- function(
     worker_log("found barrier execution context")
     barrier_arg <- list(barrier = barrier_map)
   }
-
   closure_params <- length(formals(closure))
   has_partition_index_param <- (
     !is.null(funcContext$partition_index_param) &&
@@ -1325,7 +1325,8 @@ spark_worker_execute_closure <- function(
   options(stringsAsFactors = FALSE)
 
   if (identical(fetch_result_as_sdf, FALSE)) {
-    result <- lapply(result, function(x) serialize(x, NULL))
+    serialize_impl <- spark_worker_get_serializer(sc)
+    result <- lapply(result, function(x) serialize_impl(x, NULL))
     class(result) <- c("spark_apply_binary_result", class(result))
     result <- tibble::tibble(spark_apply_binary_result = result)
   }
@@ -1513,6 +1514,7 @@ spark_worker_apply_arrow <- function(sc, config) {
       colnames(df) <- columnNames[seq_along(colnames(df))]
 
       result <- spark_worker_execute_closure(
+        sc,
         closure,
         df,
         funcContext,
@@ -1565,6 +1567,15 @@ spark_worker_apply_arrow <- function(sc, config) {
   }
 
   worker_log("finished apply")
+}
+
+spark_worker_get_serializer <- function(sc) {
+  serializer <- unserialize(worker_invoke(spark_worker_context(sc), "getSerializer"))
+  if (is.list(serializer)) {
+    function(x, ...) serializer$serializer(x)
+  } else {
+    serializer
+  }
 }
 
 spark_worker_get_deserializer <- function(sc) {
@@ -1654,6 +1665,7 @@ spark_worker_apply <- function(sc, config) {
     colnames(df) <- columnNames[seq_along(colnames(df))]
 
     result <- spark_worker_execute_closure(
+      sc,
       closure,
       df,
       funcContext,

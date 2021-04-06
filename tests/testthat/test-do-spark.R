@@ -106,16 +106,16 @@ test_that("doSpark works for loop referencing external functions and variables",
 test_that("doSpark works with 'qs' serializer", {
   test_requires("qs")
 
-  options(sparklyr.do_spark.serializer = "qs")
-  on.exit(options(sparklyr.do_spark.serializer = NULL))
+  options(sparklyr.spark_apply.serializer = "qs")
+  on.exit(options(sparklyr.spark_apply.serializer = NULL))
   foreach(x = .test_objs) %test% quote(x)
 })
 
 test_that("doSpark works with custom serializer", {
   test_requires("qs")
 
-  options(sparklyr.do_spark.serializer = function(x) qs::qserialize(x, preset = "fast"))
-  options(sparklyr.do_spark.deserializer = function(x) qs::qdeserialize(x))
+  options(sparklyr.spark_apply.serializer = function(x) qs::qserialize(x, preset = "fast"))
+  options(sparklyr.spark_apply.deserializer = function(x) qs::qdeserialize(x))
   on.exit({
     options(sparklyr.do_spark.serializer = NULL)
     options(sparklyr.do_spark.deserializer = NULL)

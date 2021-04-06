@@ -1234,11 +1234,18 @@ spark_read <- function(sc,
   )
 
   if (is.language(reader)) f <- rlang::as_closure(reader)
-  serialize_impl <- spark_apply_serializer()
-  deserialize_impl <- spark_apply_deserializer()
+  serializer <- spark_apply_serializer()
+  serialize_impl <- (
+    if (is.list(serializer)) {
+      serializer$serializer
+    } else {
+      serializer
+    }
+  )
+  deserializer <- spark_apply_deserializer()
   reader <- serialize_impl(reader)
   worker_impl <- function(df, rdr) {
-    rdr <- deserialize_impl(rdr)
+    rdr <- deserializer(rdr)
     do.call(rbind, lapply(df$path, function(path) rdr(path)))
   }
   worker_impl <- serialize_impl(worker_impl)
@@ -1276,7 +1283,8 @@ spark_read <- function(sc,
     as.integer(60),
     serialized_worker_context,
     new.env(),
-    serialize(deserialize_impl, NULL)
+    serialize(serializer, NULL),
+    serialize(deserializer, NULL)
   )
   rdd <- invoke(rdd, "cache")
   schema <- spark_schema_from_rdd(sc, rdd, columns)

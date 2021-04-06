@@ -25,6 +25,7 @@ class WorkerApply(
   schema: StructType,
   barrierMapProvider: () => Map[String, Any],
   partitionIndexProvider: () => Int,
+  serializer: Broadcast[Array[Byte]],
   deserializer: Broadcast[Array[Byte]]
 ) extends java.io.Serializable {
 
@@ -66,6 +67,7 @@ class WorkerApply(
       options,
       barrierMapProvider(),
       partitionIndexProvider(),
+      serializer.value,
       deserializer.value
     )
 

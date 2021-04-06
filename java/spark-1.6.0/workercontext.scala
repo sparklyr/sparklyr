@@ -20,6 +20,7 @@ class WorkerContext(
   options: Map[String, String],
   barrier: Map[String, Any],
   partitionIndex: Int,
+  serializer: Array[Byte],
   deserializer: Array[Byte]
 ) {
 
@@ -76,6 +77,10 @@ class WorkerContext(
 
   def getResultArray(): Array[Row] = {
     result
+  }
+
+  def getSerializer(): Array[Byte] = {
+    serializer
   }
 
   def getDeserializer(): Array[Byte] = {
