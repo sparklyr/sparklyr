@@ -175,9 +175,16 @@ spark_worker_apply_maybe_schema <- function(config, result) {
 spark_worker_build_types <- function(context, columns) {
   names <- names(columns)
   sqlutils <- worker_invoke(context, "getSqlUtils")
-  fields <- lapply(names, function(name) {
-    worker_invoke(sqlutils, "createStructField", name, columns[[name]][[1]], TRUE)
-  })
+  fields <- worker_invoke(
+    sqlutils,
+    "createStructFields",
+    lapply(
+      names,
+      function(name) {
+        list(name, columns[[name]][[1]], TRUE)
+      }
+    )
+  )
 
   worker_invoke(sqlutils, "createStructType", fields)
 }
@@ -207,6 +214,22 @@ spark_worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
   result
 }
 
+get_arrow_converters <- function(context, config) {
+  if (config$spark_version < "2.3.0") {
+    stop("ArrowConverters is only supported for Spark 2.3 or above.")
+  }
+
+  worker_invoke(context, "getArrowConverters")
+}
+
+get_arrow_converters_impl <- function(context, config) {
+  if (config$spark_version < "2.3.0") {
+    stop("ArrowConverters is only supported for Spark 2.3 or above.")
+  }
+
+  worker_invoke(context, "getArrowConvertersImpl")
+}
+
 spark_worker_apply_arrow <- function(sc, config) {
   worker_log("using arrow serializer")
 
@@ -230,9 +253,9 @@ spark_worker_apply_arrow <- function(sc, config) {
     record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
   } else {
     row_iterator <- worker_invoke(context, "getIterator")
-    arrow_converter_impl <- worker_invoke(context, "getArrowConvertersImpl")
+    arrow_converters_impl <- get_arrow_converters_impl(context, config)
     record_batch_raw <- worker_invoke(
-      arrow_converter_impl,
+      arrow_converters_impl,
       "toBatchArray",
       row_iterator,
       schema_input,
@@ -303,8 +326,8 @@ spark_worker_apply_arrow <- function(sc, config) {
   if (length(all_batches) > 0) {
     worker_log("updating ", total_rows, " rows using ", length(all_batches), " row batches")
 
-    arrow_converter <- worker_invoke(context, "getArrowConverters")
-    row_iter <- worker_invoke(arrow_converter, "fromPayloadArray", all_batches, schema_output)
+    arrow_converters <- get_arrow_converters(context, config)
+    row_iter <- worker_invoke(arrow_converters, "fromPayloadArray", all_batches, schema_output)
 
     worker_invoke(context, "setResultIter", row_iter)
     worker_log("updated ", total_rows, " rows using ", length(all_batches), " row batches")

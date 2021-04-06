@@ -75,4 +75,25 @@ object SchemaUtils {
       false
     }
   }
+
+  def castColumns(sdf: DataFrame, desiredSchema: StructType): DataFrame = {
+    val desiredColumnTypes = extractColumnTypes(desiredSchema)
+    val inputColumnTypes = extractColumnTypes(sdf.schema)
+
+    val outputColumns = sdf.schema.fieldNames.map(
+      column => {
+        val columnType = desiredColumnTypes.getOrElse(
+          column, inputColumnTypes.get(column).get
+        )
+
+        new org.apache.spark.sql.Column(column).cast(columnType)
+      }
+    )
+
+    sdf.select(outputColumns: _*)
+  }
+
+  private[this] def extractColumnTypes(schema: StructType): Map[String, DataType] = {
+    schema.fields.map(x => x.name -> x.dataType).toMap
+  }
 }
