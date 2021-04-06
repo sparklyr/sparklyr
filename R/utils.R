@@ -296,6 +296,12 @@ sort_named_list <- function(lst, ...) {
 
 `%@%` <- function(fn, largs) fn(largs)
 
+# syntax sugar for executing a chain of method calls with each call operating on
+# the JVM object returned from the previous call
+`%>|%` <- function(x, invocations) {
+  do.call(invoke, append(list(x, "%>%"), invocations))
+}
+
 pcre_to_java <- function(regex) {
   regex %>%
     gsub("\\[:alnum:\\]", "A-Za-z0-9", .) %>%

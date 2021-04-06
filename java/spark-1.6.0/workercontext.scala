@@ -16,7 +16,7 @@ class WorkerContext(
   bundlePath: String,
   context: Array[Byte],
   timeZoneId: String,
-  schema: StructType,
+  schema: org.apache.spark.sql.types.StructType,
   options: Map[String, String],
   barrier: Map[String, Any],
   partitionIndex: Int,
@@ -102,6 +102,18 @@ class WorkerContext(
 
   def getSchema() : StructType = {
     schema
+  }
+
+  def getArrowConvertersImpl() : ArrowConvertersImpl = {
+    new ArrowConvertersImpl()
+  }
+
+  def getArrowConverters() : Any = {
+    ArrowConverters
+  }
+
+  def getSqlUtils() : Any = {
+    SQLUtils
   }
 
   def getOptions() : Map[String, String] = {

@@ -384,8 +384,7 @@ spark_write_json.spark_jobj <- function(x,
 }
 
 spark_expect_jobj_class <- function(jobj, expectedClassName) {
-  class <- invoke(jobj, "getClass")
-  className <- invoke(class, "getName")
+  className <- invoke(jobj, "%>%", list("getClass"), list("getName"))
   if (!identical(className, expectedClassName)) {
     stop(
       "This operation is only supported on ",
@@ -399,11 +398,14 @@ spark_data_read_generic <- function(sc, source, fileMethod, readOptions = list()
   columnsHaveTypes <- length(names(columns)) > 0
   readSchemaProvided <- !is.null(schema)
 
-  options <- invoke(hive_context(sc), "read")
-
-  lapply(names(readOptions), function(optionName) {
-    options <<- invoke(options, "option", optionName, readOptions[[optionName]])
-  })
+  options <- hive_context(sc) %>|%
+    append(
+      list(list("read")),
+      lapply(
+        names(readOptions),
+        function(optionName) list("option", optionName, readOptions[[optionName]])
+      )
+    )
 
   if (readSchemaProvided) {
     columnDefs <- schema
@@ -425,17 +427,15 @@ spark_data_read_generic <- function(sc, source, fileMethod, readOptions = list()
 
 spark_data_apply_mode <- function(options, mode) {
   if (!is.null(mode)) {
-    if (is.list(mode)) {
-      lapply(mode, function(m) {
-        options <<- invoke(options, "mode", m)
-      })
-    }
-    else if (is.character(mode)) {
-      options <- invoke(options, "mode", mode)
-    }
-    else {
-      stop("Unsupported type ", typeof(mode), " for mode parameter.")
-    }
+    options <- (
+      if (is.list(mode)) {
+        options %>|% lapply(mode, function(m) list("mode", m))
+      } else if (is.character(mode)) {
+        invoke(options, "mode", mode)
+      } else {
+        stop("Unsupported type ", typeof(mode), " for mode parameter.")
+      }
+    )
   }
 
   options
@@ -449,13 +449,11 @@ spark_data_write_generic <- function(df,
                                      partition_by = NULL,
                                      is_jdbc = FALSE,
                                      save_args = list()) {
-  options <- invoke(df, "write")
-
-  options <- spark_data_apply_mode(options, mode)
-
-  lapply(names(writeOptions), function(writeOptionName) {
-    options <<- invoke(options, "option", writeOptionName, writeOptions[[writeOptionName]])
-  })
+  options <- invoke(df, "write") %>%
+    spark_data_apply_mode(mode) %>|%
+    lapply(names(writeOptions), function(writeOptionName) {
+      list("option", writeOptionName, writeOptions[[writeOptionName]])
+    })
 
   if (!is.null(partition_by)) {
     options <- invoke(options, "partitionBy", as.list(partition_by))
@@ -468,10 +466,10 @@ spark_data_write_generic <- function(df,
     writeOptions[["url"]] <- NULL
     if (is.null(url)) stop("Option 'url' is expected while using jdbc")
 
-    properties <- invoke_new(sc, "java.util.Properties")
-    lapply(names(writeOptions), function(optionName) {
-      invoke(properties, "setProperty", optionName, as.character(writeOptions[[optionName]]))
-    })
+    properties <- invoke_new(sc, "java.util.Properties") %>|%
+      lapply(names(writeOptions), function(optionName) {
+        list("setProperty", optionName, as.character(writeOptions[[optionName]]))
+      })
 
     invoke(options, fileMethod, url, path, properties)
   }
