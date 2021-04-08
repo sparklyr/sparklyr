@@ -85,15 +85,32 @@ spark_dataframe_cols <- function(sdf) {
 #' @export
 #' @importFrom dbplyr tbl_sql
 tbl.src_spark <- function(src, from, ...) {
-  tbl_sql("spark", src = src, from = process_tbl_name(from), ...)
+  spark_tbl_sql(src, from)
 }
 
 #' @export
 #' @importFrom dbplyr src_sql
 #' @importFrom dbplyr tbl_sql
 tbl.spark_connection <- function(src, from, ...) {
-  src <- src_sql("spark", src)
-  tbl_sql("spark", src = src, from = process_tbl_name(from), ...)
+  spark_tbl_sql(src = src_sql("spark", src), from)
+}
+
+spark_tbl_sql <- function(src, from, ...) {
+  tbl_spark <- tbl_sql("spark", src = src, from = process_tbl_name(from), ...)
+
+  tbl_spark$sdf_cache_state <- new.env(parent = emptyenv())
+  tbl_spark$sdf_cache_state$ops <- NULL
+  tbl_spark$sdf_cache_state$spark_dataframe <- NULL
+  tbl_spark$spark_dataframe <- function(self, spark_dataframe_impl) {
+    if (!identical(self$sdf_cache_state$ops, self$ops)) {
+      self$sdf_cache_state$ops <- self$ops
+      self$sdf_cache_state$spark_dataframe <- spark_dataframe_impl(self)
+    }
+
+    self$sdf_cache_state$spark_dataframe
+  }
+
+  tbl_spark
 }
 
 process_tbl_name <- function(x) {
