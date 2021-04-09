@@ -110,6 +110,26 @@ spark_tbl_sql <- function(src, from, ...) {
     self$sdf_cache_state$spark_dataframe
   }
 
+  tbl_spark$schema_cache_state <- new.env(parent = emptyenv())
+  tbl_spark$schema_cache_state$ops <- NULL
+  tbl_spark$schema_cache_state$schema <- as.list(rep(NA, 4L))
+  tbl_spark$schema <- function(self, schema_impl, expand_nested_cols, expand_struct_cols) {
+    cache_index <- (
+      as.integer(expand_nested_cols) * 2L + as.integer(expand_struct_cols) + 1L
+    )
+    if (!identical(self$schema_cache_state$ops, self$ops) ||
+        is.na(self$schema_cache_state$schema[[cache_index]])) {
+      self$schema_cache_state$ops <- self$ops
+      self$schema_cache_state$schema[[cache_index]] <- schema_impl(
+        self,
+        expand_nested_cols = expand_nested_cols,
+        expand_struct_cols = expand_struct_cols
+      )
+    }
+
+    self$schema_cache_state$schema[[cache_index]]
+  }
+
   tbl_spark
 }
 
