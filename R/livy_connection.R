@@ -666,7 +666,6 @@ livy_connection <- function(master,
   waitStartTimeout <- spark_config_value(config, c("sparklyr.connect.timeout", "livy.session.start.timeout"), 60)
   waitStartReties <- waitStartTimeout * 10
   while (session$state == "starting" &&
-    session$state != "dead" &&
     waitStartReties > 0) {
     session <- livy_get_session(sc)
 

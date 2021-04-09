@@ -7,6 +7,9 @@ if (identical(Sys.getenv("DBPLYR_API_EDITION"), "1")) {
 # timeout for downloading Spark/Livy releases
 options(timeout = 3600)
 
+options(sparklyr.connect.timeout = 300)
+options(livy.session.start.timeout = 300)
+
 library(testthat)
 library(sparklyr)
 
@@ -146,33 +149,26 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
 
   if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
     test_cases <- list(
-      list(
-        c(
-          "^spark-apply$",
-          "^spark-apply-bundle$",
-          "^spark-apply-ext$"
-        ),
-        "^dbi$",
-        c(
-          "^ml-clustering-kmeans$",
-          "^livy-config$",
-          "^livy-proxy$"
-        )
+      c(
+        "^spark-apply$",
+        "^spark-apply-bundle$",
+        "^spark-apply-ext$"
       ),
-      list(
-        c(
-          "^dplyr$",
-          "^dplyr-join$",
-          "^dplyr-stats$",
-          "^dplyr-sample.*$",
-          "^dplyr-weighted-mean$"
-        )
+      "^dbi$",
+      c(
+        "^ml-clustering-kmeans$",
+        "^livy-config$",
+        "^livy-proxy$"
+      ),
+      c(
+        "^dplyr$",
+        "^dplyr-join$",
+        "^dplyr-stats$",
+        "^dplyr-sample.*$",
+        "^dplyr-weighted-mean$"
       )
     )
-    test_filters <- lapply(
-      test_cases[[as.integer(Sys.getenv("LIVY_TEST_CASES_SUBSET"))]],
-      function(x) paste(x, collapse = "|")
-    )
+    test_filters <- lapply(test_cases, function(x) paste(x, collapse = "|"))
   } else if (is_arrow_devel) {
     test_filters <- list(
       paste(
@@ -202,6 +198,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     on.exit({
       spark_disconnect_all(terminate = TRUE)
       tryCatch(livy_service_stop(), error = function(e) {})
+      Sys.sleep(30)
 
       remove(".testthat_spark_connection", envir = .GlobalEnv)
       remove(".testthat_livy_connection", envir = .GlobalEnv)
