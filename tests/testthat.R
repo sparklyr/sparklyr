@@ -202,6 +202,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     on.exit({
       spark_disconnect_all(terminate = TRUE)
       tryCatch(livy_service_stop(), error = function(e) {})
+      Sys.sleep(10)
 
       remove(".testthat_spark_connection", envir = .GlobalEnv)
       remove(".testthat_livy_connection", envir = .GlobalEnv)
