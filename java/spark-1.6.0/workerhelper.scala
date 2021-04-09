@@ -21,6 +21,7 @@ object WorkerHelper {
     connectionTimeout: Int,
     context: Array[Byte],
     options: Map[_, _],
+    serializer: Array[Byte],
     deserializer: Array[Byte]
   ): RDD[Row] = {
 
@@ -53,6 +54,7 @@ object WorkerHelper {
       connectionTimeout,
       sparkContext.broadcast(context),
       optionsImmMap,
+      sparkContext.broadcast(serializer),
       sparkContext.broadcast(deserializer)
     )
 

@@ -24,6 +24,7 @@ object RDDBarrier {
     customEnv: Map[Object, Object],
     context: Array[Byte],
     options: Map[Object, Object],
+    serializer: Array[Byte],
     deserializer: Array[Byte]
   ): RDD[Row] = {
 
@@ -55,6 +56,7 @@ object RDDBarrier {
       connectionTimeout,
       sparkContext.broadcast(context),
       optionsImmMap,
+      sparkContext.broadcast(serializer),
       sparkContext.broadcast(deserializer)
     )
 
@@ -73,6 +75,7 @@ object RDDBarrier {
       connectionTimeout: Int,
       context: Broadcast[Array[Byte]],
       options: Map[String, String],
+      serializer: Broadcast[Array[Byte]],
       deserializer: Broadcast[Array[Byte]]
   ): sparklyr.WorkerApply = {
     val workerApply: WorkerApply = new WorkerApply(
@@ -93,6 +96,7 @@ object RDDBarrier {
         "address" -> BarrierTaskContext.get().getTaskInfos().map(e => e.address),
         "partition" -> BarrierTaskContext.get().partitionId()),
       partitionIndexProvider = () => { BarrierTaskContext.get().partitionId() },
+      serializer = deserializer,
       deserializer = deserializer
     )
 

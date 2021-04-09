@@ -19,6 +19,7 @@ class WorkerRDD(
   connectionTimeout: Int,
   context: Broadcast[Array[Byte]],
   options: Map[String, String],
+  serializer: Broadcast[Array[Byte]],
   deserializer: Broadcast[Array[Byte]]
 ) extends RDD[Row](prev) {
 
@@ -42,6 +43,7 @@ class WorkerRDD(
       schema = StructType(Nil),
       barrierMapProvider = () => Map(),
       partitionIndexProvider = () => { split.index },
+      serializer = serializer,
       deserializer = deserializer
     )
 

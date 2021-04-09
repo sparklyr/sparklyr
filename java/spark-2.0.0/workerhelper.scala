@@ -23,6 +23,7 @@ object WorkerHelper {
     connectionTimeout: Int,
     context: Array[Byte],
     options: Map[_, _],
+    serializer: Array[Byte],
     deserializer: Array[Byte]
   ): RDD[Row] = {
     var customEnvMap = scala.collection.mutable.Map[String, String]();
@@ -54,6 +55,7 @@ object WorkerHelper {
       connectionTimeout,
       sparkContext.broadcast(context),
       optionsImmMap,
+      sparkContext.broadcast(serializer),
       sparkContext.broadcast(deserializer)
     )
 
@@ -76,6 +78,7 @@ object WorkerHelper {
     options: Map[_, _],
     sparkSession: SparkSession,
     timeZoneId: String,
+    serializer: Array[Byte],
     deserializer: Array[Byte]
   ): Dataset[Row] = {
 
@@ -101,6 +104,7 @@ object WorkerHelper {
     val closureBV = sparkContext.broadcast(closure)
     val closureRLangBV = sparkContext.broadcast(closureRLang)
     val contextBV = sparkContext.broadcast(context)
+    val serializerBV = sparkContext.broadcast(serializer)
     val deserializerBV = sparkContext.broadcast(deserializer)
 
     sdf.mapPartitions(rows => {
@@ -120,6 +124,7 @@ object WorkerHelper {
         sourceSchema,
         () => Map(),
         () => { TaskContext.getPartitionId() },
+        serializerBV,
         deserializerBV
       )
 

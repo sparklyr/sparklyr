@@ -71,9 +71,11 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
     }
   }
 
-  serializer_impl <- getOption("sparklyr.do_spark.serializer")
-  deserializer_impl <- getOption("sparklyr.do_spark.deserializer")
-  enable_qs_serializer <- identical(serializer_impl, "qs")
+  serializer <- spark_apply_serializer()
+  if (is.list(serializer)) {
+    serializer <- serializer$serializer
+  }
+  deserializer <- spark_apply_deserializer()
   # internal function called by foreach
   .doSpark <- function(obj, expr, envir, data) {
     # internal function to compile an expression if possible
@@ -82,25 +84,6 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
         expr
       } else {
         compiler::compile(expr, ...)
-      }
-    }
-
-    .encode_item <- function(item) {
-      if (enable_qs_serializer) {
-        qs::qserialize(item)
-      } else if (!is.null(serializer_impl)) {
-        serializer_impl(item)
-      } else {
-        serialize(item, NULL)
-      }
-    }
-    .decode_item <- function(item) {
-      if (enable_qs_serializer) {
-        qs::qdeserialize(item)
-      } else if (!is.null(deserializer_impl)) {
-        deserializer_impl(item)
-      } else {
-        unserialize(item)
       }
     }
 
@@ -134,7 +117,7 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
             lapply(
               items$encoded,
               function(item) {
-                eval(expr, envir = as.list(.decode_item(item)), enclos = enclos)
+                eval(expr, envir = as.list(deserializer(item)), enclos = enclos)
               }
             )
           },
@@ -160,7 +143,7 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
     it <- iterators::iter(obj)
     accumulator <- foreach::makeAccum(it)
     items <- tibble::tibble(
-      encoded = it %>% as.list() %>% lapply(.encode_item)
+      encoded = it %>% as.list() %>% lapply(serializer)
     )
     spark_items <- sdf_copy_to(
       spark_conn,
