@@ -45,6 +45,35 @@ spark_dataframe.spark_connection <- function(x, sql = NULL, ...) {
 sdf_schema <- function(x,
                        expand_nested_cols = FALSE,
                        expand_struct_cols = FALSE) {
+  UseMethod("sdf_schema")
+}
+
+#' @export
+sdf_schema.tbl_spark <- function(x,
+                                 expand_nested_cols = FALSE,
+                                 expand_struct_cols = FALSE) {
+  x$schema(
+    x,
+    sdf_schema_impl,
+    expand_nested_cols = expand_nested_cols,
+    expand_struct_cols = expand_struct_cols
+  )
+}
+
+#' @export
+sdf_schema.default <- function(x,
+                               expand_nested_cols = FALSE,
+                               expand_struct_cols = FALSE) {
+  sdf_schema_impl(
+    x,
+    expand_nested_cols = expand_nested_cols,
+    expand_struct_cols = expand_struct_cols
+  )
+}
+
+sdf_schema_impl <- function(x,
+                            expand_nested_cols,
+                            expand_struct_cols) {
   process_struct_type <- function(x) {
     fields <- x$fields
     fields_list <- lapply(
