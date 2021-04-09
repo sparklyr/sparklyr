@@ -4,11 +4,16 @@
 #' @importFrom dbplyr sql_render
 #' @importFrom dbplyr sql_build
 spark_dataframe.tbl_spark <- function(x, ...) {
-  sc <- spark_connection(x)
+  x$spark_dataframe(
+    x,
+    function(tbl_spark) {
+      sc <- spark_connection(tbl_spark)
+      sql <- as.character(sql_render(sql_build(tbl_spark, con = sc), con = sc))
+      hive <- hive_context(sc)
 
-  sql <- as.character(sql_render(sql_build(x, con = sc), con = sc))
-  hive <- hive_context(sc)
-  invoke(hive, "sql", sql)
+      invoke(hive, "sql", sql)
+    }
+  )
 }
 
 #' @export
