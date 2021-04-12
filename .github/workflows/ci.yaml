@@ -216,6 +216,18 @@ jobs:
         with:
           name: Worker logs
           path: /tmp/sparklyr.log
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: Livy server logs
+          path: /tmp/livy-server.log
       - name: Dump worker logs on failure
         if: failure()
-        run: cat /tmp/sparklyr.log
+        run: |
+          cat /tmp/sparklyr.log || :
+        shell: bash
+      - name: Dump livy server logs on failure
+        if: failure()
+        run: |
+          cat /tmp/livy-server.log || :
+        shell: bash
