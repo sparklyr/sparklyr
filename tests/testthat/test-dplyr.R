@@ -304,15 +304,12 @@ test_that("compute() works as expected", {
   sdf_even <- sdf %>% dplyr::filter(id %% 2 == 0)
   sdf_odd <- sdf %>% dplyr::filter(id %% 2 == 1)
 
-  expect_null(sdf_even %>% dbplyr::remote_name())
-  expect_null(sdf_odd %>% dbplyr::remote_name())
+  expect_null(sdf_even %>% sparklyr:::sdf_remote_name())
+  expect_null(sdf_odd %>% sparklyr:::sdf_remote_name())
 
   # caching Spark dataframes with random names
   sdf_even_cached <- sdf_even %>% dplyr::compute()
   sdf_odd_cached <- sdf_odd %>% dplyr::compute()
-
-  expect_true(grepl("^table_", sdf_even_cached %>% dbplyr::remote_name()))
-  expect_true(grepl("^table_", sdf_odd_cached %>% dbplyr::remote_name()))
 
   expect_equivalent(
     sdf_even_cached %>% collect(),
@@ -327,8 +324,8 @@ test_that("compute() works as expected", {
   sdf_congruent_to_1_mod_3 <- sdf %>% dplyr::filter(id %% 3 == 1)
   sdf_congruent_to_2_mod_3 <- sdf %>% dplyr::filter(id %% 3 == 2)
 
-  expect_null(sdf_congruent_to_1_mod_3 %>% dbplyr::remote_name())
-  expect_null(sdf_congruent_to_2_mod_3 %>% dbplyr::remote_name())
+  expect_null(sdf_congruent_to_1_mod_3 %>% sparklyr:::sdf_remote_name())
+  expect_null(sdf_congruent_to_2_mod_3 %>% sparklyr:::sdf_remote_name())
 
   sdf_congruent_to_1_mod_3_cached <- sdf_congruent_to_1_mod_3 %>%
     dplyr::compute(name = "congruent_to_1_mod_3")
@@ -336,12 +333,17 @@ test_that("compute() works as expected", {
     dplyr::compute(name = "congruent_to_2_mod_3")
 
   expect_equal(
-    sdf_congruent_to_1_mod_3_cached %>% dbplyr::remote_name(),
+    sdf_congruent_to_1_mod_3_cached %>% sparklyr:::sdf_remote_name(),
     dbplyr::ident("congruent_to_1_mod_3")
   )
   expect_equivalent(
-    sdf_congruent_to_2_mod_3_cached %>% dbplyr::remote_name(),
+    sdf_congruent_to_2_mod_3_cached %>% sparklyr:::sdf_remote_name(),
     dbplyr::ident("congruent_to_2_mod_3")
+  )
+
+  temp_view <- sdf_congruent_to_2_mod_3 %>% dplyr::compute("temp_view")
+  expect_equivalent(
+    temp_view %>% sparklyr:::sdf_remote_name(), dbplyr::ident("temp_view")
   )
 
   expect_equivalent(
@@ -446,4 +448,33 @@ test_that("in_schema() works as expected", {
     dplyr::tbl(sc, dbplyr::in_schema("test_db", "hive_tbl")) %>% collect(),
     tibble::tibble(x = integer())
   )
+})
+
+test_that("sdf_remote_name returns null for computed tables", {
+  expect_equal(sparklyr:::sdf_remote_name(iris_tbl), ident("iris"))
+
+  virginica_sdf <- iris_tbl %>% filter(Species == "virginica")
+  expect_equal(sparklyr:::sdf_remote_name(virginica_sdf), NULL)
+})
+
+test_that("sdf_remote_name ignores the last group_by() operation(s)", {
+  sdf <- iris_tbl
+  for (i in seq(4)) {
+    sdf <- sdf %>% dplyr::group_by(Species)
+    expect_equal(sdf %>% sparklyr:::sdf_remote_name(), ident("iris"))
+  }
+})
+
+test_that("sdf_remote_name ignores the last ungroup() operation(s)", {
+  sdf <- iris_tbl
+  for (i in seq(4)) {
+    sdf <- sdf %>% dplyr::ungroup()
+    expect_equal(sdf %>% sparklyr:::sdf_remote_name(), ident("iris"))
+  }
+})
+
+test_that("result from dplyr::compute() has remote name", {
+  sdf <- iris_tbl
+  sdf <- sdf %>% dplyr::mutate(y = 5) %>% dplyr::compute()
+  expect_false(is.null(sdf %>% sparklyr:::sdf_remote_name()))
 })

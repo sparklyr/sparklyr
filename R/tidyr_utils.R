@@ -50,11 +50,11 @@ repair_names <- function(col_names, names_repair) {
     unlist()
 }
 
-# If x is already a Spark data frame, then return dbplyr::remote_name(x)
+# If x is already a Spark data frame, then return sdf_remote_name(x)
 # Otherwise ensure the result from Spark SQL query encapsulated by x is
 # materialized into a Spark temp view and return the name of that temp view
 ensure_tmp_view <- function(x) {
-  dbplyr::remote_name(x) %||% {
+  sdf_remote_name(x) %||% {
     sc <- spark_connection(x)
     sdf <- spark_dataframe(x)
     data_tmp_view_name <- random_string("sparklyr_tmp_")
