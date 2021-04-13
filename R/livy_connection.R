@@ -645,7 +645,36 @@ livy_connection <- function(master,
   config[["spark.jars.packages"]] <- paste(c(config[["spark.jars.packages"]], extensions$packages), collapse = ",")
   config[["spark.jars.repositories"]] <- paste(c(config[["spark.jars.repositories"]], extensions$repositories), collapse = ",")
 
-  session <- livy_create_session(master, config)
+  livy_create_session_retries <- spark_config_value(
+    config, "sparklyr.livy_create_session.retries", 3L
+  )
+  livy_create_session_retry_interval_s <- spark_config_value(
+    config, "sparklyr.livy_create_session.retry_interval_s", 5L
+  )
+
+  session <- NULL
+  attempt <- 0L
+  while (attempt <= livy_create_session_retries && is.null(session)) {
+    session <- tryCatch(
+      livy_create_session(master, config),
+      error = function(e) {
+        if (attempt == livy_create_session_retries) {
+          stop(e)
+        } else {
+          warning(
+            "Failed to create Livy session. Retrying in ",
+            spark_config_value(config, "sparklyr.gateway.routing", TRUE),
+            " second(s)"
+          )
+          Sys.sleep(livy_create_session_retry_interval_s)
+
+          NULL
+        }
+      }
+    )
+
+    attempt <- attempt + 1
+  }
 
   sc <- new_livy_connection(list(
     # spark_connection
