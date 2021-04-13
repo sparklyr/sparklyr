@@ -245,6 +245,10 @@ testthat_livy_connection <- function() {
       ),
       file.path(livy_conf_dir, "log4j.properties")
     )
+    writeLines(
+      "client.connect.timeout=60s",
+      file.path(livy_conf_dir, "livy-client.conf")
+    )
   }
 
   # generate connection if none yet exists
