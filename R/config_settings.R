@@ -46,6 +46,8 @@ spark_config_settings <- function() {
     sparklyr.livy.headers = "Additional HTTP headers for Livy connections.",
     sparklyr.livy.proxy = "Optional HTTP proxy setting for Livy connections (any non-default value must be specified via httr::use_proxy()).",
     sparklyr.livy.additional_curl_opts = "Additional CURL options for Livy connections (see httr::httr_options() for a list of valid options).",
+    sparklyr.livy_create_session.retries = "Number of retries when creating Livy session",
+    sparklyr.livy_create_session.retry_interval_s = "Retry interval (in seconds) when creating Livy session",
     sparklyr.log.invoke = "Should every call to invoke() be printed in the console? Can be set to 'callstack' to log call stack.",
     sparklyr.log.console = "Should driver logs be printed in the console?",
     sparklyr.progress = "Should job progress be reported to RStudio?",
