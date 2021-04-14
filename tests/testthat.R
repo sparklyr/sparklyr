@@ -1,4 +1,5 @@
 Sys.setenv("R_TESTS" = "")
+Sys.setenv("SPARK_LOCAL_IP" = "localhost")
 
 if (identical(Sys.getenv("DBPLYR_API_EDITION"), "1")) {
   options(sparklyr.dbplyr.edition = 1L)
