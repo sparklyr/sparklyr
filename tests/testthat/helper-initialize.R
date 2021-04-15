@@ -291,13 +291,32 @@ testthat_livy_connection <- function() {
     config$`sparklyr.log.invoke` <- "cat"
     config$`spark.sql.warehouse.dir` <- get_spark_warehouse_dir()
 
-    sc <- spark_connect(
-      master = sprintf("http://localhost:%d", livy_service_port),
-      method = "livy",
-      config = config,
-      version = version,
-      sources = TRUE
-    )
+    max_num_attempts <- 10
+    retry_interval_s <- 60
+
+    for (attempt in seq(max_num_attempts)) {
+      sc <- tryCatch(
+        spark_connect(
+          master = sprintf("http://localhost:%d", livy_service_port),
+          method = "livy",
+          config = config,
+          version = version,
+          sources = TRUE
+        ),
+        error = function(e) {
+          warning("Failed to instantiate Livy connection: ", e)
+          NULL
+        }
+      )
+
+      if (is.null(sc)) {
+        if (attempt < max_num_attempts) {
+          Sys.sleep(retry_interval_s)
+        } else {
+          stop("Failed to instantiate Livy connection after ", max_num_attempts, " attempts")
+        }
+      }
+    }
 
     assign(".testthat_livy_connection", sc, envir = .GlobalEnv)
   }

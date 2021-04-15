@@ -130,6 +130,10 @@ jobs:
       - uses: r-lib/actions/setup-r@master
         with:
           r-version: ${{ matrix.r }}
+      - name: Create dummy network interface
+        run: |
+          sudo ip link add eth65536 type dummy
+          sudo ifconfig eth65536 192.168.1.1 netmask 255.255.255.0 up
       - name: Install Java
         id: install-java
         run: |
