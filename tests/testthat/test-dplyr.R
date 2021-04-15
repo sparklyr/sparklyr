@@ -430,3 +430,20 @@ test_that("process_tbl_name works as expected", {
     tibble::tibble(a = 1, b = 1, g = 2)
   )
 })
+
+test_that("in_schema() works as expected", {
+  skip_on_arrow()
+
+  queries <- c(
+    "CREATE DATABASE `test_db`",
+    "CREATE TABLE IF NOT EXISTS `test_db`.`hive_tbl` (`x` INT) USING hive"
+  )
+  for (query in queries) {
+    DBI::dbGetQuery(sc, query)
+  }
+
+  expect_equivalent(
+    dplyr::tbl(sc, dbplyr::in_schema("test_db", "hive_tbl")) %>% collect(),
+    tibble::tibble(x = integer())
+  )
+})
