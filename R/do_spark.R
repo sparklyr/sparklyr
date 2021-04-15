@@ -127,7 +127,7 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
         )
       }
 
-      spark_apply(spark_items, worker_fn, ...)
+      spark_apply(spark_items, worker_fn, ..., memory = TRUE)
     }
 
     if (!inherits(obj, "foreach")) {

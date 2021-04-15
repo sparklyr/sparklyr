@@ -122,7 +122,7 @@ spark_apply_worker_config <- function(
 spark_apply <- function(x,
                         f,
                         columns = NULL,
-                        memory = !is.null(name),
+                        memory = TRUE,
                         group_by = NULL,
                         packages = NULL,
                         context = NULL,
