@@ -8,7 +8,7 @@ spark_apply(
   x,
   f,
   columns = NULL,
-  memory = !is.null(name),
+  memory = TRUE,
   group_by = NULL,
   packages = NULL,
   context = NULL,
