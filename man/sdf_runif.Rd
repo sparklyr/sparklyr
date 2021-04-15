@@ -4,7 +4,15 @@
 \alias{sdf_runif}
 \title{Generate random samples from the uniform distribution U(0, 1).}
 \usage{
-sdf_runif(sc, n, num_partitions = NULL, seed = NULL, output_col = "x")
+sdf_runif(
+  sc,
+  n,
+  min = 0,
+  max = 1,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+)
 }
 \arguments{
 \item{sc}{A Spark connection.}

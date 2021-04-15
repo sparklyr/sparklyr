@@ -94,8 +94,10 @@ test_that("Can generate i.i.d samples from distributions correctly", {
     list(fn = "rgamma", args = list(shape = 1.5, rate = 0.8)),
     list(fn = "rlnorm", args = list(meanlog = 0.1, sdlog = 1.1)),
     list(fn = "rnorm"),
+    list(fn = "rnorm", args = list(mean = 2.5, sd = 0.8)),
     list(fn = "rpois", args = list(lambda = 2.5)),
-    list(fn = "runif")
+    list(fn = "runif"),
+    list(fn = "runif", args = list(min = -1, max = 1))
   )
 
   set.seed(seed)

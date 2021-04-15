@@ -32,7 +32,15 @@ sdf_crosstab <- function(x, col1, col2) {
 #' @name spark_statistical_routines
 NULL
 
-gen_sample_sdf <- function(sc, method, dist_params, n, num_partitions, seed, output_col) {
+gen_sample_sdf <- function(
+                           sc,
+                           method,
+                           dist_params,
+                           n,
+                           num_partitions,
+                           seed,
+                           output_col,
+                           cls = "org.apache.spark.mllib.random.RandomRDDs") {
   num_partitions <- as.integer(num_partitions %||%
     tryCatch(spark_context(sc) %>% invoke("defaultParallelism"), error = function(e) 4L)
   )
@@ -42,7 +50,7 @@ gen_sample_sdf <- function(sc, method, dist_params, n, num_partitions, seed, out
   schema <- spark_data_build_types(sc, columns)
   do.call(
     invoke_static,
-    list(sc, "org.apache.spark.mllib.random.RandomRDDs", method, spark_context(sc)) %>%
+    list(sc, cls, method, spark_context(sc)) %>%
     append(unname(dist_params)) %>%
     append(list(n, num_partitions, seed))
   ) %>%
@@ -129,15 +137,25 @@ sdf_rlnorm <- function(sc, n, meanlog = 0, sdlog = 1, num_partitions = NULL, see
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rnorm <- function(sc, n, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rnorm <- function(sc, n, mean = 0, sd = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+  standard_normal_dist <- (mean == 0 && sd == 1)
+  cls <- (
+    if (standard_normal_dist) {
+      "org.apache.spark.mllib.random.RandomRDDs"
+    } else {
+      "sparklyr.RandomRDDs"
+    }
+  )
+
   gen_sample_sdf(
     sc,
     method = "normalRDD",
-    dist_params = list(),
+    dist_params = if (standard_normal_dist) list() else list(mean, sd),
     n = n,
     num_partitions = num_partitions,
     seed = seed,
-    output_col = output_col
+    output_col = output_col,
+    cls = cls
   )
 }
 
@@ -172,14 +190,24 @@ sdf_rpois <- function(sc, n, lambda, num_partitions = NULL, seed = NULL, output_
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_runif <- function(sc, n, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_runif <- function(sc, n, min = 0, max = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+  standard_unif_dist <- (min == 0 && max == 1)
+  cls <- (
+    if (standard_unif_dist) {
+      "org.apache.spark.mllib.random.RandomRDDs"
+    } else {
+      "sparklyr.RandomRDDs"
+    }
+  )
+
   gen_sample_sdf(
     sc,
     method = "uniformRDD",
-    dist_params = list(),
+    dist_params = if (standard_unif_dist) list() else list(min, max),
     n = n,
     num_partitions = num_partitions,
     seed = seed,
-    output_col = output_col
+    output_col = output_col,
+    cls = cls
   )
 }
