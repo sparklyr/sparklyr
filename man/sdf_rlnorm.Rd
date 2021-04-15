@@ -36,10 +36,17 @@ i.i.d. samples from a log normal distribution.
 }
 \seealso{
 Other Spark statistical routines: 
+\code{\link{sdf_rbeta}()},
+\code{\link{sdf_rbinom}()},
+\code{\link{sdf_rcauchy}()},
+\code{\link{sdf_rchisq}()},
 \code{\link{sdf_rexp}()},
 \code{\link{sdf_rgamma}()},
+\code{\link{sdf_rgeom}()},
+\code{\link{sdf_rhyper}()},
 \code{\link{sdf_rnorm}()},
 \code{\link{sdf_rpois}()},
+\code{\link{sdf_rt}()},
 \code{\link{sdf_runif}()}
 }
 \concept{Spark statistical routines}
