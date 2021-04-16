@@ -32,7 +32,7 @@ sdf_crosstab <- function(x, col1, col2) {
 #' @name spark_statistical_routines
 NULL
 
-gen_sample_sdf <- function(
+gen_samples_sdf <- function(
                            sc,
                            method,
                            dist_params,
@@ -40,12 +40,13 @@ gen_sample_sdf <- function(
                            num_partitions,
                            seed,
                            output_col,
+                           output_col_type = "double",
                            cls = "org.apache.spark.mllib.random.RandomRDDs") {
   num_partitions <- as.integer(num_partitions %||%
     tryCatch(spark_context(sc) %>% invoke("defaultParallelism"), error = function(e) 4L)
   )
   seed <- as.numeric(seed %||% Sys.time())
-  columns <- list("double")
+  columns <- list(output_col_type)
   names(columns) <- output_col
   schema <- spark_data_build_types(sc, columns)
   do.call(
@@ -54,9 +55,105 @@ gen_sample_sdf <- function(
     append(unname(dist_params)) %>%
     append(list(n, num_partitions, seed))
   ) %>%
-    invoke_static(sc, "sparklyr.RddUtils", "toRowRDD", .) %>%
+    invoke_static(sc, "sparklyr.RddUtils", paste0(output_col_type, "ToRow"), .) %>%
     invoke(spark_session(sc), "createDataFrame", ., schema) %>%
     sdf_register()
+}
+
+#' Generate random samples from a Beta distribution
+#'
+#' Generator method for creating a single-column Spark dataframes comprised of
+#' i.i.d. samples from a Betal distribution.
+#'
+#' @inheritParams spark_statistical_routines
+#' @param shape1 Non-negative parameter (alpha) of the Beta distribution.
+#' @param shape2 Non-negative parameter (beta) of the Beta distribution.
+#'
+#' @family Spark statistical routines
+#' @export
+sdf_rbeta <- function(sc, n, shape1, shape2, num_partitions = NULL, seed = NULL, output_col = "x") {
+  gen_samples_sdf(
+    sc,
+    method = "betaRDD",
+    dist_params = list(alpha = shape1, beta = shape2),
+    n = n,
+    num_partitions = num_partitions,
+    seed = seed,
+    output_col = output_col,
+    cls = "sparklyr.RandomRDDs"
+  )
+}
+
+#' Generate random samples from a binomial distribution
+#'
+#' Generator method for creating a single-column Spark dataframes comprised of
+#' i.i.d. samples from a binomial distribution.
+#'
+#' @inheritParams spark_statistical_routines
+#' @param size Number of trials (zero or more).
+#' @param prob Probability of success on each trial.
+#'
+#' @family Spark statistical routines
+#' @export
+sdf_rbinom <- function(sc, n, size, prob, num_partitions = NULL, seed = NULL, output_col = "x") {
+  gen_samples_sdf(
+    sc,
+    method = "binomialRDD",
+    dist_params = list(trials = as.integer(size), p = prob),
+    n = n,
+    num_partitions = num_partitions,
+    seed = seed,
+    output_col = output_col,
+    output_col_type = "integer",
+    cls = "sparklyr.RandomRDDs"
+  )
+}
+
+#' Generate random samples from a Cauchy distribution
+#'
+#' Generator method for creating a single-column Spark dataframes comprised of
+#' i.i.d. samples from a Cauchy distribution.
+#'
+#' @inheritParams spark_statistical_routines
+#' @param location Location parameter of the distribution.
+#' @param scale Scale parameter of the distribution.
+#'
+#' @family Spark statistical routines
+#' @export
+sdf_rcauchy <- function(sc, n, location = 0, scale = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+  gen_samples_sdf(
+    sc,
+    method = "cauchyRDD",
+    dist_params = list(median = location, scale = scale),
+    n = n,
+    num_partitions = num_partitions,
+    seed = seed,
+    output_col = output_col,
+    cls = "sparklyr.RandomRDDs"
+  )
+}
+
+#' Generate random samples from a chi-squared distribution
+#'
+#' Generator method for creating a single-column Spark dataframes comprised of
+#' i.i.d. samples from a chi-squared distribution.
+#'
+#' @inheritParams spark_statistical_routines
+#' @param df Degrees of freedom (non-negative, but can be non-integer).
+#'
+#' @family Spark statistical routines
+#' @export
+sdf_rchisq <- function(sc, n, df, num_partitions = NULL, seed = NULL, output_col = "x") {
+  gen_samples_sdf(
+    sc,
+    method = "chiSquaredRDD",
+    dist_params = list(degreesOfFreedom = df),
+    n = n,
+    num_partitions = num_partitions,
+    seed = seed,
+    output_col = output_col,
+    cls = "sparklyr.RandomRDDs"
+  )
 }
 
 #' Generate random samples from an exponential distribution
@@ -71,7 +168,7 @@ gen_sample_sdf <- function(
 #' @family Spark statistical routines
 #' @export
 sdf_rexp <- function(sc, n, rate = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
-  gen_sample_sdf(
+  gen_samples_sdf(
     sc,
     method = "exponentialRDD",
     dist_params = list(mean = 1 / rate),
@@ -94,7 +191,7 @@ sdf_rexp <- function(sc, n, rate = 1, num_partitions = NULL, seed = NULL, output
 #' @family Spark statistical routines
 #' @export
 sdf_rgamma <- function(sc, n, shape, rate = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
-  gen_sample_sdf(
+  gen_samples_sdf(
     sc,
     method = "gammaRDD",
     dist_params = list(shape = shape, scale = 1 / rate),
@@ -102,6 +199,60 @@ sdf_rgamma <- function(sc, n, shape, rate = 1, num_partitions = NULL, seed = NUL
     num_partitions = num_partitions,
     seed = seed,
     output_col = output_col
+  )
+}
+
+#' Generate random samples from a geometric distribution
+#'
+#' Generator method for creating a single-column Spark dataframes comprised of
+#' i.i.d. samples from a geometric distribution.
+#'
+#' @inheritParams spark_statistical_routines
+#' @param prob Probability of success in each trial.
+#'
+#' @family Spark statistical routines
+#' @export
+sdf_rgeom <- function(sc, n, prob, num_partitions = NULL, seed = NULL, output_col = "x") {
+  gen_samples_sdf(
+    sc,
+    method = "geometricRDD",
+    dist_params = list(p = prob),
+    n = n,
+    num_partitions = num_partitions,
+    seed = seed,
+    output_col = output_col,
+    output_col_type = "integer",
+    cls = "sparklyr.RandomRDDs"
+  )
+}
+
+#' Generate random samples from a hypergeometric distribution
+#'
+#' Generator method for creating a single-column Spark dataframes comprised of
+#' i.i.d. samples from a hypergeometric distribution.
+#'
+#' @inheritParams spark_statistical_routines
+#' @param m The number of successes among the population.
+#' @param n The number of failures among the population.
+#' @param k The number of draws.
+#'
+#' @family Spark statistical routines
+#' @export
+sdf_rhyper <- function(sc, nn, m, n, k, num_partitions = NULL, seed = NULL, output_col = "x") {
+  gen_samples_sdf(
+    sc,
+    method = "hypergeometricRDD",
+    dist_params = list(
+      populationSize = as.integer(m + n),
+      numSuccesses = as.integer(m),
+      numDraws = as.integer(k)
+    ),
+    n = nn,
+    num_partitions = num_partitions,
+    seed = seed,
+    output_col = output_col,
+    output_col_type = "integer",
+    cls = "sparklyr.RandomRDDs"
   )
 }
 
@@ -117,7 +268,7 @@ sdf_rgamma <- function(sc, n, shape, rate = 1, num_partitions = NULL, seed = NUL
 #' @family Spark statistical routines
 #' @export
 sdf_rlnorm <- function(sc, n, meanlog = 0, sdlog = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
-  gen_sample_sdf(
+  gen_samples_sdf(
     sc,
     method = "logNormalRDD",
     dist_params = list(mean = meanlog, std = sdlog),
@@ -147,7 +298,7 @@ sdf_rnorm <- function(sc, n, mean = 0, sd = 1, num_partitions = NULL, seed = NUL
     }
   )
 
-  gen_sample_sdf(
+  gen_samples_sdf(
     sc,
     method = "normalRDD",
     dist_params = if (standard_normal_dist) list() else list(mean, sd),
@@ -170,7 +321,7 @@ sdf_rnorm <- function(sc, n, mean = 0, sd = 1, num_partitions = NULL, seed = NUL
 #' @family Spark statistical routines
 #' @export
 sdf_rpois <- function(sc, n, lambda, num_partitions = NULL, seed = NULL, output_col = "x") {
-  gen_sample_sdf(
+  gen_samples_sdf(
     sc,
     method = "poissonRDD",
     dist_params = list(mean = lambda),
@@ -178,6 +329,51 @@ sdf_rpois <- function(sc, n, lambda, num_partitions = NULL, seed = NULL, output_
     num_partitions = num_partitions,
     seed = seed,
     output_col = output_col
+  )
+}
+
+#' Generate random samples from a t-distribution
+#'
+#' Generator method for creating a single-column Spark dataframes comprised of
+#' i.i.d. samples from a t-distribution.
+#'
+#' @inheritParams spark_statistical_routines
+#' @param df Degrees of freedom (> 0, maybe non-integer).
+#'
+#' @family Spark statistical routines
+#' @export
+sdf_rt <- function(sc, n, df, num_partitions = NULL, seed = NULL, output_col = "x") {
+  gen_samples_sdf(
+    sc,
+    method = "tRDD",
+    dist_params = list(degreesOfFreedom = df),
+    n = n,
+    num_partitions = num_partitions,
+    seed = seed,
+    output_col = output_col,
+    cls = "sparklyr.RandomRDDs"
+  )
+}
+
+#' Generate random samples from a Weibull distribution.
+#'
+#' Generator method for creating a single-column Spark dataframes comprised of
+#' i.i.d. samples from a Weibull distribution.
+#'
+#' @inheritParams spark_statistical_routines
+#'
+#' @family Spark statistical routines
+#' @export
+sdf_rweibull <- function(sc, n, shape, scale = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+  gen_samples_sdf(
+    sc,
+    method = "weibullRDD",
+    dist_params = list(alpha = shape, beta = scale),
+    n = n,
+    num_partitions = num_partitions,
+    seed = seed,
+    output_col = output_col,
+    cls = "sparklyr.RandomRDDs"
   )
 }
 
@@ -200,7 +396,7 @@ sdf_runif <- function(sc, n, min = 0, max = 1, num_partitions = NULL, seed = NUL
     }
   )
 
-  gen_sample_sdf(
+  gen_samples_sdf(
     sc,
     method = "uniformRDD",
     dist_params = if (standard_unif_dist) list() else list(min, max),

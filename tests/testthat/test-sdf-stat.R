@@ -90,12 +90,22 @@ test_that("Can generate i.i.d samples from distributions correctly", {
   seed <- 142857L
   probs <- seq(.1, .9, 0.1)
   test_cases <- list(
+    list(fn = "rbeta", args = list(shape1 = 2.1, shape2 = 4.9)),
+    list(fn = "rbinom", args = list(size = 1000, prob = 0.25)),
+    list(fn = "rcauchy"),
+    list(fn = "rcauchy", args = list(location = 1.5, scale = 1.25)),
+    list(fn = "rchisq", args = list(df = 3.4)),
     list(fn = "rexp", args = list(rate = 2.5)),
     list(fn = "rgamma", args = list(shape = 1.5, rate = 0.8)),
+    list(fn = "rgeom", args = list(p = 0.2)),
+    list(fn = "rhyper", args = list(m = 20, n = 80, k = 40)),
     list(fn = "rlnorm", args = list(meanlog = 0.1, sdlog = 1.1)),
     list(fn = "rnorm"),
     list(fn = "rnorm", args = list(mean = 2.5, sd = 0.8)),
     list(fn = "rpois", args = list(lambda = 2.5)),
+    list(fn = "rt", args = list(df = 5.3)),
+    list(fn = "rweibull", args = list(shape = 1.5)),
+    list(fn = "rweibull", args = list(shape = 1.5, scale = 1.1)),
     list(fn = "runif"),
     list(fn = "runif", args = list(min = -1, max = 1))
   )
@@ -106,8 +116,8 @@ test_that("Can generate i.i.d samples from distributions correctly", {
     args <- as.list(t$args)
     sdf_fn <- getFromNamespace(paste0("sdf_", fn), "sparklyr")
     stats_fn <- getFromNamespace(fn, "stats")
-    stats_fn_args <- list(n = sample_sz) %>% append(args)
-    sdf_fn_args <- list(sc, n = sample_sz) %>%
+    stats_fn_args <- list(sample_sz) %>% append(args)
+    sdf_fn_args <- list(sc, sample_sz) %>%
       append(args) %>%
       append(
         list(num_partitions = num_partitions, seed = seed, output_col = "x")
