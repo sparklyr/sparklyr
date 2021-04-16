@@ -119,7 +119,6 @@ no_databricks_guid <- function() {
 #' connection_is_open(sc)
 #'
 #' spark_disconnect(sc)
-#'
 #' @details
 #'
 #' By default, when using \code{method = "livy"}, jars are downloaded from GitHub. But

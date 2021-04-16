@@ -19,7 +19,7 @@ test_that("spark_write_rds() works as expected with non-array columns", {
   test_double_vals <- c(NA_real_, jdouble.min, jdouble.max, 0, 1.234, -jdouble.min, -jdouble.max, NaN)
   test_float_vals <- c(NA_real_, jfloat.min, jfloat.max, 0, 1.234, -jfloat.min, -jfloat.max, NaN)
   test_string_vals <- c("abcDEF", "a", "A", "", NA, "Hello, world!", "\001\002\003", NA)
-  test_date_vals = c(
+  test_date_vals <- c(
     as.Date(2500 * seq(4), origin = "1970-01-01"),
     as.Date(NA_integer_, origin = "1970-01-01"),
     as.Date(10000 + 1000 * seq(3), origin = "1970-01-01")
@@ -127,7 +127,7 @@ test_that("spark_write_rds() works as expected with array columns", {
   skip_on_arrow()
   skip_databricks_connect()
 
-  test_lgl_arr = list(
+  test_lgl_arr <- list(
     TRUE,
     FALSE,
     NA,
@@ -137,7 +137,7 @@ test_that("spark_write_rds() works as expected with array columns", {
     c(TRUE, NA, NA, NA, FALSE)
   )
 
-  test_long_arr = list(
+  test_long_arr <- list(
     1234L,
     0L,
     -1234L,
@@ -147,7 +147,7 @@ test_that("spark_write_rds() works as expected with array columns", {
     rep(NA_integer_, 7)
   )
 
-  test_double_arr = list(
+  test_double_arr <- list(
     jfloat.min,
     jfloat.max,
     NA_real_,
@@ -157,7 +157,7 @@ test_that("spark_write_rds() works as expected with array columns", {
     c(1.432e5, 8.765, NA_real_, -714.2857, NA_real_, -1.432e10, NA_real_)
   )
 
-  test_string_arr = list(
+  test_string_arr <- list(
     c("a", "b", "c", NA_character_, ""),
     "",
     rep("", 7),
@@ -167,7 +167,7 @@ test_that("spark_write_rds() works as expected with array columns", {
     "Hello"
   )
 
-  test_long_arr = list(
+  test_long_arr <- list(
     1234L,
     0L,
     -1234L,
@@ -177,7 +177,7 @@ test_that("spark_write_rds() works as expected with array columns", {
     rep(NA_integer_, 7)
   )
 
-  test_date_arr = list(
+  test_date_arr <- list(
     as.Date(2500 * seq(4), origin = "1970-01-01"),
     as.Date(NA_integer_, origin = "1970-01-01"),
     as.Date(rep(NA_integer_, 7), origin = "1970-01-01"),

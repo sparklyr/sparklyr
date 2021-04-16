@@ -33,18 +33,17 @@ sdf_crosstab <- function(x, col1, col2) {
 NULL
 
 gen_samples_sdf <- function(
-                           sc,
-                           method,
-                           dist_params,
-                           n,
-                           num_partitions,
-                           seed,
-                           output_col,
-                           output_col_type = "double",
-                           cls = "org.apache.spark.mllib.random.RandomRDDs") {
+                            sc,
+                            method,
+                            dist_params,
+                            n,
+                            num_partitions,
+                            seed,
+                            output_col,
+                            output_col_type = "double",
+                            cls = "org.apache.spark.mllib.random.RandomRDDs") {
   num_partitions <- as.integer(num_partitions %||%
-    tryCatch(spark_context(sc) %>% invoke("defaultParallelism"), error = function(e) 4L)
-  )
+    tryCatch(spark_context(sc) %>% invoke("defaultParallelism"), error = function(e) 4L))
   seed <- as.numeric(seed %||% Sys.time())
   columns <- list(output_col_type)
   names(columns) <- output_col
@@ -52,8 +51,8 @@ gen_samples_sdf <- function(
   do.call(
     invoke_static,
     list(sc, cls, method, spark_context(sc)) %>%
-    append(unname(dist_params)) %>%
-    append(list(n, num_partitions, seed))
+      append(unname(dist_params)) %>%
+      append(list(n, num_partitions, seed))
   ) %>%
     invoke_static(sc, "sparklyr.RddUtils", paste0(output_col_type, "ToRow"), .) %>%
     invoke(spark_session(sc), "createDataFrame", ., schema) %>%
@@ -295,8 +294,7 @@ sdf_rnorm <- function(sc, n, mean = 0, sd = 1, num_partitions = NULL, seed = NUL
       "org.apache.spark.mllib.random.RandomRDDs"
     } else {
       "sparklyr.RandomRDDs"
-    }
-  )
+    })
 
   gen_samples_sdf(
     sc,
@@ -393,8 +391,7 @@ sdf_runif <- function(sc, n, min = 0, max = 1, num_partitions = NULL, seed = NUL
       "org.apache.spark.mllib.random.RandomRDDs"
     } else {
       "sparklyr.RandomRDDs"
-    }
-  )
+    })
 
   gen_samples_sdf(
     sc,

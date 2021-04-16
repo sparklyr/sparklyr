@@ -430,8 +430,7 @@ sdf_quantile <- function(x,
         probabilities,
         relative.error
       )
-    }
-  )
+    })
 
   if (length(column) == 1) {
     quantiles <- unlist(quantiles)

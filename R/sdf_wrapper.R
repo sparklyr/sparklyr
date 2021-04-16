@@ -90,8 +90,7 @@ sdf_schema_impl <- function(x,
             dtype
           } else {
             field$dtype$repr
-          }
-        )
+          })
 
         list(name = name, type = type)
       }

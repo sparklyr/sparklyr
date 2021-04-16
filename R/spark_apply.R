@@ -200,8 +200,8 @@ spark_apply <- function(x,
       invoke("sessionLocalTimeZone")
     records_per_batch <- as.integer(
       arrow_max_records_per_batch %||%
-      spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||%
-      10000
+        spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||%
+        10000
     )
   }
 
@@ -265,8 +265,7 @@ spark_apply <- function(x,
       function(x, ...) serializer$serializer(x)
     } else {
       serializer
-    }
-  )
+    })
   deserializer <- spark_apply_deserializer()
   closure <- (
     if (create_rlang_closure) {
@@ -275,8 +274,7 @@ spark_apply <- function(x,
       suppressWarnings(serialize_impl(f, version = serialize_version))
     } else {
       f
-    }
-  )
+    })
   context_serialize <- serialize_impl(context, version = serialize_version)
 
   # create rlang closure
@@ -538,8 +536,7 @@ spark_apply_serializer <- function() {
       function(x, version = NULL) serialize(x, NULL, version = version)
     } else {
       list(serializer = serializer)
-    }
-  )
+    })
 
   impl
 }
