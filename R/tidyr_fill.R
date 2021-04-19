@@ -72,8 +72,7 @@ to_partition_spec <- function(group_vars, order_exprs) {
       )
     } else {
       ""
-    }
-  )
+    })
   if (length(order_exprs) > 0) {
     spec <- sprintf(
       "%s ORDER BY %s",

@@ -434,8 +434,7 @@ spark_data_apply_mode <- function(options, mode) {
         invoke(options, "mode", mode)
       } else {
         stop("Unsupported type ", typeof(mode), " for mode parameter.")
-      }
-    )
+      })
   }
 
   options
@@ -1240,8 +1239,7 @@ spark_read <- function(sc,
       serializer$serializer
     } else {
       serializer
-    }
-  )
+    })
   deserializer <- spark_apply_deserializer()
   reader <- serialize_impl(reader)
   worker_impl <- function(df, rdr) {

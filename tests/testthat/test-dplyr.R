@@ -25,7 +25,7 @@ scalars_df <- tibble::tibble(
   b_a = c(FALSE, FALSE, TRUE, TRUE),
   b_b = c(FALSE, TRUE, FALSE, TRUE),
   ba = FALSE,
-  bb= TRUE,
+  bb = TRUE,
   n_a = c(2, 3, 6, 7),
   n_b = c(3, 6, 2, 7),
   c_a = c("aa", "ab", "ca", "dd"),
@@ -97,8 +97,8 @@ test_that("'across()' works with formula syntax", {
   skip_on_arrow()
 
   expect_equivalent(
-    dplyr_across_test_cases_tbl %>% mutate(across(where(is.numeric), ~ sin(.x ^ 3 + .x))) %>% collect(),
-    dplyr_across_test_cases_df %>% mutate(across(where(is.numeric), ~ sin(.x ^ 3 + .x)))
+    dplyr_across_test_cases_tbl %>% mutate(across(where(is.numeric), ~ sin(.x^3 + .x))) %>% collect(),
+    dplyr_across_test_cases_df %>% mutate(across(where(is.numeric), ~ sin(.x^3 + .x)))
   )
 })
 

@@ -20,7 +20,7 @@ gen_circle <- function(radius, num_pts) {
 }
 
 guassian_similarity <- function(pt1, pt2) {
-  dist2 <- sum((pt2 - pt1) ^ 2)
+  dist2 <- sum((pt2 - pt1)^2)
 
   exp(-dist2 / 2)
 }

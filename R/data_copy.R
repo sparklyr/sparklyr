@@ -238,8 +238,8 @@ spark_data_copy <- function(
   }
 
   if ((length(temporal_array_columns$date_array_columns) > 0 ||
-       length(temporal_array_columns$timestamp_array_columns) > 0) &&
-       spark_version(sc) >= "3.0"){
+    length(temporal_array_columns$timestamp_array_columns) > 0) &&
+    spark_version(sc) >= "3.0") {
     df <- invoke_static(
       sc,
       "sparklyr.TemporalArrayColumnUtils",

@@ -118,7 +118,7 @@ spark_tbl_sql <- function(src, from, ...) {
       as.integer(expand_nested_cols) * 2L + as.integer(expand_struct_cols) + 1L
     )
     if (!identical(self$schema_cache_state$ops, self$ops) ||
-        is.na(self$schema_cache_state$schema[[cache_index]])) {
+      is.na(self$schema_cache_state$schema[[cache_index]])) {
       self$schema_cache_state$ops <- self$ops
       self$schema_cache_state$schema[[cache_index]] <- schema_impl(
         self,

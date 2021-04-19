@@ -224,12 +224,10 @@ partial_eval_apply_fns <- function(call, sim_data, env, what) {
               rlang::expr(~ (!!rlang::sym(find_fun(fns[[i]])))(.x, !!!call$...))
             } else {
               rlang::abort(sprintf("Unsupported `.fns` for %s", what))
-            }
-          )
+            })
 
           rlang::expr(transform(array(!!!cols), !!fn))
-        }
-      )
+        })
     }
 
     rlang::expr(concat(!!!sub_exprs))
