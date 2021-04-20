@@ -188,6 +188,10 @@ jobs:
         run: remotes::install_deps(".", dependencies = TRUE, upgrade = FALSE)
         shell: Rscript {0}
         continue-on-error: true
+      - name: List installed R packages
+        run: print(as.data.frame(installed.packages())[,c("Package", "Version")])
+        shell: Rscript {0}
+        continue-on-error: true
       - name: Build
         env:
           WARNINGS_ARE_ERRORS: 1
