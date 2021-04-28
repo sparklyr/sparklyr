@@ -115,6 +115,23 @@ test_that("'spark_apply' supports partition index as parameter", {
   )
 })
 
+test_that("'spark_apply' supports nested lists as input type", {
+  skip_on_arrow()
+
+  sdf <- copy_to(sc, data.frame(a = c(1, 1, 1, 2, 2), b = c(1, 2, 3, 1, 2))) %>%
+    group_by(a) %>%
+    summarise(vals = collect_list(b))
+
+  fn <- function(x) {
+    dplyr::transmute(x, a, b = vals[[2]])
+  }
+
+  expect_equivalent(
+    spark_apply(sdf, fn) %>% collect(),
+    tibble::tibble(a = c(1, 1, 1, 2, 2), b = 2)
+  )
+})
+
 test_that("'spark_apply' supports nested lists as return type", {
   skip_databricks_connect()
   test_requires_version("2.4.0")

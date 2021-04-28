@@ -1634,7 +1634,22 @@ spark_worker_apply <- function(sc, config) {
       if (config$single_binary_column) {
         tibble::tibble(encoded = lapply(data, function(x) x[[1]]))
       } else {
-        do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
+        bind_rows <- core_get_package_function("dplyr", "bind_rows")
+        as_tibble <- core_get_package_function("tibble", "as_tibble")
+        if (!is.null(bind_rows) && !is.null(as_tibble)) {
+          do.call(
+            bind_rows,
+            lapply(
+              data, function(x) { as_tibble(x, .name_repair = "universal") }
+            )
+          )
+        } else {
+          warning("dplyr::bind_rows or tibble::as_tibble is unavailable, ",
+                  "falling back to rbind implementation in base R. ",
+                  "Inputs with list column(s) will not work.")
+
+          do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
+        }
       })
 
     if (!config$single_binary_column) {
