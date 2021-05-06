@@ -63,7 +63,7 @@ gen_circle <- function(radius, num_pts) {
 }
 
 guassian_similarity <- function(pt1, pt2) {
-  dist2 <- sum((pt2 - pt1) ^ 2)
+  dist2 <- sum((pt2 - pt1)^2)
 
   exp(-dist2 / 2)
 }
@@ -96,10 +96,10 @@ gen_pic_data <- function() {
 pic_data <- copy_to(sc, gen_pic_data())
 
 clusters <- ml_power_iteration(
-  pic_data, src_col = "src", dst_col = "dst", weight_col = "sim", k = 2, max_iter = 40
+  pic_data,
+  src_col = "src", dst_col = "dst", weight_col = "sim", k = 2, max_iter = 40
 )
 print(clusters)
-
 }
 
 }

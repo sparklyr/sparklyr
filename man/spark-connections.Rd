@@ -113,5 +113,4 @@ sc <- spark_connect(
 connection_is_open(sc)
 
 spark_disconnect(sc)
-
 }
