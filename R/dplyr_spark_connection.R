@@ -214,7 +214,7 @@ spark_sql_translation <- function(con) {
     )
   }
 
-  dbplyr::sql_variant(
+  sparklyr_base_sql_variant <- list(
     scalar = dbplyr::sql_translator(
       .parent = dbplyr::base_scalar,
       as.numeric = function(x) dbplyr::build_sql("CAST(", x, " AS DOUBLE)"),
@@ -415,6 +415,30 @@ spark_sql_translation <- function(con) {
           partition = dbplyr::win_current_group()
         )
       }
+    )
+  )
+
+  dbplyr::sql_variant(
+    scalar = do.call(
+      dbplyr::sql_translator,
+      append(
+        list(.parent = sparklyr_base_sql_variant$scalar),
+        con$extensions$dbplyr_sql_variant$scalar
+      )
+    ),
+    aggregate = do.call(
+      dbplyr::sql_translator,
+      append(
+        list(.parent = sparklyr_base_sql_variant$aggregate),
+        con$extensions$dbplyr_sql_variant$aggregate
+      )
+    ),
+    window = do.call(
+      dbplyr::sql_translator,
+      append(
+        list(.parent = sparklyr_base_sql_variant$window),
+        con$extensions$dbplyr_sql_variant$window
+      )
     )
   )
 }

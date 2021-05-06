@@ -10,6 +10,7 @@ spark_dependency(
   initializer = NULL,
   catalog = NULL,
   repositories = NULL,
+  dbplyr_sql_variant = NULL,
   ...
 )
 }
@@ -23,6 +24,15 @@ spark_dependency(
 \item{catalog}{Optional location where extension JAR files can be downloaded for Livy.}
 
 \item{repositories}{Character vector of Spark package repositories.}
+
+\item{dbplyr_sql_variant}{Customization of dbplyr SQL translation env. Must be a
+named list of the following form:
+  list(
+    scalar = list(scalar_fn1 = ..., scalar_fn2 = ..., <etc>),
+    aggregate = list(agg_fn1 = ..., agg_fn2 = ..., <etc>),
+    window = list(wnd_fn1 = ..., wnd_fn2 = ..., <etc>)
+  )
+See \code{\link[dplyr:sql_substr]{dbplyr::sql_variant()}} for details.}
 
 \item{...}{Additional optional arguments.}
 }
