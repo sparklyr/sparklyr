@@ -26,7 +26,8 @@ registered_extensions <- function() {
 
 #' Define a Spark dependency
 #'
-#' Define a Spark dependency consisting of a set of custom JARs and Spark packages.
+#' Define a Spark dependency consisting of a set of custom JARs, Spark packages,
+#' and customized dbplyr SQL translation env.
 #'
 #' @param jars Character vector of full paths to JAR files.
 #' @param packages Character vector of Spark packages names.

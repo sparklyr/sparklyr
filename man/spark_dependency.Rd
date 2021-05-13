@@ -40,5 +40,6 @@ See \code{\link[dplyr:sql_substr]{dbplyr::sql_variant()}} for details.}
 An object of type `spark_dependency`
 }
 \description{
-Define a Spark dependency consisting of a set of custom JARs and Spark packages.
+Define a Spark dependency consisting of a set of custom JARs, Spark packages,
+and customized dbplyr SQL translation env.
 }
