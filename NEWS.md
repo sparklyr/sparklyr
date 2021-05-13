@@ -6,6 +6,43 @@
   the input while ensuring the same 'ORDER BY' operation is never duplicated
   twice in the generated Spark SQL query
 
+- Helper functions such as `sdf_rbeta()`, `sdf_rbinom()`, etc were implemented
+  for generating Spark dataframes containing i.i.d. samples from commonly used
+  probability distributions.
+
+- Fixed a bug with `compute.tbl_spark()`'s handling of positional args.
+
+- Fixed a bug that previously affected `dplyr::tbl()` when the source table
+  is specified using `dbplyr::in_schema()`.
+
+- Internal calls to `sdf_schema.tbl_spark()` and `spark_dataframe.tbl_spark()`
+  are memoized to reduce performance overhead from repeated `spark_invoke()`s.
+
+- `spark_read_libsvm()` now supports specifications of additional options via
+  the `options` parameter. Additional libsvm data source options currently
+  supported by Spark include `numFeatures` and `vectorType` (see
+  https://spark.apache.org/docs/latest/api/java/org/apache/spark/ml/source/libsvm/LibSVMDataSource.html).
+
+- `spark_read_binary()` was implemented to support binary data sources.
+
+### Distributed R
+
+- `spark_apply()` was improved to support `tibble` inputs containing list
+  columns.
+
+- Spark dataframes created by `spark_apply()` will be cached by default to
+  avoid re-computations.
+
+- `spark_apply()` and `do_spark()` now support `qs` and custom serializations.
+
+### Extensions
+
+- Sparklyr extensions can now customize dbplyr SQL translator env used by
+  `sparklyr` by supplying their own dbplyr SQL variant when calling
+  `spark_dependency()` (see
+  https://github.com/r-spark/sparklyr.sedona/blob/1455d3dea51ad16114a8112f2990ec542458aee2/R/dependencies.R#L38
+  for an example).
+
 # Sparklyr 1.6.2
 
 ### Data
