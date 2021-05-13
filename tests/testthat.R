@@ -150,6 +150,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
     test_cases <- list(
       c(
+        "^jarray$",
         "^spark-apply$",
         "^spark-apply-bundle$",
         "^spark-apply-ext$"

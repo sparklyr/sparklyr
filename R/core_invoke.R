@@ -41,10 +41,11 @@ core_invoke_cancel_running <- function(sc) {
   if (exists("connection_progress_terminated")) connection_progress_terminated(sc)
 }
 
-write_bin_args <- function(backend, object, static, method, args) {
+write_bin_args <- function(backend, object, static, method, args, return_jobj_ref = FALSE) {
   rc <- rawConnection(raw(), "r+")
   writeString(rc, object)
   writeBoolean(rc, static)
+  writeBoolean(rc, return_jobj_ref)
   writeString(rc, method)
 
   writeInt(rc, length(args))
@@ -99,14 +100,14 @@ core_invoke_socket_name <- function(sc) {
 }
 
 core_remove_jobjs <- function(sc, ids) {
-  core_invoke_method_impl(sc, static = TRUE, noreply = TRUE, "Handler", "rm", as.list(ids))
+  core_invoke_method_impl(sc, static = TRUE, noreply = TRUE, "Handler", "rm", FALSE, as.list(ids))
 }
 
-core_invoke_method <- function(sc, static, object, method, ...) {
-  core_invoke_method_impl(sc, static, noreply = FALSE, object, method, ...)
+core_invoke_method <- function(sc, static, object, method, return_jobj_ref, ...) {
+  core_invoke_method_impl(sc, static, noreply = FALSE, object, method, return_jobj_ref, ...)
 }
 
-core_invoke_method_impl <- function(sc, static, noreply, object, method, ...) {
+core_invoke_method_impl <- function(sc, static, noreply, object, method, return_jobj_ref, ...) {
   # N.B.: the reference to `object` must be retained until after a value or exception is returned to us
   # from the invoked method here (i.e., cannot have `object <- something_else` before that), because any
   # re-assignment could cause the last reference to `object` to be destroyed and the underlying JVM object
@@ -153,7 +154,7 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...) {
   # if the object is a jobj then get it's id
   objId <- ifelse(inherits(object, "spark_jobj"), object$id, object)
 
-  write_bin_args(backend, objId, static, method, args)
+  write_bin_args(backend, objId, static, method, args, return_jobj_ref)
 
   if (identical(object, "Handler") &&
     (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {

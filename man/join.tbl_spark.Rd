@@ -53,23 +53,31 @@
 )
 }
 \arguments{
-\item{x}{tbls to join}
+\item{x}{A pair of lazy data frames backed by database queries.}
 
-\item{y}{tbls to join}
+\item{y}{A pair of lazy data frames backed by database queries.}
 
-\item{by}{a character vector of variables to join by.  If \code{NULL}, the
-default, \code{*_join()} will do a natural join, using all variables with
-common names across the two tables. A message lists the variables so
-that you can check they're right (to suppress the message, simply
-explicitly list the variables that you want to join).
+\item{by}{A character vector of variables to join by.
 
-To join by different variables on x and y use a named vector.
-For example, \code{by = c("a" = "b")} will match \code{x.a} to
-\code{y.b}.}
+If \code{NULL}, the default, \verb{*_join()} will perform a natural join, using all
+variables in common across \code{x} and \code{y}. A message lists the variables so that you
+can check they're correct; suppress the message by supplying \code{by} explicitly.
+
+To join by different variables on \code{x} and \code{y}, use a named vector.
+For example, \code{by = c("a" = "b")} will match \code{x$a} to \code{y$b}.
+
+To join by multiple variables, use a vector with length > 1.
+For example, \code{by = c("a", "b")} will match \code{x$a} to \code{y$a} and \code{x$b} to
+\code{y$b}. Use a named vector to match different variables in \code{x} and \code{y}.
+For example, \code{by = c("a" = "b", "c" = "d")} will match \code{x$a} to \code{y$b} and
+\code{x$c} to \code{y$d}.
+
+To perform a cross-join, generating all combinations of \code{x} and \code{y},
+use \code{by = character()}.}
 
 \item{copy}{If \code{x} and \code{y} are not from the same data source,
 and \code{copy} is \code{TRUE}, then \code{y} will be copied into a
-temporary table in same database as \code{x}. \code{*_join()} will automatically
+temporary table in same database as \code{x}. \verb{*_join()} will automatically
 run \code{ANALYZE} on the created table in the hope that this will make
 you queries as efficient as possible by giving more data to the query
 planner.
@@ -85,12 +93,13 @@ Should be a character vector of length 2.}
 indices for the variables in \code{by}. This may speed up the join if
 there are matching indexes in \code{x}.}
 
-\item{...}{other parameters passed onto methods, for instance, \code{na_matches}
-to control how \code{NA} values are matched.  See \link{join.tbl_df} for more.}
+\item{...}{Other parameters passed onto methods.}
 
-\item{sql_on}{A custom join predicate as an SQL expression. The SQL
-can refer to the \code{LHS} and \code{RHS} aliases to disambiguate
-column names.}
+\item{sql_on}{A custom join predicate as an SQL expression.
+Usually joins use column equality, but you can perform more complex
+queries by supply \code{sql_on} which should be a SQL expression that
+uses \code{LHS} and \code{RHS} aliases to refer to the left-hand side or
+right-hand side of the join respectively.}
 }
 \description{
 These functions are wrappers around their `dplyr` equivalents that set

@@ -30,7 +30,7 @@ class Invoke {
           while (i < numArgs && argMatched) {
             val parameterType = parameterTypes(i)
 
-            if (parameterType == classOf[Seq[Any]] &&
+            if (parameterType.isAssignableFrom(classOf[Seq[Any]]) &&
                 args(i) != null && args(i).getClass.isArray) {
               // The case that the parameter type is a Scala Seq and the argument
               // is a Java array is considered matching. The array will be converted
@@ -61,7 +61,11 @@ class Invoke {
                   case _ => parameterType
                 }
               }
-              if ((parameterType.isPrimitive || args(i) != null) &&
+              if (args(i) != null &&
+                  parameterWrapperType.isAssignableFrom(args(i).getClass)) {
+                // If the parameter type in question is assignable from args(i), then
+                // consider args(i) a match.
+              } else if ((parameterType.isPrimitive || args(i) != null) &&
                   !parameterWrapperType.isInstance(args(i))) {
                 argMatched = false
 

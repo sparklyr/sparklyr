@@ -33,6 +33,23 @@ invoke <- function(jobj, method, ...) {
   UseMethod("invoke")
 }
 
+#' Invoke a Java function.
+#'
+#' Invoke a Java function and force return value of the call to be retrieved
+#' as a Java object reference.
+#'
+#' @inheritParams invoke
+#'
+#' @name j_invoke
+NULL
+
+#' @name j_invoke
+#' @export
+j_invoke <- function(jobj, method, ...) {
+  invoke_trace(spark_connection(jobj), "Invoking", method)
+  UseMethod("j_invoke")
+}
+
 #' @name invoke
 #' @export
 invoke_static <- function(sc, class, method, ...) {
@@ -40,11 +57,23 @@ invoke_static <- function(sc, class, method, ...) {
   UseMethod("invoke_static")
 }
 
+#' @name j_invoke
+#' @export
+j_invoke_static <- function(sc, class, method, ...) {
+  UseMethod("j_invoke_static")
+}
+
 #' @name invoke
 #' @export
 invoke_new <- function(sc, class, ...) {
   invoke_trace(sc, "Invoking", class)
   UseMethod("invoke_new")
+}
+
+#' @name j_invoke
+#' @export
+j_invoke_new <- function(sc, class, ...) {
+  UseMethod("j_invoke_new")
 }
 
 #' Generic Call Interface
@@ -57,11 +86,32 @@ invoke_new <- function(sc, class, ...) {
 #' @param method Name of method
 #' @param ... Call parameters
 #'
+#' @name generic_call_interface
+NULL
+
+#' Generic Call Interface
+#'
+#' @inheritParams generic_call_interface
+#'
 #' @keywords internal
 #'
 #' @export
 invoke_method <- function(sc, static, object, method, ...) {
   UseMethod("invoke_method")
+}
+
+#' Generic Call Interface
+#'
+#' Call a Java method and retrieve the return value through a JVM object
+#' reference.
+#'
+#' @inheritParams generic_call_interface
+#'
+#' @keywords internal
+#'
+#' @export
+j_invoke_method <- function(sc, static, object, method, ...) {
+  UseMethod("j_invoke_method")
 }
 
 invoke_trace <- function(sc, ...) {

@@ -31,6 +31,33 @@ random_string <- function(prefix = "table") {
   paste0(prefix, "_", gsub("-", "_", uuid::UUIDgenerate()))
 }
 
+#' Instantiate a Java array with a specific element type.
+#'
+#' Given a list of Java object references, instantiate an \code{Array[T]}
+#' containing the same list of references, where \code{T} is a non-primitive
+#' type that is more specific than \code{java.lang.Object}.
+#'
+#' @param x A list of Java object references.
+#' @param element_type A valid Java class name representing the generic type
+#'   parameter of the Java array to be instantiated. Each element of \code{x}
+#'   must refer to a Java object that is assignable to \code{element_type}.
+#'
+#' @examples
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' string_arr <- jarray(sc, letters, element_type = "java.lang.String")
+#' # string_arr is now a reference to an array of type String[]
+#'
+#' @export
+jarray <- function(sc, x, element_type) {
+  cls <- paste0("[L", element_type, ";")
+  arr_cls <- invoke_static(sc, "java.lang.Class", "forName", cls)
+
+  j_invoke_static(
+    sc, "java.util.Arrays", "copyOf", as.list(x), length(x), arr_cls
+  )
+}
+
 printf <- function(fmt, ...) {
   cat(sprintf(fmt, ...))
 }
