@@ -581,7 +581,12 @@ spark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
 
 #' @export
 invoke_method.spark_shell_connection <- function(sc, static, object, method, ...) {
-  core_invoke_method(sc, static, object, method, ...)
+  core_invoke_method(sc, static, object, method, FALSE, ...)
+}
+
+#' @export
+j_invoke_method.spark_shell_connection <- function(sc, static, object, method, ...) {
+  core_invoke_method(sc, static, object, method, TRUE, ...)
 }
 
 #' @export
@@ -783,11 +788,26 @@ invoke.shell_jobj <- function(jobj, method, ...) {
 }
 
 #' @export
+j_invoke.shell_jobj <- function(jobj, method, ...) {
+  j_invoke_method(spark_connection(jobj), FALSE, jobj, method, ...)
+}
+
+#' @export
 invoke_static.spark_shell_connection <- function(sc, class, method, ...) {
   invoke_method(sc, TRUE, class, method, ...)
 }
 
 #' @export
+j_invoke_static.spark_shell_connection <- function(sc, class, method, ...) {
+  j_invoke_method(sc, TRUE, class, method, ...)
+}
+
+#' @export
 invoke_new.spark_shell_connection <- function(sc, class, ...) {
   invoke_method(sc, TRUE, class, "<init>", ...)
+}
+
+#' @export
+j_invoke_new.spark_shell_connection <- function(sc, class, ...) {
+  j_invoke_method(sc, TRUE, class, "<init>", ...)
 }

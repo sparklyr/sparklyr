@@ -483,23 +483,25 @@ livy_invoke_statement <- function(sc, statement) {
   result
 }
 
-livy_invoke_statement_command <- function(sc, static, jobj, method, ...) {
+livy_invoke_statement_command <- function(sc, static, jobj, method, return_jobj_ref, ...) {
+  prefix <- if (return_jobj_ref) "j_" else ""
+
   if (identical(method, "<init>")) {
-    paste0("// invoke_new(sc, '", jobj, "', ...)")
+    paste0("// ", prefix, "invoke_new(sc, '", jobj, "', ...)")
   } else if (is.character(jobj)) {
-    paste0("// invoke_static(sc, '", jobj, "', '", method, "', ...)")
+    paste0("// ", prefix, "invoke_static(sc, '", jobj, "', '", method, "', ...)")
   } else {
-    paste0("// invoke(sc, <jobj>, '", method, "', ...)")
+    paste0("// ", prefix, "invoke(sc, <jobj>, '", method, "', ...)")
   }
 }
 
-livy_invoke_statement_fetch <- function(sc, static, jobj, method, ...) {
+livy_invoke_statement_fetch <- function(sc, static, jobj, method, return_jobj_ref, ...) {
   statement <- livy_statement_compose(sc, static, jobj, method, ...)
 
   # Note: Spark 2.0 requires magic to be present in the statement with the definition.
   statement$code <- paste(
     paste(
-      livy_invoke_statement_command(sc, static, jobj, method, ...),
+      livy_invoke_statement_command(sc, static, jobj, method, return_jobj_ref, ...),
       statement$code,
       sep = "\n"
     ),
@@ -776,17 +778,31 @@ print_jobj.livy_connection <- print_jobj.spark_shell_connection
 
 #' @export
 invoke.livy_jobj <- function(jobj, method, ...) {
-  livy_invoke_statement_fetch(spark_connection(jobj), FALSE, jobj, method, ...)
+  livy_invoke_statement_fetch(spark_connection(jobj), FALSE, jobj, method, FALSE, ...)
+}
+
+j_invoke.livy_jobj <- function(jobj, method, ...) {
+  livy_invoke_statement_fetch(spark_connection(jobj), FALSE, jobj, method, TRUE, ...)
 }
 
 #' @export
 invoke_static.livy_connection <- function(sc, class, method, ...) {
-  livy_invoke_statement_fetch(sc, TRUE, class, method, ...)
+  livy_invoke_statement_fetch(sc, TRUE, class, method, FALSE, ...)
+}
+
+#' @export
+j_invoke_static.livy_connection <- function(sc, class, method, ...) {
+  livy_invoke_statement_fetch(sc, TRUE, class, method, TRUE, ...)
 }
 
 #' @export
 invoke_new.livy_connection <- function(sc, class, ...) {
-  livy_invoke_statement_fetch(sc, TRUE, class, "<init>", ...)
+  livy_invoke_statement_fetch(sc, TRUE, class, "<init>", FALSE, ...)
+}
+
+#' @export
+j_invoke_new.livy_connection <- function(sc, class, ...) {
+  livy_invoke_statement_fetch(sc, TRUE, class, "<init>", TRUE, ...)
 }
 
 invoke_raw <- function(sc, code, ...) {
