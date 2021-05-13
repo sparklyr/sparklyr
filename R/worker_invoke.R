@@ -1,7 +1,7 @@
 # nocov start
 
 worker_invoke_method <- function(sc, static, object, method, ...) {
-  core_invoke_method(sc, static, object, method, ...)
+  core_invoke_method(sc, static, object, method, FALSE, ...)
 }
 
 worker_invoke <- function(jobj, method, ...) {

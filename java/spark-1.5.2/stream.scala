@@ -9,7 +9,7 @@ import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
 import io.netty.channel.ChannelHandler.Sharable
 
 class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
-  val invoke = new Invoke()
+  private[this] val invoke = new Invoke()
 
   def classExists(name: String): Boolean = {
     scala.util.Try(Class.forName(name)).isSuccess
@@ -29,6 +29,7 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
 
     val objId = Serializer.readString(dis)
     val isStatic = Serializer.readBoolean(dis)
+    val returnJObjRef = Serializer.readBoolean(dis)
     val methodName = Serializer.readString(dis)
     val numArgs = Serializer.readInt(dis)
 
@@ -58,7 +59,7 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
           Serializer.writeString(dos, s"Error: unknown method $methodName")
       }
     } else {
-      handleMethodCall(isStatic, objId, methodName, numArgs, dis, dos, classMap, logger)
+      handleMethodCall(isStatic, objId, methodName, numArgs, dis, dos, classMap, logger, returnJObjRef)
     }
 
     bos.toByteArray
@@ -87,7 +88,8 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
     dis: DataInputStream,
     dos: DataOutputStream,
     classMap: Map[String, Object],
-    logger: Logger): Unit = {
+    logger: Logger,
+    returnJObjRef: Boolean): Unit = {
       var obj: Object = null
       try {
         var cls = if (isStatic) {
@@ -136,7 +138,12 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
           res = invoke.invoke(cls, objId, obj, methodName, args, logger)
         }
         Serializer.writeInt(dos, 0)
-        serializer.writeObject(dos, res.asInstanceOf[AnyRef])
+        if (returnJObjRef) {
+          Serializer.writeType(dos, "jobj")
+          serializer.writeJObj(dos, res.asInstanceOf[AnyRef])
+        } else {
+          serializer.writeObject(dos, res.asInstanceOf[AnyRef])
+        }
       } catch {
         case e: Exception =>
           val cause = exceptionString(

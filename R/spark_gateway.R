@@ -110,4 +110,7 @@ spark_web.spark_gateway_connection <- function(sc, ...) {
 invoke_method.spark_gateway_connection <- invoke_method.spark_shell_connection
 
 #' @export
+j_invoke_method.spark_gateway_connection <- j_invoke_method.spark_shell_connection
+
+#' @export
 print_jobj.spark_gateway_connection <- print_jobj.spark_shell_connection

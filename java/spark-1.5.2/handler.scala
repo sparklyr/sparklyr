@@ -29,6 +29,7 @@ class BackendHandler(
 
     val objId = Serializer.readString(dis)
     val isStatic = Serializer.readBoolean(dis)
+    val returnJObjRef = Serializer.readBoolean(dis)
     val methodName = Serializer.readString(dis)
     val numArgs = Serializer.readInt(dis)
 
