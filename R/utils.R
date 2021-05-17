@@ -37,6 +37,7 @@ random_string <- function(prefix = "table") {
 #' containing the same list of references, where \code{T} is a non-primitive
 #' type that is more specific than \code{java.lang.Object}.
 #'
+#' @param sc A \code{spark_connection}.
 #' @param x A list of Java object references.
 #' @param element_type A valid Java class name representing the generic type
 #'   parameter of the Java array to be instantiated. Each element of \code{x}
@@ -56,6 +57,27 @@ jarray <- function(sc, x, element_type) {
   j_invoke_static(
     sc, "java.util.Arrays", "copyOf", as.list(x), length(x), arr_cls
   )
+}
+
+#' Instantiate a Java float type.
+#'
+#' Instantiate a \code{java.lang.Float} object with the value specified.
+#' NOTE: this method is useful when one has to invoke a Java/Scala method
+#' requiring a float (instead of double) type for at least one of its
+#' parameters.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param x A numeric value in R.
+#'
+#' @examples
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' jflt <- jfloat(sc, 1.23e-8)
+#' # jflt is now a reference to a java.lang.Float object
+#'
+#' @export
+jfloat <- function(sc, x) {
+  j_invoke_new(sc, "java.lang.Float", x)
 }
 
 printf <- function(fmt, ...) {

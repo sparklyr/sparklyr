@@ -36,7 +36,9 @@ object Test {
   def getNumber(): Int = number
 
   def readMap(x: Map[_, _]): Map[_, _] = x
+
   def readTestValueArray(x: Array[TestValue]): Int = x.length
+  def readFloat(x: Float): Float = x
 }
 
 package object test {

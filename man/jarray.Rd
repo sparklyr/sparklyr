@@ -7,6 +7,8 @@
 jarray(sc, x, element_type)
 }
 \arguments{
+\item{sc}{A \code{spark_connection}.}
+
 \item{x}{A list of Java object references.}
 
 \item{element_type}{A valid Java class name representing the generic type
