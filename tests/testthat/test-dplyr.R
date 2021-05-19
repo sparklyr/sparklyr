@@ -15,7 +15,7 @@ df2_tbl <- testthat_tbl("df2")
 dplyr_across_test_cases_df <- tibble(
   x = seq(3),
   y = letters[1:3],
-  t = as.POSIXct(seq(3), origin = "1970-01-01"),
+  t = as.POSIXct(seq(3), origin = "1970-01-01", tz = "UTC"),
   z = seq(3) + 5L
 )
 dplyr_across_test_cases_tbl <- testthat_tbl("dplyr_across_test_cases_df")

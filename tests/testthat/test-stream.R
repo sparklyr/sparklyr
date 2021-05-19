@@ -151,7 +151,7 @@ test_stream("stream_lag() works as expected", {
   expect_true(output_sdf %>% sdf_is_streaming())
   expect_equivalent(
     output_sdf %>% collect(),
-    expected %>% dplyr::mutate(x = as.POSIXct(x, origin = "1970-01-01"))
+    expected %>% dplyr::mutate(x = as.POSIXct(x, origin = "1970-01-01", tz = "UTC"))
   )
 })
 
