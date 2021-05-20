@@ -20,9 +20,9 @@ test_that("spark_write_rds() works as expected with non-array columns", {
   test_float_vals <- c(NA_real_, jfloat.min, jfloat.max, 0, 1.234, -jfloat.min, -jfloat.max, NaN)
   test_string_vals <- c("abcDEF", "a", "A", "", NA, "Hello, world!", "\001\002\003", NA)
   test_date_vals <- c(
-    as.Date(2500 * seq(4), origin = "1970-01-01"),
-    as.Date(NA_integer_, origin = "1970-01-01"),
-    as.Date(10000 + 1000 * seq(3), origin = "1970-01-01")
+    as.Date(2500 * seq(4), origin = "1970-01-01", tz = "UTC"),
+    as.Date(NA_integer_, origin = "1970-01-01", tz = "UTC"),
+    as.Date(10000 + 1000 * seq(3), origin = "1970-01-01", tz = "UTC")
   )
   test_struct_vals <- list(
     list(
@@ -178,13 +178,13 @@ test_that("spark_write_rds() works as expected with array columns", {
   )
 
   test_date_arr <- list(
-    as.Date(2500 * seq(4), origin = "1970-01-01"),
-    as.Date(NA_integer_, origin = "1970-01-01"),
-    as.Date(rep(NA_integer_, 7), origin = "1970-01-01"),
-    as.Date(10000 + 1000 * seq(3), origin = "1970-01-01"),
-    as.Date(c(1, NA_integer_, 2), origin = "1970-01-01"),
-    as.Date(NULL, origin = "1970-01-01"),
-    as.Date(1, origin = "1970-01-01")
+    as.Date(2500 * seq(4), origin = "1970-01-01", tz = "UTC"),
+    as.Date(NA_integer_, origin = "1970-01-01", tz = "UTC"),
+    as.Date(rep(NA_integer_, 7), origin = "1970-01-01", tz = "UTC"),
+    as.Date(10000 + 1000 * seq(3), origin = "1970-01-01", tz = "UTC"),
+    as.Date(c(1, NA_integer_, 2), origin = "1970-01-01", tz = "UTC"),
+    as.Date(NULL, origin = "1970-01-01", tz = "UTC"),
+    as.Date(1, origin = "1970-01-01", tz = "UTC")
   )
 
   arr_sdf <- copy_to(
@@ -268,5 +268,9 @@ test_that("spark_write_rds() works as expected with multiple Spark dataframe par
       }
     )
 
-  expect_equivalent(do.call(rbind, partitions), flights)
+  actual_df <- do.call(rbind, partitions)
+  flights_df <- flights
+  # ignore timezone attributes in expect_equivalent() comparison
+  attributes(flights_df$time_hour) <- attributes(actual_df$time_hour)
+  expect_equivalent(actual_df, flights_df)
 })

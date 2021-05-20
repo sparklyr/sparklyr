@@ -210,8 +210,6 @@ jobs:
           export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
           export JAVA_HOME="${{ steps.install-java.outputs.JAVA_HOME }}"
 
-          sudo timedatectl set-timezone America/Los_Angeles
-
           if [[ $CODE_COVERAGE == "true" ]]; then
             Rscript ci/.ci.R --coverage || :
           else
