@@ -89,8 +89,9 @@ test_that("ml_kmeans() works properly", {
 })
 
 test_that("ml_compute_cost() for kmeans", {
-  sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "ml_compute_cost() requires Spark 2.0+")
+
+  sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, k = 5, seed = 11)
 
@@ -112,4 +113,27 @@ test_that("ml_compute_cost() for kmeans", {
       tolerance = 0.01, scale = 1
     )
   }
+})
+
+test_that("ml_compute_silhouette_measure() for kmeans", {
+  test_requires_version("3.0.0", "ml_compute_silhouette_measure() requires Spark 2.0+")
+
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
+  iris_kmeans <- ml_kmeans(iris_tbl, ~ . - Species, k = 5, seed = 11)
+
+  version <- spark_version(sc)
+
+  expect_equal(
+    ml_compute_silhouette_measure(iris_kmeans, iris_tbl),
+    0.613,
+    tolerance = 0.01, scale = 1
+  )
+  expect_equal(
+    iris_tbl %>%
+      ft_r_formula(~ . - Species) %>%
+      ml_compute_silhouette_measure(iris_kmeans$model, .),
+    0.613,
+    tolerance = 0.01, scale = 1
+  )
 })
