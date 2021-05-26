@@ -1112,7 +1112,7 @@ spark_write_avro <- function(x,
   )
 }
 
-#' Read binary data data into a Spark DataFrame.
+#' Read binary data into a Spark DataFrame.
 #'
 #' Read binary files within a directory and convert each file into a record
 #' within the resulting Spark dataframe. The output will be a Spark dataframe
@@ -1159,6 +1159,51 @@ spark_read_binary <- function(sc,
       pathGlobFilter = path_glob_filter,
       recursiveFileLookup = tolower(as.character(recursive_file_lookup))
     ),
+    repartition = repartition,
+    memory = memory,
+    overwrite = overwrite
+  )
+}
+
+#' Read image data into a Spark DataFrame.
+#'
+#' Read image files within a directory and convert each file into a record
+#' within the resulting Spark dataframe. The output will be a Spark dataframe
+#' consisting of struct types containing the following attributes:
+#'   \itemize{
+#'     \item{origin: StringType}
+#'     \item{height: IntegerType}
+#'     \item{width: IntegerType}
+#'     \item{nChannels: IntegerType}
+#'     \item{mode: IntegerType}
+#'     \item{data: BinaryType}
+#'  }
+#'
+#' @inheritParams spark_read_csv
+#' @param dir Directory to read binary files from.
+#' @param drop_invalid Whether to drop files that are not valid images from the
+#'   result (default: TRUE).
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_image <- function(sc,
+                             name = NULL,
+                             dir = name,
+                             drop_invalid = TRUE,
+                             repartition = 0,
+                             memory = TRUE,
+                             overwrite = TRUE) {
+  if (spark_version(sc) < "2.4.0") {
+    stop("Image data source is only supported in Spark 2.4 or above.")
+  }
+
+  spark_read_source(
+    sc,
+    name = name,
+    path = dir,
+    source = "image",
+    options = list(dropInvalid = drop_invalid),
     repartition = repartition,
     memory = memory,
     overwrite = overwrite

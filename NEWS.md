@@ -23,6 +23,8 @@
   supported by Spark include `numFeatures` and `vectorType` (see
   https://spark.apache.org/docs/latest/api/java/org/apache/spark/ml/source/libsvm/LibSVMDataSource.html).
 
+- `spark_read_image()` was implemented to support image files as data sources.
+
 - `spark_read_binary()` was implemented to support binary data sources.
 
 ### Distributed R

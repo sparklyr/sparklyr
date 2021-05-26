@@ -58,6 +58,7 @@ Other Spark serialization routines:
 \code{\link{spark_read_binary}()},
 \code{\link{spark_read_csv}()},
 \code{\link{spark_read_delta}()},
+\code{\link{spark_read_image}()},
 \code{\link{spark_read_jdbc}()},
 \code{\link{spark_read_json}()},
 \code{\link{spark_read_libsvm}()},
