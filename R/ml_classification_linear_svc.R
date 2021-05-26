@@ -67,6 +67,15 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
     c(rlang::dots_list(...)) %>%
     validator_ml_linear_svc()
 
+  sc <- spark_connection(x)
+  if (spark_version(sc) >= "3.0" && !is.null(.args[["weight_col"]])) {
+    warning("Support for `weight_col` is removed in Spark 3.0 or above because",
+            "it is not intended for users (see ",
+            "https://spark.apache.org/docs/latest/ml-migration-guide.html#breaking-changes",
+            "). The `weight_col` parameter will be ignored.")
+    .args[["weight_col"]] <- NULL
+  }
+
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.LinearSVC", uid,
     features_col = .args[["features_col"]], label_col = .args[["label_col"]],
