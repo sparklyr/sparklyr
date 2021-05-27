@@ -118,8 +118,7 @@ get_spark_apply_bundle_path <- function(sc, packages) {
   bundle_path <- ""
   if (spark_apply_packages_is_bundle(packages)) {
     bundle_path <- packages
-  }
-  else if (isTRUE(packages) || is.character(packages)) {
+  } else if (isTRUE(packages) || is.character(packages)) {
     bundle_base <- spark_apply_bundle_path()
     bundle_path <- spark_apply_bundle_file(packages, bundle_base, sc$sessionId)
     if (!file.exists(bundle_path)) {
