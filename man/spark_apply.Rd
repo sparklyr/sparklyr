@@ -17,6 +17,7 @@ spark_apply(
   fetch_result_as_sdf = TRUE,
   partition_index_param = "",
   arrow_max_records_per_batch = NULL,
+  auto_deps = FALSE,
   ...
 )
 }
@@ -91,6 +92,15 @@ specify the column types. The sample size is configurable using the
 
 \item{arrow_max_records_per_batch}{Maximum size of each Arrow record batch,
 ignored if Arrow serialization is not enabled.}
+
+\item{auto_deps}{[Experimental] Whether to infer all required R packages by
+examining the closure \code{f()} and only distribute required R and their
+transitive dependencies to Spark worker nodes (default: FALSE).
+NOTE: this option will only take effect if \code{packages} is set to
+\code{TRUE} or is a character vector of R package names. If \code{packages}
+is a character vector of R package names, then both the set of packages
+specified by \code{packages} and the set of inferred packages will be
+distributed to Spark workers.}
 
 \item{...}{Optional arguments; currently unused.}
 }

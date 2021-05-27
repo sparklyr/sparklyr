@@ -468,3 +468,56 @@ download_file <- function(...) {
 
   download.file(...)
 }
+
+# Infer all R packages that may be required for executing `fn`
+infer_required_r_packages <- function(fn) {
+  pkgs <- as.data.frame(installed.packages())
+  deps <- new.env(hash = TRUE, parent = emptyenv(), size = nrow(pkgs))
+
+  populate_deps <- function(pkg) {
+    pkg <- as.character(pkg)
+
+    if (!identical(deps[[pkg]], TRUE)) {
+      imm_deps <- pkg %>%
+        tools::package_dependencies(db = installed.packages(), recursive = FALSE)
+      purrr::map(imm_deps[[1]], ~ populate_deps(.x))
+      deps[[pkg]] <- TRUE
+    }
+  }
+
+  rlang::fn_body(fn) %>%
+    globals::walkAST(
+      call = function(x) {
+        cfn <- rlang::call_fn(x)
+
+        for (mfn in list(base::library,
+                         base::require,
+                         base::requireNamespace,
+                         base::loadNamespace)) {
+          if (identical(cfn, mfn)) {
+            populate_deps(rlang::call_args(match.call(mfn, x))$package)
+            return(x)
+          }
+        }
+
+        if (identical(cfn, base::attachNamespace)) {
+          populate_deps(rlang::call_args(match.call(base::attachNamespace, x))$ns)
+          return(x)
+        }
+
+        ns <- rlang::call_ns(x)
+        if (!is.null(ns)) {
+          populate_deps(ns)
+        } else {
+          where <- strsplit(find(rlang::call_name(x)), ":")[[1]]
+          if (identical(where[[1]], "package")) {
+            populate_deps(where[[2]])
+          }
+        }
+
+        x
+      }
+    )
+
+  ls(deps)
+}
