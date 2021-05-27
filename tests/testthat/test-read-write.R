@@ -598,3 +598,45 @@ test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
     )
   )
 })
+
+test_that("spark_read_image works as expected", {
+  test_requires_version("2.4.0")
+
+  dir <- get_test_data_path("images")
+  sdf <- spark_read_image(
+    sc, name = random_string(), dir = dir, repartition = 4
+  )
+
+  expect_equal(sdf_nrow(sdf), 8)
+  expect_equal(sdf_ncol(sdf), 1)
+  expect_equal(sdf_num_partitions(sdf), 4)
+  expect_equal(
+    sdf_schema(sdf, expand_struct_col = TRUE),
+    list(
+      image = list(
+        name = "image",
+        type = list(
+          origin = list(name = "origin", type = "StringType"),
+          height = list(name = "height", type = "IntegerType"),
+          width = list(name = "width", type = "IntegerType"),
+          nChannels = list(name = "nChannels", type = "IntegerType"),
+          mode = list(name = "mode", type = "IntegerType"),
+          data = list(name = "data", type = "BinaryType")
+        )
+      )
+    )
+  )
+  expect_equal(
+    sdf %>%
+      dplyr::transmute(origin = image$origin) %>%
+      dplyr::arrange(origin) %>%
+      dplyr::collect(),
+    tibble::tibble(
+      origin = lapply(
+        c("edit-sql", "help", "livy-ui", "livy", "spark-log", "spark-ui", "spark", "yarn-ui"),
+        function(x) paste0("file://", file.path(dir, x), ".png")
+      ) %>%
+        unlist()
+    )
+  )
+})
