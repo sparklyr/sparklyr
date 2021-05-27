@@ -149,9 +149,29 @@ new_ml_kmeans_model <- function(jobj) {
   )
 
   if (!is_required_spark(jobj, "3.0.0")) {
-    spark_param_deprecated("compute_cost")
     kmeans_model[["compute_cost"]] <- function(dataset) {
       invoke(jobj, "computeCost", spark_dataframe(dataset))
+    }
+  } else {
+    sc <- spark_connection(jobj)
+    clustering_evaluator_jobj <- invoke_new(
+      sc, "org.apache.spark.ml.evaluation.ClusteringEvaluator"
+    )
+    clustering_evaluator_jobj %>% invoke(
+      "%>%",
+      list("setFeaturesCol", jobj %>% invoke("getFeaturesCol")),
+      list("setPredictionCol", jobj %>% invoke("getPredictionCol"))
+    )
+    weight_col_param <- jobj %>% invoke("weightCol")
+    if (jobj %>% invoke("isSet", weight_col_param)) {
+      clustering_evaluator_jobj %>% invoke(
+        "setWeightCol", jobj %>% invoke("getWeightCol")
+      )
+    }
+    kmeans_model[["compute_silhouette_measure"]] <- function(dataset, distance_measure) {
+      clustering_evaluator_jobj %>% invoke("setDistanceMeasure", distance_measure)
+      dataset <- jobj %>% invoke("transform", spark_dataframe(dataset))
+      invoke(clustering_evaluator_jobj, "evaluate", dataset)
     }
   }
 
