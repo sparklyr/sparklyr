@@ -596,7 +596,7 @@ livy_connection_jars <- function(config, version, scala_version) {
       target_jar <- stringr::str_sort(target_jar)[[1]]
     }
 
-    livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "feature/sparklyr-1.6.2")
+    livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "feature/sparklyr-1.6.3")
 
     livy_jars <- paste0(
       "https://github.com/sparklyr/sparklyr/blob/",
