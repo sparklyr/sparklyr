@@ -478,3 +478,10 @@ test_that("result from dplyr::compute() has remote name", {
   sdf <- sdf %>% dplyr::mutate(y = 5) %>% dplyr::compute()
   expect_false(is.null(sdf %>% sparklyr:::sdf_remote_name()))
 })
+
+test_that("tbl_ptype.tbl_spark works as expected", {
+  expect_equal(df1_tbl %>% dplyr::select_if(is.integer) %>% colnames(), "a")
+  expect_equal(df1_tbl %>% dplyr::select_if(is.numeric) %>% colnames(), "a")
+  expect_equal(df1_tbl %>% dplyr::select_if(is.character) %>% colnames(), "b")
+  expect_equal(df1_tbl %>% dplyr::select_if(is.list) %>% colnames(), character())
+})

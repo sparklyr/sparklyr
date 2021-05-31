@@ -27,6 +27,10 @@
 
 - `spark_read_binary()` was implemented to support binary data sources.
 
+- A specialized version of `tbl_ptype()` was implemented so that no data will be
+  collected from Spark to R when `dplyr` calls `tbl_ptype()` on a Spark
+  dataframe.
+
 ### Distributed R
 
 - `spark_apply()` was improved to support `tibble` inputs containing list
