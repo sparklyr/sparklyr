@@ -115,9 +115,17 @@ arrow_copy_to <- function(sc, df, parallelism) {
 
 arrow_collect <- function(tbl, ...) {
   args <- list(...)
+  n <- args$n
 
   sc <- spark_connection(tbl)
   sdf <- spark_dataframe(tbl)
+  if (!is.null(n)) {
+    n <- as.integer(n)
+    if (!is.na(n)) {
+      # If n is Inf or any value outside of integer range, then ignore it
+      sdf <- sdf %>% invoke("limit", n)
+    }
+  }
   session <- spark_session(sc)
 
   time_zone <- spark_session(sc) %>%
