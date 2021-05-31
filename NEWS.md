@@ -37,6 +37,10 @@
 
 - `spark_apply()` and `do_spark()` now support `qs` and custom serializations.
 
+- The experimental `auto_deps = TRUE` mode was implemented for `spark_apply()`
+  to infer required R packages for the closure, and to only copy required R
+  packages to Spark worker nodes when executing the closure.
+
 ### Extensions
 
 - Sparklyr extensions can now customize dbplyr SQL translator env used by
@@ -44,6 +48,16 @@
   `spark_dependency()` (see
   https://github.com/r-spark/sparklyr.sedona/blob/1455d3dea51ad16114a8112f2990ec542458aee2/R/dependencies.R#L38
   for an example).
+
+- `ml_linear_svc()` will emit a warning if `weight_col` is specified while
+  working with Spark 3.0 or above, as it is no longer supported in recent
+  versions of Spark.
+
+### Spark ML
+
+- `ml_compute_silhouette_measure()` was implemented to evaluate the
+  [Silhouette measure](https://en.wikipedia.org/wiki/Silhouette_(clustering)) of
+  k-mean clustering results.
 
 # Sparklyr 1.6.2
 
