@@ -478,3 +478,10 @@ test_that("result from dplyr::compute() has remote name", {
   sdf <- sdf %>% dplyr::mutate(y = 5) %>% dplyr::compute()
   expect_false(is.null(sdf %>% sparklyr:::sdf_remote_name()))
 })
+
+test_that("dplyr::summarize() emits an error for summarizer using one-sided formula", {
+  expect_error(
+    iris_tbl %>% summarize(across(starts_with("Petal"), ~ mean(.x) ^ 2)),
+    "One-sided formula is unsupported for 'summarize' on Spark dataframes"
+  )
+})
