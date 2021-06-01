@@ -79,7 +79,11 @@ summarise.tbl_spark <- function(.data, ...) {
   # `summarise(across(where(is.numeric), mean))` work as expected for Spark
   # dataframes
   dots <- rlang::quos(..., .named = TRUE)
-  dots <- partial_eval_dots(dots, sim_data = simulate_vars(.data))
+  dots <- dots %>% partial_eval_dots(
+    sim_data = simulate_vars(.data),
+    ctx = "summarize",
+    supports_one_sided_formula = FALSE
+  )
 
   # For each expression, check if it uses any newly created variables
   check_summarise_vars <- function(dots) {

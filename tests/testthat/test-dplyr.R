@@ -479,6 +479,13 @@ test_that("result from dplyr::compute() has remote name", {
   expect_false(is.null(sdf %>% sparklyr:::sdf_remote_name()))
 })
 
+test_that("dplyr::summarize() emits an error for summarizer using one-sided formula", {
+  expect_error(
+    iris_tbl %>% summarize(across(starts_with("Petal"), ~ mean(.x) ^ 2)),
+    "One-sided formula is unsupported for 'summarize' on Spark dataframes"
+  )
+})
+
 test_that("tbl_ptype.tbl_spark works as expected", {
   expect_equal(df1_tbl %>% dplyr::select_if(is.integer) %>% colnames(), "a")
   expect_equal(df1_tbl %>% dplyr::select_if(is.numeric) %>% colnames(), "a")
