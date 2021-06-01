@@ -425,7 +425,7 @@ Finally, we disconnect from Spark:
 ## RStudio IDE
 
 The latest RStudio [Preview
-Release](https://rstudio.com/products/rstudio/download/preview/) of
+Release](https://www.rstudio.com/products/rstudio/download/preview/) of
 the RStudio IDE includes integrated support for Spark and the sparklyr
 package, including tools for:
 
@@ -457,7 +457,7 @@ new connection dialog:
 
 The RStudio IDE features for sparklyr are available now as part of the
 [RStudio Preview
-Release](https://rstudio.com/products/rstudio/download/preview/).
+Release](https://www.rstudio.com/products/rstudio/download/preview/).
 
 ## Using H2O
 
@@ -600,8 +600,8 @@ sc <- spark_connect(master = "<address>", method = "livy", config = config)
 spark_disconnect(sc)
 ```
 
-The remote `livy` cluster will require outgoing connection to GitHub in 
-order to download `sparklyr` jars. You can avoid this by uploading the 
+The remote `livy` cluster will require outgoing connection to GitHub in
+order to download `sparklyr` jars. You can avoid this by uploading the
 required jar to HDFS and connect as:
 
 ``` r
