@@ -303,8 +303,16 @@ sdf_collect_data_frame <- function(sdf, collected) {
 #' @importFrom dplyr as_tibble
 sdf_collect_static <- function(object, impl, ...) {
   args <- list(...)
+  n <- args$n
   sc <- spark_connection(object)
   sdf <- spark_dataframe(object)
+  if (!is.null(n)) {
+    n <- as.integer(n)
+    if (!is.na(n)) {
+      # If n is Inf or any value outside of integer range, then ignore it
+      sdf <- sdf %>% invoke("limit", n)
+    }
+  }
 
   separator <- split_separator(sc)
 
