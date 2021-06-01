@@ -9,6 +9,14 @@ test_that("sdf_collect() works properly", {
   expect_equivalent(mtcars, mtcars_data)
 })
 
+test_that("sdf_collect() can collect the first n rows of a Spark dataframe", {
+  mtcars_tbl <- testthat_tbl("mtcars", repartition = 5)
+
+  mtcars_data <- sdf_collect(mtcars_tbl, n = 10)
+
+  expect_equivalent(mtcars[1:10,], mtcars_data)
+})
+
 test_that("sdf_collect() works properly with impl = \"row-wise-iter\"", {
   mtcars_tbl <- testthat_tbl("mtcars")
   mtcars_data <- sdf_collect(mtcars_tbl, impl = "row-wise-iter")

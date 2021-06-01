@@ -485,3 +485,10 @@ test_that("dplyr::summarize() emits an error for summarizer using one-sided form
     "One-sided formula is unsupported for 'summarize' on Spark dataframes"
   )
 })
+
+test_that("tbl_ptype.tbl_spark works as expected", {
+  expect_equal(df1_tbl %>% dplyr::select_if(is.integer) %>% colnames(), "a")
+  expect_equal(df1_tbl %>% dplyr::select_if(is.numeric) %>% colnames(), "a")
+  expect_equal(df1_tbl %>% dplyr::select_if(is.character) %>% colnames(), "b")
+  expect_equal(df1_tbl %>% dplyr::select_if(is.list) %>% colnames(), character())
+})
