@@ -252,6 +252,7 @@ Collate:
     'ml_feature_vector_slicer.R'
     'ml_feature_word2vec.R'
     'ml_fpm_fpgrowth.R'
+    'ml_fpm_prefixspan.R'
     'ml_helpers.R'
     'ml_mapping_tables.R'
     'ml_model_aft_survival_regression.R'
