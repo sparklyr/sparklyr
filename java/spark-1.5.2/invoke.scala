@@ -48,6 +48,10 @@ class Invoke {
                        args(i).isInstanceOf[Integer]) {
               // Parameter type is Long and argument is Integer.
               // This is done for backwards compatibility.
+            } else if (args(i) != null &&
+                      ((args(i).isInstanceOf[java.lang.Float] && parameterType == classOf[Float]) ||
+                       (args(i).isInstanceOf[Float] && parameterType == classOf[java.lang.Float]))) {
+              // Consider java.lang.Float as compatible with scala.Float
             } else {
               var parameterWrapperType = parameterType
 
