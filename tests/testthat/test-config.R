@@ -85,3 +85,31 @@ test_that("spark_config_shell_args() works as expected", {
     )
   }
 })
+
+test_that("spark_config() warns if invalid config file that exists is passed", {
+  configFilePath <- tempfile(pattern = "config_", fileext = ".yml")
+  invalidConfigContent <- c(
+    "default:",
+    "  spark.num.executors: 1",
+    "  spark.executor.memory: 2g",
+    "  spark.executor.memory: 5g"
+  )
+  writeLines(text = invalidConfigContent, con = configFilePath)
+  expect_warning(
+    spark_config(file = configFilePath),
+    "Error reading config file:"
+  )
+})
+
+test_that("spark_config() is silent if no config file is passed", {
+  expect_silent(
+    spark_config()
+  )
+})
+
+test_that("spark_config warns() if non-existent file is passed", {
+  expect_warning(
+    spark_config(file = tempfile(paste(sample(letters, 5L), collapse = ""))),
+    "Error reading config file:"
+  )
+})

@@ -31,7 +31,20 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   userEnvConfig <- tryCatch(config::get(file = Sys.getenv("SPARKLYR_CONFIG_FILE")), error = function(e) NULL)
   baseEnvConfig <- merge_lists(baseConfig, userEnvConfig)
 
-  userConfig <- tryCatch(config::get(file = file), error = function(e) NULL)
+  isFileProvided <- !missing(file)
+  userConfig <- tryCatch(
+    config::get(file = file),
+    error = function(e) {
+      if (isFileProvided) {
+        warnMessage <- sprintf(
+          "Error reading config file: %s in spark_config(): %s: %s. File will be ignored.",
+          file, deparse(e[["call"]]), e[["message"]]
+        )
+        warning(warnMessage, call. = FALSE)
+      }
+      NULL
+    }
+  )
 
   mergedConfig <- merge_lists(baseEnvConfig, userConfig)
 
