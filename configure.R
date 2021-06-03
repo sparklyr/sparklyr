@@ -31,4 +31,5 @@ spec <- Filter(
 sparklyr::compile_package_jars(spec = spec)
 
 # for now, spark master and spark 3.0.0 are equivalent
-file.copy("inst/java/sparklyr-3.0-2.12.jar", "inst/java/sparklyr-master-2.12.jar", overwrite = TRUE)
+java_dir <- file.path("inst", "java")
+file.rename(file.path(java_dir, "sparklyr-3.0-2.12.jar"), file.path(java_dir, "sparklyr-master-2.12.jar"))
