@@ -77,7 +77,28 @@ jarray <- function(sc, x, element_type) {
 #'
 #' @export
 jfloat <- function(sc, x) {
-  j_invoke_new(sc, "java.lang.Float", x)
+  j_invoke_new(sc, "java.lang.Float", as.numeric(x))
+}
+
+#' Instantiate an Array[Float].
+#'
+#' Instantiate an \code{Array[Float]} object with the value specified.
+#' NOTE: this method is useful when one has to invoke a Java/Scala method
+#' requiring an \code{Array[Float]} as one of its parameters.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param x A numeric vector in R.
+#'
+#' @examples
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' jflt_arr <- jfloat_array(sc, c(-1.23e-8, 0, -1.23e-8))
+#' # jflt_arr is now a reference an array of java.lang.Float
+#'
+#' @export
+jfloat_array <- function(sc, x) {
+  vals <- lapply(x, function(v) j_invoke_new(sc, "java.lang.Float", v))
+  jarray(sc, vals, "java.lang.Float")
 }
 
 printf <- function(fmt, ...) {

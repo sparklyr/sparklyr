@@ -35,6 +35,9 @@ class Invoke {
               // The case that the parameter type is a Scala Seq and the argument
               // is a Java array is considered matching. The array will be converted
               // to a Seq later if this method is matched.
+            } else if (parameterTypes(i).isAssignableFrom(classOf[Array[Float]]) &&
+              (args(i) != null && args(i).getClass == classOf[Array[java.lang.Float]])) {
+              // Array[java.lang.Float] is compatible with Array[scala.Float]
             } else if ((parameterType == classOf[Char] ||
                         parameterType == classOf[java.lang.Character]) &&
                        args(i) != null && args(i).isInstanceOf[String]) {
@@ -89,6 +92,9 @@ class Invoke {
                   args(i) != null && args(i).getClass.isArray) {
                 // Convert a Java array to scala Seq
                 args(i) = args(i).asInstanceOf[Array[_]].toSeq
+              } else if (parameterTypes(i).isAssignableFrom(classOf[Array[Float]]) &&
+                (args(i) != null && args(i).getClass == classOf[Array[java.lang.Float]])) {
+                args(i) = args(i).asInstanceOf[Array[java.lang.Float]].map(x => x.asInstanceOf[Float]).toArray
               } else if ((parameterTypes(i) == classOf[Char] ||
                           parameterTypes(i) == classOf[java.lang.Character]) &&
                          args(i) != null && args(i).isInstanceOf[String]) {
