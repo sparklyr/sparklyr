@@ -1,4 +1,4 @@
-# Sparklyr 1.7.0.9000
+# Sparklyr 1.7.0
 
 ### Data
 
@@ -17,11 +17,6 @@
 
 - Internal calls to `sdf_schema.tbl_spark()` and `spark_dataframe.tbl_spark()`
   are memoized to reduce performance overhead from repeated `spark_invoke()`s.
-
-- `spark_read_libsvm()` now supports specifications of additional options via
-  the `options` parameter. Additional libsvm data source options currently
-  supported by Spark include `numFeatures` and `vectorType` (see
-  https://spark.apache.org/docs/latest/api/java/org/apache/spark/ml/source/libsvm/LibSVMDataSource.html).
 
 - `spark_read_image()` was implemented to support image files as data sources.
 
@@ -53,15 +48,40 @@
   https://github.com/r-spark/sparklyr.sedona/blob/1455d3dea51ad16114a8112f2990ec542458aee2/R/dependencies.R#L38
   for an example).
 
-- `ml_linear_svc()` will emit a warning if `weight_col` is specified while
-  working with Spark 3.0 or above, as it is no longer supported in recent
-  versions of Spark.
+- `jarray()` was implemented to convert a R vector into an `Array[T]` reference.
+  A reference returned by `jarray()` can be passed to `invoke*` family of
+  functions requiring an `Array[T]` as a parameter where T is some type that is
+  more specific than `java.lang.Object`.
+
+- `jfloat()` function was implemented to cast any numeric type in R to
+  `java.lang.Float`.
 
 ### Spark ML
 
 - `ml_compute_silhouette_measure()` was implemented to evaluate the
   [Silhouette measure](https://en.wikipedia.org/wiki/Silhouette_(clustering)) of
   k-mean clustering results.
+
+- `spark_read_libsvm()` now supports specifications of additional options via
+  the `options` parameter. Additional libsvm data source options currently
+  supported by Spark include `numFeatures` and `vectorType` (see
+  https://spark.apache.org/docs/latest/api/java/org/apache/spark/ml/source/libsvm/LibSVMDataSource.html).
+
+- `ml_linear_svc()` will emit a warning if `weight_col` is specified while
+  working with Spark 3.0 or above, as it is no longer supported in recent
+  versions of Spark.
+
+# Sparklyr 1.6.3
+
+### Data
+
+- Reduced the number of `invoke()` calls needed for `sdf_schema()` to avoid
+  performance issues when processing Spark dataframes with non-trivial number
+  of columns
+
+- Implement memoization for `spark_dataframe.tbl_spark()` and
+  `sdf_schema.tbl_spark()` to reduce performance overhead for some `dplyr` use
+  cases involving Spark dataframes with non-trivial number of columns
 
 # Sparklyr 1.6.2
 
