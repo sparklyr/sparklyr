@@ -41,4 +41,3 @@
 ^CONTRIBUTORS\.md$
 ^ROADMAP\.md$
 ^Jenkinsfile
-^inst/java/sparklyr-master-2.12.jar$
