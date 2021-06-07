@@ -133,7 +133,7 @@ new_ml_one_hot_encoder_model <- function(jobj) {
   spark_require_version(spark_connection(jobj), "3.0.0")
   new_ml_transformer(
     jobj,
-    category_size = invoke(jobj, "categorySize"),
+    category_sizes = invoke(jobj, "categorySizes"),
     class = "ml_one_hot_encoder_model"
   )
 }

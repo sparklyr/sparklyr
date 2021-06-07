@@ -110,7 +110,7 @@ spark_require_version <- function(sc, required, module = NULL, required_max = NU
   # guess module based on calling function
   if (is.null(module)) {
     call <- sys.call(sys.parent())
-    module <- as.character(call[[1]])
+    module <- tryCatch(as.character(call[[1]]), error = function(ex) "")
   }
 
   # check and report version requirements

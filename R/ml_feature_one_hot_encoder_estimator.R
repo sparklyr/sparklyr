@@ -96,7 +96,7 @@ new_ml_one_hot_encoder_estimator <- function(jobj) {
 new_ml_one_hot_encoder_estimator_model <- function(jobj) {
   new_ml_transformer(
     jobj,
-    category_size = invoke(jobj, "categorySize"),
+    category_sizes = invoke(jobj, "categorySizes"),
     class = "ml_one_hot_encoder_model"
   )
 }
