@@ -39,6 +39,8 @@ object Test {
 
   def readTestValueArray(x: Array[TestValue]): Int = x.length
   def readFloat(x: Float): Float = x
+  def readJFloatArray(x: Array[java.lang.Float]): Array[java.lang.Float] = x
+  def readFloatArray(x: Array[Float]): Array[Float] = x
 }
 
 package object test {
