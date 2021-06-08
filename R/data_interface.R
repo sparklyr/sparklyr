@@ -674,7 +674,16 @@ spark_read_source <- function(sc,
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   df_reader <- spark_data_read_generic(sc, source, "format", options, columns)
-  df <- if (is.null(path)) invoke(df_reader, "load") else invoke(df_reader, "load", spark_normalize_path(path))
+  df <- if (is.null(path)) {
+    invoke(df_reader, "load")
+  } else {
+    if (sc$method != "databricks-connect") {
+      # `path` refers to some remote file in 'databricks-connect' use case, so,
+      # it should not be normalized based on the local OS platform or filesystem
+      path <- spark_normalize_path(path)
+    }
+    invoke(df_reader, "load", path)
+  }
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
