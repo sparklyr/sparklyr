@@ -465,10 +465,13 @@ spark_data_write_generic <- function(df,
     writeOptions[["url"]] <- NULL
     if (is.null(url)) stop("Option 'url' is expected while using jdbc")
 
-    properties <- invoke_new(sc, "java.util.Properties") %>|%
-      lapply(names(writeOptions), function(optionName) {
-        list("setProperty", optionName, as.character(writeOptions[[optionName]]))
-      })
+    properties <- invoke_static(
+      sc,
+      "sparklyr.Utils",
+      "setProperties",
+      as.list(names(writeOptions)),
+      unname(writeOptions)
+    )
 
     invoke(options, fileMethod, url, path, properties)
   }
