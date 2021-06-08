@@ -47,7 +47,7 @@ writeObject <- function(con, object, writeType = TRUE) {
   type <- class(object)[[1]]
 
   if (type %in% c("integer", "character", "logical", "double", "numeric", "factor", "Date", "POSIXct")) {
-    if (is.na(object)) {
+    if (is.na(object) && !is.nan(object)) {
       object <- NULL
       type <- "NULL"
     }
