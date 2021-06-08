@@ -32,14 +32,11 @@ test_that("we can interact with vector columns", {
 
   # retrieve the columns
   probability <- extracted %>%
-    sdf_read_column("probability") %>%
-    lapply(function(el) {
-      invoke(el, "toArray")
-    })
+    sdf_read_column("probability")
 
   # split into pieces
-  first <- as.numeric(lapply(probability, `[[`, 1L))
-  second <- as.numeric(lapply(probability, `[[`, 2L))
+  first <- lapply(probability, `[[`, 1L) %>% unlist()
+  second <- lapply(probability, `[[`, 2L) %>% unlist()
 
   # verify we have the expected result
   expect_equal(first, sdf_read_column(extracted, "on"))

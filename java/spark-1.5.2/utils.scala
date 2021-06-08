@@ -23,78 +23,18 @@ object Utils {
    * Utilities for importing data from R to Spark and for collecting columns /
    * Datasets back to R
    */
-
-  def collectColumnBoolean(df: DataFrame, colName: String): Array[Boolean] = {
-    df.select(colName).rdd.map(row => row(0).asInstanceOf[Boolean]).collect()
-  }
-
-  def collectColumnInteger(df: DataFrame, colName: String): Array[Int] = {
-    df.select(colName).rdd.map(row => {
-      val element = row(0)
-
-      element match {
-        case x: Int => x
-        case _ => scala.Int.MinValue
+  def collect(df: DataFrame, separator: String, impl: String): Array[_] = {
+    val (transformed_df, dtypes) = DFCollectionUtils.prepareDataFrameForCollection(df)
+    val collectRowsFromIterator = collectRows(_: Iterator[Row], dtypes, separator, df.count.toInt)
+    impl match {
+      case "row-wise" => collectRowsFromIterator(transformed_df.collect.iterator)
+      case "row-wise-iter" => {
+        // attempt to not fetch all partitions all at once
+        val rdd = transformed_df.rdd.cache
+        collectRowsFromIterator(rdd.toLocalIterator)
       }
-    }).collect()
-  }
-
-  def collectColumnDouble(df: DataFrame, colName: String): Array[Double] = {
-    df.select(colName).rdd.map(row => {
-      val element = row(0)
-
-      element match {
-        case x: Double => x
-        case _ => scala.Double.NaN
-      }
-    }).collect()
-  }
-
-  def collectColumnString(df: DataFrame, colName: String, separator: String): String = {
-    val text = df.select(colName).rdd.map(row => {
-      val element = row(0)
-
-      element match {
-        case x: String => x
-        case _ => "<NA>"
-      }
-    }).collect().mkString(separator)
-
-    if (text.length() > 0) {
-      text + separator
-    } else {
-      text
+      case "column-wise" => collectColumns(df.collect, dtypes, separator)
     }
-  }
-
-  def collectColumnDefault(df: DataFrame, colName: String): Array[Any] = {
-    df.select(colName).rdd.map(row => row(0)).collect()
-  }
-
-  def collectColumn(df: DataFrame, colName: String, colType: String, separator: String) = {
-    colType match {
-      case "BooleanType" => collectColumnBoolean(df, colName)
-      case "IntegerType" => collectColumnInteger(df, colName)
-      case "DoubleType"  => collectColumnDouble(df, colName)
-      case "StringType"  => collectColumnString(df, colName, separator)
-      case _             => collectColumnDefault(df, colName)
-    }
-  }
-
-  private[this] def toArray(columns: Iterable[Collectors.ColumnCtx[_]], numRows: Int, separator: String): Array[_] = {
-    // merge any string column into a single string delimited by `separator`
-    val StringCollectors = Array[(Row, Int) => String](Collectors.collectString, Collectors.collectForceString)
-    val res: Array[Any] = columns.map(x => {
-      val column = x.column.take(numRows)
-      if (StringCollectors contains x.collector) {
-        val str = column.mkString(separator)
-        if (str.isEmpty) str else str + separator
-      } else {
-        column
-      }
-    }).toArray
-
-    res
   }
 
   private[this] def collectRows(
@@ -130,18 +70,20 @@ object Utils {
     toArray(columns, numRows, separator)
   }
 
-  def collect(df: DataFrame, separator: String, impl: String): Array[_] = {
-    val (transformed_df, dtypes) = DFCollectionUtils.prepareDataFrameForCollection(df)
-    val collectRowsFromIterator = collectRows(_: Iterator[Row], dtypes, separator, df.count.toInt)
-    impl match {
-      case "row-wise" => collectRowsFromIterator(transformed_df.collect.iterator)
-      case "row-wise-iter" => {
-        // attempt to not fetch all partitions all at once
-        val rdd = transformed_df.rdd.cache
-        collectRowsFromIterator(rdd.toLocalIterator)
+  private[this] def toArray(columns: Iterable[Collectors.ColumnCtx[_]], numRows: Int, separator: String): Array[_] = {
+    // merge any string column into a single string delimited by `separator`
+    val StringCollectors = Array[(Row, Int) => String](Collectors.collectString, Collectors.collectForceString)
+    val res: Array[Any] = columns.map(x => {
+      val column = x.column.take(numRows)
+      if (StringCollectors contains x.collector) {
+        val str = column.mkString(separator)
+        if (str.isEmpty) str else str + separator
+      } else {
+        column
       }
-      case "column-wise" => collectColumns(df.collect, dtypes, separator)
-    }
+    }).toArray
+
+    res
   }
 
   def separateColumnArray(df: DataFrame,

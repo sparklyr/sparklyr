@@ -115,10 +115,10 @@ object Serializer {
       case "time"      => dos.writeByte('t')
       case "raw"       => dos.writeByte('r')
       case "array"     => dos.writeByte('a')
+      case "strarray"  => dos.writeByte('f')
       case "list"      => dos.writeByte('l')
       case "map"       => dos.writeByte('e')
       case "jobj"      => dos.writeByte('j')
-      case "strarray"  => dos.writeByte('f')
       case "json"      => dos.writeByte('J')
       case "sparkapplybinaryresult" => dos.writeByte('$')
       case _ => throw new IllegalArgumentException(s"Invalid type $typeStr")
@@ -144,6 +144,10 @@ object Serializer {
 
   def writeBoolean(out: DataOutputStream, value: Boolean): Unit = {
     out.writeInt(value.compare(false))
+  }
+
+  def writeLogical(out: DataOutputStream, value: Logical): Unit = {
+    out.writeInt(value.intValue)
   }
 
   def writeDate(out: DataOutputStream, value: Date): Unit = {
@@ -188,8 +192,12 @@ object Serializer {
   }
 
   def writeBytes(out: DataOutputStream, value: Array[Byte]): Unit = {
-    out.writeInt(value.length)
-    out.write(value)
+    if (value == null) {
+      out.writeInt(-1)
+    } else {
+      out.writeInt(value.length)
+      out.write(value)
+    }
   }
 
   def writeIntArr(out: DataOutputStream, value: Array[Int]): Unit = {
@@ -216,10 +224,21 @@ object Serializer {
     value.foreach(v => writeBoolean(out, v))
   }
 
+  def writeLogicalArr(out: DataOutputStream, value: Array[Logical]): Unit = {
+    writeType(out, "logical")
+    out.writeInt(value.length)
+    value.foreach(v => writeInt(out, v.intValue))
+  }
+
   def writeTimestampArr(out: DataOutputStream, value: Array[java.sql.Timestamp]): Unit = {
     writeType(out, "time")
     out.writeInt(value.length)
     value.foreach(v => writeTime(out, v))
+  }
+
+  def writeStringArr(out: DataOutputStream, value: Array[String]): Unit = {
+    val all = value.mkString("\u0019")
+    writeString(out, all)
   }
 
   def writeDateArr(out: DataOutputStream, value: Array[java.sql.Date]): Unit = {
@@ -234,17 +253,6 @@ object Serializer {
     out.writeInt(value.length)
 
     value.foreach(v => writeDate(out, v))
-  }
-
-  def writeStringArr(out: DataOutputStream, value: Array[String]): Unit = {
-    writeType(out, "character")
-    out.writeInt(value.length)
-    value.foreach(v => writeString(out, v))
-  }
-
-  def writeFastStringArr(out: DataOutputStream, value: Array[String]): Unit = {
-    val all = value.mkString("\u0019")
-    writeString(out, all)
   }
 }
 
@@ -414,6 +422,9 @@ class Serializer(tracker: JVMObjectTracker) {
           case v: java.lang.Boolean =>
             Serializer.writeType(dos, "logical")
             Serializer.writeBoolean(dos, v)
+          case v: Logical =>
+            Serializer.writeType(dos, "logical")
+            Serializer.writeLogical(dos, v)
           case v: java.sql.Date =>
             Serializer.writeType(dos, "date")
             Serializer.writeDate(dos, v)
@@ -436,8 +447,11 @@ class Serializer(tracker: JVMObjectTracker) {
           case v: Array[Byte] =>
             Serializer.writeType(dos, "raw")
             Serializer.writeBytes(dos, v)
+          case v: Raw =>
+            Serializer.writeType(dos, "raw")
+            Serializer.writeBytes(dos, v.value)
           case v: Array[Char] =>
-            Serializer.writeType(dos, "array")
+            Serializer.writeType(dos, "strarray")
             Serializer.writeStringArr(dos, v.map(_.toString))
           case v: Array[Short] =>
             Serializer.writeType(dos, "array")
@@ -460,6 +474,9 @@ class Serializer(tracker: JVMObjectTracker) {
           case v: Array[Boolean] =>
             Serializer.writeType(dos, "array")
             Serializer.writeBooleanArr(dos, v)
+          case v: Array[Logical] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeLogicalArr(dos, v)
           case v: Array[Timestamp] =>
             Serializer.writeType(dos, "array")
             Serializer.writeTimestampArr(dos, v)
@@ -471,7 +488,7 @@ class Serializer(tracker: JVMObjectTracker) {
             Serializer.writeDateArr(dos, v)
           case v: Array[String] =>
             Serializer.writeType(dos, "strarray")
-            Serializer.writeFastStringArr(dos, v)
+            Serializer.writeStringArr(dos, v)
           case v: Array[Object] =>
             Serializer.writeType(dos, "list")
             Serializer.writeInt(dos, v.length)
