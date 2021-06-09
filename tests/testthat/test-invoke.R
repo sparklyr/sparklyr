@@ -112,3 +112,9 @@ test_that("integer to Short out of range error", {
     "java\\.lang\\.Exception: Unable to cast integer to Short: out of range\\."
   )
 })
+
+test_that("NaN is handled correctly", {
+  expect_equal(invoke_static(sc, "sparklyr.Test", "infer", NaN), "Double")
+  jflt <- jfloat(sc, NaN)
+  expect_equal(invoke_static(sc, "sparklyr.Test", "readFloat", jflt), NaN)
+})
