@@ -6,8 +6,6 @@ import scala.Option
 import scala.reflect.ClassTag
 import scala.util.Try
 
-case class Numeric(value: Option[Double])
-
 object Collectors {
   val ReDecimalType = "(^DecimalType(\\(.*\\)?)$)".r
   val ReVectorType  = "(.*VectorUDT.*)".r
@@ -23,20 +21,24 @@ object Collectors {
   val ReTimestampArrayType = "(^ArrayType\\(TimestampType,(true|false)\\)$)".r
   val ReDateArrayType = "(^ArrayType\\(DateType,(true|false)\\)$)".r
 
-  def collectBoolean(row: Row, idx: Int): Int = {
-    extractBoolean(row(idx))
+  def collectLogical(row: Row, idx: Int): Logical = {
+    extractLogical(row(idx))
   }
 
-  def collectBooleanArr(row: Row, idx: Int): Array[Int] = {
+  def collectLogicalArr(row: Row, idx: Int): Array[Logical] = {
     val arr = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-    arr.map(extractBoolean).toArray
+    if (arr == null) {
+      null
+    } else {
+      arr.map(extractLogical).toArray
+    }
   }
 
-  private[this] def extractBoolean(x: Any): Int = {
+  private[this] def extractLogical(x: Any): Logical = {
     x match {
-      case b: Boolean => b.compare(false)
-      case _ => scala.Int.MinValue
+      case b: Boolean => Logical(b.compare(false))
+      case _ => Logical(scala.Int.MinValue)
     }
   }
 
@@ -53,7 +55,20 @@ object Collectors {
   )(implicit t: ClassTag[T]): Array[Int] = {
     val arr = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-    arr.map(extractIntegralType[T]).toArray
+    if (arr == null) {
+      null
+    } else {
+      arr.map(extractIntegralType[T]).toArray
+    }
+  }
+
+  def collectByteArr(row: Row, idx: Int): Raw = {
+    val intValues = collectIntegralTypeArr[Byte](row, idx)
+    if (intValues != null) {
+      Raw(intValues.map(x => x.byteValue).toArray)
+    } else {
+      Raw(null)
+    }
   }
 
   private[this] def extractIntegralType[T: scala.math.Integral](
@@ -78,7 +93,11 @@ object Collectors {
   )(implicit t: ClassTag[T]): Array[Numeric] = {
     val arr = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-    arr.map(extractNumericType[T]).toArray
+    if (arr == null) {
+      null
+    } else {
+      arr.map(extractNumericType[T]).toArray
+    }
   }
 
   private[this] def extractNumericType[T: scala.math.Numeric](
@@ -103,7 +122,11 @@ object Collectors {
   def collectBigDecimalArr(row: Row, idx: Int): Array[Numeric] = {
     val arr = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-    arr.map(extractBigDecimal).toArray
+    if (arr == null) {
+      null
+    } else {
+      arr.map(extractBigDecimal).toArray
+    }
   }
 
   private[this] def extractBigDecimal(x: Any): Numeric = {
@@ -126,7 +149,11 @@ object Collectors {
   def collectForceStringArr(row: Row, idx: Int): Array[String] = {
     val arr = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-    arr.map(extractStringRepr).toArray
+    if (arr == null) {
+      null
+    } else {
+      arr.map(extractStringRepr).toArray
+    }
   }
 
   private[this] def extractStringRepr(x: Any): String = {
@@ -137,14 +164,18 @@ object Collectors {
     }
   }
 
-  val collectString = (row: Row, idx: Int) => {
+  val collectString: (Row, Int) => String = (row: Row, idx: Int) => {
     extractString(row(idx))
   }
 
   def collectStringArr(row: Row, idx: Int): Array[String] = {
     val arr = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-    arr.map(extractString).toArray
+    if (arr == null) {
+      null
+    } else {
+      arr.map(extractString).toArray
+    }
   }
 
   private[this] def extractString(x: Any): String = {
@@ -179,7 +210,11 @@ object Collectors {
   def collectTimestampArr(row: Row, idx: Int): Array[java.sql.Timestamp] = {
     val arr = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-    arr.map(extractTimestamp).toArray
+    if (arr == null) {
+      null
+    } else {
+      arr.map(extractTimestamp).toArray
+    }
   }
 
   private[this] def extractTimestamp(x: Any): java.sql.Timestamp = {
@@ -206,7 +241,11 @@ object Collectors {
   def collectDateArr(row: Row, idx: Int): Array[DaysSinceEpoch] = {
     val arr = row(idx).asInstanceOf[scala.collection.mutable.WrappedArray[_]]
 
-    arr.map(extractDaysSinceEpoch).toArray
+    if (arr == null) {
+      null
+    } else {
+      arr.map(extractDaysSinceEpoch).toArray
+    }
   }
 
   def collectDefault(row: Row, idx: Int) = {
@@ -231,7 +270,7 @@ object Collectors {
     }
 
     colType match {
-      case "BooleanType"          => newColumnCtx[Int](Collectors.collectBoolean)
+      case "BooleanType"          => newColumnCtx[Logical](Collectors.collectLogical)
       case "ByteType"             => newColumnCtx[Int](Collectors.collectIntegralType[Byte])
       case "ShortType"            => newColumnCtx[Int](Collectors.collectIntegralType[Short])
       case "IntegerType"          => newColumnCtx[Int](Collectors.collectIntegralType[Int])
@@ -247,8 +286,8 @@ object Collectors {
       case ReVectorType(_*)       => newColumnCtx[Any](Collectors.collectVector)
       case StructTypeAsJSON.DType => newColumnCtx[Any](Collectors.collectJSON)
 
-      case ReBooleanArrayType(_*)   => newColumnCtx[Array[Int]](Collectors.collectBooleanArr)
-      case ReByteArrayType(_*)      => newColumnCtx[Array[Int]](Collectors.collectIntegralTypeArr[Byte])
+      case ReBooleanArrayType(_*)   => newColumnCtx[Array[Logical]](Collectors.collectLogicalArr)
+      case ReByteArrayType(_*)      => newColumnCtx[Raw](Collectors.collectByteArr)
       case ReShortArrayType(_*)     => newColumnCtx[Array[Int]](Collectors.collectIntegralTypeArr[Short])
       case ReIntegerArrayType(_*)   => newColumnCtx[Array[Int]](Collectors.collectIntegralTypeArr[Int])
       case ReLongArrayType(_*)      => newColumnCtx[Array[Numeric]](Collectors.collectNumericTypeArr[Long])

@@ -78,7 +78,7 @@ readTypedObject <- function(con, type) {
     "l" = readList(con),
     "e" = readMap(con),
     "s" = readStruct(con),
-    "f" = readFastStringArray(con),
+    "f" = readStringArray(con),
     "n" = NULL,
     "j" = getJobj(con, readString(con)),
     "J" = jsonlite::fromJSON(
@@ -91,24 +91,35 @@ readTypedObject <- function(con, type) {
 
 readString <- function(con) {
   stringLen <- readInt(con)
-  string <- ""
 
-  if (stringLen > 0) {
-    raw <- read_bin(con, raw(), stringLen, endian = "big")
-    if (is.element("00", raw)) {
-      warning("Input contains embedded nuls, removing.")
-      raw <- raw[raw != "00"]
+  string <- (
+    if (stringLen > 0) {
+      raw <- read_bin(con, raw(), stringLen, endian = "big")
+      if (is.element("00", raw)) {
+        warning("Input contains embedded nuls, removing.")
+        raw <- raw[raw != "00"]
+      }
+      rawToChar(raw)
+    } else if (stringLen == 0) {
+      ""
+    } else {
+      NA_character_
     }
-    string <- rawToChar(raw)
-  }
+  )
 
   Encoding(string) <- "UTF-8"
   string
 }
 
-readFastStringArray <- function(con) {
+readStringArray <- function(con) {
   joined <- readString(con)
-  as.list(strsplit(joined, "\u0019")[[1]])
+  arr <- as.list(strsplit(joined, "\u0019")[[1]])
+  lapply(
+    arr,
+    function(x) {
+      if (x == "<NA>") NA_character_ else x
+    }
+  )
 }
 
 readDateArray <- function(con, n = 1) {
@@ -256,7 +267,9 @@ readStruct <- function(con) {
 
 readRaw <- function(con) {
   dataLen <- readInt(con)
-  if (dataLen == 0) {
+  if (dataLen == -1) {
+    NA
+  } else if (dataLen == 0) {
     raw()
   } else {
     read_bin(con, raw(), as.integer(dataLen), endian = "big")

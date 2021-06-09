@@ -263,8 +263,7 @@ object RUtils {
         case "DateType" => dateColumnWriter()
         case Collectors.ReBooleanArrayType(_*) =>
           arrayColumnWriter(LGLSXP, writeLglValue)
-        case Collectors.ReByteArrayType(_*) =>
-          arrayColumnWriter(INTSXP, writeIntegralValue[Byte])
+        case Collectors.ReByteArrayType(_*) => rawColumnWriter()
         case Collectors.ReShortArrayType(_*) =>
           arrayColumnWriter(INTSXP, writeIntegralValue[Short])
         case Collectors.ReIntegerArrayType(_*) =>
@@ -321,6 +320,14 @@ object RUtils {
     )
   }
 
+  private[this] def rawColumnWriter(): (DataOutputStream, Int, Iterator[Row]) => Unit = {
+    (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
+      writeFlags(dos, dtype = VECSXP)
+      writeLength(dos, numRows)
+      colIter.foreach(row => writeRawValue(dos, row.get(0)))
+    }
+  }
+
   private[this] def integralColumnWriter[SrcType : scala.math.Integral](): (DataOutputStream, Int, Iterator[Row]) => Unit = {
     (dos: DataOutputStream, numRows: Int, colIter: Iterator[Row]) => {
       writeFlags(dos, dtype = INTSXP)
@@ -348,6 +355,17 @@ object RUtils {
         )
       }
     })
+  }
+
+  private[this] def writeRawValue(dos: DataOutputStream, v: Any): Unit = {
+    writeFlags(dos, dtype = RAWSXP)
+    if (null == v) {
+      writeLength(dos, -1)
+    } else {
+      val buf = v.asInstanceOf[scala.collection.mutable.WrappedArray[java.lang.Byte]].array
+      writeLength(dos, buf.length)
+      dos.write(buf.map(Byte.unbox))
+    }
   }
 
   private[this] def numericColumnWriter[SrcType : scala.math.Numeric](): (DataOutputStream, Int, Iterator[Row]) => Unit = {
