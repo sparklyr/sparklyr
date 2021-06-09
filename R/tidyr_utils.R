@@ -71,7 +71,7 @@ ensure_tmp_view <- function(x) {
 process_warnings <- function(out, substr_arr_col, n, extra, fill) {
   if (identical(extra, "warn") || identical(fill, "warn")) {
     output_cols <- colnames(out)
-    tmp_tbl_name <- random_string("__tidyr_separate_tmp_tbl_")
+    tmp_tbl_name <- random_string("sparklyr_tmp_")
     row_num <- random_string("__tidyr_separate_row_num_")
     row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY (SELECT 0))"))
     names(row_num_sql) <- row_num

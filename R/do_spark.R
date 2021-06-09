@@ -148,7 +148,7 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
     spark_items <- sdf_copy_to(
       spark_conn,
       items,
-      name = random_string("spark_apply"),
+      name = random_string("sparklyr_tmp_"),
       repartition = do_spark_parallelism
     )
     expr <- .compile(expr)
