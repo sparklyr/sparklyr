@@ -578,12 +578,12 @@ livy_connection_jars <- function(config, version, scala_version) {
     livy_jars <- livy_available_jars()
     livy_max_version <- max(numeric_version(livy_jars[livy_jars != "master"]))
 
-    previouis_versions <- Filter(
+    previous_versions <- Filter(
       function(maybe_version) maybe_version <= major_version,
       numeric_version(gsub("master", paste(livy_max_version, "1", sep = "."), livy_available_jars()))
     )
 
-    target_version <- previouis_versions[length(previouis_versions)]
+    target_version <- previous_versions[length(previous_versions)]
 
     target_jar_pattern <- (
       if (is.null(scala_version)) {
@@ -596,6 +596,8 @@ livy_connection_jars <- function(config, version, scala_version) {
     # requirement for Scala version compatibility
     if (length(target_jar) > 1) {
       target_jar <- stringr::str_sort(target_jar)[[1]]
+    } else if (length(target_jar) == 0) {
+      target_jar <- "sparklyr-master-2.12.jar"
     }
 
     livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "feature/sparklyr-1.7.0")

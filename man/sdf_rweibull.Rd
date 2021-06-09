@@ -19,6 +19,10 @@ sdf_rweibull(
 
 \item{n}{Sample Size (default: 1000).}
 
+\item{shape}{The shape of the Weibull distribution.}
+
+\item{scale}{The scale of the Weibull distribution (default: 1).}
+
 \item{num_partitions}{Number of partitions in the resulting Spark dataframe
 (default: default parallelism of the Spark cluster).}
 

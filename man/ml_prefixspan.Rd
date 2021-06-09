@@ -34,6 +34,12 @@ the results.}
 prefix-projected database before local iterative processing of the
 projected database begins. This parameter should be tuned with respect to
 the size of your executors.}
+
+\item{uid}{A character string used to uniquely identify the ML estimator.}
+
+\item{...}{Optional arguments; currently unused.}
+
+\item{model}{A Prefix Span model.}
 }
 \description{
 PrefixSpan algorithm for mining frequent itemsets.

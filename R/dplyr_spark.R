@@ -165,7 +165,7 @@ src_tbls.spark_connection <- function(x, ...) {
     if (is.null(db)) {
       "SHOW TABLES"
     } else {
-      as.character(dbplyr::build_sql("SHOW TABLES IN ", dbplyr::ident(db), con = sc))
+      as.character(dbplyr::build_sql("SHOW TABLES IN ", dbplyr::ident(db), con = x))
     }
   )
   tbls <- invoke(sql, "sql", query)

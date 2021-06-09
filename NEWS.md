@@ -26,6 +26,11 @@
   collected from Spark to R when `dplyr` calls `tbl_ptype()` on a Spark
   dataframe.
 
+- Added support for `database` parameter to `src_tbls.spark_connection()`
+  (e.g., `src_tbls(sc, database = "default")` where `sc` is a Spark connection).
+
+- Fixed a null pointer issue with `spark_read_jdbc()` and `spark_write_jdbc()`.
+
 ### Distributed R
 
 - `spark_apply()` was improved to support `tibble` inputs containing list
@@ -56,6 +61,21 @@
 - `jfloat()` function was implemented to cast any numeric type in R to
   `java.lang.Float`.
 
+- `jfloat_array()` was implemented to instantiate `Array[java.lang.Float]` from
+  numeric values in R.
+
+### Serialization
+
+- Added null checks that were previously missing when collecting array columns
+  from Spark dataframe to R.
+
+- `array<byte>` and `array<boolean>` columns in a Spark dataframe will be
+  collected as `raw()` and `logical()` vectors, respectively, in R rather than
+  integer arrays.
+
+- Fixed a bug that previously caused invoke params containing `NaN`s to be
+  serialized incorrectly.
+
 ### Spark ML
 
 - `ml_compute_silhouette_measure()` was implemented to evaluate the
@@ -70,6 +90,9 @@
 - `ml_linear_svc()` will emit a warning if `weight_col` is specified while
   working with Spark 3.0 or above, as it is no longer supported in recent
   versions of Spark.
+
+- Fixed an issue with `ft_one_hot_encoder.ml_pipeline()` not working as
+  expected.
 
 # Sparklyr 1.6.3
 
