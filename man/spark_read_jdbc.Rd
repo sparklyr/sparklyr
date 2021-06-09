@@ -43,6 +43,28 @@ If specified, the elements can be \code{"binary"} for \code{BinaryType},
 \description{
 Read from JDBC connection into a Spark DataFrame.
 }
+\examples{
+\dontrun{
+sc <- spark_connect(
+  master = "local",
+  config = list(
+    `sparklyr.shell.driver-class-path` = "/usr/share/java/mysql-connector-java-8.0.25.jar"
+  )
+)
+spark_read_jdbc(
+  sc,
+  name = "my_sql_table",
+  options = list(
+    url = "jdbc:mysql://localhost:3306/my_sql_schema",
+    driver = "com.mysql.jdbc.Driver",
+    user = "me",
+    password = "******",
+    dbtable = "my_sql_table"
+  )
+)
+}
+
+}
 \seealso{
 Other Spark serialization routines: 
 \code{\link{collect_from_rds}()},
