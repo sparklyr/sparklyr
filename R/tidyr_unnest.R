@@ -122,7 +122,7 @@ unnest.tbl_spark <- function(data,
   unnested_cols <- lapply(
     unnest_col_sqls,
     function(sql) {
-      tmp_view_name <- random_string("tidyr_unnest_tmp_")
+      tmp_view_name <- random_string("sparklyr_tmp_")
       DBI::dbGetQuery(
         sc,
         sprintf(

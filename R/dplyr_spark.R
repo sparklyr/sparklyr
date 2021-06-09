@@ -158,8 +158,17 @@ process_tbl_name <- function(x) {
 #' @export
 #' @importFrom dplyr src_tbls
 src_tbls.spark_connection <- function(x, ...) {
+  dots <- rlang::dots_list(...)
+  db <- dots$database
   sql <- hive_context(x)
-  tbls <- invoke(sql, "sql", "SHOW TABLES")
+  query <- (
+    if (is.null(db)) {
+      "SHOW TABLES"
+    } else {
+      as.character(dbplyr::build_sql("SHOW TABLES IN ", dbplyr::ident(db), con = sc))
+    }
+  )
+  tbls <- invoke(sql, "sql", query)
   tableNames <- sdf_read_column(tbls, "tableName")
 
   filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
