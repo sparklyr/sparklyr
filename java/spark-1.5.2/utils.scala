@@ -19,10 +19,6 @@ import scala.collection.JavaConverters._
 import scala.util.Try
 
 object Utils {
-  /**
-   * Utilities for importing data from R to Spark and for collecting columns /
-   * Datasets back to R
-   */
   def collect(df: DataFrame, separator: String, impl: String): Array[_] = {
     val (transformed_df, dtypes) = DFCollectionUtils.prepareDataFrameForCollection(df)
     val collectRowsFromIterator = collectRows(_: Iterator[Row], dtypes, separator, df.count.toInt)
@@ -490,5 +486,24 @@ object Utils {
       case v: java.util.Date => v.getTime
       case _ => throw new IllegalArgumentException("unsupported input type")
     }
+  }
+
+  def setProperties(
+    keys: Seq[String],
+    values: Seq[String]
+  ): java.util.Properties = {
+    setProperties(new java.util.Properties, keys, values)
+  }
+
+  def setProperties(
+    x: java.util.Properties,
+    keys: Seq[String],
+    values: Seq[String]
+  ): java.util.Properties = {
+    for (i <- (0 until keys.length)) {
+      x.setProperty(keys(i), values(i))
+    }
+
+    x
   }
 }
