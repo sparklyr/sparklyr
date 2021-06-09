@@ -612,6 +612,27 @@ spark_write_table.spark_jobj <- function(x,
 #'
 #' @family Spark serialization routines
 #'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(
+#'   master = "local",
+#'   config = list(
+#'     `sparklyr.shell.driver-class-path` = "/usr/share/java/mysql-connector-java-8.0.25.jar"
+#'   )
+#' )
+#' spark_read_jdbc(
+#'   sc,
+#'   name = "my_sql_table",
+#'   options = list(
+#'     url = "jdbc:mysql://localhost:3306/my_sql_schema",
+#'     driver = "com.mysql.jdbc.Driver",
+#'     user = "me",
+#'     password = "******",
+#'     dbtable = "my_sql_table"
+#'   )
+#' )
+#' }
+#'
 #' @export
 spark_read_jdbc <- function(sc,
                             name,
@@ -702,13 +723,16 @@ spark_read_source <- function(sc,
 #' \dontrun{
 #' sc <- spark_connect(
 #'   master = "local",
-#'   config = list(sparklyr.shell.packages = "mysql:mysql-connector-java:5.1.44")
+#'   config = list(
+#'     `sparklyr.shell.driver-class-path` = "/usr/share/java/mysql-connector-java-8.0.25.jar"
+#'   )
 #' )
 #' spark_write_jdbc(
 #'   sdf_len(sc, 10),
 #'   name = "my_sql_table",
 #'   options = list(
 #'     url = "jdbc:mysql://localhost:3306/my_sql_schema",
+#'     driver = "com.mysql.jdbc.Driver",
 #'     user = "me",
 #'     password = "******",
 #'     dbtable = "my_sql_table"
