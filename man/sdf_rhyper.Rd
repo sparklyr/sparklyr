@@ -18,6 +18,8 @@ sdf_rhyper(
 \arguments{
 \item{sc}{A Spark connection.}
 
+\item{nn}{Sample Size.}
+
 \item{m}{The number of successes among the population.}
 
 \item{n}{The number of failures among the population.}

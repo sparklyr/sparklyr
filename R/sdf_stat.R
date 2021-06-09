@@ -231,6 +231,7 @@ sdf_rgeom <- function(sc, n, prob, num_partitions = NULL, seed = NULL, output_co
 #' i.i.d. samples from a hypergeometric distribution.
 #'
 #' @inheritParams spark_statistical_routines
+#' @param nn Sample Size.
 #' @param m The number of successes among the population.
 #' @param n The number of failures among the population.
 #' @param k The number of draws.
@@ -284,6 +285,8 @@ sdf_rlnorm <- function(sc, n, meanlog = 0, sdlog = 1, num_partitions = NULL, see
 #' i.i.d. samples from the standard normal distribution.
 #'
 #' @inheritParams spark_statistical_routines
+#' @param mean The mean value of the normal distribution.
+#' @param sd The standard deviation of the normal distribution.
 #'
 #' @family Spark statistical routines
 #' @export
@@ -359,6 +362,8 @@ sdf_rt <- function(sc, n, df, num_partitions = NULL, seed = NULL, output_col = "
 #' i.i.d. samples from a Weibull distribution.
 #'
 #' @inheritParams spark_statistical_routines
+#' @param shape The shape of the Weibull distribution.
+#' @param scale The scale of the Weibull distribution (default: 1).
 #'
 #' @family Spark statistical routines
 #' @export
@@ -381,6 +386,8 @@ sdf_rweibull <- function(sc, n, shape, scale = 1, num_partitions = NULL, seed = 
 #' i.i.d. samples from the uniform distribution U(0, 1).
 #'
 #' @inheritParams spark_statistical_routines
+#' @param min The lower limit of the distribution.
+#' @param max The upper limit of the distribution.
 #'
 #' @family Spark statistical routines
 #' @export
