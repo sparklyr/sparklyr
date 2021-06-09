@@ -31,6 +31,76 @@ random_string <- function(prefix = "table") {
   paste0(prefix, "_", gsub("-", "_", uuid::UUIDgenerate()))
 }
 
+#' Instantiate a Java array with a specific element type.
+#'
+#' Given a list of Java object references, instantiate an \code{Array[T]}
+#' containing the same list of references, where \code{T} is a non-primitive
+#' type that is more specific than \code{java.lang.Object}.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param x A list of Java object references.
+#' @param element_type A valid Java class name representing the generic type
+#'   parameter of the Java array to be instantiated. Each element of \code{x}
+#'   must refer to a Java object that is assignable to \code{element_type}.
+#'
+#' @examples
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' string_arr <- jarray(sc, letters, element_type = "java.lang.String")
+#' # string_arr is now a reference to an array of type String[]
+#'
+#' @export
+jarray <- function(sc, x, element_type) {
+  cls <- paste0("[L", element_type, ";")
+  arr_cls <- invoke_static(sc, "java.lang.Class", "forName", cls)
+
+  j_invoke_static(
+    sc, "java.util.Arrays", "copyOf", as.list(x), length(x), arr_cls
+  )
+}
+
+#' Instantiate a Java float type.
+#'
+#' Instantiate a \code{java.lang.Float} object with the value specified.
+#' NOTE: this method is useful when one has to invoke a Java/Scala method
+#' requiring a float (instead of double) type for at least one of its
+#' parameters.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param x A numeric value in R.
+#'
+#' @examples
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' jflt <- jfloat(sc, 1.23e-8)
+#' # jflt is now a reference to a java.lang.Float object
+#'
+#' @export
+jfloat <- function(sc, x) {
+  j_invoke_new(sc, "java.lang.Float", as.numeric(x))
+}
+
+#' Instantiate an Array[Float].
+#'
+#' Instantiate an \code{Array[Float]} object with the value specified.
+#' NOTE: this method is useful when one has to invoke a Java/Scala method
+#' requiring an \code{Array[Float]} as one of its parameters.
+#'
+#' @param sc A \code{spark_connection}.
+#' @param x A numeric vector in R.
+#'
+#' @examples
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' jflt_arr <- jfloat_array(sc, c(-1.23e-8, 0, -1.23e-8))
+#' # jflt_arr is now a reference an array of java.lang.Float
+#'
+#' @export
+jfloat_array <- function(sc, x) {
+  vals <- lapply(x, function(v) j_invoke_new(sc, "java.lang.Float", v))
+  jarray(sc, vals, "java.lang.Float")
+}
+
 printf <- function(fmt, ...) {
   cat(sprintf(fmt, ...))
 }
@@ -40,7 +110,7 @@ spark_require_version <- function(sc, required, module = NULL, required_max = NU
   # guess module based on calling function
   if (is.null(module)) {
     call <- sys.call(sys.parent())
-    module <- as.character(call[[1]])
+    module <- tryCatch(as.character(call[[1]]), error = function(ex) "")
   }
 
   # check and report version requirements
@@ -418,4 +488,57 @@ download_file <- function(...) {
   }
 
   download.file(...)
+}
+
+# Infer all R packages that may be required for executing `fn`
+infer_required_r_packages <- function(fn) {
+  pkgs <- as.data.frame(installed.packages())
+  deps <- new.env(hash = TRUE, parent = emptyenv(), size = nrow(pkgs))
+
+  populate_deps <- function(pkg) {
+    pkg <- as.character(pkg)
+
+    if (!identical(deps[[pkg]], TRUE)) {
+      imm_deps <- pkg %>%
+        tools::package_dependencies(db = installed.packages(), recursive = FALSE)
+      purrr::map(imm_deps[[1]], ~ populate_deps(.x))
+      deps[[pkg]] <- TRUE
+    }
+  }
+
+  rlang::fn_body(fn) %>%
+    globals::walkAST(
+      call = function(x) {
+        cfn <- rlang::call_fn(x)
+
+        for (mfn in list(base::library,
+                         base::require,
+                         base::requireNamespace,
+                         base::loadNamespace)) {
+          if (identical(cfn, mfn)) {
+            populate_deps(rlang::call_args(match.call(mfn, x))$package)
+            return(x)
+          }
+        }
+
+        if (identical(cfn, base::attachNamespace)) {
+          populate_deps(rlang::call_args(match.call(base::attachNamespace, x))$ns)
+          return(x)
+        }
+
+        ns <- rlang::call_ns(x)
+        if (!is.null(ns)) {
+          populate_deps(ns)
+        } else {
+          where <- strsplit(find(rlang::call_name(x)), ":")[[1]]
+          if (identical(where[[1]], "package")) {
+            populate_deps(where[[2]])
+          }
+        }
+
+        x
+      }
+    )
+
+  ls(deps)
 }

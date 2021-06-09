@@ -68,14 +68,23 @@ invoke.test_jobj <- function(jobj, method, ...) {
 }
 
 #' @export
+j_invoke.test_jobj <- invoke.test_jobj
+
+#' @export
 invoke_static.test_connection <- function(sc, class, method, ...) {
   test_jobj_create(sc)
 }
 
 #' @export
+j_invoke_static.test_connection <- invoke_static.test_connection
+
+#' @export
 invoke_new.test_connection <- function(sc, class, ...) {
   test_jobj_create(sc)
 }
+
+#' @export
+j_invoke_new.test_connection <- invoke_new.test_connection
 
 #' @export
 print_jobj.test_connection <- function(sc, jobj, ...) {

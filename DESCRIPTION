@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.6.2
+Version: 1.7.0
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -252,6 +252,7 @@ Collate:
     'ml_feature_vector_slicer.R'
     'ml_feature_word2vec.R'
     'ml_fpm_fpgrowth.R'
+    'ml_fpm_prefixspan.R'
     'ml_helpers.R'
     'ml_mapping_tables.R'
     'ml_model_aft_survival_regression.R'

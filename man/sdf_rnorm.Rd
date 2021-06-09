@@ -19,6 +19,10 @@ sdf_rnorm(
 
 \item{n}{Sample Size (default: 1000).}
 
+\item{mean}{The mean value of the normal distribution.}
+
+\item{sd}{The standard deviation of the normal distribution.}
+
 \item{num_partitions}{Number of partitions in the resulting Spark dataframe
 (default: default parallelism of the Spark cluster).}
 
@@ -43,6 +47,7 @@ Other Spark statistical routines:
 \code{\link{sdf_rlnorm}()},
 \code{\link{sdf_rpois}()},
 \code{\link{sdf_rt}()},
-\code{\link{sdf_runif}()}
+\code{\link{sdf_runif}()},
+\code{\link{sdf_rweibull}()}
 }
 \concept{Spark statistical routines}

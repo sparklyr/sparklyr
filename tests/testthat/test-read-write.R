@@ -541,10 +541,10 @@ test_that("spark_read_binary can process input directory with nested partition s
     df %>% dplyr::select(path, length, content, a, b),
     tibble::tribble(
       ~path,                                                       ~length,          ~content, ~a, ~b,
-      paste0("file:", file.path(dir, "a=0", "b=0" , "file0.dat")),       4, charToRaw("1234"), 0L, 0L,
-      paste0("file:", file.path(dir, "a=0", "b=1" , "file2.dat")),       4, charToRaw("abcd"), 0L, 1L,
-      paste0("file:", file.path(dir, "a=1", "b=0" , "file1.dat")),       4, charToRaw("5678"), 1L, 0L,
-      paste0("file:", file.path(dir, "a=1", "b=1" , "file3.dat")),       4, charToRaw("efgh"), 1L, 1L,
+      paste0("file:", file.path(dir, "a=0", "b=0", "file0.dat")),       4, charToRaw("1234"), 0L, 0L,
+      paste0("file:", file.path(dir, "a=0", "b=1", "file2.dat")),       4, charToRaw("abcd"), 0L, 1L,
+      paste0("file:", file.path(dir, "a=1", "b=0", "file1.dat")),       4, charToRaw("5678"), 1L, 0L,
+      paste0("file:", file.path(dir, "a=1", "b=1", "file3.dat")),       4, charToRaw("efgh"), 1L, 1L,
     )
   )
 })
@@ -554,7 +554,8 @@ test_that("spark_read_binary can support 'pathGlobFilter' option correctly", {
 
   dir <- get_test_data_path("test_spark_read_binary")
   sdf <- spark_read_binary(
-    sc, dir = dir, name = random_string(), path_glob_filter = "*.dat"
+    sc,
+    dir = dir, name = random_string(), path_glob_filter = "*.dat"
   ) %>%
     dplyr::arrange(path)
   df <- sdf %>% collect()
@@ -579,7 +580,8 @@ test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
 
   dir <- get_test_data_path("test_spark_read_binary_recursive_file_lookup")
   sdf <- spark_read_binary(
-    sc, dir = dir, name = random_string(), recursive_file_lookup = TRUE
+    sc,
+    dir = dir, name = random_string(), recursive_file_lookup = TRUE
   ) %>%
     dplyr::arrange(path)
   df <- sdf %>% collect()
@@ -593,6 +595,48 @@ test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
       paste0("file:", file.path(dir, "a=1", "b=0", "file1.dat")),       4, charToRaw("5678"),
       paste0("file:", file.path(dir, "b=1", "file3.dat")),              4, charToRaw("efgh"),
       paste0("file:", file.path(dir, "file2.dat")),                     4, charToRaw("abcd"),
+    )
+  )
+})
+
+test_that("spark_read_image works as expected", {
+  test_requires_version("2.4.0")
+
+  dir <- get_test_data_path("images")
+  sdf <- spark_read_image(
+    sc, name = random_string(), dir = dir, repartition = 4
+  )
+
+  expect_equal(sdf_nrow(sdf), 8)
+  expect_equal(sdf_ncol(sdf), 1)
+  expect_equal(sdf_num_partitions(sdf), 4)
+  expect_equal(
+    sdf_schema(sdf, expand_struct_col = TRUE),
+    list(
+      image = list(
+        name = "image",
+        type = list(
+          origin = list(name = "origin", type = "StringType"),
+          height = list(name = "height", type = "IntegerType"),
+          width = list(name = "width", type = "IntegerType"),
+          nChannels = list(name = "nChannels", type = "IntegerType"),
+          mode = list(name = "mode", type = "IntegerType"),
+          data = list(name = "data", type = "BinaryType")
+        )
+      )
+    )
+  )
+  expect_equal(
+    sdf %>%
+      dplyr::transmute(origin = image$origin) %>%
+      dplyr::arrange(origin) %>%
+      dplyr::collect(),
+    tibble::tibble(
+      origin = lapply(
+        c("edit-sql", "help", "livy-ui", "livy", "spark-log", "spark-ui", "spark", "yarn-ui"),
+        function(x) paste0("file://", file.path(dir, x), ".png")
+      ) %>%
+        unlist()
     )
   )
 })

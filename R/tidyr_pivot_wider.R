@@ -171,7 +171,7 @@ sdf_pivot_wider <- function(data,
   rhs_select_args <- append(rhs_select_args, lapply(names_from, as.symbol))
   rhs <- value_spec %>>%
     dplyr::select %@% rhs_select_args %>%
-    copy_to(sc, ., name = random_string("__pvt_wider_spec_sdf"))
+    copy_to(sc, ., name = random_string("sparklyr_tmp_"))
   combined <- spark_dataframe(lhs) %>%
     invoke(
       "%>%",

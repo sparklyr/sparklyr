@@ -30,7 +30,7 @@ test_that("ft_one_hot_encoder() works", {
       list(c(0, 0), c(1, 0), c(0, 1))
     )
   } else {
-    expect_equal(
+    expect_setequal(
       iris_tbl %>%
         ft_string_indexer("Species", "indexed", string_order_type = "alphabetDesc") %>%
         ft_one_hot_encoder("indexed", "encoded") %>%
@@ -61,4 +61,26 @@ test_that("ft_one_hot_encoder() with multiple columns", {
       c("id", "input1", "input2", "output1", "output2")
     )
   }
+})
+
+test_that("ft_one_hot_encoder() works with ml pipeline", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
+  if (spark_version(sc) < "2.3.0") {
+    pipeline <- ml_pipeline(sc) %>%
+      ft_string_indexer("Species", "indexed") %>%
+      ft_one_hot_encoder("indexed", "encoded")
+  } else {
+    pipeline <- ml_pipeline(sc) %>%
+      ft_string_indexer("Species", "indexed", string_order_type = "alphabetDesc") %>%
+      ft_one_hot_encoder("indexed", "encoded")
+  }
+
+  expect_setequal(
+    pipeline %>%
+      ml_fit_and_transform(iris_tbl) %>%
+      pull(encoded) %>%
+      unique(),
+    list(c(0, 0), c(1, 0), c(0, 1))
+  )
 })

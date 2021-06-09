@@ -15,7 +15,6 @@ test_that("ml_linear_svc() param setting", {
     reg_param = 1e-4,
     max_iter = 50,
     standardization = FALSE,
-    weight_col = "wcol",
     tol = 1e-05,
     threshold = 0.6,
     aggregation_depth = 3,

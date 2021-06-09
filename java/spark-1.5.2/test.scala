@@ -1,5 +1,8 @@
 package sparklyr
 
+class TestValue(x: Int) {
+}
+
 object Test {
   def nullary() = 0
 
@@ -33,6 +36,11 @@ object Test {
   def getNumber(): Int = number
 
   def readMap(x: Map[_, _]): Map[_, _] = x
+
+  def readTestValueArray(x: Array[TestValue]): Int = x.length
+  def readFloat(x: Float): Float = x
+  def readJFloatArray(x: Array[java.lang.Float]): Array[java.lang.Float] = x
+  def readFloatArray(x: Array[Float]): Array[Float] = x
 }
 
 package object test {

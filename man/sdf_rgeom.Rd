@@ -37,6 +37,7 @@ Other Spark statistical routines:
 \code{\link{sdf_rnorm}()},
 \code{\link{sdf_rpois}()},
 \code{\link{sdf_rt}()},
-\code{\link{sdf_runif}()}
+\code{\link{sdf_runif}()},
+\code{\link{sdf_rweibull}()}
 }
 \concept{Spark statistical routines}

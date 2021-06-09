@@ -160,7 +160,7 @@ sdf_collect_stream <- function(x, ...) {
 
     data <- data %>%
       spark_dataframe() %>%
-      sdf_collect()
+      sdf_collect(n = n)
 
     Sys.sleep(0.1)
   }

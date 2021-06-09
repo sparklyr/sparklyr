@@ -115,10 +115,10 @@ object Serializer {
       case "time"      => dos.writeByte('t')
       case "raw"       => dos.writeByte('r')
       case "array"     => dos.writeByte('a')
+      case "strarray"  => dos.writeByte('f')
       case "list"      => dos.writeByte('l')
       case "map"       => dos.writeByte('e')
       case "jobj"      => dos.writeByte('j')
-      case "strarray"  => dos.writeByte('f')
       case "json"      => dos.writeByte('J')
       case "sparkapplybinaryresult" => dos.writeByte('$')
       case _ => throw new IllegalArgumentException(s"Invalid type $typeStr")
@@ -144,6 +144,10 @@ object Serializer {
 
   def writeBoolean(out: DataOutputStream, value: Boolean): Unit = {
     out.writeInt(value.compare(false))
+  }
+
+  def writeLogical(out: DataOutputStream, value: Logical): Unit = {
+    out.writeInt(value.intValue)
   }
 
   def writeDate(out: DataOutputStream, value: Date): Unit = {
@@ -188,8 +192,12 @@ object Serializer {
   }
 
   def writeBytes(out: DataOutputStream, value: Array[Byte]): Unit = {
-    out.writeInt(value.length)
-    out.write(value)
+    if (value == null) {
+      out.writeInt(-1)
+    } else {
+      out.writeInt(value.length)
+      out.write(value)
+    }
   }
 
   def writeIntArr(out: DataOutputStream, value: Array[Int]): Unit = {
@@ -216,10 +224,21 @@ object Serializer {
     value.foreach(v => writeBoolean(out, v))
   }
 
+  def writeLogicalArr(out: DataOutputStream, value: Array[Logical]): Unit = {
+    writeType(out, "logical")
+    out.writeInt(value.length)
+    value.foreach(v => writeInt(out, v.intValue))
+  }
+
   def writeTimestampArr(out: DataOutputStream, value: Array[java.sql.Timestamp]): Unit = {
     writeType(out, "time")
     out.writeInt(value.length)
     value.foreach(v => writeTime(out, v))
+  }
+
+  def writeStringArr(out: DataOutputStream, value: Array[String]): Unit = {
+    val all = value.mkString("\u0019")
+    writeString(out, all)
   }
 
   def writeDateArr(out: DataOutputStream, value: Array[java.sql.Date]): Unit = {
@@ -234,17 +253,6 @@ object Serializer {
     out.writeInt(value.length)
 
     value.foreach(v => writeDate(out, v))
-  }
-
-  def writeStringArr(out: DataOutputStream, value: Array[String]): Unit = {
-    writeType(out, "character")
-    out.writeInt(value.length)
-    value.foreach(v => writeString(out, v))
-  }
-
-  def writeFastStringArr(out: DataOutputStream, value: Array[String]): Unit = {
-    val all = value.mkString("\u0019")
-    writeString(out, all)
   }
 }
 
@@ -376,131 +384,145 @@ class Serializer(tracker: JVMObjectTracker) {
         }
       )
 
-      value match {
-        case v: java.lang.Character =>
-          Serializer.writeType(dos, "character")
-          Serializer.writeString(dos, v.toString)
-        case v: java.lang.String =>
-          Serializer.writeType(dos, "character")
-          Serializer.writeString(dos, v)
-        case v: java.lang.Long =>
-          Serializer.writeType(dos, "double")
-          Serializer.writeDouble(dos, v.toDouble)
-        case v: java.lang.Float =>
-          Serializer.writeType(dos, "double")
-          Serializer.writeDouble(dos, v.toDouble)
-        case v: java.math.BigDecimal =>
-          Serializer.writeType(dos, "double")
-          Serializer.writeDouble(dos, scala.math.BigDecimal(v).toDouble)
-        case v: java.lang.Double =>
-          Serializer.writeType(dos, "double")
-          Serializer.writeDouble(dos, v)
-        case v: Numeric =>
-          Serializer.writeType(dos, "double")
-          Serializer.writeNumeric(dos, v)
-        case v: java.lang.Byte =>
-          Serializer.writeType(dos, "integer")
-          Serializer.writeInt(dos, v.toInt)
-        case v: java.lang.Short =>
-          Serializer.writeType(dos, "integer")
-          Serializer.writeInt(dos, v.toInt)
-        case v: java.lang.Integer =>
-          Serializer.writeType(dos, "integer")
-          Serializer.writeInt(dos, v)
-        case v: java.lang.Boolean =>
-          Serializer.writeType(dos, "logical")
-          Serializer.writeBoolean(dos, v)
-        case v: java.sql.Date =>
-          Serializer.writeType(dos, "date")
-          Serializer.writeDate(dos, v)
-        case v: DaysSinceEpoch =>
-          Serializer.writeType(dos, "date")
-          Serializer.writeDate(dos, v)
-        case v: java.sql.Timestamp =>
-          Serializer.writeType(dos, "time")
-          Serializer.writeTime(dos, v)
-        case v: java.sql.Time =>
-          Serializer.writeType(dos, "time")
-          Serializer.writeTime(dos, v)
-        case v: StructTypeAsJSON =>
-          Serializer.writeType(dos, "json")
-          Serializer.writeString(dos, v.json)
-        case v: org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema =>
-          Serializer.writeType(dos, "list")
-          Serializer.writeInt(dos, v.length)
-          v.toSeq.foreach(elem => writeObject(dos, elem.asInstanceOf[AnyRef]))
-        case v: Array[Byte] =>
-          Serializer.writeType(dos, "raw")
-          Serializer.writeBytes(dos, v)
-        case v: Array[Char] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeStringArr(dos, v.map(_.toString))
-        case v: Array[Short] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeIntArr(dos, v.map(_.toInt))
-        case v: Array[Int] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeIntArr(dos, v)
-        case v: Array[Long] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeDoubleArr(dos, v.map(_.toDouble))
-        case v: Array[Float] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeDoubleArr(dos, v.map(_.toDouble))
-        case v: Array[Double] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeDoubleArr(dos, v)
-        case v: Array[Numeric] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeNumericArr(dos, v)
-        case v: Array[Boolean] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeBooleanArr(dos, v)
-        case v: Array[Timestamp] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeTimestampArr(dos, v)
-        case v: Array[Date] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeDateArr(dos, v)
-        case v: Array[DaysSinceEpoch] =>
-          Serializer.writeType(dos, "array")
-          Serializer.writeDateArr(dos, v)
-        case v: Array[String] =>
-          Serializer.writeType(dos, "strarray")
-          Serializer.writeFastStringArr(dos, v)
-        case v: Array[Object] =>
-          Serializer.writeType(dos, "list")
-          Serializer.writeInt(dos, v.length)
-          v.foreach(elem => writeObject(dos, elem))
-        case v @ Tuple3(_: String, _: String, _: Any) =>
-          // Tuple3
-          Serializer.writeType(dos, "list")
-          Serializer.writeInt(dos, v.productArity)
-          v.productIterator.foreach(elem => writeObject(dos, elem.asInstanceOf[Object]))
-        case v: java.util.Properties =>
-          Serializer.writeType(dos, "jobj")
-          writeJObj(dos, value)
-        case v: java.util.Map[_, _] =>
-          Serializer.writeType(dos, "map")
-          Serializer.writeInt(dos, v.size)
-          val iter = v.entrySet.iterator
-          while(iter.hasNext) {
-            val entry = iter.next
-            val key = entry.getKey
-            val value = entry.getValue
-            writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
-          }
-        case v: scala.collection.Map[_, _] =>
-          Serializer.writeType(dos, "map")
-          Serializer.writeInt(dos, v.size)
-          v.foreach { case (key, value) =>
-            writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
-          }
-        case _ =>
-          if (sqlSerDe == null || sqlSerDe._2 == null || !(sqlSerDe._2)(dos, value)) {
+      if (value.isInstanceOf[Array[java.lang.Float]]) {
+        Serializer.writeType(dos, "array")
+        Serializer.writeDoubleArr(dos, value.asInstanceOf[Array[java.lang.Float]].map(_.toDouble))
+      } else {
+        value match {
+          case v: java.lang.Character =>
+            Serializer.writeType(dos, "character")
+            Serializer.writeString(dos, v.toString)
+          case v: java.lang.String =>
+            Serializer.writeType(dos, "character")
+            Serializer.writeString(dos, v)
+          case v: java.lang.Long =>
+            Serializer.writeType(dos, "double")
+            Serializer.writeDouble(dos, v.toDouble)
+          case v: java.lang.Float =>
+            Serializer.writeType(dos, "double")
+            Serializer.writeDouble(dos, v.toDouble)
+          case v: java.math.BigDecimal =>
+            Serializer.writeType(dos, "double")
+            Serializer.writeDouble(dos, scala.math.BigDecimal(v).toDouble)
+          case v: java.lang.Double =>
+            Serializer.writeType(dos, "double")
+            Serializer.writeDouble(dos, v)
+          case v: Numeric =>
+            Serializer.writeType(dos, "double")
+            Serializer.writeNumeric(dos, v)
+          case v: java.lang.Byte =>
+            Serializer.writeType(dos, "integer")
+            Serializer.writeInt(dos, v.toInt)
+          case v: java.lang.Short =>
+            Serializer.writeType(dos, "integer")
+            Serializer.writeInt(dos, v.toInt)
+          case v: java.lang.Integer =>
+            Serializer.writeType(dos, "integer")
+            Serializer.writeInt(dos, v)
+          case v: java.lang.Boolean =>
+            Serializer.writeType(dos, "logical")
+            Serializer.writeBoolean(dos, v)
+          case v: Logical =>
+            Serializer.writeType(dos, "logical")
+            Serializer.writeLogical(dos, v)
+          case v: java.sql.Date =>
+            Serializer.writeType(dos, "date")
+            Serializer.writeDate(dos, v)
+          case v: DaysSinceEpoch =>
+            Serializer.writeType(dos, "date")
+            Serializer.writeDate(dos, v)
+          case v: java.sql.Timestamp =>
+            Serializer.writeType(dos, "time")
+            Serializer.writeTime(dos, v)
+          case v: java.sql.Time =>
+            Serializer.writeType(dos, "time")
+            Serializer.writeTime(dos, v)
+          case v: StructTypeAsJSON =>
+            Serializer.writeType(dos, "json")
+            Serializer.writeString(dos, v.json)
+          case v: org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema =>
+            Serializer.writeType(dos, "list")
+            Serializer.writeInt(dos, v.length)
+            v.toSeq.foreach(elem => writeObject(dos, elem.asInstanceOf[AnyRef]))
+          case v: Array[Byte] =>
+            Serializer.writeType(dos, "raw")
+            Serializer.writeBytes(dos, v)
+          case v: Raw =>
+            Serializer.writeType(dos, "raw")
+            Serializer.writeBytes(dos, v.value)
+          case v: Array[Char] =>
+            Serializer.writeType(dos, "strarray")
+            Serializer.writeStringArr(dos, v.map(_.toString))
+          case v: Array[Short] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeIntArr(dos, v.map(_.toInt))
+          case v: Array[Int] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeIntArr(dos, v)
+          case v: Array[Long] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeDoubleArr(dos, v.map(_.toDouble))
+          case v: Array[Float] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeDoubleArr(dos, v.map(_.toDouble))
+          case v: Array[Double] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeDoubleArr(dos, v)
+          case v: Array[Numeric] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeNumericArr(dos, v)
+          case v: Array[Boolean] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeBooleanArr(dos, v)
+          case v: Array[Logical] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeLogicalArr(dos, v)
+          case v: Array[Timestamp] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeTimestampArr(dos, v)
+          case v: Array[Date] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeDateArr(dos, v)
+          case v: Array[DaysSinceEpoch] =>
+            Serializer.writeType(dos, "array")
+            Serializer.writeDateArr(dos, v)
+          case v: Array[String] =>
+            Serializer.writeType(dos, "strarray")
+            Serializer.writeStringArr(dos, v)
+          case v: Array[Object] =>
+            Serializer.writeType(dos, "list")
+            Serializer.writeInt(dos, v.length)
+            v.foreach(elem => writeObject(dos, elem))
+          case v @ Tuple3(_: String, _: String, _: Any) =>
+            // Tuple3
+            Serializer.writeType(dos, "list")
+            Serializer.writeInt(dos, v.productArity)
+            v.productIterator.foreach(elem => writeObject(dos, elem.asInstanceOf[Object]))
+          case v: java.util.Properties =>
             Serializer.writeType(dos, "jobj")
             writeJObj(dos, value)
-          }
+          case v: java.util.Map[_, _] =>
+            Serializer.writeType(dos, "map")
+            Serializer.writeInt(dos, v.size)
+            val iter = v.entrySet.iterator
+            while(iter.hasNext) {
+              val entry = iter.next
+              val key = entry.getKey
+              val value = entry.getValue
+              writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
+            }
+          case v: scala.collection.Map[_, _] =>
+            Serializer.writeType(dos, "map")
+            Serializer.writeInt(dos, v.size)
+            v.foreach { case (key, value) =>
+              writeKeyValue(dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
+            }
+          case _ =>
+            if (sqlSerDe == null || sqlSerDe._2 == null || !(sqlSerDe._2)(dos, value)) {
+              Serializer.writeType(dos, "jobj")
+              writeJObj(dos, value)
+            }
+        }
       }
     }
   }

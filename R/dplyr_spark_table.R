@@ -138,7 +138,7 @@ print.tbl_spark <- function(x, ...) {
 
   attributes(data)$spark_dims <- c(NA_real_, sdf_ncol(x))
 
-  remote_name <- dbplyr::remote_name(x)
+  remote_name <- sdf_remote_name(x)
   remote_name <- if (is.null(remote_name) || grepl("^sparklyr_tmp_", remote_name)) "?" else remote_name
 
   attributes(data)$spark_summary <- c(
@@ -155,4 +155,10 @@ print.tbl_spark <- function(x, ...) {
   class(data) <- c("tbl_spark_print", class(data))
 
   print(data, ...)
+}
+
+#' @export
+#' @importFrom dplyr tbl_ptype
+tbl_ptype.tbl_spark <- function(.data) {
+  simulate_vars(.data)
 }

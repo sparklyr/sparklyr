@@ -434,8 +434,7 @@ spark_data_apply_mode <- function(options, mode) {
         invoke(options, "mode", mode)
       } else {
         stop("Unsupported type ", typeof(mode), " for mode parameter.")
-      }
-    )
+      })
   }
 
   options
@@ -466,10 +465,13 @@ spark_data_write_generic <- function(df,
     writeOptions[["url"]] <- NULL
     if (is.null(url)) stop("Option 'url' is expected while using jdbc")
 
-    properties <- invoke_new(sc, "java.util.Properties") %>|%
-      lapply(names(writeOptions), function(optionName) {
-        list("setProperty", optionName, as.character(writeOptions[[optionName]]))
-      })
+    properties <- invoke_static(
+      sc,
+      "sparklyr.Utils",
+      "setProperties",
+      as.list(names(writeOptions)),
+      unname(writeOptions)
+    )
 
     invoke(options, fileMethod, url, path, properties)
   }
@@ -610,6 +612,27 @@ spark_write_table.spark_jobj <- function(x,
 #'
 #' @family Spark serialization routines
 #'
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect(
+#'   master = "local",
+#'   config = list(
+#'     `sparklyr.shell.driver-class-path` = "/usr/share/java/mysql-connector-java-8.0.25.jar"
+#'   )
+#' )
+#' spark_read_jdbc(
+#'   sc,
+#'   name = "my_sql_table",
+#'   options = list(
+#'     url = "jdbc:mysql://localhost:3306/my_sql_schema",
+#'     driver = "com.mysql.jdbc.Driver",
+#'     user = "me",
+#'     password = "******",
+#'     dbtable = "my_sql_table"
+#'   )
+#' )
+#' }
+#'
 #' @export
 spark_read_jdbc <- function(sc,
                             name,
@@ -675,7 +698,16 @@ spark_read_source <- function(sc,
   if (overwrite) spark_remove_table_if_exists(sc, name)
 
   df_reader <- spark_data_read_generic(sc, source, "format", options, columns)
-  df <- if (is.null(path)) invoke(df_reader, "load") else invoke(df_reader, "load", spark_normalize_path(path))
+  df <- if (is.null(path)) {
+    invoke(df_reader, "load")
+  } else {
+    if (sc$method != "databricks-connect") {
+      # `path` refers to some remote file in 'databricks-connect' use case, so,
+      # it should not be normalized based on the local OS platform or filesystem
+      path <- spark_normalize_path(path)
+    }
+    invoke(df_reader, "load", path)
+  }
   spark_partition_register_df(sc, df, name, repartition, memory)
 }
 
@@ -691,13 +723,16 @@ spark_read_source <- function(sc,
 #' \dontrun{
 #' sc <- spark_connect(
 #'   master = "local",
-#'   config = list(sparklyr.shell.packages = "mysql:mysql-connector-java:5.1.44")
+#'   config = list(
+#'     `sparklyr.shell.driver-class-path` = "/usr/share/java/mysql-connector-java-8.0.25.jar"
+#'   )
 #' )
 #' spark_write_jdbc(
 #'   sdf_len(sc, 10),
 #'   name = "my_sql_table",
 #'   options = list(
 #'     url = "jdbc:mysql://localhost:3306/my_sql_schema",
+#'     driver = "com.mysql.jdbc.Driver",
 #'     user = "me",
 #'     password = "******",
 #'     dbtable = "my_sql_table"
@@ -1113,7 +1148,7 @@ spark_write_avro <- function(x,
   )
 }
 
-#' Read binary data data into a Spark DataFrame.
+#' Read binary data into a Spark DataFrame.
 #'
 #' Read binary files within a directory and convert each file into a record
 #' within the resulting Spark dataframe. The output will be a Spark dataframe
@@ -1160,6 +1195,51 @@ spark_read_binary <- function(sc,
       pathGlobFilter = path_glob_filter,
       recursiveFileLookup = tolower(as.character(recursive_file_lookup))
     ),
+    repartition = repartition,
+    memory = memory,
+    overwrite = overwrite
+  )
+}
+
+#' Read image data into a Spark DataFrame.
+#'
+#' Read image files within a directory and convert each file into a record
+#' within the resulting Spark dataframe. The output will be a Spark dataframe
+#' consisting of struct types containing the following attributes:
+#'   \itemize{
+#'     \item{origin: StringType}
+#'     \item{height: IntegerType}
+#'     \item{width: IntegerType}
+#'     \item{nChannels: IntegerType}
+#'     \item{mode: IntegerType}
+#'     \item{data: BinaryType}
+#'  }
+#'
+#' @inheritParams spark_read_csv
+#' @param dir Directory to read binary files from.
+#' @param drop_invalid Whether to drop files that are not valid images from the
+#'   result (default: TRUE).
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_read_image <- function(sc,
+                             name = NULL,
+                             dir = name,
+                             drop_invalid = TRUE,
+                             repartition = 0,
+                             memory = TRUE,
+                             overwrite = TRUE) {
+  if (spark_version(sc) < "2.4.0") {
+    stop("Image data source is only supported in Spark 2.4 or above.")
+  }
+
+  spark_read_source(
+    sc,
+    name = name,
+    path = dir,
+    source = "image",
+    options = list(dropInvalid = drop_invalid),
     repartition = repartition,
     memory = memory,
     overwrite = overwrite
@@ -1240,8 +1320,7 @@ spark_read <- function(sc,
       serializer$serializer
     } else {
       serializer
-    }
-  )
+    })
   deserializer <- spark_apply_deserializer()
   reader <- serialize_impl(reader)
   worker_impl <- function(df, rdr) {

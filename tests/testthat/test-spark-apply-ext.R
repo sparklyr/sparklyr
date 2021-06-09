@@ -254,3 +254,35 @@ test_that("'spark_apply' can apply function with 'NA's column", {
       collect()
   )
 })
+
+test_that("can infer R package dependencies", {
+ fn1 <- function(x) {
+    library(utf8)
+    x + 1
+  }
+  expect_true("utf8" %in% sparklyr:::infer_required_r_packages(fn1))
+
+  fn2 <- function(x) {
+    require(utf8)
+    x + 2
+  }
+  expect_true("utf8" %in% sparklyr:::infer_required_r_packages(fn2))
+
+  fn3 <- function(x) {
+    requireNamespace("utf8")
+    x + 3
+  }
+  expect_true("utf8" %in% sparklyr:::infer_required_r_packages(fn3))
+
+  fn4 <- function(x) {
+    library("sparklyr", quietly = FALSE)
+    x + 4
+  }
+  expected_deps <- tools::package_dependencies(
+    "sparklyr", db = installed.packages(), recursive = TRUE
+  )
+  testthat::expect_setequal(
+    union(expected_deps$sparklyr, c("base", "sparklyr")),
+    sparklyr:::infer_required_r_packages(fn4)
+  )
+})

@@ -33,18 +33,17 @@ sdf_crosstab <- function(x, col1, col2) {
 NULL
 
 gen_samples_sdf <- function(
-                           sc,
-                           method,
-                           dist_params,
-                           n,
-                           num_partitions,
-                           seed,
-                           output_col,
-                           output_col_type = "double",
-                           cls = "org.apache.spark.mllib.random.RandomRDDs") {
+                            sc,
+                            method,
+                            dist_params,
+                            n,
+                            num_partitions,
+                            seed,
+                            output_col,
+                            output_col_type = "double",
+                            cls = "org.apache.spark.mllib.random.RandomRDDs") {
   num_partitions <- as.integer(num_partitions %||%
-    tryCatch(spark_context(sc) %>% invoke("defaultParallelism"), error = function(e) 4L)
-  )
+    tryCatch(spark_context(sc) %>% invoke("defaultParallelism"), error = function(e) 4L))
   seed <- as.numeric(seed %||% Sys.time())
   columns <- list(output_col_type)
   names(columns) <- output_col
@@ -52,8 +51,8 @@ gen_samples_sdf <- function(
   do.call(
     invoke_static,
     list(sc, cls, method, spark_context(sc)) %>%
-    append(unname(dist_params)) %>%
-    append(list(n, num_partitions, seed))
+      append(unname(dist_params)) %>%
+      append(list(n, num_partitions, seed))
   ) %>%
     invoke_static(sc, "sparklyr.RddUtils", paste0(output_col_type, "ToRow"), .) %>%
     invoke(spark_session(sc), "createDataFrame", ., schema) %>%
@@ -232,6 +231,7 @@ sdf_rgeom <- function(sc, n, prob, num_partitions = NULL, seed = NULL, output_co
 #' i.i.d. samples from a hypergeometric distribution.
 #'
 #' @inheritParams spark_statistical_routines
+#' @param nn Sample Size.
 #' @param m The number of successes among the population.
 #' @param n The number of failures among the population.
 #' @param k The number of draws.
@@ -285,6 +285,8 @@ sdf_rlnorm <- function(sc, n, meanlog = 0, sdlog = 1, num_partitions = NULL, see
 #' i.i.d. samples from the standard normal distribution.
 #'
 #' @inheritParams spark_statistical_routines
+#' @param mean The mean value of the normal distribution.
+#' @param sd The standard deviation of the normal distribution.
 #'
 #' @family Spark statistical routines
 #' @export
@@ -295,8 +297,7 @@ sdf_rnorm <- function(sc, n, mean = 0, sd = 1, num_partitions = NULL, seed = NUL
       "org.apache.spark.mllib.random.RandomRDDs"
     } else {
       "sparklyr.RandomRDDs"
-    }
-  )
+    })
 
   gen_samples_sdf(
     sc,
@@ -361,6 +362,8 @@ sdf_rt <- function(sc, n, df, num_partitions = NULL, seed = NULL, output_col = "
 #' i.i.d. samples from a Weibull distribution.
 #'
 #' @inheritParams spark_statistical_routines
+#' @param shape The shape of the Weibull distribution.
+#' @param scale The scale of the Weibull distribution (default: 1).
 #'
 #' @family Spark statistical routines
 #' @export
@@ -383,6 +386,8 @@ sdf_rweibull <- function(sc, n, shape, scale = 1, num_partitions = NULL, seed = 
 #' i.i.d. samples from the uniform distribution U(0, 1).
 #'
 #' @inheritParams spark_statistical_routines
+#' @param min The lower limit of the distribution.
+#' @param max The upper limit of the distribution.
 #'
 #' @family Spark statistical routines
 #' @export
@@ -393,8 +398,7 @@ sdf_runif <- function(sc, n, min = 0, max = 1, num_partitions = NULL, seed = NUL
       "org.apache.spark.mllib.random.RandomRDDs"
     } else {
       "sparklyr.RandomRDDs"
-    }
-  )
+    })
 
   gen_samples_sdf(
     sc,

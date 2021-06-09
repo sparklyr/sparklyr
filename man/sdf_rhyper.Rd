@@ -18,6 +18,8 @@ sdf_rhyper(
 \arguments{
 \item{sc}{A Spark connection.}
 
+\item{nn}{Sample Size.}
+
 \item{m}{The number of successes among the population.}
 
 \item{n}{The number of failures among the population.}
@@ -48,6 +50,7 @@ Other Spark statistical routines:
 \code{\link{sdf_rnorm}()},
 \code{\link{sdf_rpois}()},
 \code{\link{sdf_rt}()},
-\code{\link{sdf_runif}()}
+\code{\link{sdf_runif}()},
+\code{\link{sdf_rweibull}()}
 }
 \concept{Spark statistical routines}

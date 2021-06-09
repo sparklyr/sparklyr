@@ -10,6 +10,7 @@ spark_dependency(
   initializer = NULL,
   catalog = NULL,
   repositories = NULL,
+  dbplyr_sql_variant = NULL,
   ...
 )
 }
@@ -24,11 +25,21 @@ spark_dependency(
 
 \item{repositories}{Character vector of Spark package repositories.}
 
+\item{dbplyr_sql_variant}{Customization of dbplyr SQL translation env. Must be a
+named list of the following form:
+  list(
+    scalar = list(scalar_fn1 = ..., scalar_fn2 = ..., <etc>),
+    aggregate = list(agg_fn1 = ..., agg_fn2 = ..., <etc>),
+    window = list(wnd_fn1 = ..., wnd_fn2 = ..., <etc>)
+  )
+See \link[dbplyr:sql_substr]{sql_variant} for details.}
+
 \item{...}{Additional optional arguments.}
 }
 \value{
 An object of type `spark_dependency`
 }
 \description{
-Define a Spark dependency consisting of a set of custom JARs and Spark packages.
+Define a Spark dependency consisting of a set of custom JARs, Spark packages,
+and customized dbplyr SQL translation env.
 }

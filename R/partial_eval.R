@@ -5,7 +5,7 @@
 # `summarise(across(where(is.numeric), mean))` work as expected for Spark
 # dataframes
 
-partial_eval <- function(call, sim_data, env = rlang::caller_env()) {
+partial_eval <- function(call, sim_data, env = rlang::caller_env(), ctx = NULL, supports_one_sided_formula = TRUE) {
   vars <- colnames(sim_data)
   if (rlang::is_null(call)) {
     NULL
@@ -14,18 +14,30 @@ partial_eval <- function(call, sim_data, env = rlang::caller_env()) {
   } else if (rlang::is_symbol(call)) {
     partial_eval_sym(call, vars, env)
   } else if (rlang::is_quosure(call)) {
-    partial_eval(rlang::get_expr(call), sim_data, rlang::get_env(call))
+    partial_eval(
+      rlang::get_expr(call),
+      sim_data,
+      env = rlang::get_env(call),
+      ctx = ctx,
+      supports_one_sided_formula = supports_one_sided_formula
+    )
   } else if (rlang::is_call(call)) {
-    partial_eval_call(call, sim_data, env)
+    partial_eval_call(
+      call,
+      sim_data,
+      env = env,
+      ctx = ctx,
+      supports_one_sided_formula = supports_one_sided_formula
+    )
   } else {
     rlang::abort(glue::glue("Unknown input type: ", typeof(call)))
   }
 }
 
-partial_eval_dots <- function(dots, sim_data) {
+partial_eval_dots <- function(dots, sim_data, ctx = NULL, supports_one_sided_formula = TRUE) {
   stopifnot(inherits(dots, "quosures"))
 
-  dots <- lapply(dots, partial_eval_quo, sim_data)
+  dots <- lapply(dots, partial_eval_quo, sim_data, ctx, supports_one_sided_formula)
 
   # Flatten across() calls
   is_list <- vapply(dots, is.list, logical(1))
@@ -35,8 +47,14 @@ partial_eval_dots <- function(dots, sim_data) {
   unlist(dots, recursive = FALSE)
 }
 
-partial_eval_quo <- function(x, sim_data) {
-  expr <- partial_eval(rlang::get_expr(x), sim_data, rlang::get_env(x))
+partial_eval_quo <- function(x, sim_data, ctx = NULL, supports_one_sided_formula = TRUE) {
+  expr <- partial_eval(
+    rlang::get_expr(x),
+    sim_data,
+    env = rlang::get_env(x),
+    ctx = ctx,
+    supports_one_sided_formula = supports_one_sided_formula
+  )
   if (is.list(expr)) {
     lapply(expr, rlang::new_quosure, env = rlang::get_env(x))
   } else {
@@ -63,7 +81,7 @@ is_tidy_pronoun <- function(call) {
   rlang::is_symbol(call[[1]], c("$", "[[")) && rlang::is_symbol(call[[2]], c(".data", ".env"))
 }
 
-partial_eval_call <- function(call, sim_data, env) {
+partial_eval_call <- function(call, sim_data, env, ctx = NULL, supports_one_sided_formula = TRUE) {
   fun <- call[[1]]
   vars <- colnames(sim_data)
 
@@ -107,7 +125,13 @@ partial_eval_call <- function(call, sim_data, env) {
       rlang::eval_bare(idx, env)
     }
   } else if (rlang::is_call(call, "across")) {
-    partial_eval_across(call, sim_data, env)
+    partial_eval_across(
+      call,
+      sim_data,
+      env = env,
+      ctx = ctx,
+      supports_one_sided_formula = supports_one_sided_formula
+    )
   } else if (rlang::is_call(call, "if_all")) {
     partial_eval_if_all(call, sim_data, env)
   } else if (rlang::is_call(call, "if_any")) {
@@ -128,7 +152,7 @@ partial_eval_call <- function(call, sim_data, env) {
 }
 
 utils::globalVariables(c("array_contains", "concat", "element_at"))
-partial_eval_across <- function(call, sim_data, env) {
+partial_eval_across <- function(call, sim_data, env, ctx = NULL, supports_one_sided_formula = TRUE) {
   call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
   vars <- colnames(sim_data)
 
@@ -137,6 +161,15 @@ partial_eval_across <- function(call, sim_data, env) {
   .fns <- eval(call$.fns, env)
 
   if (rlang::is_formula(.fns)) {
+    if (!supports_one_sided_formula) {
+      err_msg <- "One-sided formula is unsupported"
+      if (!is.null(ctx)) {
+        err_msg <- paste0(err_msg, " for '", ctx, "'")
+      }
+      err_msg <- paste0(err_msg, " on Spark dataframes.")
+
+      stop(err_msg)
+    }
     # as is
     funs <- .fns
   } else {
@@ -224,12 +257,10 @@ partial_eval_apply_fns <- function(call, sim_data, env, what) {
               rlang::expr(~ (!!rlang::sym(find_fun(fns[[i]])))(.x, !!!call$...))
             } else {
               rlang::abort(sprintf("Unsupported `.fns` for %s", what))
-            }
-          )
+            })
 
           rlang::expr(transform(array(!!!cols), !!fn))
-        }
-      )
+        })
     }
 
     rlang::expr(concat(!!!sub_exprs))

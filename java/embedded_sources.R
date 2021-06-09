@@ -166,7 +166,7 @@ readTypedObject <- function(con, type) {
     "l" = readList(con),
     "e" = readMap(con),
     "s" = readStruct(con),
-    "f" = readFastStringArray(con),
+    "f" = readStringArray(con),
     "n" = NULL,
     "j" = getJobj(con, readString(con)),
     "J" = jsonlite::fromJSON(
@@ -179,24 +179,35 @@ readTypedObject <- function(con, type) {
 
 readString <- function(con) {
   stringLen <- readInt(con)
-  string <- ""
 
-  if (stringLen > 0) {
-    raw <- read_bin(con, raw(), stringLen, endian = "big")
-    if (is.element("00", raw)) {
-      warning("Input contains embedded nuls, removing.")
-      raw <- raw[raw != "00"]
+  string <- (
+    if (stringLen > 0) {
+      raw <- read_bin(con, raw(), stringLen, endian = "big")
+      if (is.element("00", raw)) {
+        warning("Input contains embedded nuls, removing.")
+        raw <- raw[raw != "00"]
+      }
+      rawToChar(raw)
+    } else if (stringLen == 0) {
+      ""
+    } else {
+      NA_character_
     }
-    string <- rawToChar(raw)
-  }
+  )
 
   Encoding(string) <- "UTF-8"
   string
 }
 
-readFastStringArray <- function(con) {
+readStringArray <- function(con) {
   joined <- readString(con)
-  as.list(strsplit(joined, "\u0019")[[1]])
+  arr <- as.list(strsplit(joined, "\u0019")[[1]])
+  lapply(
+    arr,
+    function(x) {
+      if (x == "<NA>") NA_character_ else x
+    }
+  )
 }
 
 readDateArray <- function(con, n = 1) {
@@ -344,7 +355,9 @@ readStruct <- function(con) {
 
 readRaw <- function(con) {
   dataLen <- readInt(con)
-  if (dataLen == 0) {
+  if (dataLen == -1) {
+    NA
+  } else if (dataLen == 0) {
     raw()
   } else {
     read_bin(con, raw(), as.integer(dataLen), endian = "big")
@@ -567,10 +580,11 @@ core_invoke_cancel_running <- function(sc) {
   if (exists("connection_progress_terminated")) connection_progress_terminated(sc)
 }
 
-write_bin_args <- function(backend, object, static, method, args) {
+write_bin_args <- function(backend, object, static, method, args, return_jobj_ref = FALSE) {
   rc <- rawConnection(raw(), "r+")
   writeString(rc, object)
   writeBoolean(rc, static)
+  writeBoolean(rc, return_jobj_ref)
   writeString(rc, method)
 
   writeInt(rc, length(args))
@@ -625,14 +639,14 @@ core_invoke_socket_name <- function(sc) {
 }
 
 core_remove_jobjs <- function(sc, ids) {
-  core_invoke_method_impl(sc, static = TRUE, noreply = TRUE, "Handler", "rm", as.list(ids))
+  core_invoke_method_impl(sc, static = TRUE, noreply = TRUE, "Handler", "rm", FALSE, as.list(ids))
 }
 
-core_invoke_method <- function(sc, static, object, method, ...) {
-  core_invoke_method_impl(sc, static, noreply = FALSE, object, method, ...)
+core_invoke_method <- function(sc, static, object, method, return_jobj_ref, ...) {
+  core_invoke_method_impl(sc, static, noreply = FALSE, object, method, return_jobj_ref, ...)
 }
 
-core_invoke_method_impl <- function(sc, static, noreply, object, method, ...) {
+core_invoke_method_impl <- function(sc, static, noreply, object, method, return_jobj_ref, ...) {
   # N.B.: the reference to `object` must be retained until after a value or exception is returned to us
   # from the invoked method here (i.e., cannot have `object <- something_else` before that), because any
   # re-assignment could cause the last reference to `object` to be destroyed and the underlying JVM object
@@ -679,7 +693,7 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, ...) {
   # if the object is a jobj then get it's id
   objId <- ifelse(inherits(object, "spark_jobj"), object$id, object)
 
-  write_bin_args(backend, objId, static, method, args)
+  write_bin_args(backend, objId, static, method, args, return_jobj_ref)
 
   if (identical(object, "Handler") &&
     (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
@@ -1031,7 +1045,7 @@ writeObject <- function(con, object, writeType = TRUE) {
   type <- class(object)[[1]]
 
   if (type %in% c("integer", "character", "logical", "double", "numeric", "factor", "Date", "POSIXct")) {
-    if (is.na(object)) {
+    if (is.na(object) && !is.nan(object)) {
       object <- NULL
       type <- "NULL"
     }
@@ -1634,7 +1648,22 @@ spark_worker_apply <- function(sc, config) {
       if (config$single_binary_column) {
         tibble::tibble(encoded = lapply(data, function(x) x[[1]]))
       } else {
-        do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
+        bind_rows <- core_get_package_function("dplyr", "bind_rows")
+        as_tibble <- core_get_package_function("tibble", "as_tibble")
+        if (!is.null(bind_rows) && !is.null(as_tibble)) {
+          do.call(
+            bind_rows,
+            lapply(
+              data, function(x) { as_tibble(x, .name_repair = "universal") }
+            )
+          )
+        } else {
+          warning("dplyr::bind_rows or tibble::as_tibble is unavailable, ",
+                  "falling back to rbind implementation in base R. ",
+                  "Inputs with list column(s) will not work.")
+
+          do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
+        }
       })
 
     if (!config$single_binary_column) {
@@ -1843,7 +1872,7 @@ worker_connection.spark_jobj <- function(x, ...) {
 # nocov start
 
 worker_invoke_method <- function(sc, static, object, method, ...) {
-  core_invoke_method(sc, static, object, method, ...)
+  core_invoke_method(sc, static, object, method, FALSE, ...)
 }
 
 worker_invoke <- function(jobj, method, ...) {

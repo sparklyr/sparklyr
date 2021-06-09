@@ -3,6 +3,7 @@
 \name{ml_kmeans}
 \alias{ml_kmeans}
 \alias{ml_compute_cost}
+\alias{ml_compute_silhouette_measure}
 \title{Spark ML -- K-Means Clustering}
 \usage{
 ml_kmeans(
@@ -21,6 +22,12 @@ ml_kmeans(
 )
 
 ml_compute_cost(model, dataset)
+
+ml_compute_silhouette_measure(
+  model,
+  dataset,
+  distance_measure = c("squaredEuclidean", "cosine")
+)
 }
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
@@ -51,6 +58,8 @@ reproducible across repeated calls.}
 \item{model}{A fitted K-means model returned by \code{ml_kmeans()}}
 
 \item{dataset}{Dataset on which to calculate K-means cost}
+
+\item{distance_measure}{Distance measure to apply when computing the Silhouette measure.}
 }
 \value{
 The object returned depends on the class of \code{x}.
@@ -76,6 +85,9 @@ The object returned depends on the class of \code{x}.
 \code{ml_compute_cost()} returns the K-means cost (sum of
   squared distances of points to their nearest center) for the model
   on the given data.
+
+\code{ml_compute_silhouette_measure()} returns the Silhouette measure
+  of the clustering on the given data.
 }
 \description{
 K-means clustering with support for k-means|| initialization proposed by Bahmani et al.

@@ -90,6 +90,14 @@ spark_apply_worker_config <- function(
 #'   function in R.
 #' @param arrow_max_records_per_batch Maximum size of each Arrow record batch,
 #'   ignored if Arrow serialization is not enabled.
+#' @param auto_deps [Experimental] Whether to infer all required R packages by
+#'   examining the closure \code{f()} and only distribute required R and their
+#'   transitive dependencies to Spark worker nodes (default: FALSE).
+#'   NOTE: this option will only take effect if \code{packages} is set to
+#'   \code{TRUE} or is a character vector of R package names. If \code{packages}
+#'   is a character vector of R package names, then both the set of packages
+#'   specified by \code{packages} and the set of inferred packages will be
+#'   distributed to Spark workers.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @section Configuration:
@@ -131,6 +139,7 @@ spark_apply <- function(x,
                         fetch_result_as_sdf = TRUE,
                         partition_index_param = "",
                         arrow_max_records_per_batch = NULL,
+                        auto_deps = FALSE,
                         ...) {
   if (!is.character(partition_index_param)) {
     stop("Expected 'partition_index_param' to be a string.")
@@ -200,8 +209,8 @@ spark_apply <- function(x,
       invoke("sessionLocalTimeZone")
     records_per_batch <- as.integer(
       arrow_max_records_per_batch %||%
-      spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||%
-      10000
+        spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||%
+        10000
     )
   }
 
@@ -265,8 +274,7 @@ spark_apply <- function(x,
       function(x, ...) serializer$serializer(x)
     } else {
       serializer
-    }
-  )
+    })
   deserializer <- spark_apply_deserializer()
   closure <- (
     if (create_rlang_closure) {
@@ -275,8 +283,7 @@ spark_apply <- function(x,
       suppressWarnings(serialize_impl(f, version = serialize_version))
     } else {
       f
-    }
-  )
+    })
   context_serialize <- serialize_impl(context, version = serialize_version)
 
   # create rlang closure
@@ -318,6 +325,16 @@ spark_apply <- function(x,
 
   worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
+  # packages should be either a boolean or a character vector
+  packages <- unlist(packages)
+  if (auto_deps && !spark_apply_packages_is_bundle(packages)) {
+    required_pkgs <- infer_required_r_packages(f)
+    if (is.character(packages)) {
+      packages <- union(packages, required_pkgs)
+    } else {
+      packages <- required_pkgs
+    }
+  }
   bundle_path <- get_spark_apply_bundle_path(sc, packages)
 
   spark_apply_options <- lapply(
@@ -538,8 +555,7 @@ spark_apply_serializer <- function() {
       function(x, version = NULL) serialize(x, NULL, version = version)
     } else {
       list(serializer = serializer)
-    }
-  )
+    })
 
   impl
 }

@@ -1,4 +1,4 @@
-context("describe")
+context("sdf collect")
 
 sc <- testthat_spark_connection()
 
@@ -7,6 +7,14 @@ test_that("sdf_collect() works properly", {
   mtcars_data <- sdf_collect(mtcars_tbl)
 
   expect_equivalent(mtcars, mtcars_data)
+})
+
+test_that("sdf_collect() can collect the first n rows of a Spark dataframe", {
+  mtcars_tbl <- testthat_tbl("mtcars", repartition = 5)
+
+  mtcars_data <- sdf_collect(mtcars_tbl, n = 10)
+
+  expect_equivalent(mtcars[1:10,], mtcars_data)
 })
 
 test_that("sdf_collect() works properly with impl = \"row-wise-iter\"", {
@@ -57,7 +65,173 @@ test_that("sdf_collect() works with nested named lists", {
   }
 })
 
-test_that("sdf_collect() works with structs inside arrays", {
+test_that("sdf_collect() works with boolean array column", {
+  skip_on_arrow()
+
+  sdf <- dplyr::tbl(
+    sc,
+    dplyr::sql("
+      SELECT
+        *
+      FROM
+        VALUES (ARRAY(FALSE)),
+               (ARRAY(TRUE, FALSE)),
+               NULL,
+               (ARRAY(TRUE, NULL, FALSE))
+      AS TAB(`arr`)
+    ")
+  )
+  expect_equivalent(
+    sdf %>% sdf_collect(),
+    tibble::tibble(arr = list(FALSE, c(TRUE, FALSE), NA, c(TRUE, NA, FALSE)))
+  )
+})
+
+test_that("sdf_collect() works with byte array column", {
+  skip_on_arrow()
+
+  sdf <- dplyr::tbl(
+    sc,
+    dplyr::sql("
+      SELECT
+        *
+      FROM
+        VALUES ARRAY(CAST(97 AS BYTE), CAST(98 AS BYTE)),
+               ARRAY(CAST(98 AS BYTE), CAST(99 AS BYTE), CAST(0 AS BYTE), CAST(100 AS BYTE)),
+               NULL,
+               ARRAY(CAST(101 AS BYTE))
+      AS TAB(`arr`)
+    ")
+  )
+  df <- sdf %>% collect()
+
+  expect_equal(
+    df$arr,
+    list(
+      charToRaw("ab"),
+      c(charToRaw("bc"), as.raw(0), charToRaw("d")),
+      NA,
+      charToRaw("e")
+    )
+  )
+})
+
+test_that("sdf_collect() works with integral array column", {
+  skip_on_arrow()
+
+  for (type in c("SHORT", "INT")) {
+    sdf <- dplyr::tbl(
+      sc,
+      dplyr::sql(
+        glue::glue(
+          "
+          SELECT
+            *
+          FROM
+            VALUES ARRAY(CAST(1 AS {type})),
+                   ARRAY(CAST(2 AS {type}), CAST(3 AS {type})),
+                   NULL,
+                   ARRAY(CAST(4 AS {type}), NULL, CAST(5 AS {type}))
+          AS TAB(`arr`)
+          ",
+          type = type
+        )
+      )
+    )
+
+    expect_equivalent(
+      sdf %>% sdf_collect(),
+      tibble::tibble(arr = list(1L, c(2L, 3L), NA, c(4L, NA, 5L)))
+    )
+  }
+})
+
+test_that("sdf_collect() works with numeric array column", {
+  skip_on_arrow()
+
+  for (type in c("FLOAT", "LONG", "DOUBLE")) {
+    sdf <- dplyr::tbl(
+      sc,
+      dplyr::sql(
+        glue::glue(
+          "
+          SELECT
+            *
+          FROM
+            VALUES ARRAY(CAST(1 AS {type})),
+                   ARRAY(CAST(2 AS {type}), CAST(3 AS {type})),
+                   NULL,
+                   ARRAY(CAST(4 AS {type}), NULL, CAST('NaN' AS {type}), CAST(5 AS {type}))
+          AS TAB(`arr`)
+          ",
+          type = type
+        )
+      )
+    )
+
+    expect_equivalent(
+      sdf %>% sdf_collect(),
+      tibble::tibble(arr = list(1, c(2, 3), NA, c(4, NA, NaN, 5)))
+    )
+  }
+})
+
+test_that("sdf_collect() works with string array column", {
+  skip_on_arrow()
+
+  sdf <- dplyr::tbl(
+    sc,
+    dplyr::sql("
+      SELECT
+        *
+      FROM
+        VALUES ARRAY('ab'), ARRAY('bcd', 'e'), NULL, ARRAY('fghi', NULL, 'jk')
+      AS TAB(`arr`)
+    ")
+  )
+  expect_equivalent(
+    sdf %>% sdf_collect(),
+    tibble::tibble(arr = list("ab", c("bcd", "e"), NA, c("fghi", NA, "jk")))
+  )
+})
+
+test_that("sdf_collect() works with temporal array column", {
+  skip_on_arrow()
+
+  for (type in c("DATE", "TIMESTAMP")) {
+    sdf <- dplyr::tbl(
+      sc,
+      dplyr::sql(
+        glue::glue(
+          "
+          SELECT
+            *
+          FROM
+            VALUES ARRAY(CAST('1970-01-01' AS {type})),
+                   ARRAY(CAST('1970-01-02' AS {type}), CAST('1970-01-03' AS {type})),
+                   NULL,
+                   ARRAY(CAST('1970-01-04' AS {type}), NULL, CAST('1970-01-05' AS {type}))
+          AS TAB(`arr`)
+          ",
+          type = type
+        )
+      )
+    )
+    cast_fn <- if (type == "DATE") as.Date else as.POSIXct
+
+    expect_equivalent(
+      sdf %>% dplyr::pull(arr),
+      list(
+        cast_fn("1970-01-01", tz = "UTC"),
+        cast_fn(c("1970-01-02", "1970-01-03"), tz = "UTC"),
+        NA,
+        cast_fn(c("1970-01-04", NA, "1970-01-05"), tz = "UTC")
+      )
+    )
+  }
+})
+
+test_that("sdf_collect() works with struct array column", {
   if (spark_version(sc) < "2.3") {
     skip("deserializing Spark StructType into named list is only supported in Spark 2.3+")
   }

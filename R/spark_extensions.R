@@ -26,13 +26,22 @@ registered_extensions <- function() {
 
 #' Define a Spark dependency
 #'
-#' Define a Spark dependency consisting of a set of custom JARs and Spark packages.
+#' Define a Spark dependency consisting of a set of custom JARs, Spark packages,
+#' and customized dbplyr SQL translation env.
 #'
 #' @param jars Character vector of full paths to JAR files.
 #' @param packages Character vector of Spark packages names.
 #' @param initializer Optional callback function called when initializing a connection.
 #' @param catalog Optional location where extension JAR files can be downloaded for Livy.
 #' @param repositories Character vector of Spark package repositories.
+#' @param dbplyr_sql_variant Customization of dbplyr SQL translation env. Must be a
+#'   named list of the following form:
+#'     list(
+#'       scalar = list(scalar_fn1 = ..., scalar_fn2 = ..., <etc>),
+#'       aggregate = list(agg_fn1 = ..., agg_fn2 = ..., <etc>),
+#'       window = list(wnd_fn1 = ..., wnd_fn2 = ..., <etc>)
+#'     )
+#'   See \link[dbplyr:sql_substr]{sql_variant} for details.
 #' @param ... Additional optional arguments.
 #'
 #' @return An object of type `spark_dependency`
@@ -43,13 +52,15 @@ spark_dependency <- function(jars = NULL,
                              initializer = NULL,
                              catalog = NULL,
                              repositories = NULL,
+                             dbplyr_sql_variant = NULL,
                              ...) {
   structure(class = "spark_dependency", list(
     jars = jars,
     packages = packages,
     initializer = initializer,
     catalog = catalog,
-    repositories = repositories
+    repositories = repositories,
+    dbplyr_sql_variant = dbplyr_sql_variant
   ))
 }
 
@@ -69,6 +80,7 @@ spark_dependencies_from_extensions <- function(spark_version, scala_version, ext
   initializers <- list()
   catalog_jars <- character()
   repositories <- character()
+  dbplyr_sql_variant <- list(scalar = list(), aggregate = list(), window = list())
 
   for (extension in extensions) {
     dependencies <- spark_dependencies_from_extension(spark_version, scala_version, extension)
@@ -78,6 +90,16 @@ spark_dependencies_from_extensions <- function(spark_version, scala_version, ext
       initializers <- c(initializers, dependency$initializer)
       repositories <- c(repositories, dependency$repositories)
 
+      for (x in c("scalar", "aggregate", "window")) {
+        if (!is.null(dependency$dbplyr_sql_variant[[x]])) {
+          for (fn in names(dependency$dbplyr_sql_variant[[x]])) {
+            if (fn %in% names(dbplyr_sql_variant[[x]][[fn]])) {
+              warning("overriding existing dbplyr sql translation for '", fn, "'")
+            }
+            dbplyr_sql_variant[[x]][[fn]] <- dependency$dbplyr_sql_variant[[x]][[fn]]
+          }
+        }
+      }
       config_catalog <- spark_config_value(config, "sparklyr.extensions.catalog", TRUE)
       if (!identical(dependency$catalog, NULL) && !identical(config_catalog, FALSE)) {
         catalog_path <- dependency$catalog
@@ -98,7 +120,8 @@ spark_dependencies_from_extensions <- function(spark_version, scala_version, ext
     packages = packages,
     initializers = initializers,
     catalog_jars = catalog_jars,
-    repositories = repositories
+    repositories = repositories,
+    dbplyr_sql_variant = dbplyr_sql_variant
   )
 }
 
@@ -164,6 +187,12 @@ sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
   spark_major_minor <- spark_version[1, 1:2]
 
   exact_jar <- sprintf("sparklyr-%s-%s.jar", spark_major_minor, scala_version)
+  if (identical(exact_jar, "sparklyr-3.0-2.12.jar")) {
+    # At the moment we ship sparklyr-3.0-2.12.jar as sparklyr-master-2.12.jar
+    # for Databricks-related reasons, and do not duplicate the same jar file
+    # twice under different names to avoid inflating the size of the R package.
+    exact_jar <- "sparklyr-master-2.12.jar"
+  }
   all_jars <- dir(system.file("java", package = "sparklyr"), pattern = "sparklyr")
 
   if (exact_jar %in% all_jars) {

@@ -30,7 +30,7 @@ ml_one_hot_encoder_estimator <- ft_one_hot_encoder_estimator
 ft_one_hot_encoder_estimator.spark_connection <- function(x, input_cols = NULL, output_cols = NULL,
                                                           handle_invalid = "error", drop_last = TRUE,
                                                           uid = random_string("one_hot_encoder_estimator_"), ...) {
-  spark_require_version(x, "2.3.0", "3.0.0")
+  spark_require_version(x, required = "2.3.0", required_max = "3.0.0")
 
   .args <- list(
     input_cols = input_cols,
@@ -96,7 +96,7 @@ new_ml_one_hot_encoder_estimator <- function(jobj) {
 new_ml_one_hot_encoder_estimator_model <- function(jobj) {
   new_ml_transformer(
     jobj,
-    category_size = invoke(jobj, "categorySize"),
+    category_sizes = invoke(jobj, "categorySizes"),
     class = "ml_one_hot_encoder_model"
   )
 }

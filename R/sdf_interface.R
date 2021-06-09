@@ -430,8 +430,7 @@ sdf_quantile <- function(x,
         probabilities,
         relative.error
       )
-    }
-  )
+    })
 
   if (length(column) == 1) {
     quantiles <- unlist(quantiles)
@@ -763,7 +762,7 @@ sdf_expand_grid <- function(
       if (!"tbl_spark" %in% class(vars[[i]])) {
         vars[[i]] <- sdf_copy_to(
           sc, data.frame(vars[i]),
-          name = random_string("sdf_expand_grid_tmp")
+          name = random_string("sparklyr_tmp_")
         )
       }
     }

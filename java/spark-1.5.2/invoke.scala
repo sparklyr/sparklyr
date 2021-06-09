@@ -30,11 +30,14 @@ class Invoke {
           while (i < numArgs && argMatched) {
             val parameterType = parameterTypes(i)
 
-            if (parameterType == classOf[Seq[Any]] &&
+            if (parameterType.isAssignableFrom(classOf[Seq[Any]]) &&
                 args(i) != null && args(i).getClass.isArray) {
               // The case that the parameter type is a Scala Seq and the argument
               // is a Java array is considered matching. The array will be converted
               // to a Seq later if this method is matched.
+            } else if (parameterTypes(i).isAssignableFrom(classOf[Array[Float]]) &&
+              (args(i) != null && args(i).getClass == classOf[Array[java.lang.Float]])) {
+              // Array[java.lang.Float] is compatible with Array[scala.Float]
             } else if ((parameterType == classOf[Char] ||
                         parameterType == classOf[java.lang.Character]) &&
                        args(i) != null && args(i).isInstanceOf[String]) {
@@ -48,6 +51,10 @@ class Invoke {
                        args(i).isInstanceOf[Integer]) {
               // Parameter type is Long and argument is Integer.
               // This is done for backwards compatibility.
+            } else if (args(i) != null &&
+                      ((args(i).isInstanceOf[java.lang.Float] && parameterType == classOf[Float]) ||
+                       (args(i).isInstanceOf[Float] && parameterType == classOf[java.lang.Float]))) {
+              // Consider java.lang.Float as compatible with scala.Float
             } else {
               var parameterWrapperType = parameterType
 
@@ -61,7 +68,11 @@ class Invoke {
                   case _ => parameterType
                 }
               }
-              if ((parameterType.isPrimitive || args(i) != null) &&
+              if (args(i) != null &&
+                  parameterWrapperType.isAssignableFrom(args(i).getClass)) {
+                // If the parameter type in question is assignable from args(i), then
+                // consider args(i) a match.
+              } else if ((parameterType.isPrimitive || args(i) != null) &&
                   !parameterWrapperType.isInstance(args(i))) {
                 argMatched = false
 
@@ -81,6 +92,9 @@ class Invoke {
                   args(i) != null && args(i).getClass.isArray) {
                 // Convert a Java array to scala Seq
                 args(i) = args(i).asInstanceOf[Array[_]].toSeq
+              } else if (parameterTypes(i).isAssignableFrom(classOf[Array[Float]]) &&
+                (args(i) != null && args(i).getClass == classOf[Array[java.lang.Float]])) {
+                args(i) = args(i).asInstanceOf[Array[java.lang.Float]].map(x => x.asInstanceOf[Float]).toArray
               } else if ((parameterTypes(i) == classOf[Char] ||
                           parameterTypes(i) == classOf[java.lang.Character]) &&
                          args(i) != null && args(i).isInstanceOf[String]) {

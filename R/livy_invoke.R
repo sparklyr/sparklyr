@@ -13,6 +13,7 @@ livy_invoke_serialize <- function(sc, static, object, method, ...) {
   rc <- rawConnection(raw(), "r+")
   writeString(rc, object)
   writeBoolean(rc, static)
+  writeBoolean(rc, FALSE) # return_jobj_ref
   writeString(rc, method)
 
   args <- list(...)

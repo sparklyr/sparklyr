@@ -3,7 +3,6 @@ context("sdf-distinct")
 sc <- testthat_spark_connection()
 
 test_that("sdf_distinct works properly", {
-
   test_requires_version("1.3.0")
   skip_databricks_connect()
 
@@ -48,5 +47,4 @@ test_that("sdf_distinct works properly", {
     sdf %>% sdf_distinct(vs, c("gear", "am")) %>%
       arrange_all() %>% collect() %>% as.data.frame()
   )
-
 })

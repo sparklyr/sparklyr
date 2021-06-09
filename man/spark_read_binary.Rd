@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_interface.R
 \name{spark_read_binary}
 \alias{spark_read_binary}
-\title{Read binary data data into a Spark DataFrame.}
+\title{Read binary data into a Spark DataFrame.}
 \usage{
 spark_read_binary(
   sc,
@@ -59,6 +59,7 @@ Other Spark serialization routines:
 \code{\link{spark_read_avro}()},
 \code{\link{spark_read_csv}()},
 \code{\link{spark_read_delta}()},
+\code{\link{spark_read_image}()},
 \code{\link{spark_read_jdbc}()},
 \code{\link{spark_read_json}()},
 \code{\link{spark_read_libsvm}()},

@@ -90,8 +90,7 @@ sdf_schema_impl <- function(x,
             dtype
           } else {
             field$dtype$repr
-          }
-        )
+          })
 
         list(name = name, type = type)
       }
@@ -140,16 +139,11 @@ sdf_read_column <- function(x, column) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
 
-  schema <- sdf_schema(sdf)
-  colType <- schema[[column]]$type
+  col_df <- sdf %>%
+    invoke("select", column, list()) %>%
+    collect()
 
-  separator <- split_separator(sc)
-
-  column <- sc %>%
-    invoke_static("sparklyr.Utils", "collectColumn", sdf, column, colType, separator$regexp) %>%
-    sdf_deserialize_column(sc)
-
-  column
+  col_df[[column]]
 }
 
 #' Collect a Spark DataFrame into R.
@@ -304,8 +298,16 @@ sdf_collect_data_frame <- function(sdf, collected) {
 #' @importFrom dplyr as_tibble
 sdf_collect_static <- function(object, impl, ...) {
   args <- list(...)
+  n <- args$n
   sc <- spark_connection(object)
   sdf <- spark_dataframe(object)
+  if (!is.null(n)) {
+    n <- as.integer(n)
+    if (!is.na(n)) {
+      # If n is Inf or any value outside of integer range, then ignore it
+      sdf <- sdf %>% invoke("limit", n)
+    }
+  }
 
   separator <- split_separator(sc)
 

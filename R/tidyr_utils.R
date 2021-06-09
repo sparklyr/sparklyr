@@ -50,11 +50,11 @@ repair_names <- function(col_names, names_repair) {
     unlist()
 }
 
-# If x is already a Spark data frame, then return dbplyr::remote_name(x)
+# If x is already a Spark data frame, then return sdf_remote_name(x)
 # Otherwise ensure the result from Spark SQL query encapsulated by x is
 # materialized into a Spark temp view and return the name of that temp view
 ensure_tmp_view <- function(x) {
-  dbplyr::remote_name(x) %||% {
+  sdf_remote_name(x) %||% {
     sc <- spark_connection(x)
     sdf <- spark_dataframe(x)
     data_tmp_view_name <- random_string("sparklyr_tmp_")
@@ -71,7 +71,7 @@ ensure_tmp_view <- function(x) {
 process_warnings <- function(out, substr_arr_col, n, extra, fill) {
   if (identical(extra, "warn") || identical(fill, "warn")) {
     output_cols <- colnames(out)
-    tmp_tbl_name <- random_string("__tidyr_separate_tmp_tbl_")
+    tmp_tbl_name <- random_string("sparklyr_tmp_")
     row_num <- random_string("__tidyr_separate_row_num_")
     row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY (SELECT 0))"))
     names(row_num_sql) <- row_num

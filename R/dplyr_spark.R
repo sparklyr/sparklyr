@@ -118,7 +118,7 @@ spark_tbl_sql <- function(src, from, ...) {
       as.integer(expand_nested_cols) * 2L + as.integer(expand_struct_cols) + 1L
     )
     if (!identical(self$schema_cache_state$ops, self$ops) ||
-        is.na(self$schema_cache_state$schema[[cache_index]])) {
+      is.na(self$schema_cache_state$schema[[cache_index]])) {
       self$schema_cache_state$ops <- self$ops
       self$schema_cache_state$schema[[cache_index]] <- schema_impl(
         self,
@@ -158,8 +158,17 @@ process_tbl_name <- function(x) {
 #' @export
 #' @importFrom dplyr src_tbls
 src_tbls.spark_connection <- function(x, ...) {
+  dots <- rlang::dots_list(...)
+  db <- dots$database
   sql <- hive_context(x)
-  tbls <- invoke(sql, "sql", "SHOW TABLES")
+  query <- (
+    if (is.null(db)) {
+      "SHOW TABLES"
+    } else {
+      as.character(dbplyr::build_sql("SHOW TABLES IN ", dbplyr::ident(db), con = x))
+    }
+  )
+  tbls <- invoke(sql, "sql", query)
   tableNames <- sdf_read_column(tbls, "tableName")
 
   filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
@@ -218,20 +227,22 @@ print.src_spark <- function(x, ...) {
   spark_log(spark_connection(x))
 }
 
-# create this alias so that the S3 method signature of compute.tbl_spark() is
-# consistent with that of dplyr::compute()
-random_table_name <- random_string
-
 #' @export
 #' @importFrom dplyr compute
-compute.tbl_spark <- function(x, name = random_table_name(), ...) {
+compute.tbl_spark <- function(x, ...) {
   # This only creates a view with the specified name in Spark. The view is not
   # cached yet.
-  out <- NextMethod(generic = "compute", object = x, name = name, ...)
+  out <- NextMethod()
+
+  remote_name <- sdf_remote_name(out)
 
   # We then need a separate SQL query to cache the resulting view, as there is
   # no way (yet) to both create and cache a view using a single Spark SQL query.
-  tbl_cache(sc = spark_connection(x), name = name, force = TRUE)
+  tbl_cache(
+    sc = spark_connection(x),
+    name = as.character(remote_name),
+    force = TRUE
+  )
 
   out
 }
@@ -288,4 +299,30 @@ same_src.src_spark <- function(x, y) {
   identical(x$con$master, y$con$master) &&
     identical(x$con$app_name, y$con$app_name) &&
     identical(x$con$method, y$con$method)
+}
+
+# TODO: this should be considered a temp workaround until
+# https://github.com/tidyverse/dbplyr/issues/639 is resolved
+sdf_remote_name <- function(x) {
+  UseMethod("sdf_remote_name")
+}
+
+sdf_remote_name.tbl_spark <- function(x) {
+  sdf_remote_name(x$ops)
+}
+
+sdf_remote_name.op_base <- function(x) {
+  x$x
+}
+
+sdf_remote_name.op_group_by <- function(x) {
+  sdf_remote_name(x$x)
+}
+
+sdf_remote_name.op_ungroup <- function(x) {
+  sdf_remote_name(x$x)
+}
+
+sdf_remote_name.default <- function(x) {
+  return()
 }
