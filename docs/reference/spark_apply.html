@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
       </span>
     </div>
 
@@ -124,7 +124,7 @@
   <span class='va'>x</span>,
   <span class='va'>f</span>,
   columns <span class='op'>=</span> <span class='cn'>NULL</span>,
-  memory <span class='op'>=</span> <span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span><span class='op'>(</span><span class='va'>name</span><span class='op'>)</span>,
+  memory <span class='op'>=</span> <span class='cn'>TRUE</span>,
   group_by <span class='op'>=</span> <span class='cn'>NULL</span>,
   packages <span class='op'>=</span> <span class='cn'>NULL</span>,
   context <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -133,6 +133,7 @@
   fetch_result_as_sdf <span class='op'>=</span> <span class='cn'>TRUE</span>,
   partition_index_param <span class='op'>=</span> <span class='st'>""</span>,
   arrow_max_records_per_batch <span class='op'>=</span> <span class='cn'>NULL</span>,
+  auto_deps <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -226,6 +227,17 @@ specify the column types. The sample size is configurable using the
       <th>arrow_max_records_per_batch</th>
       <td><p>Maximum size of each Arrow record batch,
 ignored if Arrow serialization is not enabled.</p></td>
+    </tr>
+    <tr>
+      <th>auto_deps</th>
+      <td><p>[Experimental] Whether to infer all required R packages by
+examining the closure <code>f()</code> and only distribute required R and their
+transitive dependencies to Spark worker nodes (default: FALSE).
+NOTE: this option will only take effect if <code>packages</code> is set to
+<code>TRUE</code> or is a character vector of R package names. If <code>packages</code>
+is a character vector of R package names, then both the set of packages
+specified by <code>packages</code> and the set of inferred packages will be
+distributed to Spark workers.</p></td>
     </tr>
     <tr>
       <th>...</th>

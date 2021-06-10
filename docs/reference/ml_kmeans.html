@@ -73,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
       </span>
     </div>
 
@@ -137,7 +137,13 @@
   <span class='va'>...</span>
 <span class='op'>)</span>
 
-<span class='fu'>ml_compute_cost</span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>dataset</span><span class='op'>)</span></pre>
+<span class='fu'>ml_compute_cost</span><span class='op'>(</span><span class='va'>model</span>, <span class='va'>dataset</span><span class='op'>)</span>
+
+<span class='fu'>ml_compute_silhouette_measure</span><span class='op'>(</span>
+  <span class='va'>model</span>,
+  <span class='va'>dataset</span>,
+  distance_measure <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"squaredEuclidean"</span>, <span class='st'>"cosine"</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -199,6 +205,10 @@ reproducible across repeated calls.</p></td>
       <th>dataset</th>
       <td><p>Dataset on which to calculate K-means cost</p></td>
     </tr>
+    <tr>
+      <th>distance_measure</th>
+      <td><p>Distance measure to apply when computing the Silhouette measure.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -222,6 +232,8 @@ reproducible across repeated calls.</p></td>
 <p><code>ml_compute_cost()</code> returns the K-means cost (sum of
   squared distances of points to their nearest center) for the model
   on the given data.</p>
+<p><code>ml_compute_silhouette_measure()</code> returns the Silhouette measure
+  of the clustering on the given data.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>See <a href='http://spark.apache.org/docs/latest/ml-clustering.html'>http://spark.apache.org/docs/latest/ml-clustering.html</a> for

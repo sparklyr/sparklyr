@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
       </span>
     </div>
 
@@ -331,12 +331,12 @@ reproducible across repeated calls.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>janeaustenr</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/juliasilge/janeaustenr'>janeaustenr</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span>
 <span class='va'>sc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='spark-connections.html'>spark_connect</a></span><span class='op'>(</span>master <span class='op'>=</span> <span class='st'>"local"</span><span class='op'>)</span>
 
 <span class='va'>lines_tbl</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sdf_copy_to.html'>sdf_copy_to</a></span><span class='op'>(</span><span class='va'>sc</span>,
-  <span class='fu'>austen_books</span><span class='op'>(</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>30</span><span class='op'>)</span>, <span class='op'>]</span>,
+  <span class='fu'><a href='https://rdrr.io/pkg/janeaustenr/man/austen_books.html'>austen_books</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>30</span><span class='op'>)</span>, <span class='op'>]</span>,
   name <span class='op'>=</span> <span class='st'>"lines_tbl"</span>,
   overwrite <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
