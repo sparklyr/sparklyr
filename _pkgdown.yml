@@ -44,6 +44,7 @@ reference:
     - spark_read_binary
     - spark_read_csv
     - spark_read_delta
+    - spark_read_image
     - spark_read_jdbc
     - spark_read_json
     - spark_read_libsvm
@@ -66,7 +67,6 @@ reference:
     - spark_write_table
     - spark_write_rds
     - collect_from_rds
-    - dplyr_hof
   - title: Spark Tables
     contents:
     - src_databases
@@ -75,7 +75,9 @@ reference:
     - tbl_uncache
   - title: Spark DataFrames
     contents:
+    - '[.tbl_spark'
     - copy_to.spark_connection
+    - dplyr_hof
     - sdf_along
     - sdf_bind_cols
     - sdf_bind_rows
@@ -93,6 +95,20 @@ reference:
     - sdf_partition_sizes
     - sdf_pivot
     - sdf_predict
+    - sdf_rbeta
+    - sdf_rbinom
+    - sdf_rcauchy
+    - sdf_rchisq
+    - sdf_rexp
+    - sdf_rgamma
+    - sdf_rgeom
+    - sdf_rhyper
+    - sdf_rlnorm
+    - sdf_rnorm
+    - sdf_rpois
+    - sdf_rt
+    - sdf_runif
+    - sdf_rweibull
     - sdf_read_column
     - sdf_register
     - sdf_repartition
@@ -160,6 +176,7 @@ reference:
     - ml_generalized_linear_regression
     - ml_gradient_boosted_trees
     - ml_kmeans
+    - ml_kmeans_cluster_eval
     - ml_lda
     - ml_linear_regression
     - ml_logistic_regression
@@ -168,6 +185,7 @@ reference:
     - ml_naive_bayes
     - ml_one_vs_rest
     - ml_pca
+    - ml_prefixspan
     - ml_random_forest
     - ml_survival_regression
     - ml_add_stage
@@ -300,6 +318,10 @@ reference:
     - hive_context
     - hive_context_config
     - invoke
+    - j_invoke
+    - jarray
+    - jfloat
+    - jfloat_array
     - java_context
     - register_extension
     - spark_compilation_spec

@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
       </span>
     </div>
 
@@ -343,7 +343,7 @@
         <td>
           <p><code><a href="spark_read_binary.html">spark_read_binary()</a></code> </p>
         </td>
-        <td><p>Read binary data data into a Spark DataFrame.</p></td>
+        <td><p>Read binary data into a Spark DataFrame.</p></td>
       </tr><tr>
         
         <td>
@@ -356,6 +356,12 @@
           <p><code><a href="spark_read_delta.html">spark_read_delta()</a></code> </p>
         </td>
         <td><p>Read from Delta Lake into a Spark DataFrame.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="spark_read_image.html">spark_read_image()</a></code> </p>
+        </td>
+        <td><p>Read image data into a Spark DataFrame.</p></td>
       </tr><tr>
         
         <td>
@@ -488,12 +494,6 @@
           <p><code><a href="collect_from_rds.html">collect_from_rds()</a></code> </p>
         </td>
         <td><p>Collect Spark data serialized in RDS format into R</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="dplyr_hof.html">dplyr_hof</a></code> </p>
-        </td>
-        <td><p>dplyr wrappers for Apache Spark higher order functions</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -547,9 +547,21 @@
       <tr>
         
         <td>
+          <p><code><a href="sub-.tbl_spark.html">`[`(<i>&lt;tbl_spark&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Subsetting operator for Spark dataframe</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="copy_to.spark_connection.html">copy_to(<i>&lt;spark_connection&gt;</i>)</a></code> </p>
         </td>
         <td><p>Copy an R Data Frame to Spark</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="dplyr_hof.html">dplyr_hof</a></code> </p>
+        </td>
+        <td><p>dplyr wrappers for Apache Spark higher order functions</p></td>
       </tr><tr>
         
         <td>
@@ -646,6 +658,90 @@
           <p><code><a href="sdf-transform-methods.html">sdf_predict()</a></code> <code><a href="sdf-transform-methods.html">sdf_transform()</a></code> <code><a href="sdf-transform-methods.html">sdf_fit()</a></code> <code><a href="sdf-transform-methods.html">sdf_fit_and_transform()</a></code> </p>
         </td>
         <td><p>Spark ML -- Transform, fit, and predict methods (sdf_ interface)</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rbeta.html">sdf_rbeta()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a Beta distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rbinom.html">sdf_rbinom()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a binomial distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rcauchy.html">sdf_rcauchy()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a Cauchy distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rchisq.html">sdf_rchisq()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a chi-squared distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rexp.html">sdf_rexp()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from an exponential distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rgamma.html">sdf_rgamma()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a Gamma distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rgeom.html">sdf_rgeom()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a geometric distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rhyper.html">sdf_rhyper()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a hypergeometric distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rlnorm.html">sdf_rlnorm()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a log normal distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rnorm.html">sdf_rnorm()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from the standard normal distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rpois.html">sdf_rpois()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a Poisson distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rt.html">sdf_rt()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a t-distribution</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_runif.html">sdf_runif()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from the uniform distribution U(0, 1).</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sdf_rweibull.html">sdf_rweibull()</a></code> </p>
+        </td>
+        <td><p>Generate random samples from a Weibull distribution.</p></td>
       </tr><tr>
         
         <td>
@@ -986,9 +1082,15 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="ml_kmeans.html">ml_kmeans()</a></code> <code><a href="ml_kmeans.html">ml_compute_cost()</a></code> </p>
+          <p><code><a href="ml_kmeans.html">ml_kmeans()</a></code> <code><a href="ml_kmeans.html">ml_compute_cost()</a></code> <code><a href="ml_kmeans.html">ml_compute_silhouette_measure()</a></code> </p>
         </td>
         <td><p>Spark ML -- K-Means Clustering</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ml_kmeans_cluster_eval.html">ml_kmeans_cluster_eval</a></code> </p>
+        </td>
+        <td><p>Evaluate a K-mean clustering</p></td>
       </tr><tr>
         
         <td>
@@ -1037,6 +1139,12 @@
           <p><code><a href="ft_pca.html">ft_pca()</a></code> <code><a href="ft_pca.html">ml_pca()</a></code> </p>
         </td>
         <td><p>Feature Transformation -- PCA (Estimator)</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ml_prefixspan.html">ml_prefixspan()</a></code> <code><a href="ml_prefixspan.html">ml_freq_seq_patterns()</a></code> </p>
+        </td>
+        <td><p>Frequent Pattern Mining -- PrefixSpan</p></td>
       </tr><tr>
         
         <td>
@@ -1598,6 +1706,30 @@
           <p><code><a href="invoke.html">invoke()</a></code> <code><a href="invoke.html">invoke_static()</a></code> <code><a href="invoke.html">invoke_new()</a></code> </p>
         </td>
         <td><p>Invoke a Method on a JVM Object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="j_invoke.html">j_invoke()</a></code> <code><a href="j_invoke.html">j_invoke_static()</a></code> <code><a href="j_invoke.html">j_invoke_new()</a></code> </p>
+        </td>
+        <td><p>Invoke a Java function.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="jarray.html">jarray()</a></code> </p>
+        </td>
+        <td><p>Instantiate a Java array with a specific element type.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="jfloat.html">jfloat()</a></code> </p>
+        </td>
+        <td><p>Instantiate a Java float type.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="jfloat_array.html">jfloat_array()</a></code> </p>
+        </td>
+        <td><p>Instantiate an Array[Float].</p></td>
       </tr><tr>
         
         <td>

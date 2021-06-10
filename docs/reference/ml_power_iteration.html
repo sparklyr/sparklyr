@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
       </span>
     </div>
 
@@ -197,7 +197,7 @@
 <span class='op'>}</span>
 
 <span class='va'>guassian_similarity</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>pt1</span>, <span class='va'>pt2</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>dist2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='op'>(</span><span class='va'>pt2</span> <span class='op'>-</span> <span class='va'>pt1</span><span class='op'>)</span> <span class='op'>^</span> <span class='fl'>2</span><span class='op'>)</span>
+  <span class='va'>dist2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='op'>(</span><span class='va'>pt2</span> <span class='op'>-</span> <span class='va'>pt1</span><span class='op'>)</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span>
 
   <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>dist2</span> <span class='op'>/</span> <span class='fl'>2</span><span class='op'>)</span>
 <span class='op'>}</span>
@@ -230,10 +230,10 @@
 <span class='va'>pic_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='copy_to.html'>copy_to</a></span><span class='op'>(</span><span class='va'>sc</span>, <span class='fu'>gen_pic_data</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='va'>clusters</span> <span class='op'>&lt;-</span> <span class='fu'>ml_power_iteration</span><span class='op'>(</span>
-  <span class='va'>pic_data</span>, src_col <span class='op'>=</span> <span class='st'>"src"</span>, dst_col <span class='op'>=</span> <span class='st'>"dst"</span>, weight_col <span class='op'>=</span> <span class='st'>"sim"</span>, k <span class='op'>=</span> <span class='fl'>2</span>, max_iter <span class='op'>=</span> <span class='fl'>40</span>
+  <span class='va'>pic_data</span>,
+  src_col <span class='op'>=</span> <span class='st'>"src"</span>, dst_col <span class='op'>=</span> <span class='st'>"dst"</span>, weight_col <span class='op'>=</span> <span class='st'>"sim"</span>, k <span class='op'>=</span> <span class='fl'>2</span>, max_iter <span class='op'>=</span> <span class='fl'>40</span>
 <span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>clusters</span><span class='op'>)</span>
-
 <span class='op'>}</span>
 
 </div></pre>

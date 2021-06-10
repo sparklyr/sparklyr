@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Define a Spark dependency — spark_dependency" />
-<meta property="og:description" content="Define a Spark dependency consisting of a set of custom JARs and Spark packages." />
+<meta property="og:description" content="Define a Spark dependency consisting of a set of custom JARs, Spark packages,
+and customized dbplyr SQL translation env." />
 
 
 
@@ -72,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sparklyr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.7.0</span>
       </span>
     </div>
 
@@ -117,7 +118,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Define a Spark dependency consisting of a set of custom JARs and Spark packages.</p>
+    <p>Define a Spark dependency consisting of a set of custom JARs, Spark packages,
+and customized dbplyr SQL translation env.</p>
     </div>
 
     <pre class="usage"><span class='fu'>spark_dependency</span><span class='op'>(</span>
@@ -126,6 +128,7 @@
   initializer <span class='op'>=</span> <span class='cn'>NULL</span>,
   catalog <span class='op'>=</span> <span class='cn'>NULL</span>,
   repositories <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dbplyr_sql_variant <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -151,6 +154,17 @@
     <tr>
       <th>repositories</th>
       <td><p>Character vector of Spark package repositories.</p></td>
+    </tr>
+    <tr>
+      <th>dbplyr_sql_variant</th>
+      <td><p>Customization of dbplyr SQL translation env. Must be a
+named list of the following form:
+  list(
+    scalar = list(scalar_fn1 = ..., scalar_fn2 = ..., &lt;etc&gt;),
+    aggregate = list(agg_fn1 = ..., agg_fn2 = ..., &lt;etc&gt;),
+    window = list(wnd_fn1 = ..., wnd_fn2 = ..., &lt;etc&gt;)
+  )
+See <a href='https://dbplyr.tidyverse.org/reference/sql_variant.html'>sql_variant</a> for details.</p></td>
     </tr>
     <tr>
       <th>...</th>
