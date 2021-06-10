@@ -19,6 +19,10 @@ sdf_runif(
 
 \item{n}{Sample Size (default: 1000).}
 
+\item{min}{The lower limit of the distribution.}
+
+\item{max}{The upper limit of the distribution.}
+
 \item{num_partitions}{Number of partitions in the resulting Spark dataframe
 (default: default parallelism of the Spark cluster).}
 

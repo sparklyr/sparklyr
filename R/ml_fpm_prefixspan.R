@@ -14,7 +14,9 @@
 #'   prefix-projected database before local iterative processing of the
 #'   projected database begins. This parameter should be tuned with respect to
 #'   the size of your executors.
-#'
+#' @template roxlate-ml-uid
+#' @template roxlate-ml-dots
+#' @name ml_prefixspan
 #' @export
 ml_prefixspan <- function(x, seq_col = "sequence", min_support = 0.1,
                           max_pattern_length = 10,
@@ -73,6 +75,9 @@ new_ml_prefixspan_model <- function(jobj) {
 }
 
 #' @rdname ml_prefixspan
+#'
+#' @param model A Prefix Span model.
+#'
 #' @export
 ml_freq_seq_patterns <- function(model) {
   model$frequent_sequential_patterns

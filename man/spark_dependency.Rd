@@ -32,7 +32,7 @@ named list of the following form:
     aggregate = list(agg_fn1 = ..., agg_fn2 = ..., <etc>),
     window = list(wnd_fn1 = ..., wnd_fn2 = ..., <etc>)
   )
-See \code{\link[dplyr:sql_substr]{dbplyr::sql_variant()}} for details.}
+See \link[dbplyr:sql_substr]{sql_variant} for details.}
 
 \item{...}{Additional optional arguments.}
 }
