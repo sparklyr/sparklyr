@@ -187,10 +187,11 @@ sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
   spark_major_minor <- spark_version[1, 1:2]
 
   exact_jar <- sprintf("sparklyr-%s-%s.jar", spark_major_minor, scala_version)
-  if (identical(exact_jar, "sparklyr-3.0-2.12.jar")) {
+  if (grepl("sparklyr-3\\.[0-9]+-[0-9]+\\.[0-9]+\\.jar", exact_jar)) {
     # At the moment we ship sparklyr-3.0-2.12.jar as sparklyr-master-2.12.jar
     # for Databricks-related reasons, and do not duplicate the same jar file
-    # twice under different names to avoid inflating the size of the R package.
+    # twice under different names to avoid inflating the size of the R package,
+    # and sparklyr-3.0-2.12.jar should be considered compatible with Spark 3.x.
     exact_jar <- "sparklyr-master-2.12.jar"
   }
   all_jars <- dir(system.file("java", package = "sparklyr"), pattern = "sparklyr")
