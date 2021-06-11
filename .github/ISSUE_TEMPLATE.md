@@ -9,9 +9,9 @@ Please also provide the output of `utils::sessionInfo()` or
 
 If at all possible, please include a [minimal, reproducible
 example](https://stackoverflow.com/questions/5963269/how-to-make-a-great-r-reproducible-example).
-The `sparklyr` team will be much more likely to resolve your issue if they are
-able to reproduce it themselves locally. If possible, try generating a reproducible
-example using the [reprex](https://github.com/tidyverse/reprex) package.
+The `sparklyr` maintainer and the broader open-source community will be much more likely to assist
+with your issue if they are able to reproduce it themselves locally. If possible, try generating
+a reproducible example using the [reprex](https://github.com/tidyverse/reprex) package.
 
 Please delete this preamble after you have read it.
 
