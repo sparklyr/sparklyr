@@ -51,6 +51,13 @@ jobs:
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'openjdk8'
+          - name: 'Spark 3.1.1 (R release, openjdk8)'
+            r: 'release'
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '3.1.1'
+              LIVY_VERSION: 'NONE'
+              JAVA_VERSION: 'openjdk8'
           - name: 'Spark 3.0.0 (R release, openjdk8, dbplyr 1.4.4)'
             r: 'release'
             env:

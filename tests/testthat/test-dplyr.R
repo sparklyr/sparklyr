@@ -375,22 +375,17 @@ test_that("transmute creates NA_real_ column correctly", {
 })
 
 test_that("overwriting a temp view", {
-  temp_view_name <- uuid::UUIDgenerate()
+  temp_view_name <- random_string()
 
   sdf <- sdf_len(sc, 5L) %>%
     dplyr::mutate(foo = "foo") %>%
     dplyr::compute(name = temp_view_name)
-  sdf <- sdf %>%
-    dplyr::select(-foo) %>%
+  sdf <- sdf_len(sc, 5L) %>%
     dplyr::compute(name = temp_view_name)
 
+  expect_equivalent(sdf %>% collect(), tibble::tibble(id = seq(5)))
   expect_equivalent(
-    sdf %>% collect(),
-    tibble::tibble(id = seq(5))
-  )
-  expect_equivalent(
-    dplyr::tbl(sc, temp_view_name) %>% collect(),
-    tibble::tibble(id = seq(5))
+    dplyr::tbl(sc, temp_view_name) %>% collect(), tibble::tibble(id = seq(5))
   )
 })
 
@@ -435,17 +430,21 @@ test_that("process_tbl_name works as expected", {
 
 test_that("in_schema() works as expected", {
   skip_on_arrow()
+  db_name <- random_string("test_db_")
 
   queries <- c(
-    "CREATE DATABASE `test_db`",
-    "CREATE TABLE IF NOT EXISTS `test_db`.`hive_tbl` (`x` INT) USING hive"
+    sprintf("CREATE DATABASE `%s`", db_name),
+    sprintf(
+      "CREATE TABLE IF NOT EXISTS `%s`.`hive_tbl` (`x` INT) USING hive",
+      db_name
+    )
   )
   for (query in queries) {
     DBI::dbGetQuery(sc, query)
   }
 
   expect_equivalent(
-    dplyr::tbl(sc, dbplyr::in_schema("test_db", "hive_tbl")) %>% collect(),
+    dplyr::tbl(sc, dbplyr::in_schema(db_name, "hive_tbl")) %>% collect(),
     tibble::tibble(x = integer())
   )
 })
