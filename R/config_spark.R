@@ -176,8 +176,9 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
     config$sparklyr.shell.packages <- c(
       config$sparklyr.shell.packages,
       sprintf(
-        "io.delta:delta-core_%s:0.4.0",
-        if (version >= "3.0.0") "2.12" else scala_version %||% "2.11"
+        "io.delta:delta-core_%s:%s",
+        if (version >= "3.0.0") "2.12" else scala_version %||% "2.11",
+        if (version >= "3.1.0") "1.0.0" else if (version >= "3.0.0") "0.8.0" else "0.6.1"
       )
     )
   }

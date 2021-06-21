@@ -23,6 +23,27 @@ test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
   )
 })
 
+test_that("spark_write_delta() and spark_read_delta() work as expected", {
+  test_requires_version("2.4.2")
+  test_requires("nycflights13")
+
+  flights_df <- flights %>% head(100)
+  flights_sdf <- copy_to(sc, flights_df, name = random_string()) %>%
+    dplyr::mutate(rownum = dplyr::sql("ROW_NUMBER() OVER (ORDER BY NULL)"))
+
+  path <- tempfile("flights_")
+  spark_write_delta(flights_sdf, path)
+
+  expect_equivalent(
+    spark_read_delta(sc, path) %>%
+      collect() %>%
+      dplyr::arrange(rownum),
+    flights_sdf %>%
+      collect() %>%
+      dplyr::arrange(rownum)
+  )
+})
+
 test_that("spark_read_json() can load data using column names", {
   jsonPath <- get_test_data_path(
     "spark-read-json-can-load-data-using-column-names.json"
