@@ -101,6 +101,7 @@ testthat_shell_connection <- function(method = "shell") {
     }
 
     packages <- if (version >= "2.4.0") "avro" else NULL
+    if (version >= "2.4.2") packages <- c(packages, "delta")
 
     sc <- spark_connect(
       master = "local",
