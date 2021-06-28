@@ -306,24 +306,6 @@ test_that("invoke() can roundtrip collect fields", {
   succeed()
 })
 
-test_that("collect() can retrieve as.POSIXct fields with timezones", {
-  tz_entries <- list(
-    as.POSIXct("2018-01-01", tz = "UTC"),
-    as.POSIXct("2018-01-01", tz = "UTC"),
-    as.POSIXct("2018-01-01", tz = "UTC"),
-    as.POSIXct("2018-01-01 03:33", tz = "UTC"),
-    as.POSIXct("2018-01-01 03:33", tz = "UTC")
-  )
-
-  collected <- sdf_len(sc, 1) %>%
-    spark_apply(function(e, c) c$tzs, context = list(tzs = tz_entries)) %>%
-    collect() %>%
-    as.list() %>%
-    unname()
-
-  expect_equivalent(tz_entries, collected)
-})
-
 test_that("collect() can retrieve specific dates without timezones", {
   data_tbl <- sdf_copy_to(
     sc,
@@ -401,18 +383,19 @@ test_that("collect() can retrieve nested list efficiently", {
 
 test_that("array of temporal values are preserved with Spark 3.0+", {
   test_requires_version("3.0.0")
+  skip_on_arrow()
 
   df <- tibble::tibble(
     char = c("one", "two"),
     int = c(3L, 4L),
     int_arr = list(seq(5), seq(10)),
     date_arr = list(
-      as.Date(seq(5) * 700, origin = "1970-01-01", tz = "UTC"),
-      as.Date(seq(7) * 100, origin = "1970-01-01", tz = "UTC")
+      as.Date(seq(5) * 700, origin = "1970-01-01"),
+      as.Date(seq(7) * 100, origin = "1970-01-01")
     ),
     timestamp_arr = list(
-      as.POSIXct(seq(5) * 700000, origin = "1970-01-01", tz = "UTC"),
-      as.POSIXct(seq(7) * 1000000, origin = "1970-01-01", tz = "UTC")
+      as.POSIXct(seq(5) * 700000, origin = "1970-01-01"),
+      as.POSIXct(seq(7) * 1000000, origin = "1970-01-01")
     ),
     char_arr = list(letters[1:13], letters[14:26])
   )

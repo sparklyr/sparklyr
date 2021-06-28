@@ -104,6 +104,7 @@ test_stream("stream can read and write from orc", {
 
 test_stream("stream_lag() works as expected", {
   test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+  skip_on_arrow()
 
   weekdays_sdf <- stream_read_csv(sc, get_test_data_path("weekdays"))
   expect_true(weekdays_sdf %>% sdf_is_streaming())
@@ -151,7 +152,7 @@ test_stream("stream_lag() works as expected", {
   expect_true(output_sdf %>% sdf_is_streaming())
   expect_equivalent(
     output_sdf %>% collect(),
-    expected %>% dplyr::mutate(x = as.POSIXct(x, origin = "1970-01-01", tz = "UTC"))
+    expected %>% dplyr::mutate(x = as.POSIXct(x, origin = "1970-01-01"))
   )
 })
 

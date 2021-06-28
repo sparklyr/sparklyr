@@ -251,7 +251,7 @@ readDate <- function(con) {
   if (is.na(n)) {
     as.Date(NA)
   } else {
-    d <- as.Date(n, origin = "1970-01-01", tz = "UTC")
+    d <- as.Date(n, origin = "1970-01-01")
     if (getOption("sparklyr.collect.datechars", FALSE)) {
       as.character(d)
     } else {
@@ -266,7 +266,7 @@ readTime <- function(con, n = 1) {
   } else {
     t <- readDouble(con, n)
 
-    r <- as.POSIXct(t, origin = "1970-01-01", tz = "UTC")
+    r <- as.POSIXct(t, origin = "1970-01-01")
     if (getOption("sparklyr.collect.datechars", FALSE)) {
       as.character(r)
     } else {
