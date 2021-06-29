@@ -222,10 +222,10 @@ test_that("sdf_collect() works with temporal array column", {
     expect_equivalent(
       sdf %>% dplyr::pull(arr),
       list(
-        cast_fn("1970-01-01", tz = "UTC"),
-        cast_fn(c("1970-01-02", "1970-01-03"), tz = "UTC"),
+        cast_fn("1970-01-01", tz = ""),
+        cast_fn(c("1970-01-02", "1970-01-03"), tz = ""),
         NA,
-        cast_fn(c("1970-01-04", NA, "1970-01-05"), tz = "UTC")
+        cast_fn(c("1970-01-04", NA, "1970-01-05"), tz = "")
       )
     )
   }
