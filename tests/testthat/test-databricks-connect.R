@@ -18,3 +18,9 @@ test_that("spark local property is set", {
   client_type <- spark_context(sc) %>% invoke("getLocalProperty", "spark.databricks.service.client.type")
   expect_equal(client_type, "sparklyr")
 })
+
+test_that("spark libpaths config is set", {
+  sc <- testthat_spark_connection()
+
+  expect_false(is.null(sc$config$spark.r.libpaths))
+})
