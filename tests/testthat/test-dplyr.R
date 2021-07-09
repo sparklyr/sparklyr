@@ -472,6 +472,20 @@ test_that("sdf_remote_name ignores the last ungroup() operation(s)", {
   }
 })
 
+test_that("sdf_remote_name works with arrange followed by compute", {
+  tbl <- copy_to(sc, tibble::tibble(lts = letters[26:24], nums = seq(3)))
+  ordered_tbl <- tbl %>% arrange(lts) %>% compute(name = "ordered_tbl")
+
+  expect_equal(
+    ordered_tbl %>% sparklyr:::sdf_remote_name(),
+    ident("ordered_tbl")
+  )
+  expect_equivalent(
+    tbl(sc, "ordered_tbl") %>% collect(),
+    tibble::tibble(lts = letters[24:26], nums = 3:1)
+  )
+})
+
 test_that("result from dplyr::compute() has remote name", {
   sdf <- iris_tbl
   sdf <- sdf %>% dplyr::mutate(y = 5) %>% dplyr::compute()

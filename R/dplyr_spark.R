@@ -323,6 +323,10 @@ sdf_remote_name.op_ungroup <- function(x) {
   sdf_remote_name(x$x)
 }
 
+sdf_remote_name.op_order <- function(x) {
+  sdf_remote_name(x$x)
+}
+
 sdf_remote_name.default <- function(x) {
   return()
 }
