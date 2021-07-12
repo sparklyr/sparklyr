@@ -76,6 +76,12 @@
 - Fixed a bug that previously caused invoke params containing `NaN`s to be
   serialized incorrectly.
 
+### Connections
+
+- Added support for notebook-scoped libraries on Databricks connections.
+  Previously, libPaths were not shared between driver and worker in sparklyr.
+  Now, they are.
+
 ### Spark ML
 
 - `ml_compute_silhouette_measure()` was implemented to evaluate the
