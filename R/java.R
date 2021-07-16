@@ -123,8 +123,8 @@ validate_java_version_line <- function(master, version) {
   }
 
   if (compareVersion(parsedVersion, "1.9") >= 0 &&
-      compareVersion(parsedVersion, "11") == -1 &&
-      spark_master_is_local(master) && !getOption("sparklyr.java9", FALSE)) {
+    compareVersion(parsedVersion, "11") == -1 &&
+    spark_master_is_local(master) && !getOption("sparklyr.java9", FALSE)) {
     stop(
       "Java 9 is currently unsupported in Spark distributions unless you manually install Hadoop 2.8 ",
       "and manually configure Spark. Please consider uninstalling Java 9 and reinstalling Java 8. ",
