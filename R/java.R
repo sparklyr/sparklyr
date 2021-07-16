@@ -94,7 +94,9 @@ validate_java_version_line <- function(master, version) {
     strsplit(versionLine, "\"")[[1]][[2]]
   } else {
     splat <- strsplit(versionLine, "\\s+", perl = TRUE)[[1]]
-    splat[grepl("9|[0-9]+\\.[0-9]+\\.[0-9]+", splat)]
+    #Getting rid of dates when present before parsing version from 'java -version'
+    splat <- splat[!grepl("[0-9]{4}-[0-9]{2}-[0-9]{2}", splat)]
+    splat[grepl("[0-9]{1,2}(\\.[0-9]+\\.[0-9]+)?", splat)]
   }
 
   if (length(splatVersion) != 1) {
