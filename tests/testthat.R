@@ -149,25 +149,18 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
 
   if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
     test_cases <- list(
-      c(
-        "^jarray$",
-        "^spark-apply$",
-        "^spark-apply-bundle$",
-        "^spark-apply-ext$"
-      ),
+      "^spark-apply$",
+      "^spark-apply-bundle$",
+      "^spark-apply-ext$",
       "^dbi$",
-      c(
-        "^ml-clustering-kmeans$",
-        "^livy-config$",
-        "^livy-proxy$"
-      ),
-      c(
-        "^dplyr$",
-        "^dplyr-join$",
-        "^dplyr-stats$",
-        "^dplyr-sample.*$",
-        "^dplyr-weighted-mean$"
-      )
+      "^ml-clustering-kmeans$",
+      "^livy-config$",
+      "^livy-proxy$",
+      "^dplyr$",
+      "^dplyr-join$",
+      "^dplyr-stats$",
+      "^dplyr-sample.*$",
+      "^dplyr-weighted-mean$"
     )
     test_filters <- lapply(test_cases, function(x) paste(x, collapse = "|"))
   } else if (is_arrow_devel) {

@@ -81,22 +81,34 @@ jobs:
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
               JAVA_URL: 'https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_linux_hotspot_11.0.1_13.tar.gz'
-          # Livy test cases are temporarily disabled until https://github.com/sparklyr/sparklyr/issues/3048 is resolved
-          #
-          # - name: 'Livy 0.6.0 (R release, openjdk8, Spark 2.3.0)'
-          #   r: 'release'
-          #   env:
-          #     ARROW_ENABLED: 'false'
-          #     SPARK_VERSION: '2.3.0'
-          #     LIVY_VERSION: '0.6.0'
-          #     JAVA_VERSION: 'openjdk8'
-          # - name: 'Livy 0.6.0 (R release, openjdk8, Spark 2.4.0)'
-          #   r: 'release'
-          #   env:
-          #     ARROW_ENABLED: 'false'
-          #     SPARK_VERSION: '2.4.0'
-          #     LIVY_VERSION: '0.6.0'
-          #     JAVA_VERSION: 'openjdk8'
+          - name: 'Livy 0.5.0 (R release, openjdk8, Spark 2.3.0)'
+            r: 'release'
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '2.3.0'
+              LIVY_VERSION: '0.5.0'
+              JAVA_VERSION: 'openjdk8'
+          - name: 'Livy 0.5.0 (R release, openjdk8, Spark 2.4.0)'
+            r: 'release'
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '2.4.0'
+              LIVY_VERSION: '0.5.0'
+              JAVA_VERSION: 'openjdk8'
+          - name: 'Livy 0.6.0 (R release, openjdk8, Spark 2.3.0)'
+            r: 'release'
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '2.3.0'
+              LIVY_VERSION: '0.6.0'
+              JAVA_VERSION: 'openjdk8'
+          - name: 'Livy 0.6.0 (R release, openjdk8, Spark 2.4.0)'
+            r: 'release'
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '2.4.0'
+              LIVY_VERSION: '0.6.0'
+              JAVA_VERSION: 'openjdk8'
           - name: 'Arrow (release)'
             r: 'release'
             env:
