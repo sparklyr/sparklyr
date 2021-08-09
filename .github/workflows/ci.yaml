@@ -8,6 +8,12 @@ on:
 
 name: CI
 
+env:
+  # Ensure the temporary auth token for this workflow, instead of the
+  # bundled GitHub PAT from the `remotes` package is used for
+  # `remotes::install_github()`
+  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   CI:
     runs-on: ubuntu-latest
