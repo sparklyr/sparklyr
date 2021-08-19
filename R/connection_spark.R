@@ -72,7 +72,7 @@ spark_default_app_jar <- function(version, scala_version = NULL) {
 NULL
 
 spark_master_local_cores <- function(master, config) {
-  cores <- spark_config_value(config, c("sparklyr.connect.cores.local", "sparklyr.cores.local"))
+  cores <- spark_config_value(config, c("sparklyr.cores.local", "sparklyr.connect.cores.local"))
   if (master == "local" && !identical(cores, NULL)) {
     master <- paste("local[", cores, "]", sep = "")
   }
