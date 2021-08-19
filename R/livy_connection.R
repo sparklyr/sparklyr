@@ -222,7 +222,11 @@ livy_create_session <- function(master, config) {
     conf = livy_config_get(master, config)
   )
 
-  session_params <- connection_config(list(master = master, config = config), "livy.", "livy.rsc.", "livy.session.")
+  session_params <- connection_config(
+    list(master = master, config = config),
+    prefix = "livy.",
+    not_prefix = "livy.session."
+  )
   if (length(session_params) > 0) data <- append(data, session_params)
 
   req <- POST(paste(master, "sessions", sep = "/"),
