@@ -48,7 +48,7 @@ class BackendChannel(logger: Logger, terminate: () => Unit, serializer: Serializ
     }
 
     val conf = new SparkConf()
-    bossGroup = new NioEventLoopGroup(conf.getInt("sparklyr.backend.threads", 10))
+    bossGroup = new NioEventLoopGroup(conf.getInt("spark.sparklyr-backend.threads", 10))
     val workerGroup = bossGroup
     val handler = new BackendHandler(() => this.close(), logger, hostContext, serializer, tracker)
 
