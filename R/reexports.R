@@ -163,3 +163,12 @@ NULL
 #' @export
 #' @importFrom dplyr filter
 NULL
+
+#' Replace NA
+#'
+#' See \code{\link[tidyr:replace_na]{replace_na}} for more details.
+#'
+#' @name replace_na
+#' @export
+#' @importFrom tidyr replace_na
+NULL
