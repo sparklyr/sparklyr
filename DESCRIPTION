@@ -96,7 +96,7 @@ Imports:
     rstudioapi (>= 0.10),
     stringr,
     tibble,
-    tidyr,
+    tidyr (>= 0.3.0),
     tidyselect,
     uuid,
     vctrs,

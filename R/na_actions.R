@@ -16,6 +16,12 @@ na.replace.tbl_spark <- function(object, ...) {
   na.replace(spark_dataframe(object), ...)
 }
 
+#' @importFrom tidyr replace_na
+#' @export
+replace_na.tbl_spark <- function(data, replace, ...) {
+  do.call(na.replace.tbl_spark, append(list(data), replace))
+}
+
 #' @export
 na.replace.spark_jobj <- function(object, ...) {
   dots <- list(...)
@@ -28,6 +34,12 @@ na.replace.spark_jobj <- function(object, ...) {
     }
   })
   sdf_register(object)
+}
+
+#' @importFrom tidyr replace_na
+#' @export
+replace_na.spark_jobj <- function(data, replace, ...) {
+  do.call(na.replace.spark_jobj, append(list(data), replace))
 }
 
 #' @export
