@@ -44,3 +44,30 @@ the size of your executors.}
 \description{
 PrefixSpan algorithm for mining frequent itemsets.
 }
+\examples{
+\dontrun{
+library(sparklyr)
+sc <- spark_connect(master = "local", version = "2.4.0")
+
+items_df <- tibble::tibble(
+  seq = list(
+    list(list(1, 2), list(3)),
+    list(list(1), list(3, 2), list(1, 2)),
+    list(list(1, 2), list(5)),
+    list(list(6))
+  )
+)
+items_sdf <- copy_to(sc, items_df, overwrite = TRUE)
+
+prefix_span_model <- ml_prefixspan(
+  sc,
+  seq_col = "seq",
+  min_support = 0.5,
+  max_pattern_length = 5,
+  max_local_proj_db_size = 32000000
+)
+
+frequent_items <- prefix_span_model$frequent_sequential_patterns(items_sdf) \%>\% collect()
+}
+
+}
