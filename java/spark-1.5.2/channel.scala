@@ -27,7 +27,7 @@ class BackendChannel(logger: Logger, terminate: () => Unit, serializer: Serializ
     hostContext = hostContextParam
   }
 
-  def init(remote: Boolean, port: Int, deterministicPort: Boolean): Int = {
+  def init(remote: Boolean, port: Int, deterministicPort: Boolean, preCommandHooks: Option[Runnable]): Int = {
     if (remote) {
       val anyIpAddress = Array[Byte](0, 0, 0, 0)
       val anyInetAddress = InetAddress.getByAddress(anyIpAddress)
@@ -46,7 +46,7 @@ class BackendChannel(logger: Logger, terminate: () => Unit, serializer: Serializ
 
     bossGroup = new NioEventLoopGroup(BackendConf.getNumThreads)
     val workerGroup = bossGroup
-    val handler = new BackendHandler(() => this.close(), logger, hostContext, serializer, tracker)
+    val handler = new BackendHandler(() => this.close(), logger, hostContext, serializer, tracker, preCommandHooks)
 
     bootstrap = new ServerBootstrap()
       .group(bossGroup, workerGroup)

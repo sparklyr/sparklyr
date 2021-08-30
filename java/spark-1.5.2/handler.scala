@@ -16,9 +16,10 @@ class BackendHandler(
   logger: Logger,
   hostContext: String,
   serializer: Serializer,
-  tracker: JVMObjectTracker) extends SimpleChannelInboundHandler[Array[Byte]] {
+  tracker: JVMObjectTracker,
+  preCommandHooks: Option[Runnable]) extends SimpleChannelInboundHandler[Array[Byte]] {
 
-  var streamHandler = new StreamHandler(serializer, tracker)
+  var streamHandler = new StreamHandler(serializer, tracker, preCommandHooks)
 
   override def channelRead0(ctx: ChannelHandlerContext, msg: Array[Byte]): Unit = {
     val bis = new ByteArrayInputStream(msg)
