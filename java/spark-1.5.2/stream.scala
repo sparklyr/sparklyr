@@ -8,7 +8,7 @@ import scala.language.existentials
 import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
 import io.netty.channel.ChannelHandler.Sharable
 
-class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
+class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker, preCommandHooks: Option[Runnable] = None) {
   private[this] val invoke = new Invoke()
 
   def classExists(name: String): Boolean = {
@@ -90,6 +90,9 @@ class StreamHandler(serializer: Serializer, tracker: JVMObjectTracker) {
     classMap: Map[String, Object],
     logger: Logger,
     returnJObjRef: Boolean): Unit = {
+      if (preCommandHooks.isDefined) {
+        preCommandHooks.get.run()
+      }
       var obj: Object = null
       try {
         var cls = if (isStatic) {
