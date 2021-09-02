@@ -59,3 +59,4 @@ tests/testthat/parquet-in/
 tests/testthat/iris-in/
 tests/testthat/iris-out/
 .Rproj.user
+\.*\.swp

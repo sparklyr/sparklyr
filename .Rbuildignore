@@ -41,3 +41,4 @@
 ^CONTRIBUTORS\.md$
 ^ROADMAP\.md$
 ^Jenkinsfile
+^.*\..*\.swp$
