@@ -49,6 +49,27 @@ test_that("'select' works with where(...) predicate", {
   )
 })
 
+test_that("'n_distinct' summarizer works as expected", {
+  test_requires("dplyr")
+
+  summarize_n_distinct <- function(input) {
+    input %>%
+      summarize(
+        n_distinct_default = n_distinct(x ^ 2),
+        n_distinct_na_rm_true = n_distinct(x ^ 2, na.rm = TRUE),
+        n_distinct_na_rm_false = n_distinct(x ^ 2, na.rm = FALSE)
+      )
+  }
+
+  df <- tibble::tibble(x = c(-3:2, NA, NaN, NA))
+  sdf <- copy_to(sc, df, name = random_string())
+
+  expect_equivalent(
+    df %>% summarize_n_distinct(),
+    sdf %>% summarize_n_distinct() %>% collect()
+  )
+})
+
 test_that("'summarize' works with where(...) predicate", {
   test_requires("dplyr")
 
