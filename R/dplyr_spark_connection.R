@@ -367,7 +367,50 @@ spark_sql_translation <- function(con) {
       .parent = dbplyr::base_agg,
       n = function() dbplyr::sql("COUNT(*)"),
       count = function() dbplyr::sql("COUNT(*)"),
-      n_distinct = function(...) dbplyr::build_sql("COUNT(DISTINCT", list(...), ")"),
+      n_distinct = function(..., na.rm = NULL) {
+        if (identical(options("sparklyr.n_distinct.disable-na-rm"), TRUE)) {
+          # If `na.rm` option is disabled for backward-compatibility reasons,
+          # then fallback to old behavior in sparklyr 1.7 or below
+          if (!is.null(na.rm)) {
+            warning(
+              "`na.rm` option for `n_distinct()` will be ignored while ",
+              "options(\"sparklyr.n_distinct.disable-na-rm\") is set to `TRUE`"
+            )
+          }
+
+          dbplyr::build_sql("COUNT(DISTINCT", list(...), ")")
+        } else {
+          na.rm <- na.rm %||% FALSE
+
+          if (na.rm) {
+            dbplyr::build_sql(
+              "COUNT(DISTINCT",
+              list(...) %>%
+                lapply(
+                  function(x) {
+                    # consider NaN values as NA to match the `na.rm = TRUE`
+                    # behavior of `dplyr::n_distinct()`
+                    dbplyr::build_sql("NANVL(", x, ", NULL)")
+                  }
+                ),
+              ")"
+            )
+          } else {
+            dbplyr::build_sql(
+              "COUNT(DISTINCT",
+              list(...) %>%
+                lapply(
+                  function(x) {
+                    # wrap each expression in a Spark array to ensure `NULL`
+                    # values are counted
+                    dbplyr::build_sql("ARRAY(", x, ")")
+                  }
+                ),
+              ")"
+            )
+          }
+        }
+      },
       cor = dbplyr::sql_aggregate_2("CORR"),
       cov = dbplyr::sql_aggregate_2("COVAR_SAMP"),
       sd = dbplyr::sql_aggregate("STDDEV_SAMP", "sd"),
