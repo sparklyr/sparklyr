@@ -116,6 +116,7 @@ spark_read_csv <- function(sc,
                            memory = TRUE,
                            overwrite = TRUE,
                            ...) {
+  name_provided <- !is.null(name)
   c(name, path) %<-% spark_read_compat_param(sc, name, path)
 
   columnsHaveTypes <- length(names(columns)) > 0
@@ -123,7 +124,7 @@ spark_read_csv <- function(sc,
     stop("'infer_schema' must be set to FALSE when 'columns' specifies column types")
   }
 
-  if (overwrite) spark_remove_table_if_exists(sc, name)
+  if (overwrite && name_provided) spark_remove_table_if_exists(sc, name)
 
   options <- spark_csv_options(header, infer_schema, delimiter, quote, escape, charset, null_value, options)
   df <- spark_csv_read(
@@ -248,10 +249,11 @@ spark_read_parquet <- function(sc,
                                columns = NULL,
                                schema = NULL,
                                ...) {
+  name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
   path <- params[-1L]
-  if (overwrite) spark_remove_table_if_exists(sc, name)
+  if (overwrite && name_provided) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, as.list(spark_normalize_path(path)), "parquet", options, columns, schema)
   spark_partition_register_df(sc, df, name, repartition, memory)
@@ -332,10 +334,11 @@ spark_read_json <- function(sc,
                             overwrite = TRUE,
                             columns = NULL,
                             ...) {
+  name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
   path <- params[-1L]
-  if (overwrite) spark_remove_table_if_exists(sc, name)
+  if (overwrite && name_provided) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, as.list(spark_normalize_path(path)), "json", options, columns)
   spark_partition_register_df(sc, df, name, repartition, memory)
@@ -665,8 +668,9 @@ spark_read_libsvm <- function(sc,
                               overwrite = TRUE,
                               options = list(),
                               ...) {
+  name_provided <- !is.null(name)
   c(name, path) %<-% spark_read_compat_param(sc, name, path)
-  if (overwrite) spark_remove_table_if_exists(sc, name)
+  if (overwrite && name_provided) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, "libsvm", "format", options) %>%
     invoke("load", spark_normalize_path(path))
@@ -694,8 +698,9 @@ spark_read_source <- function(sc,
                               overwrite = TRUE,
                               columns = NULL,
                               ...) {
+  name_provided <- !is.null(name)
   c(name, path) %<-% spark_read_compat_param(sc, name, path)
-  if (overwrite) spark_remove_table_if_exists(sc, name)
+  if (overwrite && name_provided) spark_remove_table_if_exists(sc, name)
 
   df_reader <- spark_data_read_generic(sc, source, "format", options, columns)
   df <- if (is.null(path)) {
@@ -850,10 +855,11 @@ spark_read_text <- function(sc,
                             options = list(),
                             whole = FALSE,
                             ...) {
+  name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
   path <- params[-1L]
-  if (overwrite) spark_remove_table_if_exists(sc, name)
+  if (overwrite && name_provided) spark_remove_table_if_exists(sc, name)
 
   columns <- list(line = "character")
 
@@ -939,6 +945,7 @@ spark_read_orc <- function(sc,
                            columns = NULL,
                            schema = NULL,
                            ...) {
+  name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
   path <- params[-1L]
@@ -947,7 +954,7 @@ spark_read_orc <- function(sc,
     stop("spark_read_orc is only suppored with path of length 1 for spark versions < 2.0.0")
   }
 
-  if (overwrite) spark_remove_table_if_exists(sc, name)
+  if (overwrite && name_provided) spark_remove_table_if_exists(sc, name)
 
   df <- spark_data_read_generic(sc, as.list(spark_normalize_path(path)), "orc", options, columns, schema)
   spark_partition_register_df(sc, df, name, repartition, memory)
