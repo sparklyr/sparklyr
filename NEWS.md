@@ -1,3 +1,64 @@
+# Sparklyr 1.7.2
+
+### Connections
+
+- Added support for notebook-scoped libraries on Databricks connections.
+  R library tree paths (i.e., those returned from `.libPaths()`) are now shared
+  between driver and worker in sparklyr for Databricks connection use cases.
+
+- Java version validation function of `sparklyr` was revised to be able to parse
+  `java -version` outputs containing only major version or outputs containing
+  data values.
+
+- Spark configuration logic was revised to ensure "sparklyr.cores.local" takes
+  precedence over "sparklyr.connect.cores.local", as the latter is deprecated.
+
+- Renamed "sparklyr.backend.threads" (an undocumented, non-user-facing,
+  `sparklyr` internal-only configuration) to "spark.sparklyr-backend.threads" so
+  that it has the required "spark." prefix and is configurable through
+  `sparklyr::spark_config()`.
+
+- For Spark 2.0 or above, if `org.apache.spark.SparkEnv.get()` returns a non-
+  null env object, then `sparklyr` will use that env object to configure
+  "spark.sparklyr-backend.threads".
+
+- Support for running custom callbacks before the `sparklyr` backend starts
+  processing JVM method calls was added for Databricks-related use cases, which
+  will be useful for implementing ADL credential pass-through.
+
+### Data
+
+- Revised `spark_write_delta()` to use `delta.io` library version 1.0 when
+  working with Apache Spark 3.1 or above.
+
+- Fixed a problem with `dbplyr::remote_name()` returning `NULL` on Spark
+  dataframes returned from a `dplyr::arrange()` operation followed by
+  `dplyr::compute()` (e.g.,
+  `<a spark_dataframe> %>% arrange(<some column>) %>% compute()`).
+
+- Implemented `tidyr::replace_na()` interface for Spark dataframes.
+
+- The `n_distinct()` summarizer for Spark dataframes was revised substantially
+  to properly support `na.rm = TRUE` or `na.rm = FALSE` use cases when
+  performing `dplyr::summarize(<colname> = n_distinct(...))` types of operations
+  on Spark dataframes.
+
+- Spark data interface functions that create Spark dataframes will no longer
+  check whether any Spark dataframe with identical name exists when the
+  dataframe being created has a randomly generated name (as randomly generated
+  table name will contain a UUID and any chance of name collision is vanishingly
+  small).
+
+### Documentation
+
+- Create usage example for `ml_prefixspan()`.
+
+# Sparklyr 1.7.1
+
+### Connections
+
+- Fixed an issue with connecting to Apache Spark 3.1 or above.
+
 # Sparklyr 1.7.0
 
 ### Data
@@ -75,12 +136,6 @@
 
 - Fixed a bug that previously caused invoke params containing `NaN`s to be
   serialized incorrectly.
-
-### Connections
-
-- Added support for notebook-scoped libraries on Databricks connections.
-  Previously, libPaths were not shared between driver and worker in sparklyr.
-  Now, they are.
 
 ### Spark ML
 
