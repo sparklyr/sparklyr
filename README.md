@@ -466,7 +466,7 @@ package from [H2O](https://www.h2o.ai/) that extends
 [sparklyr](https://spark.rstudio.com/) to provide an interface into
 [Sparkling Water](https://github.com/h2oai/sparkling-water). For
 instance, the following example installs, configures and runs
-[h2o.glm](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
+[h2o.glm](https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
 
 ``` r
 library(rsparkling)
