@@ -492,3 +492,18 @@ initialize_method <- function(method, scon) {
 initialize_method.default <- function(method, scon) {
   scon
 }
+
+#' Return the port number of a {sparklyr} backend.
+#'
+#' Retrieve the port number of the {sparklyr} backend associated with a Spark
+#' connection.
+#'
+#' @param sc A \code{spark_connection}.
+#'
+#' @return The port number of the {sparklyr} backend associated with \code{sc}.
+#'
+#' @export
+sparklyr_get_backend_port <- function(sc) {
+  invoke_static(sc, "sparklyr.Shell", "getBackend") %>%
+    invoke("getPort")
+}
