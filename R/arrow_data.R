@@ -127,6 +127,7 @@ arrow_collect <- function(tbl, ...) {
     }
   }
   session <- spark_session(sc)
+  sdf <- set_sdf_collect_persistence_level(sdf)
 
   time_zone <- spark_session(sc) %>%
     invoke("sessionState") %>%
