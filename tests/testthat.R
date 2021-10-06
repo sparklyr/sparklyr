@@ -183,8 +183,9 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     )
   } else {
     test_filters <- list(
-      "^(?!spark-dynamic-config).*",
-      "^spark-dynamic-config$"
+      "^(?!spark-dynamic-config|tidyr-pivot-).*",
+      "^spark-dynamic-config$",
+      "^tidyr-pivot-.*"
     )
   }
 
