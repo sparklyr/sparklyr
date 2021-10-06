@@ -99,6 +99,7 @@ testthat_shell_connection <- function(method = "shell") {
       # TODO: investigate why there are Windows-specific timezone portability issues
       config[["spark.sql.session.timeZone"]] <- "UTC"
     }
+    config$`sparklyr.sdf_collect.persistence_level` <- "NONE"
 
     packages <- if (version >= "2.4.0") "avro" else NULL
     if (version >= "2.4.2") packages <- c(packages, "delta")
@@ -291,6 +292,7 @@ testthat_livy_connection <- function() {
     config$`sparklyr.connect.timeout` <- 120
     config$`sparklyr.log.invoke` <- "cat"
     config$`spark.sql.warehouse.dir` <- get_spark_warehouse_dir()
+    config$`sparklyr.sdf_collect.persistence_level` <- "NONE"
 
     sc <- spark_connect(
       master = sprintf("http://localhost:%d", livy_service_port),
