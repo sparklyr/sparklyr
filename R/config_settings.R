@@ -53,6 +53,7 @@ spark_config_settings <- function() {
     sparklyr.progress = "Should job progress be reported to RStudio?",
     sparklyr.progress.interval = "Total of seconds to wait before attempting to retrieve job progress in Spark.",
     sparklyr.sanitize.column.names = "Should partially unsupported column names be cleaned up?",
+    sparklyr.sdf_collect.persistence_level = "Persistence level to use when caching a Spark dataframe before collecting it from Spark to R (default: MEMORY_ONLY).",
     sparklyr.stream.collect.timeout = "Total seconds before stopping collecting a stream sample in sdf_collect_stream().",
     sparklyr.stream.validate.timeout = "Total seconds before stopping to check if stream has errors while being created.",
     sparklyr.verbose = "Use verbose logging across all sparklyr operations?",

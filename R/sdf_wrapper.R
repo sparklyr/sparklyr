@@ -1,4 +1,18 @@
+set_sdf_collect_persistence_level <- function(sdf_obj) {
+  sc <- spark_connection(sdf_obj)
 
+  persistence_level <- spark_config_value(
+    sc$config, "sparklyr.sdf_collect.persistence_level", "MEMORY_ONLY"
+  )
+  persistence_level <- invoke_static(
+    sc,
+    "org.apache.spark.storage.StorageLevel",
+    "fromString",
+    persistence_level
+  )
+
+  invoke(sdf_obj, "persist", persistence_level)
+}
 
 #' @export
 #' @importFrom dbplyr sql_render
@@ -301,6 +315,7 @@ sdf_collect_static <- function(object, impl, ...) {
   n <- args$n
   sc <- spark_connection(object)
   sdf <- spark_dataframe(object)
+  sdf <- set_sdf_collect_persistence_level(sdf)
   if (!is.null(n)) {
     n <- as.integer(n)
     if (!is.na(n)) {
