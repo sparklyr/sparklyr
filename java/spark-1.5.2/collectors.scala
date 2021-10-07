@@ -2,6 +2,7 @@ package sparklyr
 
 import org.apache.spark.sql._
 
+import scala.collection.mutable.ArrayBuffer
 import scala.Option
 import scala.reflect.ClassTag
 import scala.util.Try
@@ -252,21 +253,22 @@ object Collectors {
     row(idx)
   }
 
-  class ColumnCtx[T <: Any : Manifest](collector: (Row, Int) => T, numRows: Int) {
-    val col = new Array[T](numRows)
-    def collect(row: Row, colIdx: Int, rowIdx: Int): Unit = {
-      col(rowIdx) = collector(row, colIdx)
+  class ColumnCtx[T <: Any : Manifest](collector: (Row, Int) => T, initialCapacity: Option[Int]) {
+    // TODO: make default initialCapacity configurable
+    val col = new ArrayBuffer[T](initialCapacity.getOrElse(1000))
+    def collect(row: Row, colIdx: Int): Unit = {
+      col += collector(row, colIdx)
     }
     def column(): Array[T] = {
-      col
+      col.toArray
     }
     def collector(): (Row, Int) => T = collector
   }
 
-  def mkColumnCtx(colType: String, numRows: Int) = {
+  def mkColumnCtx(colType: String, initialCapacity: Option[Int]) = {
 
     def newColumnCtx[T <: Any : Manifest](collector: (Row, Int) => T) = {
-      new ColumnCtx[T](collector, numRows)
+      new ColumnCtx[T](collector, initialCapacity)
     }
 
     colType match {

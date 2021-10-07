@@ -127,10 +127,6 @@ arrow_collect <- function(tbl, ...) {
     }
   }
   session <- spark_session(sc)
-  storage_level <- get_sdf_storage_level(sdf)
-  # reset storage level to its previous value after sdf_collect_static() is done
-  on.exit(set_sdf_collect_storage_level(sdf, storage_level), add = TRUE)
-  sdf <- set_sdf_collect_storage_level(sdf)
 
   time_zone <- spark_session(sc) %>%
     invoke("sessionState") %>%

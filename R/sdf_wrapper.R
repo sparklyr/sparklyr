@@ -2,23 +2,6 @@ get_sdf_storage_level <- function(sdf_jobj) {
   invoke(sdf_jobj, "storageLevel")
 }
 
-set_sdf_collect_storage_level <- function(sdf_jobj, level = NULL) {
-  sc <- spark_connection(sdf_jobj)
-
-  level <- level %||% (
-    invoke_static(
-      sc,
-      "org.apache.spark.storage.StorageLevel",
-      "fromString",
-      spark_config_value(
-        sc$config, "sparklyr.sdf_collect.persistence_level", "MEMORY_AND_DISK"
-      )
-    )
-  )
-
-  invoke(sdf_jobj, "persist", level)
-}
-
 #' @export
 #' @importFrom dbplyr sql_render
 #' @importFrom dbplyr sql_build
@@ -320,10 +303,6 @@ sdf_collect_static <- function(object, impl, ...) {
   n <- args$n
   sc <- spark_connection(object)
   sdf <- spark_dataframe(object)
-  storage_level <- get_sdf_storage_level(sdf)
-  # reset storage level to its previous value after sdf_collect_static() is done
-  on.exit(set_sdf_collect_storage_level(sdf, storage_level), add = TRUE)
-  sdf <- set_sdf_collect_storage_level(sdf)
   if (!is.null(n)) {
     n <- as.integer(n)
     if (!is.na(n)) {
