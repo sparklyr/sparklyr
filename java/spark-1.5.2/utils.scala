@@ -21,7 +21,7 @@ import scala.util.Try
 object Utils {
   def collect(df: DataFrame, separator: String, impl: String): Array[_] = {
     val (transformed_df, dtypes) = DFCollectionUtils.prepareDataFrameForCollection(df)
-    val collectRowsFromIterator = collectRows(_: Iterator[Row], dtypes, separator, df.count.toInt)
+    val collectRowsFromIterator = collectRows(_: Iterator[Row], dtypes, separator)
     impl match {
       case "row-wise" => collectRowsFromIterator(transformed_df.collect.iterator)
       case "row-wise-iter" => {
@@ -37,15 +37,15 @@ object Utils {
     iter: Iterator[Row],
     dtypes: Array[(String, String)],
     separator: String,
-    maxNumRows: Int
+    maxNumRows: Option[Int] = None
   ): Array[_] = {
     val columns = dtypes.map{dtype => Collectors.mkColumnCtx(dtype._2, maxNumRows)}
 
     var numRows: Int = 0
-    while (iter.hasNext && numRows < maxNumRows) {
+    while (iter.hasNext && (maxNumRows.isEmpty || numRows < maxNumRows.get)) {
       val row: Row = iter.next
       (0 until dtypes.length).foreach(colIdx => {
-        columns(colIdx).collect(row, colIdx, numRows)
+        columns(colIdx).collect(row, colIdx)
       })
       numRows += 1
     }
@@ -55,11 +55,11 @@ object Utils {
 
   private[this] def collectColumns(local: Array[Row], dtypes: Array[(String, String)], separator: String): Array[_] = {
     val numRows: Int = local.length
-    val columns = dtypes.map{dtype => Collectors.mkColumnCtx(dtype._2, numRows)}
+    val columns = dtypes.map{dtype => Collectors.mkColumnCtx(dtype._2, Some(numRows))}
 
     (0 until dtypes.length).foreach(colIdx => {
       (0 until numRows).foreach(rowIdx => {
-        columns(colIdx).collect(local(rowIdx), colIdx, rowIdx)
+        columns(colIdx).collect(local(rowIdx), colIdx)
       })
     })
 
@@ -408,7 +408,7 @@ object Utils {
   }
 
   def collectIter(iter: Iterator[Row], dtypes: Array[Any], size: Int, separator: String): Array[_] = {
-    collectRows(iter, dtypes.map(x => x.asInstanceOf[(String, String)]).toArray, separator, size)
+    collectRows(iter, dtypes.map(x => x.asInstanceOf[(String, String)]).toArray, separator, Some(size))
   }
 
   def extractValue(row: Row, colIdx: Int) = {
