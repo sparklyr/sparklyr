@@ -24,7 +24,13 @@ spark_install_version_expand <- function(version, installed_only) {
 
   versions <- versions[grepl(version, versions)]
 
-  sort(versions, decreasing = TRUE)[1]
+  if (length(versions) > 0) {
+    sort(versions, decreasing = TRUE)[1]
+  } else {
+    # If the version specified is not a known available version, then don't
+    # attempt to exapnd it.
+    version
+  }
 }
 
 #' Find a given Spark installation by version.
@@ -62,19 +68,32 @@ spark_install_find <- function(version = NULL,
   }
 
   if (NROW(versions) == 0) {
-    if (hint) {
-      sparkInstall <- quote(spark_install(version = "", hadoop_version = ""))
-      sparkInstall$version <- sparkVersion
-      sparkInstall$hadoop_version <- hadoopVersion
+    warning(
+      "The Spark version specified may not be available.\n",
+      "Please consider running `spark_available_versions()` to list all known ",
+      "available Spark versions."
+    )
+    component_name <- sprintf(
+      "spark-%s-bin-hadoop%s", sparkVersion, hadoopVersion %||% "2.7"
+    )
+    package_name <- paste0(component_name, ".tgz")
+    spark_dir <- spark_install_dir()
 
-      stop("Spark version not installed. To install, use ", deparse(sparkInstall))
-    } else {
-      stop("Spark version not available. Find available versions, using spark_available_versions()")
-    }
+    list(
+      componentName = component_name,
+      packageName = package_name,
+      packageRemotePath = sprintf(
+        "https://archive.apache.org/dist/spark/spark-%s/%s",
+        sparkVersion, package_name
+      ),
+      packageLocalPath = file.path(spark_dir, package_name),
+      sparkDir = spark_dir,
+      sparkVersionDir = file.path(spark_install_dir(), component_name)
+    )
+  } else {
+    versions <- versions[with(versions, order(default, spark, hadoop_default, decreasing = TRUE)), ]
+    spark_install_info(as.character(versions[1, ]$spark), as.character(versions[1, ]$hadoop), latest = latest)
   }
-
-  versions <- versions[with(versions, order(default, spark, hadoop_default, decreasing = TRUE)), ]
-  spark_install_info(as.character(versions[1, ]$spark), as.character(versions[1, ]$hadoop), latest = latest)
 }
 
 #' determine the version that will be used by default if version is NULL
