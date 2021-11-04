@@ -408,6 +408,18 @@
     "pattern": "spark-%s-bin-hadoop%s.tgz"
   },
   {
+    "spark": "2.4.8",
+    "hadoop": "2.6",
+    "base": "https://archive.apache.org/dist/spark/spark-2.4.8/",
+    "pattern": "spark-%s-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "2.4.8",
+    "hadoop": "2.7",
+    "base": "https://archive.apache.org/dist/spark/spark-2.4.8/",
+    "pattern": "spark-%s-bin-hadoop%s.tgz"
+  },
+  {
     "spark": "3.0.0",
     "hadoop": "2.7",
     "base": "https://archive.apache.org/dist/spark/spark-3.0.0/",

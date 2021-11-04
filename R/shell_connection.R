@@ -26,7 +26,7 @@ shell_connection <- function(master,
 
   if (spark_master_is_local(master)) {
     if (!nzchar(spark_home) || !is.null(version)) {
-      installInfo <- spark_install_find(version, hadoop_version, latest = FALSE, hint = TRUE)
+      installInfo <- spark_install_find(version, hadoop_version, latest = FALSE)
       if (method != "databricks-connect") {
         # Databricks Connect relies on set environment value of SPARK_HOME
         spark_home <- installInfo$sparkVersionDir
