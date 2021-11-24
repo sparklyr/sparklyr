@@ -528,3 +528,27 @@ test_that("tbl_ptype.tbl_spark works as expected", {
   expect_equal(df1_tbl %>% dplyr::select_if(is.character) %>% colnames(), "b")
   expect_equal(df1_tbl %>% dplyr::select_if(is.list) %>% colnames(), character())
 })
+
+test_that("summarise(.groups=)", {
+  sdf <- copy_to(sc, data.frame(x = 1, y = 2)) %>%
+    group_by(x, y)
+
+  expect_equal(sdf %>% summarise() %>% group_vars(), "x")
+  expect_equal(sdf %>% summarise(.groups = "drop_last") %>% group_vars(), "x")
+  expect_equal(sdf %>% summarise(.groups = "drop") %>% group_vars(), character())
+  expect_equal(sdf %>% summarise(.groups = "keep") %>% group_vars(), c("x", "y"))
+
+  df <- tibble::tibble(val1 = c(1, 2, 1, 2), val2 = c(10, 20, 30, 40))
+  sdf <- copy_to(sc, df, name = random_string())
+  for (groups in c("drop_last", "drop", "keep")) {
+    expect_equivalent(
+      sdf %>%
+        group_by(val1) %>%
+        summarize(result = sum(val2), .groups = groups) %>%
+        collect(),
+      df %>%
+        group_by(val1) %>%
+        summarize(result = sum(val2), .groups = groups)
+    )
+  }
+})
