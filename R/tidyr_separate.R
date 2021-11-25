@@ -36,7 +36,7 @@ separate.tbl_spark <- function(data, col, into, sep = "[^[:alnum:]]+",
   var <- tidyselect::vars_pull(colnames(data), !!rlang::enquo(col))
 
   out <- str_separate(data, quote_sql_name(var), into, sep, extra, fill)
-  preserved <- setdiff(dplyr::group_vars(data), into)
+  preserved <- setdiff(colnames(data), into)
   preserved <- setdiff(preserved, var)
   output_cols <- if (remove) into else union(colnames(data), into)
   output_cols <- union(preserved, output_cols)
