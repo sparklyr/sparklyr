@@ -72,7 +72,7 @@ select.tbl_spark <- function(.data, ...) {
 #' @importFrom dplyr summarise
 #' @importFrom dbplyr add_op_single
 #' @importFrom dbplyr op_vars
-summarise.tbl_spark <- function(.data, ...) {
+summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
   # NOTE: this is mostly copy-pasted from
   # https://github.com/tidyverse/dbplyr/blob/master/R/verb-summarise.R
   # except for minor changes (see "partial-eval.R") to make use cases such as
@@ -102,9 +102,33 @@ summarise.tbl_spark <- function(.data, ...) {
     }
   }
 
-  check_summarise_vars(dots)
+  check_groups <- function(.groups) {
+    if (rlang::is_null(.groups)) {
+      return()
+    }
 
-  add_op_single("summarise", .data, dots = dots)
+    if (.groups %in% c("drop_last", "drop", "keep")) {
+      return()
+    }
+
+    rlang::abort(c(
+      paste0(
+        "`.groups` can't be ", rlang::as_label(.groups),
+        if (.groups == "rowwise") " in dbplyr"
+      ),
+      i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
+    ))
+  }
+
+  check_summarise_vars(dots)
+  check_groups(.groups)
+
+  add_op_single(
+    "summarise",
+    .data,
+    dots = dots,
+    args = list(.groups = .groups, env_caller = rlang::caller_env())
+  )
 }
 
 #' @export
