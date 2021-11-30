@@ -1,3 +1,33 @@
+# Sparklyr 1.7.3
+
+### Data
+
+- Implemented support for the `.groups` parameter for `dplyr::summarize()`
+  operations on Spark dataframes
+
+- Fixed the incorrect handling of the `remove = TRUE` option for
+  `separate.tbl_spark()`
+
+- Optimized away an extra count query when collecting Spark dataframes from
+  Spark to R.
+
+### Misc
+
+- By default, use links from the https://dlcdn.apache.org site for downloading
+  Apache Spark when possible.
+
+- Attempt to continue `spark_install()` process even if the Spark version
+  specified is not present in `inst/extdata/versions*.json` files (in which
+  case `sparklyr` will guess the URL of the tar ball based on the existing
+  and well-known naming convention used by https://archive.apache.org, i.e.,
+  https://archive.apache.org/dist/spark/spark-${spark version}/spark-${spark version}-bin-hadoop${hadoop version}.tgz)
+
+- Revised `inst/extdata/versions*.json` files to reflect recent releases of
+  Apache Spark.
+
+- Implemented `sparklyr_get_backend_port()` for querying the port number used
+  by the `sparklyr` backend.
+
 # Sparklyr 1.7.2
 
 ### Connections
