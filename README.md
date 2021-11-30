@@ -7,7 +7,7 @@ status](https://github.com/sparklyr/sparklyr/workflows/CI/badge.svg)
 status](https://ci.appveyor.com/api/projects/status/lxaj4kgu3liovmhp?svg=true)](https://ci.appveyor.com/project/yl790/sparklyr-ybp7x)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr)
 <a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a>
-[![codecov](https://codecov.io/gh/sparklyr/sparklyr/branch/master/graph/badge.svg)](https://codecov.io/gh/sparklyr/sparklyr)
+[![codecov](https://app.codecov.io/gh/sparklyr/sparklyr/branch/master/graph/badge.svg)](https://app.codecov.io/gh/sparklyr/sparklyr)
 [![Join the chat at
 https://gitter.im/sparklyr/sparklyr](https://badges.gitter.im/sparklyr/sparklyr.svg)](https://gitter.im/sparklyr/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
