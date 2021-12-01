@@ -14,7 +14,7 @@ df2_tbl <- testthat_tbl("df2")
 
 dplyr_across_test_cases_df <- tibble(
   x = seq(3),
-  y = letters[1:3],
+  y = as.character(seq(3)),
   t = as.POSIXct(seq(3), origin = "1970-01-01"),
   z = seq(3) + 5L
 )
@@ -117,9 +117,29 @@ test_that("'across()' works with formula syntax", {
   # of query
   skip_on_arrow()
 
-  expect_equivalent(
-    dplyr_across_test_cases_tbl %>% mutate(across(where(is.numeric), ~ sin(.x^3 + .x))) %>% collect(),
-    dplyr_across_test_cases_df %>% mutate(across(where(is.numeric), ~ sin(.x^3 + .x)))
+  test_cases <- list(
+    # formula not referencing other columns of the Spark dataframe
+    ~ sin(.x^3 + .x),
+    # formula referencing other columns of the Spark dataframe
+    ~ exp(as.numeric(y)) * sin(.x^3 + .x)
+  )
+  for (f in test_cases) {
+    expect_equivalent(
+      dplyr_across_test_cases_tbl %>% mutate(across(where(is.numeric), !!f)) %>% collect(),
+      dplyr_across_test_cases_df %>% mutate(across(where(is.numeric), !!f))
+    )
+  }
+})
+
+test_that("'across()' emits error when formula references a mutated column", {
+  expect_error(
+    dplyr_across_test_cases_tbl %>%
+      mutate(across(where(is.numeric), ~ .x + z)) %>%
+      collect(),
+    paste0(
+      "Column '.*' is referenced by the formula and is also being mutated ",
+      "within the same query\\. This type of use case is unsupported\\."
+    )
   )
 })
 

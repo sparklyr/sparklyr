@@ -191,8 +191,19 @@ partial_eval_across <- function(call, sim_data, env, ctx = NULL, supports_one_si
       rlang::abort("Formula with additional parameters is unsupported")
     }
     out <- vector("list", length(cols))
+    rhs_cols <- setdiff(all.vars(funs), ".x")
     for (i in seq_along(cols)) {
-      out[[i]] <- rlang::expr(element_at(transform(array(!!cols[[i]]), !!funs), 1L))
+      col_name <- rlang::as_string(cols[[i]])
+      if (length(rhs_cols) > 0 && col_name %in% rhs_cols) {
+        rlang::abort(paste0(
+          "Column '", col_name, "' is referenced by the formula and is also ",
+          "being mutated within the same query. This type of use case is ",
+          "unsupported."
+        ))
+      }
+      out[[i]] <- do.call(
+        substitute, list(funs, list(.x = rlang::expr(!!cols[[i]])))
+      )[[2]]
     }
   } else {
     out <- vector("list", length(cols) * length(.fns))
