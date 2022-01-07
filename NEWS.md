@@ -1,5 +1,12 @@
 # sparklyr (development version)
 
+# Sparklyr 1.7.4
+
+### Misc
+
+- Edgar Ruiz (https://github.com/edgararuiz) will be the new maintainer of
+  {sparklyr} moving forward.
+
 # Sparklyr 1.7.3
 
 ### Data

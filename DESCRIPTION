@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.7.3.9000
+Version: 1.7.4
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -38,7 +38,7 @@ Authors@R:
              email = "yue.zhang@databricks.com"),
       person(given = "Yitao",
              family = "Li",
-             role = c("aut", "cre"),
+             role = c("aut"),
              email = "yitao@rstudio.com",
              comment = c(ORCID = "0000-0002-1261-905X")),
       person(given = "Jozef",
@@ -54,11 +54,15 @@ Authors@R:
              family = "Davis",
              role = "ctb",
              email = "william.davis@worthingtonindustries.com"),
+      person(given = "Edgar",
+             family = "Ruiz",
+             role = c("aut", "cre"),
+             email = "edgar@rstudio.com"),
       person(family = "RStudio",
              role = "cph"),
       person(family = "The Apache Software Foundation",
              role = c("aut", "cph")))
-Maintainer: Yitao Li <yitao@rstudio.com>
+Maintainer: Edgar Ruiz <edgar@rstudio.com>
 Description: R interface to Apache Spark, a fast and general
     engine for big data processing, see <http://spark.apache.org>. This
     package supports connecting to local and remote Apache Spark clusters,
