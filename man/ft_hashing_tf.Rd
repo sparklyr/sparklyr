@@ -52,7 +52,7 @@ The object returned depends on the class of \code{x}.
 Maps a sequence of terms to their term frequencies using the hashing trick.
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 

@@ -49,7 +49,7 @@ The object returned depends on the class of \code{x}.
 A feature transformer that filters out stop words from input.
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 

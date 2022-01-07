@@ -20,7 +20,7 @@ spark_read_jdbc(
 
 \item{name}{The name to assign to the newly generated table.}
 
-\item{options}{A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.}
+\item{options}{A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.}
 
 \item{repartition}{The number of partitions used to distribute the
 generated table. Use 0 (the default) to avoid partitioning.}

@@ -22,7 +22,7 @@ spark_write_source(
   table already exists. Supported values include: 'error', 'append', 'overwrite' and
   ignore. Notice that 'overwrite' will also change the column structure.
 
-  For more details see also \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes}
+  For more details see also \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes}
   for your version of Spark.}
 
 \item{options}{A list of strings with additional options.}

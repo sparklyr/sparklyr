@@ -104,7 +104,7 @@ ml_regression_evaluator(pred, label_col = "mpg")
 }
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
+See \url{https://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
 
 Other ml algorithms: 

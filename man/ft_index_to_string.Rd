@@ -50,7 +50,7 @@ A Transformer that maps a column of indices back to a new column of
    of \code{\link{ft_string_indexer}}.
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 

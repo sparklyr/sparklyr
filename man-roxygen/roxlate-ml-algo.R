@@ -2,7 +2,7 @@
 #' @param uid A character string used to uniquely identify the ML estimator.
 #' @param ... Optional arguments; see Details.
 #'
-#' @seealso See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
+#' @seealso See \url{https://spark.apache.org/docs/latest/ml-classification-regression.html} for
 #'   more information on the set of supervised learning algorithms.
 #'
 #' @family ml algorithms

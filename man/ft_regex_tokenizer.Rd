@@ -58,7 +58,7 @@ regex pattern to split the text (default) or repeatedly matching the regex
 minimal length. It returns an array of strings that can be empty.
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 

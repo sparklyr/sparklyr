@@ -16,9 +16,9 @@ knitr::opts_chunk$set(warning = FALSE)
 knitr::opts_chunk$set(fig.path = "tools/readme/", dev = "png")
 ```
 
-- Install and connect to [Spark](http://spark.apache.org/) using YARN, Mesos, Livy or Kubernetes.
+- Install and connect to [Spark](https://spark.apache.org/) using YARN, Mesos, Livy or Kubernetes.
 - Use [dplyr](https://spark.rstudio.com/dplyr/) to filter and aggregate Spark datasets and [streams](https://spark.rstudio.com/guides/streaming/) then bring them into R for analysis and visualization.
-- Use [MLlib](http://spark.apache.org/docs/latest/mllib-guide.html), [H2O](https://spark.rstudio.com/guides/h2o/), [XGBoost](https://github.com/rstudio/sparkxgb) and [GraphFrames](https://github.com/rstudio/graphframes) to train models at scale in Spark.
+- Use [MLlib](https://spark.apache.org/docs/latest/mllib-guide.html), [H2O](https://spark.rstudio.com/guides/h2o/), [XGBoost](https://github.com/rstudio/sparkxgb) and [GraphFrames](https://github.com/rstudio/graphframes) to train models at scale in Spark.
 - Create interoperable machine learning [pipelines](https://spark.rstudio.com/guides/pipelines/) and productionize them with [MLeap](https://spark.rstudio.com/guides/mleap/).
 - Create [extensions](https://spark.rstudio.com/extensions.html) that call the full Spark API or run [distributed R](https://spark.rstudio.com/guides/distributed-r/) code to support new functionality.
 
@@ -126,7 +126,7 @@ iris_preview
 
 ## Machine Learning
 
-You can orchestrate machine learning algorithms in a Spark cluster via the [machine learning](http://spark.apache.org/docs/latest/mllib-guide.html) functions within **sparklyr**. These functions connect to a set of high-level APIs built on top of DataFrames that help you create and tune machine learning workflows.
+You can orchestrate machine learning algorithms in a Spark cluster via the [machine learning](https://spark.apache.org/docs/latest/mllib-guide.html) functions within **sparklyr**. These functions connect to a set of high-level APIs built on top of DataFrames that help you create and tune machine learning workflows.
 
 Here's an example where we use [ml_linear_regression](https://spark.rstudio.com/reference/ml_linear_regression/) to fit a linear regression model. We'll use the built-in `mtcars` dataset, and see if we can predict a car's fuel consumption (`mpg`) based on its weight (`wt`), and the number of cylinders the engine contains (`cyl`). We'll assume in each case that the relationship between `mpg` and each of our features is linear.
 

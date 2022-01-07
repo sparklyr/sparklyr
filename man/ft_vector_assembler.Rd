@@ -46,7 +46,7 @@ vector formed by concatenating each row element from the
 specified input columns.
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 

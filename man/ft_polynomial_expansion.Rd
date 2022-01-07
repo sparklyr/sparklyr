@@ -49,7 +49,7 @@ Perform feature expansion in a polynomial space. E.g. take a 2-variable feature
   we get (x, x * x, y, x * y, y * y).
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 

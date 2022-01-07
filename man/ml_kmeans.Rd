@@ -102,7 +102,7 @@ ml_kmeans(iris_tbl, Species ~ .)
 
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-clustering.html} for
+See \url{https://spark.apache.org/docs/latest/ml-clustering.html} for
   more information on the set of clustering algorithms.
 
 Other ml clustering algorithms: 

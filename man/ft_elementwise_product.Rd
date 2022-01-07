@@ -48,7 +48,7 @@ Outputs the Hadamard product (i.e., the element-wise product) of each input vect
   dataset by a scalar multiplier.
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 
