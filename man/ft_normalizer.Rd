@@ -46,7 +46,7 @@ The object returned depends on the class of \code{x}.
 Normalize a vector to have unit norm using the given p-norm.
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 

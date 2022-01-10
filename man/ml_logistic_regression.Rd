@@ -129,7 +129,7 @@ ml_binary_classification_evaluator(pred)
 
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-classification-regression.html} for
+See \url{https://spark.apache.org/docs/latest/ml-classification-regression.html} for
   more information on the set of supervised learning algorithms.
 
 Other ml algorithms: 

@@ -461,7 +461,7 @@ sdf_quantile <- function(x,
 #'
 #' @template roxlate-ml-x
 #' @param storage.level The storage level to be used. Please view the
-#'   \href{http://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence}{Spark Documentation}
+#'   \href{https://spark.apache.org/docs/latest/programming-guide.html#rdd-persistence}{Spark Documentation}
 #'   for information on what storage levels are accepted.
 #' @param name A name to assign this table. Passed to [sdf_register()].
 #' @export

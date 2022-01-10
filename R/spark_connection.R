@@ -3,7 +3,7 @@
 #' Access the commonly-used Spark objects associated with a Spark instance.
 #' These objects provide access to different facets of the Spark API.
 #'
-#' The \href{http://spark.apache.org/docs/latest/api/scala/#package}{Scala API documentation}
+#' The \href{https://spark.apache.org/docs/latest/api/scala/}{Scala API documentation}
 #' is useful for discovering what methods are available for each of these
 #' objects. Use \code{\link{invoke}} to call methods on these objects.
 #'

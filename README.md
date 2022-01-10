@@ -13,13 +13,13 @@ https://gitter.im/sparklyr/sparklyr](https://badges.gitter.im/sparklyr/sparklyr.
 
 <img src="tools/readme/sparklyr-illustration.png" width="320" align="right" style="margin-left: 20px; margin-right: 20px"/>
 
-  - Install and connect to [Spark](http://spark.apache.org/) using YARN,
+  - Install and connect to [Spark](https://spark.apache.org/) using YARN,
     Mesos, Livy or Kubernetes.
   - Use [dplyr](https://spark.rstudio.com/dplyr/) to filter and
     aggregate Spark datasets and
     [streams](https://spark.rstudio.com/guides/streaming/) then bring
     them into R for analysis and visualization.
-  - Use [MLlib](http://spark.apache.org/docs/latest/mllib-guide.html),
+  - Use [MLlib](https://spark.apache.org/docs/latest/mllib-guide.html),
     [H2O](https://spark.rstudio.com/guides/h2o/),
     [XGBoost](https://github.com/rstudio/sparkxgb) and
     [GraphFrames](https://github.com/rstudio/graphframes) to train
@@ -211,7 +211,7 @@ iris_preview
 
 You can orchestrate machine learning algorithms in a Spark cluster via
 the [machine
-learning](http://spark.apache.org/docs/latest/mllib-guide.html)
+learning](https://spark.apache.org/docs/latest/mllib-guide.html)
 functions within **sparklyr**. These functions connect to a set of
 high-level APIs built on top of DataFrames that help you create and tune
 machine learning workflows.

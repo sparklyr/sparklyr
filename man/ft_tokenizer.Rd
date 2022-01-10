@@ -44,7 +44,7 @@ A tokenizer that converts the input string to lowercase and then splits it
 by white spaces.
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 

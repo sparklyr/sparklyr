@@ -2,7 +2,7 @@
 #' @param uid A character string used to uniquely identify the feature transformer.
 #' @param ... Optional arguments; currently unused.
 #'
-#' @seealso See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+#' @seealso See \url{https://spark.apache.org/docs/latest/ml-features.html} for
 #'   more information on the set of transformations available for DataFrame
 #'   columns in Spark.
 #'

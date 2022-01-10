@@ -101,7 +101,7 @@ In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \co
   to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 

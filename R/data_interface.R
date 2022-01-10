@@ -154,7 +154,7 @@ spark_read_csv <- function(sc,
 #'   table already exists. Supported values include: 'error', 'append', 'overwrite' and
 #'   ignore. Notice that 'overwrite' will also change the column structure.
 #'
-#'   For more details see also \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes}
+#'   For more details see also \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes}
 #'   for your version of Spark.
 #' @param partition_by A \code{character} vector. Partitions the output by the given columns on the file system.
 #' @param ... Optional arguments; currently unused.
@@ -220,7 +220,7 @@ spark_write_csv.spark_jobj <- function(x,
 #' DataFrame.
 #'
 #' @inheritParams spark_read_csv
-#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' @param schema A (java) read schema. Useful for optimizing read operation on nested data.
 #'
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}), as well as
@@ -265,7 +265,7 @@ spark_read_parquet <- function(sc,
 #' \href{https://parquet.apache.org/}{Parquet} format.
 #'
 #' @inheritParams spark_write_csv
-#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @family Spark serialization routines
@@ -492,7 +492,7 @@ spark_data_write_generic <- function(df,
 #' Reads from a Spark Table into a Spark DataFrame.
 #'
 #' @inheritParams spark_read_csv
-#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #'
 #' @family Spark serialization routines
 #'
@@ -513,7 +513,7 @@ spark_read_table <- function(sc,
 #' Reads from a Spark Table into a Spark DataFrame.
 #'
 #' @inheritParams spark_read_csv
-#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #'
 #' @family Spark serialization routines
 #'
@@ -611,7 +611,7 @@ spark_write_table.spark_jobj <- function(x,
 #' Read from JDBC connection into a Spark DataFrame.
 #'
 #' @inheritParams spark_read_csv
-#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #'
 #' @family Spark serialization routines
 #'
@@ -683,7 +683,7 @@ spark_read_libsvm <- function(sc,
 #'
 #' @inheritParams spark_read_csv
 #' @param source A data source capable of reading data.
-#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #'
 #' @family Spark serialization routines
 #'
@@ -926,7 +926,7 @@ spark_write_text.spark_jobj <- function(x,
 #' DataFrame.
 #'
 #' @inheritParams spark_read_csv
-#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' @param schema A (java) read schema. Useful for optimizing read operation on nested data.
 #'
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}), as well as
@@ -966,7 +966,7 @@ spark_read_orc <- function(sc,
 #' \href{https://orc.apache.org/}{ORC} format.
 #'
 #' @inheritParams spark_write_csv
-#' @param options A list of strings with additional options. See \url{http://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @family Spark serialization routines

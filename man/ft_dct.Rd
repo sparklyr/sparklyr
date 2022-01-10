@@ -62,7 +62,7 @@ A feature transformer that takes the 1D discrete cosine transform of a real
 \code{ft_discrete_cosine_transform()} is an alias for \code{ft_dct} for backwards compatibility.
 }
 \seealso{
-See \url{http://spark.apache.org/docs/latest/ml-features.html} for
+See \url{https://spark.apache.org/docs/latest/ml-features.html} for
   more information on the set of transformations available for DataFrame
   columns in Spark.
 

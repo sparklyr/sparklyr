@@ -25,6 +25,6 @@ Read the schema of a Spark DataFrame.
 The \code{type} column returned gives the string representation of the
 underlying Spark  type for that column; for example, a vector of numeric
 values would be returned with the type \code{"DoubleType"}. Please see the
-\href{http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.types.package}{Spark Scala API Documentation}
+\href{https://spark.apache.org/docs/latest/api/scala/index.html}{Spark Scala API Documentation}
 for information on what types are available and exposed by Spark.
 }

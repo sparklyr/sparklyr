@@ -5,7 +5,7 @@
 #' @details
 #' Spark implements for both \eqn{L1} and \eqn{L2} regularization in linear
 #' regression models. See the preamble in the
-#' \href{http://spark.apache.org/docs/latest/ml-classification-regression.html}{Spark Classification and Regression}
+#' \href{https://spark.apache.org/docs/latest/ml-classification-regression.html}{Spark Classification and Regression}
 #' documentation for more details on how the loss function is parameterized.
 #'
 #' In particular, with \code{alpha} set to 1, the parameterization
