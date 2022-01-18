@@ -100,7 +100,7 @@ Imports:
     rstudioapi (>= 0.10),
     stringr,
     tibble,
-    tidyr (>= 0.3.0),
+    tidyr (>= 1.1.4.9000),
     tidyselect,
     uuid,
     vctrs,
@@ -123,6 +123,8 @@ Suggests:
     reshape2,
     shiny (>= 1.0.1),
     testthat
+Remotes:
+    tidyverse/tidyr
 Encoding: UTF-8
 RoxygenNote: 7.1.2
 SystemRequirements: Spark: 1.6.x, 2.x, or 3.x
