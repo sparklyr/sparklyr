@@ -80,7 +80,7 @@ ft_string_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
   )
   # backwards compatibility for params argument
   dots <- rlang::dots_list(...)
-  if (rlang::has_name(dots, "params") && rlang::is_env(dots$params)) {
+  if (rlang::has_name(dots, "params") && is.environment(dots$params)) {
     warning("`params` has been deprecated and will be removed in a future release.", call. = FALSE)
     transformer <- if (is_ml_transformer(stage)) {
       stage
