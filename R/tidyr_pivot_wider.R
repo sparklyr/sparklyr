@@ -7,16 +7,33 @@ NULL
 #' @export
 pivot_wider.tbl_spark <- function(data,
                                   id_cols = NULL,
+                                  id_expand = FALSE,
                                   names_from = !!as.name("name"),
                                   names_prefix = "",
                                   names_sep = "_",
                                   names_glue = NULL,
                                   names_sort = FALSE,
+                                  names_vary = "fastest",
+                                  names_expand = FALSE,
                                   names_repair = "check_unique",
                                   values_from = !!as.name("value"),
                                   values_fill = NULL,
                                   values_fn = NULL,
+                                  unused_fn = NULL,
                                   ...) {
+  if (!identical(id_expand, FALSE)) {
+    rlang::abort("`id_expand` is not yet supported.")
+  }
+  if (!identical(names_vary, "fastest")) {
+    rlang::abort("`names_vary` is not yet supported.")
+  }
+  if (!identical(names_expand, FALSE)) {
+    rlang::abort("`names_expand` is not yet supported.")
+  }
+  if (!identical(unused_fn, NULL)) {
+    rlang::abort("`unused_fn` is not yet supported.")
+  }
+
   names_from <- rlang::enquo(names_from)
   values_from <- rlang::enquo(values_from)
   spec <- sdf_build_wider_spec(

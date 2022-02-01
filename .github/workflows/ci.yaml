@@ -210,7 +210,7 @@ jobs:
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libcurl4-gnutls-dev libgit2-dev procps socat
       - name: Install dependencies
-        run: remotes::install_deps(".", dependencies = TRUE, upgrade = FALSE)
+        run: remotes::install_deps(".", dependencies = TRUE)
         shell: Rscript {0}
         continue-on-error: true
       - name: List installed R packages
