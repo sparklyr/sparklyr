@@ -42,3 +42,4 @@
 ^ROADMAP\.md$
 ^Jenkinsfile
 ^.*\..*\.swp$
+^cran-comments\.md$
