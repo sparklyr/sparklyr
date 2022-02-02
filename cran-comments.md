@@ -1,15 +1,19 @@
-## Release summary
+## Re-submission
+
+- Addresses pre-check NOTE by adding cran-comments.md to the build ignore file
+
+### Release summary
 
 - Addresses both CRAN Check Results warnings:
   - Un-exported object `rland::is_env()`
   - `pivot_wider()` S3 consistency  issue
   
-## Test environments
+### Test environments
 
 - Local Mac OS M1 (aarch64-apple-darwin20), R 4.1.2
 - Ubuntu 20, R 4.0.5 (GH Actions)
 
-## R CMD check results
+### R CMD check results
 
 0 errors ✓ | 0 warnings ✓ | 2 notes x
 
