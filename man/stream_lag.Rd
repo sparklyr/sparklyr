@@ -10,7 +10,7 @@ stream_lag(x, cols, thresholds = NULL)
 \item{x}{An object coercable to a Spark Streaming DataFrame.}
 
 \item{cols}{A list of expressions of the form
-<destination column> = <source column> ~ <offset>
+\out{<destination column> = <source column> ~ <offset>}
 (e.g., `prev_value = value ~ 1` will create a new column `prev_value`
 containing all values from the source column `value` shifted behind by 1}
 
