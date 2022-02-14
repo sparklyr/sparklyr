@@ -1,0 +1,7 @@
+PACKAGES*
+*.html
+Library
+Outputs
+*.Rcheck
+timings.tab
+*tar.gz
