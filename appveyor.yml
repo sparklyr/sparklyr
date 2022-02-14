@@ -1,0 +1,7 @@
+branches:
+  only:
+  - main
+
+only_commits:
+  message: /please never run me like ever/
+
