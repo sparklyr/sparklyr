@@ -43,3 +43,5 @@
 ^Jenkinsfile
 ^.*\..*\.swp$
 ^cran-comments\.md$
+^revdep/
+
