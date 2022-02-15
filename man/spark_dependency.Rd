@@ -27,11 +27,13 @@ spark_dependency(
 
 \item{dbplyr_sql_variant}{Customization of dbplyr SQL translation env. Must be a
 named list of the following form:
+\code{
   list(
     scalar = list(scalar_fn1 = ..., scalar_fn2 = ..., <etc>),
     aggregate = list(agg_fn1 = ..., agg_fn2 = ..., <etc>),
     window = list(wnd_fn1 = ..., wnd_fn2 = ..., <etc>)
   )
+  }
 See \link[dbplyr:sql_substr]{sql_variant} for details.}
 
 \item{...}{Additional optional arguments.}

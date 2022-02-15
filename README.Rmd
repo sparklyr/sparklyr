@@ -6,22 +6,81 @@ output:
     fig_height: 5
 ---
 
-![Github workflow status](https://github.com/sparklyr/sparklyr/workflows/CI/badge.svg) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/lxaj4kgu3liovmhp?svg=true)](https://ci.appveyor.com/project/yl790/sparklyr-ybp7x) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/sparklyr)](https://cran.r-project.org/package=sparklyr) <a href="https://www.r-pkg.org/pkg/sparklyr"><img src="https://cranlogs.r-pkg.org/badges/sparklyr?color=brightgreen" style=""></a> [![codecov](https://app.codecov.io/gh/sparklyr/sparklyr/branch/master/graph/badge.svg)](https://app.codecov.io/gh/sparklyr/sparklyr) [![Join the chat at https://gitter.im/sparklyr/sparklyr](https://badges.gitter.im/sparklyr/sparklyr.svg)](https://gitter.im/sparklyr/sparklyr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src="tools/readme/sparklyr-illustration.png" width="320" align="right" style="margin-left: 20px; margin-right: 20px"/>
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  eval = TRUE, 
+  warning = FALSE,
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "tools/readme/", 
+  dev = "png",
+  out.width = "100%"
+)
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = TRUE)
-knitr::opts_chunk$set(warning = FALSE)
-knitr::opts_chunk$set(fig.path = "tools/readme/", dev = "png")
+
+library(sparklyr)
+library(dplyr)
+library(ggplot2)
+
 ```
 
-- Install and connect to [Spark](https://spark.apache.org/) using YARN, Mesos, Livy or Kubernetes.
-- Use [dplyr](https://spark.rstudio.com/dplyr/) to filter and aggregate Spark datasets and [streams](https://spark.rstudio.com/guides/streaming/) then bring them into R for analysis and visualization.
-- Use [MLlib](https://spark.apache.org/docs/latest/mllib-guide.html), [H2O](https://spark.rstudio.com/guides/h2o/), [XGBoost](https://github.com/rstudio/sparkxgb) and [GraphFrames](https://github.com/rstudio/graphframes) to train models at scale in Spark.
-- Create interoperable machine learning [pipelines](https://spark.rstudio.com/guides/pipelines/) and productionize them with [MLeap](https://spark.rstudio.com/guides/mleap/).
-- Create [extensions](https://spark.rstudio.com/extensions.html) that call the full Spark API or run [distributed R](https://spark.rstudio.com/guides/distributed-r/) code to support new functionality.
+<!-- badges: start -->
+[![CI](https://github.com/sparklyr/sparklyr/workflows/CI/badge.svg)](https://github.com/sparklyr/sparklyr/actions)
+[![CRAN status](https://www.r-pkg.org/badges/version/sparklyr)](https://CRAN.R-project.org/package=sparklyr)
+[![Codecov test coverage](https://codecov.io/gh/sparklyr/sparklyr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sparklyr/sparklyr?branch=main)
+<!-- badges: end -->
 
+<img src="tools/readme/sparklyr-diagram.png" width="320" align="right" style="margin-left: 20px; margin-right: 20px"/>
+
+
+- Install and connect to [Spark](https://spark.apache.org/) using YARN, Mesos, Livy or Kubernetes.
+- Use [dplyr](#using-dplyr) to filter and aggregate Spark datasets and [streams](https://spark.rstudio.com/guides/streaming/) then bring them into R for analysis and visualization.
+- Use [MLlib](#machine-learning), [H2O](#using-h2o), [XGBoost](https://spark.rstudio.com/packages/sparkxgb/latest/) and [GraphFrames](https://spark.rstudio.com/packages/graphframes/latest/) to train models at scale in Spark.
+- Create interoperable machine learning [pipelines](https://spark.rstudio.com/guides/pipelines.html) and productionize them with [MLeap](https://spark.rstudio.com/packages/mleap/latest/).
+- Create [extensions](#extensions) that call the full Spark API or run [distributed R](#distributed-r) code to support new functionality.
+
+## Table of Contents
+
+```{r, eval = FALSE, echo = FALSE}
+toc <- function() {
+  re <- readLines("README.Rmd")
+  has_title <- as.logical(lapply(re, function(x) substr(x, 1, 2) == "##"))
+  only_titles <- re[has_title]
+  titles <- trimws(gsub("#", "", only_titles))
+  links <- trimws(gsub("`", "", titles))
+  links <- tolower(links)
+  links <- trimws(gsub(" ", "-", links))
+  links <- trimws(gsub(",", "", links))
+  toc_list <- lapply(
+    seq_along(titles),
+    function(x) {
+      pad <- ifelse(substr(only_titles[x], 1, 3) == "###", "    - ", "  - ")
+      paste0(pad, "[", titles[x], "](#",links[x], ")")
+    }
+  )
+  toc_full <- paste(toc_list[2:length(toc_list)], collapse = "\n") 
+  cat(toc_full)
+}
+toc()
+```
+  - [Installation](#installation)
+  - [Connecting to Spark](#connecting-to-spark)
+  - [Using dplyr](#using-dplyr)
+    - [Window Functions](#window-functions)
+  - [Using SQL](#using-sql)
+  - [Machine Learning](#machine-learning)
+  - [Reading and Writing Data](#reading-and-writing-data)
+  - [Distributed R](#distributed-r)
+  - [Extensions](#extensions)
+  - [Table Utilities](#table-utilities)
+  - [Connection Utilities](#connection-utilities)
+  - [RStudio IDE](#rstudio-ide)
+  - [Using H2O](#using-h2o)
+  - [Connecting through Livy](#connecting-through-livy)
+  - [Connecting through Databricks Connect](#connecting-through-databricks-connect)
+  
 ## Installation
 
 You can install the **sparklyr** package from [CRAN](https://CRAN.r-project.org) as follows:
@@ -82,7 +141,7 @@ To start with here's a simple filtering example:
 flights_tbl %>% filter(dep_delay == 2)
 ```
 
-[Introduction to dplyr](https://CRAN.R-project.org/package=dplyr) provides additional dplyr examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
+[Introduction to dplyr](https://spark.rstudio.com/guides/dplyr.html) provides additional `dplyr` examples you can try. For example, consider the last example from the tutorial which plots data on flight delays:
 
 ```{r dplyr-ggplot2}
 delay <- flights_tbl %>%
@@ -102,7 +161,7 @@ ggplot(delay, aes(dist, delay)) +
 
 ### Window Functions
 
-dplyr [window functions](https://CRAN.R-project.org/package=dplyr) are also supported, for example:
+dplyr [window functions](https://spark.rstudio.com/guides/dplyr.html#grouping) are also supported, for example:
 
 ```{r dplyr-window}
 batting_tbl %>%
@@ -116,7 +175,7 @@ For additional documentation on using dplyr with Spark see the [dplyr](https://s
 
 ## Using SQL
 
-It's also possible to execute SQL queries directly against tables within a Spark cluster. The `spark_connection` object implements a [DBI](https://github.com/rstats-db/DBI) interface for Spark, so you can use `dbGetQuery` to execute SQL and return the result as an R data frame:
+It's also possible to execute SQL queries directly against tables within a Spark cluster. The `spark_connection` object implements a [DBI](https://github.com/rstats-db/DBI) interface for Spark, so you can use `dbGetQuery()` to execute SQL and return the result as an R data frame:
 
 ```{r sql-dbi}
 library(DBI)
@@ -128,7 +187,7 @@ iris_preview
 
 You can orchestrate machine learning algorithms in a Spark cluster via the [machine learning](https://spark.apache.org/docs/latest/mllib-guide.html) functions within **sparklyr**. These functions connect to a set of high-level APIs built on top of DataFrames that help you create and tune machine learning workflows.
 
-Here's an example where we use [ml_linear_regression](https://spark.rstudio.com/reference/ml_linear_regression/) to fit a linear regression model. We'll use the built-in `mtcars` dataset, and see if we can predict a car's fuel consumption (`mpg`) based on its weight (`wt`), and the number of cylinders the engine contains (`cyl`). We'll assume in each case that the relationship between `mpg` and each of our features is linear.
+Here's an example where we use [ml_linear_regression](https://spark.rstudio.com/packages/sparklyr/latest/reference/ml_linear_regression/) to fit a linear regression model. We'll use the built-in `mtcars` dataset, and see if we can predict a car's fuel consumption (`mpg`) based on its weight (`wt`), and the number of cylinders the engine contains (`cyl`). We'll assume in each case that the relationship between `mpg` and each of our features is linear.
 
 ```{r}
 # copy mtcars into spark
@@ -178,7 +237,7 @@ src_tbls(sc)
 
 ## Distributed R
 
-You can execute arbitrary r code across your cluster using `spark_apply`. For example, we can apply `rgamma` over `iris` as follows:
+You can execute arbitrary r code across your cluster using `spark_apply()`. For example, we can apply `rgamma` over `iris` as follows:
 
 ```{r}
 spark_apply(iris_tbl, function(data) {
@@ -199,7 +258,7 @@ spark_apply(
 
 ## Extensions
 
-The facilities used internally by sparklyr for its dplyr and machine learning interfaces are available to extension packages. Since Spark is a general purpose cluster computing system there are many potential applications for extensions (e.g. interfaces to custom machine learning pipelines, interfaces to 3rd party Spark packages, etc.).
+The facilities used internally by sparklyr for its `dplyr` and machine learning interfaces are available to extension packages. Since Spark is a general purpose cluster computing system there are many potential applications for extensions (e.g. interfaces to custom machine learning pipelines, interfaces to 3rd party Spark packages, etc.).
 
 Here's a simple example that wraps a Spark text file line counting function with an R function:
 
@@ -220,7 +279,7 @@ count_lines(sc, tempfile)
 ```
 
 
-To learn more about creating extensions see the [Extensions](https://spark.rstudio.com/extensions.html) section of the sparklyr website.
+To learn more about creating extensions see the [Extensions](https://spark.rstudio.com/guides/extensions.html) section of the sparklyr website.
 
 
 ## Table Utilities
@@ -240,13 +299,13 @@ tbl_uncache(sc, "batting")
 
 ## Connection Utilities
 
-You can view the Spark web console using the `spark_web` function:
+You can view the Spark web console using the `spark_web()` function:
 
 ```{r, eval=FALSE}
 spark_web(sc)
 ```
 
-You can show the log using the `spark_log` function:
+You can show the log using the `spark_log()` function:
 
 ```{r}
 spark_log(sc, n = 10)
@@ -307,41 +366,41 @@ mtcars_glm <- h2o.glm(x = c("wt", "cyl"),
 mtcars_glm
 ```
 ```
-## Model Details:
-## ==============
-##
-## H2ORegressionModel: glm
-## Model ID:  GLM_model_R_1527265202599_1
-## GLM Model: summary
-##     family     link                              regularization
-## 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
-##                                                                lambda_search
-## 1 nlambda = 100, lambda.max = 10.132, lambda.min = 0.1013, lambda.1se = -1.0
-##   number_of_predictors_total number_of_active_predictors
-## 1                          2                           2
-##   number_of_iterations                                training_frame
-## 1                  100 frame_rdd_31_ad5c4e88ec97eb8ccedae9475ad34e02
-##
-## Coefficients: glm coefficients
-##       names coefficients standardized_coefficients
-## 1 Intercept    38.941654                 20.090625
-## 2       cyl    -1.468783                 -2.623132
-## 3        wt    -3.034558                 -2.969186
-##
-## H2ORegressionMetrics: glm
-## ** Reported on training data. **
-##
-## MSE:  6.017684
-## RMSE:  2.453097
-## MAE:  1.940985
-## RMSLE:  0.1114801
-## Mean Residual Deviance :  6.017684
-## R^2 :  0.8289895
-## Null Deviance :1126.047
-## Null D.o.F. :31
-## Residual Deviance :192.5659
-## Residual D.o.F. :29
-## AIC :156.2425
+#> Model Details:
+#> ==============
+#>
+#> H2ORegressionModel: glm
+#> Model ID:  GLM_model_R_1527265202599_1
+#> GLM Model: summary
+#>     family     link                              regularization
+#> 1 gaussian identity Elastic Net (alpha = 0.5, lambda = 0.1013 )
+#>                                                                lambda_search
+#> 1 nlambda = 100, lambda.max = 10.132, lambda.min = 0.1013, lambda.1se = -1.0
+#>   number_of_predictors_total number_of_active_predictors
+#> 1                          2                           2
+#>   number_of_iterations                                training_frame
+#> 1                  100 frame_rdd_31_ad5c4e88ec97eb8ccedae9475ad34e02
+#>
+#> Coefficients: glm coefficients
+#>       names coefficients standardized_coefficients
+#> 1 Intercept    38.941654                 20.090625
+#> 2       cyl    -1.468783                 -2.623132
+#> 3        wt    -3.034558                 -2.969186
+#>
+#> H2ORegressionMetrics: glm
+#> ** Reported on training data. **
+#>
+#> MSE:  6.017684
+#> RMSE:  2.453097
+#> MAE:  1.940985
+#> RMSLE:  0.1114801
+#> Mean Residual Deviance :  6.017684
+#> R^2 :  0.8289895
+#> Null Deviance :1126.047
+#> Null D.o.F. :31
+#> Residual Deviance :192.5659
+#> Residual D.o.F. :29
+#> AIC :156.2425
 ```
 
 ```{r eval=FALSE}
@@ -358,14 +417,14 @@ Before connecting to Livy, you will need the connection information to an existi
 livy_install()
 ```
 
-```{r livy-start}
+```{r livy-start, eval = FALSE}
 livy_service_start()
 ```
 
-To connect, use the Livy service address as `master` and `method = "livy"` in `spark_connect`. Once connection completes, use `sparklyr` as usual, for instance:
+To connect, use the Livy service address as `master` and `method = "livy"` in `spark_connect()`. Once connection completes, use `sparklyr` as usual, for instance:
 
-```{r livy-connect}
-sc <- spark_connect(master = "http://localhost:8998", method = "livy", version = "2.4.0")
+```{r livy-connect, eval = FALSE}
+sc <- spark_connect(master = "http://localhost:8998", method = "livy", version = "3.0.0")
 copy_to(sc, iris, overwrite = TRUE)
 
 spark_disconnect(sc)
@@ -373,7 +432,7 @@ spark_disconnect(sc)
 
 Once you are done using `livy` locally, you should stop this service with:
 
-```{r livy-stop}
+```{r livy-stop, eval = FALSE}
 livy_service_stop()
 ```
 
@@ -417,3 +476,10 @@ copy_to(sc, iris, overwrite = TRUE)
 ```{r eval=FALSE}
 spark_disconnect(sc)
 ```
+
+
+
+
+
+
+
