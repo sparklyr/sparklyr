@@ -30,12 +30,14 @@ stream_read_generic <- function(sc,
                                 columns,
                                 stream_options,
                                 load = FALSE) {
+
   spark_require_version(sc, "2.0.0", "Spark streaming")
+
+  name <- name %||% random_string("sparklyr_tmp_")
 
   schema <- NULL
 
-  streamOptions <- spark_session(sc) %>%
-    invoke("readStream")
+  streamOptions <- invoke(spark_session(sc), "readStream")
 
   if (identical(columns, NULL)) {
     reader <- stream_read_generic_type(sc,
@@ -64,18 +66,15 @@ stream_read_generic <- function(sc,
   if (identical(schema, NULL)) {
     schema <- streamOptions
   } else {
-    schema <- streamOptions %>%
-      invoke("schema", schema)
+    schema <-  invoke(streamOptions, "schema", schema)
   }
 
   if (is.null(path) || load) {
-    schema <- schema %>%
-      invoke("format", type)
+    schema <- invoke(schema, "format", type)
 
     schema <- if (load) invoke(schema, "load", path) else invoke(schema, "load")
 
-    schema %>%
-      invoke("createOrReplaceTempView", name)
+    invoke(schema, "createOrReplaceTempView", name)
   }
   else {
     schema %>%
@@ -86,7 +85,8 @@ stream_read_generic <- function(sc,
   tbl(sc, name)
 }
 
-stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, partition_by, stream_options) {
+stream_write_generic <- function(x, path, type, mode, trigger, checkpoint,
+                                 partition_by, stream_options) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
   sdf <- spark_dataframe(x)
@@ -101,7 +101,7 @@ stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, parti
     invoke("format", type)
 
   if (!is.null(partition_by)) {
-    streamOptions <- streamOptions %>% invoke("partitionBy", as.list(partition_by))
+    streamOptions <- invoke(streamOptions, "partitionBy", as.list(partition_by))
   }
 
   stream_options$path <- path
@@ -126,11 +126,10 @@ stream_write_generic <- function(x, path, type, mode, trigger, checkpoint, parti
     trigger <- stream_trigger_create(trigger, sc)
   }
 
-  streamOptions <- streamOptions %>%
-    invoke("outputMode", mode)
+  streamOptions <- invoke(streamOptions, "outputMode", mode)
 
   if (!identical(trigger, FALSE)) {
-    streamOptions <- streamOptions %>% invoke("trigger", trigger)
+    streamOptions <- invoke(streamOptions, "trigger", trigger)
   }
 
   streamOptions %>%
@@ -177,15 +176,9 @@ stream_read_csv <- function(sc,
                             null_value = NULL,
                             options = list(),
                             ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  infer_schema <- identical(columns, NULL) || is.character(columns)
-
   streamOptions <- spark_csv_options(
     header = header,
-    inferSchema = infer_schema,
+    inferSchema = identical(columns, NULL) || is.character(columns),
     delimiter = delimiter,
     quote = quote,
     escape = escape,
@@ -194,14 +187,7 @@ stream_read_csv <- function(sc,
     options = options
   )
 
-
-  stream_read_generic(sc,
-    path = path,
-    type = "csv",
-    name = name,
-    columns = columns,
-    stream_options = streamOptions
-  )
+  stream_read_generic(sc, path, "csv",name, columns, streamOptions)
 }
 
 #' Write CSV Stream
@@ -264,15 +250,9 @@ stream_write_csv <- function(x,
     options = options
   )
 
-  stream_write_generic(x,
-    path = path,
-    type = "csv",
-    mode = mode,
-    trigger = trigger,
-    checkpoint = checkpoint,
-    partition_by = partition_by,
-    stream_options = streamOptions
-  )
+  stream_write_generic(x, path, "csv", mode, trigger,
+                       checkpoint,partition_by,streamOptions
+                       )
 }
 
 #' Write Memory Stream
@@ -337,15 +317,9 @@ stream_write_memory <- function(x,
     )
   }
 
-  stream_write_generic(x,
-    path = name,
-    type = "memory",
-    mode = mode,
-    trigger = trigger,
-    checkpoint = checkpoint,
-    partition_by = partition_by,
-    stream_options = options
-  )
+  stream_write_generic(x, name, "memory", mode, trigger,
+                       checkpoint, partition_by, options
+                       )
 }
 
 #' Read Text Stream
@@ -377,17 +351,7 @@ stream_read_text <- function(sc,
                              name = NULL,
                              options = list(),
                              ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
-    path = path,
-    type = "text",
-    name = name,
-    columns = list(line = "character"),
-    stream_options = options
-  )
+  stream_read_generic(sc, path, "text", name, list(line = "character"), options)
 }
 
 #' Write Text Stream
@@ -425,19 +389,9 @@ stream_write_text <- function(x,
                               options = list(),
                               partition_by = NULL,
                               ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
-    path = path,
-    type = "text",
-    mode = mode,
-    trigger = trigger,
-    checkpoint = checkpoint,
-    partition_by = partition_by,
-    stream_options = options
-  )
+  stream_write_generic(x, path, "text", mode, trigger,
+                       checkpoint, partition_by, options
+                       )
 }
 
 #' Read JSON Stream
@@ -470,17 +424,7 @@ stream_read_json <- function(sc,
                              columns = NULL,
                              options = list(),
                              ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
-    path = path,
-    type = "json",
-    name = name,
-    columns = columns,
-    stream_options = options
-  )
+  stream_read_generic(sc, path, "json", name, columns, options)
 }
 
 #' Write JSON Stream
@@ -515,19 +459,9 @@ stream_write_json <- function(x,
                               options = list(),
                               partition_by = NULL,
                               ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
-    path = path,
-    type = "json",
-    mode = mode,
-    trigger = trigger,
-    checkpoint = checkpoint,
-    partition_by = partition_by,
-    stream_options = options
-  )
+  stream_write_generic(x, path, "json", mode, trigger,
+                       checkpoint, partition_by, options
+                       )
 }
 
 #' Read Parquet Stream
@@ -557,17 +491,7 @@ stream_read_parquet <- function(sc,
                                 columns = NULL,
                                 options = list(),
                                 ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
-    path = path,
-    type = "parquet",
-    name = name,
-    columns = columns,
-    stream_options = options
-  )
+  stream_read_generic(sc, path, "parquet", name, columns, options)
 }
 
 #' Write Parquet Stream
@@ -599,19 +523,9 @@ stream_write_parquet <- function(x,
                                  options = list(),
                                  partition_by = NULL,
                                  ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
-    path = path,
-    type = "parquet",
-    mode = mode,
-    trigger = trigger,
-    checkpoint = checkpoint,
-    partition_by = partition_by,
-    stream_options = options
-  )
+  stream_write_generic(x, path, "parquet", mode, trigger,
+                       checkpoint, partition_by, options
+                       )
 }
 
 #' Read ORC Stream
@@ -641,17 +555,7 @@ stream_read_orc <- function(sc,
                             columns = NULL,
                             options = list(),
                             ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
-    path = path,
-    type = "orc",
-    name = name,
-    columns = columns,
-    stream_options = options
-  )
+  stream_read_generic(sc, path, "orc", name, columns, options)
 }
 
 #' Write a ORC Stream
@@ -683,19 +587,9 @@ stream_write_orc <- function(x,
                              options = list(),
                              partition_by = NULL,
                              ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
-    path = path,
-    type = "orc",
-    mode = mode,
-    trigger = trigger,
-    checkpoint = checkpoint,
-    partition_by = partition_by,
-    stream_options = options
-  )
+  stream_write_generic(x, path, "orc", mode, trigger,
+                       checkpoint, partition_by, options
+                       )
 }
 
 #' Read Kafka Stream
@@ -729,17 +623,7 @@ stream_read_kafka <- function(sc,
                               name = NULL,
                               options = list(),
                               ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
-    path = NULL,
-    type = "kafka",
-    name = name,
-    columns = FALSE,
-    stream_options = options
-  )
+  stream_read_generic(sc, NULL, "kafka", name, FALSE, options)
 }
 
 #' Write Kafka Stream
@@ -776,19 +660,9 @@ stream_write_kafka <- function(x,
                                options = list(),
                                partition_by = NULL,
                                ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
-    path = NULL,
-    type = "kafka",
-    mode = mode,
-    trigger = trigger,
-    checkpoint = checkpoint,
-    partition_by = partition_by,
-    stream_options = options
-  )
+  stream_write_generic(x, NULL, "kafka", mode, trigger,
+                       checkpoint, partition_by, options
+                       )
 }
 
 #' Read Socket Stream
@@ -815,17 +689,7 @@ stream_read_socket <- function(sc,
                                columns = NULL,
                                options = list(),
                                ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
-    path = NULL,
-    type = "socket",
-    name = name,
-    columns = FALSE,
-    stream_options = options
-  )
+  stream_read_generic(sc, NULL, "socket", name, FALSE, options)
 }
 
 #' Write Console Stream
@@ -857,19 +721,9 @@ stream_write_console <- function(x,
                                  trigger = stream_trigger_interval(),
                                  partition_by = NULL,
                                  ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
-    path = NULL,
-    type = "console",
-    mode = mode,
-    trigger = trigger,
-    checkpoint = NULL,
-    partition_by = partition_by,
-    stream_options = options
-  )
+  stream_write_generic(x, NULL, "console", mode, trigger,
+                       NULL, partition_by, options
+                       )
 }
 
 #' Read Delta Stream
@@ -903,18 +757,7 @@ stream_read_delta <- function(sc,
                               name = NULL,
                               options = list(),
                               ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
-    path = path,
-    type = "delta",
-    name = name,
-    columns = FALSE,
-    stream_options = options,
-    load = TRUE
-  )
+  stream_read_generic(sc, path, "delta", name, FALSE, options, TRUE)
 }
 
 #' Write Delta Stream
@@ -952,17 +795,7 @@ stream_write_delta <- function(x,
                                options = list(),
                                partition_by = NULL,
                                ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
-    path = path,
-    type = "delta",
-    mode = mode,
-    trigger = FALSE,
-    checkpoint = checkpoint,
-    partition_by = partition_by,
-    stream_options = options
-  )
+  stream_write_generic(x, path, "delta", mode, FALSE,
+                       checkpoint, partition_by, options
+                       )
 }
