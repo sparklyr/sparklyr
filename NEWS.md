@@ -1,5 +1,16 @@
 # sparklyr (development version)
 
+
+### Streamming 
+
+
+No changes to functionality, only code stream data script:
+
+- Centralized NULL name checks
+- Centralized Spark version check
+- Reduced the number of pipes used for invoke()
+- Switched to positional argument calls for all reads and writes
+
 # Sparklyr 1.7.5
 
 ### Misc
