@@ -4,12 +4,21 @@
 ### Streamming 
 
 
-No changes to functionality, only code stream data script:
+No changes to functionality, only code stream line `stream_data.R` script:
 
 - Centralized NULL name checks
 - Centralized Spark version check
-- Reduced the number of pipes used for invoke()
+- Reduced the number of pipes used for `invoke()`
 - Switched to positional argument calls for all reads and writes
+
+### Data  Interface
+
+No changes to functionality, only code stream line `stream_data.R` script:
+- De-dup multiple code calls into single argument for generic writer
+- Reduced the number of lines most functions used. It seems cosmetic, but it
+actually reduces the size of the file significantly 
+- Shortnend a Spark Data Frame check call
+
 
 # Sparklyr 1.7.5
 
