@@ -54,15 +54,7 @@ ml_stop_words_remover <- ft_stop_words_remover
 ft_stop_words_remover.spark_connection <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
                                                    stop_words = ml_default_stop_words(spark_connection(x), "english"),
                                                    uid = random_string("stop_words_remover_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    case_sensitive = case_sensitive,
-    stop_words = stop_words,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_stop_words_remover()
+  .args <- validator_ml_stop_words_remover(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.StopWordsRemover",

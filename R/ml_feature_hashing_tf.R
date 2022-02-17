@@ -22,15 +22,7 @@ ml_hashing_tf <- ft_hashing_tf
 #' @export
 ft_hashing_tf.spark_connection <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
                                            num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    binary = binary,
-    num_features = num_features,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_hashing_tf()
+  .args <- validator_ml_hashing_tf(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.HashingTF",

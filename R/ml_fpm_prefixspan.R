@@ -58,14 +58,7 @@ ml_prefixspan.spark_connection <- function(x, seq_col = "sequence", min_support 
                                            max_pattern_length = 10,
                                            max_local_proj_db_size = 32000000,
                                            uid = random_string("prefixspan_"), ...) {
-  .args <- list(
-    seq_col = seq_col,
-    min_support = min_support,
-    max_pattern_length = max_pattern_length,
-    max_local_proj_db_size = max_local_proj_db_size
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_prefixspan()
+  .args <- validator_ml_prefixspan(as.list(environment()))
 
   uid <- cast_string(uid)
   jobj <- invoke_new(x, "org.apache.spark.ml.fpm.PrefixSpan", uid) %>%

@@ -37,14 +37,7 @@ ml_binarizer <- ft_binarizer
 #' @export
 ft_binarizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
                                           uid = random_string("binarizer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    threshold = threshold,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_binarizer()
+  .args <- validator_ml_binarizer(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Binarizer",

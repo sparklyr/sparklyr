@@ -51,15 +51,7 @@ ml_feature_hasher <- ft_feature_hasher
 ft_feature_hasher.spark_connection <- function(x, input_cols = NULL, output_col = NULL,
                                                num_features = 2^18, categorical_cols = NULL,
                                                uid = random_string("feature_hasher_"), ...) {
-  .args <- list(
-    input_cols = input_cols,
-    output_col = output_col,
-    num_features = num_features,
-    categorical_cols = categorical_cols,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_feature_hasher()
+  .args <- validator_ml_feature_hasher(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.FeatureHasher",

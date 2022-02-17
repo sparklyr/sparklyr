@@ -19,14 +19,7 @@ ml_idf <- ft_idf
 #' @export
 ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                     min_doc_freq = 0, uid = random_string("idf_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    min_doc_freq = min_doc_freq,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_idf()
+  .args <- validator_ml_idf(as.list(environment()))
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.IDF",

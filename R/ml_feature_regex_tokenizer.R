@@ -27,17 +27,7 @@ ml_regex_tokenizer <- ft_regex_tokenizer
 ft_regex_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, gaps = TRUE,
                                                 min_token_length = 1, pattern = "\\s+", to_lower_case = TRUE,
                                                 uid = random_string("regex_tokenizer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    gaps = gaps,
-    min_token_length = min_token_length,
-    pattern = pattern,
-    to_lower_case = to_lower_case,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_regex_tokenizer()
+  .args <- validator_ml_regex_tokenizer(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.RegexTokenizer",

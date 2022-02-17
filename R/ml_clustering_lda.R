@@ -141,24 +141,7 @@ ml_lda.spark_connection <- function(x, formula = NULL, k = 10, max_iter = 20, do
                                     keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
                                     optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
                                     topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
-  .args <- list(
-    k = k,
-    max_iter = max_iter,
-    doc_concentration = doc_concentration,
-    topic_concentration = topic_concentration,
-    subsampling_rate = subsampling_rate,
-    optimizer = optimizer,
-    checkpoint_interval = checkpoint_interval,
-    keep_last_checkpoint = keep_last_checkpoint,
-    learning_decay = learning_decay,
-    learning_offset = learning_offset,
-    optimize_doc_concentration = optimize_doc_concentration,
-    seed = seed,
-    features_col = features_col,
-    topic_distribution_col = topic_distribution_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_lda()
+  .args <- validator_ml_lda(as.list(environment()))
 
   uid <- cast_string(uid)
 

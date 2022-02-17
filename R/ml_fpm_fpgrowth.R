@@ -26,14 +26,7 @@ ml_fpgrowth <- function(x, items_col = "items", min_confidence = 0.8,
 ml_fpgrowth.spark_connection <- function(x, items_col = "items", min_confidence = 0.8,
                                          min_support = 0.3, prediction_col = "prediction",
                                          uid = random_string("fpgrowth_"), ...) {
-  .args <- list(
-    items_col = items_col,
-    min_confidence = min_confidence,
-    min_support = min_support,
-    prediction_col = prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_fpgrowth()
+  .args <- validator_ml_fpgrowth(as.list(environment()))
 
   uid <- cast_string(uid)
   jobj <- invoke_new(x, "org.apache.spark.ml.fpm.FPGrowth", uid) %>%

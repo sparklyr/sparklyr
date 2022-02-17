@@ -32,14 +32,7 @@ ft_one_hot_encoder_estimator.spark_connection <- function(x, input_cols = NULL, 
                                                           uid = random_string("one_hot_encoder_estimator_"), ...) {
   spark_require_version(x, required = "2.3.0", required_max = "3.0.0")
 
-  .args <- list(
-    input_cols = input_cols,
-    output_cols = output_cols,
-    handle_invalid = handle_invalid,
-    drop_last = drop_last,
-    uid = uid
-  ) %>%
-    validator_ml_one_hot_encoder_estimator()
+  .args <- validator_ml_one_hot_encoder_estimator(as.list(environment()))
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.OneHotEncoderEstimator",

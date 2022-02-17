@@ -29,14 +29,7 @@ ml_string_indexer <- ft_string_indexer
 ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                handle_invalid = "error", string_order_type = "frequencyDesc",
                                                uid = random_string("string_indexer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    handle_invalid = handle_invalid,
-    string_order_type = string_order_type,
-    uid = uid
-  ) %>%
-    validator_ml_string_indexer()
+  .args <- validator_ml_string_indexer(as.list(environment()))
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.StringIndexer",

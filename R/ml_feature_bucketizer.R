@@ -44,18 +44,7 @@ ml_bucketizer <- ft_bucketizer
 ft_bucketizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
                                            input_cols = NULL, output_cols = NULL, splits_array = NULL,
                                            handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    splits = splits,
-    input_cols = input_cols,
-    output_cols = output_cols,
-    splits_array = splits_array,
-    handle_invalid = handle_invalid,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_bucketizer()
+  .args <- validator_ml_bucketizer(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Bucketizer", .args[["uid"]],

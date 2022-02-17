@@ -22,14 +22,7 @@ ft_elementwise_product.spark_connection <- function(x, input_col = NULL, output_
                                                     uid = random_string("elementwise_product_"), ...) {
   spark_require_version(x, "2.0.0", "ElementwiseProduct")
 
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    scaling_vec = scaling_vec,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_elementwise_product()
+  .args <- validator_ml_elementwise_product(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.ElementwiseProduct",

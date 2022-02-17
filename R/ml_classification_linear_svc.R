@@ -50,22 +50,7 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
                                            features_col = "features", label_col = "label",
                                            prediction_col = "prediction", raw_prediction_col = "rawPrediction",
                                            uid = random_string("linear_svc_"), ...) {
-  .args <- list(
-    fit_intercept = fit_intercept,
-    reg_param = reg_param,
-    max_iter = max_iter,
-    standardization = standardization,
-    weight_col = weight_col,
-    tol = tol,
-    threshold = threshold,
-    aggregation_depth = aggregation_depth,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    raw_prediction_col = raw_prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_linear_svc()
+  .args <- validator_ml_linear_svc(as.list(environment()))
 
   sc <- spark_connection(x)
   if (spark_version(sc) >= "3.0" && !is.null(.args[["weight_col"]])) {

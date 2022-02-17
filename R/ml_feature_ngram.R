@@ -20,14 +20,7 @@ ml_ngram <- ft_ngram
 #' @export
 ft_ngram.spark_connection <- function(x, input_col = NULL, output_col = NULL, n = 2,
                                       uid = random_string("ngram_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    n = n,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_ngram()
+  .args <- validator_ml_ngram(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.NGram",

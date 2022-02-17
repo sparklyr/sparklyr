@@ -68,20 +68,7 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
     stop("Weighted quantile discretizer is only supported in Spark 3.0 or above.")
   }
 
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    num_buckets = num_buckets,
-    input_cols = input_cols,
-    output_cols = output_cols,
-    num_buckets_array = num_buckets_array,
-    handle_invalid = handle_invalid,
-    relative_error = relative_error,
-    uid = uid,
-    weight_column = weight_column
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_quantile_discretizer()
+  .args <- validator_ml_quantile_discretizer(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x,

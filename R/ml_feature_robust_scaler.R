@@ -34,18 +34,7 @@ ft_robust_scaler.spark_connection <- function(x, input_col = NULL, output_col = 
                                               lower = 0.25, upper = 0.75, with_centering = TRUE,
                                               with_scaling = TRUE, relative_error = 0.001,
                                               uid = random_string("ft_robust_scaler_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    lower = lower,
-    upper = upper,
-    with_centering = with_centering,
-    with_scaling = with_scaling,
-    relative_error = relative_error,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_robust_scaler()
+  .args <- validator_ml_robust_scaler(as.list(environment()))
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.RobustScaler",

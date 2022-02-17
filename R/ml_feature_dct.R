@@ -21,14 +21,7 @@ ml_dct <- ft_dct
 #' @export
 ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                     inverse = FALSE, uid = random_string("dct_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    inverse = inverse,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_dct()
+  .args <- validator_ml_dct(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.DCT",

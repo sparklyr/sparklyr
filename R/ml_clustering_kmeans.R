@@ -37,18 +37,7 @@ ml_kmeans.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 20, 
                                        init_steps = 2, init_mode = "k-means||", seed = NULL,
                                        features_col = "features", prediction_col = "prediction",
                                        uid = random_string("kmeans_"), ...) {
-  .args <- list(
-    k = k,
-    max_iter = max_iter,
-    tol = tol,
-    init_steps = init_steps,
-    init_mode = init_mode,
-    seed = seed,
-    features_col = features_col,
-    prediction_col = prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_kmeans()
+  .args <- validator_ml_kmeans(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.clustering.KMeans", uid,

@@ -24,15 +24,7 @@ ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col =
                                                handle_invalid = "error",
                                                max_categories = 20,
                                                uid = random_string("vector_indexer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    handle_invalid = handle_invalid,
-    max_categories = max_categories,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_vector_indexer()
+  .args <- validator_ml_vector_indexer(as.list(environment()))
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.VectorIndexer",

@@ -45,15 +45,7 @@ ml_standard_scaler <- ft_standard_scaler
 ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                 with_mean = FALSE, with_std = TRUE,
                                                 uid = random_string("standard_scaler_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    with_mean = with_mean,
-    with_std = with_std,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_standard_scaler()
+  .args <- validator_ml_standard_scaler(as.list(environment()))
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.StandardScaler",

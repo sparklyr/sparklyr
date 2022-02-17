@@ -97,16 +97,7 @@ ml_power_iteration.spark_connection <- function(x, k = 4, max_iter = 20,
     stop("`ml_power_iteration()` is only supported in Spark 2.4 or above.")
   }
 
-  .args <- list(
-    k = k,
-    max_iter = max_iter,
-    init_mode = init_mode,
-    src_col = src_col,
-    dst_col = dst_col,
-    weight_col = weight_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_power_iteration()
+  .args <- validator_ml_power_iteration(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.clustering.PowerIterationClustering",

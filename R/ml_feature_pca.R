@@ -18,14 +18,7 @@ ft_pca <- function(x, input_col = NULL, output_col = NULL, k = NULL,
 #' @export
 ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = NULL,
                                     uid = random_string("pca_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    k = k,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_pca()
+  .args <- validator_ml_pca(as.list(environment()))
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.PCA",

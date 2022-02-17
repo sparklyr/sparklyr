@@ -19,14 +19,7 @@ ml_normalizer <- ft_normalizer
 #' @export
 ft_normalizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                            p = 2, uid = random_string("normalizer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    p = p,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_normalizer()
+  .args <- validator_ml_normalizer(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Normalizer",

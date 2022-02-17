@@ -18,14 +18,7 @@ ml_vector_slicer <- ft_vector_slicer
 #' @export
 ft_vector_slicer.spark_connection <- function(x, input_col = NULL, output_col = NULL, indices = NULL,
                                               uid = random_string("vector_slicer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    indices = indices,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_vector_slicer()
+  .args <- validator_ml_vector_slicer(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.VectorSlicer",

@@ -48,19 +48,7 @@ ml_naive_bayes.spark_connection <- function(x, formula = NULL, model_type = "mul
                                             prediction_col = "prediction", probability_col = "probability",
                                             raw_prediction_col = "rawPrediction",
                                             uid = random_string("naive_bayes_"), ...) {
-  .args <- list(
-    model_type = model_type,
-    smoothing = smoothing,
-    thresholds = thresholds,
-    weight_col = weight_col,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    probability_col = probability_col,
-    raw_prediction_col = raw_prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_naive_bayes()
+  .args <- validator_ml_naive_bayes(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.NaiveBayes", uid,

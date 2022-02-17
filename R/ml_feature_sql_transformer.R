@@ -23,12 +23,7 @@ ml_sql_transformer <- ft_sql_transformer
 #' @export
 ft_sql_transformer.spark_connection <- function(x, statement = NULL,
                                                 uid = random_string("sql_transformer_"), ...) {
-  .args <- list(
-    statement = statement,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_sql_transformer()
+  .args <- validator_ml_sql_transformer(as.list(environment()))
 
   jobj <- invoke_new(
     x, "org.apache.spark.ml.feature.SQLTransformer",

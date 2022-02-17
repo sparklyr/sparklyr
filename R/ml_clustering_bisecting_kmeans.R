@@ -41,16 +41,7 @@ ml_bisecting_kmeans.spark_connection <- function(x, formula = NULL, k = 4, max_i
                                                  features_col = "features", prediction_col = "prediction",
                                                  uid = random_string("bisecting_bisecting_kmeans_"),
                                                  ...) {
-  .args <- list(
-    k = k,
-    max_iter = max_iter,
-    seed = seed,
-    min_divisible_cluster_size = min_divisible_cluster_size,
-    features_col = features_col,
-    prediction_col = prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_bisecting_kmeans()
+  .args <- validator_ml_bisecting_kmeans(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.clustering.BisectingKMeans", uid,

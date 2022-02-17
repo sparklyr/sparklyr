@@ -18,14 +18,7 @@ ml_one_vs_rest <- function(x, formula = NULL, classifier = NULL, features_col = 
 ml_one_vs_rest.spark_connection <- function(x, formula = NULL, classifier = NULL, features_col = "features",
                                             label_col = "label", prediction_col = "prediction",
                                             uid = random_string("one_vs_rest_"), ...) {
-  .args <- list(
-    classifier = classifier,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_one_vs_rest()
+  .args <- validator_ml_one_vs_rest(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.OneVsRest", uid,

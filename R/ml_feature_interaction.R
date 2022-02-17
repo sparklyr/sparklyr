@@ -21,13 +21,7 @@ ml_interaction <- ft_interaction
 #' @export
 ft_interaction.spark_connection <- function(x, input_cols = NULL, output_col = NULL,
                                             uid = random_string("interaction_"), ...) {
-  .args <- list(
-    input_cols = input_cols,
-    output_col = output_col,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_interaction()
+  .args <- validator_ml_interaction(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Interaction",

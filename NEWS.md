@@ -19,6 +19,11 @@ No changes to functionality, only code stream line `stream_data.R` script:
 actually reduces the size of the file significantly 
 - Shortnend a Spark Data Frame check call
 
+### ML
+
+- Switched all ML validator call from explicitly passing each named argument to
+using `as.list(environment())`, thus reducing the number of code lines
+
 ### Pakcage
 
 - Removes `lifecycle` dependency

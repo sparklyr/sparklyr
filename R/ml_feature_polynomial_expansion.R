@@ -21,14 +21,7 @@ ml_polynomial_expansion <- ft_polynomial_expansion
 #' @export
 ft_polynomial_expansion.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                      degree = 2, uid = random_string("polynomial_expansion_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    degree = degree,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_polynomial_expansion()
+  .args <- validator_ml_polynomial_expansion(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.PolynomialExpansion",

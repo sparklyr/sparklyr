@@ -32,16 +32,7 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NU
                                                                uid = random_string("bucketed_random_projection_lsh_"), ...) {
   spark_require_version(x, "2.1.0", "LSH")
 
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    bucket_length = bucket_length,
-    num_hash_tables = num_hash_tables,
-    seed = seed,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_bucketed_random_projection_lsh()
+  .args <- validator_ml_bucketed_random_projection_lsh(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",

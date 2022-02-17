@@ -29,29 +29,7 @@ ml_gbt_classifier.spark_connection <- function(x, formula = NULL, max_iter = 20,
                                                prediction_col = "prediction", probability_col = "probability",
                                                raw_prediction_col = "rawPrediction",
                                                uid = random_string("gbt_classifier_"), ...) {
-  .args <- list(
-    max_iter = max_iter,
-    max_depth = max_depth,
-    step_size = step_size,
-    subsampling_rate = subsampling_rate,
-    feature_subset_strategy = feature_subset_strategy,
-    min_instances_per_node = min_instances_per_node,
-    max_bins = max_bins,
-    min_info_gain = min_info_gain,
-    loss_type = loss_type,
-    seed = seed,
-    thresholds = thresholds,
-    checkpoint_interval = checkpoint_interval,
-    cache_node_ids = cache_node_ids,
-    max_memory_in_mb = max_memory_in_mb,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    probability_col = probability_col,
-    raw_prediction_col = raw_prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_gbt_classifier()
+  .args <- validator_ml_gbt_classifier(as.list(environment()))
 
   stage_class <- "org.apache.spark.ml.classification.GBTClassifier"
 

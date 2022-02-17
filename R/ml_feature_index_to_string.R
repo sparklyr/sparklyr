@@ -23,14 +23,7 @@ ml_index_to_string <- ft_index_to_string
 #' @export
 ft_index_to_string.spark_connection <- function(x, input_col = NULL, output_col = NULL, labels = NULL,
                                                 uid = random_string("index_to_string_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    labels = labels,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_index_to_string()
+  .args <- validator_ml_index_to_string(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.IndexToString",

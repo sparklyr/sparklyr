@@ -55,24 +55,7 @@ ml_multilayer_perceptron_classifier.spark_connection <- function(x, formula = NU
                                                                  prediction_col = "prediction", probability_col = "probability",
                                                                  raw_prediction_col = "rawPrediction",
                                                                  uid = random_string("multilayer_perceptron_classifier_"), ...) {
-  .args <- list(
-    layers = layers,
-    max_iter = max_iter,
-    step_size = step_size,
-    tol = tol,
-    block_size = block_size,
-    solver = solver,
-    seed = seed,
-    initial_weights = initial_weights,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    probability_col = probability_col,
-    raw_prediction_col = raw_prediction_col,
-    thresholds = thresholds
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_multilayer_perceptron_classifier()
+  .args <- validator_ml_multilayer_perceptron_classifier(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.MultilayerPerceptronClassifier", uid,

@@ -65,31 +65,7 @@ ml_logistic_regression.spark_connection <- function(x, formula = NULL, fit_inter
                                                     prediction_col = "prediction", probability_col = "probability",
                                                     raw_prediction_col = "rawPrediction",
                                                     uid = random_string("logistic_regression_"), ...) {
-  .args <- list(
-    formula = formula,
-    fit_intercept = fit_intercept,
-    elastic_net_param = elastic_net_param,
-    reg_param = reg_param,
-    max_iter = max_iter,
-    threshold = threshold,
-    thresholds = thresholds,
-    tol = tol,
-    weight_col = weight_col,
-    aggregation_depth = aggregation_depth,
-    lower_bounds_on_coefficients = lower_bounds_on_coefficients,
-    lower_bounds_on_intercepts = lower_bounds_on_intercepts,
-    upper_bounds_on_coefficients = upper_bounds_on_coefficients,
-    upper_bounds_on_intercepts = upper_bounds_on_intercepts,
-    features_col = features_col,
-    label_col = label_col,
-    family = family,
-    prediction_col = prediction_col,
-    probability_col = probability_col,
-    raw_prediction_col = raw_prediction_col,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_logistic_regression()
+  .args <- validator_ml_logistic_regression(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.LogisticRegression", .args[["uid"]],

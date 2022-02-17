@@ -21,13 +21,7 @@ ml_vector_assembler <- ft_vector_assembler
 #' @export
 ft_vector_assembler.spark_connection <- function(x, input_cols = NULL, output_col = NULL,
                                                  uid = random_string("vector_assembler_"), ...) {
-  .args <- list(
-    input_cols = input_cols,
-    output_col = output_col,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_vector_assembler()
+  .args <- validator_ml_vector_assembler(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.VectorAssembler",

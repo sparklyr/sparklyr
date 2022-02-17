@@ -40,17 +40,7 @@ ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col
                                                  binary = FALSE, min_df = 1, min_tf = 1,
                                                  vocab_size = 2^18,
                                                  uid = random_string("count_vectorizer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    binary = binary,
-    min_df = min_df,
-    min_tf = min_tf,
-    vocab_size = vocab_size,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_count_vectorizer()
+  .args <- validator_ml_count_vectorizer(as.list(environment()))
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.CountVectorizer",

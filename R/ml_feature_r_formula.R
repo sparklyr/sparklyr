@@ -60,15 +60,7 @@ ml_r_formula <- ft_r_formula
 ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "features", label_col = "label",
                                           force_index_label = FALSE,
                                           uid = random_string("r_formula_"), ...) {
-  .args <- list(
-    formula = formula,
-    features_col = features_col,
-    label_col = label_col,
-    force_index_label = force_index_label,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_r_formula()
+  .args <- validator_ml_r_formula(as.list(environment()))
 
   estimator <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", .args[["uid"]]) %>%
     invoke("setFeaturesCol", .args[["features_col"]]) %>%

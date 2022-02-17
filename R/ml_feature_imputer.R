@@ -31,15 +31,7 @@ ft_imputer.spark_connection <- function(x, input_cols = NULL, output_cols = NULL
                                         uid = random_string("imputer_"), ...) {
   spark_require_version(x, "2.2.0", "Imputer")
 
-  .args <- list(
-    input_cols = input_cols,
-    output_cols = output_cols,
-    missing_value = missing_value,
-    strategy = strategy,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_imputer()
+  .args <- validator_ml_imputer(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Imputer",

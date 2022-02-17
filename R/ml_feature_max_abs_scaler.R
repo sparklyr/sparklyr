@@ -39,13 +39,7 @@ ft_max_abs_scaler.spark_connection <- function(x, input_col = NULL, output_col =
                                                uid = random_string("max_abs_scaler_"), ...) {
   spark_require_version(x, "2.0.0", "MaxAbsScaler")
 
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_max_abs_scaler()
+  .args <- validator_ml_max_abs_scaler(as.list(environment()))
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.MaxAbsScaler",

@@ -24,28 +24,7 @@ ml_random_forest_classifier.spark_connection <- function(x, formula = NULL, num_
                                                          label_col = "label", prediction_col = "prediction",
                                                          probability_col = "probability", raw_prediction_col = "rawPrediction",
                                                          uid = random_string("random_forest_classifier_"), ...) {
-  .args <- list(
-    num_trees = num_trees,
-    subsampling_rate = subsampling_rate,
-    max_depth = max_depth,
-    min_instances_per_node = min_instances_per_node,
-    feature_subset_strategy = feature_subset_strategy,
-    impurity = impurity,
-    min_info_gain = min_info_gain,
-    max_bins = max_bins,
-    seed = seed,
-    thresholds = thresholds,
-    checkpoint_interval = checkpoint_interval,
-    cache_node_ids = cache_node_ids,
-    max_memory_in_mb = max_memory_in_mb,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    probability_col = probability_col,
-    raw_prediction_col = raw_prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_random_forest_classifier()
+  .args <- validator_ml_random_forest_classifier(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.RandomForestClassifier", uid,

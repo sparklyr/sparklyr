@@ -18,13 +18,7 @@ ml_tokenizer <- ft_tokenizer
 #' @export
 ft_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                           uid = random_string("tokenizer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_tokenizer()
+  .args <- validator_ml_tokenizer(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Tokenizer",

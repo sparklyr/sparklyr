@@ -25,25 +25,7 @@ ml_decision_tree_classifier.spark_connection <- function(x, formula = NULL, max_
                                                          label_col = "label", prediction_col = "prediction",
                                                          probability_col = "probability", raw_prediction_col = "rawPrediction",
                                                          uid = random_string("decision_tree_classifier_"), ...) {
-  .args <- list(
-    max_depth = max_depth,
-    max_bins = max_bins,
-    min_instances_per_node = min_instances_per_node,
-    min_info_gain = min_info_gain,
-    impurity = impurity,
-    seed = seed,
-    thresholds = thresholds,
-    cache_node_ids = cache_node_ids,
-    checkpoint_interval = checkpoint_interval,
-    max_memory_in_mb = max_memory_in_mb,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    probability_col = probability_col,
-    raw_prediction_col = raw_prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_decision_tree_classifier()
+  .args <- validator_ml_decision_tree_classifier(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.classification.DecisionTreeClassifier", uid,

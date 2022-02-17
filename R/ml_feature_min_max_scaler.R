@@ -42,15 +42,7 @@ ml_min_max_scaler <- ft_min_max_scaler
 ft_min_max_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
                                                min = 0, max = 1,
                                                uid = random_string("min_max_scaler_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    min = min,
-    max = max,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_min_max_scaler()
+  .args <- validator_ml_min_max_scaler(as.list(environment()))
 
   estimator <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.MinMaxScaler",

@@ -40,17 +40,7 @@ ml_gaussian_mixture.spark_connection <- function(x, formula = NULL, k = 2, max_i
                                                  uid = random_string("gaussian_mixture_"), ...) {
   spark_require_version(spark_connection(x), "2.0.0", "GaussianMixture")
 
-  .args <- list(
-    k = k,
-    max_iter = max_iter,
-    tol = tol,
-    seed = seed,
-    features_col = features_col,
-    prediction_col = prediction_col,
-    probability_col = probability_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_gaussian_mixture()
+  .args <- validator_ml_gaussian_mixture(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.clustering.GaussianMixture", uid,

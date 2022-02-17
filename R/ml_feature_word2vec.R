@@ -30,20 +30,7 @@ ml_word2vec <- ft_word2vec
 ft_word2vec.spark_connection <- function(x, input_col = NULL, output_col = NULL, vector_size = 100, min_count = 5,
                                          max_sentence_length = 1000, num_partitions = 1, step_size = 0.025, max_iter = 1,
                                          seed = NULL, uid = random_string("word2vec_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    vector_size = vector_size,
-    min_count = min_count,
-    max_sentence_length = max_sentence_length,
-    num_partitions = num_partitions,
-    step_size = step_size,
-    max_iter = max_iter,
-    seed = seed,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_word2vec()
+  .args <- validator_ml_word2vec(as.list(environment()))
 
   jobj <- spark_pipeline_stage(
     x, "org.apache.spark.ml.feature.Word2Vec",

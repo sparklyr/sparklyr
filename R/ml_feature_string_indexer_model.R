@@ -14,15 +14,7 @@ ml_string_indexer_model <- ft_string_indexer_model
 ft_string_indexer_model.spark_connection <- function(x, input_col = NULL, output_col = NULL, labels,
                                                      handle_invalid = "error",
                                                      uid = random_string("string_indexer_model_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    labels = labels,
-    handle_invalid = handle_invalid,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_string_indexer_model()
+  .args <- validator_ml_string_indexer_model(as.list(environment()))
 
   jobj <- invoke_new(
     x, "org.apache.spark.ml.feature.StringIndexerModel",
