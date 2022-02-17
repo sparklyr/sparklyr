@@ -19,6 +19,9 @@ No changes to functionality, only code stream line `stream_data.R` script:
 actually reduces the size of the file significantly 
 - Shortnend a Spark Data Frame check call
 
+### Pakcage
+
+- Removes `lifecycle` dependency
 
 # Sparklyr 1.7.5
 
