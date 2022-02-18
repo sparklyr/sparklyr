@@ -1,0 +1,152 @@
+on:
+  push:
+    branches:
+      - release
+  pull_request:
+    branches:
+      - release
+
+name: CI-release
+
+env:
+  # Ensure the temporary auth token for this workflow, instead of the
+  # bundled GitHub PAT from the `remotes` package is used for
+  # `remotes::install_github()`
+  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: 'Spark 3.1.1 (R release, openjdk8)'
+            r: 'release'
+            env:
+              ARROW_ENABLED: 'false'
+              SPARK_VERSION: '3.1.1'
+              LIVY_VERSION: 'NONE'
+              JAVA_VERSION: 'openjdk8'
+    env:
+      ${{ matrix.env }}
+    steps:
+      - name: Mount tmpfs
+        run: sudo mount -t tmpfs tmpfs /tmp
+      - name: Delete pre-existing R binaries
+        run: |
+          for b in R Rscript
+          do
+            while [ -n "$(which "$b")" ]
+            do
+              sudo rm -v "$(which "$b")"
+            done
+          done
+        shell: bash
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@master
+        with:
+          r-version: ${{ matrix.r }}
+      - name: Install Java
+        id: install-java
+        run: |
+          sudo apt-get -y remove --purge default-jdk adoptopenjdk-11-hotspot || :
+
+          if [[ ! -z "$JAVA_URL" ]]; then
+            wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+            source ./install-jdk.sh --url $JAVA_URL
+          else
+            sudo apt-get -y install openjdk-8-jdk
+            wget https://raw.githubusercontent.com/michaelklishin/jdk_switcher/master/jdk_switcher.sh
+            . ./jdk_switcher.sh
+            jdk_switcher use openjdk8;
+          fi
+
+          echo "${JAVA_HOME}"
+          echo "::set-output name=JAVA_HOME::${JAVA_HOME}"
+      - name: Install Spark master if necessary
+        run: |
+          if [[ $SPARK_VERSION == 'master' ]]; then
+            source ./ci/spark-master-install.sh;
+          fi
+      - name: Query dependencies
+        run: |
+          print(R.version)
+          install.packages("remotes")
+          saveRDS(remotes::dev_package_deps(".", dependencies = TRUE), ".github/deps.Rds", version = 2)
+          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+        shell: Rscript {0}
+      - name: Get OS name
+        id: os-name
+        run: |
+          # `os_name` will be like "Ubuntu-20.04.1-LTS"
+          OS_NAME=$(lsb_release -ds | sed 's/\s/-/g')
+          echo "::set-output name=os-name::$OS_NAME"
+      - name: Cache R packages
+        if: runner.os != 'Windows'
+        uses: actions/cache@master
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: sparklyr-ci-${{ steps.os-name.outputs.os-name }}-${{ hashFiles('.github/R-version') }}-${{ env.ARROW_ENABLED }}-${{ hashFiles('.github/deps.Rds') }}
+          restore-keys: sparklyr-ci-${{ steps.os-name.outputs.os-name }}-${{ hashFiles('.github/R-version') }}
+      - name: Cache Spark & Livy installations
+        if: runner.os != 'Windows'
+        uses: actions/cache@master
+        with:
+          path: ~/spark
+          key: sparklyr-apache-spark-${{ runner.os }}-${{ env.SPARK_VERSION }}-${{ env.LIVY_VERSION }}
+          restore-keys: sparklyr-apache-spark-${{ runner.os }}-${{ env.SPARK_VERSION }}
+      - name: Install system dependencies
+        run: |
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libcurl4-gnutls-dev libgit2-dev procps socat
+      - name: Install dependencies
+        run: remotes::install_deps(".", dependencies = TRUE)
+        shell: Rscript {0}
+        continue-on-error: true
+      - name: List installed R packages
+        run: print(as.data.frame(installed.packages())[,c("Package", "Version")])
+        shell: Rscript {0}
+        continue-on-error: true
+      - name: Build
+        env:
+          WARNINGS_ARE_ERRORS: 1
+        run: R CMD build .
+      - name: Check
+        env:
+          _R_CHECK_FORCE_SUGGESTS_: false
+          WARNINGS_ARE_ERRORS: 1
+        run: R CMD check --no-build-vignettes --no-manual --no-tests sparklyr*tar.gz
+      - name: Install sparklyr and other required package(s) from source
+        run: Rscript ci/.ci.R --install_pkgs
+      - name: Verify embedded R sources in sparklyr-*.jar
+        run: Rscript ci/.ci.R --verify-embedded-srcs
+      - name: Run tests
+        run: |
+          export SPARKLYR_LOG_FILE=/tmp/sparklyr.log
+          export JAVA_HOME="${{ steps.install-java.outputs.JAVA_HOME }}"
+
+          if [[ $CODE_COVERAGE == "true" ]]; then
+            Rscript ci/.ci.R --coverage || :
+          else
+            Rscript ci/.ci.R --testthat
+          fi
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: Worker logs
+          path: /tmp/sparklyr.log
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: Livy server logs
+          path: /tmp/livy-server.log
+      - name: Dump worker logs on failure
+        if: failure()
+        run: |
+          cat /tmp/sparklyr.log || :
+        shell: bash
+      - name: Dump livy server logs on failure
+        if: failure()
+        run: |
+          cat /tmp/livy-server.log || :
+        shell: bash
