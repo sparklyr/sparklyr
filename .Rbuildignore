@@ -40,7 +40,6 @@
 ^CODE_OF_CONDUCT\.md$
 ^CONTRIBUTORS\.md$
 ^ROADMAP\.md$
-^Jenkinsfile
 ^.*\..*\.swp$
 ^cran-comments\.md$
 ^revdep/
