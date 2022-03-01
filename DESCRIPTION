@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.7.5
+Version: 1.7.5.9000
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -98,7 +98,6 @@ Imports:
     rlang (>= 0.1.4),
     rprojroot,
     rstudioapi (>= 0.10),
-    stringr,
     tibble,
     tidyr (>= 1.2.0),
     tidyselect,
