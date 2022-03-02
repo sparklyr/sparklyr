@@ -24,7 +24,7 @@ translate_formula <- function(f) {
   # renaming variables because Spark SQL cannot handle lambda variable name
   # starting with '.'
   f <- f %>>% substitute %@% list(list(.x = var_x, .y = var_y, .z = var_z))
-  vars <- stringr::str_sort(all.vars(f))
+  vars <- sort(all.vars(f))
   params_sql <- (
     if (length(vars) > 1) {
       paste0("(", paste0(vars, collapse = ", "), ")")

@@ -1,5 +1,9 @@
 # sparklyr (development version)
 
+### Misc
+
+- Removes `stringr` dependency 
+
 # Sparklyr 1.7.5
 
 ### Misc
