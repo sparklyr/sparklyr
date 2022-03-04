@@ -45,12 +45,12 @@ broom_augment_supervised <- function(x, newdata = NULL, ...) {
   rd <- lapply(preds_vars, function(x) ifelse(any(x == orig_vars), "", x))
   rd1 <- as.character(rd)[as.character(rd) != ""]
 
-  if(any(rd1 == "prediction")) {
-    p_name <- "prediction"
-    p_new <- ".prediction"
-  } else {
+  if(any(rd1 == "predicted_label")) {
     p_name <- "predicted_label"
     p_new <- ".predicted_label"
+  } else {
+    p_name <- "prediction"
+    p_new <- ".prediction"
   }
 
   preds_sel <- dplyr::select(preds, !!!syms(c(orig_vars, p_name)))
