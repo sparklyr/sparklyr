@@ -4,12 +4,15 @@
 \alias{ml_logistic_regression_tidiers}
 \alias{tidy.ml_model_logistic_regression}
 \alias{augment.ml_model_logistic_regression}
+\alias{augment._ml_model_logistic_regression}
 \alias{glance.ml_model_logistic_regression}
 \title{Tidying methods for Spark ML Logistic Regression}
 \usage{
 \method{tidy}{ml_model_logistic_regression}(x, ...)
 
 \method{augment}{ml_model_logistic_regression}(x, newdata = NULL, ...)
+
+\method{augment}{`_ml_model_logistic_regression`}(x, new_data = NULL, ...)
 
 \method{glance}{ml_model_logistic_regression}(x, ...)
 }
@@ -19,6 +22,8 @@
 \item{...}{extra arguments (not used.)}
 
 \item{newdata}{a tbl_spark of new data to use for prediction.}
+
+\item{new_data}{a tbl_spark of new data to use for prediction.}
 }
 \description{
 These methods summarize the results of Spark ML models into tidy forms.

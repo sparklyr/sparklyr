@@ -128,9 +128,8 @@ augment._ml_model_linear_regression <- function(x, new_data = NULL,
 
   check_newdata(... = ...)
   augment(
-    x = x$fit,
-    newdata = new_data,
-    type.residuals = c("working", "deviance", "pearson", "response"),
+    x = x$fit, newdata = new_data,
+    type.residuals = type.residuals,
     ... = ...
   )
 }
