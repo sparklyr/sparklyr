@@ -5,7 +5,9 @@
 \alias{tidy.ml_model_decision_tree_classification}
 \alias{tidy.ml_model_decision_tree_regression}
 \alias{augment.ml_model_decision_tree_classification}
+\alias{augment._ml_model_decision_tree_classification}
 \alias{augment.ml_model_decision_tree_regression}
+\alias{augment._ml_model_decision_tree_regression}
 \alias{glance.ml_model_decision_tree_classification}
 \alias{glance.ml_model_decision_tree_regression}
 \alias{tidy.ml_model_random_forest_classification}
@@ -30,7 +32,11 @@
 
 \method{augment}{ml_model_decision_tree_classification}(x, newdata = NULL, ...)
 
+\method{augment}{`_ml_model_decision_tree_classification`}(x, new_data = NULL, ...)
+
 \method{augment}{ml_model_decision_tree_regression}(x, newdata = NULL, ...)
+
+\method{augment}{`_ml_model_decision_tree_regression`}(x, new_data = NULL, ...)
 
 \method{glance}{ml_model_decision_tree_classification}(x, ...)
 

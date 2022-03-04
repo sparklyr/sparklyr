@@ -48,10 +48,7 @@ augment._ml_model_logistic_regression <- function(x, new_data = NULL,
                                                   ...) {
 
   check_newdata(... = ...)
-  augment(
-    x = x$fit, newdata = new_data,
-    ... = ...
-  )
+  augment(x = x$fit, newdata = new_data, ... = ...)
 }
 
 #' @rdname ml_logistic_regression_tidiers
