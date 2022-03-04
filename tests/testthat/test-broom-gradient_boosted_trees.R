@@ -2,6 +2,7 @@ context("broom-gradient_boosted_trees")
 
 skip_databricks_connect()
 test_that("gradient_boosted_trees.tidy() works", {
+  ## ---------------- Connection and data upload to Spark ----------------------
   library(parsnip)
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
@@ -18,7 +19,7 @@ test_that("gradient_boosted_trees.tidy() works", {
     dplyr::filter(Species != "setosa")
 
   bt_classification <- iris_two  %>%
-    ml_gradient_boosted_trees(iris_two ,Species ~ Sepal_Length + Petal_Length, seed = 123)
+    ml_gradient_boosted_trees(Species ~ Sepal_Length + Petal_Length, seed = 123)
 
   bt_regression <- iris_tbl %>%
     ml_gradient_boosted_trees(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123)
@@ -30,6 +31,8 @@ test_that("gradient_boosted_trees.tidy() works", {
   bt_regression_parsnip <- boost_tree(engine = "spark") %>%
     set_mode("regression") %>%
     fit(Sepal_Length ~ Petal_Length + Petal_Width, iris_tbl)
+
+  ## ----------------------------- tidy() --------------------------------------
 
   # for classification
   td1 <- tidy(bt_classification)
@@ -71,6 +74,8 @@ test_that("gradient_boosted_trees.tidy() works", {
     all(tidy(bt_regression_parsnip) == td2)
   )
 
+  ## --------------------------- augment() -------------------------------------
+
   iris_vars <- dplyr::tbl_vars(iris_tbl)
 
   # for classification without newdata
@@ -81,9 +86,9 @@ test_that("gradient_boosted_trees.tidy() works", {
   check_tidy(au1, exp.row = 100,  exp.name = c(iris_vars, ".predicted_label"))
 
   # parsnip test
-  # expect_true(
-  #   all(collect(augment(bt_classification_parsnip)) == au1)
-  # )
+  expect_true(
+   all(collect(augment(bt_classification_parsnip)) == au1)
+  )
 
   # for regression with newdata
   au2 <- bt_regression %>%
@@ -93,9 +98,13 @@ test_that("gradient_boosted_trees.tidy() works", {
   check_tidy(au2, exp.row = 25, exp.name = c(iris_vars, ".prediction"))
 
   # parsnip test
-  # expect_true(
-  #   all(collect(augment(bt_regression_parsnip, new_data = head(iris_tbl, 25))) == au2)
-  # )
+  ap <- augment(bt_regression_parsnip, new_data = head(iris_tbl, 25))
+
+  expect_true(
+   all(collect(ap) == au2)
+  )
+
+  ## ---------------------------- glance() -------------------------------------
 
   gl_names <- c("num_trees", "total_num_nodes", "max_depth", "impurity",
                 "step_size", "loss_type", "subsampling_rate")

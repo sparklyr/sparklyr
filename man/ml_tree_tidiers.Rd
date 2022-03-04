@@ -17,7 +17,9 @@
 \alias{tidy.ml_model_gbt_classification}
 \alias{tidy.ml_model_gbt_regression}
 \alias{augment.ml_model_gbt_classification}
+\alias{augment._ml_model_gbt_classification}
 \alias{augment.ml_model_gbt_regression}
+\alias{augment._ml_model_gbt_regression}
 \alias{glance.ml_model_gbt_classification}
 \alias{glance.ml_model_gbt_regression}
 \title{Tidying methods for Spark ML tree models}
@@ -52,7 +54,11 @@
 
 \method{augment}{ml_model_gbt_classification}(x, newdata = NULL, ...)
 
+\method{augment}{`_ml_model_gbt_classification`}(x, new_data = NULL, ...)
+
 \method{augment}{ml_model_gbt_regression}(x, newdata = NULL, ...)
+
+\method{augment}{`_ml_model_gbt_regression`}(x, new_data = NULL, ...)
 
 \method{glance}{ml_model_gbt_classification}(x, ...)
 
@@ -64,6 +70,8 @@
 \item{...}{extra arguments (not used.)}
 
 \item{newdata}{a tbl_spark of new data to use for prediction.}
+
+\item{new_data}{a tbl_spark of new data to use for prediction.}
 }
 \description{
 These methods summarize the results of Spark ML models into tidy forms.
