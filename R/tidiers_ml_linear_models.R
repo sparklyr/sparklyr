@@ -120,6 +120,22 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
 }
 
 #' @rdname ml_glm_tidiers
+#' @param new_data a tbl_spark of new data to use for prediction.
+#' @export
+augment._ml_model_linear_regression <- function(x, new_data = NULL,
+                                                type.residuals = c("working", "deviance", "pearson", "response"),
+                                                ...) {
+
+  check_newdata(... = ...)
+  augment(
+    x = x$fit,
+    newdata = new_data,
+    type.residuals = c("working", "deviance", "pearson", "response"),
+    ... = ...
+  )
+}
+
+#' @rdname ml_glm_tidiers
 #' @export
 augment.ml_model_linear_regression <- augment.ml_model_generalized_linear_regression
 
