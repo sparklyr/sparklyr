@@ -13,7 +13,9 @@
 \alias{tidy.ml_model_random_forest_classification}
 \alias{tidy.ml_model_random_forest_regression}
 \alias{augment.ml_model_random_forest_classification}
+\alias{augment._ml_model_random_forest_classification}
 \alias{augment.ml_model_random_forest_regression}
+\alias{augment._ml_model_random_forest_regression}
 \alias{glance.ml_model_random_forest_classification}
 \alias{glance.ml_model_random_forest_regression}
 \alias{tidy.ml_model_gbt_classification}
@@ -48,7 +50,11 @@
 
 \method{augment}{ml_model_random_forest_classification}(x, newdata = NULL, ...)
 
+\method{augment}{`_ml_model_random_forest_classification`}(x, new_data = NULL, ...)
+
 \method{augment}{ml_model_random_forest_regression}(x, newdata = NULL, ...)
+
+\method{augment}{`_ml_model_random_forest_regression`}(x, new_data = NULL, ...)
 
 \method{glance}{ml_model_random_forest_classification}(x, ...)
 
