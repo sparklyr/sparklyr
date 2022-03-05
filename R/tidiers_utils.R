@@ -93,6 +93,6 @@ fix_data_frame <- function(x, newnames = NULL, newcol = "term") {
 
 # Checks for newdata argument in parsnip models
 check_newdata <- function(...) {
-  if (any(names(enquos(...)) == "newdata"))
+  if (any(names(rlang::enquos(...)) == "newdata"))
     rlang::abort("Did you mean to use `new_data` instead of `newdata`?")
 }

@@ -4,6 +4,8 @@
 
 - Removes `stringr` dependency 
 
+- Fixes `augment()` when the model was fitted via `parsnip` (#3233)
+
 # Sparklyr 1.7.5
 
 ### Misc
