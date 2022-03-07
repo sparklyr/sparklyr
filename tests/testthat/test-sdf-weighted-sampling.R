@@ -22,7 +22,7 @@ sdf <- testthat_tbl(
 )
 
 sample_sz <- 20L
-num_sampling_iters <- 100L
+num_sampling_iters <- 50L
 alpha <- 0.05
 
 verify_distribution <- function(replacement) {
