@@ -69,10 +69,6 @@ test_that("multilayer_perceptron.tidy() works", {
 
   check_tidy(gl1,
     exp.row = 1,
-    exp.names = c(
-      "input_units",
-      "hidden_1_units", "hidden_2_units",
-      "output_units"
-    )
+    exp.names = c("input_units", "hidden_1_units", "hidden_2_units","output_units")
   )
 })
