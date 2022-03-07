@@ -44,13 +44,13 @@ test_that("random_forest.tidy() works", {
 
   check_tidy(td2, exp.row = 2, exp.names = c("feature", "importance"))
 
-  expect_equal(td2$importance, c(0.658, 0.342), tolerance = 0.12, scale = 1)
+  expect_equal(td2$importance, c(0.658, 0.342), tolerance = 0.2, scale = 1)
 
   # parsnip test
   expect_equal(
     tidy(rf_regression_parsnip)$importance,
     td2$importance,
-    tolerance = 0.12, scale = 1
+    tolerance = 0.2, scale = 1
   )
 
   ## --------------------------- augment() -------------------------------------
