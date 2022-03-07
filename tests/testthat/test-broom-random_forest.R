@@ -5,8 +5,6 @@ test_that("random_forest.tidy() works", {
 
   ## ---------------- Connection and data upload to Spark ----------------------
 
-  library(parsnip)
-
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
@@ -17,13 +15,13 @@ test_that("random_forest.tidy() works", {
   rf_regression <- iris_tbl %>%
     ml_random_forest(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123)
 
-  rf_classification_parsnip <- rand_forest(engine = "spark") %>%
-    set_mode("classification") %>%
-    fit(Species ~ Sepal_Length + Petal_Length, iris_tbl)
+  rf_classification_parsnip <- parsnip::rand_forest(engine = "spark") %>%
+    parsnip::set_mode("classification") %>%
+    parsnip::fit(Species ~ Sepal_Length + Petal_Length, iris_tbl)
 
-  rf_regression_parsnip <- rand_forest(engine = "spark") %>%
-    set_mode("regression") %>%
-    fit(Sepal_Length ~ Petal_Length + Petal_Width, iris_tbl)
+  rf_regression_parsnip <- parsnip::rand_forest(engine = "spark") %>%
+    parsnip::set_mode("regression") %>%
+    parsnip::fit(Sepal_Length ~ Petal_Length + Petal_Width, iris_tbl)
 
   ## ----------------------------- tidy() --------------------------------------
 

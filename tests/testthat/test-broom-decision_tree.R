@@ -5,8 +5,6 @@ test_that("decision_tree.tidy() works", {
 
   ## ---------------- Connection and data upload to Spark ----------------------
 
-  library(parsnip)
-
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
@@ -17,13 +15,13 @@ test_that("decision_tree.tidy() works", {
   dt_regression <- iris_tbl %>%
     ml_decision_tree(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123)
 
-  dt_classification_parsnip <- decision_tree(engine = "spark") %>%
-    set_mode("classification") %>%
-    fit(Species ~ Sepal_Length + Petal_Length, iris_tbl)
+  dt_classification_parsnip <- parsnip::decision_tree(engine = "spark") %>%
+    parsnip::set_mode("classification") %>%
+    parsnip::fit(Species ~ Sepal_Length + Petal_Length, iris_tbl)
 
-  dt_regression_parsnip <- decision_tree(engine = "spark") %>%
-    set_mode("regression") %>%
-    fit(Sepal_Length ~ Petal_Length + Petal_Width, iris_tbl)
+  dt_regression_parsnip <- parsnip::decision_tree(engine = "spark") %>%
+    parsnip::set_mode("regression") %>%
+    parsnip::fit(Sepal_Length ~ Petal_Length + Petal_Width, iris_tbl)
 
   ## ----------------------------- tidy() --------------------------------------
 

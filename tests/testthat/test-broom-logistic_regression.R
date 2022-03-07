@@ -5,8 +5,6 @@ skip_databricks_connect()
 test_that("logistic_regression tidiers work", {
   ## ---------------- Connection and data upload to Spark ----------------------
 
-  library(parsnip)
-
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris") %>%
