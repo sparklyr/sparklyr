@@ -50,7 +50,7 @@ test_that("random_forest.tidy() works", {
   expect_equal(
     tidy(rf_regression_parsnip)$importance,
     td2$importance,
-    tolerance = 0.1, scale = 1
+    tolerance = 0.12, scale = 1
   )
 
   ## --------------------------- augment() -------------------------------------
