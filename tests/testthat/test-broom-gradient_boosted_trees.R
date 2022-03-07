@@ -16,7 +16,7 @@ test_that("gradient_boosted_trees.tidy() works", {
   }
 
   iris_two <- iris_tbl %>%
-    dplyr::filter(Species != "setosa")
+    dplyr::filter(Species == "setosa")
 
   bt_classification <- iris_two  %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Length + Petal_Length, seed = 123)
@@ -83,7 +83,7 @@ test_that("gradient_boosted_trees.tidy() works", {
     augment() %>%
     dplyr::collect()
 
-  check_tidy(au1, exp.row = 100,  exp.name = c(iris_vars, ".predicted_label"))
+  check_tidy(au1, exp.row = 50,  exp.name = c(iris_vars, ".predicted_label"))
 
   # parsnip test
   expect_true(
