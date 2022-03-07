@@ -30,7 +30,7 @@ sdf <- testthat_tbl(
 
 sample_sz <- 20L
 sample_frac <- 0.12
-num_sampling_iters <- 100L
+num_sampling_iters <- 50L
 alpha <- 0.05
 
 verify_sample_n_results <- function(weighted, replacement) {
