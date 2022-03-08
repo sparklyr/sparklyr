@@ -42,14 +42,6 @@ jobs:
               SPARK_VERSION: '2.4.4'
               LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'openjdk8'
-          - name: 'Spark 2.4.4 (R release, openjdk8, CODE_COVERAGE=true)'
-            r: 'release'
-            env:
-              ARROW_ENABLED: 'false'
-              SPARK_VERSION: '2.4.4'
-              LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'openjdk8'
-              CODE_COVERAGE: 'true'
           - name: 'Spark 3.0.0 (R release, openjdk8)'
             r: 'release'
             env:
@@ -64,14 +56,6 @@ jobs:
               SPARK_VERSION: '3.1.1'
               LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'openjdk8'
-          - name: 'Spark 3.0.0 (R release, openjdk8, dbplyr 1.4.4)'
-            r: 'release'
-            env:
-              ARROW_ENABLED: 'false'
-              SPARK_VERSION: '3.0.0'
-              LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'openjdk8'
-              DBPLYR_VERSION: '1.4.4'
           - name: 'Spark 3.0.0 (R release, openjdk8, dbplyr API edition 1)'
             r: 'release'
             env:
@@ -80,13 +64,6 @@ jobs:
               LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'openjdk8'
               DBPLYR_API_EDITION: '1'
-          - name: 'Spark 3.0.0 (R release, openjdk11)'
-            r: 'release'
-            env:
-              ARROW_ENABLED: 'false'
-              SPARK_VERSION: '3.0.0'
-              LIVY_VERSION: 'NONE'
-              JAVA_URL: 'https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_linux_hotspot_11.0.1_13.tar.gz'
           - name: 'Livy 0.5.0 (R release, openjdk8, Spark 2.3.0)'
             r: 'release'
             env:
@@ -115,28 +92,20 @@ jobs:
               SPARK_VERSION: '2.4.0'
               LIVY_VERSION: '0.6.0'
               JAVA_VERSION: 'openjdk8'
-          - name: 'Arrow (release)'
+          - name: 'Arrow (release) Spark 3.0.0 (R release, openjdk8)'
             r: 'release'
             env:
               ARROW_ENABLED: 'true'
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
               JAVA_VERSION: 'openjdk8'
-          - name: 'Arrow (nightly)'
+          - name: 'Arrow (nightly) Spark 3.0.0 (R release, openjdk8)'
             r: 'release'
             env:
               ARROW_ENABLED: 'true'
               ARROW_VERSION: 'devel'
               SPARK_VERSION: '3.0.0'
               LIVY_VERSION: 'NONE'
-              JAVA_VERSION: 'openjdk8'
-          - name: 'Deps Devel (tidyverse, r-lib, forge)'
-            r: 'release'
-            env:
-              ARROW_ENABLED: 'false'
-              SPARK_VERSION: '3.0.0'
-              LIVY_VERSION: 'NONE'
-              R_DEVEL_PACKAGES: 'true'
               JAVA_VERSION: 'openjdk8'
     env:
       ${{ matrix.env }}
