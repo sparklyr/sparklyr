@@ -42,6 +42,16 @@ augment.ml_model_logistic_regression <- function(x, newdata = NULL,
 }
 
 #' @rdname ml_logistic_regression_tidiers
+#' @param new_data a tbl_spark of new data to use for prediction.
+#' @export
+augment._ml_model_logistic_regression <- function(x, new_data = NULL,
+                                                  ...) {
+
+  check_newdata(... = ...)
+  augment(x = x$fit, newdata = new_data, ... = ...)
+}
+
+#' @rdname ml_logistic_regression_tidiers
 #' @export
 glance.ml_model_logistic_regression <- function(x, ...) {
   elastic_net_param <- x$model$param_map$elastic_net_param

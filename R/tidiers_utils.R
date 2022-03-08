@@ -33,27 +33,28 @@ glance.ml_model <- function(x, ...) {
 #' @importFrom rlang syms
 broom_augment_supervised <- function(x, newdata = NULL, ...) {
 
-  # if the user doesn't provide a new data, this funcion will
+  # if the user doesn't provide a new data, this function will
   # use the training set
-  if (is.null(newdata)) {
-    newdata <- x$dataset
-  }
+  if (is.null(newdata)) newdata <- x$dataset
 
-  if (inherits(x, "ml_model_classification")) {
-    # for classification
-    vars <- c(dplyr::tbl_vars(newdata), "predicted_label")
+  preds <- ml_predict(x, newdata)
 
-    ml_predict(x, newdata) %>%
-      dplyr::select(!!!syms(vars)) %>%
-      dplyr::rename(.predicted_label = !!rlang::sym("predicted_label"))
+  orig_vars <- dplyr::tbl_vars(newdata)
+  preds_vars <- dplyr::tbl_vars(preds)
+
+  rd <- lapply(preds_vars, function(x) ifelse(any(x == orig_vars), "", x))
+  rd1 <- as.character(rd)[as.character(rd) != ""]
+
+  if(any(rd1 == "predicted_label")) {
+    p_name <- "predicted_label"
+    p_new <- ".predicted_label"
   } else {
-    # for regression
-    vars <- c(dplyr::tbl_vars(newdata), "prediction")
-
-    ml_predict(x, newdata) %>%
-      dplyr::select(!!!syms(vars)) %>%
-      dplyr::rename(.prediction = !!rlang::sym("prediction"))
+    p_name <- "prediction"
+    p_new <- ".prediction"
   }
+
+  preds_sel <- dplyr::select(preds, !!!syms(c(orig_vars, p_name)))
+  rename(preds_sel, !! p_new := !! p_name)
 }
 
 # copied from broom to remove dependency
@@ -88,4 +89,10 @@ fix_data_frame <- function(x, newnames = NULL, newcol = "term") {
     }
   }
   tibble::as_tibble(ret)
+}
+
+# Checks for newdata argument in parsnip models
+check_newdata <- function(...) {
+  if (any(names(rlang::enquos(...)) == "newdata"))
+    rlang::abort("Did you mean to use `new_data` instead of `newdata`?")
 }

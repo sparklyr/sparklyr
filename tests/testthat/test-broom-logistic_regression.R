@@ -1,84 +1,86 @@
 context("broom-logistic_regression")
 
 skip_databricks_connect()
-test_that("logistic_regression.tidy() works", {
+
+test_that("logistic_regression tidiers work", {
+  ## ---------------- Connection and data upload to Spark ----------------------
+
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
-  iris_tbl <- testthat_tbl("iris")
+  iris_tbl <- testthat_tbl("iris") %>%
+  #iris_tbl <- sdf_copy_to(sc, iris) %>%
+    dplyr::mutate(is_setosa = ifelse(Species == "setosa", 1, 0))
 
-  # for multiclass classification
-  td1 <- iris_tbl %>%
-    ml_logistic_regression(Species ~ Sepal_Length + Petal_Length) %>%
-    tidy()
+  # Fitting model using sparklyr api
+  lr_model <- ml_logistic_regression(iris_tbl, is_setosa ~ Sepal_Length + Petal_Length)
+
+  # Fitting model using parsnip api
+  lr_parsnip <- parsnip::logistic_reg(engine = "spark") %>%
+    parsnip::fit(is_setosa ~ Sepal_Length + Petal_Length, iris_tbl)
+
+  ## ----------------------------- tidy() --------------------------------------
+
+  td1 <- tidy(lr_model)
 
   check_tidy(td1,
-    exp.row = 3, exp.col = 4,
-    exp.names = c(
-      "features", "versicolor_coef",
-      "virginica_coef", "setosa_coef"
-    )
-  )
-  expect_equal(td1$versicolor_coef, c(15.26, -5.07, 7.7), tolerance = 0.01, scale = 1)
-
-  # for binary classification
-  td2 <- iris_tbl %>%
-    dplyr::filter(Species != "setosa") %>%
-    ml_logistic_regression(Species ~ Sepal_Length + Petal_Length) %>%
-    tidy()
-
-  check_tidy(td2,
     exp.row = 3, exp.col = 2,
     exp.names = c("features", "coefficients")
   )
-  expect_equal(td2$coefficients, c(-39.84, -4.023, 13.31), tolerance = 0.01, scale = 1)
-})
 
-test_that("logistic_regression.augment() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
+  expect_equal(
+    td1$coefficients,
+    c(7.374718, 11.633918, -26.526868),
+    tolerance = 0.01, scale = 1
+    )
+
+  # parsnip test
+  expect_true(
+    all(tidy(lr_parsnip) == td1)
+  )
+
+  ## --------------------------- augment() -------------------------------------
 
   # without newdata
-  au1 <- iris_tbl %>%
-    ml_logistic_regression(Species ~ Sepal_Length + Petal_Length) %>%
-    augment() %>%
-    dplyr::collect()
+  au1 <- collect(augment(lr_model))
 
   check_tidy(au1,
     exp.row = nrow(iris),
-    exp.name = c(
-      dplyr::tbl_vars(iris_tbl),
-      ".predicted_label"
-    )
+    exp.name = c(dplyr::tbl_vars(iris_tbl), ".prediction")
   )
 
+  # parsnip test
+  expect_true(
+    all(collect(augment(lr_parsnip)) == au1)
+  )
 
   # with newdata
-  au2 <- iris_tbl %>%
-    ml_logistic_regression(Species ~ Sepal_Length + Petal_Length) %>%
-    augment(newdata = head(iris_tbl, 25)) %>%
-    dplyr::collect()
+  au2 <- collect(augment(lr_model, newdata = iris_tbl))
 
   check_tidy(au2,
-    exp.row = 25,
-    exp.name = c(
-      dplyr::tbl_vars(iris_tbl),
-      ".predicted_label"
-    )
+             exp.row = nrow(iris),
+             exp.name = c(dplyr::tbl_vars(iris_tbl), ".prediction")
   )
-})
 
-test_that("logistic_regression.glance() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
+  # parsnip test
+  expect_true(
+    all(collect(augment(lr_parsnip, new_data = iris_tbl)) == au2)
+  )
 
-  gl1 <- iris_tbl %>%
-    ml_logistic_regression(Species ~ Sepal_Length + Petal_Length) %>%
-    glance()
+  expect_error(
+    augment(lr_parsnip, newdata = iris_tbl)
+  )
 
-  check_tidy(gl1,
+  ## ---------------------------- glance() -------------------------------------
+  gu1 <- glance(lr_model)
+
+  check_tidy(gu1,
     exp.row = 1,
     exp.names = c("elastic_net_param", "lambda")
   )
+
+  # parsnip test
+  expect_true(
+    all(glance(lr_parsnip) == gu1)
+  )
+
 })

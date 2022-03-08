@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.7.5.9000
+Version: 1.7.5.9001
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -121,6 +121,7 @@ Suggests:
     RCurl,
     reshape2,
     shiny (>= 1.0.1),
+    parsnip,
     testthat
 Encoding: UTF-8
 RoxygenNote: 7.1.2
