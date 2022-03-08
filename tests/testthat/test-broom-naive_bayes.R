@@ -25,7 +25,8 @@ test_that("naive_bayes.tidy() works", {
     )
 
   expect_equal(
-    td1$Sepal_Length, c(-0.258, -0.542, -0.612),
+    sort(td1$Sepal_Length),
+    sort(c(-0.258, -0.542, -0.612)),
     tolerance = 0.001, scale = 1
     )
 
