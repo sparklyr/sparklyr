@@ -26,18 +26,32 @@ tidy.ml_model_decision_tree_regression <- function(x,
 #' @importFrom rlang syms
 #'
 #' @export
-augment.ml_model_decision_tree_classification <- function(x, newdata = NULL,
-                                                          ...) {
+augment.ml_model_decision_tree_classification <- function(x, newdata = NULL, ...) {
   broom_augment_supervised(x, newdata = newdata)
+}
+
+#' @rdname ml_tree_tidiers
+#' @param new_data a tbl_spark of new data to use for prediction.
+#' @export
+augment._ml_model_decision_tree_classification <- function(x, new_data = NULL, ...) {
+  check_newdata(... = ...)
+  augment(x = x$fit, newdata = new_data, ... = ...)
 }
 
 #' @rdname ml_tree_tidiers
 #' @importFrom rlang syms
 #'
 #' @export
-augment.ml_model_decision_tree_regression <- function(x, newdata = NULL,
-                                                      ...) {
+augment.ml_model_decision_tree_regression <- function(x, newdata = NULL, ...) {
   broom_augment_supervised(x, newdata = newdata)
+}
+
+#' @rdname ml_tree_tidiers
+#' @param new_data a tbl_spark of new data to use for prediction.
+#' @export
+augment._ml_model_decision_tree_regression <- function(x, new_data = NULL, ...) {
+  check_newdata(... = ...)
+  augment(x = x$fit, newdata = new_data, ... = ...)
 }
 
 #' @rdname ml_tree_tidiers
@@ -87,31 +101,43 @@ tidy.ml_model_random_forest_regression <- function(x,
 #' @importFrom rlang syms
 #'
 #' @export
-augment.ml_model_random_forest_classification <- function(x, newdata = NULL,
-                                                          ...) {
+augment.ml_model_random_forest_classification <- function(x, newdata = NULL, ...) {
   broom_augment_supervised(x, newdata = newdata)
+}
+
+#' @rdname ml_tree_tidiers
+#' @param new_data a tbl_spark of new data to use for prediction.
+#' @export
+augment._ml_model_random_forest_classification <- function(x, new_data = NULL, ...) {
+  check_newdata(... = ...)
+  augment(x = x$fit, newdata = new_data, ... = ...)
 }
 
 #' @rdname ml_tree_tidiers
 #' @importFrom rlang syms
 #'
 #' @export
-augment.ml_model_random_forest_regression <- function(x, newdata = NULL,
-                                                      ...) {
+augment.ml_model_random_forest_regression <- function(x, newdata = NULL, ...) {
   broom_augment_supervised(x, newdata = newdata)
 }
 
 #' @rdname ml_tree_tidiers
+#' @param new_data a tbl_spark of new data to use for prediction.
 #' @export
-glance.ml_model_random_forest_classification <- function(x,
-                                                         ...) {
+augment._ml_model_random_forest_regression <- function(x, new_data = NULL, ...) {
+  check_newdata(... = ...)
+  augment(x = x$fit, newdata = new_data, ... = ...)
+}
+
+#' @rdname ml_tree_tidiers
+#' @export
+glance.ml_model_random_forest_classification <- function(x, ...) {
   glance_random_forest(x)
 }
 
 #' @rdname ml_tree_tidiers
 #' @export
-glance.ml_model_random_forest_regression <- function(x,
-                                                     ...) {
+glance.ml_model_random_forest_regression <- function(x, ...) {
   glance_random_forest(x)
 }
 
@@ -152,18 +178,32 @@ tidy.ml_model_gbt_regression <- function(x,
 #' @importFrom rlang syms
 #'
 #' @export
-augment.ml_model_gbt_classification <- function(x, newdata = NULL,
-                                                ...) {
+augment.ml_model_gbt_classification <- function(x, newdata = NULL, ...) {
   broom_augment_supervised(x, newdata = newdata)
+}
+
+#' @rdname ml_tree_tidiers
+#' @param new_data a tbl_spark of new data to use for prediction.
+#' @export
+augment._ml_model_gbt_classification <- function(x, new_data = NULL, ...) {
+  check_newdata(... = ...)
+  augment(x = x$fit, newdata = new_data, ... = ...)
 }
 
 #' @rdname ml_tree_tidiers
 #' @importFrom rlang syms
 #'
 #' @export
-augment.ml_model_gbt_regression <- function(x, newdata = NULL,
-                                            ...) {
+augment.ml_model_gbt_regression <- function(x, newdata = NULL, ...) {
   broom_augment_supervised(x, newdata = newdata)
+}
+
+#' @rdname ml_tree_tidiers
+#' @param new_data a tbl_spark of new data to use for prediction.
+#' @export
+augment._ml_model_gbt_regression <- function(x, new_data = NULL, ...) {
+  check_newdata(... = ...)
+  augment(x = x$fit, newdata = new_data, ... = ...)
 }
 
 #' @rdname ml_tree_tidiers

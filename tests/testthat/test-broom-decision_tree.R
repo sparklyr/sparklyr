@@ -2,90 +2,111 @@ context("broom-decision_tree")
 
 skip_databricks_connect()
 test_that("decision_tree.tidy() works", {
+
+  ## ---------------- Connection and data upload to Spark ----------------------
+
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
 
-  # for classification
-  td1 <- iris_tbl %>%
-    ml_decision_tree(Species ~ Sepal_Length + Petal_Length, seed = 123) %>%
-    tidy()
+  dt_classification <- iris_tbl %>%
+    ml_decision_tree(Species ~ Sepal_Length + Petal_Length, seed = 123)
 
-  check_tidy(td1,
-    exp.row = 2,
-    exp.names = c("feature", "importance")
-  )
+  dt_regression <- iris_tbl %>%
+    ml_decision_tree(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123)
+
+  dt_classification_parsnip <- parsnip::decision_tree(engine = "spark") %>%
+    parsnip::set_mode("classification") %>%
+    parsnip::fit(Species ~ Sepal_Length + Petal_Length, iris_tbl)
+
+  dt_regression_parsnip <- parsnip::decision_tree(engine = "spark") %>%
+    parsnip::set_mode("regression") %>%
+    parsnip::fit(Sepal_Length ~ Petal_Length + Petal_Width, iris_tbl)
+
+  ## ----------------------------- tidy() --------------------------------------
+
+  # for classification
+  td1 <- tidy(dt_classification)
+
+  check_tidy(td1, exp.row = 2, exp.names = c("feature", "importance"))
+
   expect_equal(td1$importance, c(0.94, 0.0603), tolerance = 0.001, scale = 1)
 
-  # for regression
-  td2 <- iris_tbl %>%
-    ml_decision_tree(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123) %>%
-    tidy()
-
-  check_tidy(td2,
-    exp.row = 2,
-    exp.names = c("feature", "importance")
+  # parsnip test
+  expect_true(
+    all(tidy(dt_classification_parsnip) == td1)
   )
-  expect_equal(td2$importance, c(0.954, 0.0456), tolerance = 0.001, scale = 1)
-})
 
-test_that("decision_tree.augment() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
+  # for regression
+  td2 <- tidy(dt_regression)
+
+  check_tidy(td2, exp.row = 2, exp.names = c("feature", "importance"))
+
+  expect_equal(td2$importance, c(0.954, 0.0456), tolerance = 0.001, scale = 1)
+
+  # parsnip test
+  expect_true(
+    all(tidy(dt_regression_parsnip) == td2)
+  )
+
+  ## --------------------------- augment() -------------------------------------
+
+  iris_vars <- dplyr::tbl_vars(iris_tbl)
 
   # for classification without newdata
-  au1 <- iris_tbl %>%
-    ml_decision_tree(Species ~ Sepal_Length + Petal_Length, seed = 123) %>%
-    augment() %>%
-    dplyr::collect()
+  au1 <-  collect(augment(dt_classification))
 
   check_tidy(au1,
-    exp.row = nrow(iris),
-    exp.name = c(
-      dplyr::tbl_vars(iris_tbl),
-      ".predicted_label"
-    )
-  )
+             exp.row = nrow(iris),
+             exp.name = c(iris_vars, ".predicted_label")
+             )
 
+  # parsnip test
+  expect_true(
+    all(collect(augment(dt_classification_parsnip)) == au1)
+  )
 
   # for regression with newdata
-  au2 <- iris_tbl %>%
-    ml_decision_tree(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123) %>%
-    augment(head(iris_tbl, 25)) %>%
-    dplyr::collect()
+
+  top_25 <- iris_tbl %>%
+    head(25)
+
+  au2 <-collect(augment(dt_regression, top_25))
 
   check_tidy(au2,
-    exp.row = 25,
-    exp.name = c(
-      dplyr::tbl_vars(iris_tbl),
-      ".prediction"
-    )
-  )
-})
+             exp.row = 25,
+             exp.name = c(iris_vars, ".prediction")
+             )
 
-test_that("decision_tree.glance() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
+  # parsnip test
+  expect_true(
+    all(collect(augment(dt_regression_parsnip, top_25)) == au2)
+  )
+
+  ## ---------------------------- glance() -------------------------------------
+
+  gl_names <- c("num_nodes", "depth", "impurity")
 
   # for classification
-  gl1 <- iris_tbl %>%
-    ml_decision_tree(Species ~ Sepal_Length + Petal_Length, seed = 123) %>%
-    glance()
+  gl1 <- glance(dt_classification)
 
-  check_tidy(gl1,
-    exp.row = 1,
-    exp.names = c("num_nodes", "depth", "impurity")
+  check_tidy(gl1, exp.row = 1, exp.names = gl_names)
+
+  # parsnip test
+  expect_true(
+    all(glance(dt_classification_parsnip) == gl1)
   )
 
   # for regression
-  gl2 <- iris_tbl %>%
-    ml_decision_tree(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123) %>%
-    glance()
+  gl2 <- glance(dt_regression)
 
   check_tidy(gl2,
     exp.row = 1,
-    exp.names = c("num_nodes", "depth", "impurity")
+    exp.names = gl_names
+  )
+
+  # parsnip test
+  expect_true(
+    all(glance(dt_regression_parsnip) == gl2)
   )
 })
