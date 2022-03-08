@@ -1,15 +1,21 @@
 context("broom-pca")
 
 skip_databricks_connect()
-test_that("pca.tidy() works", {
+test_that("pca tidiers work", {
+
+  ## ---------------- Connection and data upload to Spark ----------------------
+
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
 
-  td1 <- iris_tbl %>%
-    dplyr::select(-Species) %>%
-    ml_pca(k = 3) %>%
-    tidy()
+  pca_model <- iris_tbl %>%
+    select(-Species) %>%
+    ml_pca(k = 3)
+
+  ## ----------------------------- tidy() --------------------------------------
+
+  td1 <- tidy(pca_model)
 
   model <- iris %>%
     dplyr::select(-Species) %>%
@@ -20,23 +26,16 @@ test_that("pca.tidy() works", {
     exp.names = c("features", "PC1", "PC2", "PC3")
   )
 
+  ## --------------------------- augment() -------------------------------------
+
   expect_equal(td1$PC1,
     -as.vector(model$rotation[, 1]),
     tolerance = 0.001, scale = 1
   )
-})
 
-test_that("pca.augment() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
-
-
-  au1 <- iris_tbl %>%
-    dplyr::select(-Species) %>%
-    ml_pca(k = 3) %>%
+  au1 <- pca_model %>%
     augment(head(iris_tbl, 25)) %>%
-    dplyr::collect()
+    collect()
 
   check_tidy(au1,
     exp.row = 25,
@@ -45,17 +44,10 @@ test_that("pca.augment() works", {
       "PC1", "PC2", "PC3"
     )
   )
-})
 
-test_that("pca.glance() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
+  ## ---------------------------- glance() -------------------------------------
 
-  gl1 <- iris_tbl %>%
-    dplyr::select(-Species) %>%
-    ml_pca(k = 3) %>%
-    glance()
+  gl1 <- glance(pca_model)
 
   check_tidy(gl1,
     exp.row = 1,
