@@ -24,13 +24,6 @@ test_that("gradient_boosted_trees.tidy() works", {
   bt_regression <- iris_tbl %>%
     ml_gradient_boosted_trees(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123)
 
-  bt_classification_parsnip <- parsnip::boost_tree(engine = "spark") %>%
-    parsnip::set_mode("classification") %>%
-    parsnip::fit(Species ~ Sepal_Length + Petal_Length, iris_two)
-
-  bt_regression_parsnip <- parsnip::boost_tree(engine = "spark") %>%
-    parsnip::set_mode("regression") %>%
-    parsnip::fit(Sepal_Length ~ Petal_Length + Petal_Width, iris_tbl)
 
   ## ----------------------------- tidy() --------------------------------------
 
@@ -41,6 +34,7 @@ test_that("gradient_boosted_trees.tidy() works", {
     exp.row = 2,
     exp.names = c("feature", "importance")
   )
+
   if (spark_version(sc) < "3.0.0") {
     expect_equal(get_importance(td1, "Petal_Length"), 0.594, tolerance = 0.05, scale = 1)
     expect_equal(get_importance(td1, "Sepal_Length"), 0.406, tolerance = 0.05, scale = 1)
@@ -48,11 +42,6 @@ test_that("gradient_boosted_trees.tidy() works", {
     expect_equal(get_importance(td1, "Petal_Length"), 0.819, tolerance = 0.05, scale = 1)
     expect_equal(get_importance(td1, "Sepal_Length"), 0.181, tolerance = 0.05, scale = 1)
   }
-
-  # parsnip test
-  expect_true(
-    all(tidy(bt_classification_parsnip) == td1)
-  )
 
   # for regression
   td2 <- tidy(bt_regression)
@@ -69,10 +58,6 @@ test_that("gradient_boosted_trees.tidy() works", {
     expect_equal(get_importance(tbl = td2, "Petal_Width"), 0.202, tolerance = 0.001, scale = 1)
   }
 
-  # parsnip test
-  expect_true(
-    all(tidy(bt_regression_parsnip) == td2)
-  )
 
   ## --------------------------- augment() -------------------------------------
 
@@ -85,10 +70,6 @@ test_that("gradient_boosted_trees.tidy() works", {
 
   check_tidy(au1, exp.row = 50,  exp.name = c(iris_vars, ".predicted_label"))
 
-  # parsnip test
-  expect_true(
-   all(collect(augment(bt_classification_parsnip)) == au1)
-  )
 
   # for regression with newdata
   au2 <- bt_regression %>%
@@ -97,12 +78,6 @@ test_that("gradient_boosted_trees.tidy() works", {
 
   check_tidy(au2, exp.row = 25, exp.name = c(iris_vars, ".prediction"))
 
-  # parsnip test
-  ap <- augment(bt_regression_parsnip, new_data = head(iris_tbl, 25))
-
-  expect_true(
-   all(collect(ap) == au2)
-  )
 
   ## ---------------------------- glance() -------------------------------------
 
@@ -112,16 +87,38 @@ test_that("gradient_boosted_trees.tidy() works", {
   # for classification
   gl1 <- glance(bt_classification)
   check_tidy(gl1, exp.row = 1, exp.names = gl_names)
-  # parsnip test
-  expect_true(
-    all(glance(bt_classification_parsnip) == gl1)
-  )
+
 
   # for regression
   gl2 <- glance(bt_regression)
+
   check_tidy(gl2, exp.row = 1, exp.names = gl_names)
-  # parsnip test
+
+
+  skip("Preventing `parsnip` tests from running due to current bug")
+
+  bt_classification_parsnip <- parsnip::boost_tree(engine = "spark") %>%
+    parsnip::set_mode("classification") %>%
+    parsnip::fit(Species ~ Sepal_Length + Petal_Length, iris_two)
+
+  bt_regression_parsnip <- parsnip::boost_tree(engine = "spark") %>%
+    parsnip::set_mode("regression") %>%
+    parsnip::fit(Sepal_Length ~ Petal_Length + Petal_Width, iris_tbl)
+
+
+  expect_true(all(tidy(bt_classification_parsnip) == td1))
+
+  expect_true(all(tidy(bt_regression_parsnip) == td2))
+
   expect_true(
-    all(glance(bt_regression_parsnip) == gl2)
+    all(collect(augment(bt_classification_parsnip)) == au1)
   )
+
+  ap <- augment(bt_regression_parsnip, new_data = head(iris_tbl, 25))
+
+  expect_true(all(collect(ap) == au2))
+
+  expect_true(all(glance(bt_classification_parsnip) == gl1))
+
+  expect_true(all(glance(bt_regression_parsnip) == gl2))
 })
