@@ -2,21 +2,28 @@ context("broom-multilayer_perceptron")
 
 skip_databricks_connect()
 test_that("multilayer_perceptron.tidy() works", {
+
+  ## ---------------- Connection and data upload to Spark ----------------------
+
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   iris_tbl <- testthat_tbl("iris")
   partitions <- iris_tbl %>%
     sdf_random_split(train = 0.75, test = 0.25, seed = 1099)
 
-  # for multiclass classification
-  td1 <- partitions$train %>%
+  mp_model <- partitions$train %>%
     ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4, 6, 3, 3))
 
-  acc <- ml_predict(td1, partitions$test) %>%
+  # for multiclass classification
+  acc <- ml_predict(mp_model, partitions$test) %>%
     ml_multiclass_classification_evaluator(metric_name = "accuracy")
+
   expect_gt(acc, 0.94)
 
-  td1 <- td1 %>% tidy()
+  ## ----------------------------- tidy() --------------------------------------
+
+  td1 <- tidy(mp_model)
+
   check_tidy(td1,
     exp.row = 3, exp.col = 2,
     exp.names = c("layers", "weight_matrix")
@@ -41,16 +48,10 @@ test_that("multilayer_perceptron.tidy() works", {
     matrix(expected_coeffs, nrow = 4, byrow = TRUE),
     tolerance = 0.001, scale = 1
   )
-})
 
-test_that("multilayer_perceptron.augment() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
+  ## --------------------------- augment() -------------------------------------
 
-  # with newdata
-  au1 <- iris_tbl %>%
-    ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4, 3, 2, 3)) %>%
+  au1 <- mp_model %>%
     augment(head(iris_tbl, 25)) %>%
     dplyr::collect()
 
@@ -61,23 +62,13 @@ test_that("multilayer_perceptron.augment() works", {
       ".predicted_label"
     )
   )
-})
 
-test_that("multilayer_perceptron.glance() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
+  ## ---------------------------- glance() -------------------------------------
 
-  gl1 <- iris_tbl %>%
-    ml_multilayer_perceptron_classifier(Species ~ ., layers = c(4, 3, 2, 3)) %>%
-    glance()
+  gl1 <- glance(mp_model)
 
   check_tidy(gl1,
     exp.row = 1,
-    exp.names = c(
-      "input_units",
-      "hidden_1_units", "hidden_2_units",
-      "output_units"
-    )
+    exp.names = c("input_units", "hidden_1_units", "hidden_2_units","output_units")
   )
 })
