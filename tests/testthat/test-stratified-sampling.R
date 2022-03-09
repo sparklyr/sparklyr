@@ -3,7 +3,7 @@ context("stratified-sampling")
 test_requires("dplyr")
 
 sample_space_sz <- 100L
-num_zeroes <- 50L
+num_zeroes <- 10L
 num_groups <- 5L
 
 sampling_test_data <- data.frame(
