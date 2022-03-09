@@ -38,3 +38,7 @@ jobs:
           extra-packages: rcmdcheck
 
       - uses: r-lib/actions/check-r-package@v1
+
+      - name: Run Tests
+        run: testthat::test_local()
+        shell: Rscript {0}
