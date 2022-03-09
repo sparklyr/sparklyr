@@ -15,14 +15,6 @@ test_that("decision_tree.tidy() works", {
   dt_regression <- iris_tbl %>%
     ml_decision_tree(Sepal_Length ~ Petal_Length + Petal_Width, seed = 123)
 
-  dt_classification_parsnip <- parsnip::decision_tree(engine = "spark") %>%
-    parsnip::set_mode("classification") %>%
-    parsnip::fit(Species ~ Sepal_Length + Petal_Length, iris_tbl)
-
-  dt_regression_parsnip <- parsnip::decision_tree(engine = "spark") %>%
-    parsnip::set_mode("regression") %>%
-    parsnip::fit(Sepal_Length ~ Petal_Length + Petal_Width, iris_tbl)
-
   ## ----------------------------- tidy() --------------------------------------
 
   # for classification
@@ -32,10 +24,7 @@ test_that("decision_tree.tidy() works", {
 
   expect_equal(td1$importance, c(0.94, 0.0603), tolerance = 0.001, scale = 1)
 
-  # parsnip test
-  expect_true(
-    all(tidy(dt_classification_parsnip) == td1)
-  )
+
 
   # for regression
   td2 <- tidy(dt_regression)
@@ -44,10 +33,7 @@ test_that("decision_tree.tidy() works", {
 
   expect_equal(td2$importance, c(0.954, 0.0456), tolerance = 0.001, scale = 1)
 
-  # parsnip test
-  expect_true(
-    all(tidy(dt_regression_parsnip) == td2)
-  )
+
 
   ## --------------------------- augment() -------------------------------------
 
@@ -61,11 +47,6 @@ test_that("decision_tree.tidy() works", {
              exp.name = c(iris_vars, ".predicted_label")
              )
 
-  # parsnip test
-  expect_true(
-    all(collect(augment(dt_classification_parsnip)) == au1)
-  )
-
   # for regression with newdata
 
   top_25 <- iris_tbl %>%
@@ -78,10 +59,6 @@ test_that("decision_tree.tidy() works", {
              exp.name = c(iris_vars, ".prediction")
              )
 
-  # parsnip test
-  expect_true(
-    all(collect(augment(dt_regression_parsnip, top_25)) == au2)
-  )
 
   ## ---------------------------- glance() -------------------------------------
 
@@ -92,10 +69,7 @@ test_that("decision_tree.tidy() works", {
 
   check_tidy(gl1, exp.row = 1, exp.names = gl_names)
 
-  # parsnip test
-  expect_true(
-    all(glance(dt_classification_parsnip) == gl1)
-  )
+
 
   # for regression
   gl2 <- glance(dt_regression)
@@ -105,8 +79,41 @@ test_that("decision_tree.tidy() works", {
     exp.names = gl_names
   )
 
-  # parsnip test
+  skip("Preventing `parsnip` tests from running due to current bug")
+
+  dt_classification_parsnip <- parsnip::decision_tree(engine = "spark") %>%
+    parsnip::set_mode("classification") %>%
+    parsnip::fit(Species ~ Sepal_Length + Petal_Length, iris_tbl)
+
+  dt_regression_parsnip <- parsnip::decision_tree(engine = "spark") %>%
+    parsnip::set_mode("regression") %>%
+    parsnip::fit(Sepal_Length ~ Petal_Length + Petal_Width, iris_tbl)
+
+  expect_true(
+    all(collect(augment(dt_classification_parsnip)) == au1)
+  )
+
+  expect_true(
+    all(collect(augment(dt_regression_parsnip, top_25)) == au2)
+  )
+
+  expect_true(
+    all(glance(dt_classification_parsnip) == gl1)
+  )
+
   expect_true(
     all(glance(dt_regression_parsnip) == gl2)
   )
+
+  expect_true(
+    all(tidy(dt_classification_parsnip) == td1)
+  )
+
+  expect_true(
+    all(tidy(dt_regression_parsnip) == td2)
+  )
+
+
+
 })
+
