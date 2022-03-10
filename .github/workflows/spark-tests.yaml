@@ -24,7 +24,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Cache Spark
+        id: cache-spark
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/work/sparklyr/spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
+          key: spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
+
       - uses: vemonet/setup-spark@v1
+        if: steps.cache-spark.outputs.cache-hit != 'true'
         with:
           spark-version: ${{ matrix.config.spark }}
           hadoop-version: ${{ matrix.config.hadoop }}
