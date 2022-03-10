@@ -109,13 +109,25 @@ testthat_shell_connection <- function(method = "shell") {
     packages <- if (version >= "2.4.0") "avro" else NULL
     if (version >= "2.4.2") packages <- c(packages, "delta")
 
-    sc <- spark_connect(
-      master = "local",
-      method = method,
-      version = version,
-      config = config,
-      packages = packages
-    )
+    if(spark_home != "") {
+      sc <- spark_connect(
+        master = "local",
+        method = method,
+        version = version,
+        config = config,
+        packages = packages,
+        spark_home = spark_home
+      )
+    } else {
+      sc <- spark_connect(
+        master = "local",
+        method = method,
+        version = version,
+        config = config,
+        packages = packages
+      )
+    }
+
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
     test_that(paste0("Starting new Spark connection, version:", sc$home_version), NULL)
   }
@@ -307,13 +319,25 @@ testthat_livy_connection <- function() {
     config$`spark.sql.warehouse.dir` <- get_spark_warehouse_dir()
     config$`sparklyr.sdf_collect.persistence_level` <- "NONE"
 
-    sc <- spark_connect(
-      master = sprintf("http://localhost:%d", livy_service_port),
-      method = "livy",
-      config = config,
-      version = version,
-      sources = TRUE
-    )
+    if(spark_home != "") {
+      sc <- spark_connect(
+        master = sprintf("http://localhost:%d", livy_service_port),
+        method = "livy",
+        config = config,
+        version = version,
+        sources = TRUE,
+        spark_home = spark_home
+      )
+    } else {
+      sc <- spark_connect(
+        master = sprintf("http://localhost:%d", livy_service_port),
+        method = "livy",
+        config = config,
+        version = version,
+        sources = TRUE
+      )
+    }
+
 
     assign(".testthat_livy_connection", sc, envir = .GlobalEnv)
   }
