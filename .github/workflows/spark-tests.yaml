@@ -4,25 +4,30 @@ on:
   push:
     branches: gha
 
-name: R-CMD-check
+name: Spark-Tests
 
 jobs:
-  R-CMD-check:
+  Spark-Tests:
     runs-on: ${{ matrix.config.os }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }} ${{ matrix.config.spark })
 
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'release', spark: '3.0.3', hadoop: '2.7'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
     steps:
       - uses: actions/checkout@v2
+
+      - uses: vemonet/setup-spark@v1
+        with:
+          spark-version: ${{ matrix.config.spark }}
+          hadoop-version: ${{ matrix.config.hadoop }}
 
       - uses: r-lib/actions/setup-r@v1
         with:
@@ -31,11 +36,6 @@ jobs:
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v1
-
-      - uses: vemonet/setup-spark@v1
-        with:
-          spark-version: '3.1.2'
-          hadoop-version: '3.2'
 
       - name: Run Tests
         run: |
