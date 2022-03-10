@@ -50,6 +50,30 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
 
+      - name: Cache Livy 0.5.0
+        id: cache-livy-five
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/.cache/livy/livy-0.5.0
+          key: livy-0.5.0
+
+      - name: Livy 5
+        if: steps.cache-livy-five.outputs.cache-hit != 'true'
+        run: sparklyr::livy_install(version = "0.5.0", spark_home = Sys.getenv("SPARK_HOME"))
+        shell: Rscript {0}
+
+      - name: Cache Livy 0.6.0
+        id: cache-livy-six
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/.cache/livy/livy-0.6.0
+          key: livy-0.6.0
+
+      - name: Livy 6
+        if: steps.cache-livy-six.outputs.cache-hit != 'true'
+        run: sparklyr::livy_install(version = "0.6.0", spark_home = Sys.getenv("SPARK_HOME"))
+        shell: Rscript {0}
+
       - name: R Session Info
         run: sessionInfo()
         shell: Rscript {0}
@@ -74,7 +98,6 @@ jobs:
           # sc
           # sparklyr::spark_disconnect(sc)
           # Livy installation
-          sparklyr::livy_install(spark_home = Sys.getenv("SPARK_HOME"))
           sparklyr::livy_install_dir()
           sparklyr::livy_installed_versions()
         shell: Rscript {0}
