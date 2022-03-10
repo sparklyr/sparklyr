@@ -118,6 +118,7 @@ testthat_shell_connection <- function(method = "shell") {
       packages = packages
     )
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
+    test_that(paste0("Starting new Spark connection, version:", sc$home_version), NULL)
   }
 
   # retrieve spark connection
