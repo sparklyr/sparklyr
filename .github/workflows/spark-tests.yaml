@@ -67,6 +67,8 @@ jobs:
 
       - name: R Tests
         run: |
-          testthat::test_file("tests/testthat/test-broom-decision_tree.R")
+          # testthat::test_file("tests/testthat/test-broom-decision_tree.R")
           # testthat::test_local(reporter = testthat::SummaryReporter)
+          sparklyr::spark_installed_versions()
+          sparklyr::spark_version_from_home(Sys.getenv("SPARK_HOME"))
         shell: Rscript {0}
