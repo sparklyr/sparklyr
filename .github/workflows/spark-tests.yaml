@@ -65,17 +65,16 @@ jobs:
           print(t_pkgs[, c("Package", "Version")])
         shell: Rscript {0}
 
-
       - name: R Tests
         run: |
           spark_version <- sparklyr::spark_version_from_home(Sys.getenv("SPARK_HOME"))
           if(as.numeric(substr(spark_version, 1, 1)) < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
           Sys.getenv("JAVA_HOME")
-          sc <- sparklyr::spark_connect("local")
-          sc
-          sparklyr::spark_disconnect(sc)
+          # sc <- sparklyr::spark_connect("local")
+          # sc
+          # sparklyr::spark_disconnect(sc)
           # Livy installation
-          sparklyr::livy_install()
+          sparklyr::livy_install(spark_home = Sys.getenv("SPARK_HOME"))
           sparklyr::livy_install_dir()
           sparklyr::livy_installed_versions()
         shell: Rscript {0}
