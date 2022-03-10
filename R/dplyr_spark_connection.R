@@ -44,7 +44,8 @@ filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
 
   dots <- rlang::quos(...)
   dots <- partial_eval_dots(dots, sim_data = simulate_vars(.data))
-  dbplyr::add_op_single("filter", .data, dots = dots)
+  .data$lazy_query <- dbplyr:::add_filter(.data, dots)
+  .data
 }
 
 #' @export
@@ -54,7 +55,7 @@ select.tbl_spark <- function(.data, ...) {
   loc <- tidyselect::eval_select(
     rlang::expr(c(...)),
     sim_data,
-    include = dbplyr::op_grps(.data$ops)
+    include = dbplyr::op_grps(.data$lazy_query)
   )
   new_vars <- rlang::set_names(rlang::syms(names(sim_data)[loc]), names(loc))
   .class <- class(.data)
@@ -70,7 +71,6 @@ select.tbl_spark <- function(.data, ...) {
 
 #' @export
 #' @importFrom dplyr summarise
-#' @importFrom dbplyr add_op_single
 #' @importFrom dbplyr op_vars
 summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
   # NOTE: this is mostly copy-pasted from
@@ -123,12 +123,8 @@ summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
   check_summarise_vars(dots)
   check_groups(.groups)
 
-  add_op_single(
-    "summarise",
-    .data,
-    dots = dots,
-    args = list(.groups = .groups, env_caller = rlang::caller_env())
-  )
+  .data$lazy_query <- dbplyr:::add_summarise(.data, dots, .groups = .groups, env_caller = rlang::caller_env())
+  .data
 }
 
 #' @export

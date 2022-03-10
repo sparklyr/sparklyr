@@ -1,12 +1,14 @@
 ft_extract_sql <- function(x) {
   get_base_name <- function(o) {
-    if (!inherits(o$x, "ident")) {
-      get_base_name(o$x)
+    # TODO
+    xx <- o$from %||% o$x
+    if (!inherits(xx, "ident")) {
+      get_base_name(xx)
     } else {
-      o$x
+      xx
     }
   }
-  pattern <- paste0("\\b", get_base_name(x$ops), "\\b")
+  pattern <- paste0("\\b", get_base_name(x$lazy_query), "\\b")
 
   gsub(pattern, "__THIS__", dbplyr::sql_render(x))
 }

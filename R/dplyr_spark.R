@@ -99,11 +99,11 @@ spark_tbl_sql <- function(src, from, ...) {
   tbl_spark <- tbl_sql("spark", src = src, from = process_tbl_name(from), ...)
 
   tbl_spark$sdf_cache_state <- new.env(parent = emptyenv())
-  tbl_spark$sdf_cache_state$ops <- NULL
+  tbl_spark$sdf_cache_state$lazy_query <- NULL
   tbl_spark$sdf_cache_state$spark_dataframe <- NULL
   tbl_spark$spark_dataframe <- function(self, spark_dataframe_impl) {
-    if (!identical(self$sdf_cache_state$ops, self$ops)) {
-      self$sdf_cache_state$ops <- self$ops
+    if (!identical(self$sdf_cache_state$lazy_query, self$lazy_query)) {
+      self$sdf_cache_state$lazy_query <- self$lazy_query
       self$sdf_cache_state$spark_dataframe <- spark_dataframe_impl(self)
     }
 
@@ -111,15 +111,15 @@ spark_tbl_sql <- function(src, from, ...) {
   }
 
   tbl_spark$schema_cache_state <- new.env(parent = emptyenv())
-  tbl_spark$schema_cache_state$ops <- NULL
+  tbl_spark$schema_cache_state$lazy_query <- NULL
   tbl_spark$schema_cache_state$schema <- as.list(rep(NA, 4L))
   tbl_spark$schema <- function(self, schema_impl, expand_nested_cols, expand_struct_cols) {
     cache_index <- (
       as.integer(expand_nested_cols) * 2L + as.integer(expand_struct_cols) + 1L
     )
-    if (!identical(self$schema_cache_state$ops, self$ops) ||
-      is.na(self$schema_cache_state$schema[[cache_index]])) {
-      self$schema_cache_state$ops <- self$ops
+    if (!identical(self$schema_cache_state$lazy_query, self$lazy_query) ||
+      is.na(self$schema_cache_state$schema[[cache_index]])[[1]]) {
+      self$schema_cache_state$lazy_query <- self$lazy_query
       self$schema_cache_state$schema[[cache_index]] <- schema_impl(
         self,
         expand_nested_cols = expand_nested_cols,
@@ -307,26 +307,42 @@ sdf_remote_name <- function(x) {
   UseMethod("sdf_remote_name")
 }
 
+#' @export
 sdf_remote_name.tbl_spark <- function(x) {
-  sdf_remote_name(x$ops)
+  sdf_remote_name(x$lazy_query)
 }
 
-sdf_remote_name.op_base <- function(x) {
+#' @export
+sdf_remote_name.lazy_query <- function(x) {
+  if (!(is.null(x$where) && is.null(x$group_by) && is.null(x$order_by) &&
+      isFALSE(x$distinct) && is.null(x$limit))) {
+    return()
+  }
+
+  sdf_remote_name(x$from)
+}
+
+#' @export
+sdf_remote_name.lazy_query_base <- function(x) {
   x$x
 }
 
+#' @export
 sdf_remote_name.op_group_by <- function(x) {
   sdf_remote_name(x$x)
 }
 
+#' @export
 sdf_remote_name.op_ungroup <- function(x) {
   sdf_remote_name(x$x)
 }
 
+#' @export
 sdf_remote_name.op_order <- function(x) {
   sdf_remote_name(x$x)
 }
 
+#' @export
 sdf_remote_name.default <- function(x) {
   return()
 }

@@ -15,7 +15,7 @@ nest_vars <- function(.data, dots, all_vars) {
 
     if (any(used_vars %in% new_vars)) {
       new_actions <- dots[rlang::seq2(init, length(dots))][new_vars]
-      .data$ops <- op_select(.data$ops, carry_over(union(all_vars, used_vars), new_actions))
+      .data$lazy_query <- dbplyr:::add_select(.data, carry_over(union(all_vars, used_vars), new_actions), "mutate")
       all_vars <- c(all_vars, setdiff(new_vars, all_vars))
       new_vars <- cur_var
       init <- i
@@ -27,7 +27,7 @@ nest_vars <- function(.data, dots, all_vars) {
   if (init != 0L) {
     dots <- dots[-rlang::seq2(1L, init - 1)]
   }
-  .data$ops <- op_select(.data$ops, carry_over(all_vars, dots))
+  .data$lazy_query <- dbplyr:::add_select(.data, carry_over(all_vars, dots), "mutate")
   .data
 }
 

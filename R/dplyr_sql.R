@@ -4,6 +4,29 @@
 #' @include utils.R
 NULL
 
+lazy_sample_query <- function(from, frac, args) {
+  structure(
+    list(
+      from = from,
+      args = args,
+      frac = frac
+    ),
+    class = c("lazy_sample_query", "lazy_query")
+  )
+}
+
+#' @export
+op_vars.lazy_sample_query <- function(op) {
+  op_vars(op$from)
+}
+
+#' @importFrom dbplyr op_grps
+#' @export
+op_grps.lazy_sample_query <- function(op) {
+  op_grps(op$from)
+}
+
+
 #' @export
 #' @importFrom dbplyr sql_build
 sql_build.op_sample_n <- function(op, con, ...) {
@@ -24,10 +47,12 @@ sql_build.op_sample_frac <- function(op, con, ...) {
   }
 }
 
-sql_build.op_sample <- function(op, con, frac) {
-  grps <- dbplyr::op_grps(op)
-  sdf <- to_sdf(op, con)
+#' @export
+sql_build.lazy_sample_query <- function(op, con, ...) {
+  grps <- dbplyr::op_grps(op$from)
+  sdf <- to_sdf(op$from, con)
   cols <- colnames(sdf)
+  frac <- op$frac
 
   sample_sdf <- (
     if (length(grps) > 0) {
@@ -159,7 +184,27 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
       .distinct_cols = distinct_cols
     )
 
-    add_op_single("tbl_spark_distinct", .data, args = args)
+    if (.keep_all) {
+      out_cols <- all_cols
+    } else {
+      out_cols <- distinct_cols
+    }
+
+    exprs <- lapply(
+      purrr::set_names(c(row_num, out_cols)),
+      function(x) rlang::expr(FIRST(!!sym(x), FALSE))
+    )
+
+    grps <- group_vars(.data)
+    out <- .data %>%
+      group_by(!!!syms(distinct_cols)) %>%
+      summarise(!!!exprs) %>%
+      select(all_of(out_cols)) %>%
+      arrange(!!sym(row_num)) %>%
+      group_by(!!!syms(grps))
+    # browser()
+    out$order_vars <- NULL
+    out
   }
 }
 
@@ -212,7 +257,8 @@ to_sdf <- function(op, con) {
     con,
     dbplyr::select_query(
       from = dbplyr::sql(
-        dbplyr::sql_render(dbplyr::sql_build(op$x, con = con), con = con),
+        # TODO
+        dbplyr::sql_render(dbplyr::sql_build(op$x %||% op$from, con = con), con = con),
         con = con
       ),
       select = dbplyr::build_sql("*", con = con)
