@@ -217,7 +217,13 @@ wait_for_svc <- function(svc_name, port, timeout_s) {
 }
 
 testthat_livy_connection <- function() {
-  version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
+  spark_home <- Sys.getenv("SPARK_HOME")
+  if(spark_home != "") {
+    version <- spark_version_from_home(spark_home)
+  } else {
+    version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
+  }
+
   livy_version <- Sys.getenv("LIVY_VERSION", "0.5.0")
 
   if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {

@@ -49,9 +49,23 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
 
-      - name: Run Tests
+      - name: R Session Info
+        run: sessionInfo()
+        shell: Rscript {0}
+
+      - name: R Environment Variables
+        run: Sys.getenv()
+        shell: Rscript {0}
+
+      - name: R Installed Packages
         run: |
-          utils::sessionInfo()
+          m_pkgs <- installed.packages()
+          t_pkgs <- as.data.frame(m_pkgs, row.names = FALSE)
+          print(t_pkgs[, c("Package", "Version")])
+        shell: Rscript {0}
+
+      - name: R Tests
+        run: |
           testthat::test_file("tests/testthat/test-broom-decision_tree.R")
           # testthat::test_local(reporter = testthat::SummaryReporter)
         shell: Rscript {0}
