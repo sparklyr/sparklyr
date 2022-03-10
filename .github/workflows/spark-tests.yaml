@@ -10,18 +10,21 @@ jobs:
   Spark-Tests:
     runs-on: ${{ matrix.config.os }}
 
-    name: Spark ${{ matrix.config.spark }} R ${{ matrix.config.r }} OS ${{ matrix.config.os }}
+    name: Spark ${{ matrix.config.spark }} Livy {{ matrix.config.livy }}
 
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {spark: '3.1.3', hadoop: '3.2', os: ubuntu-latest, r: 'release'}
-          - {spark: '3.0.3', hadoop: '2.7', os: ubuntu-latest, r: 'release'}
+          - {spark: '3.1.3', hadoop: '3.2', livy: 'NONE',  os: ubuntu-latest, r: 'release'}
+          - {spark: '3.0.3', hadoop: '2.7', livy: 'NONE',  os: ubuntu-latest, r: 'release'}
+          - {spark: '2.4.0', hadoop: '2.7', livy: 'NONE',  os: ubuntu-latest, r: 'release'}
+          - {spark: '2.4.0', hadoop: '2.7', livy: '0.6.0', os: ubuntu-latest, r: 'release'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       SPARK_HOME: /home/runner/work/sparklyr/spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
+      LIVY_VERSION: {{ matrix.config.livy }}
 
     steps:
       - uses: actions/checkout@v2
