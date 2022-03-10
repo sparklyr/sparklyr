@@ -20,6 +20,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      SPARK_HOME: /home/runner/work/sparklyr/spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
 
     steps:
       - uses: actions/checkout@v2
