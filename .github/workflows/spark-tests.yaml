@@ -10,7 +10,7 @@ jobs:
   Spark-Tests:
     runs-on: ${{ matrix.config.os }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }} ${{ matrix.config.spark })
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }} ${{ matrix.config.spark }})
 
     strategy:
       fail-fast: false
