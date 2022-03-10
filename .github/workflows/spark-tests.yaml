@@ -48,5 +48,5 @@ jobs:
 
       - name: Run Tests
         run: |
-          testthat::test_file("tests/testthat/test-broom-decision_tree.R")
+          testthat::test_local(reporter = SummaryReporter)
         shell: Rscript {0}
