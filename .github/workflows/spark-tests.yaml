@@ -47,7 +47,5 @@ jobs:
 
       - name: Run Tests
         run: |
-          sc <- sparklyr::spark_connect("local")
-          print(sc)
-          sparklyr::spark_disconnect(sc)
+          testthat::test_file("tests/testthat/test-broom-decision_tree.R")
         shell: Rscript {0}

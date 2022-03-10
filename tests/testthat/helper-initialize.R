@@ -50,7 +50,13 @@ testthat_spark_connection <- function() {
 testthat_latest_spark <- function() get(".testthat_latest_spark", envir = .GlobalEnv)
 
 testthat_shell_connection <- function(method = "shell") {
-  version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
+  spark_home <- Sys.getenv("SPARK_HOME")
+  if(spark_home != "") {
+    version <- spark_version_from_home(spark_home)
+  } else {
+    version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
+  }
+
 
   if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
     spark_disconnect_all()
