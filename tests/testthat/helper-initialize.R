@@ -55,29 +55,28 @@ testthat_shell_connection <- function(method = "shell") {
     version <- spark_version_from_home(spark_home)
   } else {
     version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
+
+    if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
+      spark_disconnect_all()
+      Sys.sleep(3)
+      livy_service_stop()
+      remove(".testthat_livy_connection", envir = .GlobalEnv)
+    }
+
+    spark_installed <- spark_installed_versions()
+    if (!is.null(version) && version == "master") {
+      assign(".test_on_spark_master", TRUE, envir = .GlobalEnv)
+      spark_installed <- spark_installed[with(spark_installed, order(spark, decreasing = TRUE)), ]
+      version <- spark_installed[1, ]$spark
+    }
+
+    if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
+      options(sparkinstall.verbose = TRUE)
+      spark_install(version)
+    }
+
+    stopifnot(nrow(spark_installed_versions()) > 0)
   }
-
-
-  if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
-    spark_disconnect_all()
-    Sys.sleep(3)
-    livy_service_stop()
-    remove(".testthat_livy_connection", envir = .GlobalEnv)
-  }
-
-  spark_installed <- spark_installed_versions()
-  if (!is.null(version) && version == "master") {
-    assign(".test_on_spark_master", TRUE, envir = .GlobalEnv)
-    spark_installed <- spark_installed[with(spark_installed, order(spark, decreasing = TRUE)), ]
-    version <- spark_installed[1, ]$spark
-  }
-
-  if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
-    options(sparkinstall.verbose = TRUE)
-    spark_install(version)
-  }
-
-  stopifnot(nrow(spark_installed_versions()) > 0)
 
   # generate connection if none yet exists
   connected <- FALSE
@@ -218,24 +217,25 @@ wait_for_svc <- function(svc_name, port, timeout_s) {
 
 testthat_livy_connection <- function() {
   spark_home <- Sys.getenv("SPARK_HOME")
+
   if(spark_home != "") {
     version <- spark_version_from_home(spark_home)
   } else {
     version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
+
+    if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
+      spark_disconnect_all()
+      remove(".testthat_spark_connection", envir = .GlobalEnv)
+      Sys.sleep(3)
+    }
+
+    spark_installed <- spark_installed_versions()
+    if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
+      spark_install(version)
+    }
   }
 
   livy_version <- Sys.getenv("LIVY_VERSION", "0.5.0")
-
-  if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
-    spark_disconnect_all()
-    remove(".testthat_spark_connection", envir = .GlobalEnv)
-    Sys.sleep(3)
-  }
-
-  spark_installed <- spark_installed_versions()
-  if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
-    spark_install(version)
-  }
 
   if (nrow(livy_installed_versions()) == 0) {
     cat("Installing Livy.")
