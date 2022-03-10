@@ -48,5 +48,5 @@ jobs:
 
       - name: Run Tests
         run: |
-          testthat::test_local(reporter = SummaryReporter)
+          testthat::test_local(reporter = testthat::SummaryReporter)
         shell: Rscript {0}
