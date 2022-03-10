@@ -71,4 +71,7 @@ jobs:
           # testthat::test_local(reporter = testthat::SummaryReporter)
           sparklyr::spark_installed_versions()
           sparklyr::spark_version_from_home(Sys.getenv("SPARK_HOME"))
+          sc <- spark_connect("local")
+          sc
+          spark_disconnect(sc)
         shell: Rscript {0}
