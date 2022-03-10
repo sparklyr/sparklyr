@@ -65,13 +65,19 @@ jobs:
           print(t_pkgs[, c("Package", "Version")])
         shell: Rscript {0}
 
+
       - name: R Tests
         run: |
+          spark_version <- sparklyr::spark_version_from_home(Sys.getenv("SPARK_HOME"))
+          if(as.numeric(spark_version) < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
+          Sys.getenv("JAVA_HOME")
           # testthat::test_file("tests/testthat/test-broom-decision_tree.R")
           # testthat::test_local(reporter = testthat::SummaryReporter)
-          sparklyr::spark_installed_versions()
-          sparklyr::spark_version_from_home(Sys.getenv("SPARK_HOME"))
           sc <- sparklyr::spark_connect("local")
           sc
           sparklyr::spark_disconnect(sc)
+          # Livy installation
+          sparklyr::livy_install()
+          sparklyr::livy_install_dir()
+          sparklyr::livy_installed_versions()
         shell: Rscript {0}
