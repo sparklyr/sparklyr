@@ -10,7 +10,7 @@ jobs:
   Spark-Tests:
     runs-on: ${{ matrix.config.os }}
 
-    name: Spark ${{ matrix.config.spark }} Livy {{ matrix.config.livy }}
+    name: Spark ${{ matrix.config.spark }} Livy ${{ matrix.config.livy }}
 
     strategy:
       fail-fast: false
@@ -24,7 +24,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       SPARK_HOME: /home/runner/work/sparklyr/spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
-      LIVY_VERSION: {{ matrix.config.livy }}
+      LIVY_VERSION: ${{ matrix.config.livy }}
 
     steps:
       - uses: actions/checkout@v2
