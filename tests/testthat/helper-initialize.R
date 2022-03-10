@@ -1,8 +1,12 @@
-library(sparklyr)
-library(dplyr)
+
+print("Loading sparklyr...")
+suppressPackageStartupMessages(library(sparklyr))
+print("Loading dplyr...")
+suppressPackageStartupMessages(library(dplyr))
 
 if (isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))) {
-  library(arrow)
+  print("Loading arrow...")
+  suppressPackageStartupMessages(library(arrow))
 }
 
 get_spark_warehouse_dir <- function() {
