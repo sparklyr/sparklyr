@@ -71,13 +71,26 @@ jobs:
         id: cache-spark-three-zero
         uses: actions/cache@v2
         with:
-          path: /home/runner/spark/spark-3.0.0-bin-hadoop3.2
+          path: /home/runner/spark/spark-3.0.3-bin-hadoop3.2
           key: spark-3-0
 
       - name: Spark 3.0
         if: steps.cache-spark-three-zero.outputs.cache-hit != 'true'
         run: sparklyr::spark_install(version = "3.0")
         shell: Rscript {0}
+
+      - name: Cache Spark 2.4
+        id: cache-spark-two-four
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/spark/spark-2.4.8-bin-hadoop2.7
+          key: spark-2-4
+
+      - name: Spark 2.4
+        if: steps.cache-spark-two-four.outputs.cache-hit != 'true'
+        run: sparklyr::spark_install(version = "2.4")
+        shell: Rscript {0}
+
 
       - name: Cache Livy 0.5.0
         id: cache-livy-five
