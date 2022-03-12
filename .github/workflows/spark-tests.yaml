@@ -17,9 +17,10 @@ jobs:
       matrix:
         config:
           - {spark: '3.1.2', hadoop: '3.2', arrow: 'true',  livy: 'NONE',  r: 'release'}
-          - {spark: '3.0.0', hadoop: '3.2', arrow: 'true',  livy: 'NONE',  r: 'release'}
-          - {spark: '2.4.8', hadoop: '2.7', arrow: 'true',  livy: 'NONE',  r: 'release'}
-          - {spark: '2.2.1', hadoop: '2.7', arrow: 'true',  livy: 'NONE',  r: 'release'}
+          - {spark: '3.0.0', hadoop: '3.2', arrow: 'false', livy: 'NONE',  r: 'release'}
+          - {spark: '2.4.8', hadoop: '2.7', arrow: 'false', livy: 'NONE',  r: 'release'}
+          - {spark: '2.4.8', hadoop: '2.7', arrow: 'false', livy: '0.6.0', r: 'release'}
+          - {spark: '2.2.1', hadoop: '2.7', arrow: 'false', livy: 'NONE',  r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
