@@ -57,16 +57,16 @@ jobs:
         shell: Rscript {0}
 
       - name: Cache Livy
-        if: ${{ matrix.config.spark }} != 'NONE'
+        if: ${{ matrix.config.livy }} != 'NONE'
         id: cache-livy
         uses: actions/cache@v2
         with:
-          path: /home/runner/.cache/livy/livy-${{ matrix.config.spark }}
+          path: /home/runner/.cache/livy/livy-${{ matrix.config.livy }}
           key: livy-${{ matrix.config.livy }}
 
       - name: Install Livy (via sparklyr)
-        if: steps.cache-livy-five.outputs.cache-hit != 'true' && ${{ matrix.config.spark }} != 'NONE'
-        run: sparklyr::livy_install(version = Sys.getenv("LIVY_VERSION"))
+        if: steps.cache-livy-five.outputs.cache-hit != 'true' && ${{ matrix.config.livy }} != 'NONE'
+        run: sparklyr::livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
         shell: Rscript {0}
 
       - name: R Session Info
