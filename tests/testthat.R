@@ -127,7 +127,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   suppressPackageStartupMessages(library(dplyr))
   suppressPackageStartupMessages(library(testthat))
 
-  Sys.setenv("TESTTHAT_FILTER" = "^dummy$")
+  #Sys.setenv("TESTTHAT_FILTER" = "^dummy$")
 
   testthat_filter <- Sys.getenv("TESTTHAT_FILTER")
   arrow_enabled <- isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))

@@ -26,6 +26,7 @@ jobs:
       SPARK_HOME: /home/runner/work/sparklyr/spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
       LIVY_VERSION: ${{ matrix.config.livy }}
       ARROW_ENABLED: ${{ matrix.config.arrow }}
+      TESTTHAT_FILTER: '^broom.*'
 
     steps:
       - uses: actions/checkout@v2
@@ -74,6 +75,10 @@ jobs:
         run: sparklyr::livy_install(version = "0.6.0", spark_home = Sys.getenv("SPARK_HOME"))
         shell: Rscript {0}
 
+      - name: Install package
+        run: devtools::install()
+        shell: Rscript {0}
+
       - name: R Session Info
         run: sessionInfo()
         shell: Rscript {0}
@@ -83,10 +88,7 @@ jobs:
         shell: Rscript {0}
 
       - name: R Installed Packages
-        run: |
-          m_pkgs <- installed.packages()
-          t_pkgs <- as.data.frame(m_pkgs, row.names = FALSE)
-          print(t_pkgs[, c("Package", "Version")])
+        run: devtools::install()
         shell: Rscript {0}
 
       - name: R Tests
