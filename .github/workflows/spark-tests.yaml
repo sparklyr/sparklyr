@@ -17,7 +17,7 @@ jobs:
       matrix:
         config:
           - {spark: '3.1.2', hadoop: '3.2', arrow: 'true',  livy: 'NONE',  r: 'release'}
-          - {spark: '3.0.3', hadoop: '3.2', arrow: 'true',  livy: 'NONE',  r: 'release'}
+          - {spark: '3.0.0', hadoop: '3.2', arrow: 'true',  livy: 'NONE',  r: 'release'}
           - {spark: '2.4.8', hadoop: '2.7', arrow: 'true',  livy: 'NONE',  r: 'release'}
           - {spark: '2.2.1', hadoop: '2.7', arrow: 'true',  livy: 'NONE',  r: 'release'}
 
@@ -85,15 +85,11 @@ jobs:
           print(t_pkgs[, c("Package", "Version")])
         shell: Rscript {0}
 
-      - name: Check Java home
+      - name: R Tests
         run: |
           spark_major <- as.numeric(substr(Sys.getenv("SPARK_VERSION"), 1, 1))
           if(spark_major < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
           Sys.getenv("JAVA_HOME")
-        shell: Rscript {0}
-
-      - name: R Tests
-        run: |
           setwd("tests")
           source("testthat.R")
         shell: Rscript {0}
