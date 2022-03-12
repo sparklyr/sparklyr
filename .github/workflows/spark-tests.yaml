@@ -50,6 +50,8 @@ jobs:
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::devtools
 
       - name: Cache Livy 0.5.0
         id: cache-livy-five
