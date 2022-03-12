@@ -55,8 +55,28 @@ jobs:
         run: devtools::install()
         shell: Rscript {0}
 
+      - name: Cache Spark 3.1
+        id: cache-spark-three-one
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/spark/spark-3.1.2-bin-hadoop3.2
+          key: spark-3-1
+
       - name: Spark 3.1
+        if: steps.cache-spark-three-one.outputs.cache-hit != 'true'
         run: sparklyr::spark_install(version = "3.1")
+        shell: Rscript {0}
+
+      - name: Cache Spark 3.0
+        id: cache-spark-three-zero
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/spark/spark-3.0.0-bin-hadoop3.2
+          key: spark-3-0
+
+      - name: Spark 3.0
+        if: steps.cache-spark-three-zero.outputs.cache-hit != 'true'
+        run: sparklyr::spark_install(version = "3.0")
         shell: Rscript {0}
 
       - name: Cache Livy 0.5.0
