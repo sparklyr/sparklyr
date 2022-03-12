@@ -65,7 +65,7 @@ jobs:
           key: livy-${{ matrix.config.livy }}
 
       - name: Install Livy (via sparklyr)
-        if: steps.cache-livy-five.outputs.cache-hit != 'true' && ${{ matrix.config.livy }} != 'NONE'
+        if: ${{ (steps.cache-livy.outputs.cache-hit != 'true') && (matrix.config.livy != 'NONE') }}
         run: sparklyr::livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
         shell: Rscript {0}
 
