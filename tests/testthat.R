@@ -213,8 +213,8 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
 
   run_tests <- function(test_filter) {
     on.exit({
-      # spark_disconnect_all(terminate = TRUE)
-      # tryCatch(livy_service_stop(), error = function(e) {})
+      spark_disconnect_all(terminate = TRUE)
+      tryCatch(livy_service_stop(), error = function(e) {})
       # Sys.sleep(30)
       # remove(".testthat_spark_connection", envir = .GlobalEnv)
       # remove(".testthat_livy_connection", envir = .GlobalEnv)
