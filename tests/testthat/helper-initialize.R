@@ -122,8 +122,6 @@ testthat_shell_connection <- function(method = "shell") {
     if(spark_home != "") {
       sc <- spark_connect(
         master = "local",
-        method = method,
-        version = version,
         config = config,
         packages = packages,
         spark_home = spark_home
@@ -333,7 +331,6 @@ testthat_livy_connection <- function() {
         master = sprintf("http://localhost:%d", livy_service_port),
         method = "livy",
         config = config,
-        version = version,
         sources = TRUE,
         spark_home = spark_home
       )
