@@ -53,7 +53,7 @@ jobs:
 
       - name: Spark install (via sparklyr)
         if: steps.cache-spark.cache-hit != 'true'
-        run: sparklyr::spark_install(version = Sys.getenv("SPARK_HOME"))
+        run: sparklyr::spark_install(version = Sys.getenv("SPARK_VERSION"))
         shell: Rscript {0}
 
       - name: Cache Livy 0.5.0
