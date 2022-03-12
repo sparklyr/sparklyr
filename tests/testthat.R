@@ -1,17 +1,8 @@
-Sys.setenv("R_TESTS" = "")
+#Sys.setenv("R_TESTS" = "")
 
 if (identical(Sys.getenv("DBPLYR_API_EDITION"), "1")) {
   options(sparklyr.dbplyr.edition = 1L)
 }
-
-# timeout for downloading Spark/Livy releases
-options(timeout = 3600)
-
-options(sparklyr.connect.timeout = 300)
-options(livy.session.start.timeout = 300)
-
-library(testthat)
-library(sparklyr)
 
 PerformanceReporter <- R6::R6Class("PerformanceReporter",
   inherit = Reporter,
@@ -30,9 +21,28 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
     n_fail = 0,
     failures = c(),
 
-    start_context = function(context) {
-      private$print_last_test()
+    line = function(...) cat(paste0("\n", ...), file = self$out),
 
+    initialize = function(file = getOption("testthat.output_file", stdout())) {
+      if (is.character(file)) {
+        file <- normalizePath(file, mustWork = FALSE)
+      }
+      self$out <- file
+      if (is.character(self$out) && file.exists(self$out)) {
+        # If writing to a file, overwrite it if it exists
+        file.remove(self$out)
+      }
+
+      # Capture at init so not affected by test settings
+      self$width <- cli::console_width()
+      self$unicode <- cli::is_utf8_output()
+      self$crayon <- crayon::has_color()
+
+      testthat_msg <- Sys.getenv("TESTTHAT_MSG")
+      if(testthat_msg != "") self$line(testthat_msg)
+    },
+
+    start_context = function(context) {
       self$last_context <- context
       self$last_time <- Sys.time()
     },
@@ -40,7 +50,6 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
     add_result = function(context, test, result) {
       elapsed_time <- as.numeric(Sys.time()) - as.numeric(self$last_time)
 
-      print_message <- TRUE
       is_error <- inherits(result, "expectation_failure") ||
         inherits(result, "expectation_error")
 
@@ -52,17 +61,7 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
       } else if (inherits(result, "expectation_warning")) {
         self$n_warn <- self$n_warn + 1
       } else {
-        print_message <- FALSE
         self$n_ok <- self$n_ok + 1
-      }
-
-      if (print_message) {
-        try({
-          cat(
-            paste0(test, ": ", private$expectation_type(result), ": ", result$message),
-            "\n"
-          )
-        })
       }
 
       if (identical(self$last_test, test)) {
@@ -71,8 +70,6 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
         self$last_test_time <- elapsed_time
       }
       else {
-        private$print_last_test()
-
         self$results$context[length(self$results$context) + 1] <- self$last_context
         self$results$time[length(self$results$time) + 1] <- elapsed_time
         self$last_test_time <- elapsed_time
@@ -83,8 +80,6 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
     },
 
     end_reporter = function() {
-      private$print_last_test()
-
       cat("\n")
       data <- data.frame(
         context = self$results$context,
@@ -121,22 +116,6 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
       }
       cat("\n")
     }
-  ),
-  private = list(
-    print_last_test = function() {
-      try({
-        if (!is.na(self$last_test) &&
-          length(self$last_test) > 0 &&
-          length(self$last_test_time) > 0) {
-          cat(paste0(self$last_test, ": ", self$last_test_time, "\n"))
-        }
-      })
-      self$last_test <- NA_character_
-    },
-    expectation_type = function(exp) {
-      stopifnot(is.expectation(exp))
-      gsub("^expectation_", "", class(exp)[[1]])
-    }
   )
 )
 
@@ -144,25 +123,72 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   # enforce all configuration settings are described
   options(sparklyr.test.enforce.config = TRUE)
 
-  livy_version <- Sys.getenv("LIVY_VERSION")
-  is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
+  suppressPackageStartupMessages(library(sparklyr))
+  suppressPackageStartupMessages(library(dplyr))
+  suppressPackageStartupMessages(library(testthat))
 
-  if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
-    test_cases <- list(
-      "^spark-apply$",
-      "^spark-apply-bundle$",
-      "^spark-apply-ext$",
-      "^dbi$",
-      "^ml-clustering-kmeans$",
-      "^livy-config$",
-      "^livy-proxy$",
-      "^dplyr$",
-      "^dplyr-join$",
-      "^dplyr-stats$",
-      "^dplyr-sample.*$",
-      "^dplyr-weighted-mean$"
+  Sys.setenv("TESTTHAT_FILTER" = "^dummy$")
+
+  testthat_filter <- Sys.getenv("TESTTHAT_FILTER")
+  arrow_enabled <- isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))
+  is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
+  livy_version <- Sys.getenv("LIVY_VERSION")
+  is_livy <- nchar(livy_version) > 0 && !identical(livy_version, "NONE")
+
+  if(is_arrow_devel && !arrow_enabled)
+    stop("Arrow Devel requested, but tests not enabled, change ARROW_ENABLED to 'true'")
+
+  if(arrow_enabled && is_livy)
+    stop("Arrow and Livy are separate test sets. Disable one of them.")
+
+  sm <- NULL
+
+  if(is_livy) {
+    sm <- c(sm, paste0("Livy tests enabled, version ", livy_version))
+  } else {
+    sm <- c(sm, paste0("Spark shell tests only (no Livy)"))
+  }
+
+  if(arrow_enabled) {
+    if(is_arrow_devel) {
+      sm <- c(sm, "Arrow enabled tests with devel version")
+    } else {
+      sm <- c(sm, "Arrow enabled tests")
+    }
+    suppressPackageStartupMessages(library(arrow))
+  } else {
+    if(!is_livy) sm <- c(sm, "Arrow disabled")
+  }
+
+  if(testthat_filter != "") {
+    sm <- c(sm, paste0("Test filter from environment variable: ", testthat_filter))
+  }
+
+  single_sm <- paste0(paste(">> ", sm, collapse = "\n"), "\n\n")
+  Sys.setenv("TESTTHAT_MSG" = single_sm)
+
+  if(testthat_filter != "") {
+    test_filters <- list(testthat_filter)
+  } else if (is_livy) {
+    test_filters <- list(
+      paste(
+        c(
+          "^spark-apply$",
+          "^spark-apply-bundle$",
+          "^spark-apply-ext$",
+          "^dbi$",
+          "^ml-clustering-kmeans$",
+          "^livy-config$",
+          "^livy-proxy$",
+          "^dplyr$",
+          "^dplyr-join$",
+          "^dplyr-stats$",
+          "^dplyr-sample.*$",
+          "^dplyr-weighted-mean$"
+        ),
+        collapse = "|"
+      )
     )
-    test_filters <- lapply(test_cases, function(x) paste(x, collapse = "|"))
   } else if (is_arrow_devel) {
     test_filters <- list(
       paste(
@@ -182,38 +208,32 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
       )
     )
   } else {
-    test_filters <- list(
-      "^(?!spark-dynamic-config|tidyr-pivot-).*",
-      "^spark-dynamic-config$",
-      "^tidyr-pivot-.*"
-    )
+    test_filters <- NULL
   }
 
   run_tests <- function(test_filter) {
     on.exit({
-      spark_disconnect_all(terminate = TRUE)
-      tryCatch(livy_service_stop(), error = function(e) {})
-      Sys.sleep(30)
-
-      remove(".testthat_spark_connection", envir = .GlobalEnv)
-      remove(".testthat_livy_connection", envir = .GlobalEnv)
+      # spark_disconnect_all(terminate = TRUE)
+      # tryCatch(livy_service_stop(), error = function(e) {})
+      # Sys.sleep(30)
+      # remove(".testthat_spark_connection", envir = .GlobalEnv)
+      # remove(".testthat_livy_connection", envir = .GlobalEnv)
     })
 
-    reporter <- MultiReporter$new(
+    new_reporter <- MultiReporter$new(
       reporters = list(
-        SummaryReporter$new(
-          max_reports = 100L,
-          show_praise = FALSE,
-          omit_dots = TRUE
-        ),
+        SummaryReporter$new(),
         PerformanceReporter$new()
       )
     )
 
-    test_check("sparklyr", filter = test_filter, reporter = reporter, perl = TRUE)
-  }
+    if(is.null(test_filters)) {
+      #test_check("sparklyr", reporter = SummaryReporter, perl = TRUE)
+    } else {
+      test_check("sparklyr", filter = test_filter, reporter = new_reporter, perl = TRUE)
+    }
 
-  for (test_filter in test_filters) {
-    run_tests(test_filter = test_filter)
+
   }
+  run_tests(test_filters)
 }

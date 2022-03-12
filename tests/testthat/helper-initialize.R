@@ -1,14 +1,3 @@
-
-print("Loading sparklyr...")
-suppressPackageStartupMessages(library(sparklyr))
-print("Loading dplyr...")
-suppressPackageStartupMessages(library(dplyr))
-
-if (isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))) {
-  print("Loading arrow...")
-  suppressPackageStartupMessages(library(arrow))
-}
-
 get_spark_warehouse_dir <- function() {
   ifelse(.Platform$OS.type == "windows", Sys.getenv("TEMP"), tempfile())
 }
@@ -34,7 +23,24 @@ spark_install_winutils <- function(version) {
   }
 }
 
+testthat_init <- function() {
+  # timeout for downloading Spark/Livy releases
+  options(timeout = 3600)
+  options(sparklyr.connect.timeout = 300)
+  options(livy.session.start.timeout = 300)
+  suppressPackageStartupMessages(library(sparklyr))
+  suppressPackageStartupMessages(library(dplyr))
+  if (isTRUE(as.logical(Sys.getenv("ARROW_ENABLED")))) {
+    suppressPackageStartupMessages(library(arrow))
+  }
+}
+
 testthat_spark_connection <- function() {
+
+  if (!exists(".testthat_spark_connection", envir = .GlobalEnv)) {
+    testthat_init()
+  }
+
   if (!exists(".testthat_latest_spark", envir = .GlobalEnv)) {
     assign(".testthat_latest_spark", "3.0.0", envir = .GlobalEnv)
   }
@@ -133,7 +139,6 @@ testthat_shell_connection <- function(method = "shell") {
     }
 
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
-    test_that(paste0("Starting new Spark connection, version:", sc$home_version), NULL)
   }
 
   # retrieve spark connection
