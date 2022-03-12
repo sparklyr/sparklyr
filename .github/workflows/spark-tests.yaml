@@ -18,11 +18,12 @@ jobs:
         config:
           - {spark: '3.1.2', hadoop: '3.2', arrow: 'true', livy: 'NONE', r: 'release'}
           - {spark: '2.4.8', hadoop: '2.7', arrow: 'true', livy: 'NONE', r: 'release'}
+          - {spark: '2.2.1', hadoop: '2.7', arrow: 'true', livy: 'NONE', r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      SPARK_VERSION: ${{ matrix.config.livy }}
+      SPARK_VERSION: ${{ matrix.config.spark }}
       LIVY_VERSION:  ${{ matrix.config.livy }}
       ARROW_ENABLED: ${{ matrix.config.arrow }}
       TESTTHAT_FILTER: '^broom.*'
