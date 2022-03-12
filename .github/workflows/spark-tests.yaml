@@ -84,11 +84,3 @@ jobs:
           print(t_pkgs[, c("Package", "Version")])
         shell: Rscript {0}
 
-      - name: R Tests
-        run: |
-          spark_version <- sparklyr::spark_version_from_home(Sys.getenv("SPARK_HOME"))
-          if(as.numeric(substr(spark_version, 1, 1)) < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
-          #setwd("tests")
-          #source("testthat.R")
-          #sparklyr::spark_installed_versions()
-        shell: Rscript {0}
