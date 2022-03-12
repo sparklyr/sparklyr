@@ -56,28 +56,17 @@ jobs:
         run: sparklyr::spark_install(version = Sys.getenv("SPARK_VERSION"))
         shell: Rscript {0}
 
-      - name: Cache Livy 0.5.0
-        id: cache-livy-five
+      - name: Cache Livy
+        if: ${{ matrix.config.spark }} != 'NONE'
+        id: cache-livy
         uses: actions/cache@v2
         with:
-          path: /home/runner/.cache/livy/livy-0.5.0
-          key: livy-0.5.0
+          path: /home/runner/.cache/livy/livy-${{ matrix.config.spark }}
+          key: livy-${{ matrix.config.livy }}
 
-      - name: Livy 5
-        if: steps.cache-livy-five.outputs.cache-hit != 'true'
-        run: sparklyr::livy_install(version = "0.5.0")
-        shell: Rscript {0}
-
-      - name: Cache Livy 0.6.0
-        id: cache-livy-six
-        uses: actions/cache@v2
-        with:
-          path: /home/runner/.cache/livy/livy-0.6.0
-          key: livy-0.6.0
-
-      - name: Livy 6
-        if: steps.cache-livy-six.outputs.cache-hit != 'true'
-        run: sparklyr::livy_install(version = "0.6.0")
+      - name: Install Livy (via sparklyr)
+        if: steps.cache-livy-five.outputs.cache-hit != 'true' && ${{ matrix.config.spark }} != 'NONE'
+        run: sparklyr::livy_install(version = Sys.getenv("LIVY_VERSION"))
         shell: Rscript {0}
 
       - name: R Session Info
@@ -101,5 +90,5 @@ jobs:
           if(as.numeric(substr(spark_version, 1, 1)) < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
           #setwd("tests")
           #source("testthat.R")
-          sparklyr::spark_installed_versions()
+          #sparklyr::spark_installed_versions()
         shell: Rscript {0}
