@@ -264,31 +264,31 @@ testthat_livy_connection <- function() {
 
   expect_gt(nrow(livy_installed_versions()), 0)
 
-  livy_conf_dir <- normalizePath(file.path("~", "livy_conf"))
-  Sys.setenv(LIVY_CONF_DIR = livy_conf_dir)
-  if (!dir.exists(livy_conf_dir)) {
-    dir.create(livy_conf_dir)
-    writeLines(
-      c(
-        "log4j.rootCategory=DEBUG, FILE",
-        "log4j.appender.FILE=org.apache.log4j.FileAppender",
-        "log4j.appender.FILE.File=/tmp/livy-server.log",
-        "log4j.appender.FILE.layout=org.apache.log4j.PatternLayout",
-        "log4j.appender.FILE.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n",
-        "log4j.logger.org.eclipse.jetty=WARN"
-      ),
-      file.path(livy_conf_dir, "log4j.properties")
-    )
-    writeLines(
-      c(
-        "livy.rsc.rpc.server.address = 0.0.0.0",
-        "livy.client.http.connection.timeout = 60s",
-        "livy.rsc.server.connect.timeout = 60s",
-        "livy.rsc.client.connect.timeout = 60s"
-      ),
-      file.path(livy_conf_dir, "livy-client.conf")
-    )
-  }
+  # livy_conf_dir <- normalizePath(file.path("~", "livy_conf"))
+  # Sys.setenv(LIVY_CONF_DIR = livy_conf_dir)
+  # if (!dir.exists(livy_conf_dir)) {
+  #   dir.create(livy_conf_dir)
+  #   writeLines(
+  #     c(
+  #       "log4j.rootCategory=DEBUG, FILE",
+  #       "log4j.appender.FILE=org.apache.log4j.FileAppender",
+  #       "log4j.appender.FILE.File=/tmp/livy-server.log",
+  #       "log4j.appender.FILE.layout=org.apache.log4j.PatternLayout",
+  #       "log4j.appender.FILE.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n",
+  #       "log4j.logger.org.eclipse.jetty=WARN"
+  #     ),
+  #     file.path(livy_conf_dir, "log4j.properties")
+  #   )
+  #   writeLines(
+  #     c(
+  #       "livy.rsc.rpc.server.address = 0.0.0.0",
+  #       "livy.client.http.connection.timeout = 60s",
+  #       "livy.rsc.server.connect.timeout = 60s",
+  #       "livy.rsc.client.connect.timeout = 60s"
+  #     ),
+  #     file.path(livy_conf_dir, "livy-client.conf")
+  #   )
+  # }
 
   # generate connection if none yet exists
   connected <- FALSE

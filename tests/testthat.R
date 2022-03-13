@@ -220,20 +220,36 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
       # remove(".testthat_livy_connection", envir = .GlobalEnv)
     })
 
-    new_reporter <- MultiReporter$new(
-      reporters = list(
-        SummaryReporter$new(),
-        PerformanceReporter$new()
+    if(is_livy) {
+      new_reporter <- MultiReporter$new(
+        reporters = list(
+          SilentReporter $new(),
+          PerformanceReporter$new()
+        )
       )
-    )
+    } else {
+      new_reporter <- MultiReporter$new(
+        reporters = list(
+          SummaryReporter$new(),
+          PerformanceReporter$new()
+        )
+      )
+    }
 
     if(is.null(test_filters)) {
       #test_check("sparklyr", reporter = SummaryReporter, perl = TRUE)
     } else {
       test_check("sparklyr", filter = test_filter, reporter = new_reporter, perl = TRUE)
     }
-
-
   }
   run_tests(test_filters)
+}
+
+testthat_test_livy <- function(livy_version = "0.6.0", spark_version = "2.4.0", filter = "^dbi$") {
+  Sys.setenv("SPARK_VERSION" = spark_version)
+  Sys.setenv("NOT_CRAN" = 'true')
+  Sys.setenv("LIVY_VERSION" = livy_version)
+  Sys.setenv("ARROW_ENABLED" = 'false')
+  Sys.setenv("TESTTHAT_FILTER" = filter)
+  source("testthat.R")
 }
