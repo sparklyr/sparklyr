@@ -16,11 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {spark: '3.1.2', hadoop: '3.2', arrow: 'true',  livy: 'NONE',  r: 'release'}
-          - {spark: '3.0.0', hadoop: '3.2', arrow: 'false', livy: 'NONE',  r: 'release'}
-          - {spark: '2.4.8', hadoop: '2.7', arrow: 'false', livy: 'NONE',  r: 'release'}
           - {spark: '2.4.8', hadoop: '2.7', arrow: 'false', livy: '0.6.0', r: 'release'}
-          - {spark: '2.2.1', hadoop: '2.7', arrow: 'false', livy: 'NONE',  r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -91,6 +87,11 @@ jobs:
           spark_major <- as.numeric(substr(Sys.getenv("SPARK_VERSION"), 1, 1))
           if(spark_major < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
           Sys.getenv("JAVA_HOME")
-          setwd("tests")
-          source("testthat.R")
+          sparklyr::livy_service_start(version = "0.6.0", spark_version = "2.4.8")
+          Sys.sleep(10)
+          sc <- sparklyr::spark_connect("http://localhost:8998", method = "livy")
+          sc
+          Sys.sleep(10)
+          sparklyr::spark_disconnect(sc)
+          sparklyr::livy_service_stop()
         shell: Rscript {0}
