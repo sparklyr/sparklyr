@@ -89,7 +89,7 @@ jobs:
           Sys.getenv("JAVA_HOME")
           sparklyr::livy_service_start(version = "0.6.0", spark_version = "2.4.8")
           Sys.sleep(10)
-          sc <- sparklyr::spark_connect("http://localhost:8998", method = "livy")
+          sc <- sparklyr::spark_connect("http://localhost:8998", method = "livy", version = "2.4.8")
           sc
           Sys.sleep(10)
           sparklyr::spark_disconnect(sc)
