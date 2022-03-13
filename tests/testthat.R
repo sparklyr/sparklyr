@@ -221,12 +221,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     })
 
     if(is_livy) {
-      new_reporter <- MultiReporter$new(
-        reporters = list(
-          SilentReporter $new(),
-          PerformanceReporter$new()
-        )
-      )
+      new_reporter <- CheckReporter()
     } else {
       new_reporter <- MultiReporter$new(
         reporters = list(
