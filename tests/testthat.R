@@ -221,7 +221,12 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     })
 
     if(is_livy) {
-      new_reporter <- CheckReporter()
+      new_reporter <- MultiReporter$new(
+        reporters = list(
+          SilentReporter$new(),
+          PerformanceReporter$new()
+        )
+      )
     } else {
       new_reporter <- MultiReporter$new(
         reporters = list(
@@ -234,7 +239,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
     if(is.null(test_filters)) {
       #test_check("sparklyr", reporter = SummaryReporter, perl = TRUE)
     } else {
-      test_check("sparklyr", filter = test_filter, reporter = new_reporter, perl = TRUE)
+      test_check("sparklyr", filter = test_filter, perl = TRUE)
     }
   }
   run_tests(test_filters)
