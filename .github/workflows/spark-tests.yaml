@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {spark: '2.4.8', hadoop: '2.7', arrow: 'false', livy: '0.6.0', r: 'release'}
+          - {spark: '2.4.0', hadoop: '2.7', arrow: 'false', livy: '0.6.0', r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

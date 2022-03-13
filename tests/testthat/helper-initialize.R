@@ -130,7 +130,7 @@ testthat_shell_connection <- function(method = "shell") {
       sc <- spark_connect(
         master = "local",
         method = method,
-        version = version,
+        #version = version,
         config = config,
         packages = packages
       )
@@ -142,6 +142,127 @@ testthat_shell_connection <- function(method = "shell") {
   # retrieve spark connection
   get(".testthat_spark_connection", envir = .GlobalEnv)
 }
+
+testthat_livy_connection <- function() {
+
+  spark_home <- Sys.getenv("SPARK_HOME")
+
+  if(spark_home != "") {
+    version <- spark_version_from_home(spark_home)
+  } else {
+    version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
+
+    if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
+      spark_disconnect_all()
+      remove(".testthat_spark_connection", envir = .GlobalEnv)
+      Sys.sleep(3)
+    }
+
+    spark_installed <- spark_installed_versions()
+    if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
+      spark_install(version)
+    }
+  }
+
+  livy_version <- Sys.getenv("LIVY_VERSION", "0.5.0")
+
+  if (nrow(livy_installed_versions()) == 0) {
+    cat("Installing Livy.")
+    livy_install(livy_version, spark_version = version)
+    cat("Livy installed.")
+  }
+
+  expect_gt(nrow(livy_installed_versions()), 0)
+
+  livy_conf_dir <- normalizePath(file.path("~", "livy_conf"))
+  # Sys.setenv(LIVY_CONF_DIR = livy_conf_dir)
+  if (!dir.exists(livy_conf_dir)) {
+    dir.create(livy_conf_dir)
+    writeLines(
+      c(
+        "log4j.rootCategory=DEBUG, FILE",
+        "log4j.appender.FILE=org.apache.log4j.FileAppender",
+        "log4j.appender.FILE.File=/tmp/livy-server.log",
+        "log4j.appender.FILE.layout=org.apache.log4j.PatternLayout",
+        "log4j.appender.FILE.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n",
+        "log4j.logger.org.eclipse.jetty=WARN"
+      ),
+      file.path(livy_conf_dir, "log4j.properties")
+    )
+    writeLines(
+      c(
+        "livy.rsc.rpc.server.address = 0.0.0.0",
+        "livy.client.http.connection.timeout = 60s",
+        "livy.rsc.server.connect.timeout = 60s",
+        "livy.rsc.client.connect.timeout = 60s"
+      ),
+      file.path(livy_conf_dir, "livy-client.conf")
+    )
+  }
+
+  # generate connection if none yet exists
+  connected <- FALSE
+  if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
+    sc <- get(".testthat_livy_connection", envir = .GlobalEnv)
+    connected <- TRUE
+  }
+
+  if (Sys.getenv("INSTALL_WINUTILS") == "true") {
+    spark_install_winutils(version)
+  }
+
+  livy_service_port <- 8998
+  if (!connected) {
+    livy_service_start(
+      version = livy_version,
+      spark_version = version,
+      stdout = FALSE,
+      stderr = FALSE
+    )
+
+    wait_for_svc(
+      svc_name = "livy",
+      port = livy_service_port,
+      timeout_s = 30
+    )
+
+    config <- list()
+    if (identical(.Platform$OS.type, "windows")) {
+      # TODO: investigate why there are Windows-specific timezone portability issues
+      config$`spark.sql.session.timeZone` <- "UTC"
+    }
+
+    config$`sparklyr.verbose` <- TRUE
+    config$`sparklyr.connect.timeout` <- 120
+    config$`sparklyr.log.invoke` <- "cat"
+    config$`spark.sql.warehouse.dir` <- get_spark_warehouse_dir()
+    config$`sparklyr.sdf_collect.persistence_level` <- "NONE"
+
+    if(spark_home != "") {
+      sc <- spark_connect(
+        master = sprintf("http://localhost:%d", livy_service_port),
+        method = "livy",
+        config = config,
+        sources = TRUE,
+        spark_home = spark_home
+      )
+    } else {
+      sc <- spark_connect(
+        master = "http://localhost:8998/",
+        method = "livy",
+        #config = config,
+        version = version
+        #sources = TRUE
+      )
+    }
+
+
+    assign(".testthat_livy_connection", sc, envir = .GlobalEnv)
+  }
+
+  get(".testthat_livy_connection", envir = .GlobalEnv)
+}
+
 
 testthat_tbl <- function(name, data = NULL, repartition = 0L) {
   sc <- testthat_spark_connection()
@@ -234,122 +355,6 @@ wait_for_svc <- function(svc_name, port, timeout_s) {
   })
 }
 
-testthat_livy_connection <- function() {
-  spark_home <- Sys.getenv("SPARK_HOME")
-
-  if(spark_home != "") {
-    version <- spark_version_from_home(spark_home)
-  } else {
-    version <- Sys.getenv("SPARK_VERSION", unset = testthat_latest_spark())
-
-    if (exists(".testthat_spark_connection", envir = .GlobalEnv)) {
-      spark_disconnect_all()
-      remove(".testthat_spark_connection", envir = .GlobalEnv)
-      Sys.sleep(3)
-    }
-
-    spark_installed <- spark_installed_versions()
-    if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
-      spark_install(version)
-    }
-  }
-
-  livy_version <- Sys.getenv("LIVY_VERSION", "0.5.0")
-
-  if (nrow(livy_installed_versions()) == 0) {
-    cat("Installing Livy.")
-    livy_install(livy_version, spark_version = version, )
-    cat("Livy installed.")
-  }
-
-  expect_gt(nrow(livy_installed_versions()), 0)
-
-  # livy_conf_dir <- normalizePath(file.path("~", "livy_conf"))
-  # Sys.setenv(LIVY_CONF_DIR = livy_conf_dir)
-  # if (!dir.exists(livy_conf_dir)) {
-  #   dir.create(livy_conf_dir)
-  #   writeLines(
-  #     c(
-  #       "log4j.rootCategory=DEBUG, FILE",
-  #       "log4j.appender.FILE=org.apache.log4j.FileAppender",
-  #       "log4j.appender.FILE.File=/tmp/livy-server.log",
-  #       "log4j.appender.FILE.layout=org.apache.log4j.PatternLayout",
-  #       "log4j.appender.FILE.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n",
-  #       "log4j.logger.org.eclipse.jetty=WARN"
-  #     ),
-  #     file.path(livy_conf_dir, "log4j.properties")
-  #   )
-  #   writeLines(
-  #     c(
-  #       "livy.rsc.rpc.server.address = 0.0.0.0",
-  #       "livy.client.http.connection.timeout = 60s",
-  #       "livy.rsc.server.connect.timeout = 60s",
-  #       "livy.rsc.client.connect.timeout = 60s"
-  #     ),
-  #     file.path(livy_conf_dir, "livy-client.conf")
-  #   )
-  # }
-
-  # generate connection if none yet exists
-  connected <- FALSE
-  if (exists(".testthat_livy_connection", envir = .GlobalEnv)) {
-    sc <- get(".testthat_livy_connection", envir = .GlobalEnv)
-    connected <- TRUE
-  }
-
-  if (Sys.getenv("INSTALL_WINUTILS") == "true") {
-    spark_install_winutils(version)
-  }
-
-  livy_service_port <- 8998
-  if (!connected) {
-    livy_service_start(
-      version = livy_version,
-      spark_version = version,
-      stdout = FALSE,
-      stderr = FALSE
-    )
-    wait_for_svc(
-      svc_name = "livy",
-      port = livy_service_port,
-      timeout_s = 30
-    )
-    config <- list()
-    if (identical(.Platform$OS.type, "windows")) {
-      # TODO: investigate why there are Windows-specific timezone portability issues
-      config$`spark.sql.session.timeZone` <- "UTC"
-    }
-
-    config$`sparklyr.verbose` <- TRUE
-    config$`sparklyr.connect.timeout` <- 120
-    config$`sparklyr.log.invoke` <- "cat"
-    config$`spark.sql.warehouse.dir` <- get_spark_warehouse_dir()
-    config$`sparklyr.sdf_collect.persistence_level` <- "NONE"
-
-    if(spark_home != "") {
-      sc <- spark_connect(
-        master = sprintf("http://localhost:%d", livy_service_port),
-        method = "livy",
-        config = config,
-        sources = TRUE,
-        spark_home = spark_home
-      )
-    } else {
-      sc <- spark_connect(
-        master = sprintf("http://localhost:%d", livy_service_port),
-        method = "livy",
-        config = config,
-        version = version,
-        sources = TRUE
-      )
-    }
-
-
-    assign(".testthat_livy_connection", sc, envir = .GlobalEnv)
-  }
-
-  get(".testthat_livy_connection", envir = .GlobalEnv)
-}
 
 get_default_args <- function(fn, exclude = NULL) {
   formals(fn) %>%
