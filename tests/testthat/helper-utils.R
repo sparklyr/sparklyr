@@ -50,10 +50,6 @@ param_add_version <- function(args, min_version, ...) {
 
 output_file <- function(filename) file.path("output", filename)
 
-using_arrow <- function() {
-  "package:arrow" %in% search()
-}
-
 is_testing_databricks_connect <- function() {
   Sys.getenv("TEST_DATABRICKS_CONNECT") == "true"
 }

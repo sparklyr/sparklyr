@@ -4,7 +4,7 @@ testthat_init <- function() {
   options(livy.session.start.timeout = 300)
   suppressPackageStartupMessages(library(sparklyr))
   suppressPackageStartupMessages(library(dplyr))
-  if (testthat_spark_env_arrow()) {
+  if (using_arrow()) {
     suppressPackageStartupMessages(library(arrow))
   }
 }
@@ -12,9 +12,10 @@ testthat_init <- function() {
 testthat_spark_connection <- function() {
   if(!testthat_spark_connection_open()) testthat_init()
   tp <- testthat_spark_connection_type()
-  if(tp == "databricks") testthat_shell_connection(method = "databricks")
-  if(tp == "shell") testthat_shell_connection()
-  if(tp == "livy") testthat_livy_connection()
+  if(tp == "databricks") sc <- testthat_shell_connection(method = "databricks")
+  if(tp == "local") sc <- testthat_shell_connection()
+  if(tp == "livy") sc <- testthat_livy_connection()
+  sc
 }
 
 testthat_shell_connection <- function(method = "shell") {
@@ -76,7 +77,7 @@ testthat_livy_connection <- function() {
     spark_version <- testthat_spark_env_version()
 
     livy_service_start(
-      version = testthat_spark_env_livy_version(),
+      version = using_livy_version(),
       spark_version = spark_version,
       stdout = FALSE,
       stderr = FALSE

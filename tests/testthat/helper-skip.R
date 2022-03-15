@@ -1,17 +1,22 @@
+skip_unless_local <- function() {
+  if(testthat_spark_connection_type() != "local") {
+    skip("Test only run on local Spark connection")
+  }
+}
+
 skip_unless_databricks_connect <- function() {
-  if (!is_testing_databricks_connect()) {
+  if (!using_databricks()) {
     skip("Test only runs on Databricks Connect")
   }
 }
 
 skip_databricks_connect <- function() {
-  if (is_testing_databricks_connect()) {
+  if (using_databricks()) {
     skip("Test is skipped on Databricks Connect")
   }
 }
-skip_arrow_devel <- function(message) {
-  is_arrow_devel <- identical(Sys.getenv("ARROW_VERSION"), "devel")
-  if (is_arrow_devel) skip(message)
+skip_arrow_devel <- function(message = "Test is skipped on Arrow development version") {
+  if (using_arrow_version() == "devel") skip(message)
 }
 
 skip_slow <- function(message) {
@@ -30,6 +35,7 @@ skip_unless_verbose <- function(message = NULL) {
   if (is.na(verbose)) skip(message)
   invisible(TRUE)
 }
+
 skip_on_arrow <- function() {
   if (using_arrow()) skip("Test unsupported in Apache Arrow")
 }
@@ -45,12 +51,12 @@ skip_covr <- function(message) {
   if (is_covr) skip(message)
 }
 
-skip_livy <- function() {
-  livy_version <- Sys.getenv("LIVY_VERSION")
-  if (nchar(livy_version) > 0 && !identical(livy_version, "NONE")) {
+skip_on_livy <- function() {
+  if(using_livy()) {
     skip("Test unsupported under Livy.")
   }
 }
+
 
 test_requires_version <- function(min_version, comment = NULL, max_version = NULL) {
   sc <- testthat_spark_connection()
@@ -80,10 +86,12 @@ test_requires <- function(...) {
       }
     }
   })
-
   invisible(TRUE)
 }
 
 test_requires_latest_spark <- function() {
   test_requires_version(testthat_latest_spark())
 }
+
+
+
