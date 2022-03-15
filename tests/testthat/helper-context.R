@@ -62,17 +62,13 @@ testthat_spark_env_version <- function(set_to = NULL) {
 
 using_livy_version <- function() {
   lv <- Sys.getenv("LIVY_VERSION")
-  if(using_arrow()) stop("Arrow and Livy cannot be tested simultaneously")
   testthat_context$spark$livy$version <- lv
   lv
 }
 
 using_livy <- function() {
   lt <- FALSE
-  if(using_livy_version() != "") {
-    lt <- TRUE
-    testthat_context$spark$livy$type <- lt
-  }
+  if(using_livy_version() != "") lt <- TRUE
   lt
 }
 
@@ -92,10 +88,7 @@ using_arrow_devel <- function() {
 
 using_arrow <- function() {
   lt <- FALSE
-  if(using_arrow_version() != "") {
-    lt <- TRUE
-    testthat_context$spark$arrow$type <- lt
-  }
+  if(using_arrow_version() != "") lt <- TRUE
   lt
 }
 

@@ -31,7 +31,6 @@ jobs:
       SPARK_VERSION: ${{ matrix.config.spark }}
       LIVY_VERSION:  ${{ matrix.config.livy }}
       ARROW_VERSION: ${{ matrix.config.arrow }}
-      TESTTHAT_FILTER: '^dbi$'
 
     steps:
       - uses: actions/checkout@v2
