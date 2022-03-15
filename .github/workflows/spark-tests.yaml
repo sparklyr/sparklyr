@@ -16,14 +16,21 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {spark: '2.4.0', hadoop: '2.7', arrow: 'false', livy: '0.6.0', r: 'release'}
+
+          - {spark: '3.1.2', hadoop: '3.2', arrow: '',        livy: '',      r: 'release'}
+          - {spark: '3.1.2', hadoop: '3.2', arrow: 'release', livy: '',      r: 'release'}
+          - {spark: '3.1.2', hadoop: '3.2', arrow: 'devel',   livy: '',      r: 'release'}
+          - {spark: '3.0.0', hadoop: '3.2', arrow: '',        livy: '',      r: 'release'}
+          - {spark: '2.4.0', hadoop: '2.7', arrow: '',        livy: '',      r: 'release'}
+          - {spark: '2.4.0', hadoop: '2.7', arrow: '',        livy: '0.6.0', r: 'release'}
+          - {spark: '2.2.1', hadoop: '2.7', arrow: '',        livy: '',      r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       SPARK_VERSION: ${{ matrix.config.spark }}
       LIVY_VERSION:  ${{ matrix.config.livy }}
-      ARROW_ENABLED: ${{ matrix.config.arrow }}
+      ARROW_VERSION: ${{ matrix.config.arrow }}
       TESTTHAT_FILTER: '^dbi$'
 
     steps:
@@ -55,7 +62,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Cache Livy
-        if: ${{ matrix.config.livy }} != 'NONE'
+        if: ${{ matrix.config.livy }} != ''
         id: cache-livy
         uses: actions/cache@v2
         with:
@@ -63,7 +70,7 @@ jobs:
           key: livy-${{ matrix.config.livy }}
 
       - name: Install Livy (via sparklyr)
-        if: ${{ (steps.cache-livy.outputs.cache-hit != 'true') && (matrix.config.livy != 'NONE') }}
+        if: ${{ (steps.cache-livy.outputs.cache-hit != 'true') && (matrix.config.livy != '') }}
         run: sparklyr::livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
         shell: Rscript {0}
 
