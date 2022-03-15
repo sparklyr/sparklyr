@@ -92,7 +92,7 @@ test_that("sdf_quantile() approximates weighted quantiles correctly", {
     expect_equal(length(approx_pct), length(pct))
 
     for (i in seq_along(pct)) {
-      expect_equal(pct[[i]], approx_pct[[i]], tol = max_error, scale = 1)
+      expect_equal(pct[[i]], approx_pct[[i]], tolerance = max_error, scale = 1)
     }
   }
 })
