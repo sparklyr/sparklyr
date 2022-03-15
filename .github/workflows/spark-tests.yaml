@@ -72,8 +72,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Switching to Arrow devel if needed
-        if: ${{ matrix.config.arrow }} == 'devel'
-        run: arrow::install_arrow(nightly = TRUE)
+        run: if(Sys.getenv("ARROW_VERSION") == "devel") arrow::install_arrow(nightly = TRUE)
         shell: Rscript {0}
 
       - name: R Session Info
