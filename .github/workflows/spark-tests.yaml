@@ -42,11 +42,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::devtools
-
-      - name: Install sparklyr
-        run: devtools::install()
-        shell: Rscript {0}
+          extra-packages: |
+            any::devtools
+            any::sparklyr
 
       - name: Cache Spark
         id: cache-spark
@@ -71,6 +69,11 @@ jobs:
       - name: Install Livy (via sparklyr)
         if: ${{ (steps.cache-livy.outputs.cache-hit != 'true') && (matrix.config.livy != '') }}
         run: sparklyr::livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
+        shell: Rscript {0}
+
+      - name: Switching to Arrow devel if needed
+        if: ${{ matrix.config.arrow }} == 'devel'
+        run: arrow::install_arrow(nightly = TRUE)
         shell: Rscript {0}
 
       - name: R Session Info
