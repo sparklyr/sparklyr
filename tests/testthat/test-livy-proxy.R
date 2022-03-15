@@ -1,4 +1,3 @@
-skip_on_livy()
 skip_on_arrow_devel()
 
 num_open_fds <- function(port) {
