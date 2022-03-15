@@ -1,3 +1,5 @@
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("'spark_yarn_cluster_get_resource_manager_webapp' fails under HA configuration", {

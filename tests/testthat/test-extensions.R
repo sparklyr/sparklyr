@@ -1,3 +1,5 @@
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("spark_dependency_fallback() works correctly", {
   expect_equal(

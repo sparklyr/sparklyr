@@ -1,3 +1,5 @@
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("'validate_java_version_line' fails with 1.6", {
   expect_error(

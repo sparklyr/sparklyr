@@ -1,3 +1,5 @@
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("jfloat_array() works as expected", {
   sc <- testthat_spark_connection()

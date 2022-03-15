@@ -15,13 +15,13 @@ skip_databricks_connect <- function() {
     skip("Test is skipped on Databricks Connect")
   }
 }
-skip_arrow_devel <- function(message = "Test is skipped on Arrow development version") {
+skip_on_arrow_devel <- function(message = "Test is skipped on Arrow development version") {
   if (using_arrow_version() == "devel") skip(message)
 }
 
 skip_slow <- function(message) {
   skip_covr(message)
-  skip_arrow_devel(message)
+  skip_on_arrow_devel(message)
 }
 
 skip_on_spark_master <- function() {

@@ -1,3 +1,5 @@
+skip_on_livy()
+skip_on_arrow_devel()
 sc <- testthat_spark_connection()
 
 test_that("top_n works as expected", {

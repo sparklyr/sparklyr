@@ -1,3 +1,5 @@
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("ft_standard_scaler() default params", {
   test_requires_latest_spark()

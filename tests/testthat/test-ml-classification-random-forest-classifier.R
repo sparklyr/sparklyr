@@ -1,3 +1,5 @@
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("ml_random_forest_classifier() default params", {
   test_requires_latest_spark()
