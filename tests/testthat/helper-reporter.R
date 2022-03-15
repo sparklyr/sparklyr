@@ -7,6 +7,7 @@ sparklyr_reporter <- function() {
   cat("\nSpark:", testthat_spark_env_version())
   cat("\nLivy:", ul)
   cat("\nArrow:", ua)
+  if(using_arrow()) cat("\n  |---", as.character(packageVersion("arrow")))
   cat("\n------------------------------\n")
 
   if (using_livy()) {
