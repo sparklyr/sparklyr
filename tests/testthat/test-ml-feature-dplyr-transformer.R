@@ -1,5 +1,4 @@
 skip_on_livy()
-skip_on_arrow_devel()
 
 skip_databricks_connect()
 
