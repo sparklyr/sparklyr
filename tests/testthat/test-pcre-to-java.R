@@ -1,4 +1,3 @@
-context("PCRE to Java regex")
 
 sc <- testthat_spark_connection()
 

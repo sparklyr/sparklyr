@@ -1,4 +1,3 @@
-context("ml fpm fpgrowth")
 
 skip_databricks_connect()
 test_that("ml_fpgrowth() default params", {

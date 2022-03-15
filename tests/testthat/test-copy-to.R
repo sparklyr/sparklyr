@@ -1,4 +1,3 @@
-context("copy data")
 
 sc <- testthat_spark_connection()
 

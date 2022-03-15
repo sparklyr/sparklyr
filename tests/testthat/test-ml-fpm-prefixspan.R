@@ -1,4 +1,3 @@
-context("ml fpm prefixspan")
 
 test_that("ml_prefixspan() works as expected", {
   test_requires_version("2.4.0", "prefixspan requires spark 2.4.0+")

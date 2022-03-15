@@ -1,4 +1,3 @@
-context("ml feature hashing tf")
 
 skip_databricks_connect()
 test_that("ft_hashing_tf() default params", {

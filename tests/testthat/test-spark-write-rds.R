@@ -1,4 +1,3 @@
-context("spark write rds")
 
 sc <- testthat_spark_connection()
 

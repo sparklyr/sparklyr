@@ -1,4 +1,3 @@
-context("sdf-unnest-longer")
 
 sc <- testthat_spark_connection()
 

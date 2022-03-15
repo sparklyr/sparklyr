@@ -1,4 +1,3 @@
-context("ml classification - naive bayes")
 
 test_that("ml_naive_bayes() default params", {
   test_requires_latest_spark()

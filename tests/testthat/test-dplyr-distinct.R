@@ -1,4 +1,3 @@
-context("dplyr distinct")
 
 sc <- testthat_spark_connection()
 

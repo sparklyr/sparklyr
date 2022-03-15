@@ -1,4 +1,3 @@
-context("invoke")
 
 sc <- testthat_spark_connection()
 

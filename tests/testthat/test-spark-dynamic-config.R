@@ -1,4 +1,3 @@
-context("spark runtime configuration")
 
 sc <- testthat_spark_connection()
 

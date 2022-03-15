@@ -1,4 +1,3 @@
-context("ml feature robust scaler")
 
 test_that("ft_robust_scaler() works properly", {
   sc <- testthat_spark_connection()

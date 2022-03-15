@@ -1,4 +1,3 @@
-context("sdf-partition-sizes")
 
 sc <- testthat_spark_connection()
 

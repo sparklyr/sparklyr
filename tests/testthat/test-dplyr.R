@@ -1,4 +1,3 @@
-context("dplyr")
 
 sc <- testthat_spark_connection()
 

@@ -1,4 +1,3 @@
-context("ml persistence")
 
 skip_databricks_connect()
 sc <- testthat_spark_connection()

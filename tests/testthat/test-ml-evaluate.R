@@ -1,4 +1,3 @@
-context("ml - evaluate")
 
 skip_databricks_connect()
 test_that("ml_evaluate() works for logistic regression", {

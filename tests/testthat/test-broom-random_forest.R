@@ -1,4 +1,3 @@
-context("broom-random_forest")
 
 skip_databricks_connect()
 test_that("random_forest.tidy() works", {

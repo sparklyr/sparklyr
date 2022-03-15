@@ -1,4 +1,3 @@
-context("broom-bisecting_kmeans")
 
 skip_databricks_connect()
 test_that("bisecting_kmeans.tidy() works", {

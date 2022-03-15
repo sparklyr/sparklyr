@@ -1,4 +1,3 @@
-context("broom-isotonic_regression")
 
 skip_databricks_connect()
 test_that("isotonic_regression.tidy() works", {

@@ -1,4 +1,3 @@
-context("ml feature stop words remover")
 
 skip_databricks_connect()
 test_that("ft_stop_words_remover() default params", {

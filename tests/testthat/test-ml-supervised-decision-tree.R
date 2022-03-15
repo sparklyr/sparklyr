@@ -1,4 +1,3 @@
-context("ml supervised - decision tree")
 
 skip_databricks_connect()
 test_that("decision tree runs successfully when all args specified", {

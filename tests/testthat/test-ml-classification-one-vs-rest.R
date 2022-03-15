@@ -1,4 +1,3 @@
-context("ml classification - one vs rest")
 
 skip_databricks_connect()
 test_that("ml_one_vs_rest() default params", {

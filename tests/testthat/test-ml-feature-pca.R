@@ -1,4 +1,3 @@
-context("ml feature - pca")
 
 skip_databricks_connect()
 test_that("ft_pca() param setting", {

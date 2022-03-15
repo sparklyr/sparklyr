@@ -1,4 +1,3 @@
-context("broom-gradient_boosted_trees")
 
 skip_databricks_connect()
 test_that("gradient_boosted_trees.tidy() works", {

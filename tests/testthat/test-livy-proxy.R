@@ -1,4 +1,3 @@
-context("livy-proxy")
 
 num_open_fds <- function(port) {
   n <- system2(

@@ -1,4 +1,3 @@
-context("ml feature - sql transformer")
 
 skip_databricks_connect()
 

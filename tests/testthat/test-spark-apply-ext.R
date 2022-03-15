@@ -1,4 +1,3 @@
-context("spark-apply-ext")
 
 test_requires("dplyr")
 sc <- testthat_spark_connection()

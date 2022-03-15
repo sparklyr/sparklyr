@@ -1,4 +1,3 @@
-context("ml classification - multilayer perceptron")
 
 skip_databricks_connect()
 test_that("ml_multilayer_perceptron_classifier() default params", {

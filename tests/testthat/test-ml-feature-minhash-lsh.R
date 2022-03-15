@@ -1,4 +1,3 @@
-context("ml feature minhash lsh")
 
 skip_databricks_connect()
 test_that("ft_minhash_lsh() default params", {

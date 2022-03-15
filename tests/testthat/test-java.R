@@ -1,4 +1,3 @@
-context("java")
 
 test_that("'validate_java_version_line' fails with 1.6", {
   expect_error(

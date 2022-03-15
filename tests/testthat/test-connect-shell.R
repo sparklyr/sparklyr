@@ -1,4 +1,3 @@
-context("connections - shell")
 
 skip_databricks_connect()
 sc <- testthat_spark_connection()

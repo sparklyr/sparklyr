@@ -1,4 +1,3 @@
-context("ml feature bucketizer")
 
 skip_databricks_connect()
 test_that("ft_bucketizer() default params", {

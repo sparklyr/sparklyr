@@ -1,4 +1,3 @@
-context("ml feature vector assembler")
 
 skip_databricks_connect()
 test_that("ft_vector_assembler() param setting", {

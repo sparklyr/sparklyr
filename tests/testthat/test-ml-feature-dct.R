@@ -1,4 +1,3 @@
-context("ml feature dct")
 
 skip_databricks_connect()
 test_that("ft_dct() default params", {

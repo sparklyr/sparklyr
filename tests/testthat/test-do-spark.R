@@ -1,4 +1,3 @@
-context("do-spark")
 
 test_requires("foreach")
 test_requires("iterators")

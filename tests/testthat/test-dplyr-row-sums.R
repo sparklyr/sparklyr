@@ -1,4 +1,3 @@
-context("dplyr rowSums")
 
 sc <- testthat_spark_connection()
 

@@ -1,4 +1,3 @@
-context("ml feature - ngram")
 
 skip_databricks_connect()
 test_that("ft_ngram() default params", {

@@ -1,4 +1,3 @@
-context("ml feature - r formula")
 
 skip_databricks_connect()
 test_that("ft_r_formula() default params", {

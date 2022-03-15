@@ -1,4 +1,3 @@
-context("ml feature - elementwise product")
 
 skip_databricks_connect()
 test_that("ft_elementwise_product() param setting", {

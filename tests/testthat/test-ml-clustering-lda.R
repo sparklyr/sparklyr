@@ -1,4 +1,3 @@
-context("ml clustering - lda")
 
 test_that("ml_lda() default params", {
   test_requires_latest_spark()

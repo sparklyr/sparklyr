@@ -1,4 +1,3 @@
-context("ml print methods")
 
 skip_databricks_connect()
 test_that("input_cols print correctly", {

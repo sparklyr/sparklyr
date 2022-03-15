@@ -1,4 +1,3 @@
-context("read-write-multiple")
 
 sc <- testthat_spark_connection()
 

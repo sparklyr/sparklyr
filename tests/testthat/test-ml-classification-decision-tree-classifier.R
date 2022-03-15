@@ -1,4 +1,3 @@
-context("ml classification decision tree")
 
 test_that("ml_decision_tree_classifier() default params", {
   test_requires_latest_spark()

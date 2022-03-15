@@ -1,4 +1,3 @@
-context("jfloat")
 
 test_that("jfloat() works as expected", {
   sc <- testthat_spark_connection()

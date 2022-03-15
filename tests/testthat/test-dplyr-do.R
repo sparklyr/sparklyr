@@ -1,4 +1,3 @@
-context("dplyr do")
 
 skip_databricks_connect()
 sc <- testthat_spark_connection()

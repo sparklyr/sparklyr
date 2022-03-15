@@ -1,4 +1,3 @@
-context("column separation")
 
 skip_databricks_connect()
 test_requires("dplyr")

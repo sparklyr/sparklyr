@@ -1,4 +1,3 @@
-context("tidyr-pivot-longer")
 
 sc <- testthat_spark_connection()
 trivial_sdf <- testthat_tbl(

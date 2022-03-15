@@ -1,4 +1,3 @@
-context("ml clustering - kmeans")
 
 skip_databricks_connect()
 test_that("ml_kmeans() param setting", {

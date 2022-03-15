@@ -1,4 +1,3 @@
-context("connections - test")
 sc <- testthat_spark_connection()
 
 test_that("test connection does not fail", {

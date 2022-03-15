@@ -1,4 +1,3 @@
-context("binds")
 
 test_requires("dplyr")
 sc <- testthat_spark_connection()

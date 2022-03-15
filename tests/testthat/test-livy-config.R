@@ -1,4 +1,3 @@
-context("livy")
 
 test_that("'livy_config()' works with extended parameters", {
   config <- livy_config(num_executors = 1)

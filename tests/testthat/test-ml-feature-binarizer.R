@@ -1,4 +1,3 @@
-context("ml feature binarizer")
 
 skip_databricks_connect()
 test_that("ft_binarizer() default params", {

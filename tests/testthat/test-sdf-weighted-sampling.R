@@ -1,4 +1,3 @@
-context("sdf-weighted-sampling")
 
 test_requires("dplyr")
 

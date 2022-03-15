@@ -1,4 +1,3 @@
-context("tidyr-unite")
 
 sc <- testthat_spark_connection()
 tidyr_unite_test_data <- tibble::tibble(g = 1L, x = "a", y = "b")

@@ -1,4 +1,3 @@
-context("Spark dataframe subsetting operator")
 
 sc <- testthat_spark_connection()
 

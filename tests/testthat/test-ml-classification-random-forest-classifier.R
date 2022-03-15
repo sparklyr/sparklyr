@@ -1,4 +1,3 @@
-context("ml classification random forest classifier")
 
 test_that("ml_random_forest_classifier() default params", {
   test_requires_latest_spark()

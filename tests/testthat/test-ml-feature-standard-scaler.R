@@ -1,4 +1,3 @@
-context("ml feature standard scaler")
 
 test_that("ft_standard_scaler() default params", {
   test_requires_latest_spark()

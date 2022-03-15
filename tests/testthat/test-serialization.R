@@ -1,4 +1,3 @@
-context("serialization")
 
 sc <- testthat_spark_connection()
 

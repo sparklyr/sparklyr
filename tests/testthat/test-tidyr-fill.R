@@ -1,4 +1,3 @@
-context("tidyr-fill")
 
 sc <- testthat_spark_connection()
 

@@ -1,4 +1,3 @@
-context("broom-lda")
 
 skip_databricks_connect()
 test_that("lda.tidy() works", {

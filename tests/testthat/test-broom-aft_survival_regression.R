@@ -1,4 +1,3 @@
-context("broom-aft_survival_regression")
 
 skip_databricks_connect()
 test_that("aft_survival_regression.tidy() works", {

@@ -1,4 +1,3 @@
-context("ml recommendation - als")
 
 skip_databricks_connect()
 test_that("ml_als() default params", {

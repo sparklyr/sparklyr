@@ -1,4 +1,3 @@
-context("ml feature vector indexer")
 
 test_that("ft_vector_indexer() default params", {
   test_requires_latest_spark()

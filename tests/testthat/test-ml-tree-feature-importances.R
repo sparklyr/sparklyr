@@ -1,4 +1,3 @@
-context("ml tree feature importances")
 
 skip_databricks_connect()
 test_that("ml_tree_feature_importance() works properly", {

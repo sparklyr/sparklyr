@@ -1,4 +1,3 @@
-context("sdf-distinct")
 
 sc <- testthat_spark_connection()
 

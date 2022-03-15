@@ -1,4 +1,3 @@
-context("dplyr cumprod")
 
 sc <- testthat_spark_connection()
 

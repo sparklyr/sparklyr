@@ -1,4 +1,3 @@
-context("sdf-avro")
 
 sc <- testthat_spark_connection()
 

@@ -1,4 +1,3 @@
-context("ml evaluation - clustering")
 
 skip_databricks_connect()
 test_that("ml_clustering_evaluator() works", {

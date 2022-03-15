@@ -1,4 +1,3 @@
-context("tidyr-separate")
 
 sc <- testthat_spark_connection()
 simple_sdf <- testthat_tbl(

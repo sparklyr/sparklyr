@@ -1,4 +1,3 @@
-context("ml feature interaction")
 
 skip_databricks_connect()
 test_that("ft_interaction() param setting", {

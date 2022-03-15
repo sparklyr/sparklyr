@@ -1,4 +1,3 @@
-context("ml feature - word2vec")
 
 skip_databricks_connect()
 test_that("ft_word2vec() default params", {

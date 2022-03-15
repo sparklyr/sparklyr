@@ -1,4 +1,3 @@
-context("pre-command hooks")
 
 sc <- testthat_spark_connection()
 

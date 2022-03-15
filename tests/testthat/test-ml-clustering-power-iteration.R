@@ -1,4 +1,3 @@
-context("ml clustering - power iteration")
 
 sc <- testthat_spark_connection()
 

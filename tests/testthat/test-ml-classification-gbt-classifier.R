@@ -1,4 +1,3 @@
-context("ml classification gbt classifier")
 
 test_that("ml_gbt_classifier() default params", {
   test_requires_latest_spark()

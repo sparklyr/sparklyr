@@ -1,4 +1,3 @@
-context("ml evaluator")
 
 skip_databricks_connect()
 test_that("basic binary classification evaluation works", {

@@ -1,4 +1,3 @@
-context("jarray")
 
 test_that("jarray() works as expected", {
   num_elems <- 1000

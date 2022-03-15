@@ -1,4 +1,3 @@
-context("compile")
 
 scalac_is_available <- function(version, download_path) {
   tryCatch(

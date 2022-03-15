@@ -1,4 +1,3 @@
-context("ml clustering - bisecting kmeans")
 
 test_that("ml_bisecting_kmeans() default params", {
   test_requires_latest_spark()

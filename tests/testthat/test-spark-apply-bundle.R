@@ -1,4 +1,3 @@
-context("spark apply bundle")
 
 sc <- testthat_spark_connection()
 

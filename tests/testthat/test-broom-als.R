@@ -1,4 +1,3 @@
-context("broom-als")
 
 skip_databricks_connect()
 test_that("als tidiers works", {

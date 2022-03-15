@@ -1,4 +1,3 @@
-context("stratified-sampling")
 
 test_requires("dplyr")
 

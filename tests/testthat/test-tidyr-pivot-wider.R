@@ -1,4 +1,3 @@
-context("tidyr-pivot-wider")
 
 sc <- testthat_spark_connection()
 

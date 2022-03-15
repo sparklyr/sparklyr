@@ -1,4 +1,3 @@
-context("ml regression - isotonic regression")
 
 skip_databricks_connect()
 test_that("ml_isotonic_regression() default params", {

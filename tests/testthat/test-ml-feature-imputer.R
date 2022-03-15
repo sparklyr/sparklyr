@@ -1,4 +1,3 @@
-context("ml feature imputer")
 
 skip_databricks_connect()
 test_that("ft_imputer() default params", {

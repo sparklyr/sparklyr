@@ -1,4 +1,3 @@
-context("ml regression - linear regression")
 
 skip_databricks_connect()
 test_that("ml_linear_regression() default params", {

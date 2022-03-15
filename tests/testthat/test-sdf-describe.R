@@ -1,4 +1,3 @@
-context("describe")
 
 test_requires("dplyr")
 

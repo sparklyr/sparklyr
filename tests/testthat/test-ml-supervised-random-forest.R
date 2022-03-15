@@ -1,4 +1,3 @@
-context("ml supervised - random forest")
 
 skip_databricks_connect()
 test_that("rf runs successfully when all args specified", {

@@ -1,4 +1,3 @@
-context("streaming")
 
 skip_databricks_connect()
 test_requires("dplyr")

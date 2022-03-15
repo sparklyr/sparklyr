@@ -1,4 +1,3 @@
-context("extension sparklyr.nested")
 sc <- testthat_spark_connection()
 
 test_that("sparklyr.nested can query nested columns", {

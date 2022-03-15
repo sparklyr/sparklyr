@@ -1,4 +1,3 @@
-context("barrier")
 
 skip_databricks_connect()
 test_that("barrier-spark_apply works", {

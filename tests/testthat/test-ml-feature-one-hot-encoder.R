@@ -1,4 +1,3 @@
-context("ml feature one hot encoder")
 
 skip_databricks_connect()
 test_that("ft_one_hot_encoder() default params", {

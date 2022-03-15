@@ -1,4 +1,3 @@
-context("broom")
 
 skip_databricks_connect()
 test_that("tidy.{glm type models} works", {

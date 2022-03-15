@@ -1,4 +1,3 @@
-context("ml clustering - kmeans")
 
 test_that("ml_kmeans() default params", {
   test_requires_latest_spark()

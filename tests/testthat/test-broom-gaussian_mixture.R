@@ -1,4 +1,3 @@
-context("broom-gaussian_mixture")
 
 skip_databricks_connect()
 test_that("gaussian_mixture.tidy() works", {

@@ -1,4 +1,3 @@
-context("broom-kmeans")
 
 skip_databricks_connect()
 test_that("kmeans.tidy() works", {

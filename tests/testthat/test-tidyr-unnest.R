@@ -1,4 +1,3 @@
-context("tidyr-unnest")
 
 sc <- testthat_spark_connection()
 

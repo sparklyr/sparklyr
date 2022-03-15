@@ -1,4 +1,3 @@
-context("ml feature - dplyr transformer")
 
 skip_databricks_connect()
 

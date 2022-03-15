@@ -1,4 +1,3 @@
-context("ml regression - glm")
 
 skip_databricks_connect()
 test_that("ml_generalized_linear_regression() default params", {

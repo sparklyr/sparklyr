@@ -1,4 +1,3 @@
-context("dplyr top_n")
 sc <- testthat_spark_connection()
 
 test_that("top_n works as expected", {

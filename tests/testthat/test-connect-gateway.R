@@ -1,4 +1,3 @@
-context("connections - gateway")
 sc <- testthat_spark_connection()
 
 test_that("gateway connection fails with invalid session", {

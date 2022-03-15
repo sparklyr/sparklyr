@@ -1,4 +1,3 @@
-context("sdf stat")
 
 sc <- testthat_spark_connection()
 

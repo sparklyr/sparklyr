@@ -1,4 +1,3 @@
-context("broom-naive_bayes")
 
 skip_databricks_connect()
 library(dplyr)

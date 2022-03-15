@@ -1,4 +1,3 @@
-context("lag & lead")
 
 sc <- testthat_spark_connection()
 

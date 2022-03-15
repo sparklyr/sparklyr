@@ -1,4 +1,3 @@
-context("pivot")
 
 test_requires("dplyr", "ggplot2")
 

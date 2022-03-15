@@ -1,4 +1,3 @@
-context("dplyr-hof")
 
 test_requires("dplyr")
 

@@ -1,4 +1,3 @@
-context("tidyr-nest")
 
 sc <- testthat_spark_connection()
 simple_sdf_1 <- testthat_tbl(

@@ -1,4 +1,3 @@
-context("ml regression decision tree regressor")
 
 skip_databricks_connect()
 test_that("ml_decision_tree_regressor() default params", {

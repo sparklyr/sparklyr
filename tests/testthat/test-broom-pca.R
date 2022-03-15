@@ -1,4 +1,3 @@
-context("broom-pca")
 
 skip_databricks_connect()
 test_that("pca tidiers work", {

@@ -1,4 +1,3 @@
-context("drop-duplicates")
 
 test_requires("dplyr")
 

@@ -1,4 +1,3 @@
-context("ml classification - linear svc")
 
 skip_databricks_connect()
 test_that("ml_linear_svc() default params", {

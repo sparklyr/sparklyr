@@ -1,4 +1,3 @@
-context("spark utils")
 
 sc <- testthat_spark_connection()
 

@@ -1,4 +1,3 @@
-context("broom-logistic_regression")
 
 skip_databricks_connect()
 

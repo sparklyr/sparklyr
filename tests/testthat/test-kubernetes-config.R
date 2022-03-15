@@ -1,4 +1,3 @@
-context("kubernetes config")
 
 test_that("spark_kubernetes_config can generate correct config", {
   expect_equal(

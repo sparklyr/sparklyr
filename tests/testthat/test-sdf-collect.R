@@ -1,4 +1,3 @@
-context("sdf collect")
 
 sc <- testthat_spark_connection()
 

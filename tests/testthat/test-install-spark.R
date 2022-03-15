@@ -1,4 +1,3 @@
-context("install")
 
 skip_databricks_connect()
 test_that("supported spark_versions can be downloaded", {

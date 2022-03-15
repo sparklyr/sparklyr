@@ -1,4 +1,3 @@
-context("broom-decision_tree")
 
 skip_databricks_connect()
 test_that("decision_tree.tidy() works", {

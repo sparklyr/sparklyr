@@ -1,4 +1,3 @@
-context("hive operators")
 
 sc <- testthat_spark_connection()
 

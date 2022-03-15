@@ -1,4 +1,3 @@
-context("broom-linear_svc")
 
 skip_databricks_connect()
 test_that("linear_svc.tidy() works", {

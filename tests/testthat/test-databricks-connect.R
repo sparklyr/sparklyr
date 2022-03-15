@@ -1,4 +1,3 @@
-context("databricks-connect")
 
 skip_unless_databricks_connect()
 

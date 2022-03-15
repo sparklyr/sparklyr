@@ -1,4 +1,3 @@
-context("ml supervised - gradient boosted trees")
 
 skip_databricks_connect()
 test_that("gbt runs successfully when all args specified", {

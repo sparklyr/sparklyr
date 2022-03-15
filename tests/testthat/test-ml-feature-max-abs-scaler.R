@@ -1,4 +1,3 @@
-context("ml feature max abs scaler")
 
 skip_databricks_connect()
 test_that("ft_max_abs_scaler() param setting", {

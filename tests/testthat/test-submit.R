@@ -1,4 +1,3 @@
-context("submit")
 
 skip_databricks_connect()
 test_that("spark_submit() can submit batch jobs", {

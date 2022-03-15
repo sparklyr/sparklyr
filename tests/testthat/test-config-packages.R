@@ -1,4 +1,3 @@
-context("config-packages")
 
 test_that("spark_config_packages() supports kafka", {
   expect_equal(

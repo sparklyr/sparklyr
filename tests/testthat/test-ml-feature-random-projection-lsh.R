@@ -1,4 +1,3 @@
-context("ml feature bucketed random projection lsh")
 
 skip_databricks_connect()
 test_that("ft_bucketed_random_projection_lsh() default params", {

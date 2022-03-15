@@ -1,4 +1,3 @@
-context("ml feature - idf")
 
 skip_databricks_connect()
 test_that("ft_idf() default params", {

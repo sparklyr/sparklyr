@@ -1,4 +1,3 @@
-context("ml feature normalizer")
 
 skip_databricks_connect()
 test_that("ft_normalizer() default params", {

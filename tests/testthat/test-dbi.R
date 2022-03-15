@@ -1,4 +1,3 @@
-context("dbi")
 
 sc <- testthat_spark_connection()
 

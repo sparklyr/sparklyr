@@ -1,4 +1,3 @@
-context("ml gaussian mixture")
 
 test_that("ml_gaussian_mixture() default params", {
   test_requires_latest_spark()
