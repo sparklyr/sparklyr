@@ -47,12 +47,10 @@ sql_build.op_sample_frac <- function(op, con, ...) {
   }
 }
 
-#' @export
-sql_build.lazy_sample_query <- function(op, con, ...) {
-  grps <- dbplyr::op_grps(op$from)
-  sdf <- to_sdf(op$from, con)
+sql_build.op_sample <- function(op, con, frac) {
+  grps <- dbplyr::op_grps(op)
+  sdf <- to_sdf(op, con)
   cols <- colnames(sdf)
-  frac <- op$frac
 
   sample_sdf <- (
     if (length(grps) > 0) {
@@ -88,6 +86,61 @@ sql_build.lazy_sample_query <- function(op, con, ...) {
       sdf_weighted_sample(
         x = sdf,
         weight_col = NULL,
+        k = sample_size,
+        replacement = op$args$replace,
+        seed = op$args$seed
+      )
+    })
+
+  sample_sdf %>% dbplyr::remote_query()
+}
+
+#' @export
+sql_build.lazy_sample_query <- function(op, con, ...) {
+  grps <- dbplyr::op_grps(op$from)
+  sdf <- to_sdf(op$from, con)
+  frac <- op$frac
+
+  if (rlang::quo_is_null(op$args$weight)) {
+    weight <- NULL
+  } else {
+    weight <- rlang::as_name(op$args$weight)
+  }
+
+  sample_sdf <- (
+    if (length(grps) > 0) {
+      if (frac) {
+        sdf_stratified_sample_frac(
+          x = sdf,
+          grps = grps,
+          frac = op$args$size,
+          weight = weight,
+          replace = op$args$replace,
+          op$args$seed
+        )
+      } else {
+        sdf_stratified_sample_n(
+          x = sdf,
+          grps = grps,
+          k = op$args$size,
+          weight = weight,
+          replace = op$args$replace,
+          op$args$seed
+        )
+      }
+    } else {
+      sample_size <- (
+        if (frac) {
+          cnt <- sdf %>%
+            spark_dataframe() %>%
+            invoke("count")
+          round(cnt * check_frac(op$args$size, replace = op$args$replace))
+        } else {
+          op$args$size
+        })
+      sdf_weighted_sample(
+        x = sdf,
+        weight_col = weight,
         k = sample_size,
         replacement = op$args$replace,
         seed = op$args$seed

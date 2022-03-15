@@ -8,7 +8,12 @@ ft_extract_sql <- function(x) {
       xx
     }
   }
-  pattern <- paste0("\\b", get_base_name(x$lazy_query), "\\b")
+
+  if (dbplyr_uses_ops()) {
+    pattern <- paste0("\\b", get_base_name(x$ops), "\\b")
+  } else {
+    pattern <- paste0("\\b", get_base_name(x$lazy_query), "\\b")
+  }
 
   gsub(pattern, "__THIS__", dbplyr::sql_render(x))
 }

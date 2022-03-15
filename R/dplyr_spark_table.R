@@ -33,7 +33,11 @@ sample_n.tbl_spark <- function(tbl,
     .env = .env
   )
 
-  tbl$lazy_query <- lazy_sample_query(tbl$lazy_query, frac = FALSE, args = args)
+  if (dbplyr_uses_ops()) {
+    tbl <- add_op_single("sample_n", .data = tbl, args = args)
+  } else {
+    tbl$lazy_query <- lazy_sample_query(tbl$lazy_query, frac = FALSE, args = args)
+  }
 
   tbl %>%
     as_sampled_tbl(frac = FALSE, args = args)
@@ -58,7 +62,11 @@ sample_frac.tbl_spark <- function(tbl,
     .env = .env
   )
 
-  tbl$lazy_query <- lazy_sample_query(tbl$lazy_query, frac = TRUE, args = args)
+  if (dbplyr_uses_ops()) {
+    tbl <- add_op_single("sample_frac", .data = tbl, args = args)
+  } else {
+    tbl$lazy_query <- lazy_sample_query(tbl$lazy_query, frac = TRUE, args = args)
+  }
 
   tbl %>%
     as_sampled_tbl(frac = TRUE, args = args)
@@ -122,8 +130,16 @@ print.tbl_spark <- function(x, ...) {
     rows <- max(rows, options$n)
   }
 
-  grps <- dbplyr::op_grps(x)
-  sort <- dbplyr::op_sort(x) %>%
+  if (dbplyr_uses_ops()) {
+    grps <- dbplyr::op_grps(x$ops)
+    sort <- dbplyr::op_sort(x$ops)
+  } else {
+    # TODO should this use `$lazy_query`?
+    grps <- dbplyr::op_grps(x)
+    sort <- dbplyr::op_sort(x)
+  }
+
+  sort <- sort %>%
     purrr::map_if(rlang::is_formula, rlang::f_rhs) %>%
     purrr::map_chr(rlang::expr_text, width = 500L)
 
