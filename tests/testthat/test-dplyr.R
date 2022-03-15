@@ -470,7 +470,7 @@ test_that("process_tbl_name works as expected", {
 
 test_that("in_schema() works as expected", {
   skip_on_arrow()
-  skip_livy()
+  skip_on_livy()
 
   db_name <- random_string("test_db_")
 

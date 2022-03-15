@@ -5,12 +5,9 @@ testthat_context <- new.env()
 testthat_spark_connection_open <- function(set_to = NULL) {
   cs <- testthat_context$spark$connection$open
   if(is.null(cs)) cs <- FALSE
-  if(!is.null(set_to)) {
-    cs <- set_to
-  } else {
-    testthat_context$spark$connection$open <- cs
-    cs
-  }
+  if(!is.null(set_to)) cs <- set_to
+  testthat_context$spark$connection$open <- cs
+  cs
 }
 
 testthat_spark_connection_object <- function(con = NULL) {

@@ -61,7 +61,6 @@ testthat_shell_connection <- function(method = "shell") {
       packages = packages
     )
 
-    testthat_spark_connection_open(TRUE)
     testthat_spark_connection_object(sc)
   }
   sc
@@ -78,9 +77,7 @@ testthat_livy_connection <- function() {
 
     livy_service_start(
       version = using_livy_version(),
-      spark_version = spark_version,
-      stdout = FALSE,
-      stderr = FALSE
+      spark_version = spark_version
     )
 
     wait_for_svc(
@@ -89,27 +86,12 @@ testthat_livy_connection <- function() {
       timeout_s = 30
     )
 
-    config <- list()
-    if (identical(.Platform$OS.type, "windows")) {
-      # TODO: investigate why there are Windows-specific timezone portability issues
-      config$`spark.sql.session.timeZone` <- "UTC"
-    }
-
-    config$`sparklyr.verbose` <- TRUE
-    config$`sparklyr.connect.timeout` <- 120
-    config$`sparklyr.log.invoke` <- "cat"
-    config$`spark.sql.warehouse.dir` <- get_spark_warehouse_dir()
-    config$`sparklyr.sdf_collect.persistence_level` <- "NONE"
-
     sc <- spark_connect(
       master = "http://localhost:8998",
       method = "livy",
-      config = config,
-      version = spark_version,
-      sources = TRUE
+      version = spark_version
     )
 
-    testthat_spark_connection_open(TRUE)
     testthat_spark_connection_object(sc)
   }
 
