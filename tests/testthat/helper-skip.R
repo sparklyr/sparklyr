@@ -88,10 +88,3 @@ test_requires <- function(...) {
   })
   invisible(TRUE)
 }
-
-test_requires_latest_spark <- function() {
-  test_requires_version(testthat_latest_spark())
-}
-
-
-

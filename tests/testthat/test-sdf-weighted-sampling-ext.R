@@ -7,12 +7,13 @@ weighted_sampling_octal_test_data <- data.frame(
   x = rep(seq(0L, 7L), 100L),
   weight = 1L + (seq(800L) * 7L + 11L) %% 17L
 )
+
 sdf <- testthat_tbl(
   name = "weighted_sampling_octal_test_data",
   repartition = 4L
 )
 
-num_sampling_iters <- 500L
+num_sampling_iters <- 100L
 alpha <- 0.05
 
 sample_sz <- 3L

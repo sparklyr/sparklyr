@@ -99,18 +99,6 @@ test_that("nesting everything", {
   )
 })
 
-test_that("nest preserves order of data", {
-  test_requires_version("2.0.0")
-  tb <- tibble::tibble(x = c(1, 3, 2, 3, 2), y = 1:5)
-  sdf <- copy_to(sc, tb)
-  sdf_nest <- tidyr::nest(sdf, data = y) %>% collect()
-  tb_nest <- tidyr::nest(tb, data = y)
-  expect_equivalent(
-    sdf_nest$x,
-    tb_nest$x
-  )
-})
-
 test_that("can strip names", {
   test_requires_version("2.0.0")
 
