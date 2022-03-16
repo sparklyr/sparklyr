@@ -1,4 +1,5 @@
-context("tidyr-nest")
+skip_on_livy()
+skip_on_arrow_devel()
 
 sc <- testthat_spark_connection()
 simple_sdf_1 <- testthat_tbl(
@@ -93,25 +94,6 @@ test_that("nesting everything", {
     tibble::tibble(
       data = list(
         list(list(x = 1, y = "B"), list(x = 2, y = "A"), list(x = 3, y = "A"))
-      )
-    )
-  )
-})
-
-test_that("nest preserves order of data", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(sc, tibble::tibble(x = c(1, 3, 2, 3, 2), y = 1:5))
-  out <- tidyr::nest(sdf, data = y) %>% collect()
-
-  expect_equivalent(
-    out,
-    tibble::tibble(
-      x = c(1, 3, 2),
-      data = list(
-        list(list(y = 1)),
-        list(list(y = 2), list(y = 4)),
-        list(list(y = 3), list(y = 5))
       )
     )
   )

@@ -1,4 +1,4 @@
-context("dplyr-sample-n")
+skip_on_livy()
 
 sc <- testthat_spark_connection()
 
@@ -7,7 +7,7 @@ test_requires("dplyr")
 
 test_that("'sample_n' works as expected", {
   test_requires_version("2.0.0")
-  skip_livy()
+  skip_on_livy()
   test_requires("dplyr")
 
   for (weight in list(NULL, rlang::sym("Petal_Length"))) {
@@ -28,7 +28,7 @@ test_that("'sample_n' works as expected", {
 
 test_that("weighted sampling works as expected with integer weight columns", {
   test_requires_version("2.0.0")
-  skip_livy()
+  skip_on_livy()
   test_requires("dplyr")
 
   sdf <- copy_to(sc, tibble::tibble(id = seq(100), weight = seq(100)))

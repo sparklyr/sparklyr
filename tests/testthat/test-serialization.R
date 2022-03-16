@@ -1,4 +1,4 @@
-context("serialization")
+skip_on_livy()
 
 sc <- testthat_spark_connection()
 

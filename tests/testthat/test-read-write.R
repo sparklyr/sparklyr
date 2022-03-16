@@ -1,4 +1,4 @@
-context("read-write")
+skip_on_livy()
 
 sc <- testthat_spark_connection()
 iris_table_name <- random_table_name("iris")

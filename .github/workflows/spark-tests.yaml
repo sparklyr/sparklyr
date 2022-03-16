@@ -1,0 +1,101 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+name: Spark-Tests
+
+jobs:
+  Spark-Tests:
+    runs-on: ubuntu-latest
+
+    name: ${{ matrix.config.name }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+
+          - {spark: '3.1.2', hadoop: '3.2', arrow: '',        livy: '',      name: 'Spark 3.1'}
+          - {spark: '3.1.2', hadoop: '3.2', arrow: 'release', livy: '',      name: 'Spark 3.1 w Arrow'}
+          - {spark: '3.1.2', hadoop: '3.2', arrow: 'devel',   livy: '',      name: 'Spark 3.1 w Arrow Dev'}
+          - {spark: '3.0.0', hadoop: '3.2', arrow: '',        livy: '',      name: 'Spark 3.0'}
+          - {spark: '2.4.0', hadoop: '2.7', arrow: '',        livy: '',      name: 'Spark 2.4'}
+          - {spark: '2.4.0', hadoop: '2.7', arrow: '',        livy: '0.6.0', name: 'Spark 2.4 w Livy 6'}
+          - {spark: '2.2.1', hadoop: '2.7', arrow: '',        livy: '',      name: 'Spark 2.2'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      SPARK_VERSION: ${{ matrix.config.spark }}
+      LIVY_VERSION:  ${{ matrix.config.livy }}
+      ARROW_VERSION: ${{ matrix.config.arrow }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::devtools
+            any::sparklyr
+
+      - name: Cache Spark
+        id: cache-spark
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/spark/spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
+          key: sparklyr-spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
+
+      - name: Install Spark (via sparklyr)
+        if: steps.cache-spark.outputs.cache-hit != 'true'
+        run: sparklyr::spark_install(version = Sys.getenv("SPARK_VERSION"))
+        shell: Rscript {0}
+
+      - name: Cache Livy
+        if: ${{ matrix.config.livy }} != ''
+        id: cache-livy
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/.cache/livy/livy-${{ matrix.config.livy }}
+          key: livy-${{ matrix.config.livy }}
+
+      - name: Install Livy (via sparklyr)
+        if: ${{ (steps.cache-livy.outputs.cache-hit != 'true') && (matrix.config.livy != '') }}
+        run: sparklyr::livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
+        shell: Rscript {0}
+
+      - name: Switching to Arrow devel if needed
+        run: if(Sys.getenv("ARROW_VERSION") == "devel") arrow::install_arrow(nightly = TRUE)
+        shell: Rscript {0}
+
+      - name: R Session Info
+        run: sessionInfo()
+        shell: Rscript {0}
+
+      - name: R Environment Variables
+        run: Sys.getenv()
+        shell: Rscript {0}
+
+      - name: R Installed Packages
+        run: |
+          m_pkgs <- installed.packages()
+          t_pkgs <- as.data.frame(m_pkgs, row.names = FALSE)
+          print(t_pkgs[, c("Package", "Version")])
+        shell: Rscript {0}
+
+      - name: R Tests
+        run: |
+          spark_major <- as.numeric(substr(Sys.getenv("SPARK_VERSION"), 1, 1))
+          if(spark_major < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
+          Sys.getenv("JAVA_HOME")
+          devtools::test(reporter = sparklyr_reporter())
+        shell: Rscript {0}

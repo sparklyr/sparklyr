@@ -1,4 +1,5 @@
-context("ml feature robust scaler")
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("ft_robust_scaler() works properly", {
   sc <- testthat_spark_connection()

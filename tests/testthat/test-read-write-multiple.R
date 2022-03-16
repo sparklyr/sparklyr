@@ -1,4 +1,5 @@
-context("read-write-multiple")
+skip_on_livy()
+skip_on_arrow_devel()
 
 sc <- testthat_spark_connection()
 

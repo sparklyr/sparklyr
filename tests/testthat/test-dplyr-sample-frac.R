@@ -1,4 +1,4 @@
-context("dplyr-sample-frac")
+skip_on_livy()
 
 sc <- testthat_spark_connection()
 
@@ -7,7 +7,7 @@ test_requires("dplyr")
 
 test_that("'sample_frac' works as expected", {
   test_requires_version("2.0.0")
-  skip_livy()
+  skip_on_livy()
   test_requires("dplyr")
 
   for (weight in list(NULL, rlang::sym("Petal_Length"))) {

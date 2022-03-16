@@ -1,4 +1,5 @@
-context("ml fpm prefixspan")
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("ml_prefixspan() works as expected", {
   test_requires_version("2.4.0", "prefixspan requires spark 2.4.0+")

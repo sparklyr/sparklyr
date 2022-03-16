@@ -1,4 +1,5 @@
-context("ml feature one hot encoder estimator")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ft_one_hot_encoder_estimator() default params", {

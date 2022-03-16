@@ -1,4 +1,5 @@
-context("compile")
+skip_on_livy()
+skip_on_arrow_devel()
 
 scalac_is_available <- function(version, download_path) {
   tryCatch(

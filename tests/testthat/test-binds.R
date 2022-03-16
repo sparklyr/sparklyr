@@ -1,4 +1,4 @@
-context("binds")
+skip_on_livy()
 
 test_requires("dplyr")
 sc <- testthat_spark_connection()

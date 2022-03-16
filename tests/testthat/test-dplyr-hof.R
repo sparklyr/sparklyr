@@ -1,4 +1,4 @@
-context("dplyr-hof")
+skip_on_livy()
 
 test_requires("dplyr")
 

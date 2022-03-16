@@ -1,4 +1,5 @@
-context("partitioning")
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("sdf_repartition works", {
   iris_tbl <- testthat_tbl("iris")

@@ -1,4 +1,4 @@
-context("dplyr-sample")
+skip_on_livy()
 
 sc <- testthat_spark_connection()
 
@@ -6,7 +6,6 @@ test_requires("dplyr")
 
 test_that("set.seed makes sampling outcomes deterministic", {
   test_requires_version("2.0.0")
-  skip_livy()
   test_requires("dplyr")
 
   sdf <- copy_to(sc, tibble::tibble(id = seq(1000), weight = rep(seq(5), 200)))

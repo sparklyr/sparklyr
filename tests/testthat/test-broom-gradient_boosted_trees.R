@@ -1,4 +1,5 @@
-context("broom-gradient_boosted_trees")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("gradient_boosted_trees.tidy() works", {

@@ -1,4 +1,5 @@
-context("kubernetes config")
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("spark_kubernetes_config can generate correct config", {
   expect_equal(

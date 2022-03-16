@@ -1,4 +1,5 @@
-context("ml stat - correlation")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 mtcars_tbl <- testthat_tbl("mtcars")

@@ -1,4 +1,5 @@
-context("broom-naive_bayes")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 library(dplyr)

@@ -1,4 +1,5 @@
-context("drop-duplicates")
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_requires("dplyr")
 

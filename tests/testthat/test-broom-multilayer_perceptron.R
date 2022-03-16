@@ -1,4 +1,5 @@
-context("broom-multilayer_perceptron")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("multilayer_perceptron.tidy() works", {
