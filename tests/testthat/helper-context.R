@@ -76,7 +76,7 @@ using_arrow_version <- function() {
 }
 
 using_arrow_devel <- function() {
-  if(using_arrow_version == "devel") {
+  if(using_arrow_version() == "devel") {
     TRUE
   } else {
     FALSE

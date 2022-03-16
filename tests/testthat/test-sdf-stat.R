@@ -1,5 +1,6 @@
 skip_on_livy()
 skip_on_arrow_devel()
+test_requires_version("3.0.0")
 
 sc <- testthat_spark_connection()
 
@@ -16,7 +17,6 @@ test_that("sdf_crosstab() works", {
 })
 
 test_that("sdf_quantile() works for a single column", {
-  test_requires_version("2.0.0", "approxQuantile() is only supported in Spark 2.0.0 or above")
 
   mtcars_tbl <- testthat_tbl("mtcars")
 
@@ -36,8 +36,6 @@ test_that("sdf_quantile() works for a single column", {
 })
 
 test_that("sdf_quantile() works for multiple column", {
-
-  test_requires_version("2.0.0", "multicolumn quantile requires 2.0+")
 
   mtcars_tbl <- testthat_tbl("mtcars")
 
