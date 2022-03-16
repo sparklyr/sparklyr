@@ -4,7 +4,8 @@ sparklyr: R interface for Apache Spark
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
 
-[![CI](https://github.com/sparklyr/sparklyr/workflows/CI/badge.svg)](https://github.com/sparklyr/sparklyr/actions)
+[![R-CMD-check](https://github.com/sparklyr/sparklyr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sparklyr/sparklyr/actions/workflows/R-CMD-check.yaml)
+[![Spark-Tests](https://github.com/sparklyr/sparklyr/actions/workflows/spark-tests.yaml/badge.svg)](https://github.com/sparklyr/sparklyr/actions/workflows/spark-tests.yaml)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/sparklyr)](https://CRAN.R-project.org/package=sparklyr)
 [![Codecov test
@@ -316,16 +317,16 @@ spark_apply(iris_tbl, function(data) {
 #> # Source: spark<?> [?? x 4]
 #>    Sepal_Length Sepal_Width Petal_Length Petal_Width
 #>           <dbl>       <dbl>        <dbl>       <dbl>
-#>  1         5.96        4.36         2.26       1.06 
-#>  2         5.76        3.86         2.26       1.06 
-#>  3         5.56        4.06         2.16       1.06 
-#>  4         5.46        3.96         2.36       1.06 
-#>  5         5.86        4.46         2.26       1.06 
-#>  6         6.26        4.76         2.56       1.26 
-#>  7         5.46        4.26         2.26       1.16 
-#>  8         5.86        4.26         2.36       1.06 
-#>  9         5.26        3.76         2.26       1.06 
-#> 10         5.76        3.96         2.36       0.964
+#>  1         6.87        5.27         3.17        1.97
+#>  2         6.67        4.77         3.17        1.97
+#>  3         6.47        4.97         3.07        1.97
+#>  4         6.37        4.87         3.27        1.97
+#>  5         6.77        5.37         3.17        1.97
+#>  6         7.17        5.67         3.47        2.17
+#>  7         6.37        5.17         3.17        2.07
+#>  8         6.77        5.17         3.27        1.97
+#>  9         6.17        4.67         3.17        1.97
+#> 10         6.67        4.87         3.27        1.87
 #> # … with more rows
 ```
 
@@ -408,16 +409,16 @@ You can show the log using the `spark_log()` function:
 
 ``` r
 spark_log(sc, n = 10)
-#> 22/02/14 16:20:54 INFO BlockManagerInfo: Removed broadcast_86_piece0 on localhost:52293 in memory (size: 5.0 KiB, free: 910.4 MiB)
-#> 22/02/14 16:20:54 INFO BlockManagerInfo: Removed broadcast_85_piece0 on localhost:52293 in memory (size: 19.5 KiB, free: 910.4 MiB)
-#> 22/02/14 16:20:54 INFO BlockManagerInfo: Removed broadcast_89_piece0 on localhost:52293 in memory (size: 18.4 KiB, free: 910.4 MiB)
-#> 22/02/14 16:20:54 INFO Executor: Finished task 0.0 in stage 67.0 (TID 83). 1004 bytes result sent to driver
-#> 22/02/14 16:20:54 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 83) in 246 ms on localhost (executor driver) (1/1)
-#> 22/02/14 16:20:54 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-#> 22/02/14 16:20:54 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:0) finished in 0.265 s
-#> 22/02/14 16:20:54 INFO DAGScheduler: Job 49 is finished. Cancelling potential speculative or zombie tasks for this job
-#> 22/02/14 16:20:54 INFO TaskSchedulerImpl: Killing all running tasks in stage 67: Stage finished
-#> 22/02/14 16:20:54 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.278883 s
+#> 22/03/16 14:49:17 INFO BlockManagerInfo: Removed broadcast_85_piece0 on localhost:51848 in memory (size: 19.5 KiB, free: 912.1 MiB)
+#> 22/03/16 14:49:17 INFO BlockManagerInfo: Removed broadcast_77_piece0 on localhost:51848 in memory (size: 16.7 KiB, free: 912.1 MiB)
+#> 22/03/16 14:49:17 INFO BlockManagerInfo: Removed broadcast_89_piece0 on localhost:51848 in memory (size: 18.4 KiB, free: 912.1 MiB)
+#> 22/03/16 14:49:17 INFO Executor: Finished task 0.0 in stage 67.0 (TID 83). 1004 bytes result sent to driver
+#> 22/03/16 14:49:17 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 83) in 194 ms on localhost (executor driver) (1/1)
+#> 22/03/16 14:49:17 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+#> 22/03/16 14:49:17 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:0) finished in 0.211 s
+#> 22/03/16 14:49:17 INFO DAGScheduler: Job 49 is finished. Cancelling potential speculative or zombie tasks for this job
+#> 22/03/16 14:49:17 INFO TaskSchedulerImpl: Killing all running tasks in stage 67: Stage finished
+#> 22/03/16 14:49:17 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.216487 s
 ```
 
 Finally, we disconnect from Spark:

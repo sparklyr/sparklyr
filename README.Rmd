@@ -19,15 +19,14 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 
-
 library(sparklyr)
 library(dplyr)
 library(ggplot2)
-
 ```
 
 <!-- badges: start -->
-[![CI](https://github.com/sparklyr/sparklyr/workflows/CI/badge.svg)](https://github.com/sparklyr/sparklyr/actions)
+[![R-CMD-check](https://github.com/sparklyr/sparklyr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sparklyr/sparklyr/actions/workflows/R-CMD-check.yaml)
+[![Spark-Tests](https://github.com/sparklyr/sparklyr/actions/workflows/spark-tests.yaml/badge.svg)](https://github.com/sparklyr/sparklyr/actions/workflows/spark-tests.yaml)
 [![CRAN status](https://www.r-pkg.org/badges/version/sparklyr)](https://CRAN.R-project.org/package=sparklyr)
 [![Codecov test coverage](https://codecov.io/gh/sparklyr/sparklyr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sparklyr/sparklyr?branch=main)
 <!-- badges: end -->
