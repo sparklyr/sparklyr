@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CODE_COVERAGE: 'true'
 
     steps:
       - uses: actions/checkout@v2
@@ -37,5 +38,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Test coverage
-        run: covr::codecov(quiet = FALSE)
+        run: |
+          identical(Sys.getenv("CODE_COVERAGE"), "true")
+          covr::codecov(quiet = FALSE)
         shell: Rscript {0}

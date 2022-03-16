@@ -13,3 +13,10 @@
 ## Sys.setenv("LIVY_VERSION" = "0.6.0")
 ## Sys.setenv("ARROW_VERSION" = "release") # Or "devel"
 ## devtools::test(reporter = sparklyr_reporter())
+
+
+if(identical(Sys.getenv("CODE_COVERAGE"), "true")) {
+  library(testthat)
+  library(sparklyr)
+  test_check("sparklyr")
+}
