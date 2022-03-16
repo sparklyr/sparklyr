@@ -13,7 +13,7 @@ sparklyr_reporter <- function() {
   if (using_livy()) {
     MultiReporter$new(
       reporters = list(
-        SilentReporter$new(),
+        SummaryReporter$new(),
         PerformanceReporter$new()
       )
     )
@@ -132,6 +132,7 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
         )
       }
       cat("\n")
+      if(self$n_fail > 0) stop("There were failures")
     }
   )
 )

@@ -2,13 +2,13 @@ skip_on_livy()
 skip_on_arrow_devel()
 
 test_that("ml_lda() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ml_lda)
 })
 
 test_that("ml_lda() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     k = 20,

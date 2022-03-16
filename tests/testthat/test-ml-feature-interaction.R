@@ -3,7 +3,7 @@ skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ft_interaction() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     input_cols = c("foo1", "foo2"),

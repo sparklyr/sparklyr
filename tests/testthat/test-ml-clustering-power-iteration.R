@@ -67,13 +67,13 @@ verify_clusters <- function(clusters) {
 pic_data <- copy_to(sc, gen_pic_data())
 
 test_that("ml_power_iteration() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
 
   test_default_args(sc, ml_power_iteration)
 })
 
 test_that("ml_power_iteration() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
 
   test_args <- list(
     k = 3,
