@@ -34,7 +34,7 @@
 ^config\.toml$
 ^appveyor\.yml$
 ^checkpoints$
-^ci$
+^utils$
 ^tests/
 ^logs/
 ^CODE_OF_CONDUCT\.md$
