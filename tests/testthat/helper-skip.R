@@ -57,6 +57,11 @@ skip_on_livy <- function() {
   }
 }
 
+skip_unless_livy <- function() {
+  if(!using_livy()) {
+    skip("Test only runs on Livy")
+  }
+}
 
 test_requires_version <- function(min_version, comment = NULL, max_version = NULL) {
   sc <- testthat_spark_connection()

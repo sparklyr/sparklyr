@@ -1,3 +1,4 @@
+skip_unless_livy()
 skip_on_arrow_devel()
 
 num_open_fds <- function(port) {
@@ -12,13 +13,10 @@ num_open_fds <- function(port) {
 
 test_that("Livy connection works with HTTP proxy", {
   sc <- testthat_spark_connection()
-  if (!identical(sc$method, "livy")) {
-    skip("Test only applicable to Livy connections")
-  }
-
+  proxy_port <- 9999
   np <- num_open_fds(proxy_port)
+
   if(np > 0) {
-    proxy_port <- 9999
 
     handle <- local_tcp_proxy(proxy_port = proxy_port, dest_port = 8998)
 
