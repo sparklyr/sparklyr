@@ -1,9 +1,17 @@
 skip_on_livy()
 skip_on_arrow_devel()
-
 skip_databricks_connect()
 test_requires("dplyr")
+
 sc <- testthat_spark_connection()
+
+test_that("stream test generates file", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+  expect_silent(stream_generate_test(iterations = 1))
+  ss <- read.csv("source/stream_1.csv")
+  expect_equal(ss$x, 1:12)
+  on.exit(unlink("source", recursive = TRUE))
+})
 
 iris_in <- paste0("file://", file.path(getwd(), "iris-in"))
 iris_out_dir <- file.path(getwd(), "iris-out")
@@ -29,6 +37,10 @@ test_stream("csv stream can be filtered with dplyr", {
     stream_write_csv(iris_out)
 
   stream_stop(stream)
+
+  expect_equal(substr(capture.output(stream)[1], 1, 6), "Stream")
+  expect_is(stream_id(stream), "character")
+
   succeed()
 })
 
@@ -170,4 +182,16 @@ test_stream("stream write handles partitioning columns correctly", {
   for (partition in c("Species=setosa", "Species=versicolor", "Species=virginica")) {
     expect_true(partition %in% sub_dirs)
   }
+})
+
+test_stream("Adds watermark step", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    stream_watermark() %>%
+    stream_write_memory("iris_stream")
+
+  stream_stop(stream)
+
+  succeed()
 })
