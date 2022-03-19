@@ -68,28 +68,23 @@ test_that("grouping is preserved", {
 test_that("nested list column pivots correctly", {
   test_requires_version("2.4.0")
 
-  sdf <- copy_to(
-    sc,
-    tibble::tibble(
-      i = c(1, 2, 1, 2),
-      g = c("a", "a", "b", "b"),
-      d = list(
-        list(x = 1, y = 5), list(x = 2, y = 6), list(x = 3, y = 7), list(x = 4, y = 8)
-      )
-    )
-  )
-  out <- tidyr::pivot_wider(sdf, names_from = g, values_from = d, names_sort = TRUE) %>%
-    collect() %>%
-    dplyr::arrange(i)
+  df <- tibble::tibble(
+    i = c(1, 2, 1, 2),
+    g = c("a", "a", "b", "b"),
+    d = list(
+      list(x = 1, y = 5), list(x = 2, y = 6), list(x = 3, y = 7), list(x = 4, y = 8)
+    ))
 
-  expect_equivalent(
-    out,
-    tibble::tibble(
-      i = 1:2,
-      a = list(list(x = 1, y = 5), list(x = 2, y = 6)),
-      b = list(list(x = 3, y = 7), list(x = 4, y = 8))
-    )
-  )
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+
+  sdf_out <- pivot_wider(sdf, names_from = g, values_from = d, names_sort = TRUE) %>%
+    collect() %>%
+    arrange(i)
+
+  df_out <- pivot_wider(df, names_from = g, values_from = d, names_sort = TRUE) %>%
+    arrange(i)
+
+  expect_equivalent(sdf_out, df_out)
 })
 
 test_that("can specify output column names using names_glue", {

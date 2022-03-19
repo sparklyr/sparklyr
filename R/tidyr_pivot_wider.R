@@ -57,6 +57,7 @@ pivot_wider.tbl_spark <- function(data,
   )
 }
 
+#' @importFrom purrr reduce map
 sdf_build_wider_spec <- function(data,
                                  names_from,
                                  values_from,
@@ -74,7 +75,7 @@ sdf_build_wider_spec <- function(data,
     collect()
 
   if (names_sort) {
-    row_ids <- vctrs::vec_sort(row_ids)
+    row_ids <- dplyr::arrange(row_ids)
   }
 
   row_names <- rlang::exec(paste, !!!row_ids, sep = names_sep)
@@ -84,11 +85,10 @@ sdf_build_wider_spec <- function(data,
   if (length(values_from) == 1) {
     out$.value <- values_from
   } else {
-    out <- vctrs::vec_repeat(out, times = vctrs::vec_size(values_from))
-    out$.value <- vctrs::vec_repeat(values_from, each = vctrs::vec_size(row_ids))
+    out <- reduce(map(seq_along(values_from), ~ out), rbind)
+    out$.value <- as.character(rep(values_from, each = 2))
     out$.name <- paste0(out$.value, names_sep, out$.name)
-
-    row_ids <- vctrs::vec_repeat(row_ids, times = vctrs::vec_size(values_from))
+    row_ids <- reduce(map(seq_along(values_from), ~ row_ids), rbind)
   }
 
   out <- vctrs::vec_cbind(out, tibble::as_tibble(row_ids), .name_repair = "minimal")

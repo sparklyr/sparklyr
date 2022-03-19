@@ -163,38 +163,45 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
   }
 }
 
+sql_collapse <- function(x) {
+  sql(paste0(map_chr(x, quote_sql_name), collapse = ", "))
+}
+
+remove_matching_strings <- function(x, y) {
+  for(i in seq_along(x)) {
+    y <- y[y != x[i]]
+  }
+  y
+}
+
 #' @export
 #' @importFrom dbplyr op_vars
 #' @importFrom dbplyr sql_build
+#' @importFrom dbplyr select_query
+#' @importFrom purrr map_chr
 sql_build.op_tbl_spark_distinct <- function(op, con, ...) {
-  output_cols <- op_vars(op)
-  sql <- lapply(
-    c(op$args$.row_num, output_cols),
-    function(x) {
-      x <- quote_sql_name(x, con)
-      sprintf("FIRST(%s, FALSE) AS %s", x, x)
-    }
-  ) %>%
-    paste(collapse = ", ") %>%
-    dbplyr::sql()
-
-  dbplyr::select_query(
-    from = dbplyr::sql_build(op$x, con = con),
-    select = sql,
-    group_by = op$args$.distinct_cols %>%
-      lapply(function(x) quote_sql_name(x, con)) %>%
-      paste(collapse = ", ") %>%
-      dbplyr::sql(),
-    order_by = quote_sql_name(op$args$.row_num, con) %>% dbplyr::sql()
-  ) %>%
-    dbplyr::select_query(
-      from = .,
-      select = output_cols %>%
-        lapply(function(x) quote_sql_name(x, con)) %>%
-        paste(collapse = ", ") %>%
-        dbplyr::sql(),
-      order_by = quote_sql_name(op$args$.row_num, con) %>% dbplyr::sql()
+  if(op$args$.keep_all) {
+    dc <- op$args$.distinct_cols
+    al <- op$args$.all_cols
+    alr <- remove_matching_strings(dc, al)
+    quoted_names <- map_chr(alr, quote_sql_name)
+    first_select <- sql(paste0("first(", quoted_names, ") as ", quoted_names, collapse = ", "))
+    group_names <- sql_collapse(dc)
+    full_select <- sql(paste(group_names, first_select, sep = ","))
+    select_query(
+      select = full_select,
+      from = sql_build(op$x, con = con),
+      group_by = group_names,
+      distinct = FALSE
     )
+  } else {
+    select_query(
+      from = sql_build(op$x, con = con),
+      select = sql_collapse(op_vars(op)),
+      distinct = TRUE
+    )
+  }
+
 }
 
 #' @export
@@ -234,3 +241,4 @@ check_frac <- function(size, replace = FALSE) {
     "set `replace` = TRUE to use sampling with replacement"
   )
 }
+
