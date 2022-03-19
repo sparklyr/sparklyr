@@ -57,10 +57,18 @@ test_that("error when overwriting existing column", {
 test_that("grouping is preserved", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(sc, tibble::tibble(g = 1, k = "x", v = 2))
-  out <- sdf %>%
-    dplyr::group_by(g) %>%
-    tidyr::pivot_wider(names_from = k, values_from = v)
+  df <- tibble::tibble(g = 1, k = "x", v = 2)
+
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+
+  sdf_out <- sdf %>%
+    group_by(g) %>%
+    pivot_wider(names_from = k, values_from = v) %>%
+    collect()
+
+  df_out <- df %>%
+    group_by(g) %>%
+    pivot_wider(names_from = k, values_from = v)
 
   expect_equal(dplyr::group_vars(out), "g")
 })
@@ -129,24 +137,35 @@ test_that("can override default keys", {
   test_requires_version("2.3.0")
   skip_databricks_connect()
 
-  df <-  tibble::tribble(
-    ~row, ~name, ~var, ~value,
-    1, "Sam", "age", 10,
-    2, "Sam", "height", 1.5,
-    3, "Bob", "age", 20
+  df <- tibble::tribble(
+      ~row, ~name, ~var, ~value,
+      1, "Sam", "age", 10,
+      2, "Sam", "height", 1.5,
+      3, "Bob", "age", 20
     )
 
+  sdf <- copy_to(sc, df, overwrite = TRUE)
 
-  expect_equivalent(
-    sdf %>%
-      tidyr::pivot_wider(id_cols = name, names_from = var, values_from = value) %>%
-      collect() %>%
-      dplyr::arrange(name),
-    tibble::tribble(
-      ~name, ~age, ~height,
-      "Bob", 20, NaN,
-      "Sam", 10, 1.5,
-    )
+  df_pw <- df %>%
+    pivot_wider(id_cols = name, names_from = var, values_from = value)
+
+  sdf_pw <- sdf %>%
+    pivot_wider(id_cols = name, names_from = var, values_from = value) %>%
+    collect()
+
+  expect_equal(
+    df_pw$name,
+    sdf_pw$name
+  )
+
+  expect_equal(
+    df_pw$age,
+    sdf_pw$age
+  )
+
+  expect_equal(
+    df_pw$height,
+    sdf_pw$height
   )
 })
 
