@@ -36,10 +36,11 @@ pivot_wider.tbl_spark <- function(data,
 
   names_from <- rlang::enquo(names_from)
   values_from <- rlang::enquo(values_from)
+
   spec <- sdf_build_wider_spec(
     data,
-    names_from = !!names_from,
-    values_from = !!values_from,
+    names_from = !! names_from,
+    values_from = !! values_from,
     names_prefix = names_prefix,
     names_sep = names_sep,
     names_glue = names_glue,
@@ -47,6 +48,7 @@ pivot_wider.tbl_spark <- function(data,
   )
 
   id_cols <- rlang::enquo(id_cols)
+
   sdf_pivot_wider(
     data,
     spec,
@@ -57,7 +59,19 @@ pivot_wider.tbl_spark <- function(data,
   )
 }
 
+
+#' @importFrom purrr transpose
+comb_table <- function(x, y) {
+  transpose(x) %>%
+    map(~ cbind(as_tibble(.x), y)) %>%
+    reduce(rbind)
+}
+
 #' @importFrom purrr reduce map
+#' @importFrom tidyselect eval_select
+#' @importFrom tibble tibble
+#' @importFrom rlang `!!` enquos enquo
+#' @importFrom dplyr ungroup arrange
 sdf_build_wider_spec <- function(data,
                                  names_from,
                                  values_from,
@@ -66,19 +80,40 @@ sdf_build_wider_spec <- function(data,
                                  names_glue = NULL,
                                  names_sort = FALSE) {
   colnames_df <- replicate_colnames(data)
-  names_from <- names(tidyselect::eval_select(rlang::enquo(names_from), colnames_df))
-  values_from <- names(tidyselect::eval_select(rlang::enquo(values_from), colnames_df))
+  values_from <- names(eval_select(enquo(values_from), colnames_df))
 
-  row_ids <- data %>%
-    dplyr::ungroup() %>>%
-    dplyr::distinct %@% lapply(names_from, as.symbol) %>%
+  local_data <- data %>%
+    head(1) %>%
     collect()
 
-  if (names_sort) {
-    row_ids <- dplyr::arrange(row_ids)
-  }
+  #eval_names_from <- tidyselect::eval_select(enquo(names_from), local_data)
+  #values_from <- tidyselect::eval_select(enquo(values_from), local_data)
 
-  row_names <- rlang::exec(paste, !!!row_ids, sep = names_sep)
+  # col_names <- local_data %>%
+  #   ungroup() %>%
+  #   select(!! enquo(names_from) ) %>%
+  #   colnames()
+  #
+  # row_ids <- map(col_names, ~ {
+  #   data %>%
+  #     ungroup() %>%
+  #     distinct(!! rlang::parse_expr(.x)) %>%
+  #     collect()
+  # }) %>%
+  #   reduce(comb_table)
+
+  row_ids <- data %>%
+    select(!! enquo(names_from)) %>%
+    distinct() %>%
+    collect()
+
+  if(dim(row_ids)[2] == 1) {
+    row_names <- row_ids[1][[1]]
+  } else {
+    #row_names <- rlang::exec(paste, !!!row_ids, sep = names_sep)
+    row_names <- transpose(row_ids) %>%
+      map_chr(~ paste(.x, collapse = names_sep))
+  }
 
   out <- tibble::tibble(.name = paste0(names_prefix, row_names))
 
@@ -91,10 +126,12 @@ sdf_build_wider_spec <- function(data,
     row_ids <- reduce(map(seq_along(values_from), ~ row_ids), rbind)
   }
 
-  out <- vctrs::vec_cbind(out, tibble::as_tibble(row_ids), .name_repair = "minimal")
+  out <- vctrs::vec_cbind(out, row_ids, .name_repair = "minimal")
   if (!is.null(names_glue)) {
     out$.name <- as.character(glue::glue_data(out, names_glue))
   }
+
+  if (names_sort) out <- arrange(out, .name)
 
   out
 }

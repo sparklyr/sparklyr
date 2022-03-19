@@ -84,19 +84,18 @@ test_that("nested list column pivots correctly", {
   df_out <- pivot_wider(df, names_from = g, values_from = d, names_sort = TRUE) %>%
     arrange(i)
 
-  expect_equivalent(sdf_out, df_out)
+  expect_equal(sdf_out, df_out)
 })
 
 test_that("can specify output column names using names_glue", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(
-    sc,
-    tibble::tibble(x = c("X", "Y"), y = 1:2, a = 1:2, b = 1:2)
-  )
+  df <- tibble::tibble(x = c("X", "Y"), y = 1:2, a = 1:2, b = 1:2)
+
+  sdf <- copy_to(sc, df, overwrite = TRUE)
 
   expect_equivalent(
-    tidyr::pivot_wider(
+    sparklyr::pivot_wider(
       sdf,
       names_from = x:y,
       values_from = a:b,
@@ -130,15 +129,13 @@ test_that("can override default keys", {
   test_requires_version("2.3.0")
   skip_databricks_connect()
 
-  sdf <- copy_to(
-    sc,
-    tibble::tribble(
-      ~row, ~name, ~var, ~value,
-      1, "Sam", "age", 10,
-      2, "Sam", "height", 1.5,
-      3, "Bob", "age", 20,
+  df <-  tibble::tribble(
+    ~row, ~name, ~var, ~value,
+    1, "Sam", "age", 10,
+    2, "Sam", "height", 1.5,
+    3, "Bob", "age", 20
     )
-  )
+
 
   expect_equivalent(
     sdf %>%
@@ -160,12 +157,15 @@ test_that("values_fn can be a single function", {
     sc,
     tibble::tibble(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
   )
-  pv <- tidyr::pivot_wider(
-    sdf,
-    names_from = key, values_from = val, values_fn = sum
-  ) %>%
-    collect() %>%
-    dplyr::arrange(a)
+
+  expect_warning(
+    pv <- tidyr::pivot_wider(
+      sdf,
+      names_from = key, values_from = val, values_fn = sum
+    ) %>%
+      collect() %>%
+      dplyr::arrange(a)
+  )
 
   expect_equivalent(pv, tibble::tibble(a = 1:2, x = c(11, 100)))
 })
