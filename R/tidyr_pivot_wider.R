@@ -86,31 +86,15 @@ sdf_build_wider_spec <- function(data,
     head(1) %>%
     collect()
 
-  #eval_names_from <- tidyselect::eval_select(enquo(names_from), local_data)
-  #values_from <- tidyselect::eval_select(enquo(values_from), local_data)
-
-  # col_names <- local_data %>%
-  #   ungroup() %>%
-  #   select(!! enquo(names_from) ) %>%
-  #   colnames()
-  #
-  # row_ids <- map(col_names, ~ {
-  #   data %>%
-  #     ungroup() %>%
-  #     distinct(!! rlang::parse_expr(.x)) %>%
-  #     collect()
-  # }) %>%
-  #   reduce(comb_table)
-
   row_ids <- data %>%
     select(!! enquo(names_from)) %>%
     distinct() %>%
-    collect()
+    collect() %>%
+    select(- group_vars(data))
 
   if(dim(row_ids)[2] == 1) {
     row_names <- row_ids[1][[1]]
   } else {
-    #row_names <- rlang::exec(paste, !!!row_ids, sep = names_sep)
     row_names <- transpose(row_ids) %>%
       map_chr(~ paste(.x, collapse = names_sep))
   }

@@ -63,14 +63,9 @@ test_that("grouping is preserved", {
 
   sdf_out <- sdf %>%
     group_by(g) %>%
-    pivot_wider(names_from = k, values_from = v) %>%
-    collect()
-
-  df_out <- df %>%
-    group_by(g) %>%
     pivot_wider(names_from = k, values_from = v)
 
-  expect_equal(dplyr::group_vars(out), "g")
+  expect_equal(dplyr::group_vars(sdf_out), "g")
 })
 
 test_that("nested list column pivots correctly", {
@@ -166,6 +161,35 @@ test_that("can override default keys", {
   expect_equal(
     df_pw$height,
     sdf_pw$height
+  )
+})
+
+test_that("groups are processed the same as local", {
+  df <- tibble(
+    x = c(rep("one", 4), rep("two", 4)),
+    y = letters[1:8],
+    z = 1:8
+  )
+
+  sdf <- copy_to(sc, df, overwrite = "TRUE")
+
+  df_wide <- df %>%
+    group_by(x) %>%
+    pivot_wider(names_from = y, values_from = z, values_fill = 0) %>%
+    select(x, letters[1:8])  %>%
+    arrange(x) %>%
+    ungroup()
+
+  sdf_wide <- sdf %>%
+    group_by(x) %>%
+    pivot_wider(names_from = y, values_from = z, values_fill = 0) %>%
+    collect() %>%
+    select(x, letters[1:8]) %>%
+    arrange(x)
+
+  expect_equal(
+    df_wide,
+    sdf_wide
   )
 })
 
