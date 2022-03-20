@@ -59,15 +59,7 @@ pivot_wider.tbl_spark <- function(data,
   )
 }
 
-
-#' @importFrom purrr transpose
-comb_table <- function(x, y) {
-  transpose(x) %>%
-    map(~ cbind(as_tibble(.x), y)) %>%
-    reduce(rbind)
-}
-
-#' @importFrom purrr reduce map
+#' @importFrom purrr reduce map transpose
 #' @importFrom tidyselect eval_select
 #' @importFrom tibble tibble
 #' @importFrom rlang `!!` enquos enquo
@@ -110,7 +102,7 @@ sdf_build_wider_spec <- function(data,
     row_ids <- reduce(map(seq_along(values_from), ~ row_ids), rbind)
   }
 
-  out <- vctrs::vec_cbind(out, row_ids, .name_repair = "minimal")
+  out <- cbind(out, row_ids)
   if (!is.null(names_glue)) {
     out$.name <- as.character(glue::glue_data(out, names_glue))
   }
@@ -138,7 +130,7 @@ sdf_pivot_wider <- function(data,
   group_vars <- dplyr::group_vars(data)
 
   names_from <- names(spec)[-(1:2)]
-  values_from <- vctrs::vec_unique(spec$.value)
+  values_from <- unique(spec$.value)
   spec_cols <- c(names_from, values_from)
 
   id_cols <- rlang::enquo(id_cols)

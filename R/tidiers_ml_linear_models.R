@@ -18,6 +18,7 @@ get_stats <- function(stats, model) {
 #'
 #' @importFrom dplyr matches everything mutate
 #' @importFrom rlang sym syms quo
+#' @importFrom tidyselect vars_select
 #' @export
 tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
                                                         ...) {
@@ -44,10 +45,10 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
     }
     trans <- exp
     # drop standard errors because they're not valid after exponentiating
-    vars <- dplyr::select_vars(c("term", new_names), -matches("std.error"))
+    vars <- vars_select(c("term", new_names), -matches("std.error"))
   } else {
     trans <- identity
-    vars <- dplyr::select_vars(c("term", new_names), everything())
+    vars <- vars_select(c("term", new_names), everything())
   }
 
 
@@ -62,12 +63,13 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
 }
 
 #' @rdname ml_glm_tidiers
+#' @importFrom tidyselect vars_select
 #' @export
 tidy.ml_model_linear_regression <- function(x, ...) {
   model <- x$model
   stats <- c("coefficient_standard_errors", "t_values", "p_values")
   new_names <- c("estimate", "std.error", "statistic", "p.value")
-  vars <- dplyr::select_vars(c("term", new_names), everything())
+  vars <- vars_select(c("term", new_names), everything())
 
   coefficients <- list(x$coefficients)
   statistics <- stats %>%
