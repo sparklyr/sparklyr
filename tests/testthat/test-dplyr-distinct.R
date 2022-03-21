@@ -116,7 +116,7 @@ test_that("distinct on a new, copied variable is equivalent to mutate followed b
 
 test_that("distinct preserves grouping", {
   df1 <- tibble::tibble(x = c(1, 1, 2, 2), y = x)
-  sdf1 <- copy_to(sc, df1)
+  sdf1 <- copy_to(sc, df1, name = "distinct_df1")
 
   df <- df1 %>% dplyr::group_by(x)
   sdf <- sdf1 %>% dplyr::group_by(x)
