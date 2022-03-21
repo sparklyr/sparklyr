@@ -63,19 +63,25 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
 
   m1 <- pipeline %>%
     ml_fit(training_tbl)
-  m1_predictions <- m1 %>%
-    ml_transform(test_tbl) %>%
-    pull(probability)
+
+  expect_warning_on_arrow(
+    m1_predictions <- m1 %>%
+      ml_transform(test_tbl) %>%
+      pull(probability)
+  )
 
   m2 <- training_tbl %>%
     ft_tokenizer("text", "words") %>%
     ft_hashing_tf("words", "features", num_features = 1000) %>%
     ml_logistic_regression(max_iter = 10, reg_param = 0.001)
-  m2_predictions <- m2 %>%
-    ml_transform(test_tbl %>%
-      ft_tokenizer("text", "words") %>%
-      ft_hashing_tf("words", "features", num_features = 1000)) %>%
-    pull(probability)
+
+  expect_warning_on_arrow(
+    m2_predictions <- m2 %>%
+      ml_transform(test_tbl %>%
+                     ft_tokenizer("text", "words") %>%
+                     ft_hashing_tf("words", "features", num_features = 1000)) %>%
+      pull(probability)
+  )
 
   expect_equal(m1_predictions, m2_predictions)
 })

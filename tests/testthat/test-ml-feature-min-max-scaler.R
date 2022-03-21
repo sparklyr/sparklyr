@@ -28,10 +28,12 @@ test_that("ft_min_max_scaler() works properly", {
     V3 = c(-1, 1, 3)
   )
 
-  scaled_features <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
-    ft_vector_assembler(paste0("V", 1:3), "features") %>%
-    ft_min_max_scaler("features", "scaledFeatures") %>%
-    pull(scaledFeatures)
+  expect_warning_on_arrow(
+    scaled_features <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
+      ft_vector_assembler(paste0("V", 1:3), "features") %>%
+      ft_min_max_scaler("features", "scaledFeatures") %>%
+      pull(scaledFeatures)
+  )
 
   expect_equal(
     scaled_features,

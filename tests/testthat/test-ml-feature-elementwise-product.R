@@ -19,11 +19,13 @@ test_that("ft_elementwise_product() works", {
   df <- data.frame(a = 1, b = 3, c = 5)
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
-  nums <- df_tbl %>%
-    ft_vector_assembler(list("a", "b", "c"), output_col = "features") %>%
-    ft_elementwise_product("features", "multiplied", c(2, 4, 6)) %>%
-    pull(multiplied) %>%
-    rlang::flatten_dbl()
+  expect_warning_on_arrow(
+    nums <- df_tbl %>%
+      ft_vector_assembler(list("a", "b", "c"), output_col = "features") %>%
+      ft_elementwise_product("features", "multiplied", c(2, 4, 6)) %>%
+      pull(multiplied) %>%
+      rlang::flatten_dbl()
+  )
 
   expect_identical(
     nums,

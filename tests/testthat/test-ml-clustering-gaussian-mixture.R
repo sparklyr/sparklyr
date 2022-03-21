@@ -65,12 +65,22 @@ test_that("ml_gaussian_mixture() works properly", {
   gmm <- ml_gaussian_mixture(sample_data, k = 2, seed = 1)
 
   expect_equal(gmm$weights, c(0.5, 0.5))
+
+  expect_warning_on_arrow(
+    g_mean <- gmm$gaussians_df() %>% pull(mean)
+  )
+
   expect_equal(
-    gmm$gaussians_df() %>% pull(mean),
+    g_mean,
     list(c(0.1, 0.1, 0.1), c(9.1, 9.1, 9.1))
   )
+
+  expect_warning_on_arrow(
+    g_cov <- gmm$gaussians_df() %>% pull(cov)
+  )
+
   expect_equal(
-    gmm$gaussians_df() %>% pull(cov),
+    g_cov,
     list(
       matrix(rep(0.00666666667, 9), nrow = 3),
       matrix(rep(0.00666666667, 9), nrow = 3)

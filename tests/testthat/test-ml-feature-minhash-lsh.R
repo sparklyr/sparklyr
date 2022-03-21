@@ -48,9 +48,13 @@ test_that("ft_minhash_lsh() works properly", {
     num_hash_tables = 5, seed = 666
   ) %>%
     ml_fit(dfA_tbl)
-  transformed <- lsh %>%
-    ml_transform(dfA_tbl) %>%
-    collect()
+
+  expect_warning_on_arrow(
+    transformed <- lsh %>%
+      ml_transform(dfA_tbl) %>%
+      collect()
+  )
+
   expect_equal(
     transformed %>% pull(hashes) %>% head(1) %>% unlist() %>% length(),
     5
@@ -67,11 +71,15 @@ test_that("ft_minhash_lsh() works properly", {
     0.75
   )
 
-  expect_equal(
-    ml_approx_similarity_join(lsh, dfA_tbl, dfB_tbl, 0.6) %>%
+  expect_warning_on_arrow(
+    m_l <- ml_approx_similarity_join(lsh, dfA_tbl, dfB_tbl, 0.6) %>%
       arrange(id_a, id_b) %>%
       ft_vector_assembler(c("id_a", "id_b"), "joined_pairs") %>%
-      pull(joined_pairs),
+      pull(joined_pairs)
+  )
+
+  expect_equal(
+    m_l,
     list(c(0, 5), c(1, 4), c(1, 5), c(2, 5))
   )
 })

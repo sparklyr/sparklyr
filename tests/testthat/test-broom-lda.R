@@ -44,9 +44,11 @@ test_that("lda.tidy() works", {
 
   ## --------------------------- augment() -------------------------------------
 
-  au1 <- lda_model %>%
-    augment() %>%
-    collect()
+  expect_warning_on_arrow(
+    au1 <- lda_model %>%
+      augment() %>%
+      collect()
+  )
 
   check_tidy(au1,
     exp.col = 2,
