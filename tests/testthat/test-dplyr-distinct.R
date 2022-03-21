@@ -59,7 +59,7 @@ test_that("unless .keep_all = TRUE", {
 
 test_that("distinct doesn't duplicate columns", {
   df <- tibble::tibble(a = 1:3, b = 4:6)
-  sdf <- copy_to(sc, df)
+  sdf <- copy_to(sc, df, overwrite = TRUE)
 
   expect_equivalent(
     sdf %>% dplyr::distinct(a, a) %>% arrange(a) %>%  collect(),

@@ -57,7 +57,9 @@ verify_distribution <- function(replacement) {
     }
   }
 
-  res <- ks.test(x = actual_dist, y = expected_dist)
+  expect_warning(
+    res <- ks.test(x = actual_dist, y = expected_dist)
+  )
 
   expect_gte(res$p.value, alpha)
 }

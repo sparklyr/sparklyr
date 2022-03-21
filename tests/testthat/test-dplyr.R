@@ -73,13 +73,13 @@ test_that("'summarize' works with where(...) predicate", {
   test_requires("dplyr")
 
   expect_equivalent(
-    iris %>% summarize(across(where(is.numeric), mean, na.rm = TRUE)),
+    iris %>% summarize(across(where(is.numeric), mean)),
     iris_tbl %>% summarize(across(where(is.numeric), mean, na.rm = TRUE)) %>% collect()
   )
 
   expect_equivalent(
     iris %>% summarize(across(starts_with("Petal"), mean)),
-    iris_tbl %>% summarize(across(starts_with("Petal"), mean)) %>% collect()
+    iris_tbl %>% summarize(across(starts_with("Petal"), mean, na.rm = TRUE)) %>% collect()
   )
 
   expect_equivalent(
