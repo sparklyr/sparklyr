@@ -90,9 +90,12 @@ test_that("sdf_copy_to supports binary columns", {
     NaN,
     NA
   )
-  sdf <- sdf_copy_to(
-    sc,
-    tibble::tibble(x = lapply(expected, function(x) serialize(x, NULL)))
+
+  expect_warning_on_arrow(
+    sdf <- sdf_copy_to(
+      sc,
+      tibble::tibble(x = lapply(expected, function(x) serialize(x, NULL)))
+    )
   )
 
   res <- sdf_collect(sdf)
