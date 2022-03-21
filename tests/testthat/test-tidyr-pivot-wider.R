@@ -165,6 +165,9 @@ test_that("can override default keys", {
 })
 
 test_that("groups are processed the same as local", {
+
+  test_requires_version("2.3.0")
+
   df <- tibble(
     x = c(rep("one", 4), rep("two", 4)),
     y = letters[1:8],

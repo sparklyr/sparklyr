@@ -65,7 +65,7 @@ NULL
 #'   on the given data.
 #' @export
 ml_compute_cost <- function(model, dataset) {
-  spark_require_version(spark_connection(spark_jobj(model)), required = "2.0.0", required_max = "3.0.0")
+  # spark_require_version(spark_connection(spark_jobj(model)), required = "2.0.0", required_max = "3.0.0")
 
   if (inherits(model, "ml_model_kmeans")) {
     model$pipeline_model %>%

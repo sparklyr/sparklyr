@@ -59,11 +59,16 @@ test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits and
   )
   expect_equal(coef(r), coef(s))
   expect_equal(residuals(r) %>% unname(), residuals(s))
+
   df_r <- beaver2 %>%
-    mutate(residuals = unname(residuals(r)))
+    mutate(residuals = unname(residuals(r))) %>%
+    arrange(residuals)
+
   df_s <- sdf_residuals(s) %>%
-    as.data.frame()
-  expect_equal(df_r, df_s)
+    arrange(residuals) %>%
+    collect()
+
+  expect_equal(df_r$residuals, df_s$residuals)
 })
 
 test_that("weights column works for glm", {
