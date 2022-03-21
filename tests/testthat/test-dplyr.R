@@ -563,11 +563,11 @@ test_that("summarise(.groups=)", {
     expect_equivalent(
       sdf %>%
         group_by(val1) %>%
-        summarize(result = sum(val2), .groups = groups) %>%
+        summarize(result = sum(val2, na.rm = TRUE), .groups = groups) %>%
         collect(),
       df %>%
         group_by(val1) %>%
-        summarize(result = sum(val2), .groups = groups)
+        summarize(result = sum(val2, na.rm = TRUE), .groups = groups)
     )
   }
 })
