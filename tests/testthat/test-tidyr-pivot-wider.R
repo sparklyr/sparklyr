@@ -80,9 +80,11 @@ test_that("nested list column pivots correctly", {
 
   sdf <- copy_to(sc, df, overwrite = TRUE)
 
-  sdf_out <- pivot_wider(sdf, names_from = g, values_from = d, names_sort = TRUE) %>%
-    collect() %>%
-    arrange(i)
+  expect_warning_on_arrow(
+    sdf_out <- pivot_wider(sdf, names_from = g, values_from = d, names_sort = TRUE) %>%
+      collect() %>%
+      arrange(i)
+  )
 
   df_out <- pivot_wider(df, names_from = g, values_from = d, names_sort = TRUE) %>%
     arrange(i)

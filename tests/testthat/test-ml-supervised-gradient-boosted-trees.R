@@ -25,12 +25,14 @@ test_that("thresholds parameter behaves as expected", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   most_predicted_label <- function(x) {
-    x %>%
-      collect() %>%
-      count(prediction) %>%
-      arrange(desc(n)) %>%
-      pull(prediction) %>%
-      first()
+    expect_warning_on_arrow(
+      x %>%
+        collect() %>%
+        count(prediction) %>%
+        arrange(desc(n)) %>%
+        pull(prediction) %>%
+        first()
+    )
   }
 
   gbt_predictions <-sans_setosa  %>%
