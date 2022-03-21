@@ -47,9 +47,14 @@ test_that("ml_aft_survival_regression() works properly", {
   expect_equal(aft$scale, 1.5472345574364683, tolerance = 1e-4, scale = 1)
 
   predicted_tbl <- ml_predict(aft, training_tbl)
-  expect_equal(predicted_tbl %>%
-    dplyr::pull(quantiles) %>%
-    dplyr::first(),
+
+  expect_warning_on_arrow(
+    p_q <- predicted_tbl %>%
+      dplyr::pull(quantiles) %>%
+      dplyr::first()
+  )
+
+  expect_equal(p_q,
   c(1.1603238947151593, 4.995456010274735),
   tolerance = 1e-4, scale = 1
   )

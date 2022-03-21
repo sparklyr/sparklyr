@@ -42,8 +42,10 @@ test_that("ft_one_hot_encoder() works", {
       ft_one_hot_encoder(indexed_cols, encoded_cols) %>%
       compute()
     for (x in encoded_cols) {
-      expect_setequal(
-        encoded_tbl %>% pull(!!x) %>% unique(), list(c(0, 0), c(0, 1), c(1, 0))
+      expect_warning_on_arrow(
+        expect_setequal(
+          encoded_tbl %>% pull(!!x) %>% unique(), list(c(0, 0), c(0, 1), c(1, 0))
+        )
       )
     }
   }
@@ -85,11 +87,15 @@ test_that("ft_one_hot_encoder() works with ml pipeline", {
       ft_one_hot_encoder("indexed", "encoded")
   }
 
-  expect_setequal(
-    pipeline %>%
+  expect_warning_on_arrow(
+    f_o <- pipeline %>%
       ml_fit_and_transform(iris_tbl) %>%
       pull(encoded) %>%
-      unique(),
+      unique()
+  )
+
+  expect_setequal(
+    f_o,
     list(c(0, 0), c(1, 0), c(0, 1))
   )
 })

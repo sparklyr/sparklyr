@@ -99,10 +99,12 @@ test_that("ml_[save/load]_model() work for ml_pipeline_model", {
   expect_equal(model1$stage_uids, model2$stage_uids)
 
   score_test_set <- function(x, data) {
-    spark_jobj(x) %>%
-      invoke("transform", spark_dataframe(data)) %>%
-      sdf_register() %>%
-      pull(probability)
+    expect_warning_on_arrow(
+      spark_jobj(x) %>%
+        invoke("transform", spark_dataframe(data)) %>%
+        sdf_register() %>%
+        pull(probability)
+    )
   }
   expect_equal(score_test_set(model1, test_tbl), score_test_set(model2, test_tbl))
 })
