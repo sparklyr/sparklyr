@@ -28,15 +28,19 @@ test_that("ft_count_vectorizer() works", {
   df <- tibble(text = c("a b c", "a a a b b c"))
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
-  counts <- df_tbl %>%
-    ft_tokenizer("text", "words") %>%
-    ft_count_vectorizer("words", "features") %>%
-    pull(features)
+  expect_warning_on_arrow(
+    counts <- df_tbl %>%
+      ft_tokenizer("text", "words") %>%
+      ft_count_vectorizer("words", "features") %>%
+      pull(features)
+  )
 
-  counts2 <- df_tbl %>%
-    ft_tokenizer("text", "words") %>%
-    ft_count_vectorizer("words", "features") %>%
-    pull(features)
+  expect_warning_on_arrow(
+    counts2 <- df_tbl %>%
+      ft_tokenizer("text", "words") %>%
+      ft_count_vectorizer("words", "features") %>%
+      pull(features)
+  )
 
   expect_identical(counts, list(c(1, 1, 1), c(3, 2, 1)))
   expect_identical(counts2, list(c(1, 1, 1), c(3, 2, 1)))

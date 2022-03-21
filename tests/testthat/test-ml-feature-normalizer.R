@@ -30,9 +30,11 @@ test_that("ft_normalizer works properly", {
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
     ft_vector_assembler(paste0("V", 1:3), "features")
 
-  norm_data1 <- df_tbl %>%
-    ft_normalizer("features", "normFeatures", p = 1) %>%
-    pull(normFeatures)
+  expect_warning_on_arrow(
+    norm_data1 <- df_tbl %>%
+      ft_normalizer("features", "normFeatures", p = 1) %>%
+      pull(normFeatures)
+  )
 
   expect_equal(
     norm_data1,
@@ -43,9 +45,11 @@ test_that("ft_normalizer works properly", {
     )
   )
 
-  norm_data2 <- df_tbl %>%
-    ft_normalizer("features", "normFeatures", p = Inf) %>%
-    pull(normFeatures)
+  expect_warning_on_arrow(
+    norm_data2 <- df_tbl %>%
+      ft_normalizer("features", "normFeatures", p = Inf) %>%
+      pull(normFeatures)
+  )
 
   expect_equal(
     norm_data2,

@@ -42,5 +42,10 @@ test_that("ft_chisq_select() works properly", {
     df_tbl, "features", "selectedFeatures", "clicked",
     num_top_features = 1
   )
-  expect_equal(pull(result, selectedFeatures), list(18, 12, 15))
+
+  expect_warning_on_arrow(
+    r_features <- pull(result, selectedFeatures)
+  )
+
+  expect_equal(r_features, list(18, 12, 15))
 })

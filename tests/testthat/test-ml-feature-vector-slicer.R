@@ -20,9 +20,13 @@ test_that("ft_vector_slicer works", {
     V2 = 2,
     V3 = 3
   )
-  sliced <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
-    ft_vector_assembler(input_cols = paste0("V", 1:3), output_col = "vector") %>%
-    ft_vector_slicer("vector", "sliced", 0:1) %>%
-    pull(sliced)
+
+  expect_warning_on_arrow(
+    sliced <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
+      ft_vector_assembler(input_cols = paste0("V", 1:3), output_col = "vector") %>%
+      ft_vector_slicer("vector", "sliced", 0:1) %>%
+      pull(sliced)
+  )
+
   expect_identical(sliced, list(c(1, 2)))
 })

@@ -22,11 +22,16 @@ test_that("ft_max_abs_scaler() works properly", {
     V3 = c(-8, -4, 8)
   )
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE)
-  expect_equal(
-    df_tbl %>%
+
+  expect_warning_on_arrow(
+    f_a <- df_tbl %>%
       ft_vector_assembler(paste0("V", 1:3), "features") %>%
       ft_max_abs_scaler("features", "scaled") %>%
-      pull(scaled),
+      pull(scaled)
+  )
+
+  expect_equal(
+    f_a,
     list(
       c(0.25, 0.01, -1),
       c(0.5, 0.1, -0.5),

@@ -25,20 +25,28 @@ test_that("r formula works as expected", {
     ft_one_hot_encoder("species_idx", "species_dummy") %>%
     ft_vector_assembler(list("Petal_Width", "species_dummy"), "features")
 
-  df1 <- pipeline %>%
-    ml_fit_and_transform(iris_tbl) %>%
-    select(features, label = Sepal_Length) %>%
-    collect()
+  expect_warning_on_arrow(
+    df1 <- pipeline %>%
+      ml_fit_and_transform(iris_tbl) %>%
+      select(features, label = Sepal_Length) %>%
+      collect()
+  )
 
-  df2 <- iris_tbl %>%
-    ft_r_formula("Sepal_Length ~ Petal_Width + Species") %>%
-    select(features, label) %>%
-    collect()
+  expect_warning_on_arrow(
+    df2 <- iris_tbl %>%
+      ft_r_formula("Sepal_Length ~ Petal_Width + Species") %>%
+      select(features, label) %>%
+      collect()
+  )
 
-  df3 <- iris_tbl %>%
-    ft_r_formula("Sepal_Length ~ Petal_Width + Species") %>%
-    select(features, label) %>%
-    collect()
+
+  expect_warning_on_arrow(
+    df3 <- iris_tbl %>%
+      ft_r_formula("Sepal_Length ~ Petal_Width + Species") %>%
+      select(features, label) %>%
+      collect()
+  )
+
 
   expect_equal(pull(df1, features), pull(df2, features))
   expect_equal(pull(df1, features), pull(df3, features))
@@ -66,7 +74,18 @@ test_that("r formula works as expected", {
 
 test_that("ft_r_formula takes formula", {
   iris_tbl <- testthat_tbl("iris")
-  v1 <- ft_r_formula(iris_tbl, "Species ~ Sepal_Length + Petal_Length") %>% pull(features)
-  v2 <- ft_r_formula(iris_tbl, Species ~ Sepal_Length + Petal_Length) %>% pull(features)
+
+  expect_warning_on_arrow(
+    v1 <- iris_tbl %>%
+      ft_r_formula("Species ~ Sepal_Length + Petal_Length") %>%
+      pull(features)
+  )
+
+  expect_warning_on_arrow(
+    v2 <- iris_tbl %>%
+      ft_r_formula(Species ~ Sepal_Length + Petal_Length) %>%
+      pull(features)
+  )
+
   expect_equal(v1, v2)
 })

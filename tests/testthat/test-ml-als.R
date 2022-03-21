@@ -1,7 +1,7 @@
 skip_on_livy()
 skip_on_arrow_devel()
-
 skip_databricks_connect()
+
 test_that("ml_als() default params", {
   test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
@@ -43,16 +43,22 @@ test_that("ml_recommend() works", {
   movie_ratings <- sdf_copy_to(sc, df, "movie_rating", overwrite = TRUE)
 
   als_model <- ml_als(movie_ratings)
-  expect_identical(
-    als_model %>%
-      ml_recommend("users", 2) %>%
-      colnames(),
-    c("item", "recommendations", "user", "rating")
+
+  expect_warning_on_arrow(
+    expect_identical(
+      als_model %>%
+        ml_recommend("users", 2) %>%
+        colnames(),
+      c("item", "recommendations", "user", "rating")
+    )
   )
-  expect_identical(
-    als_model %>%
-      ml_recommend("items", 2) %>%
-      colnames(),
-    c("user", "recommendations", "item", "rating")
+
+  expect_warning_on_arrow(
+    expect_identical(
+      als_model %>%
+        ml_recommend("items", 2) %>%
+        colnames(),
+      c("user", "recommendations", "item", "rating")
+    )
   )
 })

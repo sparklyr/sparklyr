@@ -15,11 +15,13 @@ test_that("gaussian_mixture.tidy() works", {
 
   ## ----------------------------- tidy() --------------------------------------
 
-  td1 <- tidy(model)
+  expect_warning_on_arrow(
+    td1 <- tidy(model)
+  )
 
   check_tidy(td1,
-    exp.row = 4,
-    exp.names = c("mpg", "cyl", "weight", "size", "cluster")
+             exp.row = 4,
+             exp.names = c("mpg", "cyl", "weight", "size", "cluster")
   )
 
   expect_equal(td1$size, model$summary$cluster_sizes())

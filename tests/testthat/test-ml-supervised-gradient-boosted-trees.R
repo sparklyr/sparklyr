@@ -1,10 +1,14 @@
 skip_on_livy()
 skip_on_arrow_devel()
-
 skip_databricks_connect()
+
+sc <- testthat_spark_connection()
+iris_tbl <- testthat_tbl("iris")
+
+sans_setosa <- iris_tbl %>%
+  filter(Species != "setosa")
+
 test_that("gbt runs successfully when all args specified", {
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
   model <- iris_tbl %>%
     filter(Species != "setosa") %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Width + Sepal_Length + Petal_Width,
@@ -21,39 +25,41 @@ test_that("thresholds parameter behaves as expected", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   most_predicted_label <- function(x) {
-    x %>%
-      count(prediction) %>%
-      arrange(desc(n)) %>%
-      pull(prediction) %>%
-      first()
+    expect_warning_on_arrow(
+      x %>%
+        collect() %>%
+        count(prediction) %>%
+        arrange(desc(n)) %>%
+        pull(prediction) %>%
+        first()
+    )
   }
 
-  gbt_predictions <- iris_tbl %>%
-    filter(Species != "setosa") %>%
+  gbt_predictions <-sans_setosa  %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Width,
       type = "classification",
       thresholds = c(0, 1)
     ) %>%
-    ml_predict(iris_tbl)
+    ml_predict(sans_setosa)
+
   expect_equal(most_predicted_label(gbt_predictions), 0)
 
-  gbt_predictions <- iris_tbl %>%
-    filter(Species != "setosa") %>%
+  gbt_predictions <- sans_setosa %>%
     ml_gradient_boosted_trees(Species ~ Sepal_Width,
       type = "classification",
       thresholds = c(1, 0)
     ) %>%
-    ml_predict(iris_tbl)
+    ml_predict(sans_setosa)
+
   expect_equal(most_predicted_label(gbt_predictions), 1)
 })
 
 test_that("informative error when using Spark version that doesn't support thresholds", {
   sc <- testthat_spark_connection()
   if (spark_version(sc) >= "2.2.0") skip("not applicable, threshold is supported")
-  iris_tbl <- testthat_tbl("iris")
+
   expect_error(
-    iris_tbl %>%
-      filter(Species != "setosa") %>%
+    sans_setosa %>%
       ml_gradient_boosted_trees(Species ~ Sepal_Width,
         type = "classification",
         thresholds = c(0, 1)
@@ -64,7 +70,6 @@ test_that("informative error when using Spark version that doesn't support thres
 
 test_that("one-tree ensemble agrees with ml_decision_tree()", {
   sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
   gbt <- iris_tbl %>%
     ml_gradient_boosted_trees(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
       type = "regression",
@@ -87,8 +92,6 @@ test_that("one-tree ensemble agrees with ml_decision_tree()", {
 })
 
 test_that("checkpointing works for gbt", {
-  sc <- testthat_spark_connection()
-  iris_tbl <- testthat_tbl("iris")
   spark_set_checkpoint_dir(sc, tempdir())
   expect_error(
     iris_tbl %>%

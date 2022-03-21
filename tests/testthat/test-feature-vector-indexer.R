@@ -30,23 +30,28 @@ test_that("ft_vector_indexer() works properly", {
     max_categories = 10
   ) %>%
     ml_fit(sample_data)
-  expect_identical(
-    indexer %>%
-      ml_transform(sample_data) %>%
-      head(1) %>%
-      pull(indexed) %>%
-      unlist() %>%
-      length(),
-    692L
+
+  expect_warning_on_arrow(
+    expect_identical(
+      indexer %>%
+        ml_transform(sample_data) %>%
+        head(1) %>%
+        pull(indexed) %>%
+        unlist() %>%
+        length(),
+      692L
+    )
   )
 
-  expect_identical(
-    sample_data %>%
-      ft_vector_indexer("features", "indexed", max_categories = 10) %>%
-      head(1) %>%
-      pull(indexed) %>%
-      unlist() %>%
-      length(),
-    692L
+  expect_warning_on_arrow(
+    expect_identical(
+      sample_data %>%
+        ft_vector_indexer("features", "indexed", max_categories = 10) %>%
+        head(1) %>%
+        pull(indexed) %>%
+        unlist() %>%
+        length(),
+      692L
+    )
   )
 })

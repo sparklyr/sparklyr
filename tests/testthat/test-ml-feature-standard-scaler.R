@@ -34,13 +34,17 @@ test_that("ft_standard_scaler() works properly", {
 
   scaler_model <- ml_fit(scaler, sample_data)
 
-  expect_equal(
-    scaler_model %>%
+  expect_warning_on_arrow(
+    s_m <-scaler_model %>%
       ml_transform(sample_data) %>%
       head(1) %>%
       dplyr::pull(scaledFeatures) %>%
       unlist() %>%
-      sum(),
+      sum()
+  )
+
+  expect_equal(
+    s_m,
     295.3425,
     tolerance = 0.001, scale = 1
   )

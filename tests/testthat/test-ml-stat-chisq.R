@@ -11,13 +11,18 @@ df_tbl <- sdf_copy_to(sc, data.frame(
 
 test_that("ml_chisquare_test() works", {
   test_requires_version("2.2.0", "chisquare test supported in spark 2.2+")
-  expect_identical(
-    df_tbl %>%
+
+  expect_warning_on_arrow(
+    m_c <- df_tbl %>%
       ml_chisquare_test(
         features = "gender",
         label = "party"
       ) %>%
-      names(),
+      names()
+  )
+
+  expect_identical(
+    m_c,
     c(
       "feature", "label", "p_value",
       "degrees_of_freedom", "statistic"

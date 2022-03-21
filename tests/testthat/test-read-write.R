@@ -64,12 +64,16 @@ test_that("spark_read_json() can load data using column types", {
   jsonPath <- get_test_data_path(
     "spark-read-json-can-load-data-using-column-types.json"
   )
-  df <- spark_read_json(
-    sc,
-    name = "iris_json_typed",
-    path = jsonPath,
-    columns = list("Sepal_Length" = "character", "Species" = "character", "Other" = "struct<a:integer,b:character>")
-  ) %>% collect()
+
+  expect_warning_on_arrow(
+    df <- spark_read_json(
+      sc,
+      name = "iris_json_typed",
+      path = jsonPath,
+      columns = list("Sepal_Length" = "character", "Species" = "character", "Other" = "struct<a:integer,b:character>")
+    ) %>%
+      collect()
+  )
 
   expect_true(is.character(df$Sepal_Length))
   expect_true(is.character(df$Species))
@@ -390,16 +394,18 @@ test_that("spark_write() works as expected", {
   multiple_paths <- lapply(seq(5), function(x) paste0("hdfs://file_", x))
   single_path <- "hdfs://iris"
 
-  for (paths in list(list(multiple_paths), list(single_path))) {
-    verify_spark_write_result(
-      res = spark_write(
-        iris_tbl,
-        writer = writer,
-        paths = paths[[1]]
-      ),
-      expected_paths = as.list(paths[[1]])
-    )
-  }
+  expect_warning_on_arrow(
+    for (paths in list(list(multiple_paths), list(single_path))) {
+      verify_spark_write_result(
+        res = spark_write(
+          iris_tbl,
+          writer = writer,
+          paths = paths[[1]]
+        ),
+        expected_paths = as.list(paths[[1]])
+      )
+    }
+  )
 })
 
 test_avro_schema <- list(

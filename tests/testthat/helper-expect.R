@@ -1,3 +1,11 @@
+expect_warning_on_arrow <- function(x) {
+  if(using_arrow()) {
+    expect_warning(x)
+  } else {
+    x
+  }
+}
+
 expect_coef_equal <- function(lhs, rhs) {
   nm <- names(lhs)
   lhs <- lhs[nm]

@@ -118,10 +118,13 @@ verify_sample_results <- function(weighted, replacement, sampling) {
     }
   }
 
-  if(x > 1) {
+  expect_warning(
     res <- ks.test(x = actual_dist, y = expected_dist)
-    expect_gte(res$p.value, alpha)
-  }
+  )
+
+  expect_gte(res$p.value, alpha)
+
+
 }
 
 test_that("stratified sampling without replacement works as expected", {

@@ -38,9 +38,12 @@ test_that("ft_word2vec() returns result with correct length", {
   tokenized_tbl <- ft_tokenizer(sentence_tbl, "sentence", "words") %>%
     sdf_register("tokenized")
 
-  result <- tokenized_tbl %>%
-    ft_word2vec("words", "result", vector_size = 3, min_count = 0) %>%
-    pull(result)
+  expect_warning_on_arrow(
+    result <- tokenized_tbl %>%
+      ft_word2vec("words", "result", vector_size = 3, min_count = 0) %>%
+      pull(result)
+  )
+
   expect_equal(sapply(result, length), c(3, 3, 3))
 })
 

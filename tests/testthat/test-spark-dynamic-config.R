@@ -36,6 +36,9 @@ test_that("spark_adaptive_query_execution() works", {
 })
 
 test_that("spark_coalesce_shuffle_partitions() works", {
+
+  test_requires_version("3.0.0")
+
   spark_session_config(
     sc, "spark.sql.adaptive.coalescePartitions.enabled", FALSE
   )
