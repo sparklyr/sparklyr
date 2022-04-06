@@ -2,7 +2,7 @@
 
 ### Misc
 
-- Adds compatibility with new `dbplyr` (@mgirlich)
+- Adds compatibility with new `dbplyr` (@mgirlich, #3237).
 
 - Removes `stringr` dependency 
 
