@@ -152,11 +152,3 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     select = vars
   )
 }
-
-add_op_single <- function() {
-  if (dbplyr_uses_ops()) {
-    # TODO
-  } else {
-    abort("internal error")
-  }
-}

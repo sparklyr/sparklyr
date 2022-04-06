@@ -136,7 +136,7 @@ summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
   check_groups(.groups)
 
   if (dbplyr_uses_ops()) {
-    add_op_single(
+    dbplyr::add_op_single(
       "summarise",
       .data,
       dots = dots,
