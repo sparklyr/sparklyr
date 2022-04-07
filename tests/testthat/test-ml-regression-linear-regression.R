@@ -81,7 +81,7 @@ test_that("weights column works for lm", {
   )
   s <- ml_linear_regression(iris_weighted_tbl,
     response = "Sepal_Length",
-    features_col = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+    features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
     reg_param = 0L,
     weight_col = "weights"
   )
@@ -92,7 +92,7 @@ test_that("weights column works for lm", {
   )
   s <- ml_linear_regression(iris_weighted_tbl,
     response = "Sepal_Length",
-    features_col = c("Sepal_Width", "Petal_Length", "Petal_Width"),
+    features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
     reg_param = 0L,
     weight_col = "ones"
   )
