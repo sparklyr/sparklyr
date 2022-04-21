@@ -18,21 +18,41 @@ fix_na_real_values <- function(dots) {
 #' @export
 #' @importFrom dplyr transmute
 transmute.tbl_spark <- function(.data, ...) {
-  dots <- rlang::enquos(..., .named = TRUE) %>%
-    fix_na_real_values() %>%
-    partial_eval_dots(sim_data = simulate_vars(.data))
+  if (dbplyr_uses_ops()) {
+    dots <- rlang::enquos(..., .named = TRUE) %>%
+      fix_na_real_values() %>%
+      partial_eval_dots(sim_data = simulate_vars_spark(.data))
 
-  nest_vars(.data, dots, character())
+    nest_vars(.data, dots, character())
+  } else {
+    dots_org <- rlang::enquos(..., .named = TRUE)
+    dots <- fix_na_real_values(dots_org)
+    if (identical(dots, dots_org)) {
+      NextMethod()
+    } else {
+      transmute(.data, !!!dots)
+    }
+  }
 }
 
 #' @export
 #' @importFrom dplyr mutate
 mutate.tbl_spark <- function(.data, ...) {
-  dots <- rlang::enquos(..., .named = TRUE) %>%
-    fix_na_real_values() %>%
-    partial_eval_dots(sim_data = simulate_vars(.data))
+  if (dbplyr_uses_ops()) {
+    dots <- rlang::enquos(..., .named = TRUE) %>%
+      fix_na_real_values() %>%
+      partial_eval_dots(sim_data = simulate_vars_spark(.data))
 
-  nest_vars(.data, dots, union(dbplyr::op_vars(.data), dbplyr::op_grps(.data)))
+    nest_vars(.data, dots, union(dbplyr::op_vars(.data), dbplyr::op_grps(.data)))
+  } else {
+    dots_org <- rlang::enquos(...)
+    dots <- fix_na_real_values(dots_org)
+    if (identical(dots, dots_org)) {
+      NextMethod()
+    } else {
+      mutate(.data, !!!dots)
+    }
+  }
 }
 
 #' @export
