@@ -251,18 +251,19 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
         function(x) rlang::expr(FIRST(!!sym(x), FALSE))
       )
 
-      grps <- group_vars(.data)
+      grps <- dplyr::group_vars(.data)
       out <- .data %>%
-        group_by(!!!syms(distinct_cols)) %>%
+        dplyr::group_by(!!!syms(distinct_cols)) %>%
         summarise(!!!exprs) %>%
         select(all_of(out_cols)) %>%
         arrange(!!sym(row_num)) %>%
-        group_by(!!!syms(grps))
+        dplyr::group_by(!!!syms(grps))
       out$order_vars <- NULL
       out
     }
   }
 }
+utils::globalVariables(c("FIRST"))
 
 sql_collapse <- function(x) {
   sql(paste0(map_chr(x, quote_sql_name), collapse = ", "))

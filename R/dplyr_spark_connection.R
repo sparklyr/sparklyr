@@ -17,6 +17,7 @@ fix_na_real_values <- function(dots) {
 
 #' @export
 #' @importFrom dplyr transmute
+#' @importFrom dplyr all_of
 transmute.tbl_spark <- function(.data, ...) {
   if (dbplyr_uses_ops()) {
     dots <- rlang::enquos(..., .named = TRUE) %>%
