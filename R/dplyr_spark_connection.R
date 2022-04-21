@@ -48,7 +48,7 @@ filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
   if (dbplyr_uses_ops()) {
     dbplyr::add_op_single("filter", .data, dots = dots)
   } else {
-    .data$lazy_query <- dbplyr:::add_filter(.data, dots)
+    .data$lazy_query <- add_filter(.data, dots)
     .data
   }
 }
@@ -143,7 +143,7 @@ summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
       args = list(.groups = .groups, env_caller = rlang::caller_env())
     )
   } else {
-    .data$lazy_query <- dbplyr:::add_summarise(.data, dots, .groups = .groups, env_caller = rlang::caller_env())
+    .data$lazy_query <- add_summarise(.data, dots, .groups = .groups, env_caller = rlang::caller_env())
     .data
   }
 }

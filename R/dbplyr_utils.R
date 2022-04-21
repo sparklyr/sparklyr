@@ -34,7 +34,7 @@ nest_vars <- function(.data, dots, all_vars) {
   if (dbplyr_uses_ops()) {
     .data$ops <- op_select(.data$ops, carry_over(all_vars, dots))
   } else {
-    .data$lazy_query <- dbplyr:::add_select(.data, carry_over(all_vars, dots), "mutate")
+    .data$lazy_query <- add_select(.data, carry_over(all_vars, dots), "mutate")
   }
   .data
 }
