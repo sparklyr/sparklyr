@@ -43,7 +43,7 @@ filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
   }
 
   dots <- rlang::quos(...)
-  dots <- partial_eval_dots(dots, sim_data = simulate_vars(.data))
+  dots <- partial_eval_dots(dots, sim_data = simulate_vars_spark(.data))
 
   if (dbplyr_uses_ops()) {
     dbplyr::add_op_single("filter", .data, dots = dots)
@@ -56,7 +56,7 @@ filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
 #' @export
 #' @importFrom dplyr select
 select.tbl_spark <- function(.data, ...) {
-  sim_data <- simulate_vars(.data)
+  sim_data <- simulate_vars_spark(.data)
 
   if (dbplyr_uses_ops()) {
     grps <- dbplyr::op_grps(.data$ops)
@@ -92,7 +92,7 @@ summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
   # dataframes
   dots <- rlang::quos(..., .named = TRUE)
   dots <- dots %>% partial_eval_dots(
-    sim_data = simulate_vars(.data),
+    sim_data = simulate_vars_spark(.data),
     ctx = "summarize",
     supports_one_sided_formula = FALSE
   )

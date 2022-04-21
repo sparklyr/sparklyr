@@ -179,5 +179,5 @@ print.tbl_spark <- function(x, ...) {
 #' @export
 #' @importFrom dplyr tbl_ptype
 tbl_ptype.tbl_spark <- function(.data) {
-  simulate_vars(.data)
+  simulate_vars_spark(.data)
 }
