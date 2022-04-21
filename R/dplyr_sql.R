@@ -226,9 +226,6 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
     all_cols <- colnames(.data)
 
     row_num <- random_string("__row_num")
-    # row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY NULL)"))
-    # names(row_num_sql) <- row_num
-    # .data <- .data %>>% dplyr::mutate %@% row_num_sql
     args <- list(
       .keep_all = .keep_all,
       .row_num = row_num,
@@ -239,6 +236,10 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
     if (dbplyr_uses_ops()) {
       dbplyr::add_op_single("tbl_spark_distinct", .data, args = args)
     } else {
+      row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY NULL)"))
+      names(row_num_sql) <- row_num
+      .data <- .data %>% dplyr::mutate(!!!row_num_sql)
+
       if (.keep_all) {
         out_cols <- all_cols
       } else {
