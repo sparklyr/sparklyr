@@ -453,8 +453,9 @@ translate_spark_column_types <- function(sdf) {
     )
 }
 
-simulate_vars <- function(sdf) {
-  translate_spark_column_types(sdf) %>%
+simulate_vars_spark <- function(x, drop_groups = FALSE) {
+  # TODO support `drop_groups`
+  translate_spark_column_types(x) %>%
     lapply(
       function(x) {
         fn <- tryCatch(
@@ -472,6 +473,10 @@ simulate_vars <- function(sdf) {
       }
     ) %>%
     tibble::as_tibble()
+}
+
+simulate_vars.tbl_spark <- function(x, drop_groups = FALSE) {
+  simulate_vars_spark(x, drop_groups)
 }
 
 # wrapper for download.file()
