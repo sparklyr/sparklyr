@@ -1,5 +1,7 @@
 skip_on_livy()
 skip_on_arrow_devel()
+test_requires("foreach")
+test_requires("iterators")
 
 register_test_spark_connection <- function() {
   sc <- testthat_spark_connection()
@@ -10,10 +12,9 @@ if(packageVersion("dbplyr") < 2) {
   expect_error(register_test_spark_connection())
 }
 
-
-test_requires("foreach")
-test_requires("iterators")
 test_requires_package_version("dbplyr", 2)
+
+register_test_spark_connection()
 
 u <- 1234
 v <- 5678

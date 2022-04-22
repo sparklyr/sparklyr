@@ -198,6 +198,7 @@ test_that("if_else works as expected", {
 })
 
 test_that("if_all and if_any work as expected", {
+  test_requires_package_version("dbplyr", 2)
   expect_equivalent(
     scalars_sdf %>%
       filter(if_any(starts_with("b_"))) %>%
