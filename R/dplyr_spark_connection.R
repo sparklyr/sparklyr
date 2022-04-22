@@ -63,14 +63,13 @@ filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
     stop("`.preserve` is not supported on database backends", call. = FALSE)
   }
 
-  dots <- rlang::quos(...)
-  dots <- partial_eval_dots(dots, sim_data = simulate_vars_spark(.data))
-
   if (dbplyr_uses_ops()) {
+    dots <- rlang::quos(...)
+    dots <- partial_eval_dots(dots, sim_data = simulate_vars_spark(.data))
+
     dbplyr::add_op_single("filter", .data, dots = dots)
   } else {
-    .data$lazy_query <- add_filter(.data, dots)
-    .data
+    NextMethod()
   }
 }
 
@@ -106,57 +105,57 @@ select.tbl_spark <- function(.data, ...) {
 #' @importFrom dplyr summarise
 #' @importFrom dbplyr op_vars
 summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
-  # NOTE: this is mostly copy-pasted from
-  # https://github.com/tidyverse/dbplyr/blob/master/R/verb-summarise.R
-  # except for minor changes (see "partial-eval.R") to make use cases such as
-  # `summarise(across(where(is.numeric), mean))` work as expected for Spark
-  # dataframes
-  dots <- rlang::quos(..., .named = TRUE)
-  dots <- dots %>% partial_eval_dots(
-    sim_data = simulate_vars_spark(.data),
-    ctx = "summarize",
-    supports_one_sided_formula = FALSE
-  )
+  if (dbplyr_uses_ops()) {
+    # NOTE: this is mostly copy-pasted from
+    # https://github.com/tidyverse/dbplyr/blob/master/R/verb-summarise.R
+    # except for minor changes (see "partial-eval.R") to make use cases such as
+    # `summarise(across(where(is.numeric), mean))` work as expected for Spark
+    # dataframes
+    dots <- rlang::quos(..., .named = TRUE)
+    dots <- dots %>% partial_eval_dots(
+      sim_data = simulate_vars_spark(.data),
+      ctx = "summarize",
+      supports_one_sided_formula = FALSE
+    )
 
-  # For each expression, check if it uses any newly created variables
-  check_summarise_vars <- function(dots) {
-    for (i in seq_along(dots)) {
-      used_vars <- all_names(rlang::get_expr(dots[[i]]))
-      cur_vars <- names(dots)[seq_len(i - 1)]
+    # For each expression, check if it uses any newly created variables
+    check_summarise_vars <- function(dots) {
+      for (i in seq_along(dots)) {
+        used_vars <- all_names(rlang::get_expr(dots[[i]]))
+        cur_vars <- names(dots)[seq_len(i - 1)]
 
-      if (any(used_vars %in% cur_vars)) {
-        stop(
-          "`", names(dots)[[i]],
-          "` refers to a variable created earlier in this summarise().\n",
-          "Do you need an extra mutate() step?",
-          call. = FALSE
-        )
+        if (any(used_vars %in% cur_vars)) {
+          stop(
+            "`", names(dots)[[i]],
+            "` refers to a variable created earlier in this summarise().\n",
+            "Do you need an extra mutate() step?",
+            call. = FALSE
+          )
+        }
       }
     }
-  }
 
-  check_groups <- function(.groups) {
-    if (rlang::is_null(.groups)) {
-      return()
+    check_groups <- function(.groups) {
+      if (rlang::is_null(.groups)) {
+        return()
+      }
+
+      if (.groups %in% c("drop_last", "drop", "keep")) {
+        return()
+      }
+
+      rlang::abort(c(
+        paste0(
+          "`.groups` can't be ", rlang::as_label(.groups),
+          if (.groups == "rowwise") " in dbplyr"
+        ),
+        i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
+      ))
     }
 
-    if (.groups %in% c("drop_last", "drop", "keep")) {
-      return()
-    }
+    check_summarise_vars(dots)
+    check_groups(.groups)
 
-    rlang::abort(c(
-      paste0(
-        "`.groups` can't be ", rlang::as_label(.groups),
-        if (.groups == "rowwise") " in dbplyr"
-      ),
-      i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
-    ))
-  }
-
-  check_summarise_vars(dots)
-  check_groups(.groups)
-
-  if (dbplyr_uses_ops()) {
     dbplyr::add_op_single(
       "summarise",
       .data,
@@ -164,8 +163,7 @@ summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
       args = list(.groups = .groups, env_caller = rlang::caller_env())
     )
   } else {
-    .data$lazy_query <- add_summarise(.data, dots, .groups = .groups, env_caller = rlang::caller_env())
-    .data
+    NextMethod()
   }
 }
 
