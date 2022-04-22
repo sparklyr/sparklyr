@@ -454,8 +454,14 @@ translate_spark_column_types <- function(sdf) {
 }
 
 simulate_vars_spark <- function(x, drop_groups = FALSE) {
-  # TODO support `drop_groups`
-  translate_spark_column_types(x) %>%
+  col_types <- translate_spark_column_types(x)
+
+  if (drop_groups) {
+    non_group_cols <- setdiff(names(col_types), group_vars(x))
+    col_types <- col_types[non_group_cols]
+  }
+
+  col_types %>%
     lapply(
       function(x) {
         fn <- tryCatch(
