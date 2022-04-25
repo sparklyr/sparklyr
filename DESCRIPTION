@@ -79,7 +79,7 @@ Imports:
     blob,
     config (>= 0.2),
     DBI (>= 0.6-1),
-    dbplyr (>= 1.1.0),
+    dbplyr (>= 2.1.1),
     digest,
     dplyr (>= 0.7.2),
     ellipsis (>= 0.1.0),
@@ -368,3 +368,5 @@ Collate:
     'yarn_config.R'
     'yarn_ui.R'
     'zzz.R'
+Remotes:  
+    tidyverse/dbplyr@f410a2b
