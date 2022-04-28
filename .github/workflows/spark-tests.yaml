@@ -20,7 +20,6 @@ jobs:
         config:
 
           - {spark: '3.1.2', hadoop: '3.2', arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 3.1'}
-          - {spark: '3.1.2', hadoop: '3.2', arrow: '',        livy: '',      dbplyr: '1.4.4', name: 'Spark 3.1 w dbplyr 1.4'}
           - {spark: '3.1.2', hadoop: '3.2', arrow: 'release', livy: '',      dbplyr: '',      name: 'Spark 3.1 w Arrow'}
           - {spark: '3.1.2', hadoop: '3.2', arrow: 'devel',   livy: '',      dbplyr: '',      name: 'Spark 3.1 w Arrow Dev'}
           - {spark: '3.0.0', hadoop: '3.2', arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 3.0'}
