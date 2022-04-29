@@ -368,5 +368,3 @@ Collate:
     'yarn_config.R'
     'yarn_ui.R'
     'zzz.R'
-Remotes:  
-    tidyverse/dbplyr@cb8e35c
