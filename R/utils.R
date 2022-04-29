@@ -485,6 +485,8 @@ simulate_vars.tbl_spark <- function(x, drop_groups = FALSE) {
   simulate_vars_spark(x, drop_groups)
 }
 
+simulate_vars_is_typed.tbl_spark <- function(x) TRUE
+
 # wrapper for download.file()
 download_file <- function(...) {
   min_timeout_s <- 300
