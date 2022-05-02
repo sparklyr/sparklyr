@@ -638,7 +638,7 @@ test_that("spark_read_image works as expected", {
   expect_equal(sdf_ncol(sdf), 1)
   expect_equal(sdf_num_partitions(sdf), 4)
   expect_equal(
-    sdf_schema(sdf, expand_struct_col = TRUE),
+    sdf_schema(sdf, expand_struct_cols = TRUE),
     list(
       image = list(
         name = "image",

@@ -2,6 +2,8 @@
 
 ### Misc
 
+- Compatibility with new `dbplyr` version.
+
 - Removes `stringr` dependency 
 
 - Fixes `augment()` when the model was fitted via `parsnip` (#3233)

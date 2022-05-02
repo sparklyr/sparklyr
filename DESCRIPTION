@@ -79,7 +79,7 @@ Imports:
     blob,
     config (>= 0.2),
     DBI (>= 0.6-1),
-    dbplyr (>= 1.1.0),
+    dbplyr (>= 2.1.1),
     digest,
     dplyr (>= 0.7.2),
     ellipsis (>= 0.1.0),
@@ -170,6 +170,7 @@ Collate:
     'dbi_spark_result.R'
     'dbi_spark_table.R'
     'dbi_spark_transactions.R'
+    'dbplyr-compat.R'
     'dbplyr_utils.R'
     'do_spark.R'
     'dplyr_do.R'

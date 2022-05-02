@@ -87,3 +87,7 @@ all_names <- function(x) {
 
   unique(unlist(lapply(x[-1], all_names), use.names = FALSE))
 }
+
+dbplyr_uses_ops <- function() {
+  packageVersion("dbplyr") <= package_version("2.1.1")
+}

@@ -4,6 +4,28 @@
 #' @include utils.R
 NULL
 
+lazy_sample_query <- function(from, frac, args) {
+  structure(
+    list(
+      from = from,
+      args = args,
+      frac = frac
+    ),
+    class = c("lazy_sample_query", "lazy_query")
+  )
+}
+
+#' @export
+op_vars.lazy_sample_query <- function(op) {
+  op_vars(op$from)
+}
+
+#' @importFrom dbplyr op_grps
+#' @export
+op_grps.lazy_sample_query <- function(op) {
+  op_grps(op$from)
+}
+
 #' @export
 #' @importFrom dbplyr sql_build
 sql_build.op_sample_n <- function(op, con, ...) {
@@ -63,6 +85,61 @@ sql_build.op_sample <- function(op, con, frac) {
       sdf_weighted_sample(
         x = sdf,
         weight_col = NULL,
+        k = sample_size,
+        replacement = op$args$replace,
+        seed = op$args$seed
+      )
+    })
+
+  sample_sdf %>% dbplyr::remote_query()
+}
+
+#' @export
+sql_build.lazy_sample_query <- function(op, con, ...) {
+  grps <- dbplyr::op_grps(op$from)
+  sdf <- to_sdf(op$from, con)
+  frac <- op$frac
+
+  if (rlang::quo_is_null(op$args$weight)) {
+    weight <- NULL
+  } else {
+    weight <- rlang::as_name(op$args$weight)
+  }
+
+  sample_sdf <- (
+    if (length(grps) > 0) {
+      if (frac) {
+        sdf_stratified_sample_frac(
+          x = sdf,
+          grps = grps,
+          frac = op$args$size,
+          weight = weight,
+          replace = op$args$replace,
+          op$args$seed
+        )
+      } else {
+        sdf_stratified_sample_n(
+          x = sdf,
+          grps = grps,
+          k = op$args$size,
+          weight = weight,
+          replace = op$args$replace,
+          op$args$seed
+        )
+      }
+    } else {
+      sample_size <- (
+        if (frac) {
+          cnt <- sdf %>%
+            spark_dataframe() %>%
+            invoke("count")
+          round(cnt * check_frac(op$args$size, replace = op$args$replace))
+        } else {
+          op$args$size
+        })
+      sdf_weighted_sample(
+        x = sdf,
+        weight_col = weight,
         k = sample_size,
         replacement = op$args$replace,
         seed = op$args$seed
@@ -149,9 +226,6 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
     all_cols <- colnames(.data)
 
     row_num <- random_string("__row_num")
-    # row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY NULL)"))
-    # names(row_num_sql) <- row_num
-    # .data <- .data %>>% dplyr::mutate %@% row_num_sql
     args <- list(
       .keep_all = .keep_all,
       .row_num = row_num,
@@ -159,9 +233,37 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
       .distinct_cols = distinct_cols
     )
 
-    add_op_single("tbl_spark_distinct", .data, args = args)
+    if (dbplyr_uses_ops()) {
+      dbplyr::add_op_single("tbl_spark_distinct", .data, args = args)
+    } else {
+      row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY NULL)"))
+      names(row_num_sql) <- row_num
+      .data <- .data %>% dplyr::mutate(!!!row_num_sql)
+
+      if (.keep_all) {
+        out_cols <- all_cols
+      } else {
+        out_cols <- distinct_cols
+      }
+
+      exprs <- lapply(
+        purrr::set_names(c(row_num, out_cols)),
+        function(x) rlang::expr(FIRST(!!sym(x), FALSE))
+      )
+
+      grps <- dplyr::group_vars(.data)
+      out <- .data %>%
+        dplyr::group_by(!!!syms(distinct_cols)) %>%
+        summarise(!!!exprs) %>%
+        select(all_of(out_cols)) %>%
+        arrange(!!sym(row_num)) %>%
+        dplyr::group_by(!!!syms(grps))
+      out$order_vars <- NULL
+      out
+    }
   }
 }
+utils::globalVariables(c("FIRST"))
 
 sql_collapse <- function(x) {
   sql(paste0(map_chr(x, quote_sql_name), collapse = ", "))
@@ -219,7 +321,8 @@ to_sdf <- function(op, con) {
     con,
     dbplyr::select_query(
       from = dbplyr::sql(
-        dbplyr::sql_render(dbplyr::sql_build(op$x, con = con), con = con),
+        # TODO
+        dbplyr::sql_render(dbplyr::sql_build(op$x %||% op$from, con = con), con = con),
         con = con
       ),
       select = dbplyr::build_sql("*", con = con)
