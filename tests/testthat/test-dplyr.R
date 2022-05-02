@@ -200,6 +200,7 @@ test_that("if_else works as expected", {
 })
 
 test_that("if_all and if_any work as expected", {
+  test_requires_package_version("dbplyr", 2)
   expect_equivalent(
     scalars_sdf %>%
       filter(if_any(starts_with("b_"))) %>%
@@ -218,10 +219,7 @@ test_that("if_all and if_any work as expected", {
 })
 
 test_that("if_all and if_any work as expected with boolean predicates", {
-  test_requires_version("2.4.0")
-  if (packageVersion("dbplyr") < "2") {
-    skip("This feature is only supported by dbplyr 2.0 or above")
-  }
+  test_requires_package_version("dbplyr", 2)
   skip_on_arrow()
 
   expect_equivalent(
