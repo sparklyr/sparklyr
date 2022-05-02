@@ -53,7 +53,7 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
     sFit <- ml_linear_regression(
       mtcars_tbl,
       response = "mpg",
-      features = c("cyl", "disp"),
+      features_col = c("cyl", "disp"),
       elastic_net_param = alpha,
       reg_param = lambda
     )

@@ -131,6 +131,8 @@ test_that("'across()' works with formula syntax", {
 })
 
 test_that("'across()' emits error when formula references a mutated column", {
+  skip_if_not(dbplyr_uses_ops())
+
   expect_error(
     dplyr_across_test_cases_tbl %>%
       mutate(across(where(is.numeric), ~ .x + z)) %>%
@@ -535,6 +537,8 @@ test_that("result from dplyr::compute() has remote name", {
 })
 
 test_that("dplyr::summarize() emits an error for summarizer using one-sided formula", {
+  skip_if_not(dbplyr_uses_ops())
+
   expect_error(
     iris_tbl %>% summarize(across(starts_with("Petal"), ~ mean(.x) ^ 2)),
     "One-sided formula is unsupported for 'summarize' on Spark dataframes"
