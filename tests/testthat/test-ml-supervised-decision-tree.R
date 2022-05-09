@@ -129,3 +129,20 @@ test_that("ml_decision_tree() supports response-features syntax (#1302)", {
     NA
   )
 })
+
+
+test_that("ML Pipeline works for Regression Trees", {
+
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
+
+  m_pipeline <- ml_pipeline(sc) %>%
+    ml_r_formula(Sepal_Length ~ Sepal_Width + Petal_Length) %>%
+    ml_decision_tree_regressor()
+
+  expect_is(m_pipeline, "ml_pipeline")
+
+  m_fitted <- ml_fit(m_pipeline, iris_tbl)
+
+  expect_is(m_fitted, "ml_pipeline_model")
+})
