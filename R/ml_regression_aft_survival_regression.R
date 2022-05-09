@@ -37,30 +37,34 @@
 #'
 #' @export
 ml_aft_survival_regression <- function(x, formula = NULL, censor_col = "censor",
-                                       quantile_probabilities = c(
-                                         0.01, 0.05, 0.1, 0.25, 0.5,
-                                         0.75, 0.9, 0.95, 0.99
-                                       ),
-                                       fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-                                       aggregation_depth = 2, quantiles_col = NULL,
-                                       features_col = "features", label_col = "label",
-                                       prediction_col = "prediction",
-                                       uid = random_string("aft_survival_regression_"), ...) {
+  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+  fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
+  aggregation_depth = 2, quantiles_col = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("aft_survival_regression_"),
+  response = NULL, features = NULL,
+  ...
+  ) {
   check_dots_used()
   UseMethod("ml_aft_survival_regression")
 }
 
 #' @export
-ml_aft_survival_regression.spark_connection <- function(x, formula = NULL, censor_col = "censor",
-                                                        quantile_probabilities = c(
-                                                          0.01, 0.05, 0.1, 0.25, 0.5,
-                                                          0.75, 0.9, 0.95, 0.99
-                                                        ),
-                                                        fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-                                                        aggregation_depth = 2, quantiles_col = NULL,
-                                                        features_col = "features", label_col = "label",
-                                                        prediction_col = "prediction",
-                                                        uid = random_string("aft_survival_regression_"), ...) {
+ml_aft_survival_regression.default <- function(x, formula = NULL, censor_col = "censor",
+  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+  fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
+  aggregation_depth = 2, quantiles_col = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("aft_survival_regression_"),
+  response = NULL, features = NULL,
+  ...
+  ) {
+
+  orig_x <- x
+  x <- extract_connection(x)
+
   .args <- list(
     censor_col = censor_col,
     quantile_probabilities = quantile_probabilities,
@@ -100,77 +104,45 @@ ml_aft_survival_regression.spark_connection <- function(x, formula = NULL, censo
       )
     })
 
-  new_ml_aft_survival_regression(jobj)
-}
+  nm <- new_ml_aft_survival_regression(jobj)
 
-#' @export
-ml_aft_survival_regression.ml_pipeline <- function(x, formula = NULL, censor_col = "censor",
-                                                   quantile_probabilities = c(
-                                                     0.01, 0.05, 0.1, 0.25, 0.5,
-                                                     0.75, 0.9, 0.95, 0.99
-                                                   ),
-                                                   fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-                                                   aggregation_depth = 2, quantiles_col = NULL,
-                                                   features_col = "features", label_col = "label",
-                                                   prediction_col = "prediction",
-                                                   uid = random_string("aft_survival_regression_"), ...) {
-  stage <- ml_aft_survival_regression.spark_connection(
-    x = spark_connection(x),
+  ml_aft_survival_regression_obj(
+    x = orig_x,
+    nm = nm,
     formula = formula,
-    censor_col = censor_col,
-    quantile_probabilities = quantile_probabilities,
-    fit_intercept = fit_intercept,
-    max_iter = max_iter,
-    tol = tol,
-    aggregation_depth = aggregation_depth,
-    quantiles_col = quantiles_col,
+    response = response,
+    features = features,
     features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    uid = uid,
-    ...
-  )
-  ml_add_stage(x, stage)
+    label_col = label_col
+    )
 }
 
-#' @export
-ml_aft_survival_regression.tbl_spark <- function(x, formula = NULL, censor_col = "censor",
-                                                 quantile_probabilities = c(
-                                                   0.01, 0.05, 0.1, 0.25, 0.5,
-                                                   0.75, 0.9, 0.95, 0.99
-                                                 ),
-                                                 fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-                                                 aggregation_depth = 2, quantiles_col = NULL,
-                                                 features_col = "features", label_col = "label",
-                                                 prediction_col = "prediction",
-                                                 uid = random_string("aft_survival_regression_"),
-                                                 response = NULL, features = NULL, ...) {
+ml_aft_survival_regression_obj <- function(x, nm, formula, response, features,
+                                           features_col, label_col) {
+  UseMethod("ml_aft_survival_regression_obj")
+}
+
+ml_aft_survival_regression_obj.spark_connection <- function(x, nm, formula, response,
+                                                            features, features_col, label_col) {
+  nm
+}
+
+ml_aft_survival_regression_obj.ml_pipeline <- function(x, nm, formula, response,
+                                                       features, features_col, label_col) {
+  ml_add_stage(x, nm)
+}
+
+ml_aft_survival_regression_obj.tbl_spark <- function(x, nm, formula, response,
+                                                     features, features_col, label_col) {
+
   formula <- ml_standardize_formula(formula, response, features)
 
-  stage <- ml_aft_survival_regression.spark_connection(
-    x = spark_connection(x),
-    formula = NULL,
-    censor_col = censor_col,
-    quantile_probabilities = quantile_probabilities,
-    fit_intercept = fit_intercept,
-    max_iter = max_iter,
-    tol = tol,
-    aggregation_depth = aggregation_depth,
-    quantiles_col = quantiles_col,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    uid = uid,
-    ...
-  )
-
   if (is.null(formula)) {
-    stage %>%
-      ml_fit(x)
+    ml_fit(nm, x)
   } else {
     ml_construct_model_supervised(
       new_ml_model_aft_survival_regression,
-      predictor = stage,
+      predictor = nm,
       formula = formula,
       dataset = x,
       features_col = features_col,
@@ -215,16 +187,14 @@ new_ml_aft_survival_regression_model <- function(jobj) {
 #' @details \code{ml_survival_regression()} is an alias for \code{ml_aft_survival_regression()} for backwards compatibility.
 #' @export
 ml_survival_regression <- function(x, formula = NULL, censor_col = "censor",
-                                   quantile_probabilities = c(
-                                     0.01, 0.05, 0.1, 0.25, 0.5,
-                                     0.75, 0.9, 0.95, 0.99
-                                   ),
-                                   fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-                                   aggregation_depth = 2, quantiles_col = NULL,
-                                   features_col = "features", label_col = "label",
-                                   prediction_col = "prediction",
-                                   uid = random_string("aft_survival_regression_"),
-                                   response = NULL, features = NULL, ...) {
+  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+  fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
+  aggregation_depth = 2, quantiles_col = NULL,
+  features_col = "features", label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("aft_survival_regression_"),
+  response = NULL, features = NULL, ...
+  ) {
   .Deprecated("ml_aft_survival_regression")
   UseMethod("ml_aft_survival_regression")
 }

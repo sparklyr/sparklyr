@@ -110,3 +110,26 @@ make_stats_arranger <- function(fit_intercept) {
     identity
   }
 }
+
+extract_connection <- function(x) {
+  UseMethod("extract_connection")
+}
+
+extract_connection.spark_connection <- function(x) {
+  x
+}
+
+extract_connection.tbl_spark <- function(x) {
+  spark_connection(x)
+}
+
+extract_connection.ml_pipeline <- function(x) {
+  spark_connection(x)
+}
+
+
+
+
+
+
+
