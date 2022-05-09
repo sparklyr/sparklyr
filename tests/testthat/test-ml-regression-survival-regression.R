@@ -1,7 +1,7 @@
 skip_on_livy()
 skip_on_arrow_devel()
-
 skip_databricks_connect()
+
 test_that("ml_aft_survival_regression() default params", {
   test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
@@ -26,18 +26,25 @@ test_that("ml_aft_survival_regression() param setting", {
   test_param_setting(sc, ml_aft_survival_regression, test_args)
 })
 
-test_that("ml_aft_survival_regression() works properly", {
-  sc <- testthat_spark_connection()
-  training <- data.frame(
-    label = c(1.218, 2.949, 3.627, 0.273, 4.199),
-    censor = c(1.0, 0.0, 0.0, 1.0, 0.0),
-    V1 = c(1.560, 0.346, 1.380, 0.520, 0.795),
-    V2 = c(-0.605, 2.158, 0.231, 1.151, -0.226)
-  )
-  training_tbl <- sdf_copy_to(sc, training, overwrite = TRUE) %>%
-    ft_vector_assembler(c("V1", "V2"), "features")
+sc <- testthat_spark_connection()
 
-  aft <- ml_aft_survival_regression(training_tbl,
+training <- data.frame(
+  label = c(1.218, 2.949, 3.627, 0.273, 4.199),
+  censor = c(1.0, 0.0, 0.0, 1.0, 0.0),
+  V1 = c(1.560, 0.346, 1.380, 0.520, 0.795),
+  V2 = c(-0.605, 2.158, 0.231, 1.151, -0.226)
+)
+
+training_tbl <- sdf_copy_to(sc, training, overwrite = TRUE)
+
+test_that("ml_aft_survival_regression() works properly", {
+  training_va <- ft_vector_assembler(
+    training_tbl,
+    c("V1", "V2"), "features"
+  )
+
+  aft <- ml_aft_survival_regression(
+    training_va,
     quantile_probabilities = list(0.3, 0.6),
     quantiles_col = "quantiles"
   )
@@ -46,7 +53,7 @@ test_that("ml_aft_survival_regression() works properly", {
   expect_equal(aft$intercept, 2.6380946151040043, tolerance = 1e-4, scale = 1)
   expect_equal(aft$scale, 1.5472345574364683, tolerance = 1e-4, scale = 1)
 
-  predicted_tbl <- ml_predict(aft, training_tbl)
+  predicted_tbl <- ml_predict(aft, training_va)
 
   expect_warning_on_arrow(
     p_q <- predicted_tbl %>%
@@ -55,8 +62,8 @@ test_that("ml_aft_survival_regression() works properly", {
   )
 
   expect_equal(p_q,
-  c(1.1603238947151593, 4.995456010274735),
-  tolerance = 1e-4, scale = 1
+    c(1.1603238947151593, 4.995456010274735),
+    tolerance = 1e-4, scale = 1
   )
   expect_equal(predicted_tbl %>%
     dplyr::pull(prediction) %>%
@@ -65,9 +72,34 @@ test_that("ml_aft_survival_regression() works properly", {
   tolerance = 1e-4, scale = 1
   )
 
-  aft_model <- ml_aft_survival_regression(training_tbl, label ~ V1 + V2, features_col = "feat")
+  aft_model <- ml_aft_survival_regression(training_va, label ~ V1 + V2, features_col = "feat")
+
   expect_equal(coef(aft_model),
     structure(c(2.63808989630564, -0.496304411053117, 0.198452172529228), .Names = c("(Intercept)", "V1", "V2")),
     tolerance = 1e-05, scale = 1
   )
 })
+
+test_that("ML Pipeline works", {
+  aft_pipeline <- ml_pipeline(sc) %>%
+    ft_vector_assembler(c("V1", "V2"), "features") %>%
+    ml_aft_survival_regression(
+      quantile_probabilities = list(0.3, 0.6),
+      quantiles_col = "quantiles"
+    )
+
+  expect_is(aft_pipeline, "ml_pipeline")
+
+  aft_fitted <- ml_fit(aft_pipeline, training_tbl)
+
+  expect_is(aft_fitted, "ml_pipeline_model")
+})
+
+test_that("Deprecated function fails", {
+  sc <- testthat_spark_connection()
+  expect_warning(
+    ml_survival_regression(sc),
+    "'ml_survival_regression' is deprecated."
+    )
+})
+
