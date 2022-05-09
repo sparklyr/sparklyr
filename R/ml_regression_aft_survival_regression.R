@@ -106,6 +106,7 @@ ml_aft_survival_regression.default <- function(x, formula = NULL, censor_col = "
   post_ml_obj(
     x = orig_x,
     nm = new_ml_estimator(jobj, class = "ml_aft_survival_regression"),
+    ml_function = new_ml_model_aft_survival_regression,
     formula = formula,
     response = response,
     features = features,
