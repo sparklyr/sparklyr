@@ -111,6 +111,8 @@ make_stats_arranger <- function(fit_intercept) {
   }
 }
 
+# -------------------- Extract connection functions ----------------------------
+
 extract_connection <- function(x) {
   UseMethod("extract_connection")
 }
@@ -127,9 +129,41 @@ extract_connection.ml_pipeline <- function(x) {
   spark_connection(x)
 }
 
+# --------------------- Post conversion functions ------------------------------
 
+post_ml_obj <- function(x, nm, formula, response,
+                         features, features_col, label_col) {
+  UseMethod("post_ml_obj")
+}
 
+post_ml_obj.spark_connection <- function(x, nm, formula, response,
+                                          features, features_col, label_col) {
+  nm
+}
 
+post_ml_obj.ml_pipeline <- function(x, nm, formula, response,
+                                     features, features_col, label_col) {
+  ml_add_stage(x, nm)
+}
+
+post_ml_obj.tbl_spark <- function(x, nm, formula, response,
+                                   features, features_col, label_col) {
+
+  formula <- ml_standardize_formula(formula, response, features)
+
+  if (is.null(formula)) {
+    ml_fit(nm, x)
+  } else {
+    ml_construct_model_supervised(
+      new_ml_model_aft_survival_regression,
+      predictor = nm,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col
+    )
+  }
+}
 
 
 

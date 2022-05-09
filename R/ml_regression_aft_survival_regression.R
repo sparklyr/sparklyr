@@ -103,7 +103,7 @@ ml_aft_survival_regression.default <- function(x, formula = NULL, censor_col = "
         ))
       )
 
-  post_aft_obj(
+  post_ml_obj(
     x = orig_x,
     nm = new_ml_estimator(jobj, class = "ml_aft_survival_regression"),
     formula = formula,
@@ -112,40 +112,6 @@ ml_aft_survival_regression.default <- function(x, formula = NULL, censor_col = "
     features_col = features_col,
     label_col = label_col
   )
-}
-
-post_aft_obj <- function(x, nm, formula, response,
-                         features, features_col, label_col) {
-  UseMethod("post_aft_obj")
-}
-
-post_aft_obj.spark_connection <- function(x, nm, formula, response,
-                                          features, features_col, label_col) {
-  nm
-}
-
-post_aft_obj.ml_pipeline <- function(x, nm, formula, response,
-                                     features, features_col, label_col) {
-  ml_add_stage(x, nm)
-}
-
-post_aft_obj.tbl_spark <- function(x, nm, formula, response,
-                                   features, features_col, label_col) {
-
-  formula <- ml_standardize_formula(formula, response, features)
-
-  if (is.null(formula)) {
-    ml_fit(nm, x)
-  } else {
-    ml_construct_model_supervised(
-      new_ml_model_aft_survival_regression,
-      predictor = nm,
-      formula = formula,
-      dataset = x,
-      features_col = features_col,
-      label_col = label_col
-    )
-  }
 }
 
 # Constructors
