@@ -59,49 +59,31 @@ ml_aft_survival_regression.default <- function(x, formula = NULL, censor_col = "
                                                uid = random_string("aft_survival_regression_"),
                                                response = NULL, features = NULL,
                                                ...) {
-  orig_x <- x
-  x <- extract_connection(x)
 
-  args_list <- list(
-    censor_col = cast_string(censor_col),
-    quantile_probabilities = cast_double_list(quantile_probabilities),
-    fit_intercept = cast_scalar_logical(fit_intercept),
-    max_iter = cast_scalar_integer(max_iter),
-    tol = cast_scalar_double(tol),
-    aggregation_depth = cast_scalar_integer(aggregation_depth),
-    quantiles_col = cast_nullable_string(quantiles_col),
+  stage <- spark_pipeline_stage(
+    sc = extract_connection(x),
+    class = "org.apache.spark.ml.regression.AFTSurvivalRegression",
+    uid = uid,
     features_col = features_col,
     label_col = label_col,
     prediction_col = prediction_col
   )
 
-  .args <- c(args_list, rlang::dots_list(...))
-
-  stage <- spark_pipeline_stage(
-    sc = x,
-    class = "org.apache.spark.ml.regression.AFTSurvivalRegression",
-    uid = uid,
-    features_col = .args[["features_col"]],
-    label_col = .args[["label_col"]],
-    prediction_col = .args[["prediction_col"]]
-  )
-
   jobj <- batch_invoke(
     stage,
     list(
-      list("setFitIntercept", .args[["fit_intercept"]]),
-      list("setMaxIter", .args[["max_iter"]]),
-      list("setTol", .args[["tol"]]),
-      list("setCensorCol", .args[["censor_col"]]),
-      list("setFitIntercept", .args[["fit_intercept"]]),
-      list("setQuantileProbabilities", .args[["quantile_probabilities"]]),
-      jobj_set_param_helper(stage, "setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2),
-      jobj_set_param_helper(stage, "setQuantilesCol", .args[["quantiles_col"]])
+      list("setFitIntercept", cast_scalar_logical(fit_intercept)),
+      list("setMaxIter", cast_scalar_integer(max_iter)),
+      list("setTol", cast_scalar_double(tol)),
+      list("setCensorCol", cast_string(censor_col)),
+      list("setQuantileProbabilities", cast_double_list(quantile_probabilities)),
+      jobj_set_param_helper(stage, "setAggregationDepth", cast_scalar_integer(aggregation_depth), "2.1.0", 2),
+      jobj_set_param_helper(stage, "setQuantilesCol", cast_nullable_string(quantiles_col))
     )
   )
 
   post_ml_obj(
-    x = orig_x,
+    x = x,
     nm = new_ml_estimator(jobj, class = "ml_aft_survival_regression"),
     ml_function = new_ml_model_aft_survival_regression,
     formula = formula,
