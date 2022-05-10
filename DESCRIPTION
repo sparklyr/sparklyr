@@ -260,7 +260,6 @@ Collate:
     'ml_fpm_prefixspan.R'
     'ml_helpers.R'
     'ml_mapping_tables.R'
-    'ml_model_aft_survival_regression.R'
     'ml_model_als.R'
     'ml_model_bisecting_kmeans.R'
     'ml_model_constructors.R'
