@@ -52,23 +52,20 @@ ml_decision_tree_regressor.default <- function(x, formula = NULL, max_depth = 5,
     prediction_col = .args[["prediction_col"]]
   )
 
-  jobj <- do.call(
-    invoke,
-    c(stage, "%>%", Filter(
-      function(x) !is.null(x),
-      list(
-        list("setCheckpointInterval", .args[["checkpoint_interval"]]),
-        list("setImpurity", .args[["impurity"]]),
-        list("setMaxBins", .args[["max_bins"]]),
-        list("setMaxDepth", .args[["max_depth"]]),
-        list("setMinInfoGain", .args[["min_info_gain"]]),
-        list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
-        list("setCacheNodeIds", .args[["cache_node_ids"]]),
-        list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
-        jobj_set_param_helper(stage, "setVarianceCol", .args[["variance_col"]], "2.0.0"),
-        jobj_set_param_helper(stage, "setSeed", .args[["seed"]])
-      )
-    ))
+  jobj <- batch_invoke(
+    stage,
+    list(
+      list("setCheckpointInterval", .args[["checkpoint_interval"]]),
+      list("setImpurity", .args[["impurity"]]),
+      list("setMaxBins", .args[["max_bins"]]),
+      list("setMaxDepth", .args[["max_depth"]]),
+      list("setMinInfoGain", .args[["min_info_gain"]]),
+      list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
+      list("setCacheNodeIds", .args[["cache_node_ids"]]),
+      list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
+      jobj_set_param_helper(stage, "setVarianceCol", .args[["variance_col"]], "2.0.0"),
+      jobj_set_param_helper(stage, "setSeed", .args[["seed"]])
+    )
   )
 
   post_ml_obj(

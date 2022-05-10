@@ -86,22 +86,19 @@ ml_aft_survival_regression.default <- function(x, formula = NULL, censor_col = "
     prediction_col = .args[["prediction_col"]]
   )
 
-  jobj <- do.call(
-        invoke,
-        c(stage, "%>%", Filter(
-          function(x) !is.null(x),
-          list(
-            list("setFitIntercept", .args[["fit_intercept"]]),
-            list("setMaxIter", .args[["max_iter"]]),
-            list("setTol", .args[["tol"]]),
-            list("setCensorCol", .args[["censor_col"]]),
-            list("setFitIntercept", .args[["fit_intercept"]]),
-            list("setQuantileProbabilities", .args[["quantile_probabilities"]]),
-            jobj_set_param_helper(stage, "setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2),
-            jobj_set_param_helper(stage, "setQuantilesCol", .args[["quantiles_col"]])
-          )
-        ))
-      )
+  jobj <- batch_invoke(
+    stage,
+    list(
+      list("setFitIntercept", .args[["fit_intercept"]]),
+      list("setMaxIter", .args[["max_iter"]]),
+      list("setTol", .args[["tol"]]),
+      list("setCensorCol", .args[["censor_col"]]),
+      list("setFitIntercept", .args[["fit_intercept"]]),
+      list("setQuantileProbabilities", .args[["quantile_probabilities"]]),
+      jobj_set_param_helper(stage, "setAggregationDepth", .args[["aggregation_depth"]], "2.1.0", 2),
+      jobj_set_param_helper(stage, "setQuantilesCol", .args[["quantiles_col"]])
+    )
+  )
 
   post_ml_obj(
     x = orig_x,

@@ -18,8 +18,7 @@ predict.ml_model_classification <- function(object,
 }
 
 #' @export
-predict.ml_model_regression <- function(
-                                        object, newdata = ml_model_data(object), ...) {
+predict.ml_model_regression <- function(object, newdata = ml_model_data(object), ...) {
   prediction_col <- ml_param(object$model, "prediction_col")
 
   ml_predict(object, newdata) %>%
@@ -132,23 +131,22 @@ extract_connection.ml_pipeline <- function(x) {
 # --------------------- Post conversion functions ------------------------------
 
 post_ml_obj <- function(x, nm, ml_function, formula, response,
-                         features, features_col, label_col) {
+                        features, features_col, label_col) {
   UseMethod("post_ml_obj")
 }
 
 post_ml_obj.spark_connection <- function(x, nm, ml_function, formula, response,
-                                          features, features_col, label_col) {
+                                         features, features_col, label_col) {
   nm
 }
 
 post_ml_obj.ml_pipeline <- function(x, nm, ml_function, formula, response,
-                                     features, features_col, label_col) {
+                                    features, features_col, label_col) {
   ml_add_stage(x, nm)
 }
 
 post_ml_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
-                                   features, features_col, label_col) {
-
+                                  features, features_col, label_col) {
   formula <- ml_standardize_formula(formula, response, features)
 
   if (is.null(formula)) {
@@ -165,5 +163,12 @@ post_ml_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
   }
 }
 
+# ---------------------------- ML helpers -------------------------------------
 
-
+batch_invoke <- function(stage, arguments) {
+  do.call(invoke, c(
+    stage,
+    "%>%",
+    Filter(function(x) !is.null(x), arguments)
+  ))
+}
