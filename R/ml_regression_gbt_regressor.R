@@ -26,15 +26,15 @@ ml_gbt_regressor.default<- function(x, formula = NULL, max_iter = 20, max_depth 
   x <- extract_connection(x)
 
   args_list <- list(
-    max_iter = max_iter,
+    max_iter = cast_scalar_integer(max_iter),
     max_depth = max_depth,
-    step_size = step_size,
-    subsampling_rate = subsampling_rate,
-    feature_subset_strategy = feature_subset_strategy,
+    step_size = cast_scalar_double(step_size),
+    subsampling_rate = cast_scalar_double(subsampling_rate),
+    feature_subset_strategy = cast_string(feature_subset_strategy),
     min_instances_per_node = min_instances_per_node,
     max_bins = max_bins,
     min_info_gain = min_info_gain,
-    loss_type = loss_type,
+    loss_type = cast_choice(loss_type, c("squared", "absolute")),
     seed = seed,
     checkpoint_interval = checkpoint_interval,
     cache_node_ids = cache_node_ids,
@@ -44,9 +44,9 @@ ml_gbt_regressor.default<- function(x, formula = NULL, max_iter = 20, max_depth 
     prediction_col = prediction_col
   )
 
-  .args <- c(args_list, rlang::dots_list(...))
+  args_valid <- ml_validate_decision_tree_args(args_list)
 
-  .args <- validator_ml_gbt_regressor(.args)
+  .args <- c(args_valid, rlang::dots_list(...))
 
   stage <- spark_pipeline_stage(
     sc = x,
@@ -77,7 +77,7 @@ ml_gbt_regressor.default<- function(x, formula = NULL, max_iter = 20, max_depth 
 
   post_ml_obj(
     x = orig_x,
-    nm = new_ml_gbt_regressor(jobj),
+    nm = new_ml_predictor(jobj, class = "ml_gbt_regressor"),
     ml_function = new_ml_model_gbt_regression,
     formula = formula,
     response = NULL,
@@ -85,24 +85,6 @@ ml_gbt_regressor.default<- function(x, formula = NULL, max_iter = 20, max_depth 
     features_col = features_col,
     label_col = label_col
   )
-}
-
-# Validator
-validator_ml_gbt_regressor <- function(.args) {
-  .args <- ml_validate_decision_tree_args(.args)
-
-  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
-  .args[["step_size"]] <- cast_scalar_double(.args[["step_size"]])
-  .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])
-  .args[["loss_type"]] <- cast_choice(.args[["loss_type"]], c("squared", "absolute"))
-  .args[["feature_subset_strategy"]] <- cast_string(.args[["feature_subset_strategy"]])
-  .args
-}
-
-# Constructors
-
-new_ml_gbt_regressor <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_gbt_regressor")
 }
 
 new_ml_gbt_regression_model <- function(jobj) {
