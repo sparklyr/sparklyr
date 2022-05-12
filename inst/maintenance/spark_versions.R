@@ -2,20 +2,26 @@ library(curl)
 library(rvest)
 library(stringr)
 library(purrr)
+library(fs)
+library(readr)
 
-apache_url <- "https://dlcdn.apache.org/spark/"
+# ---------------------- Functions ----------------
 
-main_page_curl <- curl(apache_url)
+## -------- Gets links from main page
+get_main_page <- function(url) {
+  main_page_curl <- curl(url)
 
-main_page_links <- main_page_curl %>%
-  read_html() %>%
-  html_elements("a") %>%
-  html_attr("href")
+  main_page_links <- main_page_curl %>%
+    read_html() %>%
+    html_elements("a") %>%
+    html_attr("href")
 
-main_spark_folders <- main_page_links[str_starts(main_page_links, "spark")]
+  main_page_links[str_starts(main_page_links, "spark")]
+}
 
-get_spark_files <- function(curr_folder) {
-  spark_folder <- paste0(apache_url, curr_folder)
+## ---- Gets file names form folders in the links from main page
+get_spark_files <- function(curr_folder, url) {
+  spark_folder <- paste0(url, curr_folder)
 
   spark_page_curl <- curl(spark_folder)
 
@@ -32,31 +38,53 @@ get_spark_files <- function(curr_folder) {
 
   map(sfs, ~ {
     list(
-      main = apache_url,
+      main = url,
       folder = curr_folder,
       file = .x
     )
   })
 }
 
-all_files <- main_spark_folders %>%
-  map(get_spark_files) %>%
-  flatten()
-
-
-
+## ---- Parses the file name to extract Spark, Hadoop and Scala version
 parse_file <- function(x) {
-  xfp <- fs::path_ext_remove(x)
+  xfp <- path_ext_remove(x)
   xf_split <- str_split(xfp, "-")[[1]]
+
+  scala <- ""
+
+  if(length(xf_split) > 4) {
+    if(str_detect(xf_split[5], "scala")) {
+      scala <- str_sub(xf_split[5], 6)
+    }
+  }
+
   list(
     spark = xf_split[2],
     hadoop = str_sub(xf_split[4], 7),
-    scala = ifelse(length(xf_split) > 4, str_sub(xf_split[5], 6), NA)
+    scala = scala
   )
 }
 
+# ---------------------- Read / create versions.rds file ----------------
+
+versions_rds <- path("inst", "maintenance", "versions.rds")
+
+if(!file_exists(versions_rds)) {
+  c("https://dlcdn.apache.org/spark/",
+    "https://archive.apache.org/dist/spark/"
+  ) %>%
+    map(~ get_main_page(.x) %>%
+          map(get_spark_files, .x) %>%
+          flatten()
+    ) %>%
+    flatten() %>%
+    write_rds(versions_rds)
+}
+
+all_files <- read_rds(versions_rds)
+
+# -------------------- Data Wrangling -------------
+
 all_files %>%
-  map(~ c(.x, parse_file(.x$file)))
-
-
-
+  map_dfr(~ c(.x, parse_file(.x$file))) %>%
+  View()
