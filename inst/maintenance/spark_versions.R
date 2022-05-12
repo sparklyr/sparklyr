@@ -34,7 +34,7 @@ get_spark_files <- function(curr_folder, url) {
     str_ends(spark_page_links, ".tgz") &
     str_detect(spark_page_links, "hadoop")
 
-  sfs <- spark_page_links[valid_spark & !str_detect(spark_page_links, "without")]
+  sfs <- spark_page_links[valid_spark]
 
   map(sfs, ~ {
     list(
@@ -47,7 +47,12 @@ get_spark_files <- function(curr_folder, url) {
 
 ## ---- Parses the file name to extract Spark, Hadoop and Scala version
 parse_file <- function(x) {
+
+  if(str_sub(x, 1, 6) != "spark-") stop("Invalid file name")
+  if(str_sub(x, 12, 22) != "-bin-hadoop") stop(str_sub(x, 10, 21))
+
   xfp <- path_ext_remove(x)
+
   xf_split <- str_split(xfp, "-")[[1]]
 
   scala <- ""
@@ -86,5 +91,19 @@ all_files <- read_rds(versions_rds)
 # -------------------- Data Wrangling -------------
 
 all_files %>%
-  map_dfr(~ c(.x, parse_file(.x$file))) %>%
-  View()
+  #head(1) %>%
+  discard(~str_detect(.x$file, "incubating")) %>%
+  discard(~str_detect(.x$file, "without")) %>%
+  discard(~str_detect(.x$file, "preview")) %>%
+  map(~ c(.x, parse_file(.x$file)))
+
+
+
+library(jsonlite)
+current_versions <- read_json("inst/extdata/versions.json")
+
+cdn_entries <- keep(current_versions, ~.x$base == "https://d3kbcqa49mib13.cloudfront.net/")
+
+
+
+
