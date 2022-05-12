@@ -4,6 +4,8 @@ library(stringr)
 library(purrr)
 library(fs)
 library(readr)
+library(jsonlite)
+library(dplyr)
 
 # ---------------------- Functions ----------------
 
@@ -46,27 +48,22 @@ get_spark_files <- function(curr_folder, url) {
 }
 
 ## ---- Parses the file name to extract Spark, Hadoop and Scala version
-parse_file <- function(x) {
+parse_file <- function(x, main, folder) {
 
   if(str_sub(x, 1, 6) != "spark-") stop("Invalid file name")
-  if(str_sub(x, 12, 22) != "-bin-hadoop") stop(str_sub(x, 10, 21))
+  if(str_sub(x, 12, 22) != "-bin-hadoop") stop("Invalid file name")
+  if(str_detect(x, "scala")) stop("No Scala version files")
+
 
   xfp <- path_ext_remove(x)
 
   xf_split <- str_split(xfp, "-")[[1]]
 
-  scala <- ""
-
-  if(length(xf_split) > 4) {
-    if(str_detect(xf_split[5], "scala")) {
-      scala <- str_sub(xf_split[5], 6)
-    }
-  }
-
   list(
     spark = xf_split[2],
     hadoop = str_sub(xf_split[4], 7),
-    scala = scala
+    base = paste0(main, folder),
+    pattern = "spark-%s-bin-hadoop%s.tgz"
   )
 }
 
@@ -90,20 +87,40 @@ all_files <- read_rds(versions_rds)
 
 # -------------------- Data Wrangling -------------
 
-all_files %>%
-  #head(1) %>%
+apache_entries <- all_files %>%
   discard(~str_detect(.x$file, "incubating")) %>%
   discard(~str_detect(.x$file, "without")) %>%
   discard(~str_detect(.x$file, "preview")) %>%
-  map(~ c(.x, parse_file(.x$file)))
+  discard(~str_detect(.x$file, "scala")) %>%
+  map(~ parse_file(.x$file, .x$main, .x$folder))
 
+versions_json <- path("inst/extdata/versions.json")
 
-
-library(jsonlite)
-current_versions <- read_json("inst/extdata/versions.json")
-
+current_versions <- read_json(versions_json)
 cdn_entries <- keep(current_versions, ~.x$base == "https://d3kbcqa49mib13.cloudfront.net/")
 
 
+final_tbl <- c(apache_entries, cdn_entries) %>%
+  map(~{
+    x <- .x
+    x$priority <- 0
+    if(str_detect(x$base, "d3kbcqa49mib13.cloudfront.net")) x$priority <- 1
+    if(str_detect(x$base, "dlcdn.apache.org")) x$priority <- 2
+    if(str_detect(x$base, "archive.apache.org")) x$priority <- 3
+    x
+  }) %>%
+  map_dfr(~.x) %>%
+  arrange(spark, hadoop, priority) %>%
+  filter(spark >= "1.5.2") %>% # Matching minimum version to the original file
+  group_by(spark, hadoop) %>%
+  filter(priority == min(priority)) %>%
+  select(-priority) %>%
+  ungroup()
 
+final_tbl %>%
+  mutate(base = str_sub(base, 1, 25)) %>%
+  count(base)
 
+final_tbl %>%
+  transpose() %>%
+  write_json(versions_json, pretty = TRUE, auto_unbox = TRUE)
