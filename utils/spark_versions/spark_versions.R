@@ -69,7 +69,7 @@ parse_file <- function(x, main, folder) {
 
 # ---------------------- Read / create versions.rds file ----------------
 
-versions_rds <- path("inst", "maintenance", "versions.rds")
+versions_rds <- path("utils", "maintenance", "versions.rds")
 
 if(!file_exists(versions_rds)) {
   c("https://dlcdn.apache.org/spark/",
@@ -85,7 +85,7 @@ if(!file_exists(versions_rds)) {
 
 all_files <- read_rds(versions_rds)
 
-# -------------------- Data Wrangling -------------
+# -------------------- Combine files -------------
 
 apache_entries <- all_files %>%
   discard(~str_detect(.x$file, "incubating")) %>%
@@ -99,6 +99,7 @@ versions_json <- path("inst/extdata/versions.json")
 current_versions <- read_json(versions_json)
 cdn_entries <- keep(current_versions, ~.x$base == "https://d3kbcqa49mib13.cloudfront.net/")
 
+# -------------------- Create new list -------------
 
 final_tbl <- c(apache_entries, cdn_entries) %>%
   map(~{
@@ -120,6 +121,8 @@ final_tbl <- c(apache_entries, cdn_entries) %>%
 final_tbl %>%
   mutate(base = str_sub(base, 1, 25)) %>%
   count(base)
+
+# ---------------- Save new versions.json to inst folder --------------
 
 final_tbl %>%
   transpose() %>%
