@@ -220,6 +220,7 @@ test_that("if_all and if_any work as expected", {
 
 test_that("if_all and if_any work as expected with boolean predicates", {
   test_requires_package_version("dbplyr", 2)
+  test_requires_version("2.4.0")
   skip_on_arrow()
 
   expect_equivalent(
