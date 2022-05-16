@@ -95,9 +95,6 @@ test_that("gradient_boosted_trees.tidy() works", {
 
   check_tidy(gl2, exp.row = 1, exp.names = gl_names)
 
-
-  skip("Preventing `parsnip` tests from running due to current bug")
-
   bt_classification_parsnip <- parsnip::boost_tree(engine = "spark") %>%
     parsnip::set_mode("classification") %>%
     parsnip::fit(Species ~ Sepal_Length + Petal_Length, iris_two)

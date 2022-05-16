@@ -76,8 +76,6 @@ test_that("random_forest.tidy() works", {
     exp.names = gl_names
   )
 
-  skip("Preventing `parsnip` tests from running due to current bug")
-
   rf_classification_parsnip <- parsnip::rand_forest(engine = "spark") %>%
     parsnip::set_mode("classification") %>%
     parsnip::fit(Species ~ Sepal_Length + Petal_Length, iris_tbl)

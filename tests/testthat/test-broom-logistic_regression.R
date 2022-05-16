@@ -56,9 +56,6 @@ test_that("logistic_regression tidiers work", {
     exp.names = c("elastic_net_param", "lambda")
   )
 
-
-  skip("Preventing `parsnip` tests from running due to current bug")
-
   lr_parsnip <- parsnip::logistic_reg(engine = "spark") %>%
     parsnip::fit(is_setosa ~ Sepal_Length + Petal_Length, iris_tbl)
 
