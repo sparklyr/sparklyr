@@ -20,7 +20,7 @@ test_that("broom interface for Linear SVC works", {
   ## ----------------------------- tidy() --------------------------------------
 
   expected_coefs <- c(-0.06004978, -0.1563083, -0.460648, 0.2276626, 1.055085)
-  if(spark_version(sc) >= "3.2.1") expected_coefs <- c(-6.8823988, -0.6154984, -1.5135447, 1.9694126, 3.3736856)
+  if(spark_version(sc) >= "3.2.0") expected_coefs <- c(-6.8823988, -0.6154984, -1.5135447, 1.9694126, 3.3736856)
 
   check_tidy(td1,
     exp.row = 5, exp.col = 2,
