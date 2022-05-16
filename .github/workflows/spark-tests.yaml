@@ -48,6 +48,11 @@ jobs:
           extra-packages: |
             any::devtools
             any::sparklyr
+            any::gs
+            any:: e1071
+            any::mlbench
+            any::glmnet
+            any::sparklyr.nested
 
       - name: Cache Spark
         id: cache-spark

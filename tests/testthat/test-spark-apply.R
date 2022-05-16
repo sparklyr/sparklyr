@@ -137,7 +137,7 @@ test_that("'spark_apply' supports nested lists as input type", {
 })
 
 test_that("'spark_apply' supports nested lists as return type", {
-  skip_arrow()
+  skip_on_arrow()
   skip_databricks_connect()
   test_requires_version("2.4.0")
 
