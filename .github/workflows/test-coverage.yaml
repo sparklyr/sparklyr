@@ -35,7 +35,6 @@ jobs:
               any::reshape2
               any::nycflights13
               any::covr
-        needs: coverage
 
       - name: Cache Spark
         id: cache-spark
