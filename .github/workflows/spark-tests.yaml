@@ -48,7 +48,7 @@ jobs:
           extra-packages: |
             any::devtools
             any::sparklyr
-            any::gs
+            any::qs
             any::e1071
             any::mlbench
             any::glmnet
