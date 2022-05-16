@@ -19,7 +19,7 @@ jobs:
       matrix:
         config:
 
-          - {spark: '3.2.1', hadoop: '3.2', arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 3.2'}
+          - {spark: '3.1.2', hadoop: '3.2', arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 3.2'}
           - {spark: '3.1.2', hadoop: '3.2', arrow: 'release', livy: '',      dbplyr: '',      name: 'Spark 3.1 w Arrow'}
           - {spark: '3.1.2', hadoop: '3.2', arrow: 'devel',   livy: '',      dbplyr: '',      name: 'Spark 3.1 w Arrow Dev'}
           - {spark: '3.0.0', hadoop: '3.2', arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 3.0'}
@@ -49,10 +49,13 @@ jobs:
             any::devtools
             any::sparklyr
             any::gs
-            any:: e1071
+            any::e1071
             any::mlbench
             any::glmnet
             any::sparklyr.nested
+            any::janeaustenr
+            any::nycflights13
+            any::reshape2
 
       - name: Cache Spark
         id: cache-spark
