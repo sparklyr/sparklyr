@@ -37,7 +37,7 @@ test_that("ft_pca() works", {
     select(starts_with("PC", ignore.case = FALSE)) %>%
     collect()
 
-  expect_equal(s, r)
+  expect_equal(s, r, tolerance = 1)
 })
 
 # Backwards compat
@@ -82,7 +82,7 @@ test_that("ml_pca() agrees with Scala result", {
     collect() %>%
     as.data.frame()
 
-  expect_equal(s, r)
+  expect_equal(s, r, tolerance = 1)
 })
 
 test_that("sdf_project() returns correct number of columns", {
