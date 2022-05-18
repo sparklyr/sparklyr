@@ -50,7 +50,7 @@ ml_aft_survival_regression <- function(x, formula = NULL, censor_col = "censor",
 }
 
 #' @export
-ml_aft_survival_regression.default <- function(x, formula = NULL, censor_col = "censor",
+ml_aft_survival_regression.spark_connection <- function(x, formula = NULL, censor_col = "censor",
                                                quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
                                                fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
                                                aggregation_depth = 2, quantiles_col = NULL,
@@ -59,41 +59,84 @@ ml_aft_survival_regression.default <- function(x, formula = NULL, censor_col = "
                                                uid = random_string("aft_survival_regression_"),
                                                response = NULL, features = NULL,
                                                ...) {
-
-  stage <- spark_pipeline_stage(
-    sc = extract_connection(x),
-    class = "org.apache.spark.ml.regression.AFTSurvivalRegression",
-    uid = uid,
+  ml_aft_survival_regression_default(
+    x = x,
+    formula = formula,
+    censor_col = censor_col,
+    quantile_probabilities = quantile_probabilities,
+    fit_intercept = fit_intercept,
+    max_iter = max_iter,
+    tol = tol,
+    aggregation_depth = aggregation_depth,
+    quantiles_col = quantiles_col,
     features_col = features_col,
     label_col = label_col,
-    prediction_col = prediction_col
-  )
-
-  jobj <- batch_invoke(
-    stage,
-    list(
-      list("setFitIntercept", cast_scalar_logical(fit_intercept)),
-      list("setMaxIter", cast_scalar_integer(max_iter)),
-      list("setTol", cast_scalar_double(tol)),
-      list("setCensorCol", cast_string(censor_col)),
-      list("setQuantileProbabilities", cast_double_list(quantile_probabilities)),
-      jobj_set_param_helper(stage, "setAggregationDepth", cast_scalar_integer(aggregation_depth), "2.1.0", 2),
-      jobj_set_param_helper(stage, "setQuantilesCol", cast_nullable_string(quantiles_col))
-    )
-  )
-
-  post_ml_obj(
-    x = x,
-    nm = new_ml_estimator(jobj, class = "ml_aft_survival_regression"),
-    ml_function = new_ml_model_aft_survival_regression,
-    formula = formula,
+    prediction_col = prediction_col,
+    uid = uid,
     response = response,
-    features = features,
-    features_col = features_col,
-    label_col = label_col
+    features = features
   )
 }
 
+#' @export
+ml_aft_survival_regression.ml_pipeline <- function(x, formula = NULL, censor_col = "censor",
+                                                   quantile_probabilities = c(
+                                                     0.01, 0.05, 0.1, 0.25, 0.5,
+                                                     0.75, 0.9, 0.95, 0.99
+                                                   ),
+                                                   fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
+                                                   aggregation_depth = 2, quantiles_col = NULL,
+                                                   features_col = "features", label_col = "label",
+                                                   prediction_col = "prediction",
+                                                   uid = random_string("aft_survival_regression_"), ...) {
+  ml_aft_survival_regression_default(
+    x = x,
+    formula = formula,
+    censor_col = censor_col,
+    quantile_probabilities = quantile_probabilities,
+    fit_intercept = fit_intercept,
+    max_iter = max_iter,
+    tol = tol,
+    aggregation_depth = aggregation_depth,
+    quantiles_col = quantiles_col,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col,
+    uid = uid
+  )
+}
+
+#' @export
+ml_aft_survival_regression.tbl_spark <- function(x, formula = NULL, censor_col = "censor",
+                                                 quantile_probabilities = c(
+                                                   0.01, 0.05, 0.1, 0.25, 0.5,
+                                                   0.75, 0.9, 0.95, 0.99
+                                                 ),
+                                                 fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
+                                                 aggregation_depth = 2, quantiles_col = NULL,
+                                                 features_col = "features", label_col = "label",
+                                                 prediction_col = "prediction",
+                                                 uid = random_string("aft_survival_regression_"),
+                                                 response = NULL, features = NULL, ...) {
+
+  ml_aft_survival_regression_default(
+    x = x,
+    formula = formula,
+    censor_col = censor_col,
+    quantile_probabilities = quantile_probabilities,
+    fit_intercept = fit_intercept,
+    max_iter = max_iter,
+    tol = tol,
+    aggregation_depth = aggregation_depth,
+    quantiles_col = quantiles_col,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col,
+    uid = uid,
+    response = response,
+    features = features
+  )
+}
 # Constructors
 
 new_ml_aft_survival_regression_model <- function(jobj) {
@@ -155,3 +198,46 @@ print.ml_model_aft_survival_regression <- function(x, ...) {
   cat("Coefficients:", sep = "\n")
   print(x$coefficients)
 }
+
+ml_aft_survival_regression_default <- function(x, formula = NULL, censor_col = "censor",
+                                          quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+                                          fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
+                                          aggregation_depth = 2, quantiles_col = NULL,
+                                          features_col = "features", label_col = "label",
+                                          prediction_col = "prediction",
+                                          uid = random_string("aft_survival_regression_"),
+                                          response = NULL, features = NULL) {
+
+  scx <- extract_connection(x)
+  scx_version <- spark_version(scx)
+
+  if(scx_version < "2.1.0") {
+    if(!is.null(aggregation_depth)) stop("Not supported in current version of Spark")
+  }
+
+  ml_process_model(
+      x = x,
+      spark_class = "org.apache.spark.ml.regression.AFTSurvivalRegression",
+      r_class = "ml_aft_survival_regression",
+      ml_function = new_ml_model_aft_survival_regression,
+      uid = uid,
+      invoke_steps = list(
+        setFeaturesCol = features_col,
+        setLabelCol = label_col,
+        setPredictionCol = prediction_col,
+        setFitIntercept = cast_scalar_logical(fit_intercept),
+        setMaxIter = cast_scalar_integer(max_iter),
+        setTol = cast_scalar_double(tol),
+        setCensorCol = cast_string(censor_col),
+        setQuantileProbabilities = cast_double_list(quantile_probabilities),
+        setAggregationDepth = cast_scalar_integer(aggregation_depth),
+        setQuantilesCol = cast_nullable_string(quantiles_col)
+      )
+  )
+}
+
+
+
+
+
+
