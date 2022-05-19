@@ -193,7 +193,7 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
   l_steps <- purrr::imap(invoke_steps, ~ list(.y, .x))
 
   for(i in seq_along(l_steps)) {
-    if(!is.null(invoke_steps[[i]])) {
+    if(!is.null(l_steps[[i]][[2]])) {
       jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
     }
   }
@@ -207,8 +207,26 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
     formula = formula,
     response = response,
     features = features,
-    features_col = features_col,
-    label_col = label_col
+    features_col = invoke_steps$setFeaturesCol,
+    label_col = invoke_steps$setLabelCol
   )
 
 }
+
+param_min_version <- function(x, value, min_version) {
+  if (!is.null(value)) {
+    if (!is.null(min_version)) {
+      sc <- spark_connection(x)
+      ver <- spark_version(sc)
+      if (ver < min_version) {
+        stop(paste0(
+          "Parameter `", deparse(substitute(value)),
+          "` is only available for Spark ", min_version, " and later."
+        ))
+      }
+    }
+  }
+
+
+}
+

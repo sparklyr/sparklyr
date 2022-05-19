@@ -148,12 +148,8 @@ ml_aft_survival_regression_default <- function(x, formula = NULL, censor_col = "
                                                uid = random_string("aft_survival_regression_"),
                                                response = NULL, features = NULL) {
 
-  scx <- extract_connection(x)
-  scx_version <- spark_version(scx)
 
-  if(scx_version < "2.1.0") {
-    if(!is.null(aggregation_depth)) stop("Not supported in current version of Spark")
-  }
+  param_min_version(x, aggregation_depth, "2.1.0")
 
   ml_process_model(
     x = x,
@@ -164,8 +160,6 @@ ml_aft_survival_regression_default <- function(x, formula = NULL, censor_col = "
     response = response,
     uid = uid,
     formula = formula,
-    features_col = features_col,
-    label_col = label_col,
     prediction_col = prediction_col,
     invoke_steps = list(
       setFeaturesCol = features_col,
