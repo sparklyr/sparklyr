@@ -137,6 +137,51 @@ ml_aft_survival_regression.tbl_spark <- function(x, formula = NULL, censor_col =
     features = features
   )
 }
+
+ml_aft_survival_regression_default <- function(x, formula = NULL, censor_col = "censor",
+                                               quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+                                               fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
+                                               aggregation_depth = 2, quantiles_col = NULL,
+                                               features_col = "features",
+                                               label_col = "label",
+                                               prediction_col = "prediction",
+                                               uid = random_string("aft_survival_regression_"),
+                                               response = NULL, features = NULL) {
+
+  scx <- extract_connection(x)
+  scx_version <- spark_version(scx)
+
+  if(scx_version < "2.1.0") {
+    if(!is.null(aggregation_depth)) stop("Not supported in current version of Spark")
+  }
+
+  ml_process_model(
+    x = x,
+    spark_class = "org.apache.spark.ml.regression.AFTSurvivalRegression",
+    r_class = "ml_aft_survival_regression",
+    ml_function = new_ml_model_aft_survival_regression,
+    features = features,
+    response = response,
+    uid = uid,
+    formula = formula,
+    features_col = features_col,
+    label_col = label_col,
+    prediction_col = prediction_col,
+    invoke_steps = list(
+      setFeaturesCol = features_col,
+      setLabelCol = label_col,
+      setPredictionCol = prediction_col,
+      setFitIntercept = cast_scalar_logical(fit_intercept),
+      setMaxIter = cast_scalar_integer(max_iter),
+      setTol = cast_scalar_double(tol),
+      setCensorCol = cast_string(censor_col),
+      setQuantileProbabilities = cast_double_list(quantile_probabilities),
+      setAggregationDepth = cast_scalar_integer(aggregation_depth),
+      setQuantilesCol = cast_nullable_string(quantiles_col)
+    )
+  )
+}
+
 # Constructors
 
 new_ml_aft_survival_regression_model <- function(jobj) {
@@ -149,22 +194,6 @@ new_ml_aft_survival_regression_model <- function(jobj) {
     quantiles_col = possibly_null(invoke)(jobj, "getQuantilesCol"),
     class = "ml_aft_survival_regression_model"
   )
-}
-
-#' @rdname ml_aft_survival_regression
-#' @template roxlate-ml-old-feature-response
-#' @details \code{ml_survival_regression()} is an alias for \code{ml_aft_survival_regression()} for backwards compatibility.
-#' @export
-ml_survival_regression <- function(x, formula = NULL, censor_col = "censor",
-                                   quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
-                                   fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-                                   aggregation_depth = 2, quantiles_col = NULL,
-                                   features_col = "features", label_col = "label",
-                                   prediction_col = "prediction",
-                                   uid = random_string("aft_survival_regression_"),
-                                   response = NULL, features = NULL, ...) {
-  .Deprecated("ml_aft_survival_regression")
-  UseMethod("ml_aft_survival_regression")
 }
 
 new_ml_model_aft_survival_regression <- function(pipeline_model, formula, dataset, label_col,
@@ -199,45 +228,19 @@ print.ml_model_aft_survival_regression <- function(x, ...) {
   print(x$coefficients)
 }
 
-ml_aft_survival_regression_default <- function(x, formula = NULL, censor_col = "censor",
-                                          quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
-                                          fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-                                          aggregation_depth = 2, quantiles_col = NULL,
-                                          features_col = "features", label_col = "label",
-                                          prediction_col = "prediction",
-                                          uid = random_string("aft_survival_regression_"),
-                                          response = NULL, features = NULL) {
 
-  scx <- extract_connection(x)
-  scx_version <- spark_version(scx)
-
-  if(scx_version < "2.1.0") {
-    if(!is.null(aggregation_depth)) stop("Not supported in current version of Spark")
-  }
-
-  ml_process_model(
-      x = x,
-      spark_class = "org.apache.spark.ml.regression.AFTSurvivalRegression",
-      r_class = "ml_aft_survival_regression",
-      ml_function = new_ml_model_aft_survival_regression,
-      uid = uid,
-      invoke_steps = list(
-        setFeaturesCol = features_col,
-        setLabelCol = label_col,
-        setPredictionCol = prediction_col,
-        setFitIntercept = cast_scalar_logical(fit_intercept),
-        setMaxIter = cast_scalar_integer(max_iter),
-        setTol = cast_scalar_double(tol),
-        setCensorCol = cast_string(censor_col),
-        setQuantileProbabilities = cast_double_list(quantile_probabilities),
-        setAggregationDepth = cast_scalar_integer(aggregation_depth),
-        setQuantilesCol = cast_nullable_string(quantiles_col)
-      )
-  )
+#' @rdname ml_aft_survival_regression
+#' @template roxlate-ml-old-feature-response
+#' @details \code{ml_survival_regression()} is an alias for \code{ml_aft_survival_regression()} for backwards compatibility.
+#' @export
+ml_survival_regression <- function(x, formula = NULL, censor_col = "censor",
+                                   quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+                                   fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
+                                   aggregation_depth = 2, quantiles_col = NULL,
+                                   features_col = "features", label_col = "label",
+                                   prediction_col = "prediction",
+                                   uid = random_string("aft_survival_regression_"),
+                                   response = NULL, features = NULL, ...) {
+  .Deprecated("ml_aft_survival_regression")
+  UseMethod("ml_aft_survival_regression")
 }
-
-
-
-
-
-

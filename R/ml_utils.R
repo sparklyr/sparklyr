@@ -179,7 +179,7 @@ batch_invoke <- function(stage, arguments) {
 
 ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_function,
                              formula = NULL, response = NULL, features = NULL,
-                             features_col = NULL, label_col = NULL) {
+                             features_col = NULL, label_col = NULL, prediction_col = NULL) {
   sc <- spark_connection(x)
 
   args <- list(sc, spark_class)
@@ -191,8 +191,6 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
   jobj <- do.call(invoke_new, args)
 
   l_steps <- purrr::imap(invoke_steps, ~ list(.y, .x))
-
-
 
   for(i in seq_along(l_steps)) {
     if(!is.null(invoke_steps[[i]])) {
