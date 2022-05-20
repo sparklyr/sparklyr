@@ -19,8 +19,6 @@ ml_aft_survival_regression(
   label_col = "label",
   prediction_col = "prediction",
   uid = random_string("aft_survival_regression_"),
-  response = NULL,
-  features = NULL,
   ...
 )
 
@@ -70,11 +68,11 @@ ml_survival_regression(
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
+\item{...}{Optional arguments; see Details.}
+
 \item{response}{(Deprecated) The name of the response column (as a length-one character vector.)}
 
 \item{features}{(Deprecated) The name of features (terms) to use for the model fit.}
-
-\item{...}{Optional arguments; see Details.}
 }
 \value{
 The object returned depends on the class of \code{x}.

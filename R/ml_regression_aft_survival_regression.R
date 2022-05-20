@@ -43,7 +43,6 @@ ml_aft_survival_regression <- function(x, formula = NULL, censor_col = "censor",
                                        features_col = "features", label_col = "label",
                                        prediction_col = "prediction",
                                        uid = random_string("aft_survival_regression_"),
-                                       response = NULL, features = NULL,
                                        ...) {
   check_dots_used()
   UseMethod("ml_aft_survival_regression")

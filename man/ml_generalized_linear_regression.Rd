@@ -23,8 +23,6 @@ ml_generalized_linear_regression(
   label_col = "label",
   prediction_col = "prediction",
   uid = random_string("generalized_linear_regression_"),
-  response = NULL,
-  features = NULL,
   ...
 )
 }

@@ -20,7 +20,8 @@ ml_gbt_regressor_default <- function(x, formula = NULL, max_iter = 20, max_depth
                                      seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
                                      max_memory_in_mb = 256, features_col = "features",
                                      label_col = "label", prediction_col = "prediction",
-                                     uid = random_string("gbt_regressor_"), ...) {
+                                     uid = random_string("gbt_regressor_"),
+                                     response = NULL, features = NULL, ...) {
   param_min_version(x, feature_subset_strategy, "2.3.0")
 
   ml_process_model(

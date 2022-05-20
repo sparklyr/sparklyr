@@ -66,7 +66,6 @@ ml_generalized_linear_regression <- function(x, formula = NULL, family = "gaussi
                                              features_col = "features", label_col = "label",
                                              prediction_col = "prediction",
                                              uid = random_string("generalized_linear_regression_"),
-                                             response = NULL, features = NULL,
                                              ...) {
   #check_dots_used()
   UseMethod("ml_generalized_linear_regression")
