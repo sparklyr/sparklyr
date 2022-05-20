@@ -10,156 +10,53 @@ ml_random_forest_regressor <- function(x, formula = NULL, num_trees = 20, subsam
   UseMethod("ml_random_forest_regressor")
 }
 
-#' @export
-ml_random_forest_regressor.spark_connection <- function(x, formula = NULL, num_trees = 20, subsampling_rate = 1,
-                                                        max_depth = 5, min_instances_per_node = 1, feature_subset_strategy = "auto",
-                                                        impurity = "variance", min_info_gain = 0, max_bins = 32,
-                                                        seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
-                                                        max_memory_in_mb = 256, features_col = "features", label_col = "label",
-                                                        prediction_col = "prediction", uid = random_string("random_forest_regressor_"), ...) {
-  .args <- list(
-    num_trees = num_trees,
-    subsampling_rate = subsampling_rate,
-    max_depth = max_depth,
-    min_instances_per_node = min_instances_per_node,
-    feature_subset_strategy = feature_subset_strategy,
-    impurity = impurity,
-    min_info_gain = min_info_gain,
-    max_bins = max_bins,
-    seed = seed,
-    checkpoint_interval = checkpoint_interval,
-    cache_node_ids = cache_node_ids,
-    max_memory_in_mb = max_memory_in_mb,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_random_forest_regressor()
-
-  jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.regression.RandomForestRegressor", uid,
-    features_col = .args[["features_col"]],
-    label_col = .args[["label_col"]], prediction_col = .args[["prediction_col"]]
-  ) %>% (
-    function(obj) {
-      do.call(
-        invoke,
-        c(obj, "%>%", Filter(
-          function(x) !is.null(x),
-          list(
-            list("setCheckpointInterval", .args[["checkpoint_interval"]]),
-            list("setMaxBins", .args[["max_bins"]]),
-            list("setMaxDepth", .args[["max_depth"]]),
-            list("setMinInfoGain", .args[["min_info_gain"]]),
-            list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
-            list("setCacheNodeIds", .args[["cache_node_ids"]]),
-            list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
-            list("setNumTrees", .args[["num_trees"]]),
-            list("setSubsamplingRate", .args[["subsampling_rate"]]),
-            list("setFeatureSubsetStrategy", .args[["feature_subset_strategy"]]),
-            list("setImpurity", .args[["impurity"]]),
-            jobj_set_param_helper(obj, "setSeed", .args[["seed"]])
-          )
-        ))
-      )
-    })
-
-  new_ml_random_forest_regressor(jobj)
-}
-
-#' @export
-ml_random_forest_regressor.ml_pipeline <- function(x, formula = NULL, num_trees = 20, subsampling_rate = 1,
-                                                   max_depth = 5, min_instances_per_node = 1, feature_subset_strategy = "auto",
-                                                   impurity = "variance", min_info_gain = 0, max_bins = 32,
-                                                   seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
-                                                   max_memory_in_mb = 256, features_col = "features", label_col = "label",
-                                                   prediction_col = "prediction", uid = random_string("random_forest_regressor_"), ...) {
-  stage <- ml_random_forest_regressor.spark_connection(
-    x = spark_connection(x),
+ml_random_forest_regressor_default <- function(x, formula = NULL, num_trees = 20, subsampling_rate = 1,
+                                               max_depth = 5, min_instances_per_node = 1, feature_subset_strategy = "auto",
+                                               impurity = "variance", min_info_gain = 0, max_bins = 32,
+                                               seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
+                                               max_memory_in_mb = 256, features_col = "features", label_col = "label",
+                                               prediction_col = "prediction", uid = random_string("random_forest_regressor_"),
+                                               response = NULL, features = NULL, ...) {
+  ml_process_model(
+    x = x,
+    spark_class = "org.apache.spark.ml.regression.RandomForestRegressor",
+    r_class = "ml_random_forest_regressor",
+    ml_function = new_ml_model_random_forest_regression,
+    features = features,
+    response = response,
+    uid = uid,
     formula = formula,
-    num_trees = num_trees,
-    subsampling_rate = subsampling_rate,
-    max_depth = max_depth,
-    min_instances_per_node = min_instances_per_node,
-    feature_subset_strategy = feature_subset_strategy,
-    impurity = impurity,
-    min_info_gain = min_info_gain,
-    max_bins = max_bins,
-    seed = seed,
-    checkpoint_interval = checkpoint_interval,
-    cache_node_ids = cache_node_ids,
-    max_memory_in_mb = max_memory_in_mb,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    uid = uid,
-    ...
+    invoke_steps = list(
+      setFeaturesCol = features_col,
+      setLabelCol = label_col,
+      setPredictionCol = prediction_col,
+      setImpurity = cast_choice(impurity, c("variance")),
+      setCheckpointInterval = cast_scalar_integer(checkpoint_interval),
+      setMaxBins = cast_scalar_integer(max_bins),
+      setMaxDepth = cast_scalar_integer(max_depth),
+      setMinInfoGain = cast_scalar_double(min_info_gain),
+      setMinInstancesPerNode = cast_scalar_integer(min_instances_per_node),
+      setCacheNodeIds = cast_scalar_logical(cache_node_ids),
+      setMaxMemoryInMB = cast_scalar_integer(max_memory_in_mb),
+      setSeed = cast_nullable_scalar_integer(seed),
+      setNumTrees = cast_scalar_integer(num_trees),
+      setSubsamplingRate = cast_scalar_double(subsampling_rate),
+      setFeatureSubsetStrategy = cast_string(feature_subset_strategy)
+    )
   )
-  ml_add_stage(x, stage)
 }
+
+# ------------------------------- Methods --------------------------------------
+#' @export
+ml_random_forest_regressor.spark_connection <- ml_random_forest_regressor_default
 
 #' @export
-ml_random_forest_regressor.tbl_spark <- function(x, formula = NULL, num_trees = 20, subsampling_rate = 1,
-                                                 max_depth = 5, min_instances_per_node = 1, feature_subset_strategy = "auto",
-                                                 impurity = "variance", min_info_gain = 0, max_bins = 32,
-                                                 seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
-                                                 max_memory_in_mb = 256, features_col = "features", label_col = "label",
-                                                 prediction_col = "prediction", uid = random_string("random_forest_regressor_"),
-                                                 response = NULL, features = NULL, ...) {
-  formula <- ml_standardize_formula(formula, response, features)
+ml_random_forest_regressor.ml_pipeline <- ml_random_forest_regressor_default
 
-  stage <- ml_random_forest_regressor.spark_connection(
-    x = spark_connection(x),
-    formula = NULL,
-    num_trees = num_trees,
-    subsampling_rate = subsampling_rate,
-    max_depth = max_depth,
-    min_instances_per_node = min_instances_per_node,
-    feature_subset_strategy = feature_subset_strategy,
-    impurity = impurity,
-    min_info_gain = min_info_gain,
-    max_bins = max_bins,
-    seed = seed,
-    checkpoint_interval = checkpoint_interval,
-    cache_node_ids = cache_node_ids,
-    max_memory_in_mb = max_memory_in_mb,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    uid = uid,
-    ...
-  )
+#' @export
+ml_random_forest_regressor.tbl_spark <- ml_random_forest_regressor_default
 
-  if (is.null(formula)) {
-    stage %>%
-      ml_fit(x)
-  } else {
-    ml_construct_model_supervised(
-      new_ml_model_random_forest_regression,
-      predictor = stage,
-      formula = formula,
-      dataset = x,
-      features_col = features_col,
-      label_col = label_col
-    )
-  }
-}
-
-validator_ml_random_forest_regressor <- function(.args) {
-  .args <- ml_validate_decision_tree_args(.args)
-
-  .args[["num_trees"]] <- cast_scalar_integer(.args[["num_trees"]])
-  .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])
-  .args[["feature_subset_strategy"]] <- cast_string(.args[["feature_subset_strategy"]])
-  .args[["impurity"]] <- cast_choice(.args[["impurity"]], "variance")
-  .args
-}
-
-new_ml_random_forest_regressor <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_random_forest_regressor")
-}
-
+# ---------------------------- Constructors ------------------------------------
 new_ml_random_forest_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
