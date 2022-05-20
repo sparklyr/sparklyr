@@ -254,5 +254,5 @@ test_that("ml_evaluate() works for svc model", {
     ml_evaluate(iris_tbl)
 
   expect_equal(names(svc_acc), "Accuracy")
-  expect_equal(svc_acc$Accuracy, 0.95, tolerance = 0.01, scale = 1)
+  expect_gt(svc_acc$Accuracy, 0.94)
 })

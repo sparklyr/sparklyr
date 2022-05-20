@@ -80,8 +80,6 @@ test_that("decision_tree.tidy() works", {
     exp.names = gl_names
   )
 
-  skip("Preventing `parsnip` tests from running due to current bug")
-
   dt_classification_parsnip <- parsnip::decision_tree(engine = "spark") %>%
     parsnip::set_mode("classification") %>%
     parsnip::fit(Species ~ Sepal_Length + Petal_Length, iris_tbl)

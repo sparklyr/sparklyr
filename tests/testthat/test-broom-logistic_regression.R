@@ -8,12 +8,16 @@ test_that("logistic_regression tidiers work", {
 
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
+
   iris_tbl <- testthat_tbl("iris") %>%
-  #iris_tbl <- sdf_copy_to(sc, iris) %>%
-    dplyr::mutate(is_setosa = ifelse(Species == "setosa", 1, 0))
+    filter(Species != "setosa")
+
+  iris_local <- iris %>%
+    filter(Species != "setosa")
 
   # Fitting model using sparklyr api
-  lr_model <- ml_logistic_regression(iris_tbl, is_setosa ~ Sepal_Length + Petal_Length)
+  lr_model <- iris_tbl %>%
+    ml_logistic_regression(Species ~ Sepal_Length + Sepal_Width, family = "binomial")
 
   ## ----------------------------- tidy() --------------------------------------
 
@@ -26,7 +30,7 @@ test_that("logistic_regression tidiers work", {
 
   expect_equal(
     td1$coefficients,
-    c(7.374718, 11.633918, -26.526868),
+    c(-13.0460, 1.9024, 0.4047),
     tolerance = 0.01, scale = 1
     )
 
@@ -36,16 +40,16 @@ test_that("logistic_regression tidiers work", {
   au1 <- collect(augment(lr_model))
 
   check_tidy(au1,
-    exp.row = nrow(iris),
-    exp.name = c(dplyr::tbl_vars(iris_tbl), ".prediction")
+    exp.row = nrow(iris_local),
+    exp.name = c(dplyr::tbl_vars(iris_tbl), ".predicted_label")
   )
 
   # with newdata
   au2 <- collect(augment(lr_model, newdata = iris_tbl))
 
   check_tidy(au2,
-             exp.row = nrow(iris),
-             exp.name = c(dplyr::tbl_vars(iris_tbl), ".prediction")
+             exp.row = nrow(iris_local),
+             exp.name = c(dplyr::tbl_vars(iris_tbl), ".predicted_label")
   )
 
   ## ---------------------------- glance() -------------------------------------
@@ -56,11 +60,8 @@ test_that("logistic_regression tidiers work", {
     exp.names = c("elastic_net_param", "lambda")
   )
 
-
-  skip("Preventing `parsnip` tests from running due to current bug")
-
   lr_parsnip <- parsnip::logistic_reg(engine = "spark") %>%
-    parsnip::fit(is_setosa ~ Sepal_Length + Petal_Length, iris_tbl)
+    parsnip::fit(Species ~ Sepal_Length + Sepal_Width, iris_tbl)
 
   expect_true(all(tidy(lr_parsnip) == td1))
 

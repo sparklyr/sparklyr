@@ -23,8 +23,18 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr
-          needs: coverage
+          extra-packages: |
+              any::devtools
+              any::sparklyr
+              any::qs
+              any::e1071
+              any::mlbench
+              any::glmnet
+              any::sparklyr.nested
+              any::janeaustenr
+              any::reshape2
+              any::nycflights13
+              any::covr
 
       - name: Cache Spark
         id: cache-spark
