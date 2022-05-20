@@ -39,7 +39,6 @@ ml_decision_tree_regressor_default <- function(x, formula = NULL, max_depth = 5,
       setPredictionCol = prediction_col,
       setImpurity = cast_choice(impurity, c("variance")),
       setCheckpointInterval = cast_scalar_integer(checkpoint_interval),
-      setImpurity = impurity,
       setMaxBins = cast_scalar_integer(max_bins),
       setMaxDepth = cast_scalar_integer(max_depth),
       setMinInfoGain = cast_scalar_double(min_info_gain),
@@ -52,6 +51,7 @@ ml_decision_tree_regressor_default <- function(x, formula = NULL, max_depth = 5,
   )
 }
 
+# ------------------------------- Methods --------------------------------------
 #' @export
 ml_decision_tree_regressor.spark_connection <- ml_decision_tree_regressor_default
 
@@ -61,6 +61,7 @@ ml_decision_tree_regressor.ml_pipeline <- ml_decision_tree_regressor_default
 #' @export
 ml_decision_tree_regressor.tbl_spark <- ml_decision_tree_regressor_default
 
+# ---------------------------- Constructors ------------------------------------
 new_ml_decision_tree_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,

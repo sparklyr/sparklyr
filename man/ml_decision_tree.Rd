@@ -72,6 +72,8 @@ ml_decision_tree_regressor(
   label_col = "label",
   prediction_col = "prediction",
   uid = random_string("decision_tree_regressor_"),
+  response = NULL,
+  features = NULL,
   ...
 )
 }

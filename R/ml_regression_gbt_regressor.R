@@ -13,80 +13,57 @@ ml_gbt_regressor <- function(x, formula = NULL, max_iter = 20, max_depth = 5,
   UseMethod("ml_gbt_regressor")
 }
 
-#' @export
-ml_gbt_regressor.default<- function(x, formula = NULL, max_iter = 20, max_depth = 5,
-                                              step_size = 0.1, subsampling_rate = 1,
-                                              feature_subset_strategy = "auto", min_instances_per_node = 1,
-                                              max_bins = 32, min_info_gain = 0, loss_type = "squared",
-                                              seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
-                                              max_memory_in_mb = 256, features_col = "features",
-                                              label_col = "label", prediction_col = "prediction",
-                                              uid = random_string("gbt_regressor_"), ...) {
-  orig_x <- x
-  x <- extract_connection(x)
+ml_gbt_regressor_default <- function(x, formula = NULL, max_iter = 20, max_depth = 5,
+                                     step_size = 0.1, subsampling_rate = 1,
+                                     feature_subset_strategy = "auto", min_instances_per_node = 1,
+                                     max_bins = 32, min_info_gain = 0, loss_type = "squared",
+                                     seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
+                                     max_memory_in_mb = 256, features_col = "features",
+                                     label_col = "label", prediction_col = "prediction",
+                                     uid = random_string("gbt_regressor_"), ...) {
+  param_min_version(x, feature_subset_strategy, "2.3.0")
 
-  args_list <- list(
-    max_iter = cast_scalar_integer(max_iter),
-    max_depth = max_depth,
-    step_size = cast_scalar_double(step_size),
-    subsampling_rate = cast_scalar_double(subsampling_rate),
-    feature_subset_strategy = cast_string(feature_subset_strategy),
-    min_instances_per_node = min_instances_per_node,
-    max_bins = max_bins,
-    min_info_gain = min_info_gain,
-    loss_type = cast_choice(loss_type, c("squared", "absolute")),
-    seed = seed,
-    checkpoint_interval = checkpoint_interval,
-    cache_node_ids = cache_node_ids,
-    max_memory_in_mb = max_memory_in_mb,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col
-  )
-
-  args_valid <- ml_validate_decision_tree_args(args_list)
-
-  .args <- c(args_valid, rlang::dots_list(...))
-
-  stage <- spark_pipeline_stage(
-    sc = x,
-    class = "org.apache.spark.ml.regression.GBTRegressor",
-    uid = uid,
-    features_col = .args[["features_col"]],
-    label_col = .args[["label_col"]],
-    prediction_col = .args[["prediction_col"]]
-  )
-
-  jobj <- batch_invoke(
-    stage,
-    list(
-      list("setCheckpointInterval", .args[["checkpoint_interval"]]),
-      list("setMaxBins", .args[["max_bins"]]),
-      list("setMaxDepth", .args[["max_depth"]]),
-      list("setMinInfoGain", .args[["min_info_gain"]]),
-      list("setMinInstancesPerNode", .args[["min_instances_per_node"]]),
-      list("setCacheNodeIds", .args[["cache_node_ids"]]),
-      list("setMaxMemoryInMB", .args[["max_memory_in_mb"]]),
-      list("setLossType", .args[["loss_type"]]),
-      list("setMaxIter", .args[["max_iter"]]),
-      list("setStepSize", .args[["step_size"]]),
-      list("setSubsamplingRate", .args[["subsampling_rate"]]),
-      jobj_set_param_helper(stage, "setFeatureSubsetStrategy", .args[["feature_subset_strategy"]], "2.3.0", "auto"),
-      jobj_set_param_helper(stage, "setSeed", .args[["seed"]])
-      ))
-
-  post_ml_obj(
-    x = orig_x,
-    nm = new_ml_predictor(jobj, class = "ml_gbt_regressor"),
+  ml_process_model(
+    x = x,
+    spark_class = "org.apache.spark.ml.regression.GBTRegressor",
+    r_class = "ml_gbt_regressor",
     ml_function = new_ml_model_gbt_regression,
+    features = features,
+    response = response,
+    uid = uid,
     formula = formula,
-    response = NULL,
-    features = NULL,
-    features_col = features_col,
-    label_col = label_col
+    invoke_steps = list(
+      setFeaturesCol = features_col,
+      setLabelCol = label_col,
+      setPredictionCol = prediction_col,
+      setMaxIter = cast_scalar_integer(max_iter),
+      setStepSize = cast_scalar_double(step_size),
+      setSubsamplingRate = cast_scalar_double(subsampling_rate),
+      setFeatureSubsetStrategy = cast_string(feature_subset_strategy),
+      setLossType = cast_choice(loss_type, c("squared", "absolute")),
+      setCheckpointInterval = cast_scalar_integer(checkpoint_interval),
+      setMaxBins = cast_scalar_integer(max_bins),
+      setMaxDepth = cast_scalar_integer(max_depth),
+      setMinInfoGain = cast_scalar_double(min_info_gain),
+      setMinInstancesPerNode = cast_scalar_integer(min_instances_per_node),
+      setCacheNodeIds = cast_scalar_logical(cache_node_ids),
+      setMaxMemoryInMB = cast_scalar_integer(max_memory_in_mb),
+      setSeed = cast_nullable_scalar_integer(seed)
+    )
   )
 }
 
+# ------------------------------- Methods --------------------------------------
+#' @export
+ml_gbt_regressor.spark_connection <- ml_gbt_regressor_default
+
+#' @export
+ml_gbt_regressor.ml_pipeline <- ml_gbt_regressor_default
+
+#' @export
+ml_gbt_regressor.tbl_spark <- ml_gbt_regressor_default
+
+# ---------------------------- Constructors ------------------------------------
 new_ml_gbt_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
