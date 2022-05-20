@@ -198,13 +198,3 @@ post_ml_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
     )
   }
 }
-
-# ---------------------------- Delete this -------------------------------------
-
-batch_invoke <- function(stage, arguments) {
-  do.call(invoke, c(
-    stage,
-    "%>%",
-    Filter(function(x) !is.null(x), arguments)
-  ))
-}
