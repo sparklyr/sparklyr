@@ -2,6 +2,8 @@
 
 ### Misc
 
+- Ensures compatibility with Spark version 3.2 (#3261)
+
 - Compatibility with new `dbplyr` version.
 
 - Removes `stringr` dependency 
