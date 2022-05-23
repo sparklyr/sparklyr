@@ -65,7 +65,7 @@ test_that("no additional grouping var is created", {
 
   expect_equal(
     colnames(mtcars_tbl_nested),
-    c("am", "cyl", "drat", "wt", "vs", "gear", "carb", "perf")
+    c("cyl", "drat", "wt", "vs", "am", "gear", "carb", "perf")
   )
   expect_equal(mtcars_tbl_nested %>% dplyr::group_vars(), "am")
 
