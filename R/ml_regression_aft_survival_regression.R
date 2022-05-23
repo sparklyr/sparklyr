@@ -57,7 +57,7 @@ ml_aft_survival_regression_default <- function(x, formula = NULL, censor_col = "
                                                prediction_col = "prediction",
                                                uid = random_string("aft_survival_regression_"),
                                                response = NULL, features = NULL) {
-  param_min_version(x, aggregation_depth, "2.1.0")
+  aggregation_depth <- param_min_version(x, aggregation_depth, "2.1.0")
 
   ml_process_model(
     x = x,

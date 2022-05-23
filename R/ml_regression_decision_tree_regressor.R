@@ -21,7 +21,7 @@ ml_decision_tree_regressor_default <- function(x, formula = NULL, max_depth = 5,
                                                response = NULL, features = NULL,
                                                ...) {
 
-  param_min_version(x, variance_col, "2.0.0")
+  variance_col <- param_min_version(x, variance_col, "2.0.0")
 
   ml_process_model(
     x = x,

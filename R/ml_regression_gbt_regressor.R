@@ -22,7 +22,8 @@ ml_gbt_regressor_default <- function(x, formula = NULL, max_iter = 20, max_depth
                                      label_col = "label", prediction_col = "prediction",
                                      uid = random_string("gbt_regressor_"),
                                      response = NULL, features = NULL, ...) {
-  param_min_version(x, feature_subset_strategy, "2.3.0")
+
+  feature_subset_strategy <- param_min_version(x, feature_subset_strategy, "2.3.0")
 
   ml_process_model(
     x = x,
@@ -40,7 +41,7 @@ ml_gbt_regressor_default <- function(x, formula = NULL, max_iter = 20, max_depth
       setMaxIter = cast_scalar_integer(max_iter),
       setStepSize = cast_scalar_double(step_size),
       setSubsamplingRate = cast_scalar_double(subsampling_rate),
-      setFeatureSubsetStrategy = cast_string(feature_subset_strategy),
+      setFeatureSubsetStrategy = cast_nullable_string(feature_subset_strategy),
       setLossType = cast_choice(loss_type, c("squared", "absolute")),
       setCheckpointInterval = cast_scalar_integer(checkpoint_interval),
       setMaxBins = cast_scalar_integer(max_bins),

@@ -53,7 +53,7 @@ ml_linear_regression_default <- function(x, formula = NULL, fit_intercept = TRUE
                                            uid = random_string("linear_regression_"),
                                            response = NULL, features = NULL, ...) {
 
-  param_min_version(x, loss, "2.3.0")
+  loss <- param_min_version(x, loss, "2.3.0")
 
   ml_process_model(
     x = x,

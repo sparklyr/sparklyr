@@ -147,21 +147,23 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
 
 }
 
-param_min_version <- function(x, value, min_version) {
+param_min_version <- function(x, value, min_version = NULL) {
+  ret <- value
   if (!is.null(value)) {
     if (!is.null(min_version)) {
       sc <- spark_connection(x)
       ver <- spark_version(sc)
       if (ver < min_version) {
-        stop(paste0(
+        warning(paste0(
           "Parameter `", deparse(substitute(value)),
-          "` is only available for Spark ", min_version, " and later."
+          "` is only available for Spark ", min_version, " and later.",
+          "The value will not be passed to the model."
         ))
+        ret <- NULL
       }
     }
   }
-
-
+  ret
 }
 
 # --------------------- Post conversion functions ------------------------------
