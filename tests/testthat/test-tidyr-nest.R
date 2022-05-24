@@ -63,10 +63,17 @@ test_that("no additional grouping var is created", {
     dplyr::group_by(am) %>%
     tidyr::nest(perf = c(hp, mpg, disp, qsec))
 
-  expect_equal(
-    colnames(mtcars_tbl_nested),
-    c("cyl", "drat", "wt", "vs", "am", "gear", "carb", "perf")
-  )
+  if (dbplyr_uses_ops()) {
+    expect_equal(
+      colnames(mtcars_tbl_nested),
+      c("am", "cyl", "drat", "wt", "vs", "gear", "carb", "perf")
+    )
+  } else {
+    expect_equal(
+      colnames(mtcars_tbl_nested),
+      c("cyl", "drat", "wt", "vs", "am", "gear", "carb", "perf")
+    )
+  }
   expect_equal(mtcars_tbl_nested %>% dplyr::group_vars(), "am")
 
   mtcars_tbl_nested <- mtcars_tbl %>%
