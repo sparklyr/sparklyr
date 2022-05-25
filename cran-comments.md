@@ -1,12 +1,11 @@
-## Submission
+## Re-Submission
 
 ### Release summary
 
-- Ensures compatibility with Spark version 3.2 
-- Compatibility with new `dbplyr` version
-- Removes `stringr` and `lifecycle` dependencies
-- Fixes `augment()` when the model was fitted via `parsnip` 
-
+- Addresses pre-check issues:
+  - Fixes URLs
+  - Fixes PDF check failure 
+  
 ### Test environments
 
 - Ubuntu 20.04, R 4.2.0, Spark 3.2 (GH Actions)
