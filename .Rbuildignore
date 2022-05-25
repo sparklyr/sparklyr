@@ -46,3 +46,4 @@
 
 ^codecov\.yml$
 ^\.github$
+^CRAN-SUBMISSION$

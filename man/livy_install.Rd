@@ -36,7 +36,7 @@ Path to LIVY_HOME (or \code{NULL} if the specified version
   was not found).
 }
 \description{
-Automatically download and install \href{http://livy.io/}{\samp{livy}}.
+Automatically download and install \href{https://livy.apache.org/}{\samp{livy}}.
 \samp{livy} provides a REST API to Spark.
 
 Find the LIVY_HOME directory for a given version of Livy that
