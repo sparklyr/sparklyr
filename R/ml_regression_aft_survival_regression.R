@@ -9,9 +9,14 @@
 #' @template roxlate-ml-intercept
 #' @template roxlate-ml-predictor-params
 #' @template roxlate-ml-aggregation-depth
-#' @param censor_col Censor column name. The value of this column could be 0 or 1. If the value is 1, it means the event has occurred i.e. uncensored; otherwise censored.
-#' @param quantile_probabilities Quantile probabilities array. Values of the quantile probabilities array should be in the range (0, 1) and the array should be non-empty.
-#' @param quantiles_col Quantiles column name. This column will output quantiles of corresponding quantileProbabilities if it is set.
+#' @param censor_col Censor column name. The value of this column could be 0 or
+#'   1. If the value is 1, it means the event has occurred i.e. uncensored;
+#'   otherwise censored.
+#' @param quantile_probabilities Quantile probabilities array. Values of the
+#'   quantile probabilities array should be in the range (0, 1) and the array
+#'   should be non-empty.
+#' @param quantiles_col Quantiles column name. This column will output quantiles
+#'   of corresponding quantileProbabilities if it is set.
 #'
 #' @examples
 #' \dontrun{
@@ -36,28 +41,46 @@
 #' }
 #'
 #' @export
-ml_aft_survival_regression <- function(x, formula = NULL, censor_col = "censor",
-                                       quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
-                                       fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-                                       aggregation_depth = 2, quantiles_col = NULL,
-                                       features_col = "features", label_col = "label",
-                                       prediction_col = "prediction",
-                                       uid = random_string("aft_survival_regression_"),
-                                       ...) {
-  check_dots_used()
-  UseMethod("ml_aft_survival_regression")
-}
+ml_aft_survival_regression <-
+  function(x,
+           formula = NULL,
+           censor_col = "censor",
+           quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5,
+                                      0.75, 0.9, 0.95, 0.99),
+           fit_intercept = TRUE,
+           max_iter = 100L,
+           tol = 1e-06,
+           aggregation_depth = 2,
+           quantiles_col = NULL,
+           features_col = "features",
+           label_col = "label",
+           prediction_col = "prediction",
+           uid = random_string("aft_survival_regression_"),
+           ...) {
+    check_dots_used()
+    UseMethod("ml_aft_survival_regression")
+  }
 
-ml_aft_survival_regression_default <- function(x, formula = NULL, censor_col = "censor",
-                                               quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
-                                               fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-                                               aggregation_depth = 2, quantiles_col = NULL,
-                                               features_col = "features",
-                                               label_col = "label",
-                                               prediction_col = "prediction",
-                                               uid = random_string("aft_survival_regression_"),
-                                               response = NULL, features = NULL) {
-  aggregation_depth <- param_min_version(x, aggregation_depth, "2.1.0")
+ml_aft_survival_regression.default <-
+  function(x,
+           formula = NULL,
+           censor_col = "censor",
+           quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5,
+                                      0.75, 0.9, 0.95, 0.99),
+           fit_intercept = TRUE,
+           max_iter = 100L,
+           tol = 1e-06,
+           aggregation_depth = 2,
+           quantiles_col = NULL,
+           features_col = "features",
+           label_col = "label",
+           prediction_col = "prediction",
+           uid = random_string("aft_survival_regression_"),
+           response = NULL,
+           features = NULL) {
+
+  aggregation_depth <-
+    param_min_version(x, aggregation_depth, "2.1.0")
 
   ml_process_model(
     x = x,
@@ -82,15 +105,18 @@ ml_aft_survival_regression_default <- function(x, formula = NULL, censor_col = "
     )
   )
 }
+
 # ------------------------------- Methods --------------------------------------
+
+# can probably safely get rid of these, since default method will catch them.
 #' @export
-ml_aft_survival_regression.spark_connection <- ml_aft_survival_regression_default
+ml_aft_survival_regression.spark_connection <- ml_aft_survival_regression.default
 
 #' @export
-ml_aft_survival_regression.ml_pipeline <- ml_aft_survival_regression_default
+ml_aft_survival_regression.ml_pipeline <- ml_aft_survival_regression.default
 
 #' @export
-ml_aft_survival_regression.tbl_spark <- ml_aft_survival_regression_default
+ml_aft_survival_regression.tbl_spark <- ml_aft_survival_regression.default
 
 # ---------------------------- Constructors ------------------------------------
 

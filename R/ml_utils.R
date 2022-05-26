@@ -117,20 +117,14 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
   sc <- spark_connection(x)
 
   args <- list(sc, spark_class)
-  if (!is.null(uid)) {
-    uid <- cast_string(uid)
-    args <- append(args, list(uid))
-  }
+  if (!is.null(uid))
+    args <- c(args, list(cast_string(uid)))
+  # should these arguments be named? i.e., args$uid <- cast_string(uid)
+  # also, this seems like a common pattern in this code base, it might make sense to have a family of utils: as_nullable_string(), as_nullable_int(), etc.
 
   jobj <- do.call(invoke_new, args)
-
-  l_steps <- purrr::imap(invoke_steps, ~ list(.y, .x))
-
-  for(i in seq_along(l_steps)) {
-    if(!is.null(l_steps[[i]][[2]])) {
-      jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
-    }
-  }
+  for(nm in names(drop_nulls(invoke_steps))) # can also use purrr::compact instead of drop_nulls(), thought that tests `length(x) == 0`, which is slightly different from is.null
+    jobj <- invoke(jobj, nm)
 
   new_estimator <- new_ml_estimator(jobj, class = r_class)
 
@@ -144,26 +138,22 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
     features_col = invoke_steps$setFeaturesCol,
     label_col = invoke_steps$setLabelCol
   )
-
 }
 
-param_min_version <- function(x, value, min_version = NULL) {
-  ret <- value
-  if (!is.null(value)) {
-    if (!is.null(min_version)) {
-      sc <- spark_connection(x)
-      ver <- spark_version(sc)
-      if (ver < min_version) {
-        warning(paste0(
-          "Parameter `", deparse(substitute(value)),
-          "` is only available for Spark ", min_version, " and later.",
-          "The value will not be passed to the model."
-        ))
-        ret <- NULL
-      }
-    }
+param_min_version <- function(x, value, min_version = NULL,
+                              value_nm = deparse(substitute(value))) {
+  if (is.null(value) || is.null(min_version))
+    return(value)
+
+  # does this potentially lead to multiple connections being opened
+  if (spark_version(spark_connection(x)) < min_version) {
+    value <- NULL
+    msg <- sprintf(
+      "Parameter `%s` is only available for Spark %s and later. The value will not be passed to the model.",
+      value_nm, min_version)
+    warning(msg) # should this throw an error instead?
   }
-  ret
+  value
 }
 
 # --------------------- Post conversion functions ------------------------------
