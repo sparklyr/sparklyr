@@ -2,9 +2,9 @@
 
 ### Release summary
 
-- Addresses pre-check issues:
-  - Fixes URLs
-  - Fixes PDF check failure 
+- Addresses manual inspection feedback regarding package size:
+  - Deleted two unused PNG files
+  - Reduced side of the largest PNG file
   
 ### Test environments
 
