@@ -457,7 +457,7 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
   col_types <- translate_spark_column_types(x)
 
   if (drop_groups) {
-    non_group_cols <- setdiff(names(col_types), group_vars(x))
+    non_group_cols <- setdiff(names(col_types), dplyr::group_vars(x))
     col_types <- col_types[non_group_cols]
   }
 

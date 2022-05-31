@@ -78,7 +78,7 @@ devtools::install_github("sparklyr/sparklyr")
 
 You can connect to both local instances of Spark as well as remote Spark
 clusters. Here we’ll connect to a local instance of Spark via the
-[spark_connect](https://spark.rstudio.com/reference/spark-connections/)
+[spark_connect](https://spark.rstudio.com/packages/sparklyr/latest/reference/spark-connections.html)
 function:
 
 ``` r
@@ -147,7 +147,7 @@ delay <- flights_tbl %>%
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
   filter(count > 20, dist < 2000, !is.na(delay)) %>%
-  collect
+  collect()
 
 # plot delays
 library(ggplot2)
@@ -198,9 +198,8 @@ website.
 
 It’s also possible to execute SQL queries directly against tables within
 a Spark cluster. The `spark_connection` object implements a
-[DBI](https://github.com/rstats-db/DBI) interface for Spark, so you can
-use `dbGetQuery()` to execute SQL and return the result as an R data
-frame:
+[DBI](https://github.com/r-dbi/DBI) interface for Spark, so you can use
+`dbGetQuery()` to execute SQL and return the result as an R data frame:
 
 ``` r
 library(DBI)
@@ -317,16 +316,16 @@ spark_apply(iris_tbl, function(data) {
 #> # Source: spark<?> [?? x 4]
 #>    Sepal_Length Sepal_Width Petal_Length Petal_Width
 #>           <dbl>       <dbl>        <dbl>       <dbl>
-#>  1         6.87        5.27         3.17        1.97
-#>  2         6.67        4.77         3.17        1.97
-#>  3         6.47        4.97         3.07        1.97
-#>  4         6.37        4.87         3.27        1.97
-#>  5         6.77        5.37         3.17        1.97
-#>  6         7.17        5.67         3.47        2.17
-#>  7         6.37        5.17         3.17        2.07
-#>  8         6.77        5.17         3.27        1.97
-#>  9         6.17        4.67         3.17        1.97
-#> 10         6.67        4.87         3.27        1.87
+#>  1         6.45        4.85         2.75        1.55
+#>  2         6.25        4.35         2.75        1.55
+#>  3         6.05        4.55         2.65        1.55
+#>  4         5.95        4.45         2.85        1.55
+#>  5         6.35        4.95         2.75        1.55
+#>  6         6.75        5.25         3.05        1.75
+#>  7         5.95        4.75         2.75        1.65
+#>  8         6.35        4.75         2.85        1.55
+#>  9         5.75        4.25         2.75        1.55
+#> 10         6.25        4.45         2.85        1.45
 #> # … with more rows
 ```
 
@@ -409,16 +408,16 @@ You can show the log using the `spark_log()` function:
 
 ``` r
 spark_log(sc, n = 10)
-#> 22/03/16 14:49:17 INFO BlockManagerInfo: Removed broadcast_85_piece0 on localhost:51848 in memory (size: 19.5 KiB, free: 912.1 MiB)
-#> 22/03/16 14:49:17 INFO BlockManagerInfo: Removed broadcast_77_piece0 on localhost:51848 in memory (size: 16.7 KiB, free: 912.1 MiB)
-#> 22/03/16 14:49:17 INFO BlockManagerInfo: Removed broadcast_89_piece0 on localhost:51848 in memory (size: 18.4 KiB, free: 912.1 MiB)
-#> 22/03/16 14:49:17 INFO Executor: Finished task 0.0 in stage 67.0 (TID 83). 1004 bytes result sent to driver
-#> 22/03/16 14:49:17 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 83) in 194 ms on localhost (executor driver) (1/1)
-#> 22/03/16 14:49:17 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-#> 22/03/16 14:49:17 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:0) finished in 0.211 s
-#> 22/03/16 14:49:17 INFO DAGScheduler: Job 49 is finished. Cancelling potential speculative or zombie tasks for this job
-#> 22/03/16 14:49:17 INFO TaskSchedulerImpl: Killing all running tasks in stage 67: Stage finished
-#> 22/03/16 14:49:17 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.216487 s
+#> 22/05/25 15:05:25 INFO BlockManagerInfo: Removed broadcast_84_piece0 on localhost:58163 in memory (size: 9.2 KiB, free: 912.1 MiB)
+#> 22/05/25 15:05:25 INFO BlockManagerInfo: Removed broadcast_87_piece0 on localhost:58163 in memory (size: 18.4 KiB, free: 912.1 MiB)
+#> 22/05/25 15:05:25 INFO BlockManagerInfo: Removed broadcast_77_piece0 on localhost:58163 in memory (size: 16.7 KiB, free: 912.1 MiB)
+#> 22/05/25 15:05:25 INFO Executor: Finished task 0.0 in stage 67.0 (TID 83). 1004 bytes result sent to driver
+#> 22/05/25 15:05:25 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 83) in 244 ms on localhost (executor driver) (1/1)
+#> 22/05/25 15:05:25 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+#> 22/05/25 15:05:25 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:0) finished in 0.259 s
+#> 22/05/25 15:05:25 INFO DAGScheduler: Job 49 is finished. Cancelling potential speculative or zombie tasks for this job
+#> 22/05/25 15:05:25 INFO TaskSchedulerImpl: Killing all running tasks in stage 67: Stage finished
+#> 22/05/25 15:05:25 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.268655 s
 ```
 
 Finally, we disconnect from Spark:
@@ -451,8 +450,8 @@ the standard RStudio data viewer:
 
 <img src="tools/readme/spark-dataview.png" class="screenshot" width=639 />
 
-You can also connect to Spark through [Livy](http://livy.io) through a
-new connection dialog:
+You can also connect to Spark through [Livy](https://livy.apache.org/)
+through a new connection dialog:
 
 <img src="tools/readme/spark-connect-livy.png" class="screenshot" width=389 />
 

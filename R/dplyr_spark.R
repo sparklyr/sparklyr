@@ -336,27 +336,12 @@ sdf_remote_name.tbl_spark <- function(x) {
   if (dbplyr_uses_ops()) {
     sdf_remote_name(x$ops)
   } else {
-    sdf_remote_name(x$lazy_query)
+    dbplyr::remote_name(x)
   }
-}
-
-#' @export
-sdf_remote_name.lazy_query <- function(x) {
-  if (!(is.null(x$where) && is.null(x$group_by) && is.null(x$order_by) &&
-      isFALSE(x$distinct) && is.null(x$limit))) {
-    return()
-  }
-
-  sdf_remote_name(x$from)
 }
 
 #' @export
 sdf_remote_name.op_base <- function(x) {
-  x$x
-}
-
-#' @export
-sdf_remote_name.lazy_query_base <- function(x) {
   x$x
 }
 

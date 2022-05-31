@@ -82,7 +82,7 @@ sdf_build_wider_spec <- function(data,
     select(!! enquo(names_from)) %>%
     distinct() %>%
     collect() %>%
-    select(- group_vars(data))
+    select(- dplyr::group_vars(data))
 
   if(dim(row_ids)[2] == 1) {
     row_names <- row_ids[1][[1]]
@@ -107,7 +107,7 @@ sdf_build_wider_spec <- function(data,
     out$.name <- as.character(glue::glue_data(out, names_glue))
   }
 
-  if (names_sort) out <- arrange(out, .name)
+  if (names_sort) out <- arrange(out, !! rlang::parse_expr(".name"))
 
   out
 }

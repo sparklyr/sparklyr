@@ -2,7 +2,7 @@
 
 #' Install Livy
 #'
-#' Automatically download and install \href{http://livy.io/}{\samp{livy}}.
+#' Automatically download and install \href{https://livy.apache.org/}{\samp{livy}}.
 #' \samp{livy} provides a REST API to Spark.
 #'
 #' @param version The version of \samp{livy} to be installed.

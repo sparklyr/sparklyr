@@ -1,8 +1,10 @@
-# sparklyr (development version)
+# Sparklyr 1.7.6
 
 ### Misc
 
-- Compatibility with new `dbplyr` version.
+- Ensures compatibility with Spark version 3.2 (#3261)
+
+- Compatibility with new `dbplyr` version (@mgirlich)
 
 - Removes `stringr` dependency 
 

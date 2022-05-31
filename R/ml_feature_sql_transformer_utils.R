@@ -11,10 +11,10 @@ ft_extract_sql <- function(x) {
     pattern <- paste0("\\b", get_base_name(x$ops), "\\b")
   } else {
     get_base_name <- function(o) {
-      if (!inherits(o$from, "lazy_query_base")) {
-        get_base_name(o$from)
+      if (!inherits(o$x, "lazy_base_query")) {
+        get_base_name(o$x)
       } else {
-        o$from$x
+        o$x$x
       }
     }
 

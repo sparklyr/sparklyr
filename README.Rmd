@@ -104,7 +104,7 @@ devtools::install_github("sparklyr/sparklyr")
 
 ## Connecting to Spark
 
-You can connect to both local instances of Spark as well as remote Spark clusters. Here we'll connect to a local instance of Spark via the [spark_connect](https://spark.rstudio.com/reference/spark-connections/) function:
+You can connect to both local instances of Spark as well as remote Spark clusters. Here we'll connect to a local instance of Spark via the [spark_connect](https://spark.rstudio.com/packages/sparklyr/latest/reference/spark-connections.html) function:
 
 ```{r sparklyr-connect, message=FALSE}
 library(sparklyr)
@@ -147,7 +147,7 @@ delay <- flights_tbl %>%
   group_by(tailnum) %>%
   summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
   filter(count > 20, dist < 2000, !is.na(delay)) %>%
-  collect
+  collect()
 
 # plot delays
 library(ggplot2)
@@ -174,7 +174,7 @@ For additional documentation on using dplyr with Spark see the [dplyr](https://s
 
 ## Using SQL
 
-It's also possible to execute SQL queries directly against tables within a Spark cluster. The `spark_connection` object implements a [DBI](https://github.com/rstats-db/DBI) interface for Spark, so you can use `dbGetQuery()` to execute SQL and return the result as an R data frame:
+It's also possible to execute SQL queries directly against tables within a Spark cluster. The `spark_connection` object implements a [DBI](https://github.com/r-dbi/DBI) interface for Spark, so you can use `dbGetQuery()` to execute SQL and return the result as an R data frame:
 
 ```{r sql-dbi}
 library(DBI)
@@ -332,7 +332,7 @@ Once you've connected to Spark you'll be able to browse the tables contained wit
 
 <img src="tools/readme/spark-dataview.png" class="screenshot" width=639 />
 
-You can also connect to Spark through [Livy](http://livy.io) through a new connection dialog:
+You can also connect to Spark through [Livy](https://livy.apache.org/) through a new connection dialog:
 
 <img src="tools/readme/spark-connect-livy.png" class="screenshot" width=389 />
 

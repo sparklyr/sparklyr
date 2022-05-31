@@ -6,8 +6,14 @@ library(fs)
 devtools::build(path = "revdep")
 revdeps <- tools::check_packages_in_dir("revdep", reverse =  list())
 
+rcheck_folders <- dir_ls(path = "revdep", glob = "*.Rcheck")
+
+sparklyr_folder <- rcheck_folders %>%
+  path_file() %>%
+  str_detect("sparklyr.Rcheck")
+
 res <- map(
-  dir_ls(path = "revdep", glob = "*.Rcheck"),
+  rcheck_folders[!sparklyr_folder],
   ~ {
     # Read log
     raw_log <- readLines(path(.x, "00check.log"))

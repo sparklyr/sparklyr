@@ -10,12 +10,12 @@ spark_write_rds(x, dest_uri)
 \item{x}{A Spark DataFrame to be exported}
 
 \item{dest_uri}{Can be a URI template containing "{partitionId}" (e.g.,
-\out{"hdfs://my_data_part_{partitionId}.rds"}) where "{partitionId}" will be
+\code{"hdfs://my_data_part_{partitionId}.rds"}) where "{partitionId}" will be
 substituted with ID of each partition using `glue`, or a list of URIs
 to be assigned to RDS output from all partitions (e.g.,
-\out{"hdfs://my_data_part_0.rds"}, \out{"hdfs://my_data_part_1.rds"}, and so on)
+\code{"hdfs://my_data_part_0.rds"}, \code{"hdfs://my_data_part_1.rds"}, and so on)
 If working with a Spark instance running locally, then all URIs should be
-in \out{"file://<local file path>"} form. Otherwise the scheme of the URI should
+in \code{"file://<local file path>"} form. Otherwise the scheme of the URI should
 reflect the underlying file system the Spark instance is working with
 (e.g., "hdfs://"). If the resulting list of URI(s) does not contain unique
 values, then it will be post-processed with `make.unique()` to ensure

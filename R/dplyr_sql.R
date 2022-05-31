@@ -4,26 +4,20 @@
 #' @include utils.R
 NULL
 
-lazy_sample_query <- function(from, frac, args) {
-  structure(
-    list(
-      from = from,
-      args = args,
-      frac = frac
-    ),
-    class = c("lazy_sample_query", "lazy_query")
+lazy_sample_query <- function(x, frac, args) {
+  f_lazy_query <- utils::getFromNamespace("lazy_query", "dbplyr")
+
+  f_lazy_query(
+    query_type = "sample",
+    x = x,
+    args = args,
+    frac = frac
   )
 }
 
 #' @export
 op_vars.lazy_sample_query <- function(op) {
-  op_vars(op$from)
-}
-
-#' @importFrom dbplyr op_grps
-#' @export
-op_grps.lazy_sample_query <- function(op) {
-  op_grps(op$from)
+  op_vars(op$x)
 }
 
 #' @export
@@ -96,8 +90,8 @@ sql_build.op_sample <- function(op, con, frac) {
 
 #' @export
 sql_build.lazy_sample_query <- function(op, con, ...) {
-  grps <- dbplyr::op_grps(op$from)
-  sdf <- to_sdf(op$from, con)
+  grps <- dbplyr::op_grps(op$x)
+  sdf <- to_sdf(op$x, con)
   frac <- op$frac
 
   if (rlang::quo_is_null(op$args$weight)) {
@@ -321,8 +315,7 @@ to_sdf <- function(op, con) {
     con,
     dbplyr::select_query(
       from = dbplyr::sql(
-        # TODO
-        dbplyr::sql_render(dbplyr::sql_build(op$x %||% op$from, con = con), con = con),
+        dbplyr::sql_render(dbplyr::sql_build(op$x, con = con), con = con),
         con = con
       ),
       select = dbplyr::build_sql("*", con = con)
