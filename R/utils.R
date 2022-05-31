@@ -555,13 +555,3 @@ infer_required_r_packages <- function(fn) {
 
   ls(deps)
 }
-
-
-drop_nulls <- function (x, i = NULL) { # copy pasted from keras
-  if (is.null(i))
-    return(x[!vapply(x, is.null, FALSE, USE.NAMES = FALSE)])
-  drop <- logical(length(x))
-  names(drop) <- names(x)
-  drop[i] <- vapply(x[i], is.null, FALSE, USE.NAMES = FALSE)
-  x[!drop]
-}

@@ -79,8 +79,7 @@ ml_aft_survival_regression.default <-
            response = NULL,
            features = NULL) {
 
-  aggregation_depth <-
-    param_min_version(x, aggregation_depth, "2.1.0")
+  aggregation_depth <- param_min_version(x, aggregation_depth, "2.1.0")
 
   ml_process_model(
     x = x,

@@ -46,9 +46,13 @@ ml_survival_regression(
 
 \item{formula}{Used when \code{x} is a \code{tbl_spark}. R formula as a character string or a formula. This is used to transform the input dataframe before fitting, see \link{ft_r_formula} for details.}
 
-\item{censor_col}{Censor column name. The value of this column could be 0 or 1. If the value is 1, it means the event has occurred i.e. uncensored; otherwise censored.}
+\item{censor_col}{Censor column name. The value of this column could be 0 or
+1. If the value is 1, it means the event has occurred i.e. uncensored;
+otherwise censored.}
 
-\item{quantile_probabilities}{Quantile probabilities array. Values of the quantile probabilities array should be in the range (0, 1) and the array should be non-empty.}
+\item{quantile_probabilities}{Quantile probabilities array. Values of the
+quantile probabilities array should be in the range (0, 1) and the array
+should be non-empty.}
 
 \item{fit_intercept}{Boolean; should the model be fit with an intercept term?}
 
@@ -58,7 +62,8 @@ ml_survival_regression(
 
 \item{aggregation_depth}{(Spark 2.1.0+) Suggested depth for treeAggregate (>= 2).}
 
-\item{quantiles_col}{Quantiles column name. This column will output quantiles of corresponding quantileProbabilities if it is set.}
+\item{quantiles_col}{Quantiles column name. This column will output quantiles
+of corresponding quantileProbabilities if it is set.}
 
 \item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
 
