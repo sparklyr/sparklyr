@@ -18,8 +18,7 @@ predict.ml_model_classification <- function(object,
 }
 
 #' @export
-predict.ml_model_regression <- function(
-                                        object, newdata = ml_model_data(object), ...) {
+predict.ml_model_regression <- function(object, newdata = ml_model_data(object), ...) {
   prediction_col <- ml_param(object$model, "prediction_col")
 
   ml_predict(object, newdata) %>%
@@ -110,3 +109,95 @@ make_stats_arranger <- function(fit_intercept) {
     identity
   }
 }
+
+# ----------------------------- ML helpers -------------------------------------
+
+ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_function,
+                             formula = NULL, response = NULL, features = NULL) {
+  sc <- spark_connection(x)
+
+  args <- list(sc, spark_class)
+  if (!is.null(uid)) {
+    uid <- cast_string(uid)
+    args <- append(args, list(uid))
+  }
+
+  jobj <- do.call(invoke_new, args)
+
+  l_steps <- purrr::imap(invoke_steps, ~ list(.y, .x))
+
+  for(i in seq_along(l_steps)) {
+    if(!is.null(l_steps[[i]][[2]])) {
+      jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
+    }
+  }
+
+  new_estimator <- new_ml_estimator(jobj, class = r_class)
+
+  post_ml_obj(
+    x = x,
+    nm = new_estimator,
+    ml_function = ml_function,
+    formula = formula,
+    response = response,
+    features = features,
+    features_col = invoke_steps$setFeaturesCol,
+    label_col = invoke_steps$setLabelCol
+  )
+
+}
+
+param_min_version <- function(x, value, min_version = NULL) {
+  ret <- value
+  if (!is.null(value)) {
+    if (!is.null(min_version)) {
+      sc <- spark_connection(x)
+      ver <- spark_version(sc)
+      if (ver < min_version) {
+        warning(paste0(
+          "Parameter `", deparse(substitute(value)),
+          "` is only available for Spark ", min_version, " and later.",
+          "The value will not be passed to the model."
+        ))
+        ret <- NULL
+      }
+    }
+  }
+  ret
+}
+
+# --------------------- Post conversion functions ------------------------------
+
+post_ml_obj <- function(x, nm, ml_function, formula, response,
+                        features, features_col, label_col) {
+  UseMethod("post_ml_obj")
+}
+
+post_ml_obj.spark_connection <- function(x, nm, ml_function, formula, response,
+                                         features, features_col, label_col) {
+  nm
+}
+
+post_ml_obj.ml_pipeline <- function(x, nm, ml_function, formula, response,
+                                    features, features_col, label_col) {
+  ml_add_stage(x, nm)
+}
+
+post_ml_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
+                                  features, features_col, label_col) {
+  formula <- ml_standardize_formula(formula, response, features)
+
+  if (is.null(formula)) {
+    ml_fit(nm, x)
+  } else {
+    ml_construct_model_supervised(
+      ml_function,
+      predictor = nm,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col
+    )
+  }
+}
+
