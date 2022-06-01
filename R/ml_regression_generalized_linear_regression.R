@@ -71,7 +71,7 @@ ml_generalized_linear_regression <- function(x, formula = NULL, family = "gaussi
   UseMethod("ml_generalized_linear_regression")
 }
 
-ml_generalized_linear_regression_default <- function(x, formula = NULL, family = "gaussian",
+ml_generalized_linear_regression_impl <- function(x, formula = NULL, family = "gaussian",
                                              link = NULL, fit_intercept = TRUE, offset_col = NULL,
                                              link_power = NULL, link_prediction_col = NULL,
                                              reg_param = 0, max_iter = 25, weight_col = NULL,
@@ -129,13 +129,13 @@ ml_generalized_linear_regression_default <- function(x, formula = NULL, family =
 # ------------------------------- Methods --------------------------------------
 
 #' @export
-ml_generalized_linear_regression.spark_connection <- ml_generalized_linear_regression_default
+ml_generalized_linear_regression.spark_connection <- ml_generalized_linear_regression_impl
 
 #' @export
-ml_generalized_linear_regression.ml_pipeline <- ml_generalized_linear_regression_default
+ml_generalized_linear_regression.ml_pipeline <- ml_generalized_linear_regression_impl
 
 #' @export
-ml_generalized_linear_regression.tbl_spark <- ml_generalized_linear_regression_default
+ml_generalized_linear_regression.tbl_spark <- ml_generalized_linear_regression_impl
 
 # ------------------------------ Fitted models ---------------------------------
 

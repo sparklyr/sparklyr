@@ -10,7 +10,7 @@ ml_random_forest_regressor <- function(x, formula = NULL, num_trees = 20, subsam
   UseMethod("ml_random_forest_regressor")
 }
 
-ml_random_forest_regressor_default <- function(x, formula = NULL, num_trees = 20, subsampling_rate = 1,
+ml_random_forest_regressor_impl <- function(x, formula = NULL, num_trees = 20, subsampling_rate = 1,
                                                max_depth = 5, min_instances_per_node = 1, feature_subset_strategy = "auto",
                                                impurity = "variance", min_info_gain = 0, max_bins = 32,
                                                seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
@@ -48,13 +48,13 @@ ml_random_forest_regressor_default <- function(x, formula = NULL, num_trees = 20
 
 # ------------------------------- Methods --------------------------------------
 #' @export
-ml_random_forest_regressor.spark_connection <- ml_random_forest_regressor_default
+ml_random_forest_regressor.spark_connection <- ml_random_forest_regressor_impl
 
 #' @export
-ml_random_forest_regressor.ml_pipeline <- ml_random_forest_regressor_default
+ml_random_forest_regressor.ml_pipeline <- ml_random_forest_regressor_impl
 
 #' @export
-ml_random_forest_regressor.tbl_spark <- ml_random_forest_regressor_default
+ml_random_forest_regressor.tbl_spark <- ml_random_forest_regressor_impl
 
 # ---------------------------- Constructors ------------------------------------
 new_ml_random_forest_regression_model <- function(jobj) {

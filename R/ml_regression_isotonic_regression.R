@@ -37,7 +37,7 @@ ml_isotonic_regression <- function(x, formula = NULL, feature_index = 0, isotoni
   UseMethod("ml_isotonic_regression")
 }
 
-ml_isotonic_regression_default <- function(x, formula = NULL, feature_index = 0, isotonic = TRUE,
+ml_isotonic_regression_impl <- function(x, formula = NULL, feature_index = 0, isotonic = TRUE,
                                            weight_col = NULL, features_col = "features",
                                            label_col = "label", prediction_col = "prediction",
                                            uid = random_string("isotonic_regression_"),
@@ -65,13 +65,13 @@ ml_isotonic_regression_default <- function(x, formula = NULL, feature_index = 0,
 
 # ------------------------------- Methods --------------------------------------
 #' @export
-ml_isotonic_regression.spark_connection <- ml_isotonic_regression_default
+ml_isotonic_regression.spark_connection <- ml_isotonic_regression_impl
 
 #' @export
-ml_isotonic_regression.ml_pipeline <- ml_isotonic_regression_default
+ml_isotonic_regression.ml_pipeline <- ml_isotonic_regression_impl
 
 #' @export
-ml_isotonic_regression.tbl_spark <- ml_isotonic_regression_default
+ml_isotonic_regression.tbl_spark <- ml_isotonic_regression_impl
 
 # ---------------------------- Constructors ------------------------------------
 new_ml_isotonic_regression_model <- function(jobj) {

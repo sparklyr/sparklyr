@@ -12,7 +12,7 @@ ml_decision_tree_regressor <- function(x, formula = NULL, max_depth = 5, max_bin
   UseMethod("ml_decision_tree_regressor")
 }
 
-ml_decision_tree_regressor_default <- function(x, formula = NULL, max_depth = 5, max_bins = 32,
+ml_decision_tree_regressor_impl <- function(x, formula = NULL, max_depth = 5, max_bins = 32,
                                                min_instances_per_node = 1, min_info_gain = 0,
                                                impurity = "variance", seed = NULL, cache_node_ids = FALSE,
                                                checkpoint_interval = 10, max_memory_in_mb = 256,
@@ -52,13 +52,13 @@ ml_decision_tree_regressor_default <- function(x, formula = NULL, max_depth = 5,
 
 # ------------------------------- Methods --------------------------------------
 #' @export
-ml_decision_tree_regressor.spark_connection <- ml_decision_tree_regressor_default
+ml_decision_tree_regressor.spark_connection <- ml_decision_tree_regressor_impl
 
 #' @export
-ml_decision_tree_regressor.ml_pipeline <- ml_decision_tree_regressor_default
+ml_decision_tree_regressor.ml_pipeline <- ml_decision_tree_regressor_impl
 
 #' @export
-ml_decision_tree_regressor.tbl_spark <- ml_decision_tree_regressor_default
+ml_decision_tree_regressor.tbl_spark <- ml_decision_tree_regressor_impl
 
 # ---------------------------- Constructors ------------------------------------
 new_ml_decision_tree_regression_model <- function(jobj) {

@@ -13,7 +13,7 @@ ml_gbt_regressor <- function(x, formula = NULL, max_iter = 20, max_depth = 5,
   UseMethod("ml_gbt_regressor")
 }
 
-ml_gbt_regressor_default <- function(x, formula = NULL, max_iter = 20, max_depth = 5,
+ml_gbt_regressor_impl <- function(x, formula = NULL, max_iter = 20, max_depth = 5,
                                      step_size = 0.1, subsampling_rate = 1,
                                      feature_subset_strategy = "auto", min_instances_per_node = 1,
                                      max_bins = 32, min_info_gain = 0, loss_type = "squared",
@@ -57,13 +57,13 @@ ml_gbt_regressor_default <- function(x, formula = NULL, max_iter = 20, max_depth
 
 # ------------------------------- Methods --------------------------------------
 #' @export
-ml_gbt_regressor.spark_connection <- ml_gbt_regressor_default
+ml_gbt_regressor.spark_connection <- ml_gbt_regressor_impl
 
 #' @export
-ml_gbt_regressor.ml_pipeline <- ml_gbt_regressor_default
+ml_gbt_regressor.ml_pipeline <- ml_gbt_regressor_impl
 
 #' @export
-ml_gbt_regressor.tbl_spark <- ml_gbt_regressor_default
+ml_gbt_regressor.tbl_spark <- ml_gbt_regressor_impl
 
 # ---------------------------- Constructors ------------------------------------
 new_ml_gbt_regression_model <- function(jobj) {

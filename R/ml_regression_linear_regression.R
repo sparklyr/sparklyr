@@ -43,7 +43,7 @@ ml_linear_regression <- function(x, formula = NULL, fit_intercept = TRUE,
   UseMethod("ml_linear_regression")
 }
 
-ml_linear_regression_default <- function(x, formula = NULL, fit_intercept = TRUE,
+ml_linear_regression_impl <- function(x, formula = NULL, fit_intercept = TRUE,
                                            elastic_net_param = 0, reg_param = 0,
                                            max_iter = 100, weight_col = NULL,
                                            loss = "squaredError", solver = "auto",
@@ -83,11 +83,11 @@ ml_linear_regression_default <- function(x, formula = NULL, fit_intercept = TRUE
 
 # ------------------------------- Methods --------------------------------------
 #' @export
-ml_linear_regression.spark_connection <- ml_linear_regression_default
+ml_linear_regression.spark_connection <- ml_linear_regression_impl
 #' @export
-ml_linear_regression.ml_pipeline <- ml_linear_regression_default
+ml_linear_regression.ml_pipeline <- ml_linear_regression_impl
 #' @export
-ml_linear_regression.tbl_spark <- ml_linear_regression_default
+ml_linear_regression.tbl_spark <- ml_linear_regression_impl
 
 # ---------------------------- Constructors ------------------------------------
 new_ml_linear_regression_model <- function(jobj) {
