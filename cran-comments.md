@@ -1,10 +1,9 @@
-## Re-Submission
+## Patch Submission
 
 ### Release summary
 
-- Addresses manual inspection feedback regarding package size:
-  - Deleted two unused PNG files
-  - Reduced side of the largest PNG file
+- Previous version missed one function that is needed to ensure compatibility 
+with the upcoming, and current, versions of `dbplyr`
   
 ### Test environments
 

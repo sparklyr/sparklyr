@@ -1,3 +1,9 @@
+# Sparklyr 1.7.7
+
+### Misc
+
+- Ensures compatibility with the upcoming, and current, versions of `dbplyr`
+
 # Sparklyr 1.7.6
 
 ### Misc
