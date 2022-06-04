@@ -67,7 +67,7 @@ filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
     dots <- rlang::quos(...)
     dots <- partial_eval_dots(dots, sim_data = simulate_vars_spark(.data))
 
-    dbplyr::add_op_single("filter", .data, dots = dots)
+    add_op_single("filter", .data, dots = dots)
   } else {
     NextMethod()
   }
@@ -155,7 +155,7 @@ summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
     check_summarise_vars(dots)
     check_groups(.groups)
 
-    dbplyr::add_op_single(
+    add_op_single(
       "summarise",
       .data,
       dots = dots,

@@ -52,7 +52,7 @@ op_select <- function(x, vars) {
 new_op_select <- function(x, vars) {
   stopifnot(inherits(x, "op"))
   stopifnot(is.list(vars))
-  dbplyr::op_single("select", x, dots = list(), args = list(vars = vars))
+  op_single("select", x, dots = list(), args = list(vars = vars))
 }
 
 carry_over <- function(sel = character(), act = list()) {

@@ -34,7 +34,7 @@ sample_n.tbl_spark <- function(tbl,
   )
 
   if (dbplyr_uses_ops()) {
-    tbl <- dbplyr::add_op_single("sample_n", .data = tbl, args = args)
+    tbl <- add_op_single("sample_n", .data = tbl, args = args)
   } else {
     tbl$lazy_query <- lazy_sample_query(tbl$lazy_query, frac = FALSE, args = args)
   }
@@ -63,7 +63,7 @@ sample_frac.tbl_spark <- function(tbl,
   )
 
   if (dbplyr_uses_ops()) {
-    tbl <- dbplyr::add_op_single("sample_frac", .data = tbl, args = args)
+    tbl <- add_op_single("sample_frac", .data = tbl, args = args)
   } else {
     tbl$lazy_query <- lazy_sample_query(tbl$lazy_query, frac = TRUE, args = args)
   }

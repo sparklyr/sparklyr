@@ -228,7 +228,7 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
     )
 
     if (dbplyr_uses_ops()) {
-      dbplyr::add_op_single("tbl_spark_distinct", .data, args = args)
+      add_op_single("tbl_spark_distinct", .data, args = args)
     } else {
       row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY NULL)"))
       names(row_num_sql) <- row_num

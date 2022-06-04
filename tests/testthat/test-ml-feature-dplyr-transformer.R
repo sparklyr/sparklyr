@@ -27,7 +27,7 @@ test_that("ft_dplyr_transformer() works", {
   } else {
     expect_equal(
       ml_param_map(dplyr_transformer),
-      list(statement = "SELECT\n  `Sepal_Length`,\n  `Sepal_Width`,\n  `Petal_Length`,\n  `Petal_Width`,\n  `Species`,\n  `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
+      list(statement = "SELECT *, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
     )
   }
 })
