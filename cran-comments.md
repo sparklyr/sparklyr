@@ -1,9 +1,8 @@
-## Patch Submission
+## Patch Re-submission
 
 ### Release summary
 
-- Previous version missed one function that is needed to ensure compatibility 
-with the upcoming, and current, versions of `dbplyr`
+- Restores missing 'java' folder 
   
 ### Test environments
 
