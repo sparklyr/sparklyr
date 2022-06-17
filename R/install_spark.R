@@ -266,7 +266,7 @@ spark_install <- function(version = NULL,
           "javax.jdo.option.ConnectionDriverName" = "org.apache.derby.jdbc.EmbeddedDriver"
         )
 
-        if (.Platform$OS.type == "windows") {
+        if (os_is_windows()) {
           hivePath <- normalizePath(
             file.path(installInfo$sparkVersionDir, "tmp", "hive"),
             mustWork = FALSE,
@@ -289,7 +289,7 @@ spark_install <- function(version = NULL,
   }
 
   spark_conf <- list()
-  if (.Platform$OS.type == "windows") {
+  if (os_is_windows()) {
     spark_conf[["spark.local.dir"]] <- normalizePath(
       file.path(installInfo$sparkVersionDir, "tmp", "local"),
       mustWork = FALSE,
@@ -340,7 +340,7 @@ spark_uninstall <- function(version, hadoop_version) {
 }
 
 spark_resolve_envpath <- function(path_with_end) {
-  if (.Platform$OS.type == "windows") {
+  if (os_is_windows()) {
     parts <- strsplit(path_with_end, "/")[[1]]
     first <- gsub("%", "", parts[[1]])
     if (nchar(Sys.getenv(first)) > 0) parts[[1]] <- Sys.getenv(first)
@@ -408,23 +408,33 @@ spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
       "rootLogger.appenderRef.file.ref" = "rootLogger.appenderRef.file.ref = File",
       "appender.file.type" = "appender.file.type = File",
       "appender.file.name" = "appender.file.name = File",
-      "appender.file.fileName" = "appender.file.fileName = logs/log4j.spark.log",
       "appender.file.append" = "appender.file.append = true",
       "appender.file.layout.type" = "appender.file.layout.type = PatternLayout",
       "appender.file.layout.pattern" =  "appender.file.layout.pattern = %d{yy/MM/dd HH:mm:ss.SSS} %t %p %c{1}: %m%n%ex",
       "logger.jetty.name" = "logger.jetty.name = org.eclipse.jetty",
       "logger.jetty.level" = "logger.jetty.level = warn"
     )
+    if(os_is_windows()){
+      log_properties <- c(
+        log_properties,
+        "appender.file.fileName" = "appender.file.fileName = logs/log4j.spark.log"
+        )
+      }
   } else {
     if(any(dir_contents == log_template_v1)) {
       log_template <- log_template_v1
       log_properties <- list(
         "log4j.rootCategory" = paste0("log4j.rootCategory=", logging, ",console,localfile"),
         "log4j.appender.localfile" = "log4j.appender.localfile=org.apache.log4j.DailyRollingFileAppender",
-        "log4j.appender.localfile.file" = "log4j.appender.localfile.file=logs/log4j.spark.log",
         "log4j.appender.localfile.layout" = "log4j.appender.localfile.layout=org.apache.log4j.PatternLayout",
         "log4j.appender.localfile.layout.ConversionPattern" = "log4j.appender.localfile.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n"
       )
+      if(os_is_windows()){
+        log_properties <- c(
+          log_properties,
+          "log4j.appender.localfile.file" = "log4j.appender.localfile.file=logs/log4j.spark.log"
+        )
+      }
     }
   }
 
