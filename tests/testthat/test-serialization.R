@@ -204,6 +204,7 @@ test_that("collect() can retrieve all data types correctly", {
   names(spark_results) <- NULL
   spark_results <- sapply(spark_results, as.character)
 
+  skip_on_os("mac")
   expect_equal(
     spark_results,
     hive_type %>% pull(!!if (arrow_compat) "avalue" else "rvalue")

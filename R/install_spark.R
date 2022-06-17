@@ -92,7 +92,11 @@ spark_install_find <- function(version = NULL,
     )
   } else {
     versions <- versions[with(versions, order(default, spark, hadoop_default, decreasing = TRUE)), ]
-    spark_install_info(as.character(versions[1, ]$spark), as.character(versions[1, ]$hadoop), latest = latest)
+    spark_install_info(
+      as.character(versions[1, ]$spark),
+      as.character(versions[1, ]$hadoop),
+      latest = latest
+      )
   }
 }
 
@@ -241,15 +245,9 @@ spark_install <- function(version = NULL,
     tryCatch(
       {
         spark_conf_log4j_set_value(
-          installInfo,
-          list(
-            "log4j.rootCategory" = paste0("log4j.rootCategory=", logging, ",console,localfile"),
-            "log4j.appender.localfile" = "log4j.appender.localfile=org.apache.log4j.DailyRollingFileAppender",
-            "log4j.appender.localfile.file" = "log4j.appender.localfile.file=logs/log4j.spark.log",
-            "log4j.appender.localfile.layout" = "log4j.appender.localfile.layout=org.apache.log4j.PatternLayout",
-            "log4j.appender.localfile.layout.ConversionPattern" = "log4j.appender.localfile.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n"
-          ),
-          reset
+          installInfo = installInfo,
+          reset = reset,
+          logging = logging
         )
       },
       error = function(e) {
@@ -269,7 +267,11 @@ spark_install <- function(version = NULL,
         )
 
         if (.Platform$OS.type == "windows") {
-          hivePath <- normalizePath(file.path(installInfo$sparkVersionDir, "tmp", "hive"), mustWork = FALSE, winslash = "/")
+          hivePath <- normalizePath(
+            file.path(installInfo$sparkVersionDir, "tmp", "hive"),
+            mustWork = FALSE,
+            winslash = "/"
+            )
 
           hiveProperties <- c(hiveProperties, list(
             "hive.exec.scratchdir" = hivePath,
@@ -288,7 +290,11 @@ spark_install <- function(version = NULL,
 
   spark_conf <- list()
   if (.Platform$OS.type == "windows") {
-    spark_conf[["spark.local.dir"]] <- normalizePath(file.path(installInfo$sparkVersionDir, "tmp", "local"), mustWork = FALSE, winslash = "/")
+    spark_conf[["spark.local.dir"]] <- normalizePath(
+      file.path(installInfo$sparkVersionDir, "tmp", "local"),
+      mustWork = FALSE,
+      winslash = "/"
+      )
   }
 
   if (!is.null(hivePath)) {
@@ -383,20 +389,69 @@ spark_install_tar <- function(tarfile) {
   )
 }
 
-spark_conf_log4j_set_value <- function(installInfo, properties, reset) {
-  log4jPropertiesPath <- file.path(installInfo$sparkConfDir, "log4j.properties")
-  if (!file.exists(log4jPropertiesPath) || reset) {
-    log4jTemplatePath <- file.path(installInfo$sparkConfDir, "log4j.properties.template")
-    file.copy(log4jTemplatePath, log4jPropertiesPath, overwrite = TRUE)
+spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
+                                       reset = TRUE, logging = "INFO") {
+
+  log_template <- NULL
+  log_properties <- NULL
+  log_template_v1 <- "log4j.properties.template"
+  log_template_v2 <- "log4j2.properties.template"
+
+  spark_conf_dir <- installInfo$sparkConfDir
+
+  dir_contents <- list.files(spark_conf_dir)
+
+  if(any(dir_contents == log_template_v2)) {
+    log_template <- log_template_v2
+    log_properties <- list(
+      "rootLogger.level" = paste0("rootLogger.level = ", tolower(logging)),
+      "rootLogger.appenderRef.file.ref" = "rootLogger.appenderRef.file.ref = File",
+      "appender.file.type" = "appender.file.type = File",
+      "appender.file.name" = "appender.file.name = File",
+      "appender.file.fileName" = "appender.file.fileName = logs/log4j.spark.log",
+      "appender.file.append" = "appender.file.append = true",
+      "appender.file.layout.type" = "appender.file.layout.type = PatternLayout",
+      "appender.file.layout.pattern" =  "appender.file.layout.pattern = %d{yy/MM/dd HH:mm:ss.SSS} %t %p %c{1}: %m%n%ex",
+      "logger.jetty.name" = "logger.jetty.name = org.eclipse.jetty",
+      "logger.jetty.level" = "logger.jetty.level = warn"
+    )
+  } else {
+    if(any(dir_contents == log_template_v1)) {
+      log_template <- log_template_v1
+      log_properties <- list(
+        "log4j.rootCategory" = paste0("log4j.rootCategory=", logging, ",console,localfile"),
+        "log4j.appender.localfile" = "log4j.appender.localfile=org.apache.log4j.DailyRollingFileAppender",
+        "log4j.appender.localfile.file" = "log4j.appender.localfile.file=logs/log4j.spark.log",
+        "log4j.appender.localfile.layout" = "log4j.appender.localfile.layout=org.apache.log4j.PatternLayout",
+        "log4j.appender.localfile.layout.ConversionPattern" = "log4j.appender.localfile.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n"
+      )
+    }
   }
 
-  log4jPropertiesFile <- file(log4jPropertiesPath)
-  lines <- readLines(log4jPropertiesFile)
+  if(is.null(log_template)) stop("No log4j template file found")
+
+  if(!is.null(properties)) log_properties <- properties
+
+  log_file <- substr(log_template, 1, nchar(log_template) - 9)
+
+  log_path <- file.path(spark_conf_dir, log_file)
+  log_path_template <- file.path(spark_conf_dir, log_template)
+
+  if (!file.exists(log_path) || reset) {
+    file.copy(
+      from = log_path_template,
+      to = log_path,
+      overwrite = TRUE
+      )
+  }
+
+  file_log <- file(log_path)
+  lines <- readLines(file_log)
 
   lines[[length(lines) + 1]] <- ""
 
-  lapply(names(properties), function(property) {
-    value <- properties[[property]]
+  lapply(names(log_properties), function(property) {
+    value <- log_properties[[property]]
     pattern <- paste(property, "=.*", sep = "")
 
     if (length(grep(pattern, lines)) > 0) {
@@ -407,8 +462,8 @@ spark_conf_log4j_set_value <- function(installInfo, properties, reset) {
     }
   })
 
-  writeLines(lines, log4jPropertiesFile)
-  close(log4jPropertiesFile)
+  writeLines(lines, file_log)
+  close(file_log)
 }
 
 spark_hive_file_set_value <- function(hivePath, properties) {
