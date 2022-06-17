@@ -69,7 +69,7 @@ parse_file <- function(x, main, folder) {
 
 # ---------------------- Read / create versions.rds file ----------------
 
-versions_rds <- path("utils", "maintenance", "versions.rds")
+versions_rds <- path("utils", "spark_versions", "versions.rds")
 
 if(!file_exists(versions_rds)) {
   c("https://dlcdn.apache.org/spark/",
@@ -77,9 +77,9 @@ if(!file_exists(versions_rds)) {
   ) %>%
     map(~ get_main_page(.x) %>%
           map(get_spark_files, .x) %>%
-          flatten()
+          purrr::flatten()
     ) %>%
-    flatten() %>%
+    purrr::flatten() %>%
     write_rds(versions_rds)
 }
 
