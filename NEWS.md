@@ -1,3 +1,9 @@
+# Sparklyr - dev
+
+### Misc
+
+- Adds support to Spark 3.3 
+
 # Sparklyr 1.7.7
 
 ### Misc
