@@ -57,10 +57,6 @@ jobs:
             any::nycflights13
             any::reshape2
 
-      - name: Load package
-        run: devtools::load_all()
-        shell: Rscript {0}
-
       - name: Cache Spark
         id: cache-spark
         uses: actions/cache@v2
@@ -70,7 +66,9 @@ jobs:
 
       - name: Install Spark (via sparklyr)
         if: steps.cache-spark.outputs.cache-hit != 'true'
-        run: spark_install(version = Sys.getenv("SPARK_VERSION"))
+        run: |
+          devtools::load_all()
+          spark_install(version = Sys.getenv("SPARK_VERSION"))
         shell: Rscript {0}
 
       - name: Cache Livy
@@ -83,7 +81,9 @@ jobs:
 
       - name: Install Livy (via sparklyr)
         if: ${{ (steps.cache-livy.outputs.cache-hit != 'true') && (matrix.config.livy != '') }}
-        run: livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
+        run: |
+          devtools::load_all()
+          livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
         shell: Rscript {0}
 
       - name: Switching to Arrow devel if needed
