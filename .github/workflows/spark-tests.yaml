@@ -58,8 +58,8 @@ jobs:
             any::reshape2
 
       - name: Load package
-        run: |
-          devtools::load_all()
+        run: devtools::load_all()
+        shell: Rscript {0}
 
       - name: Cache Spark
         id: cache-spark
