@@ -34,7 +34,7 @@ jobs:
       LIVY_VERSION:   ${{ matrix.config.livy }}
       ARROW_VERSION : ${{ matrix.config.arrow }}
       DBPLYR_VERSION: ${{ matrix.config.dbplyr }}
-      R_SPARKINSTALL_INSTALL_INFO_PATH: "inst/extdata/versions.json"
+      R_SPARKINSTALL_INSTALL_INFO_PATH: "/home/runner/work/sparklyr/sparklyr/inst/extdata/versions.json"
 
     steps:
       - uses: actions/checkout@v2
