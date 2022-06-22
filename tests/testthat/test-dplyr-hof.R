@@ -47,11 +47,10 @@ build_map_zip_with_test_tbl <- function() {
     )
 }
 
-map_tbl <- build_map_tbl()
-map_zip_with_test_tbl <- build_map_zip_with_test_tbl()
 
-if (spark_version(sc) >= "3.0.0") {
+if (spark_version(sc) >= "2.4.0") {
   map_tbl <- build_map_tbl()
+  map_zip_with_test_tbl <- build_map_zip_with_test_tbl()
 }
 
 test_that("'hof_transform' creating a new column", {
