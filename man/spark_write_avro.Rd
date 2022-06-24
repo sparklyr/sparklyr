@@ -41,6 +41,7 @@ or a specific version of Spark avro package to use (e.g.,
 \seealso{
 Other Spark serialization routines: 
 \code{\link{collect_from_rds}()},
+\code{\link{spark_insert_table}()},
 \code{\link{spark_load_table}()},
 \code{\link{spark_read_avro}()},
 \code{\link{spark_read_binary}()},
