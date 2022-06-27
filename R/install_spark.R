@@ -355,10 +355,10 @@ spark_resolve_envpath <- function(path_with_end) {
 #' @importFrom jsonlite fromJSON
 #' @export
 spark_install_dir <- function() {
-  config <- fromJSON(
-    system.file("extdata/config.json", package = packageName())
-  )
-
+  json_dev <- Sys.getenv("R_SPARKINSTALL_INSTALL_INFO_PATH", unset = NA)
+  json_pkg <- system.file("extdata/config.json", package = packageName())
+  json_use <- ifelse(!is.na(json_dev), json_dev, json_pkg)
+  config <- fromJSON(json_use)
   getOption("spark.install.dir", spark_resolve_envpath(config$dirs[[.Platform$OS.type]]))
 }
 
