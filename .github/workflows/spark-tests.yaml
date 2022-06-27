@@ -18,10 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         config:
-
-          - {spark: '3.2.1', hadoop: '3.2', arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 3.2'}
-          - {spark: '3.1.2', hadoop: '3.2', arrow: 'release', livy: '',      dbplyr: '',      name: 'Spark 3.1 w Arrow'}
-          - {spark: '3.1.2', hadoop: '3.2', arrow: 'devel',   livy: '',      dbplyr: '',      name: 'Spark 3.1 w Arrow Dev'}
+          - {spark: '3.3.0', hadoop: '3',   arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 3.3'}
+          - {spark: '3.2.1', hadoop: '3.2', arrow: 'release', livy: '',      dbplyr: '',      name: 'Spark 3.2 w Arrow'}
+          - {spark: '3.2.1', hadoop: '3.2', arrow: 'devel',   livy: '',      dbplyr: '',      name: 'Spark 3.2 w Arrow Dev'}
           - {spark: '3.0.0', hadoop: '3.2', arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 3.0'}
           - {spark: '2.4.0', hadoop: '2.7', arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 2.4'}
           - {spark: '2.4.0', hadoop: '2.7', arrow: '',        livy: '0.6.0', dbplyr: '',      name: 'Spark 2.4 w Livy 6'}
@@ -31,9 +30,11 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       SPARK_VERSION:  ${{ matrix.config.spark }}
+      HADOOP_VERSION: ${{ matrix.config.hadoop }}
       LIVY_VERSION:   ${{ matrix.config.livy }}
       ARROW_VERSION : ${{ matrix.config.arrow }}
       DBPLYR_VERSION: ${{ matrix.config.dbplyr }}
+      R_SPARKINSTALL_INSTALL_INFO_PATH: "/home/runner/work/sparklyr/sparklyr/inst/extdata/versions.json"
 
     steps:
       - uses: actions/checkout@v2
@@ -47,7 +48,6 @@ jobs:
         with:
           extra-packages: |
             any::devtools
-            any::sparklyr
             any::qs
             any::e1071
             any::mlbench
@@ -62,11 +62,13 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /home/runner/spark/spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
-          key: sparklyr-spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
+          key: sparklyr-spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}-3
 
       - name: Install Spark (via sparklyr)
         if: steps.cache-spark.outputs.cache-hit != 'true'
-        run: sparklyr::spark_install(version = Sys.getenv("SPARK_VERSION"))
+        run: |
+          devtools::load_all()
+          spark_install(version = Sys.getenv("SPARK_VERSION"), hadoop_version = Sys.getenv("HADOOP_VERSION"))
         shell: Rscript {0}
 
       - name: Cache Livy
@@ -79,7 +81,9 @@ jobs:
 
       - name: Install Livy (via sparklyr)
         if: ${{ (steps.cache-livy.outputs.cache-hit != 'true') && (matrix.config.livy != '') }}
-        run: sparklyr::livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
+        run: |
+          devtools::load_all()
+          livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
         shell: Rscript {0}
 
       - name: Switching to Arrow devel if needed

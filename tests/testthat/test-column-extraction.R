@@ -109,6 +109,7 @@ test_that("we can separate struct columns (#690)", {
   expect_identical(
     split1 %>%
       pull(start) %>%
+      sort() %>%
       head(1) %>%
       as.Date(),
     as.Date("2012-08-18 UTC")
@@ -116,6 +117,7 @@ test_that("we can separate struct columns (#690)", {
   expect_identical(
     split2 %>%
       pull(b) %>%
+      sort() %>%
       head(1) %>%
       as.Date(),
     as.Date("2013-01-15 UTC")
@@ -123,6 +125,7 @@ test_that("we can separate struct columns (#690)", {
   expect_identical(
     split3 %>%
       pull(c) %>%
+      sort() %>%
       head(1) %>%
       as.Date(),
     as.Date("2013-01-15 UTC")

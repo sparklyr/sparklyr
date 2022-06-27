@@ -555,3 +555,7 @@ infer_required_r_packages <- function(fn) {
 
   ls(deps)
 }
+
+os_is_windows <- function() {
+  .Platform$OS.type == "windows"
+}

@@ -22,16 +22,19 @@ read_spark_versions_json <- function(latest = TRUE, future = FALSE) {
     }
 
     versionsJson <- NULL
-    if (latest) {
-      versionsJson <- tryCatch(
-        {
-          suppressWarnings(
-            fromJSON(spark_versions_url(), simplifyDataFrame = TRUE)
-          )
-        },
-        error = function(e) {
-        }
-      )
+
+    if (is.na(packagePathEnv)) {
+      if (latest) {
+        versionsJson <- tryCatch(
+          {
+            suppressWarnings(
+              fromJSON(spark_versions_url(), simplifyDataFrame = TRUE)
+            )
+          },
+          error = function(e) {
+          }
+        )
+      }
     }
 
     if (is.null(versionsJson)) {
