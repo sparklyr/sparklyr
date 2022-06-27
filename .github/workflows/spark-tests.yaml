@@ -30,6 +30,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       SPARK_VERSION:  ${{ matrix.config.spark }}
+      HADOOP_VERSION: ${{ matrix.config.hadoop }}
       LIVY_VERSION:   ${{ matrix.config.livy }}
       ARROW_VERSION : ${{ matrix.config.arrow }}
       DBPLYR_VERSION: ${{ matrix.config.dbplyr }}
@@ -61,13 +62,13 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /home/runner/spark/spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
-          key: sparklyr-spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}-2
+          key: sparklyr-spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}-3
 
       - name: Install Spark (via sparklyr)
         if: steps.cache-spark.outputs.cache-hit != 'true'
         run: |
           devtools::load_all()
-          spark_install(version = Sys.getenv("SPARK_VERSION"))
+          spark_install(version = Sys.getenv("SPARK_VERSION"), hadoop_version = Sys.getenv("HADOOP_VERSION"))
         shell: Rscript {0}
 
       - name: Cache Livy
@@ -113,8 +114,5 @@ jobs:
           spark_major <- as.numeric(substr(Sys.getenv("SPARK_VERSION"), 1, 1))
           if(spark_major < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
           Sys.getenv("JAVA_HOME")
-          # devtools::test(reporter = sparklyr_reporter())
-          devtools::load_all()
-          spark_installed_versions()
-          list.files("~/spark")
+          devtools::test(reporter = sparklyr_reporter())
         shell: Rscript {0}
