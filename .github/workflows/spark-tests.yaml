@@ -61,11 +61,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /home/runner/spark/spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
-          key: sparklyr-spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
-
-      - name: R File Info
-        run: list.files()
-        shell: Rscript {0}
+          key: sparklyr-spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}-2
 
       - name: Install Spark (via sparklyr)
         if: steps.cache-spark.outputs.cache-hit != 'true'
