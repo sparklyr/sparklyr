@@ -120,4 +120,5 @@ jobs:
           # devtools::test(reporter = sparklyr_reporter())
           devtools::load_all()
           spark_installed_versions()
+          list.files("~/spark")
         shell: Rscript {0}
