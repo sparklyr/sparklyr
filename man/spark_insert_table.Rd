@@ -4,12 +4,29 @@
 \alias{spark_insert_table}
 \title{Inserts a Spark DataFrame into a Spark table}
 \usage{
-spark_insert_table(x, name, overwrite = FALSE, options = list(), ...)
+spark_insert_table(
+  x,
+  name,
+  mode = NULL,
+  overwrite = FALSE,
+  options = list(),
+  ...
+)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
 
 \item{name}{The name to assign to the newly generated table.}
+
+\item{mode}{A \code{character} element. Specifies the behavior when data or
+  table already exists. Supported values include: 'error', 'append', 'overwrite' and
+  ignore. Notice that 'overwrite' will also change the column structure.
+
+  For more details see also \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes}
+  for your version of Spark.}
+
+\item{overwrite}{Boolean; overwrite the table with the given name if it
+already exists?}
 
 \item{options}{A list of strings with additional options.}
 

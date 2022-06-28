@@ -611,6 +611,7 @@ spark_write_table.spark_jobj <- function(x,
 #' Inserts a Spark DataFrame into a Spark table.
 #'
 #' @inheritParams spark_write_csv
+#' @inheritParams spark_read_csv
 #' @param name The name to assign to the newly generated table.
 #' @param ... Optional arguments; currently unused.
 #'
@@ -619,6 +620,7 @@ spark_write_table.spark_jobj <- function(x,
 #' @export
 spark_insert_table <- function(x,
                               name,
+                              mode = NULL,
                               overwrite = FALSE,
                               options = list(),
                               ...) {
@@ -628,11 +630,11 @@ spark_insert_table <- function(x,
 #' @export
 spark_insert_table.tbl_spark <- function(x,
                                         name,
+                                        mode = NULL,
                                         overwrite = FALSE,
                                         options = list(),
                                         ...) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  sc <- spark_connection(x)
 
   mode <- if (isTRUE(overwrite)) "overwrite" else "append"
 
@@ -647,7 +649,6 @@ spark_insert_table.spark_jobj <- function(x,
                                          options = list(),
                                          ...) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  sc <- spark_connection(x)
 
   mode <- if (isTRUE(overwrite)) "overwrite" else "append"
 
