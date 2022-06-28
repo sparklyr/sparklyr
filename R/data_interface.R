@@ -606,6 +606,54 @@ spark_write_table.spark_jobj <- function(x,
   spark_data_write_generic(x, name, "saveAsTable", mode, options, partition_by)
 }
 
+#' Inserts a Spark DataFrame into a Spark table
+#'
+#' Inserts a Spark DataFrame into a Spark table.
+#'
+#' @inheritParams spark_write_csv
+#' @param name The name to assign to the newly generated table.
+#' @param ... Optional arguments; currently unused.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_insert_table <- function(x,
+                              name,
+                              overwrite = FALSE,
+                              options = list(),
+                              ...) {
+  UseMethod("spark_insert_table")
+}
+
+#' @export
+spark_insert_table.tbl_spark <- function(x,
+                                        name,
+                                        overwrite = FALSE,
+                                        options = list(),
+                                        ...) {
+  sqlResult <- spark_sqlresult_from_dplyr(x)
+  sc <- spark_connection(x)
+
+  mode <- if (isTRUE(overwrite)) "overwrite" else "append"
+
+  spark_data_write_generic(sqlResult, name, "insertInto", mode, options, NULL)
+}
+
+#' @export
+spark_insert_table.spark_jobj <- function(x,
+                                         name,
+                                         mode = NULL,
+                                         overwrite = FALSE,
+                                         options = list(),
+                                         ...) {
+  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  sc <- spark_connection(x)
+
+  mode <- if (isTRUE(overwrite)) "overwrite" else "append"
+
+  spark_data_write_generic(x, name, "insertInto", mode, options, NULL)
+}
+
 #' Read from JDBC connection into a Spark DataFrame.
 #'
 #' Read from JDBC connection into a Spark DataFrame.

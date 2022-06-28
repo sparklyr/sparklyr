@@ -207,6 +207,87 @@ test_that("spark_write_table() can write data", {
   expect_equal(sdf_nrow(append_table), 1)
 })
 
+test_that("spark_write_table() overwrites existing table definition when overwriting", {
+  skip_databricks_connect()
+  test_requires("dplyr")
+
+  df <- copy_to(sc, data.frame(foo = 1L, bar = 2L))
+
+  tbl <- random_string("test_write_table_new")
+
+  ddl <- glue::glue("CREATE TABLE {tbl} (
+    foo INT
+    ,bar BIGINT
+    )")
+
+  DBI::dbExecute(sc, ddl)
+
+  spark_write_table(df, tbl, mode = "overwrite")
+
+  # The type of bar will be int, rather than bigint, because the table was
+  # overwritten from scratch
+  desc <- DBI::dbGetQuery(sc, glue::glue("DESCRIBE TABLE {tbl}"))
+
+  expect_equal(
+    tibble::as_tibble(desc),
+    tibble::tribble(
+      ~col_name, ~data_type, ~comment,
+      "foo", "int", NA_character_,
+      "bar", "int", NA_character_,
+    )
+  )
+
+  new_table <- tbl(sc, tbl)
+
+  expect_equal(
+    tibble::as_tibble(new_table),
+    tibble::tribble(
+      ~foo, ~bar,
+      1L, 2L
+    )
+  )
+})
+
+test_that("spark_insert_table() inserts into existing table definition, even when overwriting", {
+  skip_databricks_connect()
+  test_requires("dplyr")
+
+  df <- copy_to(sc, data.frame(foo = 1L, bar = 2L))
+
+  tbl <- random_string("test_write_table_new")
+
+  ddl <- glue::glue("CREATE TABLE {tbl} (
+    foo INT
+    ,bar BIGINT
+    )")
+
+  DBI::dbExecute(sc, ddl)
+
+  spark_insert_table(df, tbl, overwrite = TRUE)
+
+  desc <- DBI::dbGetQuery(sc, glue::glue("DESCRIBE TABLE {tbl}"))
+
+  expect_equal(
+    tibble::as_tibble(desc),
+    tibble::tribble(
+      ~col_name, ~data_type, ~comment,
+      "foo", "int", NA_character_,
+      "bar", "bigint", NA_character_,
+    )
+  )
+
+  new_table <- tbl(sc, tbl)
+
+  # bar is returned as a double when the table definition is bigint
+  expect_equal(
+    tibble::as_tibble(new_table),
+    tibble::tribble(
+      ~foo, ~bar,
+      1L, 2
+    )
+  )
+})
+
 test_that("spark_read_csv() can rename columns", {
   csvPath <- get_test_data_path(
     "spark-read-csv-can-rename-columns.csv"

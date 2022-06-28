@@ -53,9 +53,7 @@
 )
 }
 \arguments{
-\item{x}{A pair of lazy data frames backed by database queries.}
-
-\item{y}{A pair of lazy data frames backed by database queries.}
+\item{x, y}{A pair of lazy data frames backed by database queries.}
 
 \item{by}{A character vector of variables to join by.
 
