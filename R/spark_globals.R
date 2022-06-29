@@ -1,5 +1,4 @@
-.globals <- new.env(parent = emptyenv())
-
+# ------------ Init session level variables ----------
 .gls_env <- new.env(parent = emptyenv())
 
 .gls_env$extension_packages <-  character()
@@ -8,7 +7,10 @@
 .gls_env$param_mapping_r_to_s <- NULL
 .gls_env$ml_class_mapping <- NULL
 .gls_env$ml_package_mapping <- NULL
+.gls_env$avail_package_cache <- NULL
+.gls_env$do_spark <- NULL
 
+# ---------- Manage session level variables ----------
 genv_get_extension_packages <- function() {
   .gls_env$extension_packages
 }
@@ -63,4 +65,34 @@ genv_set_ml_package_mapping <- function(x) {
   invisible()
 }
 
+genv_get_avail_package_cache <- function() {
+  .gls_env$avail_package_cache
+}
 
+genv_set_avail_package_cache <- function(x) {
+  .gls_env$avail_package_cache <- x
+  invisible()
+}
+
+genv_get_do_spark <- function(element = NULL) {
+  if(!is.null(element)) {
+    .gls_env$do_spark[[element]]
+  } else {
+    .gls_env$do_spark
+  }
+}
+
+genv_set_do_spark <- function(x) {
+  .gls_env$do_spark <- x
+  invisible()
+}
+
+genv_clear_do_spark_options <- function() {
+  remove(list = ls(.gls_env$do_spark$options), pos = .gls_env$do_spark$options)
+}
+
+genv_set_do_spark_options <- function(optnames, opts) {
+  for (i in seq(along = opts)) {
+    assign(optnames[i], opts[[i]], pos = .gls_env$do_spark$options)
+  }
+}
