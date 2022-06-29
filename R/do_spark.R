@@ -57,7 +57,7 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
     }
 
     # filter out unrecognized options with a warning
-    recog <- optnames %in% .globals$do_spark$valid_options
+    recog <- optnames %in% genv_get_do_spark("valid_options")
     if (any(!recog)) {
       warning(sprintf(
         "ignoring unrecognized doSpark package option(s): %s",
@@ -68,12 +68,10 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
     }
 
     # clear .options from any previous call to registerDoSpark
-    remove(list = ls(.globals$do_spark$options), pos = .globals$do_spark$options)
+    genv_clear_do_spark_options()
 
     # set new options
-    for (i in seq(along = opts)) {
-      assign(optnames[i], opts[[i]], pos = .globals$do_spark$options)
-    }
+    genv_set_do_spark_options(optnames, opts)
   }
 
   serializer <- spark_apply_serializer()
@@ -85,7 +83,7 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
   .doSpark <- function(obj, expr, envir, data) {
     # internal function to compile an expression if possible
     .compile <- function(expr, ...) {
-      if (getRversion() < "2.13.0" || isTRUE(.globals$do_spark$options$nocompile)) {
+      if (getRversion() < "2.13.0" || isTRUE(genv_get_do_spark("options")$nocompile)) {
         expr
       } else {
         compiler::compile(expr, ...)
@@ -188,12 +186,13 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
     )
   }
 
-  .globals$do_spark <- list(
-    # list of valid options for doSpark
-    valid_options = c("nocompile"),
-    # options from the last successful call to registerDoSpark
-    options = new.env(parent = emptyenv())
-  )
+  genv_set_do_spark(
+    list(
+      # list of valid options for doSpark
+      valid_options = c("nocompile"),
+      # options from the last successful call to registerDoSpark
+      options = new.env(parent = emptyenv())
+    ))
 
   .processOpts(...)
   foreach::setDoPar(

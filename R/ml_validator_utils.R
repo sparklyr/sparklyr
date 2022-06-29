@@ -1,9 +1,9 @@
 ml_map_class <- function(x) {
-  rlang::env_get(.globals$ml_class_mapping, x, default = NULL, inherit = TRUE)
+  rlang::env_get(genv_get_ml_class_mapping(), x, default = NULL, inherit = TRUE)
 }
 
 ml_map_package <- function(x) {
-  rlang::env_get(.globals$ml_package_mapping, x, default = NULL, inherit = TRUE)
+  rlang::env_get(genv_get_ml_package_mapping(), x, default = NULL, inherit = TRUE)
 }
 
 ml_get_stage_validator <- function(jobj) {
