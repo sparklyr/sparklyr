@@ -14,13 +14,16 @@
 #'
 #' @export
 register_extension <- function(package) {
-  .globals$extension_packages <- c(.globals$extension_packages, package)
+  genv_set_extension_packages(c(
+    genv_get_extension_packages(),
+    package
+  ))
 }
 
 #' @rdname register_extension
 #' @export
 registered_extensions <- function() {
-  .globals$extension_packages
+  genv_get_extension_packages()
 }
 
 
