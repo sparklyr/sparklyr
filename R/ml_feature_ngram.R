@@ -15,63 +15,28 @@ ft_ngram <- function(x, input_col = NULL, output_col = NULL, n = 2,
   UseMethod("ft_ngram")
 }
 
+ft_ngram_impl <- function(x, input_col = NULL, output_col = NULL, n = 2,
+                          uid = random_string("ngram_"), ...) {
+  ft_process(
+    x = x,
+    uid = uid,
+    spark_class = "org.apache.spark.ml.feature.NGram",
+    r_class = "ml_ngram",
+    invoke_steps = list(
+      setInputCol = cast_nullable_string(input_col),
+      setOutputCol = cast_nullable_string(output_col),
+      setN = cast_scalar_integer(n)
+    )
+  )
+}
+
 ml_ngram <- ft_ngram
 
 #' @export
-ft_ngram.spark_connection <- function(x, input_col = NULL, output_col = NULL, n = 2,
-                                      uid = random_string("ngram_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    n = n,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_ngram()
-
-  jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.NGram",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
-  ) %>%
-    invoke("setN", .args[["n"]])
-
-  new_ml_ngram(jobj)
-}
+ft_ngram.spark_connection <- ft_ngram_impl
 
 #' @export
-ft_ngram.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, n = 2,
-                                 uid = random_string("ngram_"), ...) {
-  stage <- ft_ngram.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    n = n,
-    uid = uid,
-    ...
-  )
-  ml_add_stage(x, stage)
-}
+ft_ngram.ml_pipeline <- ft_ngram_impl
 
 #' @export
-ft_ngram.tbl_spark <- function(x, input_col = NULL, output_col = NULL, n = 2,
-                               uid = random_string("ngram_"), ...) {
-  stage <- ft_ngram.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    n = n,
-    uid = uid,
-    ...
-  )
-  ml_transform(stage, x)
-}
-
-new_ml_ngram <- function(jobj) {
-  new_ml_transformer(jobj, class = "ml_ngram")
-}
-
-validator_ml_ngram <- function(.args) {
-  .args <- validate_args_transformer(.args)
-  .args[["n"]] <- cast_scalar_integer(.args[["n"]])
-  .args
-}
+ft_ngram.tbl_spark <- ft_ngram_impl

@@ -16,59 +16,28 @@ ft_interaction <- function(x, input_cols = NULL, output_col = NULL,
   UseMethod("ft_interaction")
 }
 
+ft_interaction_impl <- function(x, input_cols = NULL, output_col = NULL,
+                                uid = random_string("interaction_"), ...) {
+
+  ft_process(
+    x = x,
+    uid = uid,
+    spark_class = "org.apache.spark.ml.feature.Interaction",
+    r_class = "ml_interaction",
+    invoke_steps = list(
+      setInputCols = cast_nullable_string_list(input_cols),
+      setOutputCol = cast_nullable_string(output_col)
+    )
+  )
+}
+
 ml_interaction <- ft_interaction
 
 #' @export
-ft_interaction.spark_connection <- function(x, input_cols = NULL, output_col = NULL,
-                                            uid = random_string("interaction_"), ...) {
-  .args <- list(
-    input_cols = input_cols,
-    output_col = output_col,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_interaction()
-
-  jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.Interaction",
-    input_cols = .args[["input_cols"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
-  )
-
-  new_ml_interaction(jobj)
-}
+ft_interaction.spark_connection <- ft_interaction_impl
 
 #' @export
-ft_interaction.ml_pipeline <- function(x, input_cols = NULL, output_col = NULL,
-                                       uid = random_string("interaction_"), ...) {
-  stage <- ft_interaction.spark_connection(
-    x = spark_connection(x),
-    input_cols = input_cols,
-    output_col = output_col,
-    uid = uid,
-    ...
-  )
-  ml_add_stage(x, stage)
-}
+ft_interaction.ml_pipeline <- ft_interaction_impl
 
 #' @export
-ft_interaction.tbl_spark <- function(x, input_cols = NULL, output_col = NULL,
-                                     uid = random_string("interaction_"), ...) {
-  stage <- ft_interaction.spark_connection(
-    x = spark_connection(x),
-    input_cols = input_cols,
-    output_col = output_col,
-    uid = uid,
-    ...
-  )
-  ml_transform(stage, x)
-}
-
-new_ml_interaction <- function(jobj) {
-  new_ml_transformer(jobj, class = "ml_interaction")
-}
-
-validator_ml_interaction <- function(.args) {
-  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
-  .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
-  .args
-}
+ft_interaction.tbl_spark <- ft_interaction_impl
