@@ -48,71 +48,30 @@ ft_stop_words_remover <- function(x, input_col = NULL, output_col = NULL, case_s
   UseMethod("ft_stop_words_remover")
 }
 
+ft_stop_words_remover_impl <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
+                                       stop_words = ml_default_stop_words(spark_connection(x), "english"),
+                                       uid = random_string("stop_words_remover_"), ...) {
+  ft_process(
+    x = x,
+    uid = uid,
+    spark_class = "org.apache.spark.ml.feature.StopWordsRemover",
+    r_class = "ml_stop_words_remover",
+    invoke_steps = list(
+      setInputCol = cast_nullable_string(input_col),
+      setOutputCol = cast_nullable_string(output_col),
+      setCaseSensitive = cast_scalar_logical(case_sensitive),
+      setStopWords = cast_character_list(stop_words)
+    )
+  )
+}
+
 ml_stop_words_remover <- ft_stop_words_remover
 
 #' @export
-ft_stop_words_remover.spark_connection <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
-                                                   stop_words = ml_default_stop_words(spark_connection(x), "english"),
-                                                   uid = random_string("stop_words_remover_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    case_sensitive = case_sensitive,
-    stop_words = stop_words,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_stop_words_remover()
-
-  jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.StopWordsRemover",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
-  ) %>%
-    invoke("setCaseSensitive", .args[["case_sensitive"]]) %>%
-    invoke("setStopWords", .args[["stop_words"]])
-
-  new_ml_stop_words_remover(jobj)
-}
+ft_stop_words_remover.spark_connection <- ft_stop_words_remover_impl
+#' @export
+ft_stop_words_remover.ml_pipeline <- ft_stop_words_remover_impl
 
 #' @export
-ft_stop_words_remover.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
-                                              stop_words = ml_default_stop_words(spark_connection(x), "english"),
-                                              uid = random_string("stop_words_remover_"), ...) {
-  stage <- ft_stop_words_remover.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    case_sensitive = case_sensitive,
-    stop_words = stop_words,
-    uid = uid,
-    ...
-  )
-  ml_add_stage(x, stage)
-}
+ft_stop_words_remover.tbl_spark <- ft_stop_words_remover_impl
 
-#' @export
-ft_stop_words_remover.tbl_spark <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
-                                            stop_words = ml_default_stop_words(spark_connection(x), "english"),
-                                            uid = random_string("stop_words_remover_"), ...) {
-  stage <- ft_stop_words_remover.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    case_sensitive = case_sensitive,
-    stop_words = stop_words,
-    uid = uid,
-    ...
-  )
-  ml_transform(stage, x)
-}
-
-new_ml_stop_words_remover <- function(jobj) {
-  new_ml_transformer(jobj, class = "ml_stop_words_remover")
-}
-
-validator_ml_stop_words_remover <- function(.args) {
-  .args <- validate_args_transformer(.args)
-  .args[["case_sensitive"]] <- cast_scalar_logical(.args[["case_sensitive"]])
-  .args[["stop_words"]] <- cast_character_list(.args[["stop_words"]])
-  .args
-}
