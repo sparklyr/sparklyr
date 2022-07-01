@@ -169,7 +169,6 @@ ml_post_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
   }
 }
 
-
 # ----------------------------- FT helpers -------------------------------------
 
 ft_process <- function(x, uid, spark_class, r_class, invoke_steps) {
@@ -214,7 +213,6 @@ param_min_version <- function(x, value, min_version = NULL) {
   }
   ret
 }
-
 
 jobj_process_args <- function(x, uid, spark_class, invoke_steps) {
 
