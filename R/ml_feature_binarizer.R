@@ -27,70 +27,36 @@
 #' }
 #'
 #' @export
-ft_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_string("binarizer_"), ...) {
+ft_binarizer <- function(x, input_col, output_col, threshold = 0,
+                         uid = random_string("binarizer_"), ...) {
   check_dots_used()
   UseMethod("ft_binarizer")
 }
 
 ml_binarizer <- ft_binarizer
 
-#' @export
-ft_binarizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
-                                          uid = random_string("binarizer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    threshold = threshold,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_binarizer()
-
-  jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.Binarizer",
-    input_col = .args[["input_col"]],
-    output_col = .args[["output_col"]],
-    uid = .args[["uid"]]
-  ) %>%
-    invoke("setThreshold", .args[["threshold"]])
-
-  new_ml_binarizer(jobj)
-}
-
-#' @export
-ft_binarizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
-                                     uid = random_string("binarizer_"), ...) {
-  stage <- ft_binarizer.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    threshold = threshold,
+ft_binarizer_impl <- function(x, input_col = NULL, output_col = NULL,
+                              threshold = 0, uid = random_string("binarizer_"),
+                              ...) {
+  ft_process(
+    x = x,
     uid = uid,
-    ...
+    spark_class = "org.apache.spark.ml.feature.Binarizer",
+    r_class = "ml_binarizer",
+    invoke_steps = list(
+      setInputCol = cast_nullable_string(input_col),
+      setOutputCol = cast_nullable_string(output_col),
+      setThreshold = cast_scalar_double(threshold)
+    )
   )
-  ml_add_stage(x, stage)
+
 }
 
 #' @export
-ft_binarizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
-                                   uid = random_string("binarizer_"), ...) {
-  stage <- ft_binarizer.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    threshold = threshold,
-    uid = uid,
-    ...
-  )
-  ml_transform(stage, x)
-}
+ft_binarizer.spark_connection <- ft_binarizer_impl
 
-new_ml_binarizer <- function(jobj) {
-  new_ml_transformer(jobj, class = "ml_binarizer")
-}
+#' @export
+ft_binarizer.ml_pipeline <- ft_binarizer_impl
 
-validator_ml_binarizer <- function(.args) {
-  .args <- validate_args_transformer(.args)
-  .args[["threshold"]] <- cast_scalar_double(.args[["threshold"]])
-  .args
-}
+#' @export
+ft_binarizer.tbl_spark <- ft_binarizer_impl

@@ -114,27 +114,16 @@ make_stats_arranger <- function(fit_intercept) {
 
 ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_function,
                              formula = NULL, response = NULL, features = NULL) {
-  sc <- spark_connection(x)
 
-  args <- list(sc, spark_class)
-  if (!is.null(uid)) {
-    uid <- cast_string(uid)
-    args <- append(args, list(uid))
-  }
-
-  jobj <- do.call(invoke_new, args)
-
-  l_steps <- purrr::imap(invoke_steps, ~ list(.y, .x))
-
-  for(i in seq_along(l_steps)) {
-    if(!is.null(l_steps[[i]][[2]])) {
-      jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
-    }
-  }
+  jobj <- jobj_process_args(x = x,
+                            uid = uid,
+                            spark_class = spark_class,
+                            invoke_steps = invoke_steps
+                            )
 
   new_estimator <- new_ml_estimator(jobj, class = r_class)
 
-  post_ml_obj(
+  ml_post_obj(
     x = x,
     nm = new_estimator,
     ml_function = ml_function,
@@ -146,6 +135,66 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
   )
 
 }
+
+ml_post_obj <- function(x, nm, ml_function, formula, response,
+                        features, features_col, label_col) {
+  UseMethod("ml_post_obj")
+}
+
+ml_post_obj.spark_connection <- function(x, nm, ml_function, formula, response,
+                                         features, features_col, label_col) {
+  nm
+}
+
+ml_post_obj.ml_pipeline <- function(x, nm, ml_function, formula, response,
+                                    features, features_col, label_col) {
+  ml_add_stage(x, nm)
+}
+
+ml_post_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
+                                  features, features_col, label_col) {
+  formula <- ml_standardize_formula(formula, response, features)
+
+  if (is.null(formula)) {
+    ml_fit(nm, x)
+  } else {
+    ml_construct_model_supervised(
+      ml_function,
+      predictor = nm,
+      formula = formula,
+      dataset = x,
+      features_col = features_col,
+      label_col = label_col
+    )
+  }
+}
+
+
+# ----------------------------- FT helpers -------------------------------------
+
+ft_process <- function(x, uid, spark_class, r_class, invoke_steps) {
+
+  jobj <- jobj_process_args(x = x,
+                            uid = uid,
+                            spark_class = spark_class,
+                            invoke_steps = invoke_steps
+                            )
+
+  stage <- new_ml_transformer(jobj, class = r_class)
+
+  ft_post_obj(x = x, stage = stage)
+}
+
+ft_post_obj <- function(x, stage) UseMethod("ft_post_obj")
+
+ft_post_obj.spark_connection <- function(x, stage) stage
+
+ft_post_obj.ml_pipeline <- function(x, stage) ml_add_stage(x, stage)
+
+ft_post_obj.tbl_spark <- function(x, stage) ml_transform(stage, x)
+
+
+# ------------------------- Other utils ----------------------------------------
 
 param_min_version <- function(x, value, min_version = NULL) {
   ret <- value
@@ -166,38 +215,25 @@ param_min_version <- function(x, value, min_version = NULL) {
   ret
 }
 
-# --------------------- Post conversion functions ------------------------------
 
-post_ml_obj <- function(x, nm, ml_function, formula, response,
-                        features, features_col, label_col) {
-  UseMethod("post_ml_obj")
-}
+jobj_process_args <- function(x, uid, spark_class, invoke_steps) {
 
-post_ml_obj.spark_connection <- function(x, nm, ml_function, formula, response,
-                                         features, features_col, label_col) {
-  nm
-}
+  sc <- spark_connection(x)
 
-post_ml_obj.ml_pipeline <- function(x, nm, ml_function, formula, response,
-                                    features, features_col, label_col) {
-  ml_add_stage(x, nm)
-}
-
-post_ml_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
-                                  features, features_col, label_col) {
-  formula <- ml_standardize_formula(formula, response, features)
-
-  if (is.null(formula)) {
-    ml_fit(nm, x)
-  } else {
-    ml_construct_model_supervised(
-      ml_function,
-      predictor = nm,
-      formula = formula,
-      dataset = x,
-      features_col = features_col,
-      label_col = label_col
-    )
+  args <- list(sc, spark_class)
+  if (!is.null(uid)) {
+    uid <- cast_string(uid)
+    args <- append(args, list(uid))
   }
-}
 
+  jobj <- do.call(invoke_new, args)
+
+  l_steps <- purrr::imap(invoke_steps, ~ list(.y, .x))
+
+  for(i in seq_along(l_steps)) {
+    if(!is.null(l_steps[[i]][[2]])) {
+      jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
+    }
+  }
+  jobj
+}
