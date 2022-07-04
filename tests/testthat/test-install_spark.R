@@ -1,5 +1,5 @@
 skip_on_livy()
-skip_on_arrow()
+skip_on_arrow_devel()
 skip_on_windows()
 
 test_that("Installation and uninstallation of Spark work", {
