@@ -1,33 +1,54 @@
 skip_on_livy()
-skip_on_arrow_devel()
+skip_on_arrow()
+skip_on_windows()
 
-sc <- testthat_spark_connection()
+test_that("Installation and uninstallation of Spark work", {
+  test_spark_version <- "1.6.3"
+  test_hadoop_version <- "2.6"
 
+  install_dir <- spark_install_dir()
 
-test_that("Install commands work", {
-  expect_true(spark_can_install())
+  test_folder <- sprintf(
+    "spark-%s-bin-hadoop%s",
+    test_spark_version,
+    test_hadoop_version
+    )
 
-  spark_version <- as.character(spark_version(sc))
+  install_msg <- sprintf(
+    "Installing Spark %s for Hadoop %s or later.",
+    test_spark_version,
+    test_hadoop_version
+    )
 
-  expect_equal(
-    spark_install_version_expand(spark_version, TRUE),
-    spark_version
+  expect_message(
+    spark_install(
+      version = test_spark_version,
+      hadoop_version = test_hadoop_version,
+      verbose = TRUE
+    ),
+    install_msg
   )
 
-  expect_equal(
-    spark_install_version_expand(spark_version, FALSE),
-    spark_version
+  expect_true(
+    file.exists(file.path(install_dir, test_folder))
   )
 
-  expect_equal(
-    names(spark_default_version()),
-    c("spark", "hadoop")
+  uninstall_msg <- sprintf(
+    "spark-%s-bin-hadoop%s successfully uninstalled.",
+    test_spark_version,
+    test_hadoop_version
   )
 
-  spark_home <- Sys.getenv("SPARK_HOME")
-  if(spark_home == "") spark_home <- NULL
-  expect_equal(spark_home(), spark_home)
+  expect_message(
+    spark_uninstall(
+      version = test_spark_version,
+      hadoop_version = test_hadoop_version
+    ),
+    uninstall_msg
+  )
+
+  expect_false(
+    file.exists(file.path(install_dir, test_folder))
+  )
+
 })
-
-
-

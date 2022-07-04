@@ -326,7 +326,7 @@ spark_uninstall <- function(version, hadoop_version) {
   if (any(dir.exists(sparkDir))) {
     unlink(sparkDir, recursive = TRUE)
 
-    if (!dir.exists(sparkDir)) {
+    if (all(!(dir.exists(sparkDir)))) {
       message(info$componentName, " successfully uninstalled.")
     } else {
       stop("Failed to completely uninstall ", info$componentName)
