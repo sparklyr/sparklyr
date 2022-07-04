@@ -8,12 +8,6 @@ spark_can_install <- function() {
   }
 }
 
-# Check if the given Spark version is available in this system
-spark_install_available <- function(version, hadoop_version) {
-  installInfo <- spark_versions_info(version, hadoop_version)
-  dir.exists(installInfo$sparkVersionDir)
-}
-
 spark_install_version_expand <- function(version, installed_only) {
   if (installed_only) {
     versions <- spark_installed_versions()$spark
