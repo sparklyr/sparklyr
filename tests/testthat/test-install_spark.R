@@ -33,6 +33,21 @@ test_that("Installation and uninstallation of Spark work", {
     file.exists(file.path(install_dir, test_folder))
   )
 
+  error_msg <- sprintf(
+    "Spark %s for Hadoop %s or later already installed.",
+    test_spark_version,
+    test_hadoop_version
+  )
+
+  expect_message(
+    spark_install(
+      version = test_spark_version,
+      hadoop_version = test_hadoop_version,
+      verbose = TRUE
+    ),
+    error_msg
+  )
+
   uninstall_msg <- sprintf(
     "spark-%s-bin-hadoop%s successfully uninstalled.",
     test_spark_version,
@@ -52,3 +67,12 @@ test_that("Installation and uninstallation of Spark work", {
   )
 
 })
+
+
+test_that("Finding invalid Spark version fails", {
+  expect_warning(
+    spark_install_find(version = "1.1")
+  )
+})
+
+
