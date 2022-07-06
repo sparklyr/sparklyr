@@ -1,8 +1,12 @@
 
 test_that("jar file is created", {
-  s_version <- Sys.getenv("SPARK_VERSION", unset = NA)
+  #s_version <- Sys.getenv("SPARK_VERSION", unset = NA)
 
-  if(is.na(s_version)) s_version = "3.3.0"
+  #if(is.na(s_version)) s_version = "3.3.0"
+
+  number_of_jars <- 7
+
+  s_version <- testthat_spark_env_version()
 
   major_v <- strsplit(s_version, "\\.")[[1]][[1]]
 
@@ -28,5 +32,19 @@ test_that("jar file is created", {
 
   expect_true(
     file.exists(file.path(jar_folder, jar_name))
+  )
+
+  expect_length(
+    spark_default_compilation_spec(),
+    number_of_jars
+  )
+
+  expect_silent(
+    download_scalac()
+  )
+
+  expect_is(
+    make_version_filter(s_version),
+    "function"
   )
 })

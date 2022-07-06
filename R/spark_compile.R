@@ -345,6 +345,8 @@ download_scalac <- function(dest_path = NULL) {
     dir.create(dest_path, recursive = TRUE)
   }
 
+  ext <- ifelse(os_is_windows(), "zip", "tgz")
+
   download_urls <-  paste0(
     c(
       "http://downloads.lightbend.com/scala/2.12.10/scala-2.12.10",
@@ -352,7 +354,7 @@ download_scalac <- function(dest_path = NULL) {
       "http://downloads.lightbend.com/scala/2.10.6/scala-2.10.6"
     ),
     ".",
-    if (os_is_windows()) "zip" else "tgz"
+    ext
   )
 
   lapply(download_urls, function(download_url) {
@@ -490,15 +492,8 @@ make_version_filter <- function(version_upper) {
 
 #' list all sparklyr-*.jar files that have been built
 list_sparklyr_jars <- function() {
-  pkg_root <- rprojroot::find_package_root_file()
-
-  sparklyr_jars <- normalizePath(
-    dir(
-      file.path(pkg_root, "inst", "java"),
-      full.names = TRUE,
-      pattern = "sparklyr-.+\\.jar"
-    )
-  )
-
-  sparklyr_jars
+  normalizePath(dir(
+      file.path(rprojroot::find_package_root_file(), "inst", "java"),
+      full.names = TRUE, pattern = "sparklyr-.+\\.jar"
+    ))
 }
