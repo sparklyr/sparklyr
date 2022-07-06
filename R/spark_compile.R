@@ -44,7 +44,14 @@ spark_compile <- function(jar_name,
 
   root <- rprojroot::find_package_root_file()
 
-  java_path <- file.path(root, "inst/java")
+  env_jar_path <- Sys.getenv("R_SPARKINSTALL_COMPILE_JAR_PATH", unset = NA)
+  if(is.na(env_jar_path)) {
+    java_path <- file.path(root, "inst/java")
+  } else {
+    if(!dir.exists(env_jar_path)) dir.create(env_jar_path)
+    java_path <- env_jar_path
+  }
+
   jar_path <- file.path(java_path, jar_name)
 
   scala_path <- file.path(root, "java")
@@ -286,13 +293,15 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name(),
 
   spec_list <- list(
     list(spark = "1.5.2", scala = "2.10", remove_srcs = TRUE),
-    list(spark = "1.6.0", scala = "2.10", version_filter = "1.6.1"),
+    list(spark = "1.6.0", scala = "2.10", scala_filter = "1.6.1"),
     list(spark = "2.0.0", scala = "2.11"),
     list(spark = "2.3.0", scala = "2.11"),
     list(spark = "2.4.0", scala = "2.11"),
     list(spark = "2.4.0", scala = "2.12"),
-    list(spark = "3.0.0", scala = "2.12")
+    list(spark = "3.0.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
   )
+
+  jar_location <- find_jar()
 
   lapply(
     spec_list,
@@ -301,10 +310,12 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name(),
         spark_version = x$spark,
         scalac_path = find_scalac(x$scala, locations),
         jar_name = sprintf("%s-%s-%s.jar", pkg, substr(x$spark, 1, 3), x$scala),
-        jar_path = find_jar(),
+        jar_path = jar_location,
         scala_filter = make_version_filter(x$spark)
       )
-      if(!is.null(x$version_filter)) args$scala_filter <- make_version_filter(x$version_filter)
+
+      if(!is.null(x$jar_name)) args$jar_name <- x$jar_name
+      if(!is.null(x$scala_filter)) args$scala_filter <- make_version_filter(x$scala_filter)
       if(!is.null(x$remove_srcs)) args <- c(args, list(embedded_srcs = c()))
       do.call(spark_compilation_spec, args)
     }
@@ -334,12 +345,14 @@ download_scalac <- function(dest_path = NULL) {
     dir.create(dest_path, recursive = TRUE)
   }
 
-  ext <- if (os_is_windows()) "zip" else "tgz"
-
-  download_urls <- c(
-    paste0("http://downloads.lightbend.com/scala/2.12.10/scala-2.12.10.", ext),
-    paste0("http://downloads.lightbend.com/scala/2.11.8/scala-2.11.8.", ext),
-    paste0("http://downloads.lightbend.com/scala/2.10.6/scala-2.10.6.", ext)
+  download_urls <-  paste0(
+    c(
+      "http://downloads.lightbend.com/scala/2.12.10/scala-2.12.10",
+      "http://downloads.lightbend.com/scala/2.11.8/scala-2.11.8",
+      "http://downloads.lightbend.com/scala/2.10.6/scala-2.10.6"
+    ),
+    ".",
+    if (os_is_windows()) "zip" else "tgz"
   )
 
   lapply(download_urls, function(download_url) {
