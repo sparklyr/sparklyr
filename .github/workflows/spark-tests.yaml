@@ -94,7 +94,7 @@ jobs:
           key: scala-1
 
       - name: Install Scala (via sparklyr)
-        if: steps.cache-scala.outputs.cache-hit != 'true')
+        if: steps.cache-scala.outputs.cache-hit != 'true'
         run: |
           devtools::load_all()
           download_scalac()
