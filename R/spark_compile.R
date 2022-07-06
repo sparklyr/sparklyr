@@ -1,3 +1,33 @@
+sparklyr_jar_spec_list <- function() {
+  list(
+    list(spark = "1.5.2", scala = "2.10", remove_srcs = TRUE),
+    list(spark = "1.6.0", scala = "2.10", scala_filter = "1.6.1"),
+    list(spark = "2.0.0", scala = "2.11"),
+    list(spark = "2.3.0", scala = "2.11"),
+    list(spark = "2.4.0", scala = "2.11"),
+    list(spark = "2.4.0", scala = "2.12"),
+    list(spark = "3.0.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
+  )
+}
+
+sparklyr_jar_verify_spark <- function(install = TRUE) {
+  spec_list <- sparklyr_jar_spec_list()
+  installed_vers <- spark_installed_versions()
+  invisible(
+    lapply(
+      spec_list,
+      function(x){
+        if(!(x$spark %in% installed_vers$spark)) {
+          message("- Spark version ", x$spark, " - Not found")
+          if(install) spark_install(x$spark)
+        } else {
+          message("- Spark version ", x$spark, " - Ok")
+        }
+      }
+    )
+  )
+}
+
 #' Compile Scala sources into a Java Archive
 #'
 #' Given a set of \code{scala} source files, compile them
@@ -291,15 +321,7 @@ find_jar <- function() {
 spark_default_compilation_spec <- function(pkg = infer_active_package_name(),
                                            locations = NULL) {
 
-  spec_list <- list(
-    list(spark = "1.5.2", scala = "2.10", remove_srcs = TRUE),
-    list(spark = "1.6.0", scala = "2.10", scala_filter = "1.6.1"),
-    list(spark = "2.0.0", scala = "2.11"),
-    list(spark = "2.3.0", scala = "2.11"),
-    list(spark = "2.4.0", scala = "2.11"),
-    list(spark = "2.4.0", scala = "2.12"),
-    list(spark = "3.0.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
-  )
+  spec_list <- sparklyr_jar_spec_list()
 
   jar_location <- find_jar()
 
