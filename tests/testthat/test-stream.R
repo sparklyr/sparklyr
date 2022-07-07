@@ -13,17 +13,20 @@ test_that("stream test generates file", {
   on.exit(unlink("source", recursive = TRUE))
 })
 
-iris_in <- paste0("file://", file.path(getwd(), "iris-in"))
-iris_out_dir <- file.path(getwd(), "iris-out")
+base_dir <- tempdir()
+iris_in_dir <- file.path(base_dir, "iris-in")
+iris_in <- paste0("file://", iris_in_dir)
+iris_out_dir <- file.path(base_dir, "iris-out")
 iris_out <- paste0("file://", iris_out_dir)
 
+if (!dir.exists(iris_in_dir)) dir.create(iris_in_dir)
+
 test_stream <- function(description, test) {
-  if (!dir.exists("iris-in")) dir.create("iris-in")
-  if (dir.exists("iris-out")) unlink("iris-out", recursive = TRUE)
+  if (dir.exists(iris_out_dir)) unlink(iris_out_dir, recursive = TRUE)
 
-  write.table(iris, file.path("iris-in", "iris.csv"), row.names = FALSE, sep = ";")
+  write.table(iris, file.path(iris_in_dir, "iris.csv"), row.names = FALSE, sep = ";")
 
-  on.exit(unlink("iris-", recursive = TRUE))
+  on.exit(unlink(iris_out_dir, recursive = TRUE))
 
   test_that(description, test)
 }
@@ -78,11 +81,13 @@ test_stream("stream can read and write from text", {
 test_stream("stream can read and write from json", {
   test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
 
-  stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
-    stream_write_json("json-in")
+  json_in <- file.path(base_dir, "json-in")
 
-  stream_out <- stream_read_json(sc, "json-in") %>%
-    stream_write_csv(iris_out, delimiter = "|")
+  stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    stream_write_json(json_in)
+
+  stream_out <- stream_read_json(sc, json_in) %>%
+    stream_write_csv(iris_out)
 
   stream_stop(stream_in)
   stream_stop(stream_out)
@@ -93,10 +98,12 @@ test_stream("stream can read and write from json", {
 test_stream("stream can read and write from parquet", {
   test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
 
-  stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
-    stream_write_parquet("parquet-in")
+  parquet_in <- file.path(base_dir, "parquet-in")
 
-  stream_out <- stream_read_parquet(sc, "parquet-in") %>%
+  stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    stream_write_parquet(parquet_in)
+
+  stream_out <- stream_read_parquet(sc, parquet_in) %>%
     stream_write_csv(iris_out, delimiter = "|")
 
   stream_stop(stream_in)
@@ -192,6 +199,19 @@ test_stream("Adds watermark step", {
     stream_write_memory("iris_stream")
 
   stream_stop(stream)
+
+  succeed()
+})
+
+test_stream("stream can read and write from Delta", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+
+  delta_in <- file.path(base_dir, "delta-in")
+
+  stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    stream_write_delta(delta_in)
+
+  stream_stop(stream_in)
 
   succeed()
 })
