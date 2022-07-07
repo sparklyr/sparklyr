@@ -1,10 +1,9 @@
 
 test_that("jar file is created", {
-  #s_version <- Sys.getenv("SPARK_VERSION", unset = NA)
-
-  #if(is.na(s_version)) s_version = "3.3.0"
 
   number_of_jars <- 7
+
+  jar_folder <- path.expand("~/testjar")
 
   s_version <- testthat_spark_env_version()
 
@@ -23,8 +22,6 @@ test_that("jar file is created", {
     jar_path = find_jar(),
     scala_filter = make_version_filter(s_version)
   )
-
-  jar_folder <- path.expand("~/testjar")
 
   Sys.setenv("R_SPARKINSTALL_COMPILE_JAR_PATH" = jar_folder)
 

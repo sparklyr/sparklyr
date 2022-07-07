@@ -90,8 +90,8 @@ jobs:
         id: cache-scala
         uses: actions/cache@v2
         with:
-          path: /home/runner/.cache/scala/
-          key: scala-1
+          path: /home/runner/scala/
+          key: scala-2
 
       - name: Install Scala (via sparklyr)
         if: steps.cache-scala.outputs.cache-hit != 'true'
