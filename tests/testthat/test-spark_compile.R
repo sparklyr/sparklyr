@@ -31,8 +31,13 @@ test_that("jar file is created", {
     file.exists(file.path(jar_folder, jar_name))
   )
 
+  expect_message(
+    sparklyr_jar_verify_spark(),
+    "- Spark version"
+    )
+
   expect_length(
-    spark_default_compilation_spec(),
+    sparklyr_jar_spec_list(),
     number_of_jars
   )
 
