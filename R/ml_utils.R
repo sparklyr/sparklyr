@@ -169,6 +169,39 @@ ml_post_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
   }
 }
 
+# -------------------------- Estimator helpers ---------------------------------
+
+est_process_model <- function(x, uid, spark_class, r_class, invoke_steps) {
+
+  jobj <- jobj_process_args(x = x,
+                            uid = uid,
+                            spark_class = spark_class,
+                            invoke_steps = invoke_steps
+  )
+
+  est_post_obj(
+    x = x,
+    stage = new_ml_estimator(jobj, class = r_class)
+  )
+
+}
+
+est_post_obj <- function(x, stage) {
+  UseMethod("est_post_obj")
+}
+
+est_post_obj.spark_connection <- function(x, stage) stage
+
+est_post_obj.ml_pipeline <- function(x, stage) ml_add_stage(x, stage)
+
+est_post_obj.tbl_spark <- function(x, stage)  {
+  if (is_ml_transformer(stage)) {
+    ml_transform(stage, x)
+  } else {
+    ml_fit_and_transform(stage, x)
+  }
+}
+
 # ----------------------------- FT helpers -------------------------------------
 
 ft_process <- function(x, uid, spark_class, r_class, invoke_steps) {
