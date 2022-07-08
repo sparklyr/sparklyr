@@ -40,7 +40,7 @@ ft_chisq_selector_impl <- function(x, features_col = "features", output_col = NU
   selector_type <- param_min_version(x, selector_type, "2.1.0")
   fwe <- param_min_version(x, fwe, "2.2.0")
 
-  est_process_model(
+  estimator_process(
     x = x,
     uid = uid,
     spark_class = "org.apache.spark.ml.feature.ChiSqSelector",

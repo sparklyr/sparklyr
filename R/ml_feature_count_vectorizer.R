@@ -27,104 +27,42 @@
 #'
 #' @export
 ft_count_vectorizer <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
-                                min_df = 1, min_tf = 1,
-                                vocab_size = 2^18,
+                                min_df = 1, min_tf = 1, vocab_size = 2^18,
                                 uid = random_string("count_vectorizer_"), ...) {
   UseMethod("ft_count_vectorizer")
 }
 
+ft_count_vectorizer_impl <- function(x, input_col = NULL, output_col = NULL,
+                                     binary = FALSE, min_df = 1, min_tf = 1,
+                                     vocab_size = 2^18, uid = random_string("count_vectorizer_"),
+                                     ...) {
+  estimator_process(
+    x = x,
+    uid = uid,
+    spark_class = "org.apache.spark.ml.feature.CountVectorizer",
+    r_class = "ml_count_vectorizer",
+    invoke_steps = list(
+      setInputCol = cast_nullable_string(input_col),
+      setOutputCol = cast_nullable_string(output_col),
+      setBinary = cast_scalar_logical(binary),
+      setMinDF = cast_scalar_double(min_df),
+      setMinTF = cast_scalar_double(min_tf),
+      setVocabSize = cast_scalar_integer(vocab_size)
+      )
+  )
+}
+
+
 ml_count_vectorizer <- ft_count_vectorizer
 
 #' @export
-ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                                 binary = FALSE, min_df = 1, min_tf = 1,
-                                                 vocab_size = 2^18,
-                                                 uid = random_string("count_vectorizer_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    binary = binary,
-    min_df = min_df,
-    min_tf = min_tf,
-    vocab_size = vocab_size,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_count_vectorizer()
-
-  estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.CountVectorizer",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
-  ) %>%
-    (
-      function(obj) {
-        do.call(
-          invoke,
-          c(obj, "%>%", Filter(
-            function(x) !is.null(x),
-            list(
-              jobj_set_param_helper(obj, "setBinary", .args[["binary"]], "2.0.0", FALSE),
-              list("setMinDF", .args[["min_df"]]),
-              list("setMinTF", .args[["min_tf"]]),
-              list("setVocabSize", .args[["vocab_size"]])
-            )
-          ))
-        )
-      }) %>%
-    new_ml_count_vectorizer()
-
-  estimator
-}
+ft_count_vectorizer.spark_connection <- ft_count_vectorizer_impl
 
 #' @export
-ft_count_vectorizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                            binary = FALSE, min_df = 1, min_tf = 1,
-                                            vocab_size = 2^18,
-                                            uid = random_string("count_vectorizer_"), ...) {
-  stage <- ft_count_vectorizer.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    binary = binary,
-    min_df = min_df,
-    min_tf = min_tf,
-    vocab_size = vocab_size,
-    uid = uid,
-    ...
-  )
-
-  ml_add_stage(x, stage)
-}
+ft_count_vectorizer.ml_pipeline <- ft_count_vectorizer_impl
 
 #' @export
-ft_count_vectorizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                          binary = FALSE, min_df = 1, min_tf = 1,
-                                          vocab_size = 2^18,
-                                          uid = random_string("count_vectorizer_"), ...) {
-  stage <- ft_count_vectorizer.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    binary = binary,
-    min_df = min_df,
-    min_tf = min_tf,
-    vocab_size = vocab_size,
-    uid = uid,
-    ...
-  )
-
-  if (is_ml_transformer(stage)) {
-    ml_transform(stage, x)
-  } else {
-    ml_fit_and_transform(stage, x)
-  }
-}
-
-# Constructors
-
-new_ml_count_vectorizer <- function(jobj) {
-  new_ml_estimator(jobj, class = "ml_count_vectorizer")
-}
+ft_count_vectorizer.tbl_spark <- ft_count_vectorizer_impl
 
 new_ml_count_vectorizer_model <- function(jobj) {
   new_ml_transformer(jobj,
@@ -139,14 +77,4 @@ new_ml_count_vectorizer_model <- function(jobj) {
 #' @export
 ml_vocabulary <- function(model) {
   unlist(model$vocabulary)
-}
-
-validator_ml_count_vectorizer <- function(.args) {
-  .args <- validate_args_transformer(.args)
-
-  .args[["binary"]] <- cast_scalar_logical(.args[["binary"]])
-  .args[["min_df"]] <- cast_scalar_double(.args[["min_df"]])
-  .args[["min_tf"]] <- cast_scalar_double(.args[["min_tf"]])
-  .args[["vocab_size"]] <- cast_scalar_integer(.args[["vocab_size"]])
-  .args
 }

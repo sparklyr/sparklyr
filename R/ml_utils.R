@@ -171,7 +171,7 @@ ml_post_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
 
 # -------------------------- Estimator helpers ---------------------------------
 
-est_process_model <- function(x, uid, spark_class, r_class, invoke_steps) {
+estimator_process <- function(x, uid, spark_class, r_class, invoke_steps) {
 
   jobj <- jobj_process_args(x = x,
                             uid = uid,
