@@ -14,73 +14,32 @@ ft_idf <- function(x, input_col = NULL, output_col = NULL,
   UseMethod("ft_idf")
 }
 
+ft_idf_impl <- function(x, input_col = NULL, output_col = NULL,
+                        min_doc_freq = 0, uid = random_string("idf_"), ...) {
+  estimator_process(
+    x = x,
+    uid = uid,
+    spark_class = "org.apache.spark.ml.feature.IDF",
+    r_class = "ml_idf_model",
+    invoke_steps = list(
+      setInputCol = cast_nullable_string(input_col),
+      setOutputCol = cast_nullable_string(output_col),
+      setMinDocFreq = cast_scalar_integer(min_doc_freq)
+    )
+  )
+}
+
 ml_idf <- ft_idf
 
 #' @export
-ft_idf.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                    min_doc_freq = 0, uid = random_string("idf_"), ...) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    min_doc_freq = min_doc_freq,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_idf()
-
-  estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.IDF",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
-  ) %>%
-    invoke("setMinDocFreq", .args[["min_doc_freq"]]) %>%
-    new_ml_idf()
-
-  estimator
-}
+ft_idf.spark_connection <- ft_idf_impl
 
 #' @export
-ft_idf.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                               min_doc_freq = 0, uid = random_string("idf_"), ...) {
-  stage <- ft_idf.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    min_doc_freq = min_doc_freq,
-    uid = uid,
-    ...
-  )
-  ml_add_stage(x, stage)
-}
+ft_idf.ml_pipeline <- ft_idf_impl
 
 #' @export
-ft_idf.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                             min_doc_freq = 0, uid = random_string("idf_"), ...) {
-  stage <- ft_idf.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    min_doc_freq = min_doc_freq,
-    uid = uid,
-    ...
-  )
-
-  if (is_ml_transformer(stage)) {
-    ml_transform(stage, x)
-  } else {
-    ml_fit_and_transform(stage, x)
-  }
-}
-
-new_ml_idf <- function(jobj) {
-  new_ml_estimator(jobj, class = "ml_idf")
-}
+ft_idf.tbl_spark <- ft_idf_impl
 
 new_ml_idf_model <- function(jobj) {
   new_ml_transformer(jobj, class = "ml_idf_model")
-}
-
-validator_ml_idf <- function(.args) {
-  .args <- validate_args_transformer(.args)
-  .args[["min_doc_freq"]] <- cast_scalar_integer(.args[["min_doc_freq"]])
-  .args
 }
