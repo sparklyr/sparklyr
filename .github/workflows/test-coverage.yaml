@@ -12,7 +12,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       CODE_COVERAGE: 'true'
-      ARROW_VERSION: ''
+      ARROW_VERSION: 'release'
 
     steps:
       - uses: actions/checkout@v2

@@ -31,6 +31,17 @@ test_stream <- function(description, test) {
   test_that(description, test)
 }
 
+test_stream("Stream lag works", {
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";")
+  stream_lag(
+    x = stream,
+    cols = c(previous = Species - 1)
+    )
+
+  succeed()
+})
+
+
 test_stream("csv stream can be filtered with dplyr", {
   test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
   test_requires("dplyr")
@@ -43,6 +54,16 @@ test_stream("csv stream can be filtered with dplyr", {
 
   expect_equal(substr(capture.output(stream)[1], 1, 6), "Stream")
   expect_is(stream_id(stream), "character")
+
+  succeed()
+})
+
+test_stream("SDF collect works", {
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";")
+
+  df <- sdf_collect_stream(stream)
+
+  expect_is(df, "data.frame")
 
   succeed()
 })
@@ -204,7 +225,7 @@ test_stream("Adds watermark step", {
 })
 
 test_stream("stream can read and write from Delta", {
-  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+  test_requires_version("3.0.0", "Spark streaming requires Spark 3.0 or above")
 
   delta_in <- file.path(base_dir, "delta-in")
 
@@ -214,4 +235,11 @@ test_stream("stream can read and write from Delta", {
   stream_stop(stream_in)
 
   succeed()
+})
+
+test_that("to_milliseconds() responds as expected", {
+  expect_equal(to_milliseconds("1 second"), 1000)
+  expect_equal(to_milliseconds(1000), 1000)
+  expect_error(to_milliseconds("zzz"))
+  expect_error(to_milliseconds(list()))
 })
