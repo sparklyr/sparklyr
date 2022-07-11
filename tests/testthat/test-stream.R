@@ -60,7 +60,6 @@ test_stream("Stream lag works", {
       x = stream,
       cols = c(previous = Species ~ 1)
     ) %>%
-      head() %>%
       collect(),
     "data.frame"
   )
