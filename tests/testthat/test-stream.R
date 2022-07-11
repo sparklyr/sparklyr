@@ -32,11 +32,45 @@ test_stream <- function(description, test) {
 }
 
 test_stream("Stream lag works", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+  test_requires("dplyr")
+
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    filter(Species == "virginica") %>%
+    stream_write_csv(iris_out)
+
+  id <- stream_id(stream)
+
+  sf <- stream_find(sc, id)
+
+  succeed()
+
+  })
+
   stream <- stream_read_csv(sc, iris_in, delimiter = ";")
-  stream_lag(
-    x = stream,
-    cols = c(previous = Species - 1)
+
+test_stream("Stream lag works", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+  test_requires("dplyr")
+
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";")
+
+  expect_is(
+    stream_lag(
+      x = stream,
+      cols = c(previous = Species ~ 1)
+    ) %>%
+      head() %>%
+      collect(),
+    "data.frame"
+  )
+
+  expect_error(
+    stream_lag(
+      x = stream,
+      cols = "no-a-column"
     )
+  )
 
   succeed()
 })

@@ -408,9 +408,9 @@ to_milliseconds <- function(dur) {
 #' @export
 stream_lag <- function(x, cols, thresholds = NULL) {
   sc <- spark_connection(x)
-  if (spark_version(sc) < "2.0.0") {
-    stop("`stream_lag()` requires Spark 2.0.0 or above")
-  }
+
+  spark_require_version(sc, "2.0.0")
+
   if (!sdf_is_streaming(x)) {
     stop("expected a streaming dataframe as input")
   }
