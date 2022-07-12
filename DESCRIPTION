@@ -175,7 +175,6 @@ Collate:
     'dplyr_do.R'
     'dplyr_hof.R'
     'dplyr_join.R'
-    'partial_eval.R'
     'dplyr_spark_connection.R'
     'dplyr_spark_data.R'
     'prng_utils.R'

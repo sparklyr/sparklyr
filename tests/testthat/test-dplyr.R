@@ -583,3 +583,28 @@ test_that("tbl_spark prints", {
     "# Source: spark<iris> [?? x 5]"
   )
 })
+
+
+test_that("pmin and pmax work", {
+  pmin_df <- data.frame(x = 11:20, y = 1:10)
+
+  tbl_pmin_df <- sdf_copy_to(sc, pmin_df, overwrite = TRUE)
+
+  remote_p <- tbl_pmin_df %>%
+    mutate(
+      p_min = pmin(x, y),
+      p_max = pmax(x, y)
+    ) %>%
+    collect()
+
+  local_p <- pmin_df %>%
+    mutate(
+      p_min = pmin(x, y),
+      p_max = pmax(x, y)
+    )
+
+  expect_true(
+    all(remote_p == local_p)
+  )
+
+})

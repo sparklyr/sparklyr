@@ -1,6 +1,5 @@
 #' @include dbplyr_utils.R
 #' @include dplyr_hof.R
-#' @include partial_eval.R
 #' @include spark_sql.R
 #' @include utils.R
 NULL
