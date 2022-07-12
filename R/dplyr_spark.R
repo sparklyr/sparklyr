@@ -23,39 +23,13 @@ spark_connection.src_spark <- function(x, ...) {
   x$con
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, db_desc)
-#'   S3method(db_desc, src_spark)
-#' } else {
-#'   importFrom(dbplyr, db_connection_describe)
-#'   S3method(db_connection_describe, src_spark)
-#' }
 
-db_desc.src_spark <- function(x) {
-  spark_db_desc(x)
-}
-
+#' @importFrom dbplyr db_connection_describe
 db_connection_describe.src_spark <- function(con) {
   spark_db_desc(con)
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, db_explain)
-#'   S3method(db_explain, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_query_explain)
-#'   S3method(sql_query_explain, spark_connection)
-#' }
-
-db_explain.spark_connection <- function(con, sql, ...) {
-  explain_sql <- spark_sql_query_explain(con, sql, ...)
-  explained <- DBI::dbGetQuery(con, explain_sql)
-
-  message(explained$plan)
-}
-
+#' @importFrom dbplyr sql_query_explain
 sql_query_explain.spark_connection <- function(con, sql, ...) {
   spark_sql_query_explain(con, sql, ...)
 }
@@ -256,40 +230,12 @@ compute.tbl_spark <- function(x, ...) {
   out
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, db_save_query)
-#'   S3method(db_save_query, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_query_save)
-#'   S3method(sql_query_save, spark_connection)
-#' }
-
-db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
-  create_temp_view_sql <- spark_sql_query_save(con, sql, name, temporary, ...)
-  DBI::dbGetQuery(con, create_temp_view_sql)
-
-  # dbplyr expects db_save_query to retrieve the table name
-  name
-}
-
+#' @importFrom dbplyr sql_query_save
 sql_query_save.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
   spark_sql_query_save(con, sql, name, temporary, ...)
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, db_analyze)
-#'   S3method(db_analyze, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_table_analyze)
-#'   S3method(sql_table_analyze, spark_connection)
-#' }
-
-db_analyze.spark_connection <- function(con, table, ...) {
-  spark_db_analyze(con, table, ...)
-}
-
+#' @importFrom dbplyr sql_table_analyze
 sql_table_analyze.spark_connection <- function(con, table, ...) {
   spark_db_analyze(con, table, ...)
 }

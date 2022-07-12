@@ -113,19 +113,8 @@ build_sql_if_compare <- function(..., con, compare) {
   build_sql_if_parts(conditions, args)
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, sql_translate_env)
-#'   S3method(sql_translate_env, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_translation)
-#'   S3method(sql_translation, spark_connection)
-#' }
 
-sql_translate_env.spark_connection <- function(con) {
-  spark_sql_translation(con)
-}
-
+#' @importFrom dbplyr sql_translation
 sql_translation.spark_connection <- function(con) {
   spark_sql_translation(con)
 }
@@ -454,27 +443,7 @@ build_sql_fn <- function(fn) {
   )
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, sql_set_op)
-#'   S3method(sql_set_op, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_query_set_op)
-#'   S3method(sql_query_set_op, spark_connection)
-#' }
-
-#' @keywords internal
-sql_set_op.spark_connection <- function(con, x, y, method) {
-  sql <- spark_sql_set_op(con, x, y, method)
-
-  if (!is.null(sql)) {
-    sql
-  } else {
-    class(con) <- class(con)[class(con) != "spark_connection"]
-    NextMethod()
-  }
-}
-
+#' @importFrom dbplyr sql_query_set_op
 #' @keywords internal
 sql_query_set_op.spark_connection <- function(con, x, y, method, ..., all = FALSE) {
   sql <- spark_sql_set_op(con, x, y, method)
@@ -487,20 +456,7 @@ sql_query_set_op.spark_connection <- function(con, x, y, method, ..., all = FALS
   }
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, db_query_fields)
-#'   S3method(db_query_fields, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_query_fields)
-#'   S3method(sql_query_fields, spark_connection)
-#' }
-
-#' @keywords internal
-db_query_fields.spark_connection <- function(con, sql, ...) {
-  spark_db_query_fields(con, sql)
-}
-
+#' @importFrom dbplyr sql_query_fields
 #' @keywords internal
 sql_query_fields.spark_connection <- function(con, sql, ...) {
   spark_sql_query_fields(con, sql, ...)
