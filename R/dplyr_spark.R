@@ -341,26 +341,6 @@ sdf_remote_name.tbl_spark <- function(x) {
 }
 
 #' @export
-sdf_remote_name.op_base <- function(x) {
-  x$x
-}
-
-#' @export
-sdf_remote_name.op_group_by <- function(x) {
-  sdf_remote_name(x$x)
-}
-
-#' @export
-sdf_remote_name.op_ungroup <- function(x) {
-  sdf_remote_name(x$x)
-}
-
-#' @export
-sdf_remote_name.op_order <- function(x) {
-  sdf_remote_name(x$x)
-}
-
-#' @export
 sdf_remote_name.default <- function(x) {
   return()
 }
