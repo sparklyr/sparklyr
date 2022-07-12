@@ -76,7 +76,6 @@ Depends:
 Imports:
     assertthat,
     base64enc,
-    blob,
     config (>= 0.2),
     DBI (>= 0.6-1),
     dbplyr (>= 2.1.1),

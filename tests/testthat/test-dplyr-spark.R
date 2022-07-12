@@ -26,9 +26,15 @@ test_that("Connection functions work", {
     "# Source: spark<src_mtcars> [?? x 11]"
   )
 
-  expect_output(
-    print.src_spark(sc)
-  )
+  if(using_livy()) {
+    expect_error(
+      print.src_spark(sc)
+    )
+  } else {
+    expect_output(
+      print.src_spark(sc)
+    )
+  }
 
   expect_silent(
     db_save_query.spark_connection(
