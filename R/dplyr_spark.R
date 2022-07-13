@@ -25,11 +25,13 @@ spark_connection.src_spark <- function(x, ...) {
 
 
 #' @importFrom dbplyr db_connection_describe
+#' @export
 db_connection_describe.src_spark <- function(con) {
   spark_db_desc(con)
 }
 
 #' @importFrom dbplyr sql_query_explain
+#' @export
 sql_query_explain.spark_connection <- function(con, sql, ...) {
   spark_sql_query_explain(con, sql, ...)
 }
@@ -40,14 +42,16 @@ tbl_vars.spark_jobj <- function(x) {
   spark_dataframe_cols(x)
 }
 
-#' @export
+
 #' @importFrom dplyr tbl_vars
+#' @export
 tbl_vars.tbl_spark <- function(x) {
   spark_dataframe_cols(spark_dataframe(x))
 }
 
 #' @export
 #' @importFrom dbplyr op_vars
+#' @export
 op_vars.tbl_spark <- function(x) {
   spark_dataframe_cols(spark_dataframe(x))
 }
@@ -70,14 +74,18 @@ tbl.spark_connection <- function(src, from, ...) {
 }
 
 spark_tbl_sql <- function(src, from, ...) {
-  tbl_spark <- tbl_sql("spark", src = src, from = process_tbl_name(from), ...)
+  tbl_spark <- tbl_sql(
+    subclass = "spark",
+    src = src,
+    from = process_tbl_name(from),
+    ...)
 
   tbl_spark$sdf_cache_state <- new.env(parent = emptyenv())
   tbl_spark$sdf_cache_state$ops <- NULL
   tbl_spark$sdf_cache_state$lazy_query <- NULL
   tbl_spark$sdf_cache_state$spark_dataframe <- NULL
   tbl_spark$spark_dataframe <- function(self, spark_dataframe_impl) {
-  cached <- identical(self$sdf_cache_state$lazy_query, self$lazy_query)
+    cached <- identical(self$sdf_cache_state$lazy_query, self$lazy_query)
 
     if (!cached) {
       self$sdf_cache_state$lazy_query <- self$lazy_query
@@ -231,11 +239,13 @@ compute.tbl_spark <- function(x, ...) {
 }
 
 #' @importFrom dbplyr sql_query_save
+#' @export
 sql_query_save.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
   spark_sql_query_save(con, sql, name, temporary, ...)
 }
 
 #' @importFrom dbplyr sql_table_analyze
+#' @export
 sql_table_analyze.spark_connection <- function(con, table, ...) {
   spark_db_analyze(con, table, ...)
 }

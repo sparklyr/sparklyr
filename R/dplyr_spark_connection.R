@@ -115,6 +115,7 @@ build_sql_if_compare <- function(..., con, compare) {
 
 
 #' @importFrom dbplyr sql_translation
+#' @export
 sql_translation.spark_connection <- function(con) {
   spark_sql_translation(con)
 }
@@ -445,6 +446,7 @@ build_sql_fn <- function(fn) {
 
 #' @importFrom dbplyr sql_query_set_op
 #' @keywords internal
+#' @export
 sql_query_set_op.spark_connection <- function(con, x, y, method, ..., all = FALSE) {
   sql <- spark_sql_set_op(con, x, y, method)
 
@@ -458,6 +460,7 @@ sql_query_set_op.spark_connection <- function(con, x, y, method, ..., all = FALS
 
 #' @importFrom dbplyr sql_query_fields
 #' @keywords internal
+#' @export
 sql_query_fields.spark_connection <- function(con, sql, ...) {
   spark_sql_query_fields(con, sql, ...)
 }
