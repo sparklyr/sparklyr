@@ -36,8 +36,8 @@ sql_query_explain.spark_connection <- function(con, sql, ...) {
   spark_sql_query_explain(con, sql, ...)
 }
 
-#' @export
 #' @importFrom dplyr tbl_vars
+#' @export
 tbl_vars.spark_jobj <- function(x) {
   spark_dataframe_cols(x)
 }
@@ -49,7 +49,6 @@ tbl_vars.tbl_spark <- function(x) {
   spark_dataframe_cols(spark_dataframe(x))
 }
 
-#' @export
 #' @importFrom dbplyr op_vars
 #' @export
 op_vars.tbl_spark <- function(x) {
@@ -60,15 +59,15 @@ spark_dataframe_cols <- function(sdf) {
   as.character(invoke(sdf, "columns") %>% unlist())
 }
 
-#' @export
 #' @importFrom dbplyr tbl_sql
+#' @export
 tbl.src_spark <- function(src, from, ...) {
   spark_tbl_sql(src, from)
 }
 
-#' @export
 #' @importFrom dbplyr src_sql
 #' @importFrom dbplyr tbl_sql
+#' @export
 tbl.spark_connection <- function(src, from, ...) {
   spark_tbl_sql(src = src_sql("spark", src), from)
 }

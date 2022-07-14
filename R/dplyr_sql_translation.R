@@ -1,119 +1,3 @@
-#' @include dbplyr_utils.R
-#' @include dplyr_hof.R
-#' @include spark_sql.R
-#' @include utils.R
-NULL
-
-fix_na_real_values <- function(dots) {
-  for (i in seq_along(dots)) {
-    if (identical(rlang::quo_get_expr(dots[[i]]), rlang::expr(NA_real_))) {
-      dots[[i]] <- rlang::quo(dbplyr::sql("CAST(NULL AS DOUBLE)"))
-    }
-  }
-
-  dots
-}
-
-#' @export
-#' @importFrom dplyr transmute
-#' @importFrom dplyr all_of
-transmute.tbl_spark <- function(.data, ...) {
-  dots_org <- rlang::enquos(..., .named = TRUE)
-  dots <- fix_na_real_values(dots_org)
-  if (identical(dots, dots_org)) {
-    NextMethod()
-  } else {
-    transmute(.data, !!!dots)
-  }
-}
-
-#' @export
-#' @importFrom dplyr mutate
-mutate.tbl_spark <- function(.data, ...) {
-  dots_org <- rlang::enquos(...)
-  dots <- fix_na_real_values(dots_org)
-  if (identical(dots, dots_org)) {
-    NextMethod()
-  } else {
-    mutate(.data, !!!dots)
-  }
-}
-
-#' @export
-#' @importFrom dplyr filter
-filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
-  if (!identical(.preserve, FALSE)) {
-    stop("`.preserve` is not supported on database backends", call. = FALSE)
-  }
-  NextMethod()
-}
-
-#' @export
-#' @importFrom dplyr select
-select.tbl_spark <- function(.data, ...) {
-    NextMethod()
-}
-
-#' @export
-#' @importFrom dplyr summarise
-#' @importFrom dbplyr op_vars
-summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
-    NextMethod()
-}
-
-#' @export
-#' @importFrom dplyr sql_escape_ident
-#' @importFrom dbplyr sql_quote
-sql_escape_ident.spark_connection <- function(con, x) {
-  # Assuming it might include database name like: `dbname.tableName`
-  if (length(x) == 1) {
-    tbl_quote_name(con, x)
-  } else {
-    dbplyr::sql_quote(x, "`")
-  }
-}
-
-#' @importFrom dbplyr sql
-build_sql_if_compare <- function(..., con, compare) {
-  args <- list(...)
-
-  build_sql_if_parts <- function(ifParts, ifValues) {
-    if (length(ifParts) == 1) {
-      return(ifParts[[1]])
-    }
-
-    current <- ifParts[[1]]
-    currentName <- ifValues[[1]]
-    build_sql(
-      "if(",
-      current,
-      ", ",
-      currentName,
-      ", ",
-      build_sql_if_parts(ifParts[-1], ifValues[-1]),
-      ")"
-    )
-  }
-
-  thisIdx <- 0
-  conditions <- lapply(seq_along(args), function(idx) {
-    thisIdx <<- thisIdx + 1
-    e <- args[[idx]]
-
-    if (thisIdx == length(args)) {
-      e
-    } else {
-      indexes <- Filter(function(innerIdx) innerIdx > thisIdx, seq_along(args))
-      ifValues <- lapply(indexes, function(e) args[[e]])
-
-      dbplyr::sql(paste(e, compare, ifValues, collapse = " and "))
-    }
-  })
-
-  build_sql_if_parts(conditions, args)
-}
-
-
 #' @importFrom dbplyr sql_translation
 #' @export
 sql_translation.spark_connection <- function(con) {
@@ -463,4 +347,56 @@ sql_query_set_op.spark_connection <- function(con, x, y, method, ..., all = FALS
 #' @export
 sql_query_fields.spark_connection <- function(con, sql, ...) {
   spark_sql_query_fields(con, sql, ...)
+}
+
+#' @importFrom dbplyr sql
+build_sql_if_compare <- function(..., con, compare) {
+  args <- list(...)
+
+  build_sql_if_parts <- function(ifParts, ifValues) {
+    if (length(ifParts) == 1) {
+      return(ifParts[[1]])
+    }
+
+    current <- ifParts[[1]]
+    currentName <- ifValues[[1]]
+    build_sql(
+      "if(",
+      current,
+      ", ",
+      currentName,
+      ", ",
+      build_sql_if_parts(ifParts[-1], ifValues[-1]),
+      ")"
+    )
+  }
+
+  thisIdx <- 0
+  conditions <- lapply(seq_along(args), function(idx) {
+    thisIdx <<- thisIdx + 1
+    e <- args[[idx]]
+
+    if (thisIdx == length(args)) {
+      e
+    } else {
+      indexes <- Filter(function(innerIdx) innerIdx > thisIdx, seq_along(args))
+      ifValues <- lapply(indexes, function(e) args[[e]])
+
+      dbplyr::sql(paste(e, compare, ifValues, collapse = " and "))
+    }
+  })
+
+  build_sql_if_parts(conditions, args)
+}
+
+#' @export
+#' @importFrom dplyr sql_escape_ident
+#' @importFrom dbplyr sql_quote
+sql_escape_ident.spark_connection <- function(con, x) {
+  # Assuming it might include database name like: `dbname.tableName`
+  if (length(x) == 1) {
+    tbl_quote_name(con, x)
+  } else {
+    dbplyr::sql_quote(x, "`")
+  }
 }
