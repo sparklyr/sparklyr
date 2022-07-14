@@ -1,4 +1,3 @@
-#' @include dbplyr_utils.R
 #' @include dplyr_hof.R
 #' @include spark_sql.R
 #' @include utils.R
