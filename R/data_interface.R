@@ -176,43 +176,20 @@ spark_write_csv <- function(x, path,
   UseMethod("spark_write_csv")
 }
 
-#' @export
-spark_write_csv.tbl_spark <- function(x,
-                                      path,
-                                      header = TRUE,
-                                      delimiter = ",",
-                                      quote = "\"",
-                                      escape = "\\",
-                                      charset = "UTF-8",
-                                      null_value = NULL,
-                                      options = list(),
-                                      mode = NULL,
-                                      partition_by = NULL,
-                                      ...) {
-  sqlResult <- spark_sqlresult_from_dplyr(x)
+spark_write_csv_impl <- function(x, path, header = TRUE, delimiter = ",",
+                                 quote = "\"", escape = "\\", charset = "UTF-8",
+                                 null_value = NULL, options = list(), mode = NULL,
+                                 partition_by = NULL, ...) {
+
   options <- spark_csv_options(header, TRUE, delimiter, quote, escape, charset, null_value, options)
-
-  spark_csv_write(sqlResult, spark_normalize_path(path), options, mode, partition_by)
-}
-
-#' @export
-spark_write_csv.spark_jobj <- function(x,
-                                       path,
-                                       header = TRUE,
-                                       delimiter = ",",
-                                       quote = "\"",
-                                       escape = "\\",
-                                       charset = "UTF-8",
-                                       null_value = NULL,
-                                       options = list(),
-                                       mode = NULL,
-                                       partition_by = NULL,
-                                       ...) {
-  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  options <- spark_csv_options(header, TRUE, delimiter, quote, escape, charset, null_value, options)
-
   spark_csv_write(x, spark_normalize_path(path), options, mode, partition_by)
 }
+
+#' @export
+spark_write_csv.tbl_spark <-spark_write_csv_impl
+
+#' @export
+spark_write_csv.spark_jobj <- spark_write_csv_impl
 
 #' Read a Parquet file into a Spark DataFrame
 #'
@@ -280,27 +257,16 @@ spark_write_parquet <- function(x,
   UseMethod("spark_write_parquet")
 }
 
-#' @export
-spark_write_parquet.tbl_spark <- function(x,
-                                          path,
-                                          mode = NULL,
-                                          options = list(),
-                                          partition_by = NULL,
-                                          ...) {
-  sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, spark_normalize_path(path), "parquet", mode, options, partition_by)
+spark_write_parquet_impl <- function(x, path, mode = NULL, options = list(),
+                                     partition_by = NULL, ...) {
+  spark_data_write_generic(x, spark_normalize_path(path), "parquet", mode, options, partition_by)
 }
 
 #' @export
-spark_write_parquet.spark_jobj <- function(x,
-                                           path,
-                                           mode = NULL,
-                                           options = list(),
-                                           partition_by = NULL,
-                                           ...) {
-  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_data_write_generic(x, spark_normalize_path(path), "parquet", mode, options, partition_by)
-}
+spark_write_parquet.tbl_spark <- spark_write_parquet_impl
+
+#' @export
+spark_write_parquet.spark_jobj <- spark_write_parquet_impl
 
 #' Read a JSON file into a Spark DataFrame
 #'
@@ -364,27 +330,16 @@ spark_write_json <- function(x,
   UseMethod("spark_write_json")
 }
 
-#' @export
-spark_write_json.tbl_spark <- function(x,
-                                       path,
-                                       mode = NULL,
-                                       options = list(),
-                                       partition_by = NULL,
-                                       ...) {
-  sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, spark_normalize_path(path), "json", mode, options, partition_by)
+spark_write_json_impl <- function(x, path, mode = NULL, options = list(),
+                                  partition_by = NULL, ...) {
+  spark_data_write_generic(x, spark_normalize_path(path), "json", mode, options, partition_by)
 }
 
 #' @export
-spark_write_json.spark_jobj <- function(x,
-                                        path,
-                                        mode = NULL,
-                                        options = list(),
-                                        partition_by = NULL,
-                                        ...) {
-  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_data_write_generic(x, spark_normalize_path(path), "json", mode, options, partition_by)
-}
+spark_write_json.tbl_spark <- spark_write_json_impl
+
+#' @export
+spark_write_json.spark_jobj <- spark_write_json_impl
 
 spark_expect_jobj_class <- function(jobj, expectedClassName) {
   className <- invoke(jobj, "%>%", list("getClass"), list("getName"))
@@ -443,6 +398,15 @@ spark_data_apply_mode <- function(options, mode) {
   options
 }
 
+df_generic_write <- function(x) UseMethod("df_generic_write")
+
+df_generic_write.tbl_spark <- function(x) spark_sqlresult_from_dplyr(x)
+
+df_generic_write.spark_jobj <- function(x) {
+  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  x
+}
+
 spark_data_write_generic <- function(df,
                                      path,
                                      fileMethod,
@@ -451,6 +415,9 @@ spark_data_write_generic <- function(df,
                                      partition_by = NULL,
                                      is_jdbc = FALSE,
                                      save_args = list()) {
+
+  df <- df_generic_write(df)
+
   options <- invoke(df, "write") %>%
     spark_data_apply_mode(mode) %>|%
     lapply(names(writeOptions), function(writeOptionName) {
@@ -577,7 +544,7 @@ spark_write_table.tbl_spark <- function(x,
                                         options = list(),
                                         partition_by = NULL,
                                         ...) {
-  sqlResult <- spark_sqlresult_from_dplyr(x)
+
   sc <- spark_connection(x)
 
   if (spark_version(sc) < "2.0.0" && spark_master_is_local(sc$master)) {
@@ -590,7 +557,7 @@ spark_write_table.tbl_spark <- function(x,
 
   fileMethod <- ifelse(identical(mode, "append"), "insertInto", "saveAsTable")
 
-  spark_data_write_generic(sqlResult, name, fileMethod, mode, options, partition_by)
+  spark_data_write_generic(x, name, fileMethod, mode, options, partition_by)
 }
 
 #' @export
@@ -601,7 +568,6 @@ spark_write_table.spark_jobj <- function(x,
                                          partition_by = NULL,
                                          ...) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  sc <- spark_connection(x)
 
   spark_data_write_generic(x, name, "saveAsTable", mode, options, partition_by)
 }
@@ -634,11 +600,10 @@ spark_insert_table.tbl_spark <- function(x,
                                         overwrite = FALSE,
                                         options = list(),
                                         ...) {
-  sqlResult <- spark_sqlresult_from_dplyr(x)
 
   mode <- if (isTRUE(overwrite)) "overwrite" else "append"
 
-  spark_data_write_generic(sqlResult, name, "insertInto", mode, options, NULL)
+  spark_data_write_generic(x, name, "insertInto", mode, options, NULL)
 }
 
 #' @export
@@ -812,10 +777,7 @@ spark_write_jdbc.tbl_spark <- function(x,
                                        options = list(),
                                        partition_by = NULL,
                                        ...) {
-  sqlResult <- spark_sqlresult_from_dplyr(x)
-  sc <- spark_connection(x)
-
-  spark_data_write_generic(sqlResult, name, "jdbc", mode, options, partition_by, is_jdbc = TRUE)
+  spark_data_write_generic(x, name, "jdbc", mode, options, partition_by, is_jdbc = TRUE)
 }
 
 #' @export
@@ -826,7 +788,6 @@ spark_write_jdbc.spark_jobj <- function(x,
                                         partition_by = NULL,
                                         ...) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  sc <- spark_connection(x)
 
   spark_data_write_generic(x, name, "jdbc", mode, options, partition_by, is_jdbc = TRUE)
 }
@@ -858,8 +819,7 @@ spark_write_source.tbl_spark <- function(x,
                                          options = list(),
                                          partition_by = NULL,
                                          ...) {
-  sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, source, "format", mode, options, partition_by, ...)
+  spark_data_write_generic(x, source, "format", mode, options, partition_by, ...)
 }
 
 #' @export
@@ -938,36 +898,21 @@ spark_read_text <- function(sc,
 #' @family Spark serialization routines
 #'
 #' @export
-spark_write_text <- function(x,
-                             path,
-                             mode = NULL,
-                             options = list(),
-                             partition_by = NULL,
-                             ...) {
+spark_write_text <- function(x, path, mode = NULL, options = list(),
+                             partition_by = NULL, ...) {
   UseMethod("spark_write_text")
 }
 
-#' @export
-spark_write_text.tbl_spark <- function(x,
-                                       path,
-                                       mode = NULL,
-                                       options = list(),
-                                       partition_by = NULL,
-                                       ...) {
-  sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, spark_normalize_path(path), "text", mode, options, partition_by)
+spark_write_text_impl <- function(x, path, mode = NULL, options = list(),
+                                  partition_by = NULL, ...) {
+  spark_data_write_generic(x, spark_normalize_path(path), "text", mode, options, partition_by)
 }
 
 #' @export
-spark_write_text.spark_jobj <- function(x,
-                                        path,
-                                        mode = NULL,
-                                        options = list(),
-                                        partition_by = NULL,
-                                        ...) {
-  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
-  spark_data_write_generic(x, spark_normalize_path(path), "text", mode, options, partition_by)
-}
+spark_write_text.tbl_spark <- spark_write_text_impl
+
+#' @export
+spark_write_text.spark_jobj <- spark_write_text_impl
 
 #' Read a ORC file into a Spark DataFrame
 #'
@@ -1021,36 +966,24 @@ spark_read_orc <- function(sc,
 #' @family Spark serialization routines
 #'
 #' @export
-spark_write_orc <- function(x,
-                            path,
-                            mode = NULL,
-                            options = list(),
-                            partition_by = NULL,
-                            ...) {
+spark_write_orc <- function(x, path, mode = NULL, options = list(),
+                            partition_by = NULL, ...) {
   UseMethod("spark_write_orc")
 }
 
-#' @export
-spark_write_orc.tbl_spark <- function(x,
-                                      path,
-                                      mode = NULL,
-                                      options = list(),
-                                      partition_by = NULL,
-                                      ...) {
-  sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, spark_normalize_path(path), "orc", mode, options, partition_by)
-}
+spark_write_orc_impl <- function(x, path, mode = NULL, options = list(),
+                                 partition_by = NULL, ...) {
 
-#' @export
-spark_write_orc.spark_jobj <- function(x,
-                                       path,
-                                       mode = NULL,
-                                       options = list(),
-                                       partition_by = NULL,
-                                       ...) {
-  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
   spark_data_write_generic(x, spark_normalize_path(path), "orc", mode, options, partition_by)
 }
+
+
+#' @export
+spark_write_orc.tbl_spark <- spark_write_orc_impl
+
+#' @export
+spark_write_orc.spark_jobj <- spark_write_orc_impl
+
 
 #' Writes a Spark DataFrame into Delta Lake
 #'
@@ -1238,9 +1171,8 @@ spark_read_binary <- function(sc,
                               repartition = 0,
                               memory = TRUE,
                               overwrite = TRUE) {
-  if (spark_version(sc) < "3.0.0") {
-    stop("Binary file data source is only supported in Spark 3.0 or above.")
-  }
+
+  spark_require_version(sc, "3.0.0")
 
   spark_read_source(
     sc,
@@ -1286,9 +1218,7 @@ spark_read_image <- function(sc,
                              repartition = 0,
                              memory = TRUE,
                              overwrite = TRUE) {
-  if (spark_version(sc) < "2.4.0") {
-    stop("Image data source is only supported in Spark 2.4 or above.")
-  }
+  spark_require_version(sc, "2.4.0")
 
   spark_read_source(
     sc,
@@ -1454,9 +1384,7 @@ spark_read <- function(sc,
 #' @export
 spark_write_rds <- function(x, dest_uri) {
   sc <- spark_connection(x)
-  if (spark_version(sc) < "2.0.0") {
-    stop("`spark_write_rds()` is only supported in Spark 2.0 or above")
-  }
+  spark_require_version(sc, "2.0.0")
 
   num_partitions <- sdf_num_partitions(x)
   if (length(dest_uri) == 1) {
@@ -1491,6 +1419,76 @@ spark_write_rds <- function(x, dest_uri) {
     partition_id = seq(num_partitions) - 1,
     uri = dest_uri
   )
+}
+
+#' Collect Spark data serialized in RDS format into R
+#'
+#' Deserialize Spark data that is serialized using `spark_write_rds()` into a R
+#' dataframe.
+#'
+#' @param path Path to a local RDS file that is produced by `spark_write_rds()`
+#'   (RDS files stored in HDFS will need to be downloaded to local filesystem
+#'   first (e.g., by running `hadoop fs -copyToLocal ...` or similar)
+#'
+#' @family Spark serialization routines
+#' @export
+collect_from_rds <- function(path) {
+  data <- readRDS(path)
+  col_names <- data[[1]]
+  timestamp_col_idxes <- data[[2]]
+  date_col_idxes <- data[[3]]
+  struct_col_idxes <- data[[4]]
+  col_data <- data[[5]]
+  names(col_data) <- col_names
+  df <- tibble::as_tibble(col_data)
+
+  apply_conversion <- function(df, idx, fn) {
+    if ("list" %in% class(df[[idx]])) {
+      df[[idx]] <- lapply(df[[idx]], fn)
+    } else {
+      df[[idx]] <- fn(df[[idx]])
+    }
+
+    df
+  }
+  for (idx in timestamp_col_idxes) {
+    df <- df %>%
+      apply_conversion(
+        idx,
+        function(x) {
+          as.POSIXct(x, origin = "1970-01-01")
+        }
+      )
+  }
+  for (idx in date_col_idxes) {
+    df <- df %>%
+      apply_conversion(
+        idx,
+        function(x) {
+          as.Date(x, origin = "1970-01-01")
+        }
+      )
+  }
+  for (idx in struct_col_idxes) {
+    df <- df %>%
+      apply_conversion(
+        idx,
+        function(x) {
+          x %>%
+            lapply(
+              function(v) {
+                jsonlite::fromJSON(
+                  v,
+                  simplifyDataFrame = FALSE,
+                  simplifyMatrix = FALSE
+                )
+              }
+            )
+        }
+      )
+  }
+
+  df
 }
 
 #' Write Spark DataFrame to file using a custom writer

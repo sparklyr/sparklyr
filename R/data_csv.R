@@ -101,6 +101,9 @@ spark_csv_read <- function(sc,
 }
 
 spark_csv_write <- function(df, path, csvOptions, mode, partition_by) {
+
+  df <- df_generic_write(df)
+
   sc <- spark_connection(df)
 
   write <- invoke(df, "write")

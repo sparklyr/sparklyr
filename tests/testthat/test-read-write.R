@@ -748,3 +748,36 @@ test_that("spark_read_image works as expected", {
     )
   )
 })
+
+test_that("spark_write_rds() and collect_from_rds() works", {
+  rds_path <- get_test_data_path("rds_file.rds")
+
+  test_df <- tibble(
+    x = 1,
+    y = as.Date("2020-01-01"),
+    z = as.POSIXct("2020-01-01 12:00"),
+    a = list(b = 1, d = 2)
+  )
+
+  test_df_spark <- copy_to(sc, test_df, overwrite = TRUE)
+
+  spark_write_rds(
+    test_df_spark,
+    rds_path
+  )
+
+  expect_true(file.exists(rds_path))
+
+  test_df_collected <- collect_from_rds(rds_path)
+
+  expect_is(
+    test_df_collected,
+    "data.frame"
+  )
+
+  expect_equal(
+    as.character(lapply(test_df, class)),
+    as.character(lapply(test_df_collected, class))
+  )
+
+})

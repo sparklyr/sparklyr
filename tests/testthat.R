@@ -23,5 +23,5 @@
 if(identical(Sys.getenv("CODE_COVERAGE"), "true")) {
   library(testthat)
   library(sparklyr)
-  test_check("sparklyr")
+  test_check("sparklyr", filter = "read-write")
 }
