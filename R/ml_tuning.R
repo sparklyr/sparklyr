@@ -100,7 +100,8 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
                   # ml_map_class(jobj_class(stage_jobj, simple_name = FALSE)[[1]]),
                   ". Proceeding to use values as-is"
                   )
-          args_to_validate
+          args_to_validate %>%
+            `[`(input_param_names)
         }
 
       })
