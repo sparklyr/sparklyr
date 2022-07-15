@@ -1,3 +1,33 @@
+sparklyr_jar_spec_list <- function() {
+  list(
+    list(spark = "1.5.2", scala = "2.10", remove_srcs = TRUE),
+    list(spark = "1.6.0", scala = "2.10", scala_filter = "1.6.1"),
+    list(spark = "2.0.0", scala = "2.11"),
+    list(spark = "2.3.0", scala = "2.11"),
+    list(spark = "2.4.0", scala = "2.11"),
+    list(spark = "2.4.0", scala = "2.12"),
+    list(spark = "3.0.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
+  )
+}
+
+sparklyr_jar_verify_spark <- function(install = TRUE) {
+  spec_list <- sparklyr_jar_spec_list()
+  installed_vers <- spark_installed_versions()
+  invisible(
+    lapply(
+      spec_list,
+      function(x){
+        if(!(x$spark %in% installed_vers$spark)) {
+          message("- Spark version ", x$spark, " - Not found")
+          if(install) spark_install(x$spark)
+        } else {
+          message("- Spark version ", x$spark, " - Ok")
+        }
+      }
+    )
+  )
+}
+
 #' Compile Scala sources into a Java Archive
 #'
 #' Given a set of \code{scala} source files, compile them
@@ -44,7 +74,14 @@ spark_compile <- function(jar_name,
 
   root <- rprojroot::find_package_root_file()
 
-  java_path <- file.path(root, "inst/java")
+  env_jar_path <- Sys.getenv("R_SPARKINSTALL_COMPILE_JAR_PATH", unset = NA)
+  if(is.na(env_jar_path)) {
+    java_path <- file.path(root, "inst/java")
+  } else {
+    if(!dir.exists(env_jar_path)) dir.create(env_jar_path)
+    java_path <- env_jar_path
+  }
+
   jar_path <- file.path(java_path, jar_name)
 
   scala_path <- file.path(root, "java")
@@ -59,13 +96,13 @@ spark_compile <- function(jar_name,
     scala_files <- filter(scala_files)
   }
 
-  message("==> using scalac ", scalac_version)
-  message("==> building against Spark ", spark_version)
-  message("==> building '", jar_name, "' ...")
+  message("==> Using scalac: ", scalac_version)
+  message("==> Building against Spark: ", spark_version)
+  message("==> Building: '", jar_name, "\n")
 
   execute <- function(...) {
     cmd <- paste(...)
-    message("==> ", cmd)
+    message("==> System command: ", cmd, "\n")
     system(cmd)
   }
 
@@ -104,7 +141,7 @@ spark_compile <- function(jar_name,
   ensure_directory(inst_java_path)
 
   # copy embedded sources to current working directory
-  message("==> embedded source(s): ", paste(embedded_srcs, collapse = ", "), "\n")
+  message("==> Embedded source(s): ", paste(embedded_srcs, collapse = ", "), "\n")
   ensure_directory("sparklyr")
   for (src in embedded_srcs) {
     file.copy(file.path(scala_path, src), "sparklyr")
@@ -117,14 +154,15 @@ spark_compile <- function(jar_name,
   scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
   optflag <- ifelse(grepl("2.12", scalac_version), "-opt:l:default", "-optimise")
   status <- execute(shQuote(scalac), optflag, "-deprecation", "-feature", scala_files_quoted)
+
   if (status) {
-    stop("==> failed to compile Scala source files")
+    stop("==> Failed to compile Scala source files")
   }
 
   # call 'jar' to create our jar
   status <- execute(shQuote(jar), "cf", shQuote(jar_path), ".")
   if (status) {
-    stop("==> failed to build Java Archive")
+    stop("==> Failed to build Java Archive")
   }
 
   # double-check existence of jar
@@ -164,7 +202,6 @@ compile_package_jars <- function(..., spec = NULL) {
 
   for (el in spec) {
     el <- as.list(el)
-
     spark_version <- el$spark_version
     spark_home <- el$spark_home
     jar_name <- el$jar_name
@@ -255,8 +292,16 @@ spark_compilation_spec <- function(spark_version = NULL,
 }
 
 find_jar <- function() {
-  if (nchar(Sys.getenv("JAVA_HOME")) > 0) {
-    normalizePath(file.path(Sys.getenv("JAVA_HOME"), "bin", "jar"), mustWork = FALSE)
+  env_java_jome <- Sys.getenv("JAVA_HOME")
+  if (nchar(env_java_jome) > 0) {
+    p_jar <- normalizePath(
+      file.path(env_java_jome, "bin", "jar"),
+      mustWork = FALSE
+      )
+    p_res <- NULL
+    if(file.exists(p_jar)) p_res <- p_jar
+    if(is.null(p_res)) p_res <- system2("which", "jar", stdout = TRUE)
+    p_res
   } else {
     NULL
   }
@@ -273,62 +318,29 @@ find_jar <- function() {
 #'   be scanned.
 #'
 #' @export
-spark_default_compilation_spec <- function(
-                                           pkg = infer_active_package_name(),
+spark_default_compilation_spec <- function(pkg = infer_active_package_name(),
                                            locations = NULL) {
-  c(
-    list(
-      spark_compilation_spec(
-        spark_version = "1.5.2",
-        scalac_path = find_scalac("2.10", locations),
-        jar_name = sprintf("%s-1.5-2.10.jar", pkg),
-        jar_path = find_jar(),
-        scala_filter = make_version_filter("1.5.2"),
-        embedded_srcs = c(),
-      ),
-      spark_compilation_spec(
-        spark_version = "1.6.0",
-        scalac_path = find_scalac("2.10", locations),
-        jar_name = sprintf("%s-1.6-2.10.jar", pkg),
-        jar_path = find_jar(),
-        scala_filter = make_version_filter("1.6.1")
-      ),
-      spark_compilation_spec(
-        spark_version = "2.0.0",
-        scalac_path = find_scalac("2.11", locations),
-        jar_name = sprintf("%s-2.0-2.11.jar", pkg),
-        jar_path = find_jar(),
-        scala_filter = make_version_filter("2.0.0")
-      ),
-      spark_compilation_spec(
-        spark_version = "2.3.0",
-        scalac_path = find_scalac("2.11", locations),
-        jar_name = sprintf("%s-2.3-2.11.jar", pkg),
-        jar_path = find_jar(),
-        scala_filter = make_version_filter("2.3.0")
+
+  spec_list <- sparklyr_jar_spec_list()
+
+  jar_location <- find_jar()
+
+  lapply(
+    spec_list,
+    function(x) {
+      args <- list(
+        spark_version = x$spark,
+        scalac_path = find_scalac(x$scala, locations),
+        jar_name = sprintf("%s-%s-%s.jar", pkg, substr(x$spark, 1, 3), x$scala),
+        jar_path = jar_location,
+        scala_filter = make_version_filter(x$spark)
       )
-    ),
-    lapply(
-      c("2.11", "2.12"),
-      function(scala_version) {
-        spark_compilation_spec(
-          spark_version = "2.4.0",
-          scalac_path = find_scalac(scala_version, locations),
-          jar_name = sprintf("%s-2.4-%s.jar", pkg, scala_version),
-          jar_path = find_jar(),
-          scala_filter = make_version_filter("2.4.0")
-        )
-      }
-    ),
-    list(
-      spark_compilation_spec(
-        spark_version = "3.0.0",
-        scalac_path = find_scalac("2.12", locations),
-        jar_name = sprintf("%s-3.0-2.12.jar", pkg),
-        jar_path = find_jar(),
-        scala_filter = make_version_filter("3.0.0")
-      )
-    )
+
+      if(!is.null(x$jar_name)) args$jar_name <- x$jar_name
+      if(!is.null(x$scala_filter)) args$scala_filter <- make_version_filter(x$scala_filter)
+      if(!is.null(x$remove_srcs)) args <- c(args, list(embedded_srcs = c()))
+      do.call(spark_compilation_spec, args)
+    }
   )
 }
 
@@ -355,12 +367,16 @@ download_scalac <- function(dest_path = NULL) {
     dir.create(dest_path, recursive = TRUE)
   }
 
-  ext <- if (.Platform$OS.type == "windows") "zip" else "tgz"
+  ext <- ifelse(os_is_windows(), "zip", "tgz")
 
-  download_urls <- c(
-    paste0("http://downloads.lightbend.com/scala/2.12.10/scala-2.12.10.", ext),
-    paste0("http://downloads.lightbend.com/scala/2.11.8/scala-2.11.8.", ext),
-    paste0("http://downloads.lightbend.com/scala/2.10.6/scala-2.10.6.", ext)
+  download_urls <-  paste0(
+    c(
+      "http://downloads.lightbend.com/scala/2.12.10/scala-2.12.10",
+      "http://downloads.lightbend.com/scala/2.11.8/scala-2.11.8",
+      "http://downloads.lightbend.com/scala/2.10.6/scala-2.10.6"
+    ),
+    ".",
+    ext
   )
 
   lapply(download_urls, function(download_url) {
@@ -370,7 +386,9 @@ download_scalac <- function(dest_path = NULL) {
       dir.create(dirname(dest_file), recursive = TRUE)
     }
 
-    download_file(download_url, destfile = dest_file)
+    if(!file.exists(dest_file)) {
+      download_file(download_url, destfile = dest_file)
+    }
 
     if (ext == "zip") {
       unzip(dest_file, exdir = dest_path)
@@ -427,10 +445,8 @@ find_scalac <- function(version, locations = NULL) {
 }
 
 scalac_default_locations <- function() {
-  if (Sys.info()[["sysname"]] == "Windows") {
-    c(
+  if (os_is_windows()) {
       path.expand("~/scala")
-    )
   } else {
     c(
       path.expand("~/scala"),
@@ -443,7 +459,7 @@ scalac_default_locations <- function() {
 
 get_scalac_version <- function(scalac = Sys.which("scalac")) {
   cmd <- paste(shQuote(scalac), "-version 2>&1")
-  version_string <- if (Sys.info()[["sysname"]] == "Windows") {
+  version_string <- if (os_is_windows()) {
     shell(cmd, intern = TRUE)
   } else {
     system(cmd, intern = TRUE)
@@ -498,15 +514,8 @@ make_version_filter <- function(version_upper) {
 
 #' list all sparklyr-*.jar files that have been built
 list_sparklyr_jars <- function() {
-  pkg_root <- rprojroot::find_package_root_file()
-
-  sparklyr_jars <- normalizePath(
-    dir(
-      file.path(pkg_root, "inst", "java"),
-      full.names = TRUE,
-      pattern = "sparklyr-.+\\.jar"
-    )
-  )
-
-  sparklyr_jars
+  normalizePath(dir(
+      file.path(rprojroot::find_package_root_file(), "inst", "java"),
+      full.names = TRUE, pattern = "sparklyr-.+\\.jar"
+    ))
 }

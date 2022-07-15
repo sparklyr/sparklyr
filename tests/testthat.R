@@ -18,6 +18,8 @@
 ## local versions.json file over the one in the GH repo use:
 ## Sys.setenv("R_SPARKINSTALL_INSTALL_INFO_PATH" = here::here("inst/extdata/versions.json"))
 
+## For Coverage us: Sys.setenv("CODE_COVERAGE" = "true")
+
 if(identical(Sys.getenv("CODE_COVERAGE"), "true")) {
   library(testthat)
   library(sparklyr)

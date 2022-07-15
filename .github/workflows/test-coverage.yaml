@@ -48,6 +48,20 @@ jobs:
         run: sparklyr::spark_install(version = "3.1.2")
         shell: Rscript {0}
 
+      - name: Cache Scala
+        id: cache-scala
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/scala/
+          key: scala-2
+
+      - name: Install Scala (via sparklyr)
+        if: steps.cache-scala.outputs.cache-hit != 'true'
+        run: |
+          devtools::load_all()
+          download_scalac()
+        shell: Rscript {0}
+
       - name: Test coverage
         run: |
           identical(Sys.getenv("CODE_COVERAGE"), "true")

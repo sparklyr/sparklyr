@@ -1,6 +1,7 @@
 # Package maintenance
 
-- `java` - Scala scripts and script that creates the JAR files
+- `build_jars` - Scala scripts and script that creates the JAR files. Source
+`build_jars.R` to perform all needed operations.
 
 - `spark_versions` - Contains the script that updates a file that lists the 
 location to the available Spark versions. `spark_install()` uses that list 
