@@ -122,7 +122,11 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
     args <- append(args, list(uid))
   }
 
-  jobj <- do.call(invoke_new, args)
+  init_jobj <- do.call(invoke_new, args)
+
+  new_estimator <- new_ml_estimator(init_jobj, class = r_class)
+
+  jobj <- new_estimator$.jobj
 
   l_steps <- purrr::imap(invoke_steps, ~ list(.y, .x))
 
@@ -132,7 +136,6 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
     }
   }
 
-  new_estimator <- new_ml_estimator(jobj, class = r_class)
 
   post_ml_obj(
     x = x,

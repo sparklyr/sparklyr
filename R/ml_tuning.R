@@ -91,8 +91,18 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
 
         # Call the validator associated with the stage, and return the (validated)
         #   parameters the user specified.
-        do.call(ml_get_stage_validator(stage_jobj), list(args_to_validate)) %>%
-          `[`(input_param_names)
+        validation_function <- ml_get_stage_validator(stage_jobj)
+        if(!is.null(validation_function)) {
+          do.call(validation_function, list(args_to_validate)) %>%
+            `[`(input_param_names)
+        } else {
+          warning("Validating function was not found for ",
+                  # ml_map_class(jobj_class(stage_jobj, simple_name = FALSE)[[1]]),
+                  ". Proceeding to use values as-is"
+                  )
+          args_to_validate
+        }
+
       })
     }) %>%
     rlang::set_names(stage_uids[stage_indices])
