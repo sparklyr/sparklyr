@@ -128,11 +128,13 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
 
   jobj <- new_estimator$.jobj
 
-  l_steps <- purrr::imap(invoke_steps, ~ list(.y, .x))
+  #l_steps <- purrr::imap(invoke_steps, ~ list(.y, .x))
+
+  l_steps <- params_validate_and_set(new_estimator, invoke_steps)
 
   for(i in seq_along(l_steps)) {
-    if(!is.null(l_steps[[i]][[2]])) {
-      jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
+    if(!is.null(l_steps[[i]])) {
+      jobj <- do.call(invoke, c(jobj, list(names(l_steps[i]), l_steps[[i]])))
     }
   }
 
@@ -144,8 +146,8 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
     formula = formula,
     response = response,
     features = features,
-    features_col = invoke_steps$setFeaturesCol,
-    label_col = invoke_steps$setLabelCol
+    features_col = invoke_steps$features_col,
+    label_col = invoke_steps$label_col
   )
 
 }

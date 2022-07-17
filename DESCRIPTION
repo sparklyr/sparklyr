@@ -325,6 +325,7 @@ Collate:
     'spark_globals.R'
     'spark_hive.R'
     'spark_home.R'
+    'spark_params.R'
     'spark_submit.R'
     'spark_update_embedded_sources.R'
     'spark_utils.R'

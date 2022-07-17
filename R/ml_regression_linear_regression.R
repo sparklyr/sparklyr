@@ -65,18 +65,18 @@ ml_linear_regression_impl <- function(x, formula = NULL, fit_intercept = TRUE,
     uid = uid,
     formula = formula,
     invoke_steps = list(
-      setFeaturesCol = features_col,
-      setLabelCol = label_col,
-      setPredictionCol = prediction_col,
-      setElasticNetParam = cast_scalar_double(elastic_net_param),
-      setFitIntercept = cast_scalar_logical(fit_intercept),
-      setRegParam = cast_scalar_double(reg_param),
-      setMaxIter = cast_scalar_integer(max_iter),
-      setSolver = cast_choice(solver, c("auto", "l-bfgs", "normal")),
-      setStandardization = cast_scalar_logical(standardization),
-      setTol = cast_scalar_double(tol),
-      setLoss = loss,
-      setWeightCol = cast_nullable_string(weight_col)
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      elastic_net_param = elastic_net_param,
+      fit_intercept = fit_intercept,
+      reg_param = reg_param,
+      max_iter = max_iter,
+      solver = solver,
+      standardization = standardization,
+      tol = tol,
+      loss = loss,
+      weight_col = weight_col
     )
   )
 }
