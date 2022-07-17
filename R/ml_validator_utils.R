@@ -18,6 +18,7 @@ ml_get_stage_validator <- function(jobj) {
       envir = pkg_env,
       mode = "function"
     )} else {
+      NULL
   }
 }
 
