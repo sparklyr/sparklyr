@@ -71,12 +71,12 @@ ml_linear_regression_impl <- function(x, formula = NULL, fit_intercept = TRUE,
       elastic_net_param = elastic_net_param,
       fit_intercept = fit_intercept,
       reg_param = reg_param,
+      max_iter = max_iter,
       solver = solver,
       standardization = standardization,
       tol = tol,
       loss = loss,
-      weight_col = weight_col,
-      max_iter = max_iter
+      weight_col = weight_col
     )
   )
 }

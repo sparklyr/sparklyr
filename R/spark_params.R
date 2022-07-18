@@ -77,7 +77,8 @@ params_validate <- function(x, params, unmatched_fail = FALSE) {
   for(i in seq_along(params)) {
     if(matched_names[i]) {
       fn <- pm[names(pm) == names(params[i])]
-      do.call(fn[[1]], list(x = params[[i]]))
+      new_val <- do.call(fn[[1]], list(x = params[[i]]))
+      params[[i]] <- new_val
     }
   }
   params

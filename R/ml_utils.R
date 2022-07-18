@@ -125,15 +125,11 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
   jobj <- do.call(invoke_new, args)
 
   pe <- params_validate_estimator_and_set(x, invoke_steps)
-  #pe <- invoke_steps
 
   l_steps <- purrr::imap(pe, ~ list(.y, .x))
 
-  readr::write_rds(l_steps, "bug.rds")
-
   for(i in seq_along(l_steps)) {
     if(!is.null(l_steps[[i]][[2]])) {
-      cat("Attempt", l_steps[[i]][[1]], ": ", l_steps[[i]][[2]], "\n")
       jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
     }
   }
