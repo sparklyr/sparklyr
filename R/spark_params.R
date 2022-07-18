@@ -41,11 +41,20 @@ params_validate_and_set <- function(x, params = list()) {
   set_names(validated, names_set)
 }
 
+#' @importFrom rlang set_names
+params_validate_estimator_and_set <- function(x, params = list()) {
+  validated <- params_validate_estimator(x, params)
+  new_names <- map_chr(names(validated), params_name_r_to_spark)
+  names_set <- paste0("set", new_names)
+  set_names(validated, names_set)
+}
+
+
 params_name_r_to_spark <- function(x) {
   sw <- strsplit(x, "_")[[1]]
   fl <- toupper(substr(sw, 1, 1))
   ll <- substr(sw, 2, nchar(sw))
-  paste0(fl, ll, collapse = "")
+  trimws(paste0(fl, ll, collapse = ""))
 }
 
 #' @importFrom purrr imap
