@@ -27,7 +27,6 @@ ml_gbt_regressor_impl <- function(x, formula = NULL, max_iter = 20, max_depth = 
 
   ml_process_model(
     x = x,
-    spark_class = "org.apache.spark.ml.regression.GBTRegressor",
     r_class = "ml_gbt_regressor",
     ml_function = new_ml_model_gbt_regression,
     features = features,

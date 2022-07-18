@@ -86,7 +86,6 @@ ml_aft_survival_regression_impl <-
 
     ml_process_model(
       x = x,
-      spark_class = "org.apache.spark.ml.regression.AFTSurvivalRegression",
       r_class = "ml_aft_survival_regression",
       ml_function = new_ml_model_aft_survival_regression,
       features = features,

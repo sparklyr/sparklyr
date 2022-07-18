@@ -19,7 +19,6 @@ ml_random_forest_regressor_impl <- function(x, formula = NULL, num_trees = 20, s
                                                response = NULL, features = NULL, ...) {
   ml_process_model(
     x = x,
-    spark_class = "org.apache.spark.ml.regression.RandomForestRegressor",
     r_class = "ml_random_forest_regressor",
     ml_function = new_ml_model_random_forest_regression,
     features = features,

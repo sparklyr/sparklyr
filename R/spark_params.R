@@ -12,6 +12,7 @@ params_validator.pre_ml_estimator <- function(x) {
 
 params_base_validator <- function(x) {
   list(
+    #LR
     features_col = function(x) cast_string(x),
     label_col = function(x) cast_string(x),
     prediction_col = function(x) cast_string(x),
@@ -23,7 +24,14 @@ params_base_validator <- function(x) {
     standardization = function(x) cast_scalar_logical(x),
     tol = function(x) cast_scalar_double(x),
     loss = function(x) cast_choice(x, c("squaredError", "huber")),
-    weight_col = function(x) cast_nullable_string(x)
+    weight_col = function(x) cast_nullable_string(x),
+    # GLM
+    family = function(x) cast_choice(x, c("gaussian", "binomial", "poisson", "gamma", "tweedie")),
+    link = function(x) cast_nullable_string(x),
+    link_power = function(x) cast_nullable_scalar_double(x),
+    variance_power = function(x) cast_nullable_scalar_double(x),
+    link_prediction_col = function(x) cast_nullable_string(x),
+    offset_col = function(x) cast_nullable_string(x)
   )
 }
 
@@ -55,7 +63,7 @@ params_name_r_to_spark <- function(x) {
 }
 
 #' @importFrom purrr imap
-params_validate <- function(x, params, unmatched_fail = FALSE) {
+params_validate <- function(x, params, unmatched_fail = TRUE) {
   pm <- params_validator(x)
 
   matched_list <- imap(params, ~ any(names(pm) == .y))
@@ -71,11 +79,13 @@ params_validate <- function(x, params, unmatched_fail = FALSE) {
     }
   }
 
+  names_params <- names(params)
   for(i in seq_along(params)) {
     if(matched_names[i]) {
-      fn <- pm[names(pm) == names(params[i])]
+      fn <- pm[names(pm) == names_params[i]]
       new_val <- do.call(fn[[1]], list(x = params[[i]]))
-      params[[i]] <- new_val
+      if(is.null(new_val) != is.null(params[[i]])) stop("NULL value not valid")
+      if(!is.null(new_val)) params[[i]] <- new_val
     }
   }
   params

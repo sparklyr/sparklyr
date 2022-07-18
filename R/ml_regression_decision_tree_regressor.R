@@ -25,7 +25,6 @@ ml_decision_tree_regressor_impl <- function(x, formula = NULL, max_depth = 5, ma
 
   ml_process_model(
     x = x,
-    spark_class = "org.apache.spark.ml.regression.DecisionTreeRegressor",
     r_class = "ml_decision_tree_regressor",
     ml_function = new_ml_model_decision_tree_regression,
     features = features,

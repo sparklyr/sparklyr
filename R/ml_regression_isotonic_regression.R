@@ -44,7 +44,6 @@ ml_isotonic_regression_impl <- function(x, formula = NULL, feature_index = 0, is
                                            response = NULL, features = NULL, ...) {
   ml_process_model(
     x = x,
-    spark_class = "org.apache.spark.ml.regression.IsotonicRegression",
     r_class = "ml_isotonic_regression",
     ml_function = new_ml_model_isotonic_regression,
     features = features,
