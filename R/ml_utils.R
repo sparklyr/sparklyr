@@ -112,9 +112,13 @@ make_stats_arranger <- function(fit_intercept) {
 
 # ----------------------------- ML helpers -------------------------------------
 
-ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_function,
+ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
                              formula = NULL, response = NULL, features = NULL) {
   sc <- spark_connection(x)
+
+  # Mapping R class to Spark model using /inst/sparkml/class_mapping.json
+  class_mapping <- as.list(genv_get_ml_class_mapping())
+  spark_class <- names(class_mapping[class_mapping == r_class])
 
   args <- list(sc, spark_class)
   if (!is.null(uid)) {
@@ -124,7 +128,7 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
 
   jobj <- do.call(invoke_new, args)
 
-  pe <- params_validate_estimator_and_set(x, invoke_steps)
+  pe <- params_validate_estimator_and_set(jobj, invoke_steps)
 
   l_steps <- purrr::imap(pe, ~ list(.y, .x))
 

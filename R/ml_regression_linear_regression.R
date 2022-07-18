@@ -57,7 +57,6 @@ ml_linear_regression_impl <- function(x, formula = NULL, fit_intercept = TRUE,
 
   ml_process_model(
     x = x,
-    spark_class = "org.apache.spark.ml.regression.LinearRegression",
     r_class = "ml_linear_regression",
     ml_function = new_ml_model_linear_regression,
     features = features,

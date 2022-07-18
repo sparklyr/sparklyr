@@ -27,23 +27,20 @@ params_base_validator <- function(x) {
   )
 }
 
-params_validate_estimator <- function(x, params = list()) {
+params_validate_estimator <- function(jobj, params = list()) {
   dummy_obj <- list()
-  class(dummy_obj) <- "pre_ml_estimator"
+
+  spark_obj_name <- jobj_info(jobj)[[1]]
+  class_mapping <- as.list(genv_get_ml_class_mapping())
+  r_obj_class <- class_mapping[names(class_mapping) == spark_obj_name][[1]]
+
+  class(dummy_obj) <- c(r_obj_class, "pre_ml_estimator")
   params_validate(dummy_obj, params = params)
 }
 
 #' @importFrom rlang set_names
-params_validate_and_set <- function(x, params = list()) {
-  validated <- params_validate(x, params)
-  new_names <- map_chr(names(validated), params_name_r_to_spark)
-  names_set <- paste0("set", new_names)
-  set_names(validated, names_set)
-}
-
-#' @importFrom rlang set_names
-params_validate_estimator_and_set <- function(x, params = list()) {
-  validated <- params_validate_estimator(x, params)
+params_validate_estimator_and_set <- function(jobj, params = list()) {
+  validated <- params_validate_estimator(jobj, params)
   new_names <- map_chr(names(validated), params_name_r_to_spark)
   names_set <- paste0("set", new_names)
   set_names(validated, names_set)
