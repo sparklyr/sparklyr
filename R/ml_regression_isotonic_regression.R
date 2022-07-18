@@ -51,12 +51,12 @@ ml_isotonic_regression_impl <- function(x, formula = NULL, feature_index = 0, is
     uid = uid,
     formula = formula,
     invoke_steps = list(
-      setFeaturesCol = features_col,
-      setLabelCol = label_col,
-      setPredictionCol = prediction_col,
-      setFeatureIndex = cast_scalar_integer(feature_index),
-      setIsotonic = cast_scalar_logical(isotonic),
-      setWeightCol = cast_nullable_string(weight_col)
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      feature_index = feature_index,
+      isotonic = isotonic,
+      weight_col = weight_col
     )
   )
 

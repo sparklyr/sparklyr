@@ -93,16 +93,16 @@ ml_aft_survival_regression_impl <-
       uid = uid,
       formula = formula,
       invoke_steps = list(
-        setFeaturesCol = features_col,
-        setLabelCol = label_col,
-        setPredictionCol = prediction_col,
-        setFitIntercept = cast_scalar_logical(fit_intercept),
-        setMaxIter = cast_scalar_integer(max_iter),
-        setTol = cast_scalar_double(tol),
-        setCensorCol = cast_string(censor_col),
-        setQuantileProbabilities = cast_double_list(quantile_probabilities),
-        setAggregationDepth = cast_scalar_integer(aggregation_depth),
-        setQuantilesCol = cast_nullable_string(quantiles_col)
+        features_col = features_col,
+        label_col = label_col,
+        prediction_col = prediction_col,
+        fit_intercept = fit_intercept,
+        max_iter = max_iter,
+        tol = tol,
+        censor_col = censor_col,
+        quantile_probabilities = quantile_probabilities,
+        aggregation_depth = aggregation_depth,
+        quantiles_col = quantiles_col
       )
     )
   }

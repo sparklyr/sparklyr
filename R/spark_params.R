@@ -31,7 +31,33 @@ params_base_validator <- function(x) {
     link_power = function(x) cast_nullable_scalar_double(x),
     variance_power = function(x) cast_nullable_scalar_double(x),
     link_prediction_col = function(x) cast_nullable_string(x),
-    offset_col = function(x) cast_nullable_string(x)
+    offset_col = function(x) cast_nullable_string(x),
+    # AFT
+    censor_col = function(x) cast_string(x),
+    quantile_probabilities = function(x) cast_double_list(x),
+    aggregation_depth = function(x) cast_scalar_integer(x),
+    quantiles_col = function(x) cast_nullable_string(x),
+    # Decision tree
+    impurity = function(x) cast_choice(x, c("variance")),
+    checkpoint_interval = function(x) cast_scalar_integer(x),
+    max_bins = function(x) cast_scalar_integer(x),
+    max_depth = function(x) cast_scalar_integer(x),
+    min_info_gain = function(x) cast_scalar_double(x),
+    min_instances_per_node = function(x) cast_scalar_integer(x),
+    cache_node_ids = function(x) cast_scalar_logical(x),
+    max_memory_in_mb = function(x) cast_scalar_integer(x),
+    variance_col = function(x) cast_nullable_string(x),
+    seed = function(x) cast_nullable_scalar_integer(x),
+    # Isotonic
+    feature_index = function(x) cast_scalar_integer(x),
+    isotonic = function(x) cast_scalar_logical(x),
+    # Random Forest
+    num_trees = function(x) cast_scalar_integer(x),
+    subsampling_rate = function(x) cast_scalar_double(x),
+    feature_subset_strategy = function(x) cast_string(x),
+    # GBT
+    step_size = function(x) cast_scalar_double(x),
+    loss_type = function(x) cast_choice(x, c("squared", "absolute"))
   )
 }
 
@@ -49,21 +75,29 @@ params_validate_estimator <- function(jobj, params = list()) {
 #' @importFrom rlang set_names
 params_validate_estimator_and_set <- function(jobj, params = list()) {
   validated <- params_validate_estimator(jobj, params)
-  new_names <- map_chr(names(validated), params_name_r_to_spark)
+  new_names <- map_chr(
+    names(validated),
+    param_name_r_to_spark,
+    as.list(genv_get_param_mapping_r_to_s())
+    )
   names_set <- paste0("set", new_names)
   set_names(validated, names_set)
 }
 
-
-params_name_r_to_spark <- function(x) {
-  sw <- strsplit(x, "_")[[1]]
+param_name_r_to_spark <- function(x, initial_catalog = NULL) {
+  match_catalog <- initial_catalog[names(initial_catalog) == x]
+  if(length(match_catalog) == 0) {
+    sw <- strsplit(x, "_")[[1]]
+  } else {
+    sw <- match_catalog[[1]]
+  }
   fl <- toupper(substr(sw, 1, 1))
   ll <- substr(sw, 2, nchar(sw))
   trimws(paste0(fl, ll, collapse = ""))
 }
 
 #' @importFrom purrr imap
-params_validate <- function(x, params, unmatched_fail = TRUE) {
+params_validate <- function(x, params, unmatched_fail = FALSE) {
   pm <- params_validator(x)
 
   matched_list <- imap(params, ~ any(names(pm) == .y))
