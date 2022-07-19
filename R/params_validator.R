@@ -117,9 +117,11 @@ params_validate <- function(x, params, unmatched_fail = FALSE) {
   for(i in seq_along(params)) {
     if(matched_names[i]) {
       fn <- pm[names(pm) == names_params[i]]
-      new_val <- do.call(fn[[1]], list(x = params[[i]]))
-      if(is.null(new_val) != is.null(params[[i]])) stop("NULL value not valid")
-      if(!is.null(new_val)) params[[i]] <- new_val
+      if(!is.null(params[[i]])) {
+        new_val <- do.call(fn[[1]], list(x = params[[i]]))
+        if(is.null(new_val) != is.null(params[[i]])) stop("NULL value not valid")
+        if(!is.null(new_val)) params[[i]] <- new_val
+      }
     }
   }
   params

@@ -82,7 +82,8 @@ ml_aft_survival_regression_impl <-
            uid = random_string("aft_survival_regression_"),
            response = NULL,
            features = NULL, ...) {
-    aggregation_depth <- param_min_version(x, aggregation_depth, "2.1.0")
+
+    param_min_version(x, aggregation_depth, "2.1.0")
 
     ml_process_model(
       x = x,
