@@ -91,8 +91,15 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
 
         # Call the validator associated with the stage, and return the (validated)
         #   parameters the user specified.
-        do.call(ml_get_stage_validator(stage_jobj), list(args_to_validate)) %>%
-          `[`(input_param_names)
+        validation_function <- ml_get_stage_validator(stage_jobj)
+        if(!is.null(validation_function)) {
+          do.call(validation_function, list(args_to_validate)) %>%
+            `[`(input_param_names)
+        } else {
+          params_validate_estimator(stage_jobj, args_to_validate) %>%
+            `[`(input_param_names)
+        }
+
       })
     }) %>%
     rlang::set_names(stage_uids[stage_indices])

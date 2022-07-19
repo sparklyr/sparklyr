@@ -25,7 +25,6 @@ ml_decision_tree_regressor_impl <- function(x, formula = NULL, max_depth = 5, ma
 
   ml_process_model(
     x = x,
-    spark_class = "org.apache.spark.ml.regression.DecisionTreeRegressor",
     r_class = "ml_decision_tree_regressor",
     ml_function = new_ml_model_decision_tree_regression,
     features = features,
@@ -33,19 +32,19 @@ ml_decision_tree_regressor_impl <- function(x, formula = NULL, max_depth = 5, ma
     uid = uid,
     formula = formula,
     invoke_steps = list(
-      setFeaturesCol = features_col,
-      setLabelCol = label_col,
-      setPredictionCol = prediction_col,
-      setImpurity = cast_choice(impurity, c("variance")),
-      setCheckpointInterval = cast_scalar_integer(checkpoint_interval),
-      setMaxBins = cast_scalar_integer(max_bins),
-      setMaxDepth = cast_scalar_integer(max_depth),
-      setMinInfoGain = cast_scalar_double(min_info_gain),
-      setMinInstancesPerNode = cast_scalar_integer(min_instances_per_node),
-      setCacheNodeIds = cast_scalar_logical(cache_node_ids),
-      setMaxMemoryInMB = cast_scalar_integer(max_memory_in_mb),
-      setVarianceCol = variance_col,
-      setSeed = cast_nullable_scalar_integer(seed)
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      impurity = impurity,
+      checkpoint_interval = checkpoint_interval,
+      max_bins = max_bins,
+      max_depth = max_depth,
+      min_info_gain = min_info_gain,
+      min_instances_per_node = min_instances_per_node,
+      cache_node_ids = cache_node_ids,
+      max_memory_in_mb = max_memory_in_mb,
+      variance_col = variance_col,
+      seed = seed
     )
   )
 }
