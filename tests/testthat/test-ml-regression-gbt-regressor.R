@@ -32,19 +32,12 @@ test_that("ml_gbt_regressor() param setting", {
 })
 
 test_that("ML Pipeline works for GBTs", {
-
-  if(spark_version(sc) <= "2.3") {
-    feature_subset_strategy = NULL
-  } else {
-    feature_subset_strategy = "sqrt"
-  }
-
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
 
   m_pipeline <- ml_pipeline(sc) %>%
     ml_r_formula(Sepal_Length ~ Sepal_Width + Petal_Length) %>%
-    ml_gbt_regressor(feature_subset_strategy = feature_subset_strategy)
+    ml_gbt_regressor()
 
   expect_is(m_pipeline, "ml_pipeline")
 
@@ -56,16 +49,9 @@ test_that("ML Pipeline works for GBTs", {
 
 test_that("Tuning works GBT", {
   sc <- testthat_spark_connection()
-
-  if(spark_version(sc) <= "2.3") {
-    feature_subset_strategy = NULL
-  } else {
-    feature_subset_strategy = "sqrt"
-  }
-
   pipeline <- ml_pipeline(sc) %>%
     ft_r_formula(Sepal_Length ~ Sepal_Width + Petal_Length) %>%
-    ml_gbt_regressor(feature_subset_strategy = feature_subset_strategy)
+    ml_gbt_regressor()
 
   cv <- ml_cross_validator(
     sc,

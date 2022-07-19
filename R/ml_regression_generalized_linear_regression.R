@@ -81,7 +81,7 @@ ml_generalized_linear_regression_impl <- function(x, formula = NULL, family = "g
                                              uid = random_string("generalized_linear_regression_"),
                                              response = NULL, features = NULL,
                                              ...) {
-  param_min_version(x, offset_col, "2.3.0")
+  offset_col <- param_min_version(x, offset_col, "2.3.0")
 
   fam <- family
   if (is.function(fam)) {

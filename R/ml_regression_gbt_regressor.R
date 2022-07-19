@@ -23,7 +23,7 @@ ml_gbt_regressor_impl <- function(x, formula = NULL, max_iter = 20, max_depth = 
                                      uid = random_string("gbt_regressor_"),
                                      response = NULL, features = NULL, ...) {
 
-  param_min_version(x, feature_subset_strategy, "2.3.0")
+  feature_subset_strategy <- param_min_version(x, feature_subset_strategy, "2.3.0", "auto")
 
   ml_process_model(
     x = x,
