@@ -91,7 +91,7 @@ sql_build.op_sample <- function(op, con, frac) {
 #' @export
 sql_build.lazy_sample_query <- function(op, con, ...) {
   grps <- dbplyr::op_grps(op$x)
-  sdf <- to_sdf(op$x, con)
+  sdf <- to_sdf(op, con)
   frac <- op$frac
 
   if (rlang::quo_is_null(op$args$weight)) {

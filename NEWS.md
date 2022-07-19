@@ -6,6 +6,10 @@
 
 # Sparklyr 1.7.7
 
+### dplyr
+
+- Makes sure to run previous `dplyr` actions before sampling (#3276)
+
 ### Misc
 
 - Ensures compatibility with the upcoming, and current, versions of `dbplyr`
