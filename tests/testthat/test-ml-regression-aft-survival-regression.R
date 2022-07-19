@@ -103,3 +103,41 @@ test_that("Deprecated function fails", {
     )
 })
 
+test_that("Tuning works with AFT", {
+  test_requires("survival")
+
+  sc <- testthat_spark_connection()
+
+  ovarian_tbl <- sdf_copy_to(
+    sc,
+    survival::ovarian,
+    name = "ovarian_tbl",
+    overwrite = TRUE
+    )
+
+  pipeline <- ml_pipeline(sc) %>%
+    ft_r_formula(futime ~ ecog_ps + rx + age + resid_ds) %>%
+    ml_aft_survival_regression(censor_col = "fustat")
+
+  cv <- ml_cross_validator(
+    sc,
+    estimator = pipeline,
+    estimator_param_maps = list(
+      aft_survival_regression = list(
+        max_iter = c(10, 20),
+        aggregation_depth = c(2, 4)
+      )
+    ),
+    evaluator = ml_regression_evaluator(sc),
+    num_folds = 2,
+    seed = 1111
+  )
+
+  cv_model <- ml_fit(cv, ovarian_tbl)
+  expect_is(cv_model, "ml_cross_validator_model")
+
+  cv_metrics <- ml_validation_metrics(cv_model)
+  expect_equal(dim(cv_metrics), c(4, 3))
+})
+
+
