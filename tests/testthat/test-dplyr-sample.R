@@ -38,3 +38,24 @@ test_that("set.seed makes sampling outcomes deterministic", {
     }
   }
 })
+
+test_that("dplyr query is executed before sampling", {
+
+  expect_equal(
+    testthat_tbl("mtcars") %>%
+      select(hp, mpg) %>%
+      sample_n(5) %>%
+      collect() %>%
+      dim(),
+    c(5, 2)
+  )
+
+  expect_equal(
+    testthat_tbl("mtcars") %>%
+      select(hp, mpg) %>%
+      sample_frac(0.1) %>%
+      collect() %>%
+      dim(),
+    c(3, 2)
+  )
+})

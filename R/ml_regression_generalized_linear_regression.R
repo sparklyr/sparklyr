@@ -87,19 +87,15 @@ ml_generalized_linear_regression_impl <- function(x, formula = NULL, family = "g
   if (is.function(fam)) {
     warning("Specifying a function for `family` is deprecated; please specify strings for `family` and `link`.")
     fam <- fam()
-    link <- cast_string(fam$link)
-    family <- cast_string(fam$family)
-  } else if (inherits(fam, "family")) {
-    link <- cast_string(fam$link)
-    family <- cast_string(fam$family)
-  } else {
-    family <- cast_choice(fam, c("gaussian", "binomial", "poisson", "gamma", "tweedie"))
-    link <- cast_nullable_string(link)
+    }
+
+  if (inherits(fam, "family") | is.function(fam)) {
+    link <- fam$link
+    family <- fam$family
   }
 
   ml_process_model(
     x = x,
-    spark_class = "org.apache.spark.ml.regression.GeneralizedLinearRegression",
     r_class = "ml_generalized_linear_regression",
     ml_function = new_ml_model_generalized_linear_regression,
     features = features,
@@ -107,24 +103,31 @@ ml_generalized_linear_regression_impl <- function(x, formula = NULL, family = "g
     uid = uid,
     formula = formula,
     invoke_steps = list(
-      setFeaturesCol = features_col,
-      setLabelCol = label_col,
-      setPredictionCol = prediction_col,
-      setFamily = family,
-      setLink = link,
-      setFitIntercept = cast_scalar_logical(fit_intercept),
-      setRegParam = cast_scalar_double(reg_param),
-      setMaxIter = cast_scalar_integer(max_iter),
-      setSolver = cast_choice(solver, "irls"),
-      setTol = cast_scalar_double(tol),
-      setLinkPower = cast_nullable_scalar_double(link_power),
-      setVariancePower = cast_nullable_scalar_double(variance_power),
-      setLinkPredictionCol = cast_nullable_string(link_prediction_col),
-      setWeightCol = cast_nullable_string(weight_col),
-      setOffsetCol = offset_col
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      family = family,
+      link = link,
+      fit_intercept = fit_intercept,
+      reg_param = reg_param,
+      max_iter = max_iter,
+      solver = solver,
+      tol = tol,
+      link_power = link_power,
+      variance_power = variance_power,
+      link_prediction_col = link_prediction_col,
+      weight_col = weight_col,
+      offset_col = offset_col
     )
   )
 }
+
+params_validator.ml_generalized_linear_regression <- function(x) {
+  x <- params_base_validator(x)
+  x$solver <- function(x) cast_choice(x, "irls")
+  x
+}
+
 
 # ------------------------------- Methods --------------------------------------
 

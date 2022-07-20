@@ -33,6 +33,7 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
 
   glmnet <- get("glmnet", envir = asNamespace("glmnet"))
   sc <- testthat_spark_connection()
+
   mtcars_tbl <- testthat_tbl("mtcars")
 
   values <- seq(0, 0.4, by = 0.4)
@@ -66,6 +67,7 @@ test_that("ml_linear_regression and 'penalized' produce similar model fits", {
 
 test_that("weights column works for lm", {
   sc <- testthat_spark_connection()
+
   set.seed(42)
   iris_weighted <- iris %>%
     dplyr::mutate(
@@ -99,7 +101,9 @@ test_that("weights column works for lm", {
 })
 
 test_that("ml_linear_regression print methods work", {
+
   sc <- testthat_spark_connection()
+
   iris_tbl <- testthat_tbl("iris")
   linear_model <- ml_linear_regression(
     iris_tbl, Petal_Length ~ Petal_Width
@@ -120,6 +124,7 @@ test_that("ml_linear_regression print methods work", {
 
 test_that("fitted() works for linear regression", {
   sc <- testthat_spark_connection()
+
   iris_tbl <- testthat_tbl("iris")
   m <- ml_linear_regression(iris_tbl, Petal_Width ~ Petal_Length)
   expect_equal(
@@ -127,3 +132,34 @@ test_that("fitted() works for linear regression", {
     nrow(iris)
   )
 })
+
+
+test_that("Tuning works with Linear Regression", {
+  sc <- testthat_spark_connection()
+
+  pipeline <- ml_pipeline(sc) %>%
+    ft_r_formula(mpg ~ .) %>%
+    ml_linear_regression()
+
+  cv <- ml_cross_validator(
+    sc,
+    estimator = pipeline,
+    estimator_param_maps = list(
+      linear_regression = list(
+        elastic_net_param = c(0.25, 0.75),
+        reg_param = c(0.1, 0.05)
+      )
+    ),
+    evaluator = ml_regression_evaluator(sc),
+    num_folds = 10,
+    seed = 1111
+  )
+
+  cv_model <- ml_fit(cv, testthat_tbl("mtcars"))
+  expect_is(cv_model, "ml_cross_validator_model")
+
+  cv_metrics <- ml_validation_metrics(cv_model)
+  expect_equal(dim(cv_metrics), c(4, 3))
+})
+
+

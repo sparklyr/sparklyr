@@ -297,6 +297,7 @@ Collate:
     'mutation.R'
     'na_actions.R'
     'new_model_multilayer_perceptron.R'
+    'params_validator.R'
     'precondition.R'
     'project_template.R'
     'qubole_connection.R'

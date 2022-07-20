@@ -112,9 +112,13 @@ make_stats_arranger <- function(fit_intercept) {
 
 # ----------------------------- ML helpers -------------------------------------
 
-ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_function,
+ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
                              formula = NULL, response = NULL, features = NULL) {
   sc <- spark_connection(x)
+
+  # Mapping R class to Spark model using /inst/sparkml/class_mapping.json
+  class_mapping <- as.list(genv_get_ml_class_mapping())
+  spark_class <- names(class_mapping[class_mapping == r_class])
 
   args <- list(sc, spark_class)
   if (!is.null(uid)) {
@@ -124,7 +128,9 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
 
   jobj <- do.call(invoke_new, args)
 
-  l_steps <- purrr::imap(invoke_steps, ~ list(.y, .x))
+  pe <- params_validate_estimator_and_set(jobj, invoke_steps)
+
+  l_steps <- purrr::imap(pe, ~ list(.y, .x))
 
   for(i in seq_along(l_steps)) {
     if(!is.null(l_steps[[i]][[2]])) {
@@ -141,29 +147,32 @@ ml_process_model <- function(x, uid, spark_class, r_class, invoke_steps, ml_func
     formula = formula,
     response = response,
     features = features,
-    features_col = invoke_steps$setFeaturesCol,
-    label_col = invoke_steps$setLabelCol
+    features_col = invoke_steps$features_col,
+    label_col = invoke_steps$label_col
   )
 
 }
 
-param_min_version <- function(x, value, min_version = NULL) {
-  ret <- value
+param_min_version <- function(x, value, min_version = NULL, default = NULL) {
+  res <- value
   if (!is.null(value)) {
     if (!is.null(min_version)) {
       sc <- spark_connection(x)
       ver <- spark_version(sc)
       if (ver < min_version) {
-        warning(paste0(
-          "Parameter `", deparse(substitute(value)),
-          "` is only available for Spark ", min_version, " and later.",
-          "The value will not be passed to the model."
-        ))
-        ret <- NULL
+        if(value != default) {
+          stop(paste0(
+            "Parameter `", deparse(substitute(value)),
+            "` is only available for Spark ", min_version, " and later.",
+            "To avoid passing this variable, change the argument value to NULL."
+          ))
+        } else {
+          res <- NULL
+        }
       }
     }
   }
-  ret
+  res
 }
 
 # --------------------- Post conversion functions ------------------------------
