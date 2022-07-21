@@ -124,3 +124,30 @@ test_that("ml_generalized_linear_regression print methods work", {
     print = TRUE
   )
 })
+
+test_that("Tuning works GLM", {
+  sc <- testthat_spark_connection()
+
+  pipeline <- ml_pipeline(sc) %>%
+    ft_r_formula(Sepal_Length ~ Sepal_Width + Petal_Length) %>%
+    ml_generalized_linear_regression()
+
+  cv <- ml_cross_validator(
+    sc,
+    estimator = pipeline,
+    estimator_param_maps = list(
+      generalized_linear_regression = list(
+        max_iter = c(25, 30)
+      )
+    ),
+    evaluator = ml_regression_evaluator(sc),
+    num_folds = 2,
+    seed = 1111
+  )
+
+  cv_model <- ml_fit(cv, testthat_tbl("iris"))
+  expect_is(cv_model, "ml_cross_validator_model")
+
+  cv_metrics <- ml_validation_metrics(cv_model)
+  expect_equal(dim(cv_metrics), c(2, 2))
+})

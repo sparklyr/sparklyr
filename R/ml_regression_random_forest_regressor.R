@@ -19,7 +19,6 @@ ml_random_forest_regressor_impl <- function(x, formula = NULL, num_trees = 20, s
                                                response = NULL, features = NULL, ...) {
   ml_process_model(
     x = x,
-    spark_class = "org.apache.spark.ml.regression.RandomForestRegressor",
     r_class = "ml_random_forest_regressor",
     ml_function = new_ml_model_random_forest_regression,
     features = features,
@@ -27,21 +26,21 @@ ml_random_forest_regressor_impl <- function(x, formula = NULL, num_trees = 20, s
     uid = uid,
     formula = formula,
     invoke_steps = list(
-      setFeaturesCol = features_col,
-      setLabelCol = label_col,
-      setPredictionCol = prediction_col,
-      setImpurity = cast_choice(impurity, c("variance")),
-      setCheckpointInterval = cast_scalar_integer(checkpoint_interval),
-      setMaxBins = cast_scalar_integer(max_bins),
-      setMaxDepth = cast_scalar_integer(max_depth),
-      setMinInfoGain = cast_scalar_double(min_info_gain),
-      setMinInstancesPerNode = cast_scalar_integer(min_instances_per_node),
-      setCacheNodeIds = cast_scalar_logical(cache_node_ids),
-      setMaxMemoryInMB = cast_scalar_integer(max_memory_in_mb),
-      setSeed = cast_nullable_scalar_integer(seed),
-      setNumTrees = cast_scalar_integer(num_trees),
-      setSubsamplingRate = cast_scalar_double(subsampling_rate),
-      setFeatureSubsetStrategy = cast_string(feature_subset_strategy)
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      impurity = impurity,
+      checkpoint_interval = checkpoint_interval,
+      max_bins = max_bins,
+      max_depth = max_depth,
+      min_info_gain = min_info_gain,
+      min_instances_per_node = min_instances_per_node,
+      cache_node_ids = cache_node_ids,
+      max_memory_in_mb = max_memory_in_mb,
+      seed = seed,
+      num_trees = num_trees,
+      subsampling_rate = subsampling_rate,
+      feature_subset_strategy = feature_subset_strategy
     )
   )
 }

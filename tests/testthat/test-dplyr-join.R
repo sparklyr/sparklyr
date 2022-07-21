@@ -8,8 +8,8 @@ test_that("left_join works as expected", {
   s1 <- data.frame(x = 1:3, y = 4:6)
   s2 <- data.frame(x = 1:3, y = 7:9)
 
-  d1 <- copy_to(sc, s1, overwrite = TRUE)
-  d2 <- copy_to(sc, s2, overwrite = TRUE)
+  d1 <- sdf_copy_to(sc, s1, overwrite = TRUE)
+  d2 <- sdf_copy_to(sc, s2, overwrite = TRUE)
 
   j1 <- left_join(d1, d2, by = "x") %>%
     dplyr::arrange(x) %>%
@@ -43,7 +43,7 @@ test_that("left_join works with default suffixes", {
   expect_named(j2, c("group", "value1", "conflict_x", "conflict_y"))
 })
 
-test_that("left_join works with user-supplied `.` suffixes", {
+test_that("joins works with user-supplied `.` suffixes", {
   test_requires("dplyr")
 
   s1 <- data.frame(
@@ -69,6 +69,22 @@ test_that("left_join works with user-supplied `.` suffixes", {
 
   expect_message(
     left_join(d1, d2, by = "group", suffix = c(".x", ".y")),
+    "Replacing '.' with '_' in suffixes. New suffixes: _x, _y"
+  )
+
+  expect_message(
+    right_join(d1, d2, by = "group", suffix = c(".x", ".y")),
+    "Replacing '.' with '_' in suffixes. New suffixes: _x, _y"
+  )
+
+  expect_message(
+    full_join(d1, d2, by = "group", suffix = c(".x", ".y")),
+    "Replacing '.' with '_' in suffixes. New suffixes: _x, _y"
+  )
+
+
+  expect_message(
+    inner_join(d1, d2, by = "group", suffix = c(".x", ".y")),
     "Replacing '.' with '_' in suffixes. New suffixes: _x, _y"
   )
 })

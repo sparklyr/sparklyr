@@ -202,11 +202,7 @@ sdf_bind_cols <- function(...) {
 mutate_names <- function(x, value) {
   sdf <- spark_dataframe(x)
   renamed <- invoke(sdf, "toDF", as.list(value))
-  if (dbplyr_uses_ops()) {
-    sdf_register(renamed, name = as.character(x$ops$x))
-  } else {
-    sdf_register(renamed, name = as.character(x$lazy_query$x))
-  }
+  sdf_register(renamed, name = as.character(x$lazy_query$x))
 }
 
 #' @export

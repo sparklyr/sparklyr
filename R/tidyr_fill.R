@@ -12,21 +12,13 @@ fill.tbl_spark <- function(data, ..., .direction = c("down", "up", "downup", "up
 
   group_vars <- data %>% dplyr::group_vars()
 
-  if (dbplyr_uses_ops()) {
-    order_exprs <- lapply(dbplyr::op_sort(data$ops), rlang::get_expr)
-    if ("op_arrange" %in% class(data$ops)) {
-      # no need to include 'order by' in the input when the same 'order by' will
-      # be part of the window spec
-      data$ops <- data$ops$x
-    }
-  } else {
-    order_exprs <- lapply(dbplyr::op_sort(data), rlang::get_expr)
-    if ("op_arrange" %in% class(data$lazy_query)) {
-      # no need to include 'order by' in the input when the same 'order by' will
-      # be part of the window spec
-      data$lazy_query <- data$lazy_query$x
-    }
+  order_exprs <- lapply(dbplyr::op_sort(data), rlang::get_expr)
+  if ("op_arrange" %in% class(data$lazy_query)) {
+    # no need to include 'order by' in the input when the same 'order by' will
+    # be part of the window spec
+    data$lazy_query <- data$lazy_query$x
   }
+
   cols <- colnames(data)
   vars <- names(tidyselect::eval_select(rlang::expr(c(...)), replicate_colnames(data)))
 

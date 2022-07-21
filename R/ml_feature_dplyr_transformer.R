@@ -1,4 +1,3 @@
-#' @include ml_feature_sql_transformer_utils.R
 #' @include ml_feature_sql_transformer.R
 NULL
 
@@ -83,4 +82,19 @@ ft_dplyr_transformer.tbl_spark <- function(x, tbl,
     ...
   )
   ml_transform(stage, x)
+}
+
+ft_extract_sql <- function(x) {
+
+  get_base_name <- function(o) {
+    if (!inherits(o$x, "lazy_base_query")) {
+      get_base_name(o$x)
+    } else {
+      o$x$x
+    }
+  }
+
+  pattern <- paste0("\\b", get_base_name(x$lazy_query), "\\b")
+
+  gsub(pattern, "__THIS__", dbplyr::sql_render(x))
 }

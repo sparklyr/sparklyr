@@ -4,7 +4,14 @@
 
 - Adds support to Spark 3.3 
 
+- Removes code related to backwards compatibility with `dbplyr`. `sparklyr`
+  requires `dbplyr` version 2.2.1 or above, so the code is no longer needed. 
+
 # Sparklyr 1.7.7
+
+### dplyr
+
+- Makes sure to run previous `dplyr` actions before sampling (#3276)
 
 ### Misc
 
