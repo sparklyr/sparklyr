@@ -47,3 +47,10 @@ test_that("debug_string() works", {
   debug <- sdf_debug_string(iris_tbl, print = FALSE)
   expect_true(grepl("^\\([0-9]+\\)", debug[1]))
 })
+
+test_that("'spark_config_settings()' returns a data.frame", {
+  expect_is(
+    spark_config_settings(),
+    "data.frame"
+  )
+})
