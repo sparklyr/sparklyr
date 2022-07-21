@@ -76,12 +76,11 @@ Depends:
 Imports:
     assertthat,
     base64enc,
-    blob,
     config (>= 0.2),
-    DBI (>= 0.6-1),
-    dbplyr (>= 2.1.1),
+    DBI (>= 1.0.0),
+    dbplyr (>= 2.2.1),
     digest,
-    dplyr (>= 0.7.2),
+    dplyr (>= 1.0.9),
     ellipsis (>= 0.1.0),
     forge,
     generics,
@@ -169,21 +168,18 @@ Collate:
     'dbi_spark_result.R'
     'dbi_spark_table.R'
     'dbi_spark_transactions.R'
-    'dbplyr-compat.R'
-    'dbplyr_utils.R'
     'do_spark.R'
     'dplyr_do.R'
     'dplyr_hof.R'
     'dplyr_join.R'
-    'partial_eval.R'
-    'dplyr_spark_connection.R'
     'dplyr_spark_data.R'
     'prng_utils.R'
-    'ml_feature_sql_transformer_utils.R'
     'dplyr_spark_table.R'
     'stratified_sample.R'
     'sdf_sql.R'
     'dplyr_sql.R'
+    'dplyr_sql_translation.R'
+    'dplyr_verbs.R'
     'imports.R'
     'install_spark.R'
     'install_spark_versions.R'

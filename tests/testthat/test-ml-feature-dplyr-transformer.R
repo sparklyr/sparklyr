@@ -19,17 +19,10 @@ test_that("ft_dplyr_transformer() works", {
 
   dplyr_transformer <- ft_dplyr_transformer(sc, transformed)
 
-  if (dbplyr_uses_ops()) {
-    expect_equal(
-      ml_param_map(dplyr_transformer),
-      list(statement = "SELECT `Sepal_Length`, `Sepal_Width`, `Petal_Length`, `Petal_Width`, `Species`, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
-    )
-  } else {
-    expect_equal(
-      ml_param_map(dplyr_transformer),
-      list(statement = "SELECT *, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
-    )
-  }
+  expect_equal(
+    ml_param_map(dplyr_transformer),
+    list(statement = "SELECT *, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
+  )
 })
 
 test_that("ft_dplyr_transformer() supports all sampling use cases", {

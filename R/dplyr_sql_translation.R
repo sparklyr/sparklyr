@@ -1,236 +1,5 @@
-#' @include dbplyr_utils.R
-#' @include dplyr_hof.R
-#' @include partial_eval.R
-#' @include spark_sql.R
-#' @include utils.R
-NULL
-
-fix_na_real_values <- function(dots) {
-  for (i in seq_along(dots)) {
-    if (identical(rlang::quo_get_expr(dots[[i]]), rlang::expr(NA_real_))) {
-      dots[[i]] <- rlang::quo(dbplyr::sql("CAST(NULL AS DOUBLE)"))
-    }
-  }
-
-  dots
-}
-
+#' @importFrom dbplyr sql_translation
 #' @export
-#' @importFrom dplyr transmute
-#' @importFrom dplyr all_of
-transmute.tbl_spark <- function(.data, ...) {
-  if (dbplyr_uses_ops()) {
-    dots <- rlang::enquos(..., .named = TRUE) %>%
-      fix_na_real_values() %>%
-      partial_eval_dots(sim_data = simulate_vars_spark(.data))
-
-    nest_vars(.data, dots, character())
-  } else {
-    dots_org <- rlang::enquos(..., .named = TRUE)
-    dots <- fix_na_real_values(dots_org)
-    if (identical(dots, dots_org)) {
-      NextMethod()
-    } else {
-      transmute(.data, !!!dots)
-    }
-  }
-}
-
-#' @export
-#' @importFrom dplyr mutate
-mutate.tbl_spark <- function(.data, ...) {
-  if (dbplyr_uses_ops()) {
-    dots <- rlang::enquos(..., .named = TRUE) %>%
-      fix_na_real_values() %>%
-      partial_eval_dots(sim_data = simulate_vars_spark(.data))
-
-    nest_vars(.data, dots, union(dbplyr::op_vars(.data), dbplyr::op_grps(.data)))
-  } else {
-    dots_org <- rlang::enquos(...)
-    dots <- fix_na_real_values(dots_org)
-    if (identical(dots, dots_org)) {
-      NextMethod()
-    } else {
-      mutate(.data, !!!dots)
-    }
-  }
-}
-
-#' @export
-#' @importFrom dplyr filter
-filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
-  if (!identical(.preserve, FALSE)) {
-    stop("`.preserve` is not supported on database backends", call. = FALSE)
-  }
-
-  if (dbplyr_uses_ops()) {
-    dots <- rlang::quos(...)
-    dots <- partial_eval_dots(dots, sim_data = simulate_vars_spark(.data))
-
-    add_op_single("filter", .data, dots = dots)
-  } else {
-    NextMethod()
-  }
-}
-
-#' @export
-#' @importFrom dplyr select
-select.tbl_spark <- function(.data, ...) {
-  if (dbplyr_uses_ops()) {
-    sim_data <- simulate_vars_spark(.data)
-    grps <- dbplyr::op_grps(.data$ops)
-
-    loc <- tidyselect::eval_select(
-      rlang::expr(c(...)),
-      sim_data,
-      include = grps
-    )
-    new_vars <- rlang::set_names(rlang::syms(names(sim_data)[loc]), names(loc))
-    .class <- class(.data)
-    class(.data) <- setdiff(class(.data), "tbl_spark")
-    .data <- do.call(
-      select,
-      append(list(.data), as.list(new_vars))
-    )
-    class(.data) <- .class
-
-    .data
-  } else {
-    NextMethod()
-  }
-}
-
-#' @export
-#' @importFrom dplyr summarise
-#' @importFrom dbplyr op_vars
-summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
-  if (dbplyr_uses_ops()) {
-    # NOTE: this is mostly copy-pasted from
-    # https://github.com/tidyverse/dbplyr/blob/master/R/verb-summarise.R
-    # except for minor changes (see "partial-eval.R") to make use cases such as
-    # `summarise(across(where(is.numeric), mean))` work as expected for Spark
-    # dataframes
-    dots <- rlang::quos(..., .named = TRUE)
-    dots <- dots %>% partial_eval_dots(
-      sim_data = simulate_vars_spark(.data),
-      ctx = "summarize",
-      supports_one_sided_formula = FALSE
-    )
-
-    # For each expression, check if it uses any newly created variables
-    check_summarise_vars <- function(dots) {
-      for (i in seq_along(dots)) {
-        used_vars <- all_names(rlang::get_expr(dots[[i]]))
-        cur_vars <- names(dots)[seq_len(i - 1)]
-
-        if (any(used_vars %in% cur_vars)) {
-          stop(
-            "`", names(dots)[[i]],
-            "` refers to a variable created earlier in this summarise().\n",
-            "Do you need an extra mutate() step?",
-            call. = FALSE
-          )
-        }
-      }
-    }
-
-    check_groups <- function(.groups) {
-      if (rlang::is_null(.groups)) {
-        return()
-      }
-
-      if (.groups %in% c("drop_last", "drop", "keep")) {
-        return()
-      }
-
-      rlang::abort(c(
-        paste0(
-          "`.groups` can't be ", rlang::as_label(.groups),
-          if (.groups == "rowwise") " in dbplyr"
-        ),
-        i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
-      ))
-    }
-
-    check_summarise_vars(dots)
-    check_groups(.groups)
-
-    add_op_single(
-      "summarise",
-      .data,
-      dots = dots,
-      args = list(.groups = .groups, env_caller = rlang::caller_env())
-    )
-  } else {
-    NextMethod()
-  }
-}
-
-#' @export
-#' @importFrom dplyr sql_escape_ident
-#' @importFrom dbplyr sql_quote
-sql_escape_ident.spark_connection <- function(con, x) {
-  # Assuming it might include database name like: `dbname.tableName`
-  if (length(x) == 1) {
-    tbl_quote_name(con, x)
-  } else {
-    dbplyr::sql_quote(x, "`")
-  }
-}
-
-#' @importFrom dbplyr sql
-build_sql_if_compare <- function(..., con, compare) {
-  args <- list(...)
-
-  build_sql_if_parts <- function(ifParts, ifValues) {
-    if (length(ifParts) == 1) {
-      return(ifParts[[1]])
-    }
-
-    current <- ifParts[[1]]
-    currentName <- ifValues[[1]]
-    build_sql(
-      "if(",
-      current,
-      ", ",
-      currentName,
-      ", ",
-      build_sql_if_parts(ifParts[-1], ifValues[-1]),
-      ")"
-    )
-  }
-
-  thisIdx <- 0
-  conditions <- lapply(seq_along(args), function(idx) {
-    thisIdx <<- thisIdx + 1
-    e <- args[[idx]]
-
-    if (thisIdx == length(args)) {
-      e
-    } else {
-      indexes <- Filter(function(innerIdx) innerIdx > thisIdx, seq_along(args))
-      ifValues <- lapply(indexes, function(e) args[[e]])
-
-      dbplyr::sql(paste(e, compare, ifValues, collapse = " and "))
-    }
-  })
-
-  build_sql_if_parts(conditions, args)
-}
-
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, sql_translate_env)
-#'   S3method(sql_translate_env, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_translation)
-#'   S3method(sql_translation, spark_connection)
-#' }
-
-sql_translate_env.spark_connection <- function(con) {
-  spark_sql_translation(con)
-}
-
 sql_translation.spark_connection <- function(con) {
   spark_sql_translation(con)
 }
@@ -559,28 +328,9 @@ build_sql_fn <- function(fn) {
   )
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, sql_set_op)
-#'   S3method(sql_set_op, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_query_set_op)
-#'   S3method(sql_query_set_op, spark_connection)
-#' }
-
+#' @importFrom dbplyr sql_query_set_op
 #' @keywords internal
-sql_set_op.spark_connection <- function(con, x, y, method) {
-  sql <- spark_sql_set_op(con, x, y, method)
-
-  if (!is.null(sql)) {
-    sql
-  } else {
-    class(con) <- class(con)[class(con) != "spark_connection"]
-    NextMethod()
-  }
-}
-
-#' @keywords internal
+#' @export
 sql_query_set_op.spark_connection <- function(con, x, y, method, ..., all = FALSE) {
   sql <- spark_sql_set_op(con, x, y, method)
 
@@ -592,21 +342,61 @@ sql_query_set_op.spark_connection <- function(con, x, y, method, ..., all = FALS
   }
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, db_query_fields)
-#'   S3method(db_query_fields, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_query_fields)
-#'   S3method(sql_query_fields, spark_connection)
-#' }
-
+#' @importFrom dbplyr sql_query_fields
 #' @keywords internal
-db_query_fields.spark_connection <- function(con, sql, ...) {
-  spark_db_query_fields(con, sql)
-}
-
-#' @keywords internal
+#' @export
 sql_query_fields.spark_connection <- function(con, sql, ...) {
   spark_sql_query_fields(con, sql, ...)
+}
+
+#' @importFrom dbplyr sql
+build_sql_if_compare <- function(..., con, compare) {
+  args <- list(...)
+
+  build_sql_if_parts <- function(ifParts, ifValues) {
+    if (length(ifParts) == 1) {
+      return(ifParts[[1]])
+    }
+
+    current <- ifParts[[1]]
+    currentName <- ifValues[[1]]
+    build_sql(
+      "if(",
+      current,
+      ", ",
+      currentName,
+      ", ",
+      build_sql_if_parts(ifParts[-1], ifValues[-1]),
+      ")"
+    )
+  }
+
+  thisIdx <- 0
+  conditions <- lapply(seq_along(args), function(idx) {
+    thisIdx <<- thisIdx + 1
+    e <- args[[idx]]
+
+    if (thisIdx == length(args)) {
+      e
+    } else {
+      indexes <- Filter(function(innerIdx) innerIdx > thisIdx, seq_along(args))
+      ifValues <- lapply(indexes, function(e) args[[e]])
+
+      dbplyr::sql(paste(e, compare, ifValues, collapse = " and "))
+    }
+  })
+
+  build_sql_if_parts(conditions, args)
+}
+
+#' @export
+#' @importFrom dplyr sql_escape_ident
+#' @importFrom dbplyr sql_quote
+sql_escape_ident.spark_connection <- function(con, x) {
+  # Assuming it might include database name like: `dbname.tableName`
+  if (length(x) == 1) {
+    tbl_quote_name(con, x)
+  } else {
+    dbplyr::sql_quote(x, "`")
+  }
 }

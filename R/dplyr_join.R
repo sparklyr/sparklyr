@@ -10,18 +10,11 @@
 #' @name join.tbl_spark
 NULL
 
-#' @rdname join.tbl_spark
-#' @export
-#' @importFrom dplyr inner_join
-inner_join.tbl_spark <-
-  function(x,
-           y,
-           by = NULL,
-           copy = FALSE,
-           suffix = c("_x", "_y"),
-           auto_index = FALSE,
-           ...,
-           sql_on = NULL) {
+join_tbl_spark_impl <- function(x, y, by = NULL, copy = FALSE,
+                                suffix = c("_x", "_y"), auto_index = FALSE,
+                                ..., sql_on = NULL
+                                ) {
+
     if (any(grepl("\\.", suffix))) {
       suffix <- gsub("\\.", "_", suffix)
       message(
@@ -32,72 +25,23 @@ inner_join.tbl_spark <-
 
     NextMethod(suffix = suffix)
   }
+
+#' @rdname join.tbl_spark
+#' @export
+#' @importFrom dplyr inner_join
+inner_join.tbl_spark <- join_tbl_spark_impl
 
 #' @rdname join.tbl_spark
 #' @export
 #' @importFrom dplyr left_join
-left_join.tbl_spark <-
-  function(x,
-           y,
-           by = NULL,
-           copy = FALSE,
-           suffix = c("_x", "_y"),
-           auto_index = FALSE,
-           ...,
-           sql_on = NULL) {
-    if (any(grepl("\\.", suffix))) {
-      suffix <- gsub("\\.", "_", suffix)
-      message(
-        "Replacing '.' with '_' in suffixes. New suffixes: ",
-        paste(suffix, collapse = ", ")
-      )
-    }
-
-    NextMethod(suffix = suffix)
-  }
+left_join.tbl_spark <- join_tbl_spark_impl
 
 #' @rdname join.tbl_spark
 #' @export
 #' @importFrom dplyr right_join
-right_join.tbl_spark <-
-  function(x,
-           y,
-           by = NULL,
-           copy = FALSE,
-           suffix = c("_x", "_y"),
-           auto_index = FALSE,
-           ...,
-           sql_on = NULL) {
-    if (any(grepl("\\.", suffix))) {
-      suffix <- gsub("\\.", "_", suffix)
-      message(
-        "Replacing '.' with '_' in suffixes. New suffixes: ",
-        paste(suffix, collapse = ", ")
-      )
-    }
-
-    NextMethod(suffix = suffix)
-  }
+right_join.tbl_spark <- join_tbl_spark_impl
 
 #' @rdname join.tbl_spark
 #' @export
 #' @importFrom dplyr full_join
-full_join.tbl_spark <-
-  function(x,
-           y,
-           by = NULL,
-           copy = FALSE,
-           suffix = c("_x", "_y"),
-           auto_index = FALSE,
-           ...,
-           sql_on = NULL) {
-    if (any(grepl("\\.", suffix))) {
-      suffix <- gsub("\\.", "_", suffix)
-      message(
-        "Replacing '.' with '_' in suffixes. New suffixes: ",
-        paste(suffix, collapse = ", ")
-      )
-    }
-
-    NextMethod(suffix = suffix)
-  }
+full_join.tbl_spark <- join_tbl_spark_impl

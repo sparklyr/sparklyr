@@ -130,20 +130,6 @@ test_that("'across()' works with formula syntax", {
   }
 })
 
-test_that("'across()' emits error when formula references a mutated column", {
-  skip_if_not(dbplyr_uses_ops())
-
-  expect_error(
-    dplyr_across_test_cases_tbl %>%
-      mutate(across(where(is.numeric), ~ .x + z)) %>%
-      collect(),
-    paste0(
-      "Column '.*' is referenced by the formula and is also being mutated ",
-      "within the same query\\. This type of use case is unsupported\\."
-    )
-  )
-})
-
 test_that("'mutate' and 'transmute' work with NSE", {
   test_requires("dplyr")
   col <- "mpg"
@@ -535,15 +521,6 @@ test_that("result from dplyr::compute() has remote name", {
   expect_false(is.null(sdf %>% sparklyr:::sdf_remote_name()))
 })
 
-test_that("dplyr::summarize() emits an error for summarizer using one-sided formula", {
-  skip_if_not(dbplyr_uses_ops())
-
-  expect_error(
-    iris_tbl %>% summarize(across(starts_with("Petal"), ~ mean(.x) ^ 2)),
-    "One-sided formula is unsupported for 'summarize' on Spark dataframes"
-  )
-})
-
 test_that("tbl_ptype.tbl_spark works as expected", {
   expect_equal(df1_tbl %>% dplyr::select_if(is.integer) %>% colnames(), "a")
   expect_equal(df1_tbl %>% dplyr::select_if(is.numeric) %>% colnames(), "a")
@@ -573,4 +550,38 @@ test_that("summarise(.groups=)", {
         summarize(result = sum(val2, na.rm = TRUE), .groups = groups)
     )
   }
+})
+
+
+test_that("tbl_spark prints", {
+  print_output <- capture.output(print.tbl_spark(iris_tbl))
+  expect_equal(
+    print_output[1],
+    "# Source: spark<iris> [?? x 5]"
+  )
+})
+
+
+test_that("pmin and pmax work", {
+  pmin_df <- data.frame(x = 11:20, y = 1:10)
+
+  tbl_pmin_df <- sdf_copy_to(sc, pmin_df, overwrite = TRUE)
+
+  remote_p <- tbl_pmin_df %>%
+    mutate(
+      p_min = pmin(x, y),
+      p_max = pmax(x, y)
+    ) %>%
+    collect()
+
+  local_p <- pmin_df %>%
+    mutate(
+      p_min = pmin(x, y),
+      p_max = pmax(x, y)
+    )
+
+  expect_true(
+    all(remote_p == local_p)
+  )
+
 })

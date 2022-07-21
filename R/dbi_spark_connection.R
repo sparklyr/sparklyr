@@ -78,11 +78,8 @@ setMethod("dbSetProperty", c("spark_connection", "character", "character"), func
   )
 })
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") >= "2") {
-#'   importFrom(dbplyr, dbplyr_edition)
-#'   S3method(dbplyr_edition, spark_connection)
-#' }
+#' @importFrom dbplyr dbplyr_edition
+#' @export
 dbplyr_edition.spark_connection <- function(con) {
   as.integer(spark_config_value(con$config, "sparklyr.dbplyr.edition", 2L))
 }
