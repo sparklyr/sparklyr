@@ -126,6 +126,7 @@ jobs:
 
       - name: R Tests
         run: |
+          devtools::load_all()
           spark_major <- as.numeric(substr(Sys.getenv("SPARK_VERSION"), 1, 1))
           if(spark_major < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
           Sys.getenv("JAVA_HOME")
