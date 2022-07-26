@@ -19,13 +19,14 @@ ml_metrics_regression <- function(data, truth, estimate = prediction,
     estimate = as_name(enquo(estimate)),
     metrics = metrics,
     evaluator = "org.apache.spark.ml.evaluation.RegressionEvaluator",
-    pred_col = "setRawPredictionCol"
+    pred_col = "setRawPredictionCol",
+    estimator_name = "standard"
   )
 
 }
 
 #' @export
-ml_metrics_binary <- function(data, truth, estimate = prediction,
+ml_metrics_binary <- function(data, truth = label, estimate = rawPrediction,
                               metrics = c("roc_auc", "pr_auc"),
                               ...) {
   ml_metrics_impl(
@@ -34,13 +35,14 @@ ml_metrics_binary <- function(data, truth, estimate = prediction,
     estimate = as_name(enquo(estimate)),
     metrics = metrics,
     evaluator = "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator",
-    pred_col = "setRawPredictionCol"
+    pred_col = "setRawPredictionCol",
+    estimator_name = "binary"
   )
 
 }
 
 #' @export
-ml_metrics_multiclass <- function(data, truth, estimate = prediction,
+ml_metrics_multiclass <- function(data, truth = label, estimate = prediction,
                                   metrics = c("accuracy"),
                                   ...) {
   ml_metrics_impl(
@@ -49,7 +51,8 @@ ml_metrics_multiclass <- function(data, truth, estimate = prediction,
     estimate = as_name(enquo(estimate)),
     metrics = metrics,
     evaluator = "org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator",
-    pred_col = "setPredictionCol"
+    pred_col = "setPredictionCol",
+    estimator_name = "multiclass"
   )
 }
 
@@ -58,7 +61,9 @@ ml_metrics_multiclass <- function(data, truth, estimate = prediction,
 # "truePositiveRateByLabel", "falsePositiveRateByLabel", "precisionByLabel",
 # "recallByLabel", "fMeasureByLabel", "logLoss", "hammingLoss"
 
-ml_metrics_impl <- function(data, truth, estimate, metrics, evaluator, pred_col) {
+ml_metrics_impl <- function(data, truth, estimate, metrics,
+                            evaluator, pred_col, estimator_name
+                            ) {
   init_steps <- list(truth, estimate)
   names(init_steps) <- c("setLabelCol", pred_col)
 
@@ -74,7 +79,7 @@ ml_metrics_impl <- function(data, truth, estimate, metrics, evaluator, pred_col)
         "evaluate" = spark_dataframe(data)
       )
       val <- ml_metrics_steps(init, steps)
-      tibble(.metric = .x, .estimator = "standard", .estimate = val)
+      tibble(.metric = .x, .estimator = estimator_name, .estimate = val)
     }
   )
 }
