@@ -28,9 +28,8 @@ ml_metrics_regression <- function(data, truth, estimate = prediction,
   map_dfr(
     metrics,
     ~ {
-      metric <- ifelse(.x == "rsq", "r2", .x)
       steps <- list(
-        "setMetricName" = metric,
+        "setMetricName" = ml_metrics_conversion(.x),
         "evaluate" = df_data
       )
       val <- ml_metrics_steps(init, steps)
@@ -59,10 +58,8 @@ ml_metrics_binary <- function(data, truth, estimate = prediction,
   map_dfr(
     metrics,
     ~ {
-      metric <- ifelse(.x == "roc_auc", "areaUnderROC", .x)
-      metric <- ifelse(.x == "pr_auc", "areaUnderPR", metric)
       steps <- list(
-        "setMetricName" = metric,
+        "setMetricName" = ml_metrics_conversion(.x),
         "evaluate" = df_data
       )
       val <- ml_metrics_steps(init, steps)
@@ -70,6 +67,61 @@ ml_metrics_binary <- function(data, truth, estimate = prediction,
     }
   )
 }
+
+#' @export
+ml_metrics_multiclass <- function(data, truth, estimate = prediction,
+                                  metrics = c("accuracy"),
+                                  ...) {
+  estimate <- enquo(estimate)
+  truth <- enquo(truth)
+
+  conn <- spark_connection(data)
+  df_data <- spark_dataframe(data)
+
+  evaluator <- "org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator"
+  init_steps <- list(
+    "setLabelCol" = as_name(truth),
+    "setPredictionCol" = as_name(estimate)
+  )
+  init <- ml_metrics_init(evaluator, init_steps)
+
+  map_dfr(
+    metrics,
+    ~ {
+      steps <- list(
+        "setMetricName" = ml_metrics_conversion(.x),
+        "evaluate" = df_data
+      )
+      val <- ml_metrics_steps(init, steps)
+      tibble(.metric = .x, .estimator = "multiclass", .estimate = val)
+    }
+  )
+}
+
+# "f1" (default), "accuracy", "weightedPrecision", "weightedRecall",
+# "weightedTruePositiveRate", "weightedFalsePositiveRate", "weightedFMeasure",
+# "truePositiveRateByLabel", "falsePositiveRateByLabel", "precisionByLabel",
+# "recallByLabel", "fMeasureByLabel", "logLoss", "hammingLoss"
+
+
+
+ml_metrics_conversion <- function(x) {
+  conv_table <- c(
+    "f1" = "f1",
+    "accuracy" = "accuracy",
+    "weightedPrecision" = "precision",
+    "rsq" = "r2",
+    "roc_auc" = "areaUnderROC",
+    "pr_auc" = "areaUnderPR"
+  )
+  match <- conv_table[conv_table == x]
+  if(length(match) == 1) {
+    names(match)
+  } else {
+    x
+  }
+}
+
 
 
 ml_metrics_init <- function(evaluator, invoke_steps = list()) {
