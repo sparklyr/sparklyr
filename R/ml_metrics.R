@@ -20,8 +20,8 @@ ml_metrics_regression <- function(data, truth, estimate = prediction,
 
   evaluator <- "org.apache.spark.ml.evaluation.RegressionEvaluator"
   init_steps <- list(
-    "setLabelCol" = as_name(estimate),
-    "setPredictionCol" = as_name(truth)
+    "setLabelCol" = as_name(truth),
+    "setPredictionCol" = as_name(estimate)
   )
   init <- ml_metrics_init(evaluator, init_steps)
 
@@ -38,6 +38,39 @@ ml_metrics_regression <- function(data, truth, estimate = prediction,
     }
   )
 }
+
+#' @export
+ml_metrics_binary <- function(data, truth, estimate = prediction,
+                              metrics = c("roc_auc", "pr_auc"),
+                              ...) {
+  estimate <- enquo(estimate)
+  truth <- enquo(truth)
+
+  conn <- spark_connection(data)
+  df_data <- spark_dataframe(data)
+
+  evaluator <- "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator"
+  init_steps <- list(
+    "setLabelCol" = as_name(truth),
+    "setRawPredictionCol" = as_name(estimate)
+  )
+  init <- ml_metrics_init(evaluator, init_steps)
+
+  map_dfr(
+    metrics,
+    ~ {
+      metric <- ifelse(.x == "roc_auc", "areaUnderROC", .x)
+      metric <- ifelse(.x == "pr_auc", "areaUnderPR", metric)
+      steps <- list(
+        "setMetricName" = metric,
+        "evaluate" = df_data
+      )
+      val <- ml_metrics_steps(init, steps)
+      tibble(.metric = .x, .estimator = "binary", .estimate = val)
+    }
+  )
+}
+
 
 ml_metrics_init <- function(evaluator, invoke_steps = list()) {
   new_jobj <- invoke_new(sc, list(evaluator, random_string("metric_")))
