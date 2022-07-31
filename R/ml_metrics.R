@@ -13,7 +13,7 @@
 #' actually happened
 #' @param estimate The name of the column from `x` that contains the prediction.
 #' Defaults to `prediction`, since it is the default that `ml_predict()` uses.
-#' @param metrics A character vector with the metrics to calculate. For regression
+#' @param metrics A character vector with the metrics to calculate. For regression models
 #' the possible values are: `rmse` (Root mean squared error), `mse` (Mean squared error),
 #' `rsq` (R squared), `mae` (Mean absolute error), and `var` (Explained variance).
 #'  Defaults to: `rmse`, `rsq`, `mae`
@@ -36,13 +36,13 @@ ml_metrics_regression <- function(x, truth, estimate = prediction,
 
 }
 
-#' @param truth The name of the column from `x` that contains an integer field
+#' @param truth The name of the column from `x` with an integer field
 #' containing the binary response (0 or 1). The `ml_predict()` function will
 #' create a new field named `label` which contains the expected type and values.
 #' `truth` defaults to `label`.
 #' @param estimate The name of the column from `x` that contains the prediction.
 #' Defaults to `rawPrediction`, since its type and expected values will match `truth`.
-#' @param metrics A character vector with the metrics to calculate. For regression
+#' @param metrics A character vector with the metrics to calculate. For binary models
 #' the possible values are: `roc_auc` (Area under the Receiver Operator curve),
 #' `pr_auc` (Area under the Precesion Recall curve).
 #'  Defaults to: `roc_auc`, `pr_auc`
@@ -60,9 +60,24 @@ ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
     pred_col = "setRawPredictionCol",
     estimator_name = "binary"
   )
-
 }
 
+#' @param truth The name of the column from `x` with an integer field containing
+#' an the indexed value for each outcome . The `ml_predict()` function will
+#' create a new field named `label` which contains the expected type and values.
+#' `truth` defaults to `label`.
+#' @param estimate The name of the column from `x` that contains the prediction.
+#' Defaults to `prediction`, since its type and indexed values will match `truth`.
+#' @inherit ml_metrics_regression
+#' @param metrics A character vector with the metrics to calculate. For multiclass
+#' models the possible values are: `acurracy`, `f_meas` (F-score), `recall` and
+#' `precision`. This function translates the argument into an acceptable Spark
+#' parameter. If no translation is found, then the raw value of the argument is
+#' passed to Spark. This makes it possible to request a metric that is not listed
+#' here but, depending on version, it is available in Spark. Other metrics form
+#' multi-class models are: `weightedTruePositiveRate`, `weightedFalsePositiveRate`,
+#' `weightedFMeasure`, `truePositiveRateByLabel`, `falsePositiveRateByLabel`,
+#' `precisionByLabel`, `recallByLabel`, `fMeasureByLabel`, `logLoss`, `hammingLoss`
 #' @export
 ml_metrics_multiclass <- function(x, truth = label, estimate = prediction,
                                   metrics = c("accuracy"),
@@ -77,11 +92,6 @@ ml_metrics_multiclass <- function(x, truth = label, estimate = prediction,
     estimator_name = "multiclass"
   )
 }
-
-# "f1" (default), "accuracy", "weightedPrecision", "weightedRecall",
-# "weightedTruePositiveRate", "weightedFalsePositiveRate", "weightedFMeasure",
-# "truePositiveRateByLabel", "falsePositiveRateByLabel", "precisionByLabel",
-# "recallByLabel", "fMeasureByLabel", "logLoss", "hammingLoss"
 
 ml_metrics_impl <- function(x, truth, estimate, metrics,
                             evaluator, pred_col, estimator_name
@@ -107,14 +117,18 @@ ml_metrics_impl <- function(x, truth, estimate, metrics,
 }
 
 ml_metrics_conversion <- function(x) {
+
   conv_table <- c(
-    "f1" = "f1",
     "accuracy" = "accuracy",
     "weightedPrecision" = "precision",
     "rsq" = "r2",
     "roc_auc" = "areaUnderROC",
-    "pr_auc" = "areaUnderPR"
+    "pr_auc" = "areaUnderPR",
+    "f_meas" = "f1",
+    "recall" = "weightedRecall",
+    "precision" = "weightedPrecision"
   )
+
   match <- conv_table[conv_table == x]
   if(length(match) == 1) {
     names(match)

@@ -16,7 +16,7 @@ ml_metrics_binary(
 \item{x}{A `tbl_spark` containing the estimate (prediction) and the truth (value
 of what actually happened)}
 
-\item{truth}{The name of the column from `x` that contains an integer field
+\item{truth}{The name of the column from `x` with an integer field
 containing the binary response (0 or 1). The `ml_predict()` function will
 create a new field named `label` which contains the expected type and values.
 `truth` defaults to `label`.}
@@ -24,7 +24,7 @@ create a new field named `label` which contains the expected type and values.
 \item{estimate}{The name of the column from `x` that contains the prediction.
 Defaults to `rawPrediction`, since its type and expected values will match `truth`.}
 
-\item{metrics}{A character vector with the metrics to calculate. For regression
+\item{metrics}{A character vector with the metrics to calculate. For binary models
 the possible values are: `roc_auc` (Area under the Receiver Operator curve),
 `pr_auc` (Area under the Precesion Recall curve).
  Defaults to: `roc_auc`, `pr_auc`}
