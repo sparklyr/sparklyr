@@ -49,3 +49,20 @@ containing the truth and estimate, and return a `tibble` with the results. The
 `tibble` has the same format and variable names as the output of the `yardstick`
 functions.
 }
+\examples{
+\dontrun{
+sc <- spark_connect("local")
+tbl_iris <- copy_to(sc, iris)
+iris_split <- sdf_random_split(tbl_iris, training = 0.5, test = 0.5)
+model <- ml_random_forest(iris_split$training, "Species ~ .")
+tbl_predictions <- ml_predict(model, iris_split$test)
+
+ml_metrics_multiclass(tbl_predictions)
+
+# Request different metrics
+ml_metrics_multiclass(tbl_predictions, metrics = c("recall", "precision"))
+
+# Request metrics not translated by the function, but valid in Spark
+ml_metrics_multiclass(tbl_predictions, metrics = c("logLoss", "hammingLoss"))
+}
+}
