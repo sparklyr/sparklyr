@@ -1,7 +1,7 @@
 #' Extracts metrics from a fitted table
 #' @description The function works best when passed a `tbl_spark` created by
 #' `ml_predict()`. The output `tbl_spark` will contain the correct variable
-#' types and format that the Spark "evaluator"  expects.
+#' types and format that the given Spark model "evaluator" expects.
 #' @details The `ml_metrics` family of functions implement Spark's `evaluate`
 #' closer to how the `yardstick` package works. The functions expect a table
 #' containing the truth and estimate, and return a `tibble` with the results. The
@@ -36,6 +36,17 @@ ml_metrics_regression <- function(x, truth, estimate = prediction,
 
 }
 
+#' @param truth The name of the column from `x` that contains an integer field
+#' containing the binary response (0 or 1). The `ml_predict()` function will
+#' create a new field named `label` which contains the expected type and values.
+#' `truth` defaults to `label`.
+#' @param estimate The name of the column from `x` that contains the prediction.
+#' Defaults to `rawPrediction`, since its type and expected values will match `truth`.
+#' @param metrics A character vector with the metrics to calculate. For regression
+#' the possible values are: `roc_auc` (Area under the Receiver Operator curve),
+#' `pr_auc` (Area under the Precesion Recall curve).
+#'  Defaults to: `roc_auc`, `pr_auc`
+#' @inherit ml_metrics_regression
 #' @export
 ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
                               metrics = c("roc_auc", "pr_auc"),
