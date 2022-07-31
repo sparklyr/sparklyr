@@ -13,10 +13,10 @@
 #' actually happened
 #' @param estimate The name of the column from `x` that contains the prediction.
 #' Defaults to `prediction`, since it is the default that `ml_predict()` uses.
-#' @param metrics A character vector with the metrics to calculate. For regression models
-#' the possible values are: `rmse` (Root mean squared error), `mse` (Mean squared error),
-#' `rsq` (R squared), `mae` (Mean absolute error), and `var` (Explained variance).
-#'  Defaults to: `rmse`, `rsq`, `mae`
+#' @param metrics A character vector with the metrics to calculate. For regression
+#' models the possible values are: `rmse` (Root mean squared error), `mse` (Mean
+#' squared error),`rsq` (R squared), `mae` (Mean absolute error), and `var`
+#' (Explained variance). Defaults to: `rmse`, `rsq`, `mae`
 #' @importFrom rlang as_name
 #' @importFrom purrr map_dfr imap
 #' @importFrom tibble tibble
@@ -29,7 +29,7 @@ ml_metrics_regression <- function(x, truth, estimate = prediction,
     truth = as_name(enquo(truth)),
     estimate = as_name(enquo(estimate)),
     metrics = metrics,
-    evaluator = "org.apache.spark.ml.evaluation.RegressionEvaluator",
+    evaluator = "RegressionEvaluator",
     pred_col = "setRawPredictionCol",
     estimator_name = "standard"
   )
@@ -56,7 +56,7 @@ ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
     truth = as_name(enquo(truth)),
     estimate = as_name(enquo(estimate)),
     metrics = metrics,
-    evaluator = "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator",
+    evaluator = "BinaryClassificationEvaluator",
     pred_col = "setRawPredictionCol",
     estimator_name = "binary"
   )
@@ -68,7 +68,6 @@ ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
 #' `truth` defaults to `label`.
 #' @param estimate The name of the column from `x` that contains the prediction.
 #' Defaults to `prediction`, since its type and indexed values will match `truth`.
-#' @inherit ml_metrics_regression
 #' @param metrics A character vector with the metrics to calculate. For multiclass
 #' models the possible values are: `acurracy`, `f_meas` (F-score), `recall` and
 #' `precision`. This function translates the argument into an acceptable Spark
@@ -78,38 +77,46 @@ ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
 #' multi-class models are: `weightedTruePositiveRate`, `weightedFalsePositiveRate`,
 #' `weightedFMeasure`, `truePositiveRateByLabel`, `falsePositiveRateByLabel`,
 #' `precisionByLabel`, `recallByLabel`, `fMeasureByLabel`, `logLoss`, `hammingLoss`
+#' @param beta Numerical value used for precision and recall. Defaults to 1.
+#' @inherit ml_metrics_regression
 #' @export
 ml_metrics_multiclass <- function(x, truth = label, estimate = prediction,
-                                  metrics = c("accuracy"),
+                                  metrics = c("accuracy"), beta = 1,
                                   ...) {
   ml_metrics_impl(
     x = x,
     truth = as_name(enquo(truth)),
     estimate = as_name(enquo(estimate)),
     metrics = metrics,
-    evaluator = "org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator",
+    evaluator = "MulticlassClassificationEvaluator",
     pred_col = "setPredictionCol",
-    estimator_name = "multiclass"
+    estimator_name = "multiclass",
+    beta = beta
   )
 }
 
 ml_metrics_impl <- function(x, truth, estimate, metrics,
-                            evaluator, pred_col, estimator_name
+                            evaluator, pred_col, estimator_name,
+                            beta = NULL
                             ) {
   init_steps <- list(truth, estimate)
   names(init_steps) <- c("setLabelCol", pred_col)
 
   conn <- spark_connection(x)
-  new_jobj <- invoke_new(conn, list(evaluator, random_string("metric_")))
+  new_jobj <- invoke_new(
+    conn, list(
+      paste0("org.apache.spark.ml.evaluation.", evaluator),
+      random_string("metric_")
+      )
+    )
   init <- ml_metrics_steps(new_jobj, init_steps)
 
   map_dfr(
     metrics,
     ~ {
-      steps <- list(
-        "setMetricName" = ml_metrics_conversion(.x),
-        "evaluate" = spark_xframe(x)
-      )
+      steps <- list("setMetricName" = ml_metrics_conversion(.x))
+      if(!is.null(beta)) steps <- c(steps, list("setBeta" = beta))
+      steps <- c(steps, list("evaluate" = spark_dataframe(x)))
       val <- ml_metrics_steps(init, steps)
       tibble(.metric = .x, .estimator = estimator_name, .estimate = val)
     }
@@ -118,15 +125,14 @@ ml_metrics_impl <- function(x, truth, estimate, metrics,
 
 ml_metrics_conversion <- function(x) {
 
+  # Spark's value ------- R arg value
   conv_table <- c(
-    "accuracy" = "accuracy",
     "weightedPrecision" = "precision",
-    "rsq" = "r2",
-    "roc_auc" = "areaUnderROC",
-    "pr_auc" = "areaUnderPR",
-    "f_meas" = "f1",
-    "recall" = "weightedRecall",
-    "precision" = "weightedPrecision"
+    "r2" = "rsq",
+    "areaUnderROC" = "roc_auc",
+    "areaUnderPR" = "pr_auc",
+    "f1" = "f_meas",
+    "weightedRecall" = "recall"
   )
 
   match <- conv_table[conv_table == x]

@@ -9,6 +9,7 @@ ml_metrics_multiclass(
   truth = label,
   estimate = prediction,
   metrics = c("accuracy"),
+  beta = 1,
   ...
 )
 }
@@ -33,6 +34,8 @@ here but, depending on version, it is available in Spark. Other metrics form
 multi-class models are: `weightedTruePositiveRate`, `weightedFalsePositiveRate`,
 `weightedFMeasure`, `truePositiveRateByLabel`, `falsePositiveRateByLabel`,
 `precisionByLabel`, `recallByLabel`, `fMeasureByLabel`, `logLoss`, `hammingLoss`}
+
+\item{beta}{Numerical value used for precision and recall. Defaults to 1.}
 }
 \description{
 The function works best when passed a `tbl_spark` created by

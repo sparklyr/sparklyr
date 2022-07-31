@@ -22,10 +22,10 @@ actually happened}
 \item{estimate}{The name of the column from `x` that contains the prediction.
 Defaults to `prediction`, since it is the default that `ml_predict()` uses.}
 
-\item{metrics}{A character vector with the metrics to calculate. For regression models
-the possible values are: `rmse` (Root mean squared error), `mse` (Mean squared error),
-`rsq` (R squared), `mae` (Mean absolute error), and `var` (Explained variance).
- Defaults to: `rmse`, `rsq`, `mae`}
+\item{metrics}{A character vector with the metrics to calculate. For regression
+models the possible values are: `rmse` (Root mean squared error), `mse` (Mean
+squared error),`rsq` (R squared), `mae` (Mean absolute error), and `var`
+(Explained variance). Defaults to: `rmse`, `rsq`, `mae`}
 }
 \description{
 The function works best when passed a `tbl_spark` created by
