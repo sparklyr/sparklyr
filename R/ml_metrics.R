@@ -1,20 +1,31 @@
-
-# "rmse" (default): root mean squared error -
-# "mse": mean squared error -
-# "r2": R^2^ metric -
-# "mae": mean absolute error -
-# "var": explained variance
-
+#' Extracts metrics from a fitted table
+#' @description The function works best when passed a `tbl_spark` created by
+#' `ml_predict()`. The output `tbl_spark` will contain the correct variable
+#' types and format that the Spark "evaluator"  expects.
+#' @details The `ml_metrics` family of functions implement Spark's `evaluate`
+#' closer to how the `yardstick` package works. The functions expect a table
+#' containing the truth and estimate, and return a `tibble` with the results. The
+#' `tibble` has the same format and variable names as the output of the `yardstick`
+#' functions.
+#' @param x A `tbl_spark` containing the estimate (prediction) and the truth (value
+#' of what actually happened)
+#' @param truth The name of the column from `x` that contains the value of what
+#' actually happened
+#' @param estimate The name of the column from `x` that contains the prediction.
+#' Defaults to `prediction`, since it is the default that `ml_predict()` uses.
+#' @param metrics A character vector with the metrics to calculate. For regression
+#' the possible values are: `rmse` (Root mean squared error), `mse` (Mean squared error),
+#' `rsq` (R squared), `mae` (Mean absolute error), and `var` (Explained variance).
+#'  Defaults to: `rmse`, `rsq`, `mae`
 #' @importFrom rlang as_name
 #' @importFrom purrr map_dfr imap
 #' @importFrom tibble tibble
 #' @export
-ml_metrics_regression <- function(data, truth, estimate = prediction,
+ml_metrics_regression <- function(x, truth, estimate = prediction,
                                   metrics = c("rmse", "rsq", "mae"),
                                   ...) {
-
   ml_metrics_impl(
-    data = data,
+    x = x,
     truth = as_name(enquo(truth)),
     estimate = as_name(enquo(estimate)),
     metrics = metrics,
@@ -26,11 +37,11 @@ ml_metrics_regression <- function(data, truth, estimate = prediction,
 }
 
 #' @export
-ml_metrics_binary <- function(data, truth = label, estimate = rawPrediction,
+ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
                               metrics = c("roc_auc", "pr_auc"),
                               ...) {
   ml_metrics_impl(
-    data = data,
+    x = x,
     truth = as_name(enquo(truth)),
     estimate = as_name(enquo(estimate)),
     metrics = metrics,
@@ -42,11 +53,11 @@ ml_metrics_binary <- function(data, truth = label, estimate = rawPrediction,
 }
 
 #' @export
-ml_metrics_multiclass <- function(data, truth = label, estimate = prediction,
+ml_metrics_multiclass <- function(x, truth = label, estimate = prediction,
                                   metrics = c("accuracy"),
                                   ...) {
   ml_metrics_impl(
-    data = data,
+    x = x,
     truth = as_name(enquo(truth)),
     estimate = as_name(enquo(estimate)),
     metrics = metrics,
@@ -61,13 +72,13 @@ ml_metrics_multiclass <- function(data, truth = label, estimate = prediction,
 # "truePositiveRateByLabel", "falsePositiveRateByLabel", "precisionByLabel",
 # "recallByLabel", "fMeasureByLabel", "logLoss", "hammingLoss"
 
-ml_metrics_impl <- function(data, truth, estimate, metrics,
+ml_metrics_impl <- function(x, truth, estimate, metrics,
                             evaluator, pred_col, estimator_name
                             ) {
   init_steps <- list(truth, estimate)
   names(init_steps) <- c("setLabelCol", pred_col)
 
-  conn <- spark_connection(data)
+  conn <- spark_connection(x)
   new_jobj <- invoke_new(conn, list(evaluator, random_string("metric_")))
   init <- ml_metrics_steps(new_jobj, init_steps)
 
@@ -76,7 +87,7 @@ ml_metrics_impl <- function(data, truth, estimate, metrics,
     ~ {
       steps <- list(
         "setMetricName" = ml_metrics_conversion(.x),
-        "evaluate" = spark_dataframe(data)
+        "evaluate" = spark_xframe(x)
       )
       val <- ml_metrics_steps(init, steps)
       tibble(.metric = .x, .estimator = estimator_name, .estimate = val)
