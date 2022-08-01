@@ -2,6 +2,11 @@
 
 ### Misc
 
+- Adds new metric extraction functions: `ml_metrics_binary()`, `ml_metrics_regression()` 
+and `ml_metrics_multiclass()`. They work closer to how `yardstick` metric extraction
+functions work. They expect a table with the predictions and actual values, and returns
+a concise `tibble` with the metrics.  
+
 - Adds support to Spark 3.3 
 
 - Removes code related to backwards compatibility with `dbplyr`. `sparklyr`

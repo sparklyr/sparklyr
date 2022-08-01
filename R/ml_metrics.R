@@ -17,6 +17,7 @@
 #' models the possible values are: `rmse` (Root mean squared error), `mse` (Mean
 #' squared error),`rsq` (R squared), `mae` (Mean absolute error), and `var`
 #' (Explained variance). Defaults to: `rmse`, `rsq`, `mae`
+#' @param ... Optional arguments; currently unused.
 #' @importFrom rlang as_name
 #' @importFrom purrr map_dfr imap
 #' @importFrom tibble tibble
@@ -25,7 +26,9 @@
 #' sc <- spark_connect("local")
 #' tbl_iris <- copy_to(sc, iris)
 #' iris_split <- sdf_random_split(tbl_iris, training = 0.5, test = 0.5)
-#' model <- ml_generalized_linear_regression(iris_split$training, "Sepal_Length ~ Sepal_Width + Petal_Length + Petal_Width")
+#' training <- iris_split$training
+#' reg_formula <- "Sepal_Length ~ Sepal_Width + Petal_Length + Petal_Width"
+#' model <- ml_generalized_linear_regression(training, reg_formula)
 #' tbl_predictions <- ml_predict(model, iris_split$test)
 #' tbl_predictions %>%
 #'   ml_metrics_regression(Sepal_Length)
@@ -43,7 +46,6 @@ ml_metrics_regression <- function(x, truth, estimate = prediction,
     pred_col = "setPredictionCol",
     estimator_name = "standard"
   )
-
 }
 
 #' @param truth The name of the column from `x` with an integer field
@@ -134,8 +136,7 @@ ml_metrics_multiclass <- function(x, truth = label, estimate = prediction,
 
 ml_metrics_impl <- function(x, truth, estimate, metrics,
                             evaluator, pred_col, estimator_name,
-                            beta = NULL
-                            ) {
+                            beta = NULL) {
   init_steps <- list(truth, estimate)
   names(init_steps) <- c("setLabelCol", pred_col)
 
@@ -144,15 +145,15 @@ ml_metrics_impl <- function(x, truth, estimate, metrics,
     conn, list(
       paste0("org.apache.spark.ml.evaluation.", evaluator),
       random_string("metric_")
-      )
     )
+  )
   init <- ml_metrics_steps(new_jobj, init_steps)
 
   map_dfr(
     metrics,
     ~ {
       steps <- list("setMetricName" = ml_metrics_conversion(.x))
-      if(!is.null(beta)) steps <- c(steps, list("setBeta" = beta))
+      if (!is.null(beta)) steps <- c(steps, list("setBeta" = beta))
       steps <- c(steps, list("evaluate" = spark_dataframe(x)))
       val <- ml_metrics_steps(init, steps)
       tibble(.metric = .x, .estimator = estimator_name, .estimate = val)
@@ -173,7 +174,7 @@ ml_metrics_conversion <- function(x) {
   )
 
   match <- conv_table[conv_table == x]
-  if(length(match) == 1) {
+  if (length(match) == 1) {
     names(match)
   } else {
     x
@@ -182,8 +183,10 @@ ml_metrics_conversion <- function(x) {
 
 ml_metrics_steps <- function(jobj, invoke_steps = list()) {
   l_steps <- imap(invoke_steps, ~ list(.y, .x))
-  for(i in seq_along(l_steps)) {
+  for (i in seq_along(l_steps)) {
     jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
   }
   jobj
 }
+
+utils::globalVariables(c("label", "rawPrediction", "prediction"))

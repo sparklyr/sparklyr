@@ -36,6 +36,8 @@ multi-class models are: `weightedTruePositiveRate`, `weightedFalsePositiveRate`,
 `precisionByLabel`, `recallByLabel`, `fMeasureByLabel`, `logLoss`, `hammingLoss`}
 
 \item{beta}{Numerical value used for precision and recall. Defaults to 1.}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 The function works best when passed a `tbl_spark` created by

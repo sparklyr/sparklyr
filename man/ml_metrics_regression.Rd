@@ -26,6 +26,8 @@ Defaults to `prediction`, since it is the default that `ml_predict()` uses.}
 models the possible values are: `rmse` (Root mean squared error), `mse` (Mean
 squared error),`rsq` (R squared), `mae` (Mean absolute error), and `var`
 (Explained variance). Defaults to: `rmse`, `rsq`, `mae`}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 The function works best when passed a `tbl_spark` created by
@@ -44,7 +46,9 @@ functions.
 sc <- spark_connect("local")
 tbl_iris <- copy_to(sc, iris)
 iris_split <- sdf_random_split(tbl_iris, training = 0.5, test = 0.5)
-model <- ml_generalized_linear_regression(iris_split$training, "Sepal_Length ~ Sepal_Width + Petal_Length + Petal_Width")
+training <- iris_split$training
+reg_formula <- "Sepal_Length ~ Sepal_Width + Petal_Length + Petal_Width"
+model <- ml_generalized_linear_regression(training, reg_formula)
 tbl_predictions <- ml_predict(model, iris_split$test)
 tbl_predictions \%>\%
   ml_metrics_regression(Sepal_Length)

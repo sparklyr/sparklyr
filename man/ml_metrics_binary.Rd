@@ -28,6 +28,8 @@ Defaults to `rawPrediction`, since its type and expected values will match `trut
 the possible values are: `roc_auc` (Area under the Receiver Operator curve),
 `pr_auc` (Area under the Precesion Recall curve).
  Defaults to: `roc_auc`, `pr_auc`}
+
+\item{...}{Optional arguments; currently unused.}
 }
 \description{
 The function works best when passed a `tbl_spark` created by
