@@ -1,3 +1,5 @@
+skip_on_livy()
+
 test_that("Multiclass metrics return expected results", {
   tbl_iris <- testthat_tbl("iris")
 

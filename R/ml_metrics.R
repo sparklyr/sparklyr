@@ -100,7 +100,9 @@ ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
 #' multi-class models are: `weightedTruePositiveRate`, `weightedFalsePositiveRate`,
 #' `weightedFMeasure`, `truePositiveRateByLabel`, `falsePositiveRateByLabel`,
 #' `precisionByLabel`, `recallByLabel`, `fMeasureByLabel`, `logLoss`, `hammingLoss`
-#' @param beta Numerical value used for precision and recall. Defaults to 1.
+#' @param beta Numerical value used for precision and recall. Defaults to NULL, but
+#' if the Spark session's verion is 3.0 and above, then NULL is changed to 1,
+#' unless something different is supplied in this argument.
 #' @examples
 #' \dontrun{
 #' sc <- spark_connect("local")
@@ -120,7 +122,7 @@ ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
 #' @inherit ml_metrics_regression
 #' @export
 ml_metrics_multiclass <- function(x, truth = label, estimate = prediction,
-                                  metrics = c("accuracy"), beta = 1,
+                                  metrics = c("accuracy"), beta = NULL,
                                   ...) {
   ml_metrics_impl(
     x = x,
@@ -137,6 +139,11 @@ ml_metrics_multiclass <- function(x, truth = label, estimate = prediction,
 ml_metrics_impl <- function(x, truth, estimate, metrics,
                             evaluator, pred_col, estimator_name,
                             beta = NULL) {
+
+  if(spark_version(spark_connection(x)) >= 3) {
+    if(is.null(beta) && evaluator == "MulticlassClassificationEvaluator") beta <- 1
+  }
+
   init_steps <- list(truth, estimate)
   names(init_steps) <- c("setLabelCol", pred_col)
 
