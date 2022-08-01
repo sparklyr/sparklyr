@@ -41,3 +41,15 @@ containing the truth and estimate, and return a `tibble` with the results. The
 `tibble` has the same format and variable names as the output of the `yardstick`
 functions.
 }
+\examples{
+\dontrun{
+sc <- spark_connect("local")
+tbl_iris <- copy_to(sc, iris)
+prep_iris <- tbl_iris \%>\%
+  mutate(is_setosa = ifelse(Species == "setosa", 1, 0))
+iris_split <- sdf_random_split(prep_iris, training = 0.5, test = 0.5)
+model <- ml_logistic_regression(iris_split$training, "is_setosa ~ Sepal_Length")
+tbl_predictions <- ml_predict(model, iris_split$test)
+ml_metrics_binary(tbl_predictions)
+}
+}

@@ -20,6 +20,16 @@
 #' @importFrom rlang as_name
 #' @importFrom purrr map_dfr imap
 #' @importFrom tibble tibble
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect("local")
+#' tbl_iris <- copy_to(sc, iris)
+#' iris_split <- sdf_random_split(tbl_iris, training = 0.5, test = 0.5)
+#' model <- ml_generalized_linear_regression(iris_split$training, "Sepal_Length ~ Sepal_Width + Petal_Length + Petal_Width")
+#' tbl_predictions <- ml_predict(model, iris_split$test)
+#' tbl_predictions %>%
+#'   ml_metrics_regression(Sepal_Length)
+#' }
 #' @export
 ml_metrics_regression <- function(x, truth, estimate = prediction,
                                   metrics = c("rmse", "rsq", "mae"),
@@ -30,7 +40,7 @@ ml_metrics_regression <- function(x, truth, estimate = prediction,
     estimate = as_name(enquo(estimate)),
     metrics = metrics,
     evaluator = "RegressionEvaluator",
-    pred_col = "setRawPredictionCol",
+    pred_col = "setPredictionCol",
     estimator_name = "standard"
   )
 
@@ -47,6 +57,17 @@ ml_metrics_regression <- function(x, truth, estimate = prediction,
 #' `pr_auc` (Area under the Precesion Recall curve).
 #'  Defaults to: `roc_auc`, `pr_auc`
 #' @inherit ml_metrics_regression
+#' @examples
+#' \dontrun{
+#' sc <- spark_connect("local")
+#' tbl_iris <- copy_to(sc, iris)
+#' prep_iris <- tbl_iris %>%
+#'   mutate(is_setosa = ifelse(Species == "setosa", 1, 0))
+#' iris_split <- sdf_random_split(prep_iris, training = 0.5, test = 0.5)
+#' model <- ml_logistic_regression(iris_split$training, "is_setosa ~ Sepal_Length")
+#' tbl_predictions <- ml_predict(model, iris_split$test)
+#' ml_metrics_binary(tbl_predictions)
+#' }
 #' @export
 ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
                               metrics = c("roc_auc", "pr_auc"),

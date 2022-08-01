@@ -39,3 +39,14 @@ containing the truth and estimate, and return a `tibble` with the results. The
 `tibble` has the same format and variable names as the output of the `yardstick`
 functions.
 }
+\examples{
+\dontrun{
+sc <- spark_connect("local")
+tbl_iris <- copy_to(sc, iris)
+iris_split <- sdf_random_split(tbl_iris, training = 0.5, test = 0.5)
+model <- ml_generalized_linear_regression(iris_split$training, "Sepal_Length ~ Sepal_Width + Petal_Length + Petal_Width")
+tbl_predictions <- ml_predict(model, iris_split$test)
+tbl_predictions \%>\%
+  ml_metrics_regression(Sepal_Length)
+}
+}
