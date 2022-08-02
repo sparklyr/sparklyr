@@ -9,7 +9,7 @@ ml_metrics_multiclass(
   truth = label,
   estimate = prediction,
   metrics = c("accuracy"),
-  beta = 1,
+  beta = NULL,
   ...
 )
 }
@@ -35,7 +35,9 @@ multi-class models are: `weightedTruePositiveRate`, `weightedFalsePositiveRate`,
 `weightedFMeasure`, `truePositiveRateByLabel`, `falsePositiveRateByLabel`,
 `precisionByLabel`, `recallByLabel`, `fMeasureByLabel`, `logLoss`, `hammingLoss`}
 
-\item{beta}{Numerical value used for precision and recall. Defaults to 1.}
+\item{beta}{Numerical value used for precision and recall. Defaults to NULL, but
+if the Spark session's verion is 3.0 and above, then NULL is changed to 1,
+unless something different is supplied in this argument.}
 
 \item{...}{Optional arguments; currently unused.}
 }
