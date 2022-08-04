@@ -40,12 +40,12 @@ jobs:
         id: cache-spark
         uses: actions/cache@v2
         with:
-          path: /home/runner/spark/spark-3.1.2-bin-hadoop3.2
-          key: sparklyr-spark-3.1.2-bin-hadoop3.2
+          path: /home/runner/spark/spark-3.1.3-bin-hadoop3.2
+          key: sparklyr-spark-3.1.3-bin-hadoop3.2
 
       - name: Install Spark (via sparklyr)
         if: steps.cache-spark.outputs.cache-hit != 'true'
-        run: sparklyr::spark_install(version = "3.1.2")
+        run: sparklyr::spark_install(version = "3.1.3")
         shell: Rscript {0}
 
       - name: Cache Scala
