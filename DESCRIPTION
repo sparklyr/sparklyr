@@ -104,7 +104,7 @@ Imports:
     withr,
     xml2
 Suggests:
-    arrow (>= 0.14.0),
+    arrow (>= 0.17.0),
     broom,
     diffobj,
     foreach,
