@@ -6,9 +6,8 @@
 \usage{
 ml_default_stop_words(
   sc,
-  language = c("english", "danish", "dutch", "finnish", "french", "german",
-    "hungarian", "italian", "norwegian", "portuguese", "russian", "spanish", "swedish",
-    "turkish"),
+  language = c("english", "danish", "dutch", "finnish", "french", "german", "hungarian",
+    "italian", "norwegian", "portuguese", "russian", "spanish", "swedish", "turkish"),
   ...
 )
 }
