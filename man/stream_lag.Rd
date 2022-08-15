@@ -9,10 +9,8 @@ stream_lag(x, cols, thresholds = NULL)
 \arguments{
 \item{x}{An object coercable to a Spark Streaming DataFrame.}
 
-\item{cols}{A list of expressions of the form
-\out{<destination column> = <source column> ~ <offset>}
-(e.g., `prev_value = value ~ 1` will create a new column `prev_value`
-containing all values from the source column `value` shifted behind by 1}
+\item{cols}{A list of expressions for a single or multiple variables to create
+that will contain the value of a previous entry.}
 
 \item{thresholds}{Optional named list of timestamp column(s) and
 corresponding time duration(s) for deterimining whether a previous record

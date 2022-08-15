@@ -2,6 +2,8 @@
 
 ### Misc
 
+- Addresses new CRAN HTML checks
+
 - Adds new metric extraction functions: `ml_metrics_binary()`, `ml_metrics_regression()` 
 and `ml_metrics_multiclass()`. They work closer to how `yardstick` metric extraction
 functions work. They expect a table with the predictions and actual values, and returns
@@ -752,7 +754,7 @@ a concise `tibble` with the metrics.
 
 - Add config `sparklyr.livy.jar` to configure path or URL to sparklyr JAR.
 
-# Data
+### Data
 
 - Add support for `partition_by` when using `spark_write_delta()` (#2228).
 
