@@ -752,7 +752,7 @@ a concise `tibble` with the metrics.
 
 - Add config `sparklyr.livy.jar` to configure path or URL to sparklyr JAR.
 
-# Data
+### Data
 
 - Add support for `partition_by` when using `spark_write_delta()` (#2228).
 
