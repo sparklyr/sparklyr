@@ -2,6 +2,8 @@
 
 ### Misc
 
+- Addresses new CRAN HTML checks
+
 - Adds new metric extraction functions: `ml_metrics_binary()`, `ml_metrics_regression()` 
 and `ml_metrics_multiclass()`. They work closer to how `yardstick` metric extraction
 functions work. They expect a table with the predictions and actual values, and returns
