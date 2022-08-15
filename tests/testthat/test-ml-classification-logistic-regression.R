@@ -1,14 +1,15 @@
-context("ml classification - logistic regression")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ml_logistic_regression() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ml_logistic_regression)
 })
 
 test_that("ml_logistic_regression() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     fit_intercept = FALSE,
@@ -62,19 +63,25 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
 
   m1 <- pipeline %>%
     ml_fit(training_tbl)
-  m1_predictions <- m1 %>%
-    ml_transform(test_tbl) %>%
-    pull(probability)
+
+  expect_warning_on_arrow(
+    m1_predictions <- m1 %>%
+      ml_transform(test_tbl) %>%
+      pull(probability)
+  )
 
   m2 <- training_tbl %>%
     ft_tokenizer("text", "words") %>%
     ft_hashing_tf("words", "features", num_features = 1000) %>%
     ml_logistic_regression(max_iter = 10, reg_param = 0.001)
-  m2_predictions <- m2 %>%
-    ml_transform(test_tbl %>%
-      ft_tokenizer("text", "words") %>%
-      ft_hashing_tf("words", "features", num_features = 1000)) %>%
-    pull(probability)
+
+  expect_warning_on_arrow(
+    m2_predictions <- m2 %>%
+      ml_transform(test_tbl %>%
+                     ft_tokenizer("text", "words") %>%
+                     ft_hashing_tf("words", "features", num_features = 1000)) %>%
+      pull(probability)
+  )
 
   expect_equal(m1_predictions, m2_predictions)
 })

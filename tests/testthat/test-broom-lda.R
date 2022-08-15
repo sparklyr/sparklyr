@@ -1,7 +1,11 @@
-context("broom-lda")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("lda.tidy() works", {
+
+  ## ---------------- Connection and data upload to Spark ----------------------
+
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
 
@@ -16,9 +20,12 @@ test_that("lda.tidy() works", {
     overwrite = TRUE
   )
 
-  td1 <- lines_tbl %>%
-    ml_lda(~text, k = 3) %>%
-    tidy()
+  lda_model <- lines_tbl %>%
+    ml_lda(~text, k = 3)
+
+  ## ----------------------------- tidy() --------------------------------------
+
+  td1 <- tidy(lda_model)
 
   check_tidy(td1,
     exp.row = 18, exp.col = 3,
@@ -34,52 +41,23 @@ test_that("lda.tidy() works", {
     tolerance = 0.001,
     scale = 1
   )
-})
 
-test_that("lda.augment() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
+  ## --------------------------- augment() -------------------------------------
 
-  samples <- data.frame(text = c(
-    "The cat sat on the mat.",
-    "The dog ate my homework."
-  ))
-
-  lines_tbl <- sdf_copy_to(sc,
-    samples,
-    name = "lines_tbl",
-    overwrite = TRUE
+  expect_warning_on_arrow(
+    au1 <- lda_model %>%
+      augment() %>%
+      collect()
   )
-
-  au1 <- lines_tbl %>%
-    ml_lda(~text, k = 3) %>%
-    augment() %>%
-    dplyr::collect()
 
   check_tidy(au1,
     exp.col = 2,
     exp.name = c("text", ".topic")
   )
-})
 
-test_that("lda.glance() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
+  ## ---------------------------- glance() -------------------------------------
 
-  samples <- data.frame(text = c(
-    "The cat sat on the mat.",
-    "The dog ate my homework."
-  ))
-
-  lines_tbl <- sdf_copy_to(sc,
-    samples,
-    name = "lines_tbl",
-    overwrite = TRUE
-  )
-
-  gl1 <- lines_tbl %>%
-    ml_lda(~text, k = 3) %>%
-    glance()
+  gl1 <- glance(lda_model)
 
   check_tidy(gl1,
     exp.row = 1,

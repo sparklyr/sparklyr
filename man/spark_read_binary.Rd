@@ -55,6 +55,7 @@ with the following columns and possibly partition columns:
 \seealso{
 Other Spark serialization routines: 
 \code{\link{collect_from_rds}()},
+\code{\link{spark_insert_table}()},
 \code{\link{spark_load_table}()},
 \code{\link{spark_read_avro}()},
 \code{\link{spark_read_csv}()},

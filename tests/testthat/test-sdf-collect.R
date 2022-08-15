@@ -1,4 +1,4 @@
-context("sdf collect")
+skip_on_livy()
 
 sc <- testthat_spark_connection()
 
@@ -58,7 +58,10 @@ test_that("sdf_collect() works with nested named lists", {
     z = list(list(a = list(c = "foo", d = "bar", e = list("e")), b = "b"))
   )
   sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
-  res <- sdf_collect(sdf)
+
+  expect_warning_on_arrow(
+    res <- sdf_collect(sdf)
+  )
 
   for (col in colnames(df)) {
     expect_equivalent(lapply(df[[col]], as.list), res[[col]])
@@ -239,7 +242,10 @@ test_that("sdf_collect() works with struct array column", {
   jsonFilePath <- get_test_data_path("struct-inside-arrays.json")
 
   sentences <- spark_read_json(sc, name = "sentences", path = jsonFilePath, overwrite = TRUE)
-  sentences_local <- sdf_collect(sentences)
+
+  expect_warning_on_arrow(
+    sentences_local <- sdf_collect(sentences)
+  )
 
   expect_equal(sentences_local$text, c("t e x t"))
 
@@ -273,7 +279,10 @@ test_that("sdf_collect() works with structs inside nested arrays", {
   jsonFilePath <- get_test_data_path("struct-inside-nested-arrays.json")
 
   sentences <- spark_read_json(sc, name = "sentences", path = jsonFilePath, overwrite = TRUE)
-  sentences_local <- sdf_collect(sentences)
+
+  expect_warning_on_arrow(
+    sentences_local <- sdf_collect(sentences)
+  )
 
   expect_equal(sentences_local$text, c("t e x t"))
 
@@ -306,12 +315,15 @@ test_that("sdf_collect() supports callback", {
   sdf <- sdf_copy_to(sc, df, repartition = 2, overwrite = TRUE)
 
   collected <- list()
-  sdf %>%
-    sdf_collect(callback = function(batch_df) {
-      batch_count <<- batch_count + 1
-      row_count <<- row_count + nrow(batch_df)
-      collected <<- append(collected, batch_df$val)
-    })
+
+  expect_warning_on_arrow(
+    sdf %>%
+      sdf_collect(callback = function(batch_df) {
+        batch_count <<- batch_count + 1
+        row_count <<- row_count + nrow(batch_df)
+        collected <<- append(collected, batch_df$val)
+      })
+  )
 
   expect_equal(
     batch_count,
@@ -332,10 +344,13 @@ test_that("sdf_collect() supports callback", {
 
   if (spark_version(sc) >= "2.4") {
     collected <- list()
-    sdf %>%
-      sdf_collect(callback = function(batch_df, idx) {
-        collected <<- append(collected, batch_df$val)
-      })
+
+    expect_warning_on_arrow(
+      sdf %>%
+        sdf_collect(callback = function(batch_df, idx) {
+          collected <<- append(collected, batch_df$val)
+        })
+    )
 
     expect_equal(
       collected,

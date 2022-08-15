@@ -5,6 +5,7 @@
 \alias{tidy.ml_model_generalized_linear_regression}
 \alias{tidy.ml_model_linear_regression}
 \alias{augment.ml_model_generalized_linear_regression}
+\alias{augment._ml_model_linear_regression}
 \alias{augment.ml_model_linear_regression}
 \alias{glance.ml_model_generalized_linear_regression}
 \alias{glance.ml_model_linear_regression}
@@ -17,6 +18,13 @@
 \method{augment}{ml_model_generalized_linear_regression}(
   x,
   newdata = NULL,
+  type.residuals = c("working", "deviance", "pearson", "response"),
+  ...
+)
+
+\method{augment}{`_ml_model_linear_regression`}(
+  x,
+  new_data = NULL,
   type.residuals = c("working", "deviance", "pearson", "response"),
   ...
 )
@@ -43,6 +51,8 @@
 
 \item{type.residuals}{type of residuals, defaults to \code{"working"}. Must be set to
 \code{"working"} when \code{newdata} is supplied.}
+
+\item{new_data}{a tbl_spark of new data to use for prediction.}
 }
 \description{
 These methods summarize the results of Spark ML models into tidy forms.

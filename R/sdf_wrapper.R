@@ -303,7 +303,7 @@ sdf_collect_static <- function(object, impl, ...) {
   n <- args$n
   sc <- spark_connection(object)
   sdf <- spark_dataframe(object)
-  if (!is.null(n)) {
+  if (!is.null(n) && !is.infinite(n)) {
     n <- as.integer(n)
     if (!is.na(n)) {
       # If n is Inf or any value outside of integer range, then ignore it

@@ -363,10 +363,8 @@ to_milliseconds <- function(dur) {
 #' are shifted behind by the offset(s) specified in `...` (see example)
 #'
 #' @param x An object coercable to a Spark Streaming DataFrame.
-#' @param cols A list of expressions of the form
-#'   \out{<destination column> = <source column> ~ <offset>}
-#'   (e.g., `prev_value = value ~ 1` will create a new column `prev_value`
-#'   containing all values from the source column `value` shifted behind by 1
+#' @param cols A list of expressions for a single or multiple variables to create
+#' that will contain the value of a previous entry.
 #' @param thresholds Optional named list of timestamp column(s) and
 #'   corresponding time duration(s) for deterimining whether a previous record
 #'   is sufficiently recent relative to the current record.
@@ -408,9 +406,9 @@ to_milliseconds <- function(dur) {
 #' @export
 stream_lag <- function(x, cols, thresholds = NULL) {
   sc <- spark_connection(x)
-  if (spark_version(sc) < "2.0.0") {
-    stop("`stream_lag()` requires Spark 2.0.0 or above")
-  }
+
+  spark_require_version(sc, "2.0.0")
+
   if (!sdf_is_streaming(x)) {
     stop("expected a streaming dataframe as input")
   }

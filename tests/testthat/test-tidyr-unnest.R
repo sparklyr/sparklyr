@@ -1,4 +1,5 @@
-context("tidyr-unnest")
+skip_on_livy()
+skip_on_arrow_devel()
 
 sc <- testthat_spark_connection()
 
@@ -51,13 +52,14 @@ test_that("can unnest nested lists", {
   sdf <- copy_to(sc, tbl)
   sdf.nested <- sdf %>% tidyr::nest(n1 = c(b, c), n2 = c(d, e))
 
-  expect_equivalent(
-    sdf.nested %>%
+  expect_warning_on_arrow(
+    s_n <- sdf.nested %>%
       tidyr::unnest(c(n1, n2)) %>%
       collect() %>%
-      dplyr::arrange(c),
-    tbl
+      dplyr::arrange(c)
   )
+
+  expect_equivalent(s_n, tbl)
 })
 
 test_that("grouping is preserved", {

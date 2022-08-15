@@ -1,8 +1,9 @@
-context("ml feature - feature hasher")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ft_feature_hasher() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     input_cols = c("foo", "bar"),
@@ -22,8 +23,9 @@ test_that("ft_feature_hasher() works", {
     3.0, FALSE, "2", "bar"
   )
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE)
-  expect_identical(
-    df_tbl %>%
+
+  expect_warning_on_arrow(
+    f_h <- df_tbl %>%
       ft_feature_hasher(
         input_cols = c("real", "bool", "stringNum", "string"),
         output_col = "features",
@@ -31,7 +33,8 @@ test_that("ft_feature_hasher() works", {
       ) %>%
       pull(features) %>%
       first() %>%
-      length(),
-    32L
+      length()
   )
+
+  expect_identical(f_h, 32L)
 })

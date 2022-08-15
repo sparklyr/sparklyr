@@ -1,4 +1,3 @@
-context("dplyr weighted-mean")
 
 sc <- testthat_spark_connection()
 

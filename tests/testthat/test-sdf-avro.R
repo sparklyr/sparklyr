@@ -1,4 +1,5 @@
-context("sdf-avro")
+skip_on_livy()
+skip_on_arrow_devel()
 
 sc <- testthat_spark_connection()
 
@@ -47,15 +48,17 @@ test_that("to_avro and from_avro work properly", {
     )
   )
 
-  collected <- sdf_from_avro(
-    sdf_transformed,
-    c(
-      student = schema %>%
-        jsonlite::toJSON(auto_unbox = TRUE) %>%
-        as.character()
-    )
-  ) %>%
-    sdf_collect()
+  expect_warning_on_arrow(
+    collected <- sdf_from_avro(
+      sdf_transformed,
+      c(
+        student = schema %>%
+          jsonlite::toJSON(auto_unbox = TRUE) %>%
+          as.character()
+      )
+    ) %>%
+      sdf_collect()
+  )
 
   expect_equal(colnames(collected), "student")
   expect_equal(length(collected$student), length(df$student))

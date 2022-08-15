@@ -67,176 +67,80 @@ ml_generalized_linear_regression <- function(x, formula = NULL, family = "gaussi
                                              prediction_col = "prediction",
                                              uid = random_string("generalized_linear_regression_"),
                                              ...) {
-  check_dots_used()
+  #check_dots_used()
   UseMethod("ml_generalized_linear_regression")
 }
 
-#' @export
-ml_generalized_linear_regression.spark_connection <- function(x, formula = NULL, family = "gaussian",
-                                                              link = NULL, fit_intercept = TRUE, offset_col = NULL,
-                                                              link_power = NULL, link_prediction_col = NULL,
-                                                              reg_param = 0, max_iter = 25, weight_col = NULL,
-                                                              solver = "irls", tol = 1e-6, variance_power = 0,
-                                                              features_col = "features", label_col = "label",
-                                                              prediction_col = "prediction",
-                                                              uid = random_string("generalized_linear_regression_"),
-                                                              ...) {
-  spark_require_version(x, "2.0.0", "GeneralizedLinearRegression")
+ml_generalized_linear_regression_impl <- function(x, formula = NULL, family = "gaussian",
+                                             link = NULL, fit_intercept = TRUE, offset_col = NULL,
+                                             link_power = NULL, link_prediction_col = NULL,
+                                             reg_param = 0, max_iter = 25, weight_col = NULL,
+                                             solver = "irls", tol = 1e-6, variance_power = 0,
+                                             features_col = "features", label_col = "label",
+                                             prediction_col = "prediction",
+                                             uid = random_string("generalized_linear_regression_"),
+                                             response = NULL, features = NULL,
+                                             ...) {
+  offset_col <- param_min_version(x, offset_col, "2.3.0")
 
-  .args <- list(
-    family = family,
-    link = link,
-    fit_intercept = fit_intercept,
-    offset_col = offset_col,
-    link_power = link_power,
-    link_prediction_col = link_prediction_col,
-    reg_param = reg_param,
-    max_iter = max_iter,
-    weight_col = weight_col,
-    solver = solver,
-    tol = tol,
-    variance_power = variance_power,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_generalized_linear_regression()
-
-  jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.regression.GeneralizedLinearRegression", uid,
-    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
-    prediction_col = .args[["prediction_col"]]
-  ) %>%
-    invoke("setFamily", .args[["family"]]) %>%
-    invoke("setFitIntercept", .args[["fit_intercept"]]) %>%
-    invoke("setRegParam", .args[["reg_param"]]) %>%
-    invoke("setMaxIter", .args[["max_iter"]]) %>%
-    invoke("setSolver", .args[["solver"]]) %>%
-    invoke("setTol", .args[["tol"]]) %>%
-    jobj_set_param("setLinkPower", .args[["link_power"]]) %>%
-    jobj_set_param("setVariancePower", .args[["variance_power"]]) %>%
-    jobj_set_param("setLink", .args[["link"]]) %>%
-    jobj_set_param("setLinkPredictionCol", .args[["link_prediction_col"]]) %>%
-    jobj_set_param("setWeightCol", .args[["weight_col"]]) %>%
-    jobj_set_param("setOffsetCol", .args[["offset_col"]], "2.3.0")
-
-  new_ml_generalized_linear_regression(jobj)
-}
-
-#' @export
-ml_generalized_linear_regression.ml_pipeline <- function(x, formula = NULL, family = "gaussian",
-                                                         link = NULL, fit_intercept = TRUE, offset_col = NULL,
-                                                         link_power = NULL, link_prediction_col = NULL,
-                                                         reg_param = 0, max_iter = 25, weight_col = NULL,
-                                                         solver = "irls", tol = 1e-6, variance_power = 0,
-                                                         features_col = "features", label_col = "label",
-                                                         prediction_col = "prediction",
-                                                         uid = random_string("generalized_linear_regression_"),
-                                                         ...) {
-  stage <- ml_generalized_linear_regression(
-    x = spark_connection(x),
-    formula = formula,
-    family = family,
-    link = link,
-    fit_intercept = fit_intercept,
-    offset_col = offset_col,
-    link_power = link_power,
-    link_prediction_col = link_prediction_col,
-    reg_param = reg_param,
-    max_iter = max_iter,
-    weight_col = weight_col,
-    solver = solver,
-    tol = tol,
-    variance_power = variance_power,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    uid = uid,
-    ...
-  )
-  ml_add_stage(x, stage)
-}
-
-#' @export
-ml_generalized_linear_regression.tbl_spark <- function(x, formula = NULL, family = "gaussian",
-                                                       link = NULL, fit_intercept = TRUE, offset_col = NULL,
-                                                       link_power = NULL, link_prediction_col = NULL,
-                                                       reg_param = 0, max_iter = 25, weight_col = NULL,
-                                                       solver = "irls", tol = 1e-6, variance_power = 0,
-                                                       features_col = "features", label_col = "label",
-                                                       prediction_col = "prediction",
-                                                       uid = random_string("generalized_linear_regression_"),
-                                                       response = NULL, features = NULL, ...) {
-  formula <- ml_standardize_formula(formula, response, features)
-
-  stage <- ml_generalized_linear_regression(
-    x = spark_connection(x),
-    formula = formula,
-    family = family,
-    link = link,
-    fit_intercept = fit_intercept,
-    offset_col = offset_col,
-    link_power = link_power,
-    link_prediction_col = link_prediction_col,
-    reg_param = reg_param,
-    max_iter = max_iter,
-    weight_col = weight_col,
-    solver = solver,
-    tol = tol,
-    variance_power = variance_power,
-    features_col = features_col,
-    label_col = label_col,
-    prediction_col = prediction_col,
-    uid = uid,
-    ...
-  )
-
-  if (is.null(formula)) {
-    stage %>%
-      ml_fit(x)
-  } else {
-    ml_construct_model_supervised(
-      new_ml_model_generalized_linear_regression,
-      predictor = stage,
-      formula = formula,
-      dataset = x,
-      features_col = features_col,
-      label_col = label_col
-    )
-  }
-}
-
-validator_ml_generalized_linear_regression <- function(.args) {
-  .args[["reg_param"]] <- cast_scalar_double(.args[["reg_param"]])
-  .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
-  fam <- .args[["family"]]
+  fam <- family
   if (is.function(fam)) {
     warning("Specifying a function for `family` is deprecated; please specify strings for `family` and `link`.")
     fam <- fam()
-    .args[["link"]] <- cast_string(fam$link)
-    .args[["family"]] <- cast_string(fam$family)
-  } else if (inherits(fam, "family")) {
-    .args[["link"]] <- cast_string(fam$link)
-    .args[["family"]] <- cast_string(fam$family)
-  } else {
-    .args[["family"]] <- cast_choice(fam, c("gaussian", "binomial", "poisson", "gamma", "tweedie"))
-    .args[["link"]] <- cast_nullable_string(.args[["link"]])
+    }
+
+  if (inherits(fam, "family") | is.function(fam)) {
+    link <- fam$link
+    family <- fam$family
   }
-  .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
-  .args[["solver"]] <- cast_choice(.args[["solver"]], "irls")
-  .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
-  .args[["offset_col"]] <- cast_nullable_string(.args[["offset_col"]])
-  .args[["link_power"]] <- cast_nullable_scalar_double(.args[["link_power"]])
-  .args[["variance_power"]] <- cast_nullable_scalar_double(.args[["variance_power"]])
-  .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
-  .args[["link_prediction_col"]] <- cast_nullable_string(.args[["link_prediction_col"]])
-  .args
+
+  ml_process_model(
+    x = x,
+    r_class = "ml_generalized_linear_regression",
+    ml_function = new_ml_model_generalized_linear_regression,
+    features = features,
+    response = response,
+    uid = uid,
+    formula = formula,
+    invoke_steps = list(
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      family = family,
+      link = link,
+      fit_intercept = fit_intercept,
+      reg_param = reg_param,
+      max_iter = max_iter,
+      solver = solver,
+      tol = tol,
+      link_power = link_power,
+      variance_power = variance_power,
+      link_prediction_col = link_prediction_col,
+      weight_col = weight_col,
+      offset_col = offset_col
+    )
+  )
 }
 
-new_ml_generalized_linear_regression <- function(jobj) {
-  new_ml_predictor(jobj, class = "ml_generalized_linear_regression")
+params_validator.ml_generalized_linear_regression <- function(x) {
+  x <- params_base_validator(x)
+  x$solver <- function(x) cast_choice(x, "irls")
+  x
 }
+
+
+# ------------------------------- Methods --------------------------------------
+
+#' @export
+ml_generalized_linear_regression.spark_connection <- ml_generalized_linear_regression_impl
+
+#' @export
+ml_generalized_linear_regression.ml_pipeline <- ml_generalized_linear_regression_impl
+
+#' @export
+ml_generalized_linear_regression.tbl_spark <- ml_generalized_linear_regression_impl
+
+# ------------------------------ Fitted models ---------------------------------
 
 new_ml_generalized_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary")) {
@@ -252,7 +156,11 @@ new_ml_generalized_linear_regression_model <- function(jobj) {
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = invoke(jobj, "intercept"),
-    link_prediction_col = if (invoke(jobj, "isSet", invoke(jobj, "linkPredictionCol"))) invoke(jobj, "getLinkPredictionCol") else NULL,
+    link_prediction_col = if (
+      invoke(jobj, "isSet", invoke(jobj, "linkPredictionCol")))
+      invoke(jobj, "getLinkPredictionCol")
+    else NULL
+    ,
     summary = summary,
     class = "ml_generalized_linear_regression_model"
   )
@@ -283,6 +191,8 @@ new_ml_generalized_linear_regression_summary <- function(jobj, fit_intercept, ..
     class = "ml_generalized_linear_regression_summary"
   )
 }
+
+# ---------------------------- Constructors ------------------------------------
 
 new_ml_generalized_linear_regression_training_summary <- function(jobj, fit_intercept) {
   arrange_stats <- make_stats_arranger(fit_intercept)

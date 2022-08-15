@@ -1,4 +1,5 @@
-context("print")
+skip_on_livy()
+skip_on_arrow_devel()
 test_requires("dplyr")
 sc <- testthat_spark_connection()
 

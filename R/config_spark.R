@@ -173,12 +173,17 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
 
     if (version < "2.4.2") stop("Delta Lake requires Spark 2.4.2 or newer")
 
+    delta_version <- "0.6.1"
+    if(version >= "3.0") delta_version <- "0.8.0"
+    if(version >= "3.1") delta_version <- "1.0.0"
+    if(version >= "3.2") delta_version <- "1.2.1"
+
     config$sparklyr.shell.packages <- c(
       config$sparklyr.shell.packages,
       sprintf(
         "io.delta:delta-core_%s:%s",
         if (version >= "3.0.0") "2.12" else scala_version %||% "2.11",
-        if (version >= "3.1.0") "1.0.0" else if (version >= "3.0.0") "0.8.0" else "0.6.1"
+        delta_version
       )
     )
   }

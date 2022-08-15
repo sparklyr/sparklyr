@@ -474,6 +474,55 @@ spark_write_table.spark_jobj <- function(x, name, mode = NULL, options = list(),
   spark_data_write_generic(x, name, "saveAsTable", mode, options, partition_by)
 }
 
+#' Inserts a Spark DataFrame into a Spark table
+#'
+#' Inserts a Spark DataFrame into a Spark table.
+#'
+#' @inheritParams spark_write_csv
+#' @inheritParams spark_read_csv
+#' @param name The name to assign to the newly generated table.
+#' @param ... Optional arguments; currently unused.
+#'
+#' @family Spark serialization routines
+#'
+#' @export
+spark_insert_table <- function(x,
+                              name,
+                              mode = NULL,
+                              overwrite = FALSE,
+                              options = list(),
+                              ...) {
+  UseMethod("spark_insert_table")
+}
+
+#' @export
+spark_insert_table.tbl_spark <- function(x,
+                                        name,
+                                        mode = NULL,
+                                        overwrite = FALSE,
+                                        options = list(),
+                                        ...) {
+  sqlResult <- spark_sqlresult_from_dplyr(x)
+
+  mode <- if (isTRUE(overwrite)) "overwrite" else "append"
+
+  spark_data_write_generic(sqlResult, name, "insertInto", mode, options, NULL)
+}
+
+#' @export
+spark_insert_table.spark_jobj <- function(x,
+                                         name,
+                                         mode = NULL,
+                                         overwrite = FALSE,
+                                         options = list(),
+                                         ...) {
+  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+
+  mode <- if (isTRUE(overwrite)) "overwrite" else "append"
+
+  spark_data_write_generic(x, name, "insertInto", mode, options, NULL)
+}
+
 #' Read from JDBC connection into a Spark DataFrame.
 #'
 #' Read from JDBC connection into a Spark DataFrame.
@@ -1129,12 +1178,12 @@ spark_read <- function(sc, paths, reader, columns, packages = TRUE, ...) {
 #'
 #' @param x A Spark DataFrame to be exported
 #' @param dest_uri  Can be a URI template containing "{partitionId}" (e.g.,
-#'   \out{"hdfs://my_data_part_{partitionId}.rds"}) where "{partitionId}" will be
+#'   \code{"hdfs://my_data_part_{partitionId}.rds"}) where "{partitionId}" will be
 #'   substituted with ID of each partition using `glue`, or a list of URIs
 #'   to be assigned to RDS output from all partitions (e.g.,
-#'   \out{"hdfs://my_data_part_0.rds"}, \out{"hdfs://my_data_part_1.rds"}, and so on)
+#'   \code{"hdfs://my_data_part_0.rds"}, \code{"hdfs://my_data_part_1.rds"}, and so on)
 #'   If working with a Spark instance running locally, then all URIs should be
-#'   in \out{"file://<local file path>"} form. Otherwise the scheme of the URI should
+#'   in \code{"file://<local file path>"} form. Otherwise the scheme of the URI should
 #'   reflect the underlying file system the Spark instance is working with
 #'   (e.g., "hdfs://"). If the resulting list of URI(s) does not contain unique
 #'   values, then it will be post-processed with `make.unique()` to ensure

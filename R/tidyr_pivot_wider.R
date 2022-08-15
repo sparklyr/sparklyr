@@ -36,10 +36,11 @@ pivot_wider.tbl_spark <- function(data,
 
   names_from <- rlang::enquo(names_from)
   values_from <- rlang::enquo(values_from)
+
   spec <- sdf_build_wider_spec(
     data,
-    names_from = !!names_from,
-    values_from = !!values_from,
+    names_from = !! names_from,
+    values_from = !! values_from,
     names_prefix = names_prefix,
     names_sep = names_sep,
     names_glue = names_glue,
@@ -47,6 +48,7 @@ pivot_wider.tbl_spark <- function(data,
   )
 
   id_cols <- rlang::enquo(id_cols)
+
   sdf_pivot_wider(
     data,
     spec,
@@ -57,6 +59,11 @@ pivot_wider.tbl_spark <- function(data,
   )
 }
 
+#' @importFrom purrr reduce map transpose
+#' @importFrom tidyselect eval_select
+#' @importFrom tibble tibble
+#' @importFrom rlang `!!` enquos enquo
+#' @importFrom dplyr ungroup arrange
 sdf_build_wider_spec <- function(data,
                                  names_from,
                                  values_from,
@@ -65,36 +72,42 @@ sdf_build_wider_spec <- function(data,
                                  names_glue = NULL,
                                  names_sort = FALSE) {
   colnames_df <- replicate_colnames(data)
-  names_from <- names(tidyselect::eval_select(rlang::enquo(names_from), colnames_df))
-  values_from <- names(tidyselect::eval_select(rlang::enquo(values_from), colnames_df))
+  values_from <- names(eval_select(enquo(values_from), colnames_df))
 
-  row_ids <- data %>%
-    dplyr::ungroup() %>>%
-    dplyr::distinct %@% lapply(names_from, as.symbol) %>%
+  local_data <- data %>%
+    head(1) %>%
     collect()
 
-  if (names_sort) {
-    row_ids <- vctrs::vec_sort(row_ids)
-  }
+  row_ids <- data %>%
+    select(!! enquo(names_from)) %>%
+    distinct() %>%
+    collect() %>%
+    select(- dplyr::group_vars(data))
 
-  row_names <- rlang::exec(paste, !!!row_ids, sep = names_sep)
+  if(dim(row_ids)[2] == 1) {
+    row_names <- row_ids[1][[1]]
+  } else {
+    row_names <- transpose(row_ids) %>%
+      map_chr(~ paste(.x, collapse = names_sep))
+  }
 
   out <- tibble::tibble(.name = paste0(names_prefix, row_names))
 
   if (length(values_from) == 1) {
     out$.value <- values_from
   } else {
-    out <- vctrs::vec_repeat(out, times = vctrs::vec_size(values_from))
-    out$.value <- vctrs::vec_repeat(values_from, each = vctrs::vec_size(row_ids))
+    out <- reduce(map(seq_along(values_from), ~ out), rbind)
+    out$.value <- as.character(rep(values_from, each = 2))
     out$.name <- paste0(out$.value, names_sep, out$.name)
-
-    row_ids <- vctrs::vec_repeat(row_ids, times = vctrs::vec_size(values_from))
+    row_ids <- reduce(map(seq_along(values_from), ~ row_ids), rbind)
   }
 
-  out <- vctrs::vec_cbind(out, tibble::as_tibble(row_ids), .name_repair = "minimal")
+  out <- cbind(out, row_ids)
   if (!is.null(names_glue)) {
     out$.name <- as.character(glue::glue_data(out, names_glue))
   }
+
+  if (names_sort) out <- arrange(out, !! rlang::parse_expr(".name"))
 
   out
 }
@@ -117,7 +130,7 @@ sdf_pivot_wider <- function(data,
   group_vars <- dplyr::group_vars(data)
 
   names_from <- names(spec)[-(1:2)]
-  values_from <- vctrs::vec_unique(spec$.value)
+  values_from <- unique(spec$.value)
   spec_cols <- c(names_from, values_from)
 
   id_cols <- rlang::enquo(id_cols)

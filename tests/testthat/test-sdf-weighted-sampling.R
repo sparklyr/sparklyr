@@ -1,4 +1,5 @@
-context("sdf-weighted-sampling")
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_requires("dplyr")
 
@@ -22,7 +23,7 @@ sdf <- testthat_tbl(
 )
 
 sample_sz <- 20L
-num_sampling_iters <- 100L
+num_sampling_iters <- 50L
 alpha <- 0.05
 
 verify_distribution <- function(replacement) {
@@ -56,7 +57,9 @@ verify_distribution <- function(replacement) {
     }
   }
 
-  res <- ks.test(x = actual_dist, y = expected_dist)
+  expect_warning(
+    res <- ks.test(x = actual_dist, y = expected_dist)
+  )
 
   expect_gte(res$p.value, alpha)
 }

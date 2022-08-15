@@ -1,13 +1,14 @@
-context("ml feature standard scaler")
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("ft_standard_scaler() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ft_standard_scaler)
 })
 
 test_that("ft_standard_scaler() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     input_col = "foo",
@@ -33,13 +34,17 @@ test_that("ft_standard_scaler() works properly", {
 
   scaler_model <- ml_fit(scaler, sample_data)
 
-  expect_equal(
-    scaler_model %>%
+  expect_warning_on_arrow(
+    s_m <-scaler_model %>%
       ml_transform(sample_data) %>%
       head(1) %>%
       dplyr::pull(scaledFeatures) %>%
       unlist() %>%
-      sum(),
+      sum()
+  )
+
+  expect_equal(
+    s_m,
     295.3425,
     tolerance = 0.001, scale = 1
   )

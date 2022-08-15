@@ -1,4 +1,4 @@
-context("ml feature - dplyr transformer")
+skip_on_livy()
 
 skip_databricks_connect()
 
@@ -21,7 +21,7 @@ test_that("ft_dplyr_transformer() works", {
 
   expect_equal(
     ml_param_map(dplyr_transformer),
-    list(statement = "SELECT `Sepal_Length`, `Sepal_Width`, `Petal_Length`, `Petal_Width`, `Species`, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
+    list(statement = "SELECT *, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
   )
 })
 

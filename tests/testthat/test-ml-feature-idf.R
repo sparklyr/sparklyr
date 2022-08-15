@@ -1,14 +1,15 @@
-context("ml feature - idf")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ft_idf() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ft_idf)
 })
 
 test_that("ft_idf() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     input_col = "foo",
@@ -29,12 +30,15 @@ test_that("ft_idf() works properly", {
     )
   )
   sentence_tbl <- copy_to(sc, sentence_df, overwrite = TRUE)
-  idf_1 <- sentence_tbl %>%
-    ft_tokenizer("sentence", "words") %>%
-    ft_hashing_tf("words", "rawFeatures", num_features = 20) %>%
-    ft_idf("rawFeatures", "features") %>%
-    pull(features) %>%
-    first()
+
+  expect_warning_on_arrow(
+    idf_1 <- sentence_tbl %>%
+      ft_tokenizer("sentence", "words") %>%
+      ft_hashing_tf("words", "rawFeatures", num_features = 20) %>%
+      ft_idf("rawFeatures", "features") %>%
+      pull(features) %>%
+      first()
+  )
 
   # hashing implementation changed in 3.0 -- https://issues.apache.org/jira/browse/SPARK-23469
   expected_non_zero_idxes <- ifelse(

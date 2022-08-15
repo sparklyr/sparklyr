@@ -1,14 +1,15 @@
-context("ml feature - word2vec")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ft_word2vec() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ft_word2vec)
 })
 
 test_that("ft_word2vec() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     input_col = "foo",
@@ -37,9 +38,12 @@ test_that("ft_word2vec() returns result with correct length", {
   tokenized_tbl <- ft_tokenizer(sentence_tbl, "sentence", "words") %>%
     sdf_register("tokenized")
 
-  result <- tokenized_tbl %>%
-    ft_word2vec("words", "result", vector_size = 3, min_count = 0) %>%
-    pull(result)
+  expect_warning_on_arrow(
+    result <- tokenized_tbl %>%
+      ft_word2vec("words", "result", vector_size = 3, min_count = 0) %>%
+      pull(result)
+  )
+
   expect_equal(sapply(result, length), c(3, 3, 3))
 })
 

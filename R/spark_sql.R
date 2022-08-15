@@ -1,6 +1,3 @@
-# Spark SQL functionalities shared among dplyr_spark.R, dplyr_spark_connection.R,
-# and dbi_spark_connection.R
-
 #' @include connection_spark.R
 #' @include sql_utils.R
 #' @include tbl_spark.R

@@ -18,6 +18,7 @@ get_stats <- function(stats, model) {
 #'
 #' @importFrom dplyr matches everything mutate
 #' @importFrom rlang sym syms quo
+#' @importFrom tidyselect vars_select
 #' @export
 tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
                                                         ...) {
@@ -44,10 +45,10 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
     }
     trans <- exp
     # drop standard errors because they're not valid after exponentiating
-    vars <- dplyr::select_vars(c("term", new_names), -matches("std.error"))
+    vars <- vars_select(c("term", new_names), -matches("std.error"))
   } else {
     trans <- identity
-    vars <- dplyr::select_vars(c("term", new_names), everything())
+    vars <- vars_select(c("term", new_names), everything())
   }
 
 
@@ -62,12 +63,13 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
 }
 
 #' @rdname ml_glm_tidiers
+#' @importFrom tidyselect vars_select
 #' @export
 tidy.ml_model_linear_regression <- function(x, ...) {
   model <- x$model
   stats <- c("coefficient_standard_errors", "t_values", "p_values")
   new_names <- c("estimate", "std.error", "statistic", "p.value")
-  vars <- dplyr::select_vars(c("term", new_names), everything())
+  vars <- vars_select(c("term", new_names), everything())
 
   coefficients <- list(x$coefficients)
   statistics <- stats %>%
@@ -117,6 +119,21 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
     # Two calls to 'rename': https://github.com/sparklyr/sparklyr/issues/678
     dplyr::rename(fitted = !!"prediction") %>%
     dplyr::rename(resid = !!"residuals")
+}
+
+#' @rdname ml_glm_tidiers
+#' @param new_data a tbl_spark of new data to use for prediction.
+#' @export
+augment._ml_model_linear_regression <- function(x, new_data = NULL,
+                                                type.residuals = c("working", "deviance", "pearson", "response"),
+                                                ...) {
+
+  check_newdata(... = ...)
+  augment(
+    x = x$fit, newdata = new_data,
+    type.residuals = type.residuals,
+    ... = ...
+  )
 }
 
 #' @rdname ml_glm_tidiers

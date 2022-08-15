@@ -1,14 +1,15 @@
-context("ml feature normalizer")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ft_normalizer() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ft_normalizer)
 })
 
 test_that("ft_normalizer() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     input_col = "foo",
@@ -29,9 +30,11 @@ test_that("ft_normalizer works properly", {
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
     ft_vector_assembler(paste0("V", 1:3), "features")
 
-  norm_data1 <- df_tbl %>%
-    ft_normalizer("features", "normFeatures", p = 1) %>%
-    pull(normFeatures)
+  expect_warning_on_arrow(
+    norm_data1 <- df_tbl %>%
+      ft_normalizer("features", "normFeatures", p = 1) %>%
+      pull(normFeatures)
+  )
 
   expect_equal(
     norm_data1,
@@ -42,9 +45,11 @@ test_that("ft_normalizer works properly", {
     )
   )
 
-  norm_data2 <- df_tbl %>%
-    ft_normalizer("features", "normFeatures", p = Inf) %>%
-    pull(normFeatures)
+  expect_warning_on_arrow(
+    norm_data2 <- df_tbl %>%
+      ft_normalizer("features", "normFeatures", p = Inf) %>%
+      pull(normFeatures)
+  )
 
   expect_equal(
     norm_data2,

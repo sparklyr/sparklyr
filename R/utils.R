@@ -453,8 +453,15 @@ translate_spark_column_types <- function(sdf) {
     )
 }
 
-simulate_vars <- function(sdf) {
-  translate_spark_column_types(sdf) %>%
+simulate_vars_spark <- function(x, drop_groups = FALSE) {
+  col_types <- translate_spark_column_types(x)
+
+  if (drop_groups) {
+    non_group_cols <- setdiff(names(col_types), dplyr::group_vars(x))
+    col_types <- col_types[non_group_cols]
+  }
+
+  col_types %>%
     lapply(
       function(x) {
         fn <- tryCatch(
@@ -473,6 +480,12 @@ simulate_vars <- function(sdf) {
     ) %>%
     tibble::as_tibble()
 }
+
+simulate_vars.tbl_spark <- function(x, drop_groups = FALSE) {
+  simulate_vars_spark(x, drop_groups)
+}
+
+simulate_vars_is_typed.tbl_spark <- function(x) TRUE
 
 # wrapper for download.file()
 download_file <- function(...) {
@@ -541,4 +554,8 @@ infer_required_r_packages <- function(fn) {
     )
 
   ls(deps)
+}
+
+os_is_windows <- function() {
+  .Platform$OS.type == "windows"
 }

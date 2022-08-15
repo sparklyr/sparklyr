@@ -1,5 +1,4 @@
-context("spark-apply")
-
+skip_on_livy()
 test_requires("dplyr")
 sc <- testthat_spark_connection()
 
@@ -71,22 +70,27 @@ test_that("'spark_apply' works with columns param of type list", {
 })
 
 test_that("'spark_apply' works with fetch_result_as_sdf = FALSE", {
-  actual <- sdf_len(sc, 4) %>%
-    spark_apply(
-      function(df, ctx) {
-        lapply(df$id, function(id) {
-          list(a = seq(id), b = ctx)
-        })
-      },
-      context = list(1, 2, 3),
-      fetch_result_as_sdf = FALSE
-    )
+
+  expect_warning_on_arrow(
+    actual <- sdf_len(sc, 4) %>%
+      spark_apply(
+        function(df, ctx) {
+          lapply(df$id, function(id) {
+            list(a = seq(id), b = ctx)
+          })
+        },
+        context = list(1, 2, 3),
+        fetch_result_as_sdf = FALSE
+      )
+  )
+
   expected <- list(
     list(a = seq(1), b = list(1, 2, 3)),
     list(a = seq(2), b = list(1, 2, 3)),
     list(a = seq(3), b = list(1, 2, 3)),
     list(a = seq(4), b = list(1, 2, 3))
   )
+
   expect_equal(expected, actual)
 })
 
@@ -133,6 +137,7 @@ test_that("'spark_apply' supports nested lists as input type", {
 })
 
 test_that("'spark_apply' supports nested lists as return type", {
+  skip_on_arrow()
   skip_databricks_connect()
   test_requires_version("2.4.0")
 
@@ -143,23 +148,27 @@ test_that("'spark_apply' supports nested lists as return type", {
       "[{\"name\":\"Eddie\",\"id\":5}, {\"name\":\"Frank\",\"id\":6}]"
     )
   )
-  actual <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
-    spark_apply(
-      function(df) {
-        tibble::tibble(
-          person = lapply(
-            df$json,
-            function(x) {
-              jsonlite::fromJSON(
-                x,
-                simplifyDataFrame = FALSE, simplifyMatrix = FALSE
-              )
-            }
+
+  expect_warning_on_arrow(
+    actual <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
+      spark_apply(
+        function(df) {
+          tibble::tibble(
+            person = lapply(
+              df$json,
+              function(x) {
+                jsonlite::fromJSON(
+                  x,
+                  simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+                )
+              }
+            )
           )
-        )
-      }
-    ) %>%
-    sdf_collect()
+        }
+      ) %>%
+      sdf_collect()
+  )
+
   expected <- list(
     list(
       list(id = 1, name = "Alice"),

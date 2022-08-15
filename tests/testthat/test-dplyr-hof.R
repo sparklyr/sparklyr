@@ -1,4 +1,4 @@
-context("dplyr-hof")
+skip_on_livy()
 
 test_requires("dplyr")
 
@@ -47,11 +47,10 @@ build_map_zip_with_test_tbl <- function() {
     )
 }
 
-map_tbl <- build_map_tbl()
-map_zip_with_test_tbl <- build_map_zip_with_test_tbl()
 
-if (spark_version(sc) >= "3.0.0") {
+if (spark_version(sc) >= "2.4.0") {
   map_tbl <- build_map_tbl()
+  map_zip_with_test_tbl <- build_map_zip_with_test_tbl()
 }
 
 test_that("'hof_transform' creating a new column", {
@@ -2087,16 +2086,18 @@ test_that("map_zip_with() works through dbplyr", {
 test_that("accessing struct field inside lambda expression", {
   test_requires_version("2.4.0")
 
-  res <- test_tbl %>%
-    dplyr::mutate(
-      array_of_structs = array(struct(z), named_struct("z", -1))
-    ) %>%
-    hof_transform(
-      dest_col = w,
-      expr = array_of_structs,
-      func = s %->% (s$z)
-    ) %>%
-    collect()
+  expect_warning_on_arrow(
+    res <- test_tbl %>%
+      dplyr::mutate(
+        array_of_structs = array(struct(z), named_struct("z", -1))
+      ) %>%
+      hof_transform(
+        dest_col = w,
+        expr = array_of_structs,
+        func = s %->% (s$z)
+      ) %>%
+      collect()
+  )
 
   expect_equivalent(
     res,
@@ -2115,16 +2116,18 @@ test_that("accessing struct field inside lambda expression", {
 test_that("accessing struct field inside formula", {
   test_requires_version("2.4.0")
 
-  res <- test_tbl %>%
-    dplyr::mutate(
-      array_of_structs = array(struct(z), named_struct("z", -1))
-    ) %>%
-    hof_transform(
-      dest_col = w,
-      expr = array_of_structs,
-      func = ~ .x$z
-    ) %>%
-    collect()
+  expect_warning_on_arrow(
+    res <- test_tbl %>%
+      dplyr::mutate(
+        array_of_structs = array(struct(z), named_struct("z", -1))
+      ) %>%
+      hof_transform(
+        dest_col = w,
+        expr = array_of_structs,
+        func = ~ .x$z
+      ) %>%
+      collect()
+  )
 
   expect_equivalent(
     res,

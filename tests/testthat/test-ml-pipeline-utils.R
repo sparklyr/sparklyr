@@ -1,4 +1,5 @@
-context("ml pipeline utils")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 sc <- testthat_spark_connection()

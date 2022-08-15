@@ -1,14 +1,15 @@
-context("ml feature dct")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ft_dct() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ft_dct)
 })
 
 test_that("ft_dct() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     input_col = "foo",
@@ -32,10 +33,14 @@ test_that("ft_dct() works", {
     c(-1.0, 3.378492794482933, -7.000000000000001, 2.9301512653149677),
     c(4.0, 9.304453421915744, 11.000000000000002, 1.5579302036357163)
   )
-  out1 <- df_tbl %>%
-    ft_vector_assembler(as.list(paste0("f", 1:4)), "features") %>%
-    ft_dct("features", "featuresDCT") %>%
-    pull(featuresDCT)
+
+  expect_warning_on_arrow(
+    out1 <- df_tbl %>%
+      ft_vector_assembler(as.list(paste0("f", 1:4)), "features") %>%
+      ft_dct("features", "featuresDCT") %>%
+      pull(featuresDCT)
+  )
+
   expect_equal(out1, expected_out)
 })
 
@@ -48,9 +53,13 @@ test_that("ft_discrete_cosine_transform() backwards compat", {
   )
   df_tbl <- testthat_tbl("df")
   # check backwards compatibility
-  out2 <- df_tbl %>%
-    ft_vector_assembler(as.list(paste0("f", 1:4)), "features") %>%
-    ft_discrete_cosine_transform("features", "featuresDCT") %>%
-    dplyr::pull(featuresDCT)
+
+  expect_warning_on_arrow(
+    out2 <- df_tbl %>%
+      ft_vector_assembler(as.list(paste0("f", 1:4)), "features") %>%
+      ft_discrete_cosine_transform("features", "featuresDCT") %>%
+      dplyr::pull(featuresDCT)
+  )
+
   expect_equal(out2, expected_out)
 })

@@ -1,7 +1,7 @@
 find_in_extensions <- function(what) {
 
   # Get package namespaces for sparkly and extensions.
-  namespaces <- c("sparklyr", .globals$extension_packages) %>%
+  namespaces <- c("sparklyr", genv_get_extension_packages()) %>%
     purrr::map(asNamespace)
 
   (function(what, namespaces) {

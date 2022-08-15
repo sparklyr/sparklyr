@@ -1,4 +1,5 @@
-context("column separation")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_requires("dplyr")
@@ -31,8 +32,10 @@ test_that("we can interact with vector columns", {
   )
 
   # retrieve the columns
-  probability <- extracted %>%
-    sdf_read_column("probability")
+  expect_warning_on_arrow(
+    probability <- extracted %>%
+      sdf_read_column("probability")
+  )
 
   # split into pieces
   first <- lapply(probability, `[[`, 1L) %>% unlist()
@@ -84,12 +87,18 @@ test_that("we can separate struct columns (#690)", {
     overwrite = TRUE
   )
 
+
   sliding_window_sdf <- date_sdf %>%
     dplyr::mutate(sw = window(event_date, "150 days", "30 days"))
-  split1 <- sliding_window_sdf %>%
-    sdf_separate_column("sw")
+
+  expect_warning_on_arrow(
+    split1 <- sliding_window_sdf %>%
+      sdf_separate_column("sw")
+  )
+
   split2 <- sliding_window_sdf %>%
     sdf_separate_column("sw", c("a", "b"))
+
   split3 <- sliding_window_sdf %>%
     sdf_separate_column("sw", list("c" = 2))
 
@@ -100,6 +109,7 @@ test_that("we can separate struct columns (#690)", {
   expect_identical(
     split1 %>%
       pull(start) %>%
+      sort() %>%
       head(1) %>%
       as.Date(),
     as.Date("2012-08-18 UTC")
@@ -107,6 +117,7 @@ test_that("we can separate struct columns (#690)", {
   expect_identical(
     split2 %>%
       pull(b) %>%
+      sort() %>%
       head(1) %>%
       as.Date(),
     as.Date("2013-01-15 UTC")
@@ -114,6 +125,7 @@ test_that("we can separate struct columns (#690)", {
   expect_identical(
     split3 %>%
       pull(c) %>%
+      sort() %>%
       head(1) %>%
       as.Date(),
     as.Date("2013-01-15 UTC")

@@ -1,7 +1,7 @@
 spark_apply_packages <- function(packages) {
   db <- Sys.getenv("sparklyr.apply.packagesdb")
   if (nchar(db) == 0) {
-    if (!exists("availablePackagesChache", envir = .globals)) {
+    if (is.null(genv_get_avail_package_cache())) {
       db <- tryCatch(
         {
           available.packages()
@@ -14,11 +14,10 @@ spark_apply_packages <- function(packages) {
           NULL
         }
       )
-
-      assign("availablePackagesChache", db, envir = .globals)
+      genv_set_avail_package_cache(db)
     }
     else {
-      db <- get("availablePackagesChache", envir = .globals)
+      db <- genv_get_avail_package_cache()
     }
   }
 

@@ -1,4 +1,4 @@
-context("connections - shell")
+skip_on_livy()
 
 skip_databricks_connect()
 sc <- testthat_spark_connection()
@@ -126,4 +126,31 @@ test_that("spark_connection reports correct dbplyr edition", {
     dbplyr::dbplyr_edition(sc),
     ifelse(identical(Sys.getenv("DBPLYR_API_EDITION"), "1"), 1L, 2L)
   )
+})
+
+test_that("Abort shell returns expected output", {
+  expect_error(
+    abort_shell(
+      output_file = tempfile(),
+      error_file = tempfile(),
+      message = "test",
+      spark_submit_path = "",
+      shell_args = ""
+      )
+  )
+})
+
+test_that("Misc tests", {
+  expect_true(
+    spark_connection_in_driver(testthat_spark_connection())
+  )
+
+  expect_equal(
+    spark_disconnect("test"),
+    0
+  )
+
+  expect_silent(
+    spark_log_file(testthat_spark_connection())
+    )
 })

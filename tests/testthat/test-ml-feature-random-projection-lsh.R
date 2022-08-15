@@ -1,14 +1,15 @@
-context("ml feature bucketed random projection lsh")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ft_bucketed_random_projection_lsh() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ft_bucketed_random_projection_lsh)
 })
 
 test_that("ft_bucketed_random_projection_lsh() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     input_col = "x",
@@ -47,9 +48,13 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
     bucket_length = 2, num_hash_tables = 3, seed = 666
   ) %>%
     ml_fit(dfA_tbl)
-  transformed <- lsh %>%
-    ml_transform(dfA_tbl) %>%
-    dplyr::collect()
+
+  expect_warning_on_arrow(
+    transformed <- lsh %>%
+      ml_transform(dfA_tbl) %>%
+      dplyr::collect()
+  )
+
   expect_equal(
     transformed %>% dplyr::pull(hashes) %>% head(1) %>% unlist() %>% length(),
     3
@@ -63,11 +68,16 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
       dplyr::pull(id),
     c(0, 1)
   )
-  expect_equal(
-    ml_approx_similarity_join(lsh, dfA_tbl, dfB_tbl, 2) %>%
+
+  expect_warning_on_arrow(
+    s_j <- ml_approx_similarity_join(lsh, dfA_tbl, dfB_tbl, 2) %>%
       dplyr::arrange(id_a, id_b) %>%
       ft_vector_assembler(c("id_a", "id_b"), "joined_pairs") %>%
-      dplyr::pull(joined_pairs),
+      dplyr::pull(joined_pairs)
+  )
+
+  expect_equal(
+    s_j,
     list(c(0, 4), c(0, 6), c(1, 4), c(1, 7), c(2, 5), c(2, 7), c(3, 5), c(3, 6))
   )
 })

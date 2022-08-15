@@ -1,4 +1,5 @@
-context("ml tree feature importances")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ml_tree_feature_importance() works properly", {

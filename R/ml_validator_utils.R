@@ -1,18 +1,25 @@
 ml_map_class <- function(x) {
-  rlang::env_get(.globals$ml_class_mapping, x, default = NULL, inherit = TRUE)
+  rlang::env_get(genv_get_ml_class_mapping(), x, default = NULL, inherit = TRUE)
 }
 
 ml_map_package <- function(x) {
-  rlang::env_get(.globals$ml_package_mapping, x, default = NULL, inherit = TRUE)
+  rlang::env_get(genv_get_ml_package_mapping(), x, default = NULL, inherit = TRUE)
 }
 
 ml_get_stage_validator <- function(jobj) {
   cl <- jobj_class(jobj, simple_name = FALSE)[[1]]
-  get(
-    paste0("validator_", ml_map_class(cl)),
-    envir = asNamespace(ml_map_package(cl)),
-    mode = "function"
-  )
+
+  cl_fn <- paste0("validator_", ml_map_class(cl))
+  pkg_env <- asNamespace(ml_map_package(cl))
+
+  if(cl_fn %in% ls(pkg_env)) {
+    get(
+      cl_fn,
+      envir = pkg_env,
+      mode = "function"
+    )} else {
+      NULL
+  }
 }
 
 ml_get_stage_constructor <- function(jobj) {

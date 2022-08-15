@@ -48,8 +48,9 @@ register_mapping_tables <- function() {
     rlang::env_poke_parent(param_mapping_s_to_r, extension_param_mappings_s_to_r)
   }
 
-  .globals$param_mapping_r_to_s <- param_mapping_r_to_s
-  .globals$param_mapping_s_to_r <- param_mapping_s_to_r
+  genv_set_param_mapping_r_to_s(param_mapping_r_to_s)
+
+  genv_set_param_mapping_s_to_r(param_mapping_s_to_r)
 
   ml_class_mapping <- read_base_mapping(file_name = "class_mapping.json") %>%
     as.environment()
@@ -73,6 +74,6 @@ register_mapping_tables <- function() {
     rlang::env_poke_parent(ml_package_mapping, extension_package_mappings)
   }
 
-  .globals$ml_class_mapping <- ml_class_mapping
-  .globals$ml_package_mapping <- ml_package_mapping
+  genv_set_ml_class_mapping(ml_class_mapping)
+  genv_set_ml_package_mapping(ml_package_mapping)
 }

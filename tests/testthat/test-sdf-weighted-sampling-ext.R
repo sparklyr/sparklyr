@@ -1,4 +1,5 @@
-context("sdf-weighted-sampling-ext")
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_requires("dplyr")
 
@@ -6,12 +7,13 @@ weighted_sampling_octal_test_data <- data.frame(
   x = rep(seq(0L, 7L), 100L),
   weight = 1L + (seq(800L) * 7L + 11L) %% 17L
 )
+
 sdf <- testthat_tbl(
   name = "weighted_sampling_octal_test_data",
   repartition = 4L
 )
 
-num_sampling_iters <- 1000L
+num_sampling_iters <- 100L
 alpha <- 0.05
 
 sample_sz <- 3L
@@ -52,7 +54,10 @@ verify_distribution <- function(replacement) {
     actual_dist[[sample + 1L]] <- actual_dist[[sample + 1L]] + 1L
   }
 
-  res <- ks.test(x = actual_dist, y = expected_dist)
+  expect_warning(
+    res <- ks.test(x = actual_dist, y = expected_dist)
+  )
+
   expect_gte(res$p.value, alpha)
 }
 

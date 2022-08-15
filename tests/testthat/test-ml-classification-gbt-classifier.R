@@ -1,13 +1,14 @@
-context("ml classification gbt classifier")
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("ml_gbt_classifier() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ml_gbt_classifier)
 })
 
 test_that("ml_gbt_classifier() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     max_iter = 10,

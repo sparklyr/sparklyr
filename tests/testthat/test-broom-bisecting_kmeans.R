@@ -1,29 +1,32 @@
-context("broom-bisecting_kmeans")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("bisecting_kmeans.tidy() works", {
+
+  ## ---------------- Connection and data upload to Spark ----------------------
+
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0")
   mtcars_tbl <- testthat_tbl("mtcars")
 
-  td1 <- mtcars_tbl %>%
-    ml_bisecting_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
-    tidy()
+  bk_model <- mtcars_tbl %>%
+    ml_bisecting_kmeans(~ mpg + cyl, k = 4L, seed = 123)
+
+  ## ----------------------------- tidy() --------------------------------------
+
+  td1 <- tidy(bk_model)
 
   check_tidy(td1,
     exp.row = 4,
     exp.names = c("mpg", "cyl", "size", "cluster")
   )
+
   expect_equal(td1$size, c(11, 9, 7, 5))
-})
 
-test_that("bisecting_kmeans.augment() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
-  mtcars_tbl <- testthat_tbl("mtcars")
+  ## --------------------------- augment() -------------------------------------
 
-  au1 <- mtcars_tbl %>%
-    ml_bisecting_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
+  au1 <- bk_model %>%
     augment() %>%
     dplyr::collect()
 
@@ -32,8 +35,7 @@ test_that("bisecting_kmeans.augment() works", {
     exp.name = c(names(mtcars), ".cluster")
   )
 
-  au2 <- mtcars_tbl %>%
-    ml_bisecting_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
+  au2 <- bk_model %>%
     augment(newdata = head(mtcars_tbl, 25)) %>%
     dplyr::collect()
 
@@ -41,20 +43,12 @@ test_that("bisecting_kmeans.augment() works", {
     exp.row = 25,
     exp.name = c(names(mtcars), ".cluster")
   )
-})
 
-test_that("bisecting_kmeans.glance() works", {
-  test_requires_version("2.0.0")
-  sc <- testthat_spark_connection()
-  mtcars_tbl <- testthat_tbl("mtcars")
+  ## ---------------------------- glance() -------------------------------------
 
-  version <- spark_version(sc)
+  gl1 <- glance(bk_model)
 
-  gl1 <- mtcars_tbl %>%
-    ml_bisecting_kmeans(~ mpg + cyl, k = 4L, seed = 123) %>%
-    glance()
-
-  if (version >= "2.3.0") {
+  if (spark_version(sc) >= "2.3.0") {
     check_tidy(gl1,
       exp.row = 1,
       exp.names = c("k", "wssse", "silhouette")

@@ -1,5 +1,4 @@
-context("spark apply bundle")
-
+skip_on_livy()
 sc <- testthat_spark_connection()
 
 test_that("'spark_apply_bundle' can `worker_spark_apply_unbundle`", {

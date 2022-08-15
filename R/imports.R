@@ -4,6 +4,7 @@
 #' @importFrom stats as.formula coefficients gaussian na.fail na.omit predict quantile
 #' @importFrom dplyr type_sum
 #' @importFrom rlang %||%
+#' @importFrom purrr map_chr
 NULL
 
 #' @importFrom generics tidy

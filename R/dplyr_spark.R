@@ -23,57 +23,34 @@ spark_connection.src_spark <- function(x, ...) {
   x$con
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, db_desc)
-#'   S3method(db_desc, src_spark)
-#' } else {
-#'   importFrom(dbplyr, db_connection_describe)
-#'   S3method(db_connection_describe, src_spark)
-#' }
 
-db_desc.src_spark <- function(x) {
-  spark_db_desc(x)
-}
-
+#' @importFrom dbplyr db_connection_describe
+#' @export
 db_connection_describe.src_spark <- function(con) {
   spark_db_desc(con)
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, db_explain)
-#'   S3method(db_explain, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_query_explain)
-#'   S3method(sql_query_explain, spark_connection)
-#' }
-
-db_explain.spark_connection <- function(con, sql, ...) {
-  explain_sql <- spark_sql_query_explain(con, sql, ...)
-  explained <- DBI::dbGetQuery(con, explain_sql)
-
-  message(explained$plan)
-}
-
+#' @importFrom dbplyr sql_query_explain
+#' @export
 sql_query_explain.spark_connection <- function(con, sql, ...) {
   spark_sql_query_explain(con, sql, ...)
 }
 
-#' @export
 #' @importFrom dplyr tbl_vars
+#' @export
 tbl_vars.spark_jobj <- function(x) {
   spark_dataframe_cols(x)
 }
 
-#' @export
+
 #' @importFrom dplyr tbl_vars
+#' @export
 tbl_vars.tbl_spark <- function(x) {
   spark_dataframe_cols(spark_dataframe(x))
 }
 
-#' @export
 #' @importFrom dbplyr op_vars
+#' @export
 op_vars.tbl_spark <- function(x) {
   spark_dataframe_cols(spark_dataframe(x))
 }
@@ -82,28 +59,35 @@ spark_dataframe_cols <- function(sdf) {
   as.character(invoke(sdf, "columns") %>% unlist())
 }
 
-#' @export
 #' @importFrom dbplyr tbl_sql
+#' @export
 tbl.src_spark <- function(src, from, ...) {
   spark_tbl_sql(src, from)
 }
 
-#' @export
 #' @importFrom dbplyr src_sql
 #' @importFrom dbplyr tbl_sql
+#' @export
 tbl.spark_connection <- function(src, from, ...) {
   spark_tbl_sql(src = src_sql("spark", src), from)
 }
 
 spark_tbl_sql <- function(src, from, ...) {
-  tbl_spark <- tbl_sql("spark", src = src, from = process_tbl_name(from), ...)
+  tbl_spark <- tbl_sql(
+    subclass = "spark",
+    src = src,
+    from = process_tbl_name(from),
+    ...)
 
   tbl_spark$sdf_cache_state <- new.env(parent = emptyenv())
   tbl_spark$sdf_cache_state$ops <- NULL
+  tbl_spark$sdf_cache_state$lazy_query <- NULL
   tbl_spark$sdf_cache_state$spark_dataframe <- NULL
   tbl_spark$spark_dataframe <- function(self, spark_dataframe_impl) {
-    if (!identical(self$sdf_cache_state$ops, self$ops)) {
-      self$sdf_cache_state$ops <- self$ops
+    cached <- identical(self$sdf_cache_state$lazy_query, self$lazy_query)
+
+    if (!cached) {
+      self$sdf_cache_state$lazy_query <- self$lazy_query
       self$sdf_cache_state$spark_dataframe <- spark_dataframe_impl(self)
     }
 
@@ -112,14 +96,20 @@ spark_tbl_sql <- function(src, from, ...) {
 
   tbl_spark$schema_cache_state <- new.env(parent = emptyenv())
   tbl_spark$schema_cache_state$ops <- NULL
+  tbl_spark$schema_cache_state$lazy_query <- NULL
   tbl_spark$schema_cache_state$schema <- as.list(rep(NA, 4L))
   tbl_spark$schema <- function(self, schema_impl, expand_nested_cols, expand_struct_cols) {
     cache_index <- (
       as.integer(expand_nested_cols) * 2L + as.integer(expand_struct_cols) + 1L
     )
-    if (!identical(self$schema_cache_state$ops, self$ops) ||
-      is.na(self$schema_cache_state$schema[[cache_index]])) {
-      self$schema_cache_state$ops <- self$ops
+
+    cached <- identical(self$schema_cache_state$lazy_query, self$lazy_query)
+
+
+    if (!cached || is.na(self$schema_cache_state$schema[[cache_index]])[[1]]) {
+
+      self$schema_cache_state$lazy_query <- self$lazy_query
+
       self$schema_cache_state$schema[[cache_index]] <- schema_impl(
         self,
         expand_nested_cols = expand_nested_cols,
@@ -247,40 +237,14 @@ compute.tbl_spark <- function(x, ...) {
   out
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, db_save_query)
-#'   S3method(db_save_query, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_query_save)
-#'   S3method(sql_query_save, spark_connection)
-#' }
-
-db_save_query.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
-  create_temp_view_sql <- spark_sql_query_save(con, sql, name, temporary, ...)
-  DBI::dbGetQuery(con, create_temp_view_sql)
-
-  # dbplyr expects db_save_query to retrieve the table name
-  name
-}
-
+#' @importFrom dbplyr sql_query_save
+#' @export
 sql_query_save.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
   spark_sql_query_save(con, sql, name, temporary, ...)
 }
 
-#' @rawNamespace
-#' if (utils::packageVersion("dbplyr") < "2") {
-#'   importFrom(dplyr, db_analyze)
-#'   S3method(db_analyze, spark_connection)
-#' } else {
-#'   importFrom(dbplyr, sql_table_analyze)
-#'   S3method(sql_table_analyze, spark_connection)
-#' }
-
-db_analyze.spark_connection <- function(con, table, ...) {
-  spark_db_analyze(con, table, ...)
-}
-
+#' @importFrom dbplyr sql_table_analyze
+#' @export
 sql_table_analyze.spark_connection <- function(con, table, ...) {
   spark_db_analyze(con, table, ...)
 }
@@ -307,26 +271,12 @@ sdf_remote_name <- function(x) {
   UseMethod("sdf_remote_name")
 }
 
+#' @export
 sdf_remote_name.tbl_spark <- function(x) {
-  sdf_remote_name(x$ops)
+  dbplyr::remote_name(x)
 }
 
-sdf_remote_name.op_base <- function(x) {
-  x$x
-}
-
-sdf_remote_name.op_group_by <- function(x) {
-  sdf_remote_name(x$x)
-}
-
-sdf_remote_name.op_ungroup <- function(x) {
-  sdf_remote_name(x$x)
-}
-
-sdf_remote_name.op_order <- function(x) {
-  sdf_remote_name(x$x)
-}
-
+#' @export
 sdf_remote_name.default <- function(x) {
   return()
 }

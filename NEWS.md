@@ -1,4 +1,40 @@
-# sparklyr (development version)
+# Sparklyr - dev
+
+### Misc
+
+- Addresses new CRAN HTML checks
+
+- Adds new metric extraction functions: `ml_metrics_binary()`, `ml_metrics_regression()` 
+and `ml_metrics_multiclass()`. They work closer to how `yardstick` metric extraction
+functions work. They expect a table with the predictions and actual values, and returns
+a concise `tibble` with the metrics.  
+
+- Adds support to Spark 3.3 
+
+- Removes code related to backwards compatibility with `dbplyr`. `sparklyr`
+  requires `dbplyr` version 2.2.1 or above, so the code is no longer needed. 
+
+# Sparklyr 1.7.7
+
+### dplyr
+
+- Makes sure to run previous `dplyr` actions before sampling (#3276)
+
+### Misc
+
+- Ensures compatibility with the upcoming, and current, versions of `dbplyr`
+
+# Sparklyr 1.7.6
+
+### Misc
+
+- Ensures compatibility with Spark version 3.2 (#3261)
+
+- Compatibility with new `dbplyr` version (@mgirlich)
+
+- Removes `stringr` dependency 
+
+- Fixes `augment()` when the model was fitted via `parsnip` (#3233)
 
 
 ### Streamming 
@@ -746,7 +782,7 @@ using `as.list(environment())`, thus reducing the number of code lines
 
 - Add config `sparklyr.livy.jar` to configure path or URL to sparklyr JAR.
 
-# Data
+### Data
 
 - Add support for `partition_by` when using `spark_write_delta()` (#2228).
 

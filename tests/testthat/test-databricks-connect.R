@@ -1,4 +1,5 @@
-context("databricks-connect")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_unless_databricks_connect()
 

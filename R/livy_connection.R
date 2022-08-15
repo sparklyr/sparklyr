@@ -599,7 +599,7 @@ livy_connection_jars <- function(config, version, scala_version) {
     # Select the jar file built with the lowest version of Scala in case there is no
     # requirement for Scala version compatibility
     if (length(target_jar) > 1) {
-      target_jar <- stringr::str_sort(target_jar)[[1]]
+      target_jar <- sort(target_jar)[[1]]
     } else if (length(target_jar) == 0) {
       target_jar <- "sparklyr-master-2.12.jar"
     }

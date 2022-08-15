@@ -1,4 +1,5 @@
-context("config")
+skip_on_livy()
+skip_on_arrow_devel()
 
 test_that("spark_config_exists function works as expected", {
   expect_false(

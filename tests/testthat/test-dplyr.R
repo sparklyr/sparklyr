@@ -1,4 +1,3 @@
-context("dplyr")
 
 sc <- testthat_spark_connection()
 
@@ -75,12 +74,12 @@ test_that("'summarize' works with where(...) predicate", {
 
   expect_equivalent(
     iris %>% summarize(across(where(is.numeric), mean)),
-    iris_tbl %>% summarize(across(where(is.numeric), mean)) %>% collect()
+    iris_tbl %>% summarize(across(where(is.numeric), mean, na.rm = TRUE)) %>% collect()
   )
 
   expect_equivalent(
     iris %>% summarize(across(starts_with("Petal"), mean)),
-    iris_tbl %>% summarize(across(starts_with("Petal"), mean)) %>% collect()
+    iris_tbl %>% summarize(across(starts_with("Petal"), mean, na.rm = TRUE)) %>% collect()
   )
 
   expect_equivalent(
@@ -129,18 +128,6 @@ test_that("'across()' works with formula syntax", {
       dplyr_across_test_cases_df %>% mutate(across(where(is.numeric), !!f))
     )
   }
-})
-
-test_that("'across()' emits error when formula references a mutated column", {
-  expect_error(
-    dplyr_across_test_cases_tbl %>%
-      mutate(across(where(is.numeric), ~ .x + z)) %>%
-      collect(),
-    paste0(
-      "Column '.*' is referenced by the formula and is also being mutated ",
-      "within the same query\\. This type of use case is unsupported\\."
-    )
-  )
 })
 
 test_that("'mutate' and 'transmute' work with NSE", {
@@ -199,6 +186,7 @@ test_that("if_else works as expected", {
 })
 
 test_that("if_all and if_any work as expected", {
+  test_requires_package_version("dbplyr", 2)
   expect_equivalent(
     scalars_sdf %>%
       filter(if_any(starts_with("b_"))) %>%
@@ -217,10 +205,8 @@ test_that("if_all and if_any work as expected", {
 })
 
 test_that("if_all and if_any work as expected with boolean predicates", {
+  test_requires_package_version("dbplyr", 2)
   test_requires_version("2.4.0")
-  if (packageVersion("dbplyr") < "2") {
-    skip("This feature is only supported by dbplyr 2.0 or above")
-  }
   skip_on_arrow()
 
   expect_equivalent(
@@ -471,7 +457,7 @@ test_that("process_tbl_name works as expected", {
 
 test_that("in_schema() works as expected", {
   skip_on_arrow()
-  skip_livy()
+  skip_on_livy()
 
   db_name <- random_string("test_db_")
 
@@ -535,13 +521,6 @@ test_that("result from dplyr::compute() has remote name", {
   expect_false(is.null(sdf %>% sparklyr:::sdf_remote_name()))
 })
 
-test_that("dplyr::summarize() emits an error for summarizer using one-sided formula", {
-  expect_error(
-    iris_tbl %>% summarize(across(starts_with("Petal"), ~ mean(.x) ^ 2)),
-    "One-sided formula is unsupported for 'summarize' on Spark dataframes"
-  )
-})
-
 test_that("tbl_ptype.tbl_spark works as expected", {
   expect_equal(df1_tbl %>% dplyr::select_if(is.integer) %>% colnames(), "a")
   expect_equal(df1_tbl %>% dplyr::select_if(is.numeric) %>% colnames(), "a")
@@ -564,11 +543,45 @@ test_that("summarise(.groups=)", {
     expect_equivalent(
       sdf %>%
         group_by(val1) %>%
-        summarize(result = sum(val2), .groups = groups) %>%
+        summarize(result = sum(val2, na.rm = TRUE), .groups = groups) %>%
         collect(),
       df %>%
         group_by(val1) %>%
-        summarize(result = sum(val2), .groups = groups)
+        summarize(result = sum(val2, na.rm = TRUE), .groups = groups)
     )
   }
+})
+
+
+test_that("tbl_spark prints", {
+  print_output <- capture.output(print.tbl_spark(iris_tbl))
+  expect_equal(
+    print_output[1],
+    "# Source: spark<iris> [?? x 5]"
+  )
+})
+
+
+test_that("pmin and pmax work", {
+  pmin_df <- data.frame(x = 11:20, y = 1:10)
+
+  tbl_pmin_df <- sdf_copy_to(sc, pmin_df, overwrite = TRUE)
+
+  remote_p <- tbl_pmin_df %>%
+    mutate(
+      p_min = pmin(x, y),
+      p_max = pmax(x, y)
+    ) %>%
+    collect()
+
+  local_p <- pmin_df %>%
+    mutate(
+      p_min = pmin(x, y),
+      p_max = pmax(x, y)
+    )
+
+  expect_true(
+    all(remote_p == local_p)
+  )
+
 })

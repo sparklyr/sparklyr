@@ -11,13 +11,13 @@ pivot_longer.tbl_spark <- function(data,
                                    names_prefix = NULL,
                                    names_sep = NULL,
                                    names_pattern = NULL,
-                                   names_ptypes = list(),
-                                   names_transform = list(),
+                                   names_ptypes = NULL,
+                                   names_transform = NULL,
                                    names_repair = "check_unique",
                                    values_to = "value",
                                    values_drop_na = FALSE,
-                                   values_ptypes = list(),
-                                   values_transform = list(),
+                                   values_ptypes = NULL,
+                                   values_transform = NULL,
                                    ...) {
   cols <- rlang::enquo(cols)
   spec <- build_longer_spec(
@@ -135,8 +135,8 @@ sdf_pivot_longer <- function(data,
                              spec,
                              names_repair = "check_unique",
                              values_drop_na = FALSE,
-                             values_ptypes = list(),
-                             values_transform = list()) {
+                             values_ptypes = NULL,
+                             values_transform = NULL) {
   sc <- spark_connection(data)
   if (spark_version(sc) < "2.0.0") {
     rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.0.0 or higher")

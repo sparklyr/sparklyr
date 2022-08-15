@@ -168,7 +168,7 @@ ml_chisquare_test <- function(x, features, label) {
   ) %>%
     sdf_register() %>%
     dplyr::collect() %>%
-    tidyr::unnest() %>%
+    tidyr::unnest(cols = c("pValues", "degreesOfFreedom", "statistics")) %>%
     dplyr::transmute(
       p_value = !!rlang::sym("pValues"),
       degrees_of_freedom = unlist(!!rlang::sym("degreesOfFreedom")),

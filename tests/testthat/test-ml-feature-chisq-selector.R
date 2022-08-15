@@ -1,14 +1,15 @@
-context("ml feature chisq selector")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ft_chisq_selector() default params", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_default_args(sc, ft_chisq_selector)
 })
 
 test_that("ft_chisq_selector() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
   test_args <- list(
     features_col = "feat",
@@ -41,5 +42,10 @@ test_that("ft_chisq_select() works properly", {
     df_tbl, "features", "selectedFeatures", "clicked",
     num_top_features = 1
   )
-  expect_equal(pull(result, selectedFeatures), list(18, 12, 15))
+
+  expect_warning_on_arrow(
+    r_features <- pull(result, selectedFeatures)
+  )
+
+  expect_equal(r_features, list(18, 12, 15))
 })

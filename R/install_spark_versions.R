@@ -1,5 +1,3 @@
-.globals <- new.env(parent = emptyenv())
-
 spark_versions_file_pattern <- function() {
   "spark-(.*)-bin-(?:hadoop)?(.*)"
 }
@@ -11,44 +9,49 @@ spark_versions_url <- function() {
 #' @importFrom jsonlite fromJSON
 read_spark_versions_json <- function(latest = TRUE, future = FALSE) {
   # see if we have a cached version
-  if (!exists("sparkVersionsJson", envir = .globals)) {
+  if (is.null(genv_get_spark_versions_json())) {
     # This function might be called during a custom configuration and the package
     # will not be available at that time; allow overriding with environment variable
-    packagePathEnv <- Sys.getenv("R_SPARKINSTALL_INSTALL_INFO_PATH", unset = NA)
-    packagePath <- if (!is.na(packagePathEnv)) {
-      packagePathEnv
+    package_path_env <- Sys.getenv("R_SPARKINSTALL_INSTALL_INFO_PATH", unset = NA)
+    package_path <- if (!is.na(package_path_env)) {
+      package_path_env
     } else {
       system.file(file.path("extdata", "versions.json"), package = packageName())
     }
 
-    versionsJson <- NULL
-    if (latest) {
-      versionsJson <- tryCatch(
-        {
-          suppressWarnings(
-            fromJSON(spark_versions_url(), simplifyDataFrame = TRUE)
-          )
-        },
-        error = function(e) {
-        }
-      )
+    versions_json <- NULL
+
+    if (is.na(package_path_env)) {
+      if (latest) {
+        versions_json <- tryCatch(
+          {
+            suppressWarnings(
+              fromJSON(spark_versions_url(), simplifyDataFrame = TRUE)
+            )
+          },
+          error = function(e) {
+          }
+        )
+      }
     }
 
-    if (is.null(versionsJson)) {
-      versionsJson <- fromJSON(packagePath, simplifyDataFrame = TRUE)
+    if (is.null(versions_json)) {
+      versions_json <- fromJSON(package_path, simplifyDataFrame = TRUE)
     }
 
-    assign("sparkVersionsJson", versionsJson, envir = .globals)
+    genv_set_spark_versions_json(versions_json)
   }
 
   if (identical(future, TRUE)) {
     # add future versions
-    futureVersionsPath <- system.file(file.path("extdata", "versions-next.json"), package = packageName())
-    futureVersionsJson <- fromJSON(futureVersionsPath, simplifyDataFrame = TRUE)
-    versionsJson <- rbind(.globals$sparkVersionsJson, futureVersionsJson)
+    future_versions_path <- system.file(file.path("extdata", "versions-next.json"),
+                                        package = packageName()
+                                        )
+    future_versions_json <- fromJSON(future_versions_path, simplifyDataFrame = TRUE)
+    rbind(genv_get_spark_versions_json(), future_versions_json)
   }
   else {
-    .globals$sparkVersionsJson
+    genv_get_spark_versions_json()
   }
 }
 

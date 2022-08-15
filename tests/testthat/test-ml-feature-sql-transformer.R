@@ -1,4 +1,5 @@
-context("ml feature - sql transformer")
+skip_on_livy()
+skip_on_arrow_devel()
 
 skip_databricks_connect()
 
@@ -6,7 +7,7 @@ sc <- testthat_spark_connection()
 iris_tbl <- testthat_tbl("iris")
 
 test_that("ft_sql_transformer() param setting", {
-  test_requires_latest_spark()
+  test_requires_version("3.0.0")
   test_args <- list(
     statement = "lalallalalal"
   )

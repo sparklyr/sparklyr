@@ -1,4 +1,4 @@
-context("read-write")
+skip_on_livy()
 
 sc <- testthat_spark_connection()
 iris_table_name <- random_table_name("iris")
@@ -64,12 +64,16 @@ test_that("spark_read_json() can load data using column types", {
   jsonPath <- get_test_data_path(
     "spark-read-json-can-load-data-using-column-types.json"
   )
-  df <- spark_read_json(
-    sc,
-    name = "iris_json_typed",
-    path = jsonPath,
-    columns = list("Sepal_Length" = "character", "Species" = "character", "Other" = "struct<a:integer,b:character>")
-  ) %>% collect()
+
+  expect_warning_on_arrow(
+    df <- spark_read_json(
+      sc,
+      name = "iris_json_typed",
+      path = jsonPath,
+      columns = list("Sepal_Length" = "character", "Species" = "character", "Other" = "struct<a:integer,b:character>")
+    ) %>%
+      collect()
+  )
 
   expect_true(is.character(df$Sepal_Length))
   expect_true(is.character(df$Species))
@@ -201,6 +205,87 @@ test_that("spark_write_table() can write data", {
   append_table <- tbl(sc, tbl)
 
   expect_equal(sdf_nrow(append_table), 1)
+})
+
+test_that("spark_write_table() overwrites existing table definition when overwriting", {
+  skip_databricks_connect()
+  test_requires("dplyr")
+
+  df <- copy_to(sc, data.frame(foo = 1L, bar = 2L))
+
+  tbl <- random_string("test_write_table_new")
+
+  ddl <- glue::glue("CREATE TABLE {tbl} (
+    foo INT
+    ,bar BIGINT
+    )")
+
+  DBI::dbExecute(sc, ddl)
+
+  spark_write_table(df, tbl, mode = "overwrite")
+
+  # The type of bar will be int, rather than bigint, because the table was
+  # overwritten from scratch
+  desc <- DBI::dbGetQuery(sc, glue::glue("DESCRIBE TABLE {tbl}"))
+
+  expect_equal(
+    tibble::as_tibble(desc),
+    tibble::tribble(
+      ~col_name, ~data_type, ~comment,
+      "foo", "int", NA_character_,
+      "bar", "int", NA_character_,
+    )
+  )
+
+  new_table <- tbl(sc, tbl)
+
+  expect_equal(
+    tibble::as_tibble(new_table),
+    tibble::tribble(
+      ~foo, ~bar,
+      1L, 2L
+    )
+  )
+})
+
+test_that("spark_insert_table() inserts into existing table definition, even when overwriting", {
+  skip_databricks_connect()
+  test_requires("dplyr")
+
+  df <- copy_to(sc, data.frame(foo = 1L, bar = 2L))
+
+  tbl <- random_string("test_write_table_new")
+
+  ddl <- glue::glue("CREATE TABLE {tbl} (
+    foo INT
+    ,bar BIGINT
+    )")
+
+  DBI::dbExecute(sc, ddl)
+
+  spark_insert_table(df, tbl, overwrite = TRUE)
+
+  desc <- DBI::dbGetQuery(sc, glue::glue("DESCRIBE TABLE {tbl}"))
+
+  expect_equal(
+    tibble::as_tibble(desc),
+    tibble::tribble(
+      ~col_name, ~data_type, ~comment,
+      "foo", "int", NA_character_,
+      "bar", "bigint", NA_character_,
+    )
+  )
+
+  new_table <- tbl(sc, tbl)
+
+  # bar is returned as a double when the table definition is bigint
+  expect_equal(
+    tibble::as_tibble(new_table),
+    tibble::tribble(
+      ~foo, ~bar,
+      1L, 2
+    )
+  )
 })
 
 test_that("spark_read_csv() can rename columns", {
@@ -390,16 +475,18 @@ test_that("spark_write() works as expected", {
   multiple_paths <- lapply(seq(5), function(x) paste0("hdfs://file_", x))
   single_path <- "hdfs://iris"
 
-  for (paths in list(list(multiple_paths), list(single_path))) {
-    verify_spark_write_result(
-      res = spark_write(
-        iris_tbl,
-        writer = writer,
-        paths = paths[[1]]
-      ),
-      expected_paths = as.list(paths[[1]])
-    )
-  }
+  expect_warning_on_arrow(
+    for (paths in list(list(multiple_paths), list(single_path))) {
+      verify_spark_write_result(
+        res = spark_write(
+          iris_tbl,
+          writer = writer,
+          paths = paths[[1]]
+        ),
+        expected_paths = as.list(paths[[1]])
+      )
+    }
+  )
 })
 
 test_avro_schema <- list(
@@ -632,7 +719,7 @@ test_that("spark_read_image works as expected", {
   expect_equal(sdf_ncol(sdf), 1)
   expect_equal(sdf_num_partitions(sdf), 4)
   expect_equal(
-    sdf_schema(sdf, expand_struct_col = TRUE),
+    sdf_schema(sdf, expand_struct_cols = TRUE),
     list(
       image = list(
         name = "image",

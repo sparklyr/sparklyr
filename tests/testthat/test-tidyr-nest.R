@@ -1,4 +1,5 @@
-context("tidyr-nest")
+skip_on_livy()
+skip_on_arrow_devel()
 
 sc <- testthat_spark_connection()
 simple_sdf_1 <- testthat_tbl(
@@ -14,7 +15,9 @@ mtcars_tbl <- testthat_tbl("mtcars")
 test_that("nest turns grouped values into one list-df", {
   test_requires_version("2.0.0")
 
-  out <- tidyr::nest(simple_sdf_1, data = y) %>% collect()
+  expect_warning_on_arrow(
+    out <- tidyr::nest(simple_sdf_1, data = y) %>% collect()
+  )
 
   expect_equivalent(
     out,
@@ -28,8 +31,14 @@ test_that("nest uses grouping vars if present", {
   out <- tidyr::nest(dplyr::group_by(simple_sdf_1, x))
 
   expect_equal(dplyr::group_vars(out), "x")
+
+  expect_warning_on_arrow(
+    o_c <- out %>%
+      collect()
+  )
+
   expect_equivalent(
-    out %>% collect(),
+    o_c,
     tibble::tibble(x = 1, data = list(lapply(seq(3), function(y) list(y = y))))
   )
 })
@@ -42,7 +51,7 @@ test_that("provided grouping vars override grouped defaults", {
 
   expect_equal(dplyr::group_vars(out), "x")
   expect_equivalent(
-    out %>% collect(),
+    expect_warning_on_arrow(out %>% collect()),
     tibble::tibble(x = 1, z = 3, data = list(list(y = 2)))
   )
 })
@@ -56,8 +65,9 @@ test_that("no additional grouping var is created", {
 
   expect_equal(
     colnames(mtcars_tbl_nested),
-    c("am", "cyl", "drat", "wt", "vs", "gear", "carb", "perf")
+    c("cyl", "drat", "wt", "vs", "am", "gear", "carb", "perf")
   )
+
   expect_equal(mtcars_tbl_nested %>% dplyr::group_vars(), "am")
 
   mtcars_tbl_nested <- mtcars_tbl %>%
@@ -73,9 +83,11 @@ test_that("no additional grouping var is created", {
 test_that("puts data into the correct row", {
   test_requires_version("2.0.0")
 
-  out <- tidyr::nest(simple_sdf_2, data = x) %>%
-    dplyr::filter(y == "B") %>%
-    collect()
+  expect_warning_on_arrow(
+    out <- tidyr::nest(simple_sdf_2, data = x) %>%
+      dplyr::filter(y == "B") %>%
+      collect()
+  )
 
   expect_equivalent(
     out,
@@ -86,7 +98,9 @@ test_that("puts data into the correct row", {
 test_that("nesting everything", {
   test_requires_version("2.0.0")
 
-  out <- tidyr::nest(simple_sdf_2, data = c(x, y)) %>% collect()
+  expect_warning_on_arrow(
+    out <- tidyr::nest(simple_sdf_2, data = c(x, y)) %>% collect()
+  )
 
   expect_equivalent(
     out,
@@ -98,30 +112,17 @@ test_that("nesting everything", {
   )
 })
 
-test_that("nest preserves order of data", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(sc, tibble::tibble(x = c(1, 3, 2, 3, 2), y = 1:5))
-  out <- tidyr::nest(sdf, data = y) %>% collect()
-
-  expect_equivalent(
-    out,
-    tibble::tibble(
-      x = c(1, 3, 2),
-      data = list(
-        list(list(y = 1)),
-        list(list(y = 2), list(y = 4)),
-        list(list(y = 3), list(y = 5))
-      )
-    )
-  )
-})
-
 test_that("can strip names", {
   test_requires_version("2.0.0")
 
   sdf <- copy_to(sc, tibble::tibble(x = c(1, 1, 1), ya = 1:3, yb = 4:6))
-  out <- tidyr::nest(sdf, y = starts_with("y"), .names_sep = "") %>% collect()
+
+  expect_warning_on_arrow(
+    out <- sdf %>%
+      tidyr::nest(y = starts_with("y"), .names_sep = "") %>%
+      collect()
+  )
+
 
   expect_equivalent(
     out,
@@ -136,12 +137,17 @@ test_that("nesting works for empty data frames", {
   test_requires_version("2.0.0")
 
   sdf <- copy_to(sc, tibble::tibble(x = integer(), y = character()))
-  out <- tidyr::nest(sdf, data = x) %>% collect()
+
+  expect_warning_on_arrow(
+    out <- tidyr::nest(sdf, data = x) %>% collect()
+  )
 
   expect_named(out, c("y", "data"))
   expect_equal(nrow(out), 0L)
 
-  out <- tidyr::nest(sdf, data = c(x, y)) %>% collect()
+  expect_warning_on_arrow(
+    out <- tidyr::nest(sdf, data = c(x, y)) %>% collect()
+  )
 
   expect_named(out, "data")
   expect_equivalent(out, tibble::tibble(data = list(NA)))
@@ -151,9 +157,12 @@ test_that("can nest multiple columns", {
   test_requires_version("2.0.0")
 
   sdf <- copy_to(sc, tibble::tibble(x = 1, a1 = 1, a2 = 2, b1 = 1, b2 = 2))
-  out <- sdf %>%
-    tidyr::nest(a = c(a1, a2), b = c(b1, b2)) %>%
-    collect()
+
+  expect_warning_on_arrow(
+    out <- sdf %>%
+      tidyr::nest(a = c(a1, a2), b = c(b1, b2)) %>%
+      collect()
+  )
 
   expect_equivalent(
     out,
@@ -172,8 +181,9 @@ test_that("nesting no columns nests all inputs", {
   sdf <- copy_to(sc, tibble::tibble(a1 = 1, a2 = 2, b1 = 1, b2 = 2))
 
   expect_warning(out <- tidyr::nest(sdf), "must not be empty")
+
   expect_equivalent(
-    out %>% collect(),
+    expect_warning_on_arrow(out %>% collect()),
     tibble::tibble(
       data = list(list(list(a1 = 1, a2 = 2, b1 = 1, b2 = 2)))
     )

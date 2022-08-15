@@ -1,4 +1,5 @@
-context("tidyr-pivot-wider")
+skip_on_livy()
+skip_on_arrow_devel()
 
 sc <- testthat_spark_connection()
 
@@ -56,51 +57,50 @@ test_that("error when overwriting existing column", {
 test_that("grouping is preserved", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(sc, tibble::tibble(g = 1, k = "x", v = 2))
-  out <- sdf %>%
-    dplyr::group_by(g) %>%
-    tidyr::pivot_wider(names_from = k, values_from = v)
+  df <- tibble::tibble(g = 1, k = "x", v = 2)
 
-  expect_equal(dplyr::group_vars(out), "g")
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+
+  sdf_out <- sdf %>%
+    group_by(g) %>%
+    pivot_wider(names_from = k, values_from = v)
+
+  expect_equal(dplyr::group_vars(sdf_out), "g")
 })
 
 test_that("nested list column pivots correctly", {
   test_requires_version("2.4.0")
 
-  sdf <- copy_to(
-    sc,
-    tibble::tibble(
-      i = c(1, 2, 1, 2),
-      g = c("a", "a", "b", "b"),
-      d = list(
-        list(x = 1, y = 5), list(x = 2, y = 6), list(x = 3, y = 7), list(x = 4, y = 8)
-      )
-    )
-  )
-  out <- tidyr::pivot_wider(sdf, names_from = g, values_from = d, names_sort = TRUE) %>%
-    collect() %>%
-    dplyr::arrange(i)
+  df <- tibble::tibble(
+    i = c(1, 2, 1, 2),
+    g = c("a", "a", "b", "b"),
+    d = list(
+      list(x = 1, y = 5), list(x = 2, y = 6), list(x = 3, y = 7), list(x = 4, y = 8)
+    ))
 
-  expect_equivalent(
-    out,
-    tibble::tibble(
-      i = 1:2,
-      a = list(list(x = 1, y = 5), list(x = 2, y = 6)),
-      b = list(list(x = 3, y = 7), list(x = 4, y = 8))
-    )
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+
+  expect_warning_on_arrow(
+    sdf_out <- pivot_wider(sdf, names_from = g, values_from = d, names_sort = TRUE) %>%
+      collect() %>%
+      arrange(i)
   )
+
+  df_out <- pivot_wider(df, names_from = g, values_from = d, names_sort = TRUE) %>%
+    arrange(i)
+
+  expect_equal(sdf_out, df_out)
 })
 
 test_that("can specify output column names using names_glue", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(
-    sc,
-    tibble::tibble(x = c("X", "Y"), y = 1:2, a = 1:2, b = 1:2)
-  )
+  df <- tibble::tibble(x = c("X", "Y"), y = 1:2, a = 1:2, b = 1:2)
+
+  sdf <- copy_to(sc, df, overwrite = TRUE)
 
   expect_equivalent(
-    tidyr::pivot_wider(
+    sparklyr::pivot_wider(
       sdf,
       names_from = x:y,
       values_from = a:b,
@@ -134,26 +134,67 @@ test_that("can override default keys", {
   test_requires_version("2.3.0")
   skip_databricks_connect()
 
-  sdf <- copy_to(
-    sc,
-    tibble::tribble(
+  df <- tibble::tribble(
       ~row, ~name, ~var, ~value,
       1, "Sam", "age", 10,
       2, "Sam", "height", 1.5,
-      3, "Bob", "age", 20,
+      3, "Bob", "age", 20
     )
+
+  sdf <- copy_to(sc, df, overwrite = TRUE)
+
+  df_pw <- df %>%
+    pivot_wider(id_cols = name, names_from = var, values_from = value)
+
+  sdf_pw <- sdf %>%
+    pivot_wider(id_cols = name, names_from = var, values_from = value) %>%
+    collect()
+
+  expect_equal(
+    df_pw$name,
+    sdf_pw$name
   )
 
-  expect_equivalent(
-    sdf %>%
-      tidyr::pivot_wider(id_cols = name, names_from = var, values_from = value) %>%
-      collect() %>%
-      dplyr::arrange(name),
-    tibble::tribble(
-      ~name, ~age, ~height,
-      "Bob", 20, NaN,
-      "Sam", 10, 1.5,
-    )
+  expect_equal(
+    df_pw$age,
+    sdf_pw$age
+  )
+
+  expect_equal(
+    df_pw$height,
+    sdf_pw$height
+  )
+})
+
+test_that("groups are processed the same as local", {
+
+  test_requires_version("2.3.0")
+
+  df <- tibble(
+    x = c(rep("one", 4), rep("two", 4)),
+    y = letters[1:8],
+    z = 1:8
+  )
+
+  sdf <- copy_to(sc, df, overwrite = "TRUE")
+
+  df_wide <- df %>%
+    group_by(x) %>%
+    pivot_wider(names_from = y, values_from = z, values_fill = 0) %>%
+    select(x, letters[1:8])  %>%
+    arrange(x) %>%
+    ungroup()
+
+  sdf_wide <- sdf %>%
+    group_by(x) %>%
+    pivot_wider(names_from = y, values_from = z, values_fill = 0) %>%
+    collect() %>%
+    select(x, letters[1:8]) %>%
+    arrange(x)
+
+  expect_equal(
+    df_wide,
+    sdf_wide
   )
 })
 
@@ -164,12 +205,15 @@ test_that("values_fn can be a single function", {
     sc,
     tibble::tibble(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
   )
-  pv <- tidyr::pivot_wider(
-    sdf,
-    names_from = key, values_from = val, values_fn = sum
-  ) %>%
-    collect() %>%
-    dplyr::arrange(a)
+
+  expect_warning(
+    pv <- tidyr::pivot_wider(
+      sdf,
+      names_from = key, values_from = val, values_fn = sum
+    ) %>%
+      collect() %>%
+      dplyr::arrange(a)
+  )
 
   expect_equivalent(pv, tibble::tibble(a = 1:2, x = c(11, 100)))
 })

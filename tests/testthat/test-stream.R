@@ -1,23 +1,79 @@
-context("streaming")
-
+skip_on_livy()
+skip_on_arrow_devel()
 skip_databricks_connect()
 test_requires("dplyr")
+
 sc <- testthat_spark_connection()
 
-iris_in <- paste0("file://", file.path(getwd(), "iris-in"))
-iris_out_dir <- file.path(getwd(), "iris-out")
+test_that("stream test generates file", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+  expect_silent(stream_generate_test(iterations = 1))
+  ss <- read.csv("source/stream_1.csv")
+  expect_equal(ss$x, 1:12)
+  on.exit(unlink("source", recursive = TRUE))
+})
+
+base_dir <- tempdir()
+iris_in_dir <- file.path(base_dir, "iris-in")
+iris_in <- paste0("file://", iris_in_dir)
+iris_out_dir <- file.path(base_dir, "iris-out")
 iris_out <- paste0("file://", iris_out_dir)
 
+if (!dir.exists(iris_in_dir)) dir.create(iris_in_dir)
+
 test_stream <- function(description, test) {
-  if (!dir.exists("iris-in")) dir.create("iris-in")
-  if (dir.exists("iris-out")) unlink("iris-out", recursive = TRUE)
+  if (dir.exists(iris_out_dir)) unlink(iris_out_dir, recursive = TRUE)
 
-  write.table(iris, file.path("iris-in", "iris.csv"), row.names = FALSE, sep = ";")
+  write.table(iris, file.path(iris_in_dir, "iris.csv"), row.names = FALSE, sep = ";")
 
-  on.exit(unlink("iris-", recursive = TRUE))
+  on.exit(unlink(iris_out_dir, recursive = TRUE))
 
   test_that(description, test)
 }
+
+test_stream("Stream lag works", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+  test_requires("dplyr")
+
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    filter(Species == "virginica") %>%
+    stream_write_csv(iris_out)
+
+  id <- stream_id(stream)
+
+  sf <- stream_find(sc, id)
+
+  succeed()
+
+  })
+
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";")
+
+test_stream("Stream lag works", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+  test_requires("dplyr")
+
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";")
+
+  expect_is(
+    stream_lag(
+      x = stream,
+      cols = c(previous = Species ~ 1)
+    ) %>%
+      collect(),
+    "data.frame"
+  )
+
+  expect_error(
+    stream_lag(
+      x = stream,
+      cols = "no-a-column"
+    )
+  )
+
+  succeed()
+})
+
 
 test_stream("csv stream can be filtered with dplyr", {
   test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
@@ -28,6 +84,20 @@ test_stream("csv stream can be filtered with dplyr", {
     stream_write_csv(iris_out)
 
   stream_stop(stream)
+
+  expect_equal(substr(capture.output(stream)[1], 1, 6), "Stream")
+  expect_is(stream_id(stream), "character")
+
+  succeed()
+})
+
+test_stream("SDF collect works", {
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";")
+
+  df <- sdf_collect_stream(stream)
+
+  expect_is(df, "data.frame")
+
   succeed()
 })
 
@@ -65,11 +135,13 @@ test_stream("stream can read and write from text", {
 test_stream("stream can read and write from json", {
   test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
 
-  stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
-    stream_write_json("json-in")
+  json_in <- file.path(base_dir, "json-in")
 
-  stream_out <- stream_read_json(sc, "json-in") %>%
-    stream_write_csv(iris_out, delimiter = "|")
+  stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    stream_write_json(json_in)
+
+  stream_out <- stream_read_json(sc, json_in) %>%
+    stream_write_csv(iris_out)
 
   stream_stop(stream_in)
   stream_stop(stream_out)
@@ -80,10 +152,12 @@ test_stream("stream can read and write from json", {
 test_stream("stream can read and write from parquet", {
   test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
 
-  stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
-    stream_write_parquet("parquet-in")
+  parquet_in <- file.path(base_dir, "parquet-in")
 
-  stream_out <- stream_read_parquet(sc, "parquet-in") %>%
+  stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    stream_write_parquet(parquet_in)
+
+  stream_out <- stream_read_parquet(sc, parquet_in) %>%
     stream_write_csv(iris_out, delimiter = "|")
 
   stream_stop(stream_in)
@@ -169,4 +243,36 @@ test_stream("stream write handles partitioning columns correctly", {
   for (partition in c("Species=setosa", "Species=versicolor", "Species=virginica")) {
     expect_true(partition %in% sub_dirs)
   }
+})
+
+test_stream("Adds watermark step", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    stream_watermark() %>%
+    stream_write_memory("iris_stream")
+
+  stream_stop(stream)
+
+  succeed()
+})
+
+test_stream("stream can read and write from Delta", {
+  test_requires_version("3.0.0", "Spark streaming requires Spark 3.0 or above")
+
+  delta_in <- file.path(base_dir, "delta-in")
+
+  stream_in <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    stream_write_delta(delta_in)
+
+  stream_stop(stream_in)
+
+  succeed()
+})
+
+test_that("to_milliseconds() responds as expected", {
+  expect_equal(to_milliseconds("1 second"), 1000)
+  expect_equal(to_milliseconds(1000), 1000)
+  expect_error(to_milliseconds("zzz"))
+  expect_error(to_milliseconds(list()))
 })
