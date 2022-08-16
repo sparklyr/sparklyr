@@ -2,315 +2,117 @@
 # template:
 #   path: inst/pkgdown/templates
 reference:
-  - title: Spark Operations
+  - title: Spark Sessions
     contents:
-    - get_spark_sql_catalog_implementation
-    - spark_config
     - spark_connect
     - spark_disconnect
+    - spark_config
     - spark_install
     - spark_log
     - spark_web
-    - connection_is_open
-    - connection_spark_shinyapp
-    - spark_session_config
-    - spark_set_checkpoint_dir
-    - spark_submit
-    - spark_table_name
-    - spark_uninstall
-    - spark_version_from_home
-    - spark_versions
-    - spark_config_kubernetes
-    - spark_config_settings
-    - spark_connection_find
-    - spark_dependency_fallback
-    - spark_extension
-    - spark_load_table
-    - list_sparklyr_jars
-    - spark_config_packages
-    - spark_connection
-    - spark_adaptive_query_execution
-    - spark_advisory_shuffle_partition_size
-    - spark_auto_broadcast_join_threshold
-    - spark_coalesce_initial_num_partitions
-    - spark_coalesce_min_num_partitions
-    - spark_coalesce_shuffle_partitions
-    - spark_connection-class
-    - spark_jobj-class
   - title: Spark Data
     contents:
-    - spark_read
-    - spark_read_avro
-    - spark_read_binary
-    - spark_read_csv
-    - spark_read_delta
-    - spark_read_image
-    - spark_read_jdbc
-    - spark_read_json
-    - spark_read_libsvm
-    - spark_read_parquet
-    - spark_read_source
-    - spark_read_table
-    - spark_read_orc
-    - spark_read_text
+    - starts_with("spark_read")
+    - starts_with("spark_write")
+    - spark_insert_table
     - spark_save_table
-    - spark_write
-    - spark_write_avro
-    - spark_write_orc
-    - spark_write_text
-    - spark_write_csv
-    - spark_write_delta
-    - spark_write_jdbc
-    - spark_write_json
-    - spark_write_parquet
-    - spark_write_source
-    - spark_write_table
-    - spark_write_rds
     - collect_from_rds
   - title: Spark Tables
     contents:
     - src_databases
-    - tbl_cache
-    - tbl_change_db
-    - tbl_uncache
+    - starts_with("tbl_")
   - title: Spark DataFrames
     contents:
-    - '[.tbl_spark'
-    - copy_to.spark_connection
     - dplyr_hof
-    - sdf_along
-    - sdf_bind_cols
-    - sdf_bind_rows
-    - sdf_broadcast
-    - sdf_checkpoint
-    - sdf_coalesce
-    - sdf_copy_to
-    - sdf_distinct
-    - sdf_drop_duplicates
-    - sdf_expand_grid
-    - sdf_from_avro
-    - sdf_len
-    - sdf_num_partitions
-    - sdf_partition
-    - sdf_partition_sizes
-    - sdf_pivot
-    - sdf_predict
-    - sdf_rbeta
-    - sdf_rbinom
-    - sdf_rcauchy
-    - sdf_rchisq
-    - sdf_rexp
-    - sdf_rgamma
-    - sdf_rgeom
-    - sdf_rhyper
-    - sdf_rlnorm
-    - sdf_rnorm
-    - sdf_rpois
-    - sdf_rt
-    - sdf_runif
-    - sdf_rweibull
-    - sdf_read_column
-    - sdf_register
-    - sdf_repartition
-    - sdf_residuals
-    - sdf_sample
-    - sdf_separate_column
-    - sdf_seq
-    - sdf_sort
-    - sdf_to_avro
-    - sdf_with_unique_id
-    - sdf_collect
-    - sdf_crosstab
-    - sdf_debug_string
-    - sdf_describe
-    - sdf_dim
-    - sdf_fit
-    - sdf_fit_and_transform
-    - sdf_import
-    - sdf_is_streaming
-    - sdf_last_index
-    - sdf_load_parquet
-    - sdf_load_table
-    - sdf_ncol
-    - sdf_nrow
-    - sdf_persist
-    - sdf_project
-    - sdf_quantile
-    - sdf_random_split
-    - sdf_save_parquet
-    - sdf_save_table
-    - sdf_schema
-    - sdf_sql
-    - sdf_transform
-    - sdf_unnest_longer
-    - sdf_unnest_wider
-    - sdf_with_sequential_id
-    - join.tbl_spark
-    - separate
-    - unite
-    - nest
-    - unnest
-    - pivot_wider
-    - pivot_longer
-    - fill
-    - left_join
-    - right_join
-    - inner_join
-    - full_join
-    - hof_aggregate
-    - hof_array_sort
-    - hof_exists
-    - hof_filter
-    - hof_forall
-    - hof_map_filter
-    - hof_map_zip_with
-    - hof_transform
-    - hof_transform_keys
-    - hof_transform_values
-    - hof_zip_with
-    - sdf_weighted_sample
+    - starts_with("sdf_")
+    - starts_with("hof_")
     - transform_sdf
-  - title: Spark Machine Learning
+  - title: Spark ML - Regression
     contents:
-    - ml_decision_tree
-    - ml_generalized_linear_regression
-    - ml_gradient_boosted_trees
-    - ml_kmeans
-    - ml_kmeans_cluster_eval
-    - ml_lda
     - ml_linear_regression
-    - ml_logistic_regression
-    - ml_model_data
-    - ml_multilayer_perceptron
+    - ml_aft_survival_regression
+    - ml_isotonic_regression
+    - ml_survival_regression
+    - ml_generalized_linear_regression
+  - title: Spark ML - Classification
+    contents:
     - ml_naive_bayes
     - ml_one_vs_rest
-    - ml_pca
-    - ml_prefixspan
-    - ml_random_forest
-    - ml_survival_regression
-    - ml_add_stage
-    - ml_aft_survival_regression
-    - ml_als
-    - ml_approx_nearest_neighbors
-    - ml_approx_similarity_join
-    - ml_association_rules
-    - ml_binary_classification_evaluator
-    - ml_bisecting_kmeans
-    - ml_call_constructor
-    - ml_chisquare_test
-    - ml_clustering_evaluator
-    - ml_clustering_pipeline
-    - ml_compute_cost
-    - ml_construct_model_clustering
-    - ml_construct_model_supervised
-    - ml_corr
-    - ml_cross_validator
+    - ml_logistic_regression
+    - ml_multilayer_perceptron_classifier
+    - ml_linear_svc
+  - title: Spark ML - Tree
+    contents:
+    - ml_decision_tree
     - ml_decision_tree_classifier
     - ml_decision_tree_regressor
-    - ml_default_stop_words
-    - ml_describe_topics
-    - ml_evaluate
+    - ml_gradient_boosted_trees
+    - ml_gbt_regressor
+    - ml_gbt_classifier
+    - ml_random_forest
+    - ml_random_forest_regressor
+    - ml_random_forest_classifier
     - ml_feature_importances
-    - ml_find_synonyms
+    - ml_tree_feature_importance
+  - title: Spark ML - Clustering
+    contents:
+    - ml_kmeans
+    - ml_kmeans_cluster_eval
+    - ml_bisecting_kmeans
+    - ml_gaussian_mixture
+    - ml_compute_cost
+    - ml_power_iteration
+  - title: Spark ML - Text
+    contents:
+    - ml_lda
+    - ml_chisquare_test
+    - ml_default_stop_words
+    - ml_fpgrowth
+    - ml_prefixspan
+    - ml_vocabulary
+  - title: Spark ML - Recommendations
+    contents:
+    - ml_als
+  - title: Spark ML - Hyper-parameter tuning
+    contents:
+    - ml-tuning
+  - title: Spark ML - Evaluation
+    contents:
+    - starts_with("ml_metrics")
+    - ml_evaluate
+    - ml_regression_evaluator
+    - ml_binary_classification_evaluator
+    - ml_clustering_evaluator
+    - ml_multiclass_classification_evaluator
+  - title: Spark ML - Operations
+    contents:
+    - ml_model_data
+    - ml_call_constructor
+    - ml_corr
     - ml_fit
     - ml_fit_and_transform
-    - ml_fpgrowth
-    - ml_freq_itemsets
-    - ml_gaussian_mixture
-    - ml_gbt_classifier
-    - ml_gbt_regressor
-    - ml_is_set
-    - ml_isotonic_regression
     - ml_labels
-    - ml_linear_svc
     - ml_load
-    - ml_log_likelihood
-    - ml_log_perplexity
-    - ml_multiclass_classification_evaluator
-    - ml_multilayer_perceptron_classifier
-    - ml_param
-    - ml_param_map
-    - ml_params
-    - ml_pipeline
-    - ml_power_iteration
+    - ml-params
     - ml_predict
-    - ml_random_forest_classifier
-    - ml_random_forest_regressor
-    - ml_recommend
-    - ml_regression_evaluator
     - ml_save
-    - ml_stage
-    - ml_stages
     - ml_standardize_formula
-    - ml_sub_models
     - ml_summary
     - ml_supervised_pipeline
-    - ml_topics_matrix
-    - ml_train_validation_split
     - ml_transform
     - ml_uid
-    - ml_validation_metrics
-    - ml_vocabulary
+  - title: Spark Pipelines
+    contents:
+    - ml_pipeline
+    - ml_stage
+    - ml_add_stage
   - title: Spark Feature Transformers
     contents:
-    - ft_binarizer
-    - ft_bucketizer
-    - ft_count_vectorizer
-    - ft_discrete_cosine_transform
-    - ft_elementwise_product
-    - ft_index_to_string
-    - ft_one_hot_encoder
-    - ft_quantile_discretizer
-    - ft_sql_transformer
-    - ft_string_indexer
-    - ft_vector_assembler
-    - ft_tokenizer
-    - ft_regex_tokenizer
-    - ft_count_vectorizer
-    - ft_bucketed_random_projection_lsh
-    - ft_chisq_selector
-    - ft_dct
-    - ft_dplyr_transformer
-    - ft_feature_hasher
-    - ft_hashing_tf
-    - ft_idf
-    - ft_imputer
-    - ft_interaction
-    - ft_max_abs_scaler
-    - ft_min_max_scaler
-    - ft_minhash_lsh
-    - ft_ngram
-    - ft_normalizer
-    - ft_one_hot_encoder_estimator
-    - ft_pca
-    - ft_polynomial_expansion
-    - ft_r_formula
-    - ft_standard_scaler
-    - ft_stop_words_remover
-    - ft_string_indexer_model
-    - ft_vector_indexer
-    - ft_vector_slicer
-    - ft_word2vec
-    - ft_robust_scaler
-  - title: Spark Machine Learning Utilities
-    contents:
-    - ml_binary_classification_eval
-    - ml_classification_eval
-    - ml_tree_feature_importance
-    - ml_als_tidiers
-    - ml_glm_tidiers
-    - ml_isotonic_regression_tidiers
-    - ml_lda_tidiers
-    - ml_linear_svc_tidiers
-    - ml_logistic_regression_tidiers
-    - ml_multilayer_perceptron_tidiers
-    - ml_naive_bayes_tidiers
-    - ml_pca_tidiers
-    - ml_survival_regression_tidiers
-    - ml_tree_tidiers
-    - ml_unsupervised_tidiers
+    - starts_with("ft_")
+    - ml_pca
   - title: Extensions
     contents:
+    - ml_supervised_pipeline
     - compile_package_jars
     - connection_config
     - download_scalac
@@ -342,43 +144,84 @@ reference:
     - registerDoSpark
   - title: Livy
     contents:
-    - livy_available_versions
-    - livy_config
-    - livy_home_dir
-    - livy_install
-    - livy_install_dir
-    - livy_installed_versions
-    - livy_service_start
-    - livy_service_stop
+    - starts_with("livy_")
   - title: Streaming
     contents:
-    - stream_find
-    - stream_generate_test
-    - stream_id
-    - stream_lag
-    - stream_name
-    - stream_read_csv
-    - stream_read_json
-    - stream_read_delta
-    - stream_read_kafka
-    - stream_read_orc
-    - stream_read_parquet
-    - stream_read_socket
-    - stream_read_text
-    - stream_render
-    - stream_stats
-    - stream_stop
-    - stream_trigger_continuous
-    - stream_trigger_interval
-    - stream_view
-    - stream_watermark
-    - stream_write_console
-    - stream_write_csv
-    - stream_write_delta
-    - stream_write_json
-    - stream_write_kafka
-    - stream_write_memory
-    - stream_write_orc
-    - stream_write_parquet
-    - stream_write_text
+    - starts_with("stream_")
     - reactiveSpark
+  - title: dplyr integration
+    contents:
+    - copy_to.spark_connection
+    - distinct
+    - filter
+    - full_join
+    - inner_join
+    - join.tbl_spark
+    - left_join
+    - mutate
+    - right_join
+    - select
+  - title: tidyr integration
+    contents:
+    - pivot_longer
+    - pivot_wider
+    - fill
+    - na.replace
+    - nest
+    - replace_na
+    - separate
+    - unite
+    - unnest
+  - title: tidymodels integration
+    contents:
+    - ml_als_tidiers
+    - ml_glm_tidiers
+    - ml_isotonic_regression_tidiers
+    - ml_lda_tidiers
+    - ml_linear_svc_tidiers
+    - ml_logistic_regression_tidiers
+    - ml_multilayer_perceptron_tidiers
+    - ml_naive_bayes_tidiers
+    - ml_pca_tidiers
+    - ml_survival_regression_tidiers
+    - ml_tree_tidiers
+    - ml_unsupervised_tidiers
+  - title: Spark Operations
+    contents:
+    - get_spark_sql_catalog_implementation
+    - connection_is_open
+    - connection_spark_shinyapp
+    - spark_session_config
+    - spark_set_checkpoint_dir
+    - spark_submit
+    - spark_table_name
+    - spark_uninstall
+    - spark_version_from_home
+    - spark_versions
+    - spark_config_kubernetes
+    - spark_config_settings
+    - spark_connection_find
+    - spark_dependency_fallback
+    - spark_extension
+    - spark_load_table
+    - list_sparklyr_jars
+    - spark_config_packages
+    - spark_connection
+    - spark_adaptive_query_execution
+    - spark_advisory_shuffle_partition_size
+    - spark_auto_broadcast_join_threshold
+    - spark_coalesce_initial_num_partitions
+    - spark_coalesce_min_num_partitions
+    - spark_coalesce_shuffle_partitions
+    - spark_connection-class
+    - spark_jobj-class
+    - sparklyr_get_backend_port
+  - title: Other
+    contents:
+    - spark_statistical_routines
+    - ensure
+    - random_string
+    - "%->%"
+    - "[.tbl_spark"
+    - generic_call_interface
+
