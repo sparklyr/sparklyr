@@ -1,3 +1,10 @@
+# Sparklyr (dev)
+
+### Bug Fixes
+
+- Better resolves intermediate column names when using `dplyr` verbs for
+  data transformation (#3286)
+
 # Sparklyr 1.7.8
 
 ### New features
