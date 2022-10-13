@@ -7,6 +7,10 @@ setMethod(
       stop("Table ", name, " already exists")
     }
 
+    if (append && overwrite) {
+      stop("append and overwrite parameters cannot both be setted to TRUE.")
+    }
+
     temp_name <- if (identical(temporary, FALSE)) random_string("sparklyr_tmp_") else name
 
     if (identical(append, TRUE)) {
