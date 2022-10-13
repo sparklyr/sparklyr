@@ -26,6 +26,11 @@ test_that("dbWriteTable can write a table", {
     tables[tables$tableName == temp_table_name, ]$isTemporary,
     TRUE
   )
+
+  dbWriteTable(sc, persisted_table_name, dbi_df[, c("a")], overwrite = TRUE)
+  dbi_df_content <- dbGetQuery(sc, paste("SELECT * FROM ", persisted_table_name, sep=""))
+
+  expect_equal(dbi_df[, c("a")], dbi_df_content)
 })
 
 test_that("dbGetQuery works with parameterized queries", {
