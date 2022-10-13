@@ -1,8 +1,8 @@
 
 setMethod(
   "dbWriteTable", "spark_connection",
-  function(conn, name, value, temporary = getOption("sparklyr.dbwritetable.temp", FALSE), append = FALSE, repartition = 0, serializer = NULL) {
-    found <- dbExistsTable(conn, name)
+  function(conn, name, value, temporary = getOption("sparklyr.dbwritetable.temp", FALSE), overwrite = FALSE, append = FALSE, repartition = 0, serializer = NULL) {
+    found <- dbExistsTable(conn, name) && !overwrite
     if (found) {
       stop("Table ", name, " already exists")
     }
