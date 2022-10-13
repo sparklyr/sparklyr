@@ -14,6 +14,10 @@ setMethod("dbDisconnect", "spark_connection", function(conn) {
   spark_disconnect(conn)
 })
 
+setMethod("dbIsValid", "spark_connection", function(dbObj) {
+  connection_is_open(dbObj)
+})
+
 # Determine database type for R vector.
 setMethod("dbDataType", "spark_connection", function(dbObj, obj) {
   get_data_type(obj)
