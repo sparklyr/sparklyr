@@ -49,6 +49,20 @@ test_that("dbExistsTable performs case-insensitive comparisons on table names", 
   expect_true(dbExistsTable(sc, "testtempview"))
 })
 
+test_that("dbIsValid detects when a connection is opened", {
+  expect_true(dbIsValid(sc))
+})
+
+test_that("dbDisconnect ends the connection", {
+  dbDisconnect(sc)
+  expect_false(connection_is_open(sc))
+})
+
+test_that("dbIsValid detects when a connection is closed", {
+  spark_disconnect(sc)
+  expect_false(dbIsValid(sc))
+})
+
 teardown({
   dbRemoveTable(sc, persisted_table_name)
   dbRemoveTable(sc, temp_table_name)
