@@ -9,13 +9,21 @@ setMethod(
 
     temp_name <- if (identical(temporary, FALSE)) random_string("sparklyr_tmp_") else name
 
+    if (identical(append, TRUE)) {
+        mode <- "append"
+    } else if (identical(overwrite, TRUE)) {
+        mode <- "overwrite"
+    } else {
+        mode <- NULL
+    }
+
     spark_data_copy(conn, value, temp_name, repartition, serializer = serializer)
 
     if (identical(temporary, FALSE)) {
       spark_write_table(
         tbl(conn, temp_name),
         name,
-        if (identical(append, TRUE)) "append" else NULL
+        mode
       )
     }
 
