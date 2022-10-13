@@ -10,6 +10,10 @@ setMethod("show", "spark_connection", function(object) {
   cat("<spark_connection> ", info$master, "\n", sep = "")
 })
 
+setMethod("dbDisconnect", "spark_connection", function(conn) {
+  spark_disconnect(conn)
+})
+
 # Determine database type for R vector.
 setMethod("dbDataType", "spark_connection", function(dbObj, obj) {
   get_data_type(obj)
