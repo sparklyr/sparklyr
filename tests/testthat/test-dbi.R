@@ -49,6 +49,10 @@ test_that("dbExistsTable performs case-insensitive comparisons on table names", 
   expect_true(dbExistsTable(sc, "testtempview"))
 })
 
+test_that("dbListTables list all the existing tables", {
+  expect_true(persisted_table_name %in% dbListTables(sc))
+})
+
 test_that("dbIsValid detects when a connection is opened", {
   expect_true(dbIsValid(sc))
 })
