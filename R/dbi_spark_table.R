@@ -44,8 +44,12 @@ setMethod(
 )
 
 
-setMethod("dbListTables", "spark_connection", function(conn) {
-  df <- df_from_sql(conn, "SHOW TABLES")
+setMethod("dbListTables", "spark_connection", function(conn, databaseSchema=NULL) {
+  query <- "SHOW TABLES"
+  if (!is.null(databaseSchema)) {
+    query <- paste(query, "FROM", databaseSchema, sep=" ")
+  }
+  df <- df_from_sql(conn, query)
 
   if (nrow(df) <= 0) {
     character(0)
