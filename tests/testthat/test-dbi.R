@@ -49,6 +49,15 @@ test_that("dbExistsTable performs case-insensitive comparisons on table names", 
   expect_true(dbExistsTable(sc, "testtempview"))
 })
 
+test_that("dbColumnInfo list the columns with its type and sql type", {
+  res <- dbSendQuery(sc, "SELECT * FROM iris", "setosa")
+  columns_info <- dbColumnInfo(res)
+
+  expect_equal(columns_info$name, c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width", "Species"))
+  expect_equal(columns_info$type, c("numeric", "numeric", "numeric", "numeric", "character"))
+  expect_equal(columns_info$sql.type, c("DoubleType", "DoubleType", "DoubleType", "DoubleType", "StringType"))
+})
+
 test_that("dbListTables list all the existing tables", {
   expect_true(persisted_table_name %in% dbListTables(sc))
 })
