@@ -38,7 +38,24 @@ setMethod("dbGetRowsAffected", "DBISparkResult", function(res, ...) {
 })
 
 setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
-  ""
+  # Retrieving an empty result
+  tinyres <- dbSendQuery(res@conn, res@sql)
+  tinyres@sdf <- tinyres@sdf %>% invoke("limit", as.integer(1))
+  sdf_columns <- tinyres@sdf %>% invoke("dtypes")
+  df <- dbFetch(tinyres, n=0)
+
+  columns <- colnames(df)
+  columns_types <- sapply(df, function (x) class(x)[1])
+  columns_sql_types <- sapply(sdf_columns, function(x) { x %>% invoke("_2") })
+
+  columns_info <- data.frame(
+    name=columns, 
+    type=columns_types, 
+    sql.type=columns_sql_types
+  )
+  rownames(columns_info) <- NULL
+
+  columns_info
 })
 
 setMethod(
