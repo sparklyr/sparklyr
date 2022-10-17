@@ -101,10 +101,12 @@ setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA
   if (n > 0) {
     range <- 0
     if (nrow(df) > 0) {
-      end <- min(nrow(df), nrow(df))
+      end <- min(nrow(df), end)
       range <- start:end
     }
     df <- df[range, ]
+  } else if (n == 0) {
+    df <- df[0,]
   }
 
   if (nrow(df) == 0) {
