@@ -44,10 +44,10 @@ setMethod(
 )
 
 
-setMethod("dbListTables", "spark_connection", function(conn, databaseSchema=NULL) {
+setMethod("dbListTables", "spark_connection", function(conn, database = NULL) {
   query <- "SHOW TABLES"
-  if (!is.null(databaseSchema)) {
-    query <- paste(query, "FROM", databaseSchema, sep=" ")
+  if (!is.null(database)) {
+    query <- paste(query, "FROM", database, sep = " ")
   }
   df <- df_from_sql(conn, query)
 
