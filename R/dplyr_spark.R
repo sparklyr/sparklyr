@@ -120,6 +120,8 @@ spark_tbl_sql <- function(src, from, ...) {
     self$schema_cache_state$schema[[cache_index]]
   }
 
+  tbl_spark$r_schema <- simulate_vars_spark(tbl_spark)
+
   tbl_spark
 }
 

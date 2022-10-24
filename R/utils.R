@@ -454,31 +454,45 @@ translate_spark_column_types <- function(sdf) {
 }
 
 simulate_vars_spark <- function(x, drop_groups = FALSE) {
-  col_types <- translate_spark_column_types(x)
 
-  if (drop_groups) {
-    non_group_cols <- setdiff(names(col_types), dplyr::group_vars(x))
-    col_types <- col_types[non_group_cols]
+  process <- FALSE
+
+  r_schema <- x$r_schema
+
+  if(!is.null(r_schema)) {
+    if(!setequal(colnames(x), colnames(r_schema))) process <- TRUE
+  } else {
+    process <- TRUE
   }
 
-  col_types %>%
-    lapply(
-      function(x) {
-        fn <- tryCatch(
-          get(paste0("as.", x), envir = parent.frame()),
-          error = function(e) {
-            NULL
-          }
-        )
+  if(process) {
+    col_types <- translate_spark_column_types(x)
 
-        if (is.null(fn)) {
-          list()
-        } else {
-          fn(NA)
+    if (drop_groups) {
+      non_group_cols <- setdiff(names(col_types), dplyr::group_vars(x))
+      col_types <- col_types[non_group_cols]
+    }
+
+    r_schema <- col_types %>%
+      lapply(
+        function(x) {
+          fn <- tryCatch(
+            get(paste0("as.", x), envir = parent.frame()),
+            error = function(e) {
+              NULL
+            }
+          )
+
+          if (is.null(fn)) {
+            list()
+          } else {
+            fn(NA)
+          }
         }
-      }
-    ) %>%
-    tibble::as_tibble()
+      ) %>%
+      tibble::as_tibble()
+  }
+  r_schema
 }
 
 simulate_vars.tbl_spark <- function(x, drop_groups = FALSE) {
