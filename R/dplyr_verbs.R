@@ -9,6 +9,9 @@ NULL
 transmute.tbl_spark <- function(.data, ...) {
   dots_org <- rlang::enquos(..., .named = TRUE)
   dots <- fix_na_real_values(dots_org)
+
+  .data <- set_simulate_temp(.data, ...)
+
   if (identical(dots, dots_org)) {
     NextMethod()
   } else {
@@ -21,6 +24,9 @@ transmute.tbl_spark <- function(.data, ...) {
 mutate.tbl_spark <- function(.data, ...) {
   dots_org <- rlang::enquos(...)
   dots <- fix_na_real_values(dots_org)
+
+  .data <- set_simulate_temp(.data, ...)
+
   if (identical(dots, dots_org)) {
     NextMethod()
   } else {
@@ -31,6 +37,7 @@ mutate.tbl_spark <- function(.data, ...) {
 #' @export
 #' @importFrom dplyr filter
 filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
+  .data <- reset_simulate_temp(.data, ...)
   if (!identical(.preserve, FALSE)) {
     stop("`.preserve` is not supported on database backends", call. = FALSE)
   }
@@ -40,14 +47,16 @@ filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
 #' @export
 #' @importFrom dplyr select
 select.tbl_spark <- function(.data, ...) {
-    NextMethod()
+  .data <- reset_simulate_temp(.data, ...)
+  NextMethod()
 }
 
 #' @export
 #' @importFrom dplyr summarise
 #' @importFrom dbplyr op_vars
 summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
-    NextMethod()
+  .data <- reset_simulate_temp(.data, ...)
+  NextMethod()
 }
 
 fix_na_real_values <- function(dots) {
@@ -59,3 +68,31 @@ fix_na_real_values <- function(dots) {
 
   dots
 }
+
+set_simulate_temp <- function(.data, ...) {
+  dots_org <- rlang::enquos(...)
+  if(dots_all_same(dots_org)) {
+    .data$simulate_temp_schema<- run_simulate_vars(.data, FALSE)
+  } else {
+    .data$simulate_temp_schema <- NULL
+  }
+  .data
+}
+
+reset_simulate_temp <- function(.data, ...) {
+  .data$simulate_temp_schema <-  NULL
+  .data
+}
+
+dots_all_same <- function(dots) {
+  dots_expr <- map(dots, rlang::quo_get_expr)
+  ret <- purrr::map_lgl(
+    seq_along(dots_expr),
+    ~ dots_expr[[1]] == dots_expr[[.x]]
+  ) %>%
+    all()
+  if(is.na(ret)) ret <- FALSE
+  if(is.null(ret)) ret <- FALSE
+  ret
+}
+
