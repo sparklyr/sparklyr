@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+<<<<<<< HEAD
 - Better resolves intermediate column names when using `dplyr` verbs for
   data transformation (#3286)
   
@@ -9,6 +10,9 @@
 new element called `r_schema`. This is used by `simulate_vars()` if `x` columns
 matched what it's cached on `r_schema`, so it accelerates selection and
 mutation routines (#3293)
+=======
+- Fixes `pivot_wider()` issues with simpler cases (#3289)
+>>>>>>> main
 
 # Sparklyr 1.7.8
 
