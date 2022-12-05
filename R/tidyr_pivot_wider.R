@@ -91,15 +91,21 @@ sdf_build_wider_spec <- function(data,
       map_chr(~ paste(.x, collapse = names_sep))
   }
 
-  out <- tibble::tibble(.name = paste0(names_prefix, row_names))
+  out <- tibble(.name = paste0(names_prefix, row_names))
 
   if (length(values_from) == 1) {
     out$.value <- values_from
   } else {
-    out <- reduce(map(seq_along(values_from), ~ out), rbind)
-    out$.value <- as.character(rep(values_from, each = 2))
+    out <- seq_along(values_from) %>%
+      map(~ out) %>%
+      reduce(rbind)
+
+    out$.value <- as.character(rep(values_from, each = nrow(row_ids)))
     out$.name <- paste0(out$.value, names_sep, out$.name)
-    row_ids <- reduce(map(seq_along(values_from), ~ row_ids), rbind)
+
+    row_ids <- seq_along(values_from) %>%
+      map(~row_ids) %>%
+      reduce(rbind)
   }
 
   out <- cbind(out, row_ids)
@@ -107,7 +113,9 @@ sdf_build_wider_spec <- function(data,
     out$.name <- as.character(glue::glue_data(out, names_glue))
   }
 
-  if (names_sort) out <- arrange(out, !! rlang::parse_expr(".name"))
+  if (names_sort) {
+    out <- arrange(out, .name)
+    }
 
   out
 }

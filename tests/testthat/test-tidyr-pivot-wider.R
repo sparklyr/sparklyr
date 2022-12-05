@@ -312,3 +312,39 @@ test_that("default `names_from` and `values_from` works as expected", {
 
   expect_equivalent(pv, tibble::tibble(x = 1, y = 2))
 })
+
+
+
+test_that("Simple cases work", {
+
+  d <- data.frame(
+    c1 = c(11, 11, 11),
+    c2 = c(21, 21, 21),
+    c3 = c(31, 32, 33),
+    c4 = c(41, 42, 43),
+    c5 = c(51, 52, 53)
+  )
+
+  ds <- copy_to(sc, d)
+
+  expect_equal(
+    collect(pivot_wider(head(ds, 1), id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5))),
+    tidyr::pivot_wider(head(d, 1), id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5))
+  )
+
+  expect_equal(
+    collect(pivot_wider(head(ds, 2), id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5))),
+    tidyr::pivot_wider(head(d, 2), id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5))
+  )
+
+  expect_equal(
+    collect(pivot_wider(ds, id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5))),
+    tidyr::pivot_wider(d, id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5))
+  )
+
+})
+
+
+
+
+
