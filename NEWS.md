@@ -1,3 +1,9 @@
+# Sparklyr (dev)
+
+### Bug Fixes
+
+- Fixes `pivot_wider()` issues with simpler cases (#3289)
+
 # Sparklyr 1.7.8
 
 ### New features
