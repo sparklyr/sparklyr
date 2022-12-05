@@ -39,8 +39,8 @@ pivot_wider.tbl_spark <- function(data,
 
   spec <- sdf_build_wider_spec(
     data,
-    names_from = !! names_from,
-    values_from = !! values_from,
+    names_from = !!names_from,
+    values_from = !!values_from,
     names_prefix = names_prefix,
     names_sep = names_sep,
     names_glue = names_glue,
@@ -79,12 +79,12 @@ sdf_build_wider_spec <- function(data,
     collect()
 
   row_ids <- data %>%
-    select(!! enquo(names_from)) %>%
+    select(!!enquo(names_from)) %>%
     distinct() %>%
     collect() %>%
-    select(- dplyr::group_vars(data))
+    select(-dplyr::group_vars(data))
 
-  if(dim(row_ids)[2] == 1) {
+  if (dim(row_ids)[2] == 1) {
     row_names <- row_ids[1][[1]]
   } else {
     row_names <- transpose(row_ids) %>%
@@ -97,7 +97,7 @@ sdf_build_wider_spec <- function(data,
     out$.value <- values_from
   } else {
     out <- seq_along(values_from) %>%
-      map(~ out) %>%
+      map(~out) %>%
       reduce(rbind)
 
     out$.value <- as.character(rep(values_from, each = nrow(row_ids)))
@@ -114,8 +114,8 @@ sdf_build_wider_spec <- function(data,
   }
 
   if (names_sort) {
-    out <- arrange(out, .name)
-    }
+    out <- arrange(out, !!rlang::parse_expr(".name"))
+  }
 
   out
 }
@@ -301,8 +301,7 @@ sdf_pivot_wider <- function(data,
     dplyr::summarize %@% summarizers
 }
 
-.apply_pivot_wider_names_repair <- function(
-                                            data,
+.apply_pivot_wider_names_repair <- function(data,
                                             spec,
                                             spec_cols,
                                             key_vars,

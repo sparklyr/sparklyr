@@ -316,6 +316,7 @@ test_that("default `names_from` and `values_from` works as expected", {
 
 
 test_that("Simple cases work", {
+  test_requires_version("2.3.0")
 
   d <- data.frame(
     c1 = c(11, 11, 11),
