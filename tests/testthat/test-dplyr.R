@@ -442,6 +442,7 @@ test_that("process_tbl_name works as expected", {
   expect_equal(sparklyr:::process_tbl_name("a"), "a")
   expect_equal(sparklyr:::process_tbl_name("xyz"), "xyz")
   expect_equal(sparklyr:::process_tbl_name("x.y"), dbplyr::in_schema("x", "y"))
+  expect_equal(sparklyr:::process_tbl_name("x.y.z"), dbplyr::in_catalog("x", "y", "z"))
 
   df1 <- tibble::tibble(a = 1, g = 2) %>%
     copy_to(sc, ., "df1", overwrite = TRUE)
