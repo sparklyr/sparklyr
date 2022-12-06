@@ -454,16 +454,6 @@ translate_spark_column_types <- function(sdf) {
 }
 
 simulate_vars_spark <- function(x, drop_groups = FALSE) {
-  r_schema <- NULL
-
-  if(!is.null(x$simulate_temp_schema)) r_schema <- x$simulate_temp_schema
-
-  if(is.null(r_schema)) r_schema <- run_simulate_vars(x, drop_groups)
-
-  r_schema
-}
-
-run_simulate_vars <- function(x, drop_groups) {
   col_types <- translate_spark_column_types(x)
 
   if (drop_groups) {
