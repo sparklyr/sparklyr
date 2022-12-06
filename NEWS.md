@@ -2,6 +2,9 @@
 
 ### Bug Fixes
 
+- Better resolves intermediate column names when using `dplyr` verbs for
+  data transformation (#3286)
+  
 - Fixes `pivot_wider()` issues with simpler cases (#3289)
 
 # Sparklyr 1.7.8
