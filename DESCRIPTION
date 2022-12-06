@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.7.7.9001
+Version: 1.7.8.9000
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -104,7 +104,7 @@ Imports:
     withr,
     xml2
 Suggests:
-    arrow (>= 0.14.0),
+    arrow (>= 0.17.0),
     broom,
     diffobj,
     foreach,
@@ -122,7 +122,7 @@ Suggests:
     parsnip,
     testthat
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 SystemRequirements: Spark: 1.6.x, 2.x, or 3.x
 Collate:
     'spark_data_build_types.R'

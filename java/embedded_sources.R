@@ -8,21 +8,15 @@ arrow_write_record_batch <- function(df, spark_version_number = NULL) {
   }
 
   withr::with_envvar(arrow_env_vars, {
-    # New in arrow 0.17: takes a data.frame and returns a raw buffer with Arrow data
-    if ("write_to_raw" %in% ls(envir = asNamespace("arrow"))) {
-      # Fixed in 0.17: arrow doesn't hardcode a GMT timezone anymore
-      # so set the local timezone to any POSIXt columns that don't have one set
-      # https://github.com/sparklyr/sparklyr/issues/2439
-      df[] <- lapply(df, function(x) {
-        if (inherits(x, "POSIXt") && is.null(attr(x, "tzone"))) {
-          attr(x, "tzone") <- Sys.timezone()
-        }
-        x
-      })
-      arrow::write_to_raw(df, format = "stream")
-    } else {
-      arrow::write_arrow(arrow::record_batch(!!!df), raw())
-    }
+    # Set the local timezone to any POSIXt columns that don't have one set
+    # https://github.com/sparklyr/sparklyr/issues/2439
+    df[] <- lapply(df, function(x) {
+      if (inherits(x, "POSIXt") && is.null(attr(x, "tzone"))) {
+        attr(x, "tzone") <- Sys.timezone()
+      }
+      x
+    })
+    arrow::write_to_raw(df, format = "stream")
   })
 }
 

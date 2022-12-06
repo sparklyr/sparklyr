@@ -39,8 +39,8 @@ pivot_wider.tbl_spark <- function(data,
 
   spec <- sdf_build_wider_spec(
     data,
-    names_from = !! names_from,
-    values_from = !! values_from,
+    names_from = !!names_from,
+    values_from = !!values_from,
     names_prefix = names_prefix,
     names_sep = names_sep,
     names_glue = names_glue,
@@ -79,27 +79,33 @@ sdf_build_wider_spec <- function(data,
     collect()
 
   row_ids <- data %>%
-    select(!! enquo(names_from)) %>%
+    select(!!enquo(names_from)) %>%
     distinct() %>%
     collect() %>%
-    select(- dplyr::group_vars(data))
+    select(-dplyr::group_vars(data))
 
-  if(dim(row_ids)[2] == 1) {
+  if (dim(row_ids)[2] == 1) {
     row_names <- row_ids[1][[1]]
   } else {
     row_names <- transpose(row_ids) %>%
       map_chr(~ paste(.x, collapse = names_sep))
   }
 
-  out <- tibble::tibble(.name = paste0(names_prefix, row_names))
+  out <- tibble(.name = paste0(names_prefix, row_names))
 
   if (length(values_from) == 1) {
     out$.value <- values_from
   } else {
-    out <- reduce(map(seq_along(values_from), ~ out), rbind)
-    out$.value <- as.character(rep(values_from, each = 2))
+    out <- seq_along(values_from) %>%
+      map(~out) %>%
+      reduce(rbind)
+
+    out$.value <- as.character(rep(values_from, each = nrow(row_ids)))
     out$.name <- paste0(out$.value, names_sep, out$.name)
-    row_ids <- reduce(map(seq_along(values_from), ~ row_ids), rbind)
+
+    row_ids <- seq_along(values_from) %>%
+      map(~row_ids) %>%
+      reduce(rbind)
   }
 
   out <- cbind(out, row_ids)
@@ -107,7 +113,9 @@ sdf_build_wider_spec <- function(data,
     out$.name <- as.character(glue::glue_data(out, names_glue))
   }
 
-  if (names_sort) out <- arrange(out, !! rlang::parse_expr(".name"))
+  if (names_sort) {
+    out <- arrange(out, !!rlang::parse_expr(".name"))
+  }
 
   out
 }
@@ -293,8 +301,7 @@ sdf_pivot_wider <- function(data,
     dplyr::summarize %@% summarizers
 }
 
-.apply_pivot_wider_names_repair <- function(
-                                            data,
+.apply_pivot_wider_names_repair <- function(data,
                                             spec,
                                             spec_cols,
                                             key_vars,

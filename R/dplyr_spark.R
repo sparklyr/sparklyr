@@ -52,7 +52,7 @@ tbl_vars.tbl_spark <- function(x) {
 #' @importFrom dbplyr op_vars
 #' @export
 op_vars.tbl_spark <- function(x) {
-  spark_dataframe_cols(spark_dataframe(x))
+  colnames(x)
 }
 
 spark_dataframe_cols <- function(sdf) {
@@ -138,8 +138,10 @@ process_tbl_name <- function(x) {
         x
       } else if (identical(num_components, 2L)) {
         dbplyr::in_schema(components[[1]], components[[2]])
+      } else if (identical(num_components, 3L)) {
+        dbplyr::in_catalog(components[[1]], components[[2]], components[[3]])
       } else {
-        stop("expected input to be <table name> or <schema name>.<table name>")
+        stop("expected input to be <table name>, <schema name>.<table name>, or <catalog name>.<schema name>.<table name>")
       }
     }
   }
