@@ -112,7 +112,7 @@ spark_actions <- function(scon) {
       Help = list(
         icon = file.path(icons, "help.png"),
         callback = function() {
-          utils::browseURL("http://spark.rstudio.com")
+          utils::browseURL("https://spark.rstudio.com")
         }
       )
     )
