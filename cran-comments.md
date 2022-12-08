@@ -1,6 +1,6 @@
 # Re-submission
 
-- Addresses feedback from CRAN
+- Addresses reference to moved page
 
 ## Test environments
 

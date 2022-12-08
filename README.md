@@ -121,21 +121,25 @@ To start with here’s a simple filtering example:
 # filter by departure delay and print the first few records
 flights_tbl %>% filter(dep_delay == 2)
 #> # Source: spark<?> [?? x 19]
-#>     year month   day dep_time sched_de…¹ dep_d…² arr_t…³ sched…⁴ arr_d…⁵ carrier flight tailnum origin dest 
-#>    <int> <int> <int>    <int>      <int>   <dbl>   <int>   <int>   <dbl> <chr>    <int> <chr>   <chr>  <chr>
-#>  1  2013     1     1      517        515       2     830     819      11 UA        1545 N14228  EWR    IAH  
-#>  2  2013     1     1      542        540       2     923     850      33 AA        1141 N619AA  JFK    MIA  
-#>  3  2013     1     1      702        700       2    1058    1014      44 B6         671 N779JB  JFK    LAX  
-#>  4  2013     1     1      715        713       2     911     850      21 UA         544 N841UA  EWR    ORD  
-#>  5  2013     1     1      752        750       2    1025    1029      -4 UA         477 N511UA  LGA    DEN  
-#>  6  2013     1     1      917        915       2    1206    1211      -5 B6          41 N568JB  JFK    MCO  
-#>  7  2013     1     1      932        930       2    1219    1225      -6 VX         251 N641VA  JFK    LAS  
-#>  8  2013     1     1     1028       1026       2    1350    1339      11 UA        1004 N76508  LGA    IAH  
-#>  9  2013     1     1     1042       1040       2    1325    1326      -1 B6          31 N529JB  JFK    MCO  
-#> 10  2013     1     1     1231       1229       2    1523    1529      -6 UA         428 N402UA  EWR    FLL  
-#> # … with more rows, 5 more variables: air_time <dbl>, distance <dbl>, hour <dbl>, minute <dbl>,
-#> #   time_hour <dttm>, and abbreviated variable names ¹​sched_dep_time, ²​dep_delay, ³​arr_time,
-#> #   ⁴​sched_arr_time, ⁵​arr_delay
+#>     year month   day dep_t…¹ sched…² dep_d…³ arr_t…⁴ sched…⁵
+#>    <int> <int> <int>   <int>   <int>   <dbl>   <int>   <int>
+#>  1  2013     1     1     517     515       2     830     819
+#>  2  2013     1     1     542     540       2     923     850
+#>  3  2013     1     1     702     700       2    1058    1014
+#>  4  2013     1     1     715     713       2     911     850
+#>  5  2013     1     1     752     750       2    1025    1029
+#>  6  2013     1     1     917     915       2    1206    1211
+#>  7  2013     1     1     932     930       2    1219    1225
+#>  8  2013     1     1    1028    1026       2    1350    1339
+#>  9  2013     1     1    1042    1040       2    1325    1326
+#> 10  2013     1     1    1231    1229       2    1523    1529
+#> # … with more rows, 11 more variables: arr_delay <dbl>,
+#> #   carrier <chr>, flight <int>, tailnum <chr>,
+#> #   origin <chr>, dest <chr>, air_time <dbl>,
+#> #   distance <dbl>, hour <dbl>, minute <dbl>,
+#> #   time_hour <dttm>, and abbreviated variable names
+#> #   ¹​dep_time, ²​sched_dep_time, ³​dep_delay, ⁴​arr_time,
+#> #   ⁵​sched_arr_time
 ```
 
 [Introduction to dplyr](https://spark.rstudio.com/guides/dplyr.html)
@@ -155,7 +159,8 @@ ggplot(delay, aes(dist, delay)) +
   geom_point(aes(size = count), alpha = 1/2) +
   geom_smooth() +
   scale_size_area(max_size = 2)
-#> `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
+#> `geom_smooth()` using method = 'gam' and formula = 'y ~
+#> s(x, bs = "cs")'
 ```
 
 <img src="tools/readme/dplyr-ggplot2-1.png" width="100%" />
@@ -205,17 +210,28 @@ a Spark cluster. The `spark_connection` object implements a
 library(DBI)
 iris_preview <- dbGetQuery(sc, "SELECT * FROM iris LIMIT 10")
 iris_preview
-#>    Sepal_Length Sepal_Width Petal_Length Petal_Width Species
-#> 1           5.1         3.5          1.4         0.2  setosa
-#> 2           4.9         3.0          1.4         0.2  setosa
-#> 3           4.7         3.2          1.3         0.2  setosa
-#> 4           4.6         3.1          1.5         0.2  setosa
-#> 5           5.0         3.6          1.4         0.2  setosa
-#> 6           5.4         3.9          1.7         0.4  setosa
-#> 7           4.6         3.4          1.4         0.3  setosa
-#> 8           5.0         3.4          1.5         0.2  setosa
-#> 9           4.4         2.9          1.4         0.2  setosa
-#> 10          4.9         3.1          1.5         0.1  setosa
+#>    Sepal_Length Sepal_Width Petal_Length Petal_Width
+#> 1           5.1         3.5          1.4         0.2
+#> 2           4.9         3.0          1.4         0.2
+#> 3           4.7         3.2          1.3         0.2
+#> 4           4.6         3.1          1.5         0.2
+#> 5           5.0         3.6          1.4         0.2
+#> 6           5.4         3.9          1.7         0.4
+#> 7           4.6         3.4          1.4         0.3
+#> 8           5.0         3.4          1.5         0.2
+#> 9           4.4         2.9          1.4         0.2
+#> 10          4.9         3.1          1.5         0.1
+#>    Species
+#> 1   setosa
+#> 2   setosa
+#> 3   setosa
+#> 4   setosa
+#> 5   setosa
+#> 6   setosa
+#> 7   setosa
+#> 8   setosa
+#> 9   setosa
+#> 10  setosa
 ```
 
 ## Machine Learning
@@ -299,7 +315,9 @@ spark_write_json(iris_tbl, temp_json)
 iris_json_tbl <- spark_read_json(sc, "iris_json", temp_json)
 
 src_tbls(sc)
-#> [1] "batting"      "flights"      "iris"         "iris_csv"     "iris_json"    "iris_parquet" "mtcars"
+#> [1] "batting"      "flights"      "iris"        
+#> [4] "iris_csv"     "iris_json"    "iris_parquet"
+#> [7] "mtcars"
 ```
 
 ## Distributed R
@@ -315,16 +333,16 @@ spark_apply(iris_tbl, function(data) {
 #> # Source: spark<?> [?? x 4]
 #>    Sepal_Length Sepal_Width Petal_Length Petal_Width
 #>           <dbl>       <dbl>        <dbl>       <dbl>
-#>  1         7.06        5.46         3.36        2.16
-#>  2         6.86        4.96         3.36        2.16
-#>  3         6.66        5.16         3.26        2.16
-#>  4         6.56        5.06         3.46        2.16
-#>  5         6.96        5.56         3.36        2.16
-#>  6         7.36        5.86         3.66        2.36
-#>  7         6.56        5.36         3.36        2.26
-#>  8         6.96        5.36         3.46        2.16
-#>  9         6.36        4.86         3.36        2.16
-#> 10         6.86        5.06         3.46        2.06
+#>  1         5.51        3.91         1.81       0.610
+#>  2         5.31        3.41         1.81       0.610
+#>  3         5.11        3.61         1.71       0.610
+#>  4         5.01        3.51         1.91       0.610
+#>  5         5.41        4.01         1.81       0.610
+#>  6         5.81        4.31         2.11       0.810
+#>  7         5.01        3.81         1.81       0.710
+#>  8         5.41        3.81         1.91       0.610
+#>  9         4.81        3.31         1.81       0.610
+#> 10         5.31        3.51         1.91       0.510
 #> # … with more rows
 ```
 
@@ -339,14 +357,15 @@ spark_apply(
   group_by = "Species"
 )
 #> # Source: spark<?> [?? x 6]
-#>   Species    term         estimate std.error statistic  p.value
-#>   <chr>      <chr>           <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 versicolor (Intercept)   -0.0843    0.161     -0.525 6.02e- 1
-#> 2 versicolor Petal_Length   0.331     0.0375     8.83  1.27e-11
-#> 3 virginica  (Intercept)    1.14      0.379      2.99  4.34e- 3
-#> 4 virginica  Petal_Length   0.160     0.0680     2.36  2.25e- 2
-#> 5 setosa     (Intercept)   -0.0482    0.122     -0.396 6.94e- 1
-#> 6 setosa     Petal_Length   0.201     0.0826     2.44  1.86e- 2
+#>   Species    term         estimate std.er…¹ stati…²  p.value
+#>   <chr>      <chr>           <dbl>    <dbl>   <dbl>    <dbl>
+#> 1 versicolor (Intercept)   -0.0843   0.161   -0.525 6.02e- 1
+#> 2 versicolor Petal_Length   0.331    0.0375   8.83  1.27e-11
+#> 3 virginica  (Intercept)    1.14     0.379    2.99  4.34e- 3
+#> 4 virginica  Petal_Length   0.160    0.0680   2.36  2.25e- 2
+#> 5 setosa     (Intercept)   -0.0482   0.122   -0.396 6.94e- 1
+#> 6 setosa     Petal_Length   0.201    0.0826   2.44  1.86e- 2
+#> # … with abbreviated variable names ¹​std.error, ²​statistic
 ```
 
 ## Extensions
@@ -407,16 +426,16 @@ You can show the log using the `spark_log()` function:
 
 ``` r
 spark_log(sc, n = 10)
-#> 22/12/07 15:06:01 INFO BlockManagerInfo: Removed broadcast_87_piece0 on localhost:63303 in memory (size: 18.3 KiB, free: 912.1 MiB)
-#> 22/12/07 15:06:01 INFO BlockManagerInfo: Removed broadcast_88_piece0 on localhost:63303 in memory (size: 18.3 KiB, free: 912.1 MiB)
-#> 22/12/07 15:06:01 INFO BlockManagerInfo: Removed broadcast_89_piece0 on localhost:63303 in memory (size: 18.3 KiB, free: 912.1 MiB)
-#> 22/12/07 15:06:01 INFO Executor: Finished task 0.0 in stage 67.0 (TID 83). 1004 bytes result sent to driver
-#> 22/12/07 15:06:01 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 83) in 267 ms on localhost (executor driver) (1/1)
-#> 22/12/07 15:06:01 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-#> 22/12/07 15:06:01 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:0) finished in 0.290 s
-#> 22/12/07 15:06:01 INFO DAGScheduler: Job 49 is finished. Cancelling potential speculative or zombie tasks for this job
-#> 22/12/07 15:06:01 INFO TaskSchedulerImpl: Killing all running tasks in stage 67: Stage finished
-#> 22/12/07 15:06:01 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.300256 s
+#> 22/12/08 10:13:49 INFO BlockManagerInfo: Removed broadcast_84_piece0 on localhost:54296 in memory (size: 9.2 KiB, free: 912.1 MiB)
+#> 22/12/08 10:13:49 INFO BlockManagerInfo: Removed broadcast_86_piece0 on localhost:54296 in memory (size: 5.0 KiB, free: 912.1 MiB)
+#> 22/12/08 10:13:49 INFO BlockManagerInfo: Removed broadcast_76_piece0 on localhost:54296 in memory (size: 8.7 KiB, free: 912.1 MiB)
+#> 22/12/08 10:13:49 INFO Executor: Finished task 0.0 in stage 67.0 (TID 83). 1004 bytes result sent to driver
+#> 22/12/08 10:13:49 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 83) in 187 ms on localhost (executor driver) (1/1)
+#> 22/12/08 10:13:49 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
+#> 22/12/08 10:13:49 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:0) finished in 0.199 s
+#> 22/12/08 10:13:49 INFO DAGScheduler: Job 49 is finished. Cancelling potential speculative or zombie tasks for this job
+#> 22/12/08 10:13:49 INFO TaskSchedulerImpl: Killing all running tasks in stage 67: Stage finished
+#> 22/12/08 10:13:49 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.204972 s
 ```
 
 Finally, we disconnect from Spark:
@@ -455,10 +474,6 @@ through a new connection dialog:
 <div style="margin-bottom: 15px;">
 
 </div>
-
-The RStudio IDE features for sparklyr are available now as part of the
-[RStudio Preview
-Release](https://www.rstudio.com/products/rstudio/download/preview/).
 
 ## Using H2O
 

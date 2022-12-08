@@ -19,6 +19,8 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 
+options(width = 60)
+
 library(sparklyr)
 library(dplyr)
 library(ggplot2)
@@ -338,7 +340,6 @@ You can also connect to Spark through [Livy](https://livy.apache.org/) through a
 
 <div style="margin-bottom: 15px;"></div>
 
-The RStudio IDE features for sparklyr are available now as part of the [RStudio Preview Release](https://www.rstudio.com/products/rstudio/download/preview/).
 
 ## Using H2O
 
