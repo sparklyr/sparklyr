@@ -12,7 +12,7 @@ check_key <- function(.key) {
 
 #' @importFrom tidyr nest
 #' @export
-nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = lifecycle::deprecated()) {
+nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = NULL) {
   if (.data %>% spark_connection() %>% spark_version() < "2.0.0") {
     rlang::abort("`nest.tbl_spark` requires Spark 2.0.0 or higher")
   }
