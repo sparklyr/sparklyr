@@ -129,8 +129,8 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
     out <- .data %>%
       dplyr::group_by(!!!syms(distinct_cols)) %>%
       summarise(!!!exprs) %>%
+      arrange(row_num) %>%
       select(all_of(out_cols)) %>%
-      arrange(!!sym(row_num)) %>%
       dplyr::group_by(!!!syms(grps))
     out$order_vars <- NULL
     out
