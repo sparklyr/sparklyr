@@ -736,7 +736,7 @@ test_that("spark_read_image works as expected", {
   )
   expect_equal(
     sdf %>%
-      dplyr::transmute(origin = image$origin) %>%
+      dplyr::transmute(origin = image[["origin"]]) %>%
       dplyr::arrange(origin) %>%
       dplyr::collect(),
     tibble::tibble(
