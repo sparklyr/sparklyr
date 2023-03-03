@@ -17,7 +17,7 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = NULL) {
     rlang::abort("`nest.tbl_spark` requires Spark 2.0.0 or higher")
   }
 
-  .key <- check_key(.key)
+  #.key <- check_key(.key)
   group_vars <- dplyr::group_vars(.data)
   if (missing(...)) {
     if (length(group_vars) > 0) {
@@ -27,7 +27,12 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = NULL) {
         "`...` must not be empty for ungrouped data frames.\n",
         "Did you want `", .key, " = everything()`?"
       ))
-      nested_cols <- rlang::list2(!!.key := colnames(.data))
+      if(is.null(.key)) {
+        nested_cols <-  rlang::list2(data = colnames(.data))
+      } else {
+        nested_cols <- rlang::list2(!!.key := colnames(.data))
+      }
+
     }
   } else {
     cols <- replicate_colnames(.data)
