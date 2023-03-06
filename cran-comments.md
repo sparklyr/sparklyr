@@ -1,6 +1,11 @@
-# Re-submission
+# Submission
 
-- Addresses reference to moved page
+- Addresses Warning from CRAN checks
+
+- Addresses option(stringsAsFactors) usage
+
+- Fixes root cause of issue processing pivot wider and distinct (#3317 & #3320)
+
 
 ## Test environments
 

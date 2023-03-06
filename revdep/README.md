@@ -500,7 +500,7 @@ Status: 1 NOTE
 * package encoding: UTF-8
 Examples with CPU (user + system) or elapsed time > 5s
                        user system elapsed
-asof_future_left_join 0.371  0.096  19.849
+asof_future_left_join 0.368  0.079  19.623
 * checking running R code from vignettes ... NONE
   ‘importing-time-series-data.Rmd’ using ‘UTF-8’... OK
   ‘overview.Rmd’ using ‘UTF-8’... OK
