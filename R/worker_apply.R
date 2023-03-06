@@ -92,10 +92,6 @@ spark_worker_execute_closure <- function(
   result <- do.call(closure, closure_args)
   worker_log("computed closure")
 
-  as_factors <- getOption("stringsAsFactors")
-  on.exit(options(stringsAsFactors = as_factors))
-  options(stringsAsFactors = FALSE)
-
   if (identical(fetch_result_as_sdf, FALSE)) {
     serialize_impl <- spark_worker_get_serializer(sc)
     result <- lapply(result, function(x) serialize_impl(x, NULL))

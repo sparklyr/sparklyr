@@ -1,3 +1,15 @@
+# Sparklyr 1.8.0
+
+### Bug Fixes
+
+- Addresses Warning from CRAN checks
+
+- Addresses option(stringsAsFactors) usage
+
+- Fixes root cause of issue processing pivot wider and distinct (#3317 & #3320)
+
+- Updates local Spark download sources
+
 # Sparklyr 1.7.9
 
 ### Bug Fixes
