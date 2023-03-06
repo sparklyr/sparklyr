@@ -219,7 +219,9 @@ test_that("spark_write_rds() works as expected with array columns", {
       )
     ) %>%
     dplyr::mutate(
-      decimal_arr = transform(long_arr, ~ decimal(.x))
+      decimal_arr = dplyr::sql(
+        "TRANSFORM(`long_arr`, x -> CAST(`x` AS DECIMAL))"
+      )
     )
 
   spark_write_rds(arr_sdf, paste0("file://", test_rds_output))
