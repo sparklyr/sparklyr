@@ -41,7 +41,7 @@
 ###  apache.sedona
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/apache.sedona.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -57,7 +57,7 @@ Status: 1 NOTE
 ###  catalog
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/catalog.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -71,7 +71,7 @@ Status: OK
 ###  geospark
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/geospark.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -90,7 +90,7 @@ Status: 2 NOTEs
 ###  graphframes
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/graphframes.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -382,7 +382,7 @@ Status: 1 NOTE
 ###  rsparkling
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/rsparkling.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * this is package ‘rsparkling’ version ‘0.2.19’
@@ -401,7 +401,7 @@ Status: 2 NOTEs
 ###  s3.resourcer
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/s3.resourcer.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -416,7 +416,7 @@ Status: OK
 ###  shinyML
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/shinyML.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -431,7 +431,7 @@ Status: 1 NOTE
 ###  spark.sas7bdat
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/spark.sas7bdat.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -445,7 +445,7 @@ Status: OK
 ###  sparkavro
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkavro.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -461,7 +461,7 @@ Status: 1 NOTE
 ###  sparkbq
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkbq.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -476,7 +476,7 @@ Status: 1 NOTE
 ###  sparkhail
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkhail.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -492,7 +492,7 @@ Status: 1 NOTE
 ###  sparklyr.flint
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparklyr.flint.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -500,7 +500,7 @@ Status: 1 NOTE
 * package encoding: UTF-8
 Examples with CPU (user + system) or elapsed time > 5s
                        user system elapsed
-asof_future_left_join 0.368  0.079  19.623
+asof_future_left_join 0.409  0.122   21.01
 * checking running R code from vignettes ... NONE
   ‘importing-time-series-data.Rmd’ using ‘UTF-8’... OK
   ‘overview.Rmd’ using ‘UTF-8’... OK
@@ -512,7 +512,7 @@ Status: OK
 ###  sparklyr.nested
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparklyr.nested.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * this is package ‘sparklyr.nested’ version ‘0.0.4’
@@ -525,7 +525,7 @@ Status: OK
 ###  sparktf
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparktf.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -541,7 +541,7 @@ Status: 1 NOTE
 ###  sparkwarc
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkwarc.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -554,7 +554,7 @@ Status: OK
 ###  sparkxgb
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkxgb.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
@@ -571,7 +571,7 @@ Status: 1 NOTE
 ###  variantspark
 ```
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/variantspark.Rcheck’
-* using R version 4.2.1 (2022-06-23)
+* using R version 4.2.2 (2022-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
 * using session charset: UTF-8
 * checking extension type ... Package
