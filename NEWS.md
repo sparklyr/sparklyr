@@ -1,3 +1,13 @@
+# Sparklyr 1.8.1
+
+### Bug Fixes
+
+- Fixes consistency issues with dplyr's sample_n(), slice(), op_vars(), and sample_frac()
+
+### Internal functionality
+
+- Adds R-devel to GHA testing
+
 # Sparklyr 1.8.0
 
 ### Bug Fixes
