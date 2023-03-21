@@ -2,25 +2,20 @@
 
 - Addresses Warning from CRAN checks
 
-- Addresses option(stringsAsFactors) usage
-
-- Fixes root cause of issue processing pivot wider and distinct (#3317 & #3320)
-
-
 ## Test environments
 
-- Ubuntu 20.04, R 4.2.2, Spark 3.3 (GH Actions)
-- Ubuntu 20.04, R 4.2.2, Spark 3.2 (GH Actions)
-- Ubuntu 20.04, R 4.2.2, Spark 3.1 (GH Actions)
-- Ubuntu 20.04, R 4.2.2, Spark 2.4 (GH Actions)
-- Ubuntu 20.04, R 4.2.2, Spark 2.2 (GH Actions)
+- Ubuntu 20.04, R 4.2.3, Spark 3.3 (GH Actions)
+- Ubuntu 20.04, R 4.2.3, Spark 3.2 (GH Actions)
+- Ubuntu 20.04, R 4.2.3, Spark 3.1 (GH Actions)
+- Ubuntu 20.04, R 4.2.3, Spark 2.4 (GH Actions)
+- Ubuntu 20.04, R 4.2.3, Spark 2.2 (GH Actions)
   
 ## R CMD check environments
 
-- Local Mac OS M1 (aarch64-apple-darwin20), R 4.2.1
-- Mac OS x86_64-apple-darwin17.0 (64-bit), R 4.2.2
-- Windows  x86_64-w64-mingw32 (64-bit), R 4.2.2
-- Linux x86_64-pc-linux-gnu (64-bit), R 4.2.2
+- Local Mac OS M1 (aarch64-apple-darwin20), R 4.2.3
+- Mac OS x86_64-apple-darwin17.0 (64-bit), R 4.2.3
+- Windows  x86_64-w64-mingw32 (64-bit), R 4.2.3
+- Linux x86_64-pc-linux-gnu (64-bit), R 4.2.3
 
 
 ## R CMD check results
@@ -37,9 +32,9 @@ Notes:
   use conditionally.
 
 ❯ checking installed package size ... NOTE
-    installed size is  6.8Mb
+    installed size is  6.7Mb
     sub-directories of 1Mb or more:
-      R      2.1Mb
+      R      2.0Mb
       java   3.4Mb
 ```
 
@@ -49,7 +44,7 @@ Notes:
 
 |Package|Version|Error|Warning|Note|OK|
 |:---|:---|:---|:---|:---|:---|
-|[apache.sedona](#apache.sedona)|1.3.1|0|0|1|39|
+|[apache.sedona](#apache.sedona)|1.4.0|0|0|0|40|
 |[catalog](#catalog)|0.1.1|0|0|0|42|
 |[geospark](#geospark)|0.3.1|0|0|2|41|
 |[graphframes](#graphframes)|0.1.2|0|0|1|41|
@@ -77,7 +72,7 @@ Notes:
 |[sparkavro](#sparkavro)|0.3.0|0|0|1|42|
 |[sparkbq](#sparkbq)|0.1.1|0|0|1|40|
 |[sparkhail](#sparkhail)|0.1.1|0|0|1|42|
-|[sparklyr.flint](#sparklyr.flint)|0.2.2|0|0|0|46|
+|[sparklyr.flint](#sparklyr.flint)|0.2.2|1|0|0|45|
 |[sparklyr.nested](#sparklyr.nested)|0.0.4|0|0|0|41|
 |[sparktf](#sparktf)|0.1.0|0|0|1|42|
 |[sparkwarc](#sparkwarc)|0.1.6|0|0|0|47|
