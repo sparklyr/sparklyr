@@ -93,13 +93,13 @@ livy_install <- function(version = "0.6.0",
   # construct path to livy download
   if (version <= "0.3.0") {
     url <- sprintf(
-      "http://archive.cloudera.com/beta/livy/livy-server-%s.zip",
+      "https://archive.cloudera.com/beta/livy/livy-server-%s.zip",
       version
     )
   } else {
     apache_prefix <- if (package_version(version) >= package_version("0.6.0")) "apache-" else ""
     url <- sprintf(
-      "http://archive.apache.org/dist/incubator/livy/%s-incubating/%slivy-%s-incubating-bin.zip",
+      "https://archive.apache.org/dist/incubator/livy/%s-incubating/%slivy-%s-incubating-bin.zip",
       version,
       apache_prefix,
       version

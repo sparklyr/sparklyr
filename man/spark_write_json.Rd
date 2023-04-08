@@ -33,7 +33,7 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Serialize a Spark DataFrame to the \href{http://www.json.org/}{JavaScript
+Serialize a Spark DataFrame to the \href{https://www.json.org/}{JavaScript
 Object Notation} format.
 }
 \seealso{

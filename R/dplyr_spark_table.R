@@ -19,7 +19,8 @@ sample_n.tbl_spark <- function(tbl,
                                size,
                                replace = FALSE,
                                weight = NULL,
-                               .env = parent.frame()) {
+                               .env = parent.frame(),
+                               ...) {
   if (spark_version(spark_connection(tbl)) < "2.0.0") {
     stop("sample_n() is not supported until Spark 2.0 or later. Use sdf_sample instead.")
   }
@@ -44,7 +45,8 @@ sample_frac.tbl_spark <- function(tbl,
                                   size = 1,
                                   replace = FALSE,
                                   weight = NULL,
-                                  .env = parent.frame()) {
+                                  .env = parent.frame(),
+                                  ...) {
   if (spark_version(spark_connection(tbl)) < "2.0.0") {
     stop("sample_frac() is not supported until Spark 2.0 or later.")
   }
@@ -75,7 +77,7 @@ as_sampled_tbl <- function(tbl, frac, args) {
 
 #' @export
 #' @importFrom dplyr slice_
-slice_.tbl_spark <- function(x, ...) {
+slice_.tbl_spark <- function(.data, ..., .dots) {
   stop("Slice is not supported in this version of sparklyr")
 }
 

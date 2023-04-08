@@ -304,7 +304,7 @@ spark_write_parquet.spark_jobj <- function(x,
 
 #' Read a JSON file into a Spark DataFrame
 #'
-#' Read a table serialized in the \href{http://www.json.org/}{JavaScript
+#' Read a table serialized in the \href{https://www.json.org/}{JavaScript
 #' Object Notation} format into a Spark DataFrame.
 #'
 #' @inheritParams spark_read_csv
@@ -346,7 +346,7 @@ spark_read_json <- function(sc,
 
 #' Write a Spark DataFrame to a JSON file
 #'
-#' Serialize a Spark DataFrame to the \href{http://www.json.org/}{JavaScript
+#' Serialize a Spark DataFrame to the \href{https://www.json.org/}{JavaScript
 #' Object Notation} format.
 #'
 #' @inheritParams spark_write_csv

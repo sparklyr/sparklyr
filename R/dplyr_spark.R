@@ -51,8 +51,8 @@ tbl_vars.tbl_spark <- function(x) {
 
 #' @importFrom dbplyr op_vars
 #' @export
-op_vars.tbl_spark <- function(x) {
-  spark_dataframe_cols(spark_dataframe(x))
+op_vars.tbl_spark <- function(op) {
+  colnames(op)
 }
 
 spark_dataframe_cols <- function(sdf) {

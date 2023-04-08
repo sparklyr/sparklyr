@@ -181,7 +181,7 @@ stop_with_winutils_error <- function(hadoopBinPath) {
     "\n\n",
     "Alternatively, if you are using RStudio you can install the RStudio Preview Release,\n",
     "which includes an embedded copy of Hadoop winutils.exe:\n\n",
-    "  https://www.rstudio.com/products/rstudio/download/preview/",
+    "  https://www.posit.co/products/rstudio/download/preview/",
     "\n\n",
     call. = FALSE
   )

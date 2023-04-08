@@ -105,9 +105,9 @@ final_tbl <- c(apache_entries, cdn_entries) %>%
   map(~{
     x <- .x
     x$priority <- 0
-    if(str_detect(x$base, "d3kbcqa49mib13.cloudfront.net")) x$priority <- 1
-    if(str_detect(x$base, "dlcdn.apache.org")) x$priority <- 2
-    if(str_detect(x$base, "archive.apache.org")) x$priority <- 3
+    if(str_detect(x$base, "dlcdn.apache.org")) x$priority <- 1
+    if(str_detect(x$base, "archive.apache.org")) x$priority <- 2
+    if(str_detect(x$base, "d3kbcqa49mib13.cloudfront.net")) x$priority <- 3
     x
   }) %>%
   map_dfr(~.x) %>%

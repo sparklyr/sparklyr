@@ -1,6 +1,6 @@
 #' Spark ML -- Naive-Bayes
 #'
-#' Naive Bayes Classifiers. It supports Multinomial NB (see \href{http://nlp.stanford.edu/IR-book/html/htmledition/naive-bayes-text-classification-1.html}{here}) which can handle finitely supported discrete data. For example, by converting documents into TF-IDF vectors, it can be used for document classification. By making every vector a binary (0/1) data, it can also be used as Bernoulli NB (see \href{http://nlp.stanford.edu/IR-book/html/htmledition/the-bernoulli-model-1.html}{here}). The input feature values must be nonnegative.
+#' Naive Bayes Classifiers. It supports Multinomial NB (see \href{https://nlp.stanford.edu/IR-book/html/htmledition/naive-bayes-text-classification-1.html}{here}) which can handle finitely supported discrete data. For example, by converting documents into TF-IDF vectors, it can be used for document classification. By making every vector a binary (0/1) data, it can also be used as Bernoulli NB (see \href{http://nlp.stanford.edu/IR-book/html/htmledition/the-bernoulli-model-1.html}{here}). The input feature values must be nonnegative.
 #'
 #' @template roxlate-ml-algo
 #' @template roxlate-ml-probabilistic-classifier-params

@@ -371,9 +371,9 @@ download_scalac <- function(dest_path = NULL) {
 
   download_urls <-  paste0(
     c(
-      "http://downloads.lightbend.com/scala/2.12.10/scala-2.12.10",
-      "http://downloads.lightbend.com/scala/2.11.8/scala-2.11.8",
-      "http://downloads.lightbend.com/scala/2.10.6/scala-2.10.6"
+      "https://downloads.lightbend.com/scala/2.12.10/scala-2.12.10",
+      "https://downloads.lightbend.com/scala/2.11.8/scala-2.11.8",
+      "https://downloads.lightbend.com/scala/2.10.6/scala-2.10.6"
     ),
     ".",
     ext

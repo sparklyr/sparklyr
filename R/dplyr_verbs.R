@@ -40,14 +40,14 @@ filter.tbl_spark <- function(.data, ..., .preserve = FALSE) {
 #' @export
 #' @importFrom dplyr select
 select.tbl_spark <- function(.data, ...) {
-    NextMethod()
+  NextMethod()
 }
 
 #' @export
 #' @importFrom dplyr summarise
 #' @importFrom dbplyr op_vars
 summarise.tbl_spark <- function(.data, ..., .groups = NULL) {
-    NextMethod()
+  NextMethod()
 }
 
 fix_na_real_values <- function(dots) {

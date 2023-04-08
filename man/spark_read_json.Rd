@@ -45,7 +45,7 @@ If specified, the elements can be \code{"binary"} for \code{BinaryType},
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Read a table serialized in the \href{http://www.json.org/}{JavaScript
+Read a table serialized in the \href{https://www.json.org/}{JavaScript
 Object Notation} format into a Spark DataFrame.
 }
 \details{
