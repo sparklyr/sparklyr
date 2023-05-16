@@ -332,6 +332,7 @@ Collate:
     'stream_operations.R'
     'stream_shiny.R'
     'stream_view.R'
+    'synapse_connection.R'
     'test_connection.R'
     'tidiers_ml_aft_survival_regression.R'
     'tidiers_ml_als.R'

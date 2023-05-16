@@ -128,7 +128,7 @@ no_databricks_guid <- function() {
 #' @export
 spark_connect <- function(master,
                           spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell", "livy", "databricks", "test", "qubole"),
+                          method = c("shell", "livy", "databricks", "test", "qubole", "synapse"),
                           app_name = "sparklyr",
                           version = NULL,
                           config = spark_config(),
@@ -271,6 +271,14 @@ spark_connect <- function(master,
       version,
       hadoop_version,
       extensions
+    )
+  } else if (method == "synapse") {
+    scon <- synapse_connection(
+      spark_home = spark_home,
+      spark_version = version,
+      scala_version = scala_version,
+      config = config,
+      extensions = extensions
     )
   } else {
     # other methods
