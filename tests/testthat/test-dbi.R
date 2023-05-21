@@ -36,6 +36,15 @@ test_that("dbGetQuery works with parameterized queries", {
   expect_equal(nrow(virginica), 50)
 })
 
+test_that("dbGetQuery works with native parameterized queries", {
+  if (spark_version(sc) < "3.4.0") skip("native parameterized queries not supported before 3.4.0")
+  setosa <- dbGetQuery(sc, "SELECT * FROM iris WHERE species = :species", params = list(species = "setosa"))
+  expect_equal(nrow(setosa), 50)
+
+  virginica <- dbGetQuery(sc, "SELECT * FROM iris WHERE species = :virginica", params = list(virginica = "virginica"))
+  expect_equal(nrow(virginica), 50)
+})
+
 test_that("dbExistsTable performs case-insensitive comparisons on table names", {
   sdf <- copy_to(sc, data.frame(a = 1, b = 2), name = "testTempView")
 

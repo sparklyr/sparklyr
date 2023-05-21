@@ -44,10 +44,16 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
 setMethod(
   "dbSendQuery",
   "spark_connection",
-  function(conn, statement, ...) {
+  function(conn, statement, ..., params = list()) {
     sql <- as.character(DBI::sqlInterpolate(conn, statement, ...))
 
-    sdf <- invoke(hive_context(conn), "sql", sql)
+    if (spark_version(conn) < "3.4.0") {
+      if (hasArg("params")) stop("Native paramtereized queries require Spark 3.4.0 or newer")
+      sdf <- invoke(hive_context(conn), "sql", sql)
+    } else {
+      sdf <- invoke(hive_context(conn), "sql", sql, as.environment(params))
+    }
+
     rs <- new("DBISparkResult",
       sql = sql,
       conn = conn,
