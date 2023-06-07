@@ -6,7 +6,7 @@ sparklyr_jar_spec_list <- function() {
     list(spark = "2.3.0", scala = "2.11"),
     list(spark = "2.4.0", scala = "2.11"),
     list(spark = "2.4.0", scala = "2.12"),
-    list(spark = "3.0.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
+    list(spark = "3.4.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
   )
 }
 
