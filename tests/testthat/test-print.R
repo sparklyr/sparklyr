@@ -21,7 +21,7 @@ test_that("print supports spark tables", {
 
   verify_table_src(printed)
 
-  expect_true(grepl("with more rows", printed[14]))
+  expect_true(grepl("# ℹ more rows", printed[14]))
 })
 
 test_that("can print more than 10 rows from a spark tables", {
@@ -32,7 +32,7 @@ test_that("can print more than 10 rows from a spark tables", {
   expect_true(grepl("1", printed[4]))
   expect_true(grepl("49", printed[52]))
   expect_true(grepl("50", printed[53]))
-  expect_true(grepl("with more rows", printed[54]))
+  expect_true(grepl("# ℹ more rows", printed[54]))
 })
 
 test_that("print supports spark context", {
