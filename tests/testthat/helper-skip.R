@@ -15,6 +15,13 @@ skip_databricks_connect <- function() {
     skip("Test is skipped on Databricks Connect")
   }
 }
+
+skip_unless_synapse_connect <- function() {
+  if (testthat_spark_connection_type() != "synapse") {
+    skip("Test only runs on Synapse connection")
+  }
+}
+
 skip_on_arrow_devel <- function(message = "Test is skipped on Arrow development version") {
   if (using_arrow_version() == "devel") skip(message)
 }
