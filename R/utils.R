@@ -522,7 +522,7 @@ infer_required_r_packages <- function(fn) {
   rlang::fn_body(fn) %>%
     globals::walkAST(
       call = function(x) {
-        cfn <- rlang::call_fn(x)
+        cfn <- rlang::eval_bare(x[[1]])
 
         for (mfn in list(base::library,
                          base::require,
