@@ -118,7 +118,7 @@ ml_spark_param_map <- function(param_map, sc, stage_jobjs) {
       purrr::discard(~ is.null(.x[["value"]]))
   }) %>%
     unname() %>%
-    rlang::flatten() %>%
+    purrr::list_flatten() %>%
     purrr::reduce(
       function(x, pair) invoke(x, "put", pair$param_jobj, pair$value),
       .init = invoke_new(sc, "org.apache.spark.ml.param.ParamMap")
