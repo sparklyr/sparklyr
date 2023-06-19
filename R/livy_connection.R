@@ -37,7 +37,6 @@ livy_available_jars <- function() {
 #' @export
 #'
 #' @importFrom base64enc base64encode
-#' @importFrom jsonlite unbox
 #'
 #' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
@@ -138,7 +137,7 @@ livy_config <- function(config = spark_config(),
     }
     singleValues <- c("proxy_user", "driver_memory", "driver_cores", "executor_memory", "executor_cores", "num_executors", "queue", "name", "heartbeat_timeout")
     singleValues <- singleValues[singleValues %in% names(additional_params)]
-    additional_params[singleValues] <- lapply(additional_params[singleValues], unbox)
+    additional_params[singleValues] <- lapply(additional_params[singleValues], jsonlite::unbox)
 
 
     for (l in names(additional_params)) {
@@ -189,7 +188,6 @@ livy_get_sessions <- function(master, config) {
   sessions
 }
 
-#' @importFrom jsonlite unbox
 livy_config_get_prefix <- function(master, config, prefix, not_prefix) {
   params <- connection_config(list(
     master = master,
@@ -197,7 +195,7 @@ livy_config_get_prefix <- function(master, config, prefix, not_prefix) {
   ), prefix, not_prefix)
 
   params <- lapply(params, function(param) {
-    if (length(param) == 1) unbox(param) else param
+    if (length(param) == 1) jsonlite::unbox(param) else param
   })
 
   if (length(params) == 0) {
@@ -215,10 +213,9 @@ livy_config_get <- function(master, config) {
 }
 
 #' @importFrom httr POST
-#' @importFrom jsonlite unbox
 livy_create_session <- function(master, config) {
   data <- list(
-    kind = unbox("spark"),
+    kind = jsonlite::unbox("spark"),
     conf = livy_config_get(master, config)
   )
 
@@ -388,7 +385,6 @@ livy_log_operation <- function(sc, text) {
 
 #' @importFrom httr POST
 #' @importFrom jsonlite toJSON
-#' @importFrom jsonlite unbox
 livy_post_statement <- function(sc, code) {
   livy_log_operation(sc, code)
 
@@ -398,7 +394,7 @@ livy_post_statement <- function(sc, code) {
     )),
     body = toJSON(
       list(
-        code = unbox(code)
+        code = jsonlite::unbox(code)
       )
     ),
     sc$config$sparklyr.livy.auth
