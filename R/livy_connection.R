@@ -178,7 +178,7 @@ livy_get_json <- function(url, config) {
   content(req)
 }
 
-#' @import assertthat
+#' @importFrom assertthat assert_that
 livy_get_sessions <- function(master, config) {
   sessions <- livy_get_json(paste(master, "sessions", sep = "/"), config)
 
