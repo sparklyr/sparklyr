@@ -1,5 +1,7 @@
 # sparklyr (development version)
 
+- Fix various rlang deprecation warnings (@mgirlich, #3333).
+
 # Sparklyr 1.8.1
 
 ### Bug Fixes
