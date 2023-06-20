@@ -560,7 +560,6 @@ os_is_windows <- function() {
   .Platform$OS.type == "windows"
 }
 
-#' @importFrom forge cast_choice
 cast_string <- function(x) {
   vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
   vctrs::vec_cast(x, character())
@@ -640,4 +639,8 @@ cast_integer_list <- function(x, allow_null = FALSE) {
 
 cast_double_list <- function(x, allow_null = FALSE) {
   cast_list(x, numeric(), allow_null = allow_null)
+}
+
+cast_choice <- function(x, choices, error_arg = rlang::caller_arg(x), error_call = rlang::caller_env()) {
+  arg_match(x, choices, error_arg = error_arg, error_call = error_call)
 }
