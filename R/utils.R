@@ -642,5 +642,5 @@ cast_double_list <- function(x, allow_null = FALSE) {
 }
 
 cast_choice <- function(x, choices, error_arg = rlang::caller_arg(x), error_call = rlang::caller_env()) {
-  arg_match(x, choices, error_arg = error_arg, error_call = error_call)
+  rlang::arg_match(x, choices, error_arg = error_arg, error_call = error_call)
 }
