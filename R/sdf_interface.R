@@ -531,7 +531,7 @@ sdf_repartition <- function(x, partitions = NULL, partition_by = NULL) {
     cast_scalar_integer()
 
   if (spark_version(sc) >= "2.0.0") {
-    partition_by <- cast_nullable_character_list(partition_by) %||% list()
+    partition_by <- cast_string_list(partition_by, allow_null = TRUE) %||% list()
 
     return(
       invoke_static(sc, "sparklyr.Repartition", "repartition", sdf, partitions, partition_by) %>%
@@ -596,7 +596,7 @@ validate_cols <- function(x, cols) {
 sdf_describe <- function(x, cols = colnames(x)) {
   validate_cols(x, cols)
 
-  cols <- cast_character_list(cols)
+  cols <- cast_string_list(cols)
 
   x %>%
     spark_dataframe() %>%
@@ -612,7 +612,7 @@ sdf_describe <- function(x, cols = colnames(x)) {
 sdf_drop_duplicates <- function(x, cols = NULL) {
   validate_cols(x, cols)
 
-  cols <- cast_character_list(cols, allow_null = TRUE)
+  cols <- cast_string_list(cols, allow_null = TRUE)
   sdf <- spark_dataframe(x)
 
   sdf_deduplicated <- if (is.null(cols)) {
@@ -663,7 +663,7 @@ sdf_to_avro <- function(x, cols = colnames(x)) {
   validate_cols(x, cols)
   validate_spark_avro_pkg_version(spark_connection(x))
 
-  cols <- cast_character_list(cols, allow_null = TRUE)
+  cols <- cast_string_list(cols, allow_null = TRUE)
   transform_sdf(
     x,
     cols,

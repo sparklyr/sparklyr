@@ -68,7 +68,7 @@ ft_string_indexer_model.tbl_spark <- function(x, input_col = NULL, output_col = 
 
 validator_ml_string_indexer_model <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["labels"]] <- cast_character_list(.args[["labels"]])
+  .args[["labels"]] <- cast_string_list(.args[["labels"]])
   .args[["handle_invalid"]] <- cast_choice(
     .args[["handle_invalid"]],
     c("error", "skip", "keep")

@@ -108,9 +108,9 @@ new_ml_feature_hasher <- function(jobj) {
 }
 
 validator_ml_feature_hasher <- function(.args) {
-  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
+  .args[["input_cols"]] <- cast_string_list(.args[["input_cols"]], allow_null = TRUE)
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
-  .args[["categorical_cols"]] <- cast_nullable_string_list(.args[["categorical_cols"]])
+  .args[["categorical_cols"]] <- cast_string_list(.args[["categorical_cols"]], allow_null = TRUE)
   .args[["num_features"]] <- cast_scalar_integer(.args[["num_features"]])
   .args[["uid"]] <- cast_string(.args[["uid"]])
   .args

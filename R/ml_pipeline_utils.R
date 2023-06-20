@@ -165,9 +165,9 @@ jobj_set_ml_params <- function(jobj, features_col, label_col, prediction_col,
 
 validate_args_transformer <- function(.args) {
   .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
-  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
+  .args[["input_cols"]] <- cast_string_list(.args[["input_cols"]], allow_null = TRUE)
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
-  .args[["output_cols"]] <- cast_nullable_string_list(.args[["output_cols"]])
+  .args[["output_cols"]] <- cast_string_list(.args[["output_cols"]], allow_null = TRUE)
   .args
 }
 
