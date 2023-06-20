@@ -560,9 +560,8 @@ os_is_windows <- function() {
   .Platform$OS.type == "windows"
 }
 
-#' @importFrom forge cast_character_list cast_choice cast_double cast_double_list cast_integer
-#' @importFrom forge cast_nullable_character_list cast_nullable_double_list cast_nullable_integer_list cast_nullable_scalar_double
-#' @importFrom forge cast_nullable_scalar_integer cast_nullable_string cast_nullable_string_list
+#' @importFrom forge cast_character_list cast_choice cast_double_list
+#' @importFrom forge cast_nullable_character_list cast_nullable_double_list cast_nullable_integer_list cast_nullable_string_list
 cast_string <- function(x) {
   vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
   vctrs::vec_cast(x, character())
@@ -580,5 +579,38 @@ cast_scalar_double <- function(x) {
 
 cast_scalar_integer <- function(x) {
   vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
+  vctrs::vec_cast(x, integer())
+}
+
+cast_nullable_string <- function(x) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+
+  cast_string(x)
+}
+
+cast_nullable_scalar_double <- function(x) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+
+  cast_scalar_double(x)
+}
+
+cast_nullable_scalar_integer <- function(x) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+
+  cast_scalar_integer(x)
+}
+
+
+cast_double <- function(x) {
+  vctrs::vec_cast(x, numeric())
+}
+
+cast_integer <- function(x) {
   vctrs::vec_cast(x, integer())
 }

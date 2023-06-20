@@ -345,6 +345,7 @@ cast_double_matrix <- function(mat) {
     return(mat)
   }
   mat %>%
+    as.vector() %>%
     cast_double() %>%
     matrix(nrow = nrow(mat))
 }
