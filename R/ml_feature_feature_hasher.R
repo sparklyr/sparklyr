@@ -112,6 +112,6 @@ validator_ml_feature_hasher <- function(.args) {
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
   .args[["categorical_cols"]] <- cast_nullable_string_list(.args[["categorical_cols"]])
   .args[["num_features"]] <- cast_scalar_integer(.args[["num_features"]])
-  .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
+  .args[["uid"]] <- cast_string(.args[["uid"]])
   .args
 }

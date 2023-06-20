@@ -167,7 +167,7 @@ new_ml_quantile_discretizer <- function(jobj) {
 }
 
 validator_ml_quantile_discretizer <- function(.args) {
-  .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
+  .args[["uid"]] <- cast_string(.args[["uid"]])
 
   if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]])) {
     stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
