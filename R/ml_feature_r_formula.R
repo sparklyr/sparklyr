@@ -3,7 +3,7 @@
 #' Implements the transforms required for fitting a dataset against an R model
 #'   formula. Currently we support a limited subset of the R operators,
 #'   including \code{~}, \code{.}, \code{:}, \code{+}, and \code{-}. Also see the R formula docs here:
-#'   \url{http://stat.ethz.ch/R-manual/R-patched/library/stats/html/formula.html}
+#'   \url{https://stat.ethz.ch/R-manual/R-patched/library/stats/html/formula.html}
 #'
 #' @details The basic operators in the formula are:
 #'
