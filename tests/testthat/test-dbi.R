@@ -26,6 +26,11 @@ test_that("dbWriteTable can write a table", {
     tables[tables$tableName == temp_table_name, ]$isTemporary,
     TRUE
   )
+
+  dbWriteTable(sc, persisted_table_name, dbi_df[c("a")], overwrite = TRUE)
+  dbi_df_content <- dbGetQuery(sc, paste("SELECT * FROM ", persisted_table_name))
+
+  expect_equal(dbi_df[c("a")], dbi_df_content)
 })
 
 test_that("dbGetQuery works with parameterized queries", {
@@ -42,6 +47,23 @@ test_that("dbExistsTable performs case-insensitive comparisons on table names", 
   expect_true(dbExistsTable(sc, "testTempView"))
   expect_true(dbExistsTable(sc, "TESTTEMPVIEW"))
   expect_true(dbExistsTable(sc, "testtempview"))
+})
+
+test_that("dbColumnInfo list the columns with its type and sql type", {
+  res <- dbSendQuery(sc, "SELECT * FROM iris", "setosa")
+  columns_info <- dbColumnInfo(res)
+
+  expect_equal(columns_info$name, c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width", "Species"))
+  expect_equal(columns_info$type, c("numeric", "numeric", "numeric", "numeric", "character"))
+  expect_equal(columns_info$sql.type, c("DoubleType", "DoubleType", "DoubleType", "DoubleType", "StringType"))
+})
+
+test_that("dbListTables list all the existing tables", {
+  expect_true(persisted_table_name %in% dbListTables(sc))
+})
+
+test_that("dbIsValid detects when a connection is opened", {
+  expect_true(dbIsValid(sc))
 })
 
 teardown({
