@@ -37,11 +37,19 @@ test_that("dbGetQuery works with parameterized queries", {
 })
 
 test_that("dbGetQuery works with native parameterized queries", {
-  if (spark_version(sc) < "3.4.0") skip("native parameterized queries not supported before 3.4.0")
-  setosa <- dbGetQuery(sc, "SELECT * FROM iris WHERE species = :species", params = list(species = "setosa"))
+  test_requires_version("3.4.0")
+  setosa <- dbGetQuery(
+    conn = sc,
+    statement = "SELECT * FROM iris WHERE species = :species",
+    params = list(species = "setosa")
+    )
   expect_equal(nrow(setosa), 50)
 
-  virginica <- dbGetQuery(sc, "SELECT * FROM iris WHERE species = :virginica", params = list(virginica = "virginica"))
+  virginica <- dbGetQuery(
+    conn = sc,
+    statement = "SELECT * FROM iris WHERE species = :virginica",
+    params = list(virginica = "virginica")
+    )
   expect_equal(nrow(virginica), 50)
 })
 
