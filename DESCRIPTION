@@ -82,7 +82,6 @@ Imports:
     digest,
     dplyr (>= 1.0.9),
     ellipsis (>= 0.1.0),
-    forge,
     generics,
     globals,
     glue,
