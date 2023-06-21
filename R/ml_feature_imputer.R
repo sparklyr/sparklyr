@@ -90,8 +90,8 @@ ft_imputer.tbl_spark <- function(x, input_cols = NULL, output_cols = NULL,
 }
 
 validator_ml_imputer <- function(.args) {
-  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
-  .args[["output_cols"]] <- cast_nullable_string_list(.args[["output_cols"]])
+  .args[["input_cols"]] <- cast_string_list(.args[["input_cols"]], allow_null = TRUE)
+  .args[["output_cols"]] <- cast_string_list(.args[["output_cols"]], allow_null = TRUE)
   .args[["strategy"]] <- cast_choice(.args[["strategy"]], c("mean", "median"))
   .args[["missing_value"]] <- cast_nullable_scalar_double(.args[["missing_value"]])
   .args

@@ -70,6 +70,6 @@ new_ml_vector_slicer <- function(jobj) {
 
 validator_ml_vector_slicer <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["indices"]] <- cast_nullable_integer_list(.args[["indices"]])
+  .args[["indices"]] <- cast_integer_list(.args[["indices"]], allow_null = TRUE)
   .args
 }

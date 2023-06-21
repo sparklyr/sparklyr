@@ -198,11 +198,11 @@ ml_multilayer_perceptron <- function(x, formula = NULL, layers, max_iter = 100, 
 validator_ml_multilayer_perceptron_classifier <- function(.args) {
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   .args[["step_size"]] <- cast_scalar_double(.args[["step_size"]])
-  .args[["layers"]] <- cast_nullable_integer_list(.args[["layers"]])
+  .args[["layers"]] <- cast_integer_list(.args[["layers"]], allow_null = TRUE)
   .args[["seed"]] <- cast_nullable_scalar_integer(.args[["seed"]])
   .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
   .args[["block_size"]] <- cast_scalar_integer(.args[["block_size"]])
-  .args[["initial_weights"]] <- cast_nullable_double_list(.args[["initial_weights"]])
+  .args[["initial_weights"]] <- cast_double_list(.args[["initial_weights"]], allow_null = TRUE)
   .args[["solver"]] <- cast_choice(.args[["solver"]], c("l-bfgs", "gd"))
   .args
 }

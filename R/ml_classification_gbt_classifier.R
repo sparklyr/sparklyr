@@ -200,7 +200,7 @@ ml_gbt_classifier.tbl_spark <- function(x, formula = NULL, max_iter = 20, max_de
 validator_ml_gbt_classifier <- function(.args) {
   .args <- ml_validate_decision_tree_args(.args)
 
-  .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
+  .args[["thresholds"]] <- cast_double_list(.args[["thresholds"]], allow_null = TRUE)
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   .args[["step_size"]] <- cast_scalar_double(.args[["step_size"]])
   .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])

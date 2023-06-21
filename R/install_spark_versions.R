@@ -115,30 +115,36 @@ spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE, sh
 #' @keywords internal
 #' @export
 spark_versions <- function(latest = TRUE) {
-  downloadData <- read_spark_versions_json(latest, future = TRUE)
-  downloadData$installed <- rep(FALSE, NROW(downloadData))
+  json_data <- read_spark_versions_json(latest, future = TRUE)
 
-  downloadData$download <- paste(
-    downloadData$base,
-    mapply(function(pattern, spark, hadoop) {
-      sprintf(pattern, spark, hadoop)
-    }, downloadData$pattern, downloadData$spark, downloadData$hadoop),
-    sep = ""
-  )
+  json_data$installed <- FALSE
 
-  downloadData$default <- rep(FALSE, NROW(downloadData))
-  downloadData$hadoop_default <- rep(FALSE, NROW(downloadData))
+  json_data$download  <- json_data %>%
+    transpose() %>%
+    map_chr(~{
+      paste0(.x$base, sprintf(.x$pattern, .x$spark, .x$hadoop))
+      })
+
+  json_data$default <- FALSE
+  json_data$hadoop_default <- FALSE
 
   # apply spark and hadoop versions
-  downloadData[downloadData$spark == "2.4.3" & downloadData$hadoop == "2.7", ]$default <- TRUE
-  lapply(unique(downloadData$spark), function(version) {
-    validVersions <- downloadData[grepl("2", downloadData$hadoop) & downloadData$spark == version, ]
-    maxHadoop <- validVersions[with(validVersions, order(hadoop, decreasing = TRUE)), ]$hadoop[[1]]
+  json_data[json_data$spark == "2.4.3" & json_data$hadoop == "2.7", ]$default <- TRUE
 
-    downloadData[downloadData$spark == version & downloadData$hadoop == maxHadoop, ]$hadoop_default <<- TRUE
-  })
+  json_data$hadoop_default <- json_data$spark %>%
+    unique() %>%
+    map(~ {
+      spark <- json_data$spark == .x
+      current <- json_data[spark, ]
+      temp_hadoop <- ifelse(current$hadoop == "cdh4", 0, current$hadoop)
+      temp_hadoop <- as.double(temp_hadoop)
+      max_hadoop <- temp_hadoop == max(temp_hadoop)
+      if(sum(max_hadoop) > 1) stop("Duplicate Spark + Hadoop combinations")
+      max_hadoop
+    }) %>%
+    reduce(c)
 
-  mergedData <- downloadData
+  mergedData <- json_data
   lapply(
     Filter(
       function(e) !is.null(e),
@@ -151,7 +157,7 @@ spark_versions <- function(latest = TRUE) {
       })
     ),
     function(row) {
-      currentRow <- downloadData[downloadData$spark == row$spark & downloadData$hadoop == row$hadoop, ]
+      currentRow <- json_data[json_data$spark == row$spark & json_data$hadoop == row$hadoop, ]
       notCurrentRow <- mergedData[mergedData$spark != row$spark | mergedData$hadoop != row$hadoop, ]
 
       newRow <- c(row, installed = TRUE)
@@ -162,13 +168,15 @@ spark_versions <- function(latest = TRUE) {
 
       if (NROW(currentRow) > 0) {
         currentRow$spark <- gsub("-preview", "", currentRow$spark)
-        hadoop_default <- if (compareVersion(currentRow$spark, "2.0") >= 0) "2.7" else "2.6"
+        #hadoop_default <- if (compareVersion(currentRow$spark, "2.0") >= 0) "2.7" else "2.6"
 
         newRow$base <- currentRow$base
         newRow$pattern <- currentRow$pattern
         newRow$download <- currentRow$download
         newRow$default <- identical(currentRow$spark, "3.0.0")
-        newRow$hadoop_default <- identical(currentRow$hadoop, hadoop_default)
+
+        #newRow$hadoop_default <- identical(currentRow$hadoop, hadoop_default)
+        newRow$hadoop_default <- currentRow$hadoop_default
       }
 
       mergedData <<- rbind(notCurrentRow, newRow)

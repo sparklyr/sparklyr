@@ -174,7 +174,7 @@ ml_random_forest_classifier.tbl_spark <- function(x, formula = NULL, num_trees =
 # Validator
 validator_ml_random_forest_classifier <- function(.args) {
   .args <- .args %>% ml_validate_decision_tree_args()
-  .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
+  .args[["thresholds"]] <- cast_double_list(.args[["thresholds"]], allow_null = TRUE)
   .args[["num_trees"]] <- cast_scalar_integer(.args[["num_trees"]])
   .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])
   .args[["impurity"]] <- cast_choice(.args[["impurity"]], c("gini", "entropy"))

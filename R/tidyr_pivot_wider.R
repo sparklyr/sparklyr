@@ -146,7 +146,7 @@ sdf_pivot_wider <- function(data,
   if (!rlang::quo_is_null(id_cols)) {
     key_vars <- names(tidyselect::eval_select(id_cols, colnames_df))
   } else {
-    key_vars <- dplyr::tbl_vars(colnames_df)
+    key_vars <- as.character(dplyr::tbl_vars(colnames_df))
   }
   key_vars <- setdiff(key_vars, spec_cols)
 
