@@ -518,10 +518,13 @@ test_that("summarise(.groups=)", {
       sdf %>%
         group_by(val1) %>%
         summarize(result = sum(val2, na.rm = TRUE), .groups = groups) %>%
+        arrange(val1) %>%
         collect(),
       df %>%
         group_by(val1) %>%
-        summarize(result = sum(val2, na.rm = TRUE), .groups = groups)
+        summarize(result = sum(val2, na.rm = TRUE), .groups = groups) %>%
+        arrange(val1)
+
     )
   }
 })

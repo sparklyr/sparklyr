@@ -144,10 +144,12 @@ test_that("can override default keys", {
   sdf <- copy_to(sc, df, overwrite = TRUE)
 
   df_pw <- df %>%
-    pivot_wider(id_cols = name, names_from = var, values_from = value)
+    pivot_wider(id_cols = name, names_from = var, values_from = value) %>%
+    arrange(name)
 
   sdf_pw <- sdf %>%
     pivot_wider(id_cols = name, names_from = var, values_from = value) %>%
+    arrange(name) %>%
     collect()
 
   expect_equal(
@@ -338,10 +340,10 @@ test_that("Simple cases work", {
     tidyr::pivot_wider(head(d, 2), id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5))
   )
 
-  skip("Failing on GH, needs investigation")
+  # skip("Failing on GH, needs investigation")
   expect_equal(
-    collect(pivot_wider(ds, id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5))),
-    tidyr::pivot_wider(d, id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5))
+    collect(pivot_wider(ds, id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5), names_sort = TRUE)),
+    tidyr::pivot_wider(d, id_cols = c(c1, c2), names_from = c3, values_from = c(c4, c5), names_sort = TRUE)
   )
 
 })
