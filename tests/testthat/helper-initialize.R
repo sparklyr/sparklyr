@@ -13,6 +13,7 @@ testthat_spark_connection <- function() {
   if(!testthat_spark_connection_open()) testthat_init()
   tp <- testthat_spark_connection_type()
   if(tp == "databricks") sc <- testthat_shell_connection(method = "databricks")
+  if(tp == "synapse") sc <- testthat_shell_connection(method = "synapse")
   if(tp == "local") sc <- testthat_shell_connection()
   if(tp == "livy") sc <- testthat_livy_connection()
   sc

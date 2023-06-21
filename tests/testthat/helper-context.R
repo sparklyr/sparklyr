@@ -29,9 +29,11 @@ testthat_spark_connection_type <- function() {
     ct <- "local"
     lv <- using_livy()
     db <- using_databricks()
+    sy <- using_synapse()
     if(lv && db) stop("Databricks and Livy cannot be tested simultaneously")
     if(lv) ct <- "livy"
     if(db) ct <- "databricks"
+    if(sy) ct <- "synapse"
   }
   ct
 }
@@ -95,4 +97,12 @@ using_databricks <- function() {
   if(dc == 'true') dcs <- TRUE
   testthat_context$databricks <- dcs
   dcs
+}
+
+using_synapse <- function() {
+  if(Sys.getenv("TEST_SYNAPSE_CONNECT") == "true") {
+    TRUE
+  } else {
+    FALSE
+  }
 }
