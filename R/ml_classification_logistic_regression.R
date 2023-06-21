@@ -345,6 +345,7 @@ cast_double_matrix <- function(mat) {
     return(mat)
   }
   mat %>%
+    as.vector() %>%
     cast_double() %>%
     matrix(nrow = nrow(mat))
 }
@@ -359,12 +360,12 @@ validator_ml_logistic_regression <- function(.args) {
   .args[["family"]] <- cast_choice(.args[["family"]], c("auto", "binomial", "multinomial"))
   .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
   .args[["threshold"]] <- cast_scalar_double(.args[["threshold"]])
-  .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
+  .args[["thresholds"]] <- cast_double_list(.args[["thresholds"]], allow_null = TRUE)
   .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
   .args[["aggregation_depth"]] <- cast_scalar_integer(.args[["aggregation_depth"]])
   .args[["lower_bounds_on_coefficients"]] <- cast_double_matrix(.args[["lower_bounds_on_coefficients"]])
   .args[["upper_bounds_on_coefficients"]] <- cast_double_matrix(.args[["upper_bounds_on_coefficients"]])
-  .args[["lower_bounds_on_intercepts"]] <- cast_nullable_double_list(.args[["lower_bounds_on_intercepts"]])
-  .args[["upper_bounds_on_intercepts"]] <- cast_nullable_double_list(.args[["upper_bounds_on_intercepts"]])
+  .args[["lower_bounds_on_intercepts"]] <- cast_double_list(.args[["lower_bounds_on_intercepts"]], allow_null = TRUE)
+  .args[["upper_bounds_on_intercepts"]] <- cast_double_list(.args[["upper_bounds_on_intercepts"]], allow_null = TRUE)
   .args
 }

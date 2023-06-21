@@ -68,7 +68,7 @@ new_ml_interaction <- function(jobj) {
 }
 
 validator_ml_interaction <- function(.args) {
-  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
+  .args[["input_cols"]] <- cast_string_list(.args[["input_cols"]], allow_null = TRUE)
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
   .args
 }

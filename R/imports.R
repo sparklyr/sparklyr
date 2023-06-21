@@ -19,8 +19,5 @@ generics::augment
 #' @export
 generics::glance
 
-#' @import forge
-NULL
-
 #' @importFrom ellipsis check_dots_used
 NULL

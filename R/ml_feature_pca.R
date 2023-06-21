@@ -130,6 +130,7 @@ ml_pca <- function(x,
   assembled <- random_string("assembled")
   out <- random_string("out")
 
+  features <- as.character(features)
   pipeline <- ml_pipeline(sc) %>%
     ft_vector_assembler(features, assembled) %>%
     ft_pca(assembled, out, k = k)

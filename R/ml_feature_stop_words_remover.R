@@ -113,6 +113,6 @@ new_ml_stop_words_remover <- function(jobj) {
 validator_ml_stop_words_remover <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["case_sensitive"]] <- cast_scalar_logical(.args[["case_sensitive"]])
-  .args[["stop_words"]] <- cast_character_list(.args[["stop_words"]])
+  .args[["stop_words"]] <- cast_string_list(.args[["stop_words"]])
   .args
 }

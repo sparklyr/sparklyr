@@ -119,7 +119,7 @@ new_ml_bucketizer <- function(jobj) {
 
 # Validator
 validator_ml_bucketizer <- function(.args) {
-  .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
+  .args[["uid"]] <- cast_string(.args[["uid"]])
 
   if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]])) {
     stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
@@ -129,9 +129,9 @@ validator_ml_bucketizer <- function(.args) {
   if (!is.null(.args[["splits"]]) && length(.args[["splits"]]) < 3) {
     stop("`splits` must be at least length 3.", call. = FALSE)
   }
-  .args[["splits"]] <- cast_nullable_double_list(.args[["splits"]])
-  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
-  .args[["output_cols"]] <- cast_nullable_string_list(.args[["output_cols"]])
+  .args[["splits"]] <- cast_double_list(.args[["splits"]], allow_null = TRUE)
+  .args[["input_cols"]] <- cast_string_list(.args[["input_cols"]], allow_null = TRUE)
+  .args[["output_cols"]] <- cast_string_list(.args[["output_cols"]], allow_null = TRUE)
   if (!is.null(.args[["splits_array"]])) {
     .args[["splits_array"]] <- purrr::map(
       .args[["splits_array"]],

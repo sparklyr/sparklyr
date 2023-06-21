@@ -519,7 +519,7 @@ sdf_separate_column <- function(x,
     indices <- x %>%
       head(1) %>%
       dplyr::pull(!!rlang::sym(column)) %>%
-      rlang::flatten() %>%
+      purrr::list_flatten() %>%
       length() %>%
       seq_len(.)
 

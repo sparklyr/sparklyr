@@ -75,6 +75,6 @@ new_ml_index_to_string <- function(jobj) {
 
 validator_ml_index_to_string <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["labels"]] <- cast_nullable_string_list(.args[["labels"]])
+  .args[["labels"]] <- cast_string_list(.args[["labels"]], allow_null = TRUE)
   .args
 }
