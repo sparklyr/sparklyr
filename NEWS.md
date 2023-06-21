@@ -2,6 +2,21 @@
 
 - Fix various rlang deprecation warnings (@mgirlich, #3333).
 
+- Adds Azure Synapse Analytics connectivity (@Bob-Chou , #3336)
+
+- Adds support for "parameterized" queries now available in Spark 3.4 (@gregleleu #3335)
+
+- Adds new DBI methods: `dbValid` and `dbDisconnect` (@alibell, #3296)
+
+- Adds `overwrite` parameter to `dbWriteTable()` (@alibell, #3296)
+
+- Adds `database` parameter to `dbListTables()` (@alibell, #3296)
+
+- Fixes Spark download locations (#3331)
+
+- Switches upper version of Spark to 3.4, and updates JARS (#3334)
+
+
 # Sparklyr 1.8.1
 
 ### Bug Fixes
