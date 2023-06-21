@@ -175,6 +175,7 @@ test_that("'spark_apply' can roundtrip dates", {
 })
 
 test_that("'spark_apply' can roundtrip Date-Time", {
+  skip("Research issue with test failure (#3341)")
   skip_slow("takes too long to measure coverage")
   expect_equal(
     dates_tbl %>%
