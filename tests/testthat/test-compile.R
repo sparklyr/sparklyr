@@ -1,5 +1,6 @@
 skip_on_livy()
 skip_on_arrow_devel()
+skip_on_ci()
 
 scalac_is_available <- function(version, download_path) {
   tryCatch(
