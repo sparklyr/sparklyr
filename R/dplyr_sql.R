@@ -72,7 +72,7 @@ sql_build.lazy_sample_query <- function(op, con, ...) {
       )
     })
 
-  sample_sdf %>% dbplyr::remote_query()
+  dbplyr::sql_build(sample_sdf)
 }
 
 #' @export
