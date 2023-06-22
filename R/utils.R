@@ -288,7 +288,7 @@ path_program <- function(program, fmt = NULL) {
 }
 
 infer_active_package_name <- function() {
-  root <- rprojroot::find_package_root_file()
+  root <- package_root()
   dcf <- read.dcf(file.path(root, "DESCRIPTION"), all = TRUE)
   dcf$Package
 }

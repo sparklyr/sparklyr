@@ -92,7 +92,6 @@ Imports:
     purrr,
     rappdirs,
     rlang (>= 0.1.4),
-    rprojroot,
     rstudioapi (>= 0.10),
     tibble,
     tidyr (>= 1.2.0),
@@ -119,7 +118,8 @@ Suggests:
     reshape2,
     shiny (>= 1.0.1),
     parsnip,
-    testthat
+    testthat,
+    rprojroot
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 SystemRequirements: Spark: 1.6.x, 2.x, or 3.x
