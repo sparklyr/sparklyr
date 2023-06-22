@@ -178,7 +178,6 @@ livy_get_json <- function(url, config) {
   content(req)
 }
 
-#' @importFrom assertthat assert_that
 livy_get_sessions <- function(master, config) {
   sessions <- livy_get_json(paste(master, "sessions", sep = "/"), config)
 
@@ -873,3 +872,14 @@ initialize_connection.livy_connection <- function(sc) {
 }
 
 # nocov end
+
+#' @importFrom rlang as_label abort
+assert_that <- function(x) {
+  y <- enquo(x)
+  if(x) {
+    TRUE
+  } else {
+    msg <- glue::glue("'{as_label(y)}' is not `TRUE`")
+    abort(msg)
+  }
+}
