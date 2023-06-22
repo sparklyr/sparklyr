@@ -10,7 +10,7 @@ spark_dataframe.tbl_spark <- function(x, ...) {
     x,
     function(tbl_spark) {
       sc <- spark_connection(tbl_spark)
-      sql <- as.character(sql_render(sql_build(tbl_spark, con = sc), con = sc))
+      sql <- as.character(dbplyr::remote_query(tbl_spark))
       hive <- hive_context(sc)
 
       invoke(hive, "sql", sql)
