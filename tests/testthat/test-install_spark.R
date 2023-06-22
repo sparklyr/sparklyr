@@ -1,10 +1,11 @@
 skip_on_livy()
 skip_on_arrow_devel()
 skip_on_windows()
+skip_on_ci()
 
 test_that("Installation and uninstallation of Spark work", {
-  test_spark_version <- "1.6.3"
-  test_hadoop_version <- "2.6"
+  test_spark_version <- "3.1.1"
+  test_hadoop_version <- "3.2"
 
   install_dir <- spark_install_dir()
 
