@@ -94,8 +94,11 @@ ft_extract_sql <- function(x) {
     }
   }
 
-  tbl_name <- format(get_base_name(x$lazy_query))
-  tbl_name <- substr(tbl_name, 2, nchar(tbl_name) - 1)
+  tbl_name <- get_base_name(x$lazy_query)
+  if (packageVersion("dbplyr") > "2.3.2") {
+    tbl_name <- format(tbl_name)
+    tbl_name <- substr(tbl_name, 2, nchar(tbl_name) - 1)
+  }
   pattern <- paste0("\\b", tbl_name, "\\b")
 
   gsub(pattern, "__THIS__", dbplyr::sql_render(x))
