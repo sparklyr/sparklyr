@@ -154,11 +154,8 @@ to_sdf <- function(op, con) {
   sdf_sql(
     con,
     dbplyr::select_query(
-      from = dbplyr::sql(
-        dbplyr::sql_render(dbplyr::sql_build(op$x, con = con), con = con),
-        con = con
-      ),
-      select = dbplyr::build_sql("*", con = con)
+      from = dbplyr::sql_build(op$x, con = con),
+      select = dbplyr::sql("*")
     ) %>%
       dbplyr::sql_render(con = con) %>%
       dbplyr::sql() %>%
