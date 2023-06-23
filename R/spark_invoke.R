@@ -29,7 +29,6 @@ NULL
 #'   invoke("count")
 #' @export
 invoke <- function(jobj, method, ...) {
-  #invoke_trace(spark_connection(jobj), "Invoking", method)
   UseMethod("invoke")
 }
 

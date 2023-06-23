@@ -60,6 +60,7 @@ test_jobj_create <- function(sc) {
 
 #' @export
 invoke.test_jobj <- function(jobj, method, ...) {
+  invoke_trace(spark_connection(jobj), "Invoking", method)
   if (method == "version") {
     "1.0.0"
   } else {

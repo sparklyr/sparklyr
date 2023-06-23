@@ -786,6 +786,7 @@ print_jobj.livy_connection <- print_jobj.spark_shell_connection
 
 #' @export
 invoke.livy_jobj <- function(jobj, method, ...) {
+  invoke_trace(spark_connection(jobj), "Invoking", method)
   livy_invoke_statement_fetch(spark_connection(jobj), FALSE, jobj, method, FALSE, ...)
 }
 
