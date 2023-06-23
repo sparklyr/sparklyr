@@ -115,7 +115,8 @@ j_invoke_method <- function(sc, static, object, method, ...) {
 }
 
 invoke_trace <- function(sc, ...) {
-  invoke_config <- spark_config_value(sc$config, "sparklyr.log.invoke", FALSE)
+  config <- sc$config
+  invoke_config <- spark_config_value(config, "sparklyr.log.invoke", FALSE)
   if (invoke_config %in% c(TRUE, "callstack", "cat")) {
     args <- list(...)
     trace_message <- paste(args, collapse = " ")

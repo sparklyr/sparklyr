@@ -137,7 +137,15 @@ spark_connect <- function(master,
                           scala_version = NULL,
                           ...) {
   # validate method
-  method <- match.arg(method)
+  method <- method[[1]]
+
+  obj_name <- method
+  if(obj_name %in% c("databricks", "qubole")) {
+    obj_name <- "shell"
+  }
+
+  obj_method <- as_spark_method(obj_name)
+
 
   # A Databricks GUID indicates that it is running on a Databricks cluster,
   # so if there is no GUID, then method = "databricks" must refer to Databricks Connect
@@ -181,7 +189,9 @@ spark_connect <- function(master,
     )
   }
 
-  if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
+  if (is.null(spark_home) || !nzchar(spark_home)) {
+    spark_home <- spark_config_value(config, "spark.home", "")
+  }
 
   # increase default memory
   if (spark_master_is_local(master) &&
@@ -201,11 +211,11 @@ spark_connect <- function(master,
     return(sconFound[[1]])
   }
 
-  shell_args <- spark_config_shell_args(config, master)
 
   # clean spark_apply per-connection cache
-  if (dir.exists(spark_apply_bundle_path())) {
-    unlink(spark_apply_bundle_path(), recursive = TRUE)
+  bundle_path <-spark_apply_bundle_path()
+  if (dir.exists(bundle_path)) {
+    unlink(bundle_path, recursive = TRUE)
   }
 
   # connect using the specified method
@@ -219,6 +229,81 @@ spark_connect <- function(master,
     method <- "gateway"
   }
 
+  scon <- spark_connect_method(
+    obj_method,
+    method = method,
+    master = master,
+    spark_home = spark_home,
+    config = config,
+    app_name = app_name,
+    version = version,
+    hadoop_version = hadoop_version,
+    extensions = extensions,
+    scala_version = scala_version
+  )
+
+  scon$state$hive_support_enabled <- spark_config_value(
+    config,
+    name = "sparklyr.connect.enablehivesupport",
+    default = TRUE
+  )
+  scon <- initialize_connection(scon)
+
+  # initialize extensions
+  if (length(scon$extensions) > 0) {
+    for (initializer in scon$extensions$initializers) {
+      if (is.function(initializer)) initializer(scon)
+    }
+  }
+
+  # register mapping tables for spark.ml
+  register_mapping_tables()
+
+  # custom initializers for connection methods
+  scon <- initialize_method(structure(scon, class = method), scon)
+
+  # cache spark web
+  scon$state$spark_web <- tryCatch(spark_web(scon), error = function(e) NULL)
+
+  # create the connection code
+  libs <- c("sparklyr", extensions)
+  if ("package:dplyr" %in% search()) {
+    libs <- c(libs, "dplyr")
+  }
+  libs_call <- glue::glue("library({libs})")
+  fun_call <- deparse(match.call(), width.cutoff = 500)
+  sc_call <- glue::glue("sc <- {fun_call}")
+  connect_call <- paste0(c(libs_call, sc_call), collapse = "\n")
+
+  # let viewer know that we've opened a connection; guess that the result will
+  # be assigned into the global environment
+  on_connection_opened(scon, globalenv(), connect_call)
+
+  # Register a finalizer to sleep on R exit to support older versions of the RStudio IDE
+  reg.finalizer(asNamespace("sparklyr"), function(x) {
+    if (connection_is_open(scon)) {
+      Sys.sleep(1)
+    }},
+    onexit = TRUE
+    )
+
+  if (method == "databricks-connect") {
+    spark_context(scon) %>%
+      invoke(
+        "setLocalProperty",
+        "spark.databricks.service.client.type",
+        "sparklyr"
+        )
+  }
+
+  # add to our internal list
+  spark_connections_add(scon)
+
+  # return scon
+  scon
+
+  return(scon)
+#-------------------------------- OLD ------------------------------------------
   # spark-shell (local install of spark)
   if (method == "shell" || method == "qubole" || method == "databricks-connect") {
     scon <- shell_connection(
@@ -286,65 +371,72 @@ spark_connect <- function(master,
     stop("Unsupported connection method '", method, "'")
   }
 
-  scon$state$hive_support_enabled <- spark_config_value(
+
+}
+
+as_spark_method <- function(x) {
+  structure(
+    list(),
+    class = paste0("spark_method_", x)
+  )
+}
+
+#' @export
+spark_connect_method <- function(x,
+                                 method,
+                                 master,
+                                 spark_home,
+                                 config,
+                                 app_name,
+                                 version,
+                                 hadoop_version,
+                                 extensions,
+                                 scala_version,
+                                 ...
+                                 ) {
+  UseMethod("spark_connect_method")
+}
+
+#' @export
+spark_connect_method.spark_method_shell <- function(
+    x,
+    method,
+    master,
+    spark_home,
     config,
-    name = "sparklyr.connect.enablehivesupport",
-    default = TRUE
+    app_name,
+    version,
+    hadoop_version,
+    extensions,
+    scala_version,
+    ...
+) {
+  scon <- shell_connection(
+    master = master,
+    spark_home = spark_home,
+    method = method,
+    app_name = app_name,
+    version = version,
+    hadoop_version = hadoop_version,
+    shell_args = spark_config_shell_args(config, master),
+    config = config,
+    service = spark_config_value(
+      config,
+      "sparklyr.gateway.service",
+      FALSE
+    ),
+    remote = spark_config_value(
+      config,
+      "sparklyr.gateway.remote",
+      spark_master_is_yarn_cluster(master, config)
+    ),
+    extensions = extensions,
+    batch = NULL,
+    scala_version = scala_version
   )
-  scon <- initialize_connection(scon)
-
-  # initialize extensions
-  if (length(scon$extensions) > 0) {
-    for (initializer in scon$extensions$initializers) {
-      if (is.function(initializer)) initializer(scon)
-    }
+  if (method != "shell") {
+    scon$method <- method
   }
-
-  # register mapping tables for spark.ml
-  register_mapping_tables()
-
-  # custom initializers for connection methods
-  scon <- initialize_method(structure(scon, class = method), scon)
-
-  # cache spark web
-  scon$state$spark_web <- tryCatch(spark_web(scon), error = function(e) NULL)
-
-  # notify connection viewer of connection
-  libs <- c("sparklyr", extensions)
-  libs <- vapply(libs,
-    function(lib) paste0("library(", lib, ")"),
-    character("1"),
-    USE.NAMES = FALSE
-  )
-  libs <- paste(libs, collapse = "\n")
-  if ("package:dplyr" %in% search()) {
-    libs <- paste(libs, "library(dplyr)", sep = "\n")
-  }
-  parentCall <- match.call()
-  connectCall <- paste(libs,
-    paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
-    sep = "\n"
-  )
-
-  # let viewer know that we've opened a connection; guess that the result will
-  # be assigned into the global environment
-  on_connection_opened(scon, globalenv(), connectCall)
-
-  # Register a finalizer to sleep on R exit to support older versions of the RStudio IDE
-  reg.finalizer(asNamespace("sparklyr"), function(x) {
-    if (connection_is_open(scon)) {
-      Sys.sleep(1)
-    }
-  }, onexit = TRUE)
-
-  if (method == "databricks-connect") {
-    spark_context(scon) %>% invoke("setLocalProperty", "spark.databricks.service.client.type", "sparklyr")
-  }
-
-  # add to our internal list
-  spark_connections_add(scon)
-
-  # return scon
   scon
 }
 

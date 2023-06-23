@@ -613,13 +613,20 @@ livy_connection_jars <- function(config, version, scala_version) {
   livy_jars
 }
 
-livy_connection <- function(master,
-                            config,
-                            app_name,
-                            version,
-                            hadoop_version,
-                            extensions,
-                            scala_version = NULL) {
+spark_connect_method.spark_method_livy <- function(
+    x,
+    method,
+    master,
+    spark_home,
+    config,
+    app_name,
+    version,
+    hadoop_version,
+    extensions,
+    scala_version,
+    ...
+) {
+
   if (is.null(version)) {
     stop("Livy connections now require the Spark version to be specified.", call. = FALSE)
   }

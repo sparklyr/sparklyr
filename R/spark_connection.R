@@ -260,6 +260,11 @@ initialize_connection <- function(sc) {
   UseMethod("initialize_connection")
 }
 
+initialize_connection.default <- function(sc) {
+  sc
+}
+
+
 new_spark_connection <- function(scon, ..., class = character()) {
   structure(
     scon,
