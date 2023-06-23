@@ -34,23 +34,10 @@ spark_sql_query_explain <- function(con, sql, ...) {
 
 #' @importFrom dbplyr sql
 spark_db_query_fields_sql <- function(con, query) {
-  sql_select_impl <- (
-    if (utils::packageVersion("dbplyr") < "2") {
-      dplyr::sql_select
-    } else {
-      dbplyr::sql_query_select
-    })
-  sql_subquery_impl <- (
-    if (utils::packageVersion("dbplyr") < "2") {
-      dplyr::sql_subquery
-    } else {
-      dbplyr::sql_query_wrap
-    })
-
-  sql_select_impl(
+  dbplyr::sql_query_select(
     con,
     sql("*"),
-    sql_subquery_impl(con, query),
+    dbplyr::sql_query_wrap(con, query),
     where = sql("0 = 1")
   )
 }
