@@ -49,8 +49,8 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
   columns_sql_types <- sapply(sdf_columns, function(x) { x %>% invoke("_2") })
 
   columns_info <- data.frame(
-    name=columns, 
-    type=columns_types, 
+    name=columns,
+    type=columns_types,
     sql.type=columns_sql_types
   )
   rownames(columns_info) <- NULL
@@ -68,9 +68,9 @@ setMethod(
       if (hasArg("params")) stop("Native paramtereized queries require Spark 3.4.0 or newer")
       sdf <- invoke(hive_context(conn), "sql", sql)
     } else {
-      sdf <- invoke(hive_context(conn), "sql", sql, as.environment(params))
+      sdf <- invoke(hive_context(conn), "sql", sql)
+      #sdf <- invoke(hive_context(conn), "sql", sql, as.environment(params))
     }
-
     rs <- new("DBISparkResult",
       sql = sql,
       conn = conn,
