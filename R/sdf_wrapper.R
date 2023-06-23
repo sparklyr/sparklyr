@@ -142,7 +142,7 @@ sdf_read_column <- function(x, column) {
   sdf <- spark_dataframe(x)
 
   col_df <- sdf %>%
-    invoke("select", column, list()) %>%
+    invoke("select", column) %>%
     collect()
 
   col_df[[column]]
@@ -175,7 +175,7 @@ sdf_collect <- function(object, impl = c("row-wise", "row-wise-iter", "column-wi
   } else if (arrow_enabled(sc, object) && !identical(args$arrow, FALSE)) {
     arrow_collect(object, ...)
   } else {
-    sdf_collect_static(object, impl, ...)
+    collect(object, impl, ...)
   }
 }
 
