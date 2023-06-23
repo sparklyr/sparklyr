@@ -74,7 +74,7 @@ test_that("'summarize' works with where(...) predicate", {
 
   expect_equivalent(
     iris %>% summarize(across(where(is.numeric), mean)),
-    iris_tbl %>% summarize(across(where(is.numeric), mean))
+    iris_tbl %>% summarize(across(where(is.numeric), mean)) %>% collect()
   )
 
   expect_equivalent(
@@ -84,7 +84,7 @@ test_that("'summarize' works with where(...) predicate", {
 
   expect_equivalent(
     iris %>% summarize(across(where(is.factor), n_distinct)),
-    iris_tbl %>% summarize(across(where(is.character), n_distinct))
+    iris_tbl %>% summarize(across(where(is.character), n_distinct)) %>% collect()
   )
 })
 
