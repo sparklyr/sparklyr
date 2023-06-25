@@ -69,7 +69,8 @@ setMethod(
       sdf <- invoke(hive_context(conn), "sql", sql)
     } else {
       sdf <- invoke(hive_context(conn), "sql", sql)
-      sdf <- invoke(hive_context(conn), "sql", sql, as.environment(params))
+      # TODO: databricks - Figure out params
+      # sdf <- invoke(hive_context(conn), "sql", sql, as.environment(params))
     }
     rs <- new("DBISparkResult",
       sql = sql,
