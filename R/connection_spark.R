@@ -217,8 +217,10 @@ spark_connect <- function(master,
     method <- "gateway"
   }
 
+  obj_method <- as_spark_method(method)
+
   scon <- spark_connect_method(
-    x = method,
+    x = obj_method,
     method = method,
     master = master,
     spark_home = spark_home,
@@ -395,6 +397,14 @@ spark_connect_method.default <- function(
   }
   scon
 }
+
+as_spark_method <- function(x) {
+  structure(
+    list(),
+    class = paste0("spark_method_", x)
+  )
+}
+
 
 
 #' @name spark-connections
