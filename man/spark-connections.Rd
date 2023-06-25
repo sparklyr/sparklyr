@@ -3,6 +3,8 @@
 \name{spark-connections}
 \alias{spark-connections}
 \alias{spark_connect}
+\alias{spark_connect_method}
+\alias{spark_connect_method.default}
 \alias{spark_connection_is_open}
 \alias{spark_disconnect}
 \alias{spark_disconnect_all}
@@ -19,6 +21,34 @@ spark_connect(
   extensions = sparklyr::registered_extensions(),
   packages = NULL,
   scala_version = NULL,
+  ...
+)
+
+spark_connect_method(
+  x,
+  method,
+  master,
+  spark_home,
+  config,
+  app_name,
+  version,
+  hadoop_version,
+  extensions,
+  scala_version,
+  ...
+)
+
+\method{spark_connect_method}{default}(
+  x,
+  method,
+  master,
+  spark_home,
+  config,
+  app_name,
+  version,
+  hadoop_version,
+  extensions,
+  scala_version,
   ...
 )
 
