@@ -133,8 +133,11 @@ ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
   l_steps <- purrr::imap(pe, ~ list(.y, .x))
 
   for(i in seq_along(l_steps)) {
-    if(!is.null(l_steps[[i]][[2]])) {
-      jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
+    c_step <- l_steps[[i]]
+    c_method <- c_step[[1]]
+    c_value <- c_step[[2]]
+    if(!is.null(c_value)) {
+      rlang::exec(invoke, jobj, c_method, c_value)
     }
   }
 

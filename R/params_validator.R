@@ -64,7 +64,13 @@ params_base_validator <- function(x) {
 params_validate_estimator <- function(jobj, params = list()) {
   dummy_obj <- list()
 
-  spark_obj_name <- jobj_info(jobj)[[1]]
+  def_class <- jobj[["class"]]
+  if(is.null(def_class)) {
+    spark_obj_name <- jobj_info(jobj)[[1]]
+  } else {
+    spark_obj_name <- def_class
+  }
+
   class_mapping <- as.list(genv_get_ml_class_mapping())
   r_obj_class <- class_mapping[names(class_mapping) == spark_obj_name][[1]]
 

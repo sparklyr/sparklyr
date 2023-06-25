@@ -48,8 +48,8 @@ ml_call_constructor <- function(jobj) {
 new_ml_pipeline_stage <- function(jobj, ..., class = character()) {
   structure(
     list(
-      uid = invoke(jobj, "uid"),
-      param_map = ml_get_param_map(jobj),
+      uid = 1, #TODO: restore invoke(jobj, "uid"),
+      param_map = NULL, #TODO: restore ml_get_param_map(jobj),
       ...,
       .jobj = jobj
     ),
