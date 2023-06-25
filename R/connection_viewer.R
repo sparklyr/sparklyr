@@ -157,8 +157,8 @@ on_connection_opened <- function(scon, env, connectCall) {
           },
 
           # table enumeration code
-          listObjects = function(type = "table") {
-            connection_list_tables(scon, includeType = TRUE)
+          listObjects = function(...) {
+            rstudio_db_objects(scon, ...)
           },
 
           # column enumeration code
@@ -254,6 +254,16 @@ on_connection_updated <- function(scon, hint) {
   if (!is.null(viewer)) {
     viewer$connectionUpdated(type = "Spark", host = to_host(scon), hint = hint)
   }
+}
+
+#' @export
+rstudio_db_objects <- function(sc, catalog, schema, name, type) {
+  UseMethod("rstudio_db_objects")
+}
+
+#' @export
+rstudio_db_objects.spark_connection <- function(sc, catalog, schema, name, type) {
+  connection_list_tables(sc, includeType = TRUE)
 }
 
 connection_list_tables <- function(sc, includeType = FALSE) {
