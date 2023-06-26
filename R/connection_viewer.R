@@ -178,8 +178,8 @@ on_connection_opened <- function(scon, env, connectCall) {
           },
 
           # table preview code
-          previewObject = function(rowLimit, table) {
-            connection_preview_table(scon, table, rowLimit)
+          previewObject = function(rowLimit, ...) {
+            spark_connect_db_preview(scon, rowLimit, ...)
           },
 
           # other actions that can be executed on this connection
@@ -333,6 +333,28 @@ connection_list_columns <- function(sc, table) {
   } else {
     NULL
   }
+}
+
+#' @export
+spark_connect_db_preview <- function(
+    sc,
+    rowLimit,
+    table = NULL,
+    view = NULL,
+    catalog = NULL,
+    schema = NULL) {
+  UseMethod("spark_connect_db_preview")
+}
+
+#' @export
+spark_connect_db_preview.spark_connection <- function(
+    sc,
+    rowLimit,
+    table = NULL,
+    view = NULL,
+    catalog = NULL,
+    schema = NULL) {
+  connection_preview_table(sc, table, rowLimit)
 }
 
 connection_preview_table <- function(sc, table, limit) {
