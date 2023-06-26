@@ -42,7 +42,9 @@ spark_actions <- function(scon) {
         "Log" = list(
           icon = file.path(icons, "spark-log.png"),
           callback = function() {
-            utils::browseURL(file.path(scon$master, "ui", "session", scon$sessionId, "log"))
+            utils::browseURL(
+              file.path(scon$master, "ui", "session", scon$sessionId, "log")
+              )
           }
         )
       )
@@ -171,8 +173,8 @@ on_connection_opened <- function(scon, env, connectCall) {
           },
 
           # column enumeration code
-          listColumns = function(table) {
-            connection_list_columns(scon, table)
+          listColumns = function(...) {
+            spark_connect_db_columns(scon, ...)
           },
 
           # table preview code
@@ -293,6 +295,24 @@ connection_list_tables <- function(sc, includeType = FALSE) {
   } else {
     tables
   }
+}
+
+#' @export
+spark_connect_db_columns <- function(sc,
+                                     table = NULL,
+                                     view = NULL,
+                                     catalog = NULL,
+                                     schema = NULL) {
+  UseMethod("spark_connect_db_columns")
+}
+
+#' @export
+spark_connect_db_columns.spark_connection <- function(sc,
+                                                      table = NULL,
+                                                      view = NULL,
+                                                      catalog = NULL,
+                                                      schema = NULL) {
+  connection_list_columns(sc, table = table)
 }
 
 connection_list_columns <- function(sc, table) {
