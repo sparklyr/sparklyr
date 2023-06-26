@@ -151,14 +151,23 @@ on_connection_opened <- function(scon, env, connectCall) {
           },
 
           listObjectTypes = function() {
-            return(list(
-              table = list(contains = "data")
-            ))
+            return(
+              list(catalog = list(
+                contains =
+                  list(schema = list(
+                    contains =
+                      list(
+                        table = list(contains = "data"),
+                        view = list(contains = "data")
+                      )
+                  ))
+              ))
+            )
           },
 
           # table enumeration code
-          listObjects = function(type = "table") {
-            connection_list_tables(scon, includeType = TRUE)
+          listObjects = function(...) {
+            spark_connect_db_objects(scon, ...)
           },
 
           # column enumeration code
@@ -254,6 +263,16 @@ on_connection_updated <- function(scon, hint) {
   if (!is.null(viewer)) {
     viewer$connectionUpdated(type = "Spark", host = to_host(scon), hint = hint)
   }
+}
+
+#' @export
+spark_connect_db_objects <- function(sc, catalog, schema, name, type) {
+  UseMethod("spark_connect_db_objects")
+}
+
+#' @export
+spark_connect_db_objects.spark_connection <- function(sc, catalog, schema, name, type) {
+  connection_list_tables(sc, includeType = TRUE)
 }
 
 connection_list_tables <- function(sc, includeType = FALSE) {
