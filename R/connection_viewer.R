@@ -6,14 +6,20 @@
 spark_actions <- function(scon) {
   icons <- system.file(file.path("icons"), package = "sparklyr")
 
-  actions <- list(
-    "Spark" = list(
-      icon = file.path(icons, "spark-ui.png"),
-      callback = function() {
-        browse_url(spark_web(scon))
-      }
+  url <- spark_web(scon)
+
+  if(as.character(url) == "") {
+    actions <- list()
+  } else {
+    actions <- list(
+      "Spark" = list(
+        icon = file.path(icons, "spark-ui.png"),
+        callback = function() {
+          browse_url(url)
+        }
+      )
     )
-  )
+  }
 
   if (spark_connection_is_yarn(scon)) {
     actions <- c(
@@ -51,17 +57,20 @@ spark_actions <- function(scon) {
     )
   }
   else {
-    actions <- c(
-      actions,
-      list(
-        Log = list(
-          icon = file.path(icons, "spark-log.png"),
-          callback = function() {
-            file.edit(spark_log_file(scon))
-          }
+    if(length(as.character(spark_log(scon))) > 1) {
+      actions <- c(
+        actions,
+        list(
+          Log = list(
+            icon = file.path(icons, "spark-log.png"),
+            callback = function() {
+              file.edit(spark_log_file(scon))
+            }
+          )
         )
       )
-    )
+    }
+
   }
 
   if (exists(".rs.api.documentNew")) {
