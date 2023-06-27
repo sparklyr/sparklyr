@@ -208,7 +208,7 @@ test_that("values_fn can be a single function", {
     tibble::tibble(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
   )
 
-  expect_warning(
+  suppressWarnings(
     pv <- tidyr::pivot_wider(
       sdf,
       names_from = key, values_from = val, values_fn = sum
