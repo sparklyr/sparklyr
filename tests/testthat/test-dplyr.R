@@ -11,6 +11,9 @@ df2 <- tibble(b = letters[1:3], c = letters[24:26])
 df1_tbl <- testthat_tbl("df1")
 df2_tbl <- testthat_tbl("df2")
 
+sdf_5 <- copy_to(sc, data.frame(id = 1:5))
+sdf_10 <- copy_to(sc, data.frame(id = 1:10))
+
 dplyr_across_test_cases_df <- tibble(
   x = seq(3),
   y = as.character(seq(3)),
@@ -300,7 +303,7 @@ test_that("'sdf_broadcast' forces broadcast hash join", {
 test_that("compute() works as expected", {
   test_requires("dplyr")
 
-  sdf <- sdf_len(sc, 10L)
+  sdf <- sdf_10
   sdf_even <- sdf %>% dplyr::filter(id %% 2 == 0)
   sdf_odd <- sdf %>% dplyr::filter(id %% 2 == 1)
 
@@ -357,7 +360,7 @@ test_that("compute() works as expected", {
 })
 
 test_that("mutate creates NA_real_ column correctly", {
-  sdf <- sdf_len(sc, 5L) %>% dplyr::mutate(z = NA_real_, sq = id * id)
+  sdf <- sdf_5 %>% dplyr::mutate(z = NA_real_, sq = id * id)
 
   expect_equivalent(
     sdf %>% collect(),
@@ -366,7 +369,7 @@ test_that("mutate creates NA_real_ column correctly", {
 })
 
 test_that("transmute creates NA_real_ column correctly", {
-  sdf <- sdf_len(sc, 5L) %>% dplyr::transmute(z = NA_real_, sq = id * id)
+  sdf <- sdf_5 %>% dplyr::transmute(z = NA_real_, sq = id * id)
 
   expect_equivalent(
     sdf %>% collect(),
@@ -377,10 +380,10 @@ test_that("transmute creates NA_real_ column correctly", {
 test_that("overwriting a temp view", {
   temp_view_name <- random_string()
 
-  sdf <- sdf_len(sc, 5L) %>%
+  sdf <- sdf_5 %>%
     dplyr::mutate(foo = "foo") %>%
     dplyr::compute(name = temp_view_name)
-  sdf <- sdf_len(sc, 5L) %>%
+  sdf <- sdf_5 %>%
     dplyr::compute(name = temp_view_name)
 
   expect_equivalent(sdf %>% collect(), tibble::tibble(id = seq(5)))
@@ -423,33 +426,39 @@ test_that("process_tbl_name works as expected", {
     copy_to(sc, ., "df2", overwrite = TRUE)
 
   query <- sql("SELECT df1.a, df2.b, df1.g FROM df1 LEFT JOIN df2 ON df1.g = df2.g")
-  expect_equivalent(
-    tbl(sc, query) %>% collect(),
-    tibble::tibble(a = 1, b = 1, g = 2)
-  )
+  if(spark_version(sc) >= "3.4.0"){
+    expect_error(tbl(sc, query))
+  } else {
+    expect_equivalent(
+      tbl(sc, query) %>% collect(),
+      tibble::tibble(a = 1, b = 1, g = 2)
+    )
+  }
+
 })
 
 test_that("in_schema() works as expected", {
   skip_on_arrow()
   skip_on_livy()
+  if(spark_version <= "3.4.0") {
+    db_name <- random_string("test_db_")
 
-  db_name <- random_string("test_db_")
-
-  queries <- c(
-    sprintf("CREATE DATABASE `%s`", db_name),
-    sprintf(
-      "CREATE TABLE IF NOT EXISTS `%s`.`hive_tbl` (`x` INT) USING hive",
-      db_name
+    queries <- c(
+      sprintf("CREATE DATABASE `%s`", db_name),
+      sprintf(
+        "CREATE TABLE IF NOT EXISTS `%s`.`hive_tbl` (`x` INT) USING hive",
+        db_name
+      )
     )
-  )
-  for (query in queries) {
-    DBI::dbGetQuery(sc, query)
-  }
+    for (query in queries) {
+      DBI::dbGetQuery(sc, query)
+    }
 
-  expect_equivalent(
-    dplyr::tbl(sc, dbplyr::in_schema(db_name, "hive_tbl")) %>% collect(),
-    tibble::tibble(x = integer())
-  )
+    expect_equivalent(
+      dplyr::tbl(sc, dbplyr::in_schema(db_name, "hive_tbl")) %>% collect(),
+      tibble::tibble(x = integer())
+    )
+  }
 })
 
 test_that("sdf_remote_name returns null for computed tables", {
@@ -562,3 +571,4 @@ test_that("pmin and pmax work", {
   )
 
 })
+

@@ -142,7 +142,7 @@ sdf_read_column <- function(x, column) {
   sdf <- spark_dataframe(x)
 
   col_df <- sdf %>%
-    invoke("select", column, list()) %>%
+    invoke("select", column) %>%
     collect()
 
   col_df[[column]]
