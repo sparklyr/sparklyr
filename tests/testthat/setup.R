@@ -6,6 +6,11 @@ cat("\n----- sparklyr test setup ----")
 cat("\nSpark:", testthat_spark_env_version())
 cat("\nLivy:", ul)
 cat("\nArrow:", ua)
+if(using_method()) {
+  cat("\n-----------")
+  cat("\nMaster:", using_master_get())
+  cat("\nMethod:", using_method_get())
+}
 if(using_arrow()) cat("\n  |---", as.character(packageVersion("arrow")))
 cat("\n------------------------------\n")
 
