@@ -49,7 +49,8 @@ arrays_sdf <- copy_to(sc, arrays_df, overwrite = TRUE)
 test_that("'select' works with where(...) predicate", {
   test_requires("dplyr")
 
-  expect_error(
+  expect_equal(
+    iris %>% select(where(is.numeric)) %>% tbl_vars() %>% gsub("\\.", "_", .),
     iris_tbl %>% select(where(is.numeric)) %>% collect() %>% tbl_vars()
   )
 })
@@ -78,8 +79,9 @@ test_that("'n_distinct' summarizer works as expected", {
 test_that("'summarize' works with where(...) predicate", {
   test_requires("dplyr")
 
-  expect_error(
-    iris_tbl %>% summarize(across(where(is.numeric), mean))
+  expect_equivalent(
+    iris %>% summarize(across(where(is.numeric), mean)),
+    iris_tbl %>% summarize(across(where(is.numeric), mean)) %>% collect()
   )
 
   expect_equivalent(
@@ -87,8 +89,9 @@ test_that("'summarize' works with where(...) predicate", {
     iris_tbl %>% summarize(across(starts_with("Petal"), ~mean(.x, na.rm = TRUE))) %>%  collect()
   )
 
-  expect_error(
-    iris_tbl %>% summarize(across(where(is.character), n_distinct))
+  expect_equivalent(
+    iris %>% summarize(across(where(is.factor), n_distinct)),
+    iris_tbl %>% summarize(across(where(is.character), n_distinct)) %>% collect()
   )
 })
 
