@@ -48,6 +48,7 @@ arrays_sdf <- copy_to(sc, arrays_df, overwrite = TRUE)
 
 test_that("'select' works with where(...) predicate", {
   test_requires("dplyr")
+  skip_if(!tidyselect_data_has_predicates(sc))
 
   expect_equal(
     iris %>% select(where(is.numeric)) %>% tbl_vars() %>% gsub("\\.", "_", .),
@@ -78,6 +79,7 @@ test_that("'n_distinct' summarizer works as expected", {
 
 test_that("'summarize' works with where(...) predicate", {
   test_requires("dplyr")
+  skip_if(!tidyselect_data_has_predicates(sc))
 
   expect_equivalent(
     iris %>% summarize(across(where(is.numeric), mean)),

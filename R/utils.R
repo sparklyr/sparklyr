@@ -489,7 +489,12 @@ tidyselect_data_proxy.tbl_spark <- function(x) {
 
 #' @export
 tidyselect_data_has_predicates.tbl_spark <- function(x) {
-  TRUE
+  supported <- unlist(options("sparklyr.support.predicates"))
+  out <- TRUE
+  if(!is.null(supported)) {
+    out <- supported
+  }
+  out
 }
 
 # wrapper for download.file()
