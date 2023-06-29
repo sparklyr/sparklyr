@@ -1,5 +1,10 @@
 # sparklyr (development version)
 
+- Adds ability to turn off predicate support (where(), across()) using 
+  options("sparklyr.support.predicates" = FALSE). Defaults to TRUE. This should
+  accelerate `dplyr` commands because it won't need to process column types
+  for every single piped command
+
 - Fix various rlang deprecation warnings (@mgirlich, #3333).
 
 - Adds Azure Synapse Analytics connectivity (@Bob-Chou , #3336)
