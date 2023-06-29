@@ -10,9 +10,11 @@ spark_db_analyze <- function(con, table, ...) {
     return(NULL)
   }
 
-  info <- dbGetQuery(con, build_sql("SHOW TABLES LIKE", table, con = con))
+  table_q <- as.character(escape(table, con = con))
+  table_name <- substr(table_q, 2, nchar(table_q) - 1)
+  info <- dbGetQuery(con, build_sql("SHOW TABLES LIKE ", table_name, con = con))
   if (nrow(info) > 0 && identical(info$isTemporary, FALSE)) {
-    dbExecute(con, build_sql("ANALYZE TABLE", table, "COMPUTE STATISTICS", con = con))
+    dbExecute(con, build_sql("ANALYZE TABLE ", table, " COMPUTE STATISTICS", con = con))
   }
 }
 
@@ -34,23 +36,10 @@ spark_sql_query_explain <- function(con, sql, ...) {
 
 #' @importFrom dbplyr sql
 spark_db_query_fields_sql <- function(con, query) {
-  sql_select_impl <- (
-    if (utils::packageVersion("dbplyr") < "2") {
-      dplyr::sql_select
-    } else {
-      dbplyr::sql_query_select
-    })
-  sql_subquery_impl <- (
-    if (utils::packageVersion("dbplyr") < "2") {
-      dplyr::sql_subquery
-    } else {
-      dbplyr::sql_query_wrap
-    })
-
-  sql_select_impl(
+  dbplyr::sql_query_select(
     con,
     sql("*"),
-    sql_subquery_impl(con, query),
+    dbplyr::sql_query_wrap(con, query),
     where = sql("0 = 1")
   )
 }
@@ -89,13 +78,16 @@ spark_sql_query_fields <- function(con, query, ...) {
   }
 }
 
-#' @importFrom dbplyr as.sql
 #' @importFrom dbplyr build_sql
 #' @importFrom dbplyr sql
 spark_sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
+  if (packageVersion("dbplyr") <= "2.3.2") {
+    name <- as.sql(name)
+  }
+
   build_sql(
     "CREATE OR REPLACE ", if (temporary) sql("TEMPORARY "), "VIEW \n",
-    as.sql(name), " AS ", sql,
+    name, " AS ", sql,
     con = con
   )
 }

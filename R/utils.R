@@ -481,11 +481,16 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
     tibble::as_tibble()
 }
 
-simulate_vars.tbl_spark <- function(x, drop_groups = FALSE) {
-  simulate_vars_spark(x, drop_groups)
+#' @importFrom tidyselect tidyselect_data_proxy tidyselect_data_has_predicates
+#' @export
+tidyselect_data_proxy.tbl_spark <- function(x) {
+  simulate_vars_spark(x, FALSE)
 }
 
-simulate_vars_is_typed.tbl_spark <- function(x) TRUE
+#' @export
+tidyselect_data_has_predicates.tbl_spark <- function(x) {
+  TRUE
+}
 
 # wrapper for download.file()
 download_file <- function(...) {

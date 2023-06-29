@@ -22,6 +22,13 @@ dplyr_across_test_cases_df <- tibble(
 )
 dplyr_across_test_cases_tbl <- testthat_tbl("dplyr_across_test_cases_df")
 
+test_remote_name <- function(x, y) {
+  if (packageVersion("dbplyr") <= "2.3.2") {
+    y <- ident(y)
+  }
+  expect_equal(sparklyr:::sdf_remote_name(x), y)
+}
+
 scalars_df <- tibble::tibble(
   row_num = seq(4),
   b_a = c(FALSE, FALSE, TRUE, TRUE),
@@ -45,7 +52,8 @@ arrays_sdf <- copy_to(sc, arrays_df, overwrite = TRUE)
 test_that("'select' works with where(...) predicate", {
   test_requires("dplyr")
 
-  expect_error(
+  expect_equal(
+    iris %>% select(where(is.numeric)) %>% tbl_vars() %>% gsub("\\.", "_", .),
     iris_tbl %>% select(where(is.numeric)) %>% collect() %>% tbl_vars()
   )
 })
@@ -75,8 +83,9 @@ test_that("'n_distinct' summarizer works as expected", {
 test_that("'summarize' works with where(...) predicate", {
   test_requires("dplyr")
 
-  expect_error(
-    iris_tbl %>% summarize(across(where(is.numeric), mean))
+  expect_equivalent(
+    iris %>% summarize(across(where(is.numeric), mean)),
+    iris_tbl %>% summarize(across(where(is.numeric), mean)) %>% collect()
   )
 
   expect_equivalent(
@@ -84,8 +93,9 @@ test_that("'summarize' works with where(...) predicate", {
     iris_tbl %>% summarize(across(starts_with("Petal"), ~mean(.x, na.rm = TRUE))) %>%  collect()
   )
 
-  expect_error(
-    iris_tbl %>% summarize(across(where(is.character), n_distinct))
+  expect_equivalent(
+    iris %>% summarize(across(where(is.factor), n_distinct)),
+    iris_tbl %>% summarize(across(where(is.character), n_distinct)) %>% collect()
   )
 })
 
@@ -336,18 +346,20 @@ test_that("compute() works as expected", {
   sdf_congruent_to_2_mod_3_cached <- sdf_congruent_to_2_mod_3 %>%
     dplyr::compute(name = "congruent_to_2_mod_3")
 
-  expect_equal(
-    sdf_congruent_to_1_mod_3_cached %>% dbplyr::remote_name(),
-    dbplyr::ident("congruent_to_1_mod_3")
+  test_remote_name(
+    sdf_congruent_to_1_mod_3_cached,
+    "congruent_to_1_mod_3"
   )
-  expect_equivalent(
-    sdf_congruent_to_2_mod_3_cached %>% dbplyr::remote_name(),
-    dbplyr::ident("congruent_to_2_mod_3")
+  test_remote_name(
+    sdf_congruent_to_2_mod_3_cached,
+    "congruent_to_2_mod_3"
   )
 
+
   temp_view <- sdf_congruent_to_2_mod_3 %>% dplyr::compute("temp_view")
-  expect_equivalent(
-    temp_view %>% dbplyr::remote_name(), dbplyr::ident("temp_view")
+
+  test_remote_name(
+    temp_view, "temp_view"
   )
 
   expect_equivalent(
@@ -407,6 +419,8 @@ test_that("dplyr::distinct() impl is configurable", {
     dbplyr::remote_query() %>%
     strsplit("\\s+")
 
+  query[[1]][[3]] <- gsub(sprintf("`%s`.*", tbl_name), "*", query[[1]][[3]])
+
   expect_equal(
     toupper(query[[1]]),
     c("SELECT", "DISTINCT", "*", "FROM", sprintf("`%s`", toupper(tbl_name)))
@@ -465,7 +479,7 @@ test_that("in_schema() works as expected", {
 })
 
 test_that("sdf_remote_name returns null for computed tables", {
-  expect_equal(sparklyr:::sdf_remote_name(iris_tbl), ident("iris"))
+  test_remote_name(iris_tbl, "iris")
 
   virginica_sdf <- iris_tbl %>% filter(Species == "virginica")
   expect_equal(sparklyr:::sdf_remote_name(virginica_sdf), NULL)
@@ -475,7 +489,7 @@ test_that("sdf_remote_name ignores the last group_by() operation(s)", {
   sdf <- iris_tbl
   for (i in seq(4)) {
     sdf <- sdf %>% dplyr::group_by(Species)
-    expect_equal(sdf %>% dbplyr::remote_name(), ident("iris"))
+    test_remote_name(sdf, "iris")
   }
 })
 
@@ -483,7 +497,7 @@ test_that("sdf_remote_name ignores the last ungroup() operation(s)", {
   sdf <- iris_tbl
   for (i in seq(4)) {
     sdf <- sdf %>% dplyr::ungroup()
-    expect_equal(sdf %>% dbplyr::remote_name(), ident("iris"))
+    test_remote_name(sdf, "iris")
   }
 })
 
@@ -491,9 +505,9 @@ test_that("sdf_remote_name works with arrange followed by compute", {
   tbl <- copy_to(sc, tibble::tibble(lts = letters[26:24], nums = seq(3)))
   ordered_tbl <- tbl %>% arrange(lts) %>% compute(name = "ordered_tbl")
 
-  expect_equal(
-    ordered_tbl %>% dbplyr::remote_name(),
-    ident("ordered_tbl")
+test_remote_name(
+    ordered_tbl,
+    "ordered_tbl"
   )
   expect_equivalent(
     tbl(sc, "ordered_tbl") %>% collect(),

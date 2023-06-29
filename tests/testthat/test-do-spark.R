@@ -8,10 +8,6 @@ register_test_spark_connection <- function() {
   registerDoSpark(sc)
 }
 
-if(packageVersion("dbplyr") < 2) {
-  expect_error(register_test_spark_connection())
-}
-
 test_requires_package_version("dbplyr", 2)
 
 register_test_spark_connection()
