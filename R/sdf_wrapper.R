@@ -141,9 +141,16 @@ sdf_read_column <- function(x, column) {
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
 
-  col_df <- sdf %>%
-    invoke("select", column) %>%
-    collect()
+  # This is for integrating pyspark
+  # prevents adding a 'value' to the
+  # column name call
+  if(inherits(sdf, "shell_jobj")) {
+    col_df <- invoke(sdf, "select", column, list())
+  } else {
+    col_df <- invoke(sdf, "select", column)
+  }
+
+  col_df <- collect(col_df)
 
   col_df[[column]]
 }

@@ -363,4 +363,3 @@ Collate:
     'yarn_config.R'
     'yarn_ui.R'
     'zzz.R'
-Config/testthat/edition: 3

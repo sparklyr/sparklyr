@@ -26,7 +26,7 @@ test_remote_name <- function(x, y) {
   if (packageVersion("dbplyr") <= "2.3.2") {
     y <- ident(y)
   }
-  expect_equal(sparklyr:::sdf_remote_name(x), y)
+  expect_equal(dbplyr::remote_name(x), y)
 }
 
 scalars_df <- tibble::tibble(
@@ -443,14 +443,10 @@ test_that("process_tbl_name works as expected", {
     copy_to(sc, ., "df2", overwrite = TRUE)
 
   query <- sql("SELECT df1.a, df2.b, df1.g FROM df1 LEFT JOIN df2 ON df1.g = df2.g")
-  if(spark_version(sc) >= "3.4.0"){
-    expect_error(tbl(sc, query))
-  } else {
-    expect_equivalent(
-      tbl(sc, query) %>% collect(),
-      tibble::tibble(a = 1, b = 1, g = 2)
-    )
-  }
+  expect_equivalent(
+    tbl(sc, query) %>% collect(),
+    tibble::tibble(a = 1, b = 1, g = 2)
+  )
 
 })
 
@@ -482,7 +478,7 @@ test_that("sdf_remote_name returns null for computed tables", {
   test_remote_name(iris_tbl, "iris")
 
   virginica_sdf <- iris_tbl %>% filter(Species == "virginica")
-  expect_equal(sparklyr:::sdf_remote_name(virginica_sdf), NULL)
+  expect_equal(dbplyr::remote_name(virginica_sdf), NULL)
 })
 
 test_that("sdf_remote_name ignores the last group_by() operation(s)", {
