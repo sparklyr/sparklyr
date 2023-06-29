@@ -112,12 +112,12 @@ Suggests:
     nnet,
     nycflights13,
     R6,
-    r2d3,    
+    r2d3,
     RCurl,
     reshape2,
     shiny (>= 1.0.1),
     parsnip,
-    testthat,
+    testthat (>= 3.0.0),
     rprojroot
 Encoding: UTF-8
 RoxygenNote: 7.2.3
@@ -363,3 +363,4 @@ Collate:
     'yarn_config.R'
     'yarn_ui.R'
     'zzz.R'
+Config/testthat/edition: 3
