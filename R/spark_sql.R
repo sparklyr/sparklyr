@@ -82,7 +82,7 @@ spark_sql_query_fields <- function(con, query, ...) {
 #' @importFrom dbplyr sql
 spark_sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
   if (packageVersion("dbplyr") <= "2.3.2") {
-    name <- as.sql(name)
+    name <- dbplyr::as.sql(name)
   }
 
   build_sql(
