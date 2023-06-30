@@ -1,5 +1,9 @@
 # Submission
 
+- Addresses issues from Windows pre-checks
+
+## In this version
+
 - Fix various rlang deprecation warnings (@mgirlich, #3333).
 
 - Adds Azure Synapse Analytics connectivity (@Bob-Chou , #3336)

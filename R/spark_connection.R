@@ -200,6 +200,7 @@ spark_web <- function(sc, ...) {
   }
 }
 
+#' @export
 spark_web.default <- function(sc, ...) {
   url <- tryCatch(
     {

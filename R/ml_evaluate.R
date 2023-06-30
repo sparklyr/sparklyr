@@ -24,6 +24,7 @@ ml_evaluate <- function(x, dataset) {
   UseMethod("ml_evaluate")
 }
 
+#' @export
 ml_evaluate.default <- function(x, dataset) {
   stop("`ml_evaluate()` is not supported for `", class(x)[[1]], "`.", call. = FALSE)
 }
