@@ -484,7 +484,11 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
 #' @importFrom tidyselect tidyselect_data_proxy tidyselect_data_has_predicates
 #' @export
 tidyselect_data_proxy.tbl_spark <- function(x) {
-  NextMethod()
+  if(tidyselect_data_has_predicates(x)) {
+    simulate_vars_spark(x, FALSE)
+  } else {
+    NextMethod()
+  }
 }
 
 #' @export

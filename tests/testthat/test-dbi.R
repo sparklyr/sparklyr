@@ -52,6 +52,7 @@ test_that("dbGetQuery works with native parameterized queries", {
 
   virginica <- dbGetQuery(
     conn = sc,
+
     statement = "SELECT * FROM iris WHERE species = :virginica",
     params = list(virginica = "virginica")
     )

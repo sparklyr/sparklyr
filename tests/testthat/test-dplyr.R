@@ -3,6 +3,9 @@ sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
 mtcars_tbl <- testthat_tbl("mtcars")
+
+has_predicates <- tidyselect_data_has_predicates(mtcars_tbl)
+
 test_requires("dplyr")
 
 df1 <- tibble(a = 1:3, b = letters[1:3])
@@ -51,7 +54,7 @@ arrays_sdf <- copy_to(sc, arrays_df, overwrite = TRUE)
 
 test_that("'select' works with where(...) predicate", {
   test_requires("dplyr")
-  skip_if(!tidyselect_data_has_predicates(sc))
+  skip_if(!has_predicates)
 
   expect_equal(
     iris %>% select(where(is.numeric)) %>% tbl_vars() %>% gsub("\\.", "_", .),
@@ -83,7 +86,7 @@ test_that("'n_distinct' summarizer works as expected", {
 
 test_that("'summarize' works with where(...) predicate", {
   test_requires("dplyr")
-  skip_if(!tidyselect_data_has_predicates(sc))
+  skip_if(!has_predicates)
 
   expect_equivalent(
     iris %>% summarize(across(where(is.numeric), mean)),
@@ -434,6 +437,7 @@ test_that("dplyr::distinct() impl is configurable", {
 })
 
 test_that("process_tbl_name works as expected", {
+  skip_if(any(grepl("connect_", class(sc))))
   expect_equal(sparklyr:::process_tbl_name("a"), "a")
   expect_equal(sparklyr:::process_tbl_name("xyz"), "xyz")
   expect_equal(sparklyr:::process_tbl_name("x.y"), dbplyr::in_schema("x", "y"))
