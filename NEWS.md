@@ -1,11 +1,6 @@
-# sparklyr (development version)
+# Sparklyr 1.8.2
 
-- Adds ability to turn off predicate support (where(), across()) using 
-  options("sparklyr.support.predicates" = FALSE). Defaults to TRUE. This should
-  accelerate `dplyr` commands because it won't need to process column types
-  for every single piped command
-
-- Fix various rlang deprecation warnings (@mgirlich, #3333).
+### New Features
 
 - Adds Azure Synapse Analytics connectivity (@Bob-Chou , #3336)
 
@@ -17,7 +12,18 @@
 
 - Adds `database` parameter to `dbListTables()` (@alibell, #3296)
 
+- Adds ability to turn off predicate support (where(), across()) using 
+  options("sparklyr.support.predicates" = FALSE). Defaults to TRUE. This should
+  accelerate `dplyr` commands because it won't need to process column types
+  for every single piped command
+
+### Fixes
+
 - Fixes Spark download locations (#3331)
+
+- Fix various rlang deprecation warnings (@mgirlich, #3333).
+
+### Misc
 
 - Switches upper version of Spark to 3.4, and updates JARS (#3334)
 
