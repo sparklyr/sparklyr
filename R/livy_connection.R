@@ -782,6 +782,7 @@ invoke.livy_jobj <- function(jobj, method, ...) {
   livy_invoke_statement_fetch(spark_connection(jobj), FALSE, jobj, method, FALSE, ...)
 }
 
+#' @export
 j_invoke.livy_jobj <- function(jobj, method, ...) {
   livy_invoke_statement_fetch(spark_connection(jobj), FALSE, jobj, method, TRUE, ...)
 }

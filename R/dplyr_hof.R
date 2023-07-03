@@ -123,7 +123,7 @@ process_dest_col <- function(expr, dest_col) {
   lambda
 }
 
-do.mutate <- function(x, dest_col_name, sql, ...) {
+do_mutate <- function(x, dest_col_name, sql, ...) {
   args <- list(dbplyr::sql(sql))
   names(args) <- as.character(dest_col_name)
 
@@ -174,7 +174,7 @@ hof_transform <- function(
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Filter Array Column
@@ -214,7 +214,7 @@ hof_filter <- function(x, func, expr = NULL, dest_col = NULL, ...) {
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Apply Aggregate Function to Array Column
@@ -275,7 +275,7 @@ hof_aggregate <- function(
   )))
 
   x %>>%
-    do.mutate %@% c(list(as.character(dest_col), sql), args)
+    do_mutate %@% c(list(as.character(dest_col), sql), args)
 }
 
 #' Determine Whether Some Element Exists in an Array Column
@@ -305,7 +305,7 @@ hof_exists <- function(x, pred, expr = NULL, dest_col = NULL, ...) {
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Combines 2 Array Columns
@@ -370,7 +370,7 @@ hof_zip_with <- function(
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Sorts array using a custom comparator
@@ -424,7 +424,7 @@ hof_array_sort <- function(
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Filters a map
@@ -470,7 +470,7 @@ hof_map_filter <- function(
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Checks whether all elements in an array satisfy a predicate
@@ -521,7 +521,7 @@ hof_forall <- function(
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Transforms keys of a map
@@ -566,7 +566,7 @@ hof_transform_keys <- function(
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Transforms values of a map
@@ -611,7 +611,7 @@ hof_transform_values <- function(
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Merges two maps into one
@@ -689,5 +689,5 @@ hof_map_zip_with <- function(
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
