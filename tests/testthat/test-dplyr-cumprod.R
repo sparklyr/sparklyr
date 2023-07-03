@@ -1,3 +1,4 @@
+skip_connection("dplyr-cumprod")
 skip_on_livy()
 #TODO: databricks - Remove after figuring what to do about cumprod
 skip()

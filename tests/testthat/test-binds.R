@@ -1,3 +1,4 @@
+skip_connection("binds")
 skip_on_livy()
 
 test_requires("dplyr")

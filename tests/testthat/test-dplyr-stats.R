@@ -1,3 +1,4 @@
+skip_connection("dplyr-stats")
 
 sc <- testthat_spark_connection()
 

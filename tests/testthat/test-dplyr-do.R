@@ -1,3 +1,4 @@
+skip_connection("dplyr-do")
 skip_on_livy()
 
 skip_databricks_connect()

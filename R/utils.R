@@ -1,3 +1,13 @@
+#' @export
+spark_integ_test_skip <- function(sc, test_name) {
+  UseMethod("spark_integ_test_skip")
+}
+
+#' @export
+spark_integ_test_skip.default <- function(sc, test_name) {
+  FALSE
+}
+
 is.installed <- function(package) {
   is.element(package, installed.packages()[, 1])
 }

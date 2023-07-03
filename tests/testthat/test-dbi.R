@@ -1,3 +1,4 @@
+skip_connection("dbi")
 
 sc <- testthat_spark_connection()
 
