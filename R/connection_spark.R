@@ -8,7 +8,10 @@
 NULL
 
 methods::setOldClass(c("livy_connection", "spark_connection"))
-methods::setOldClass(c("databricks_connection", "spark_gateway_connection", "spark_shell_connection", "spark_connection"))
+methods::setOldClass(
+  c("databricks_connection", "spark_gateway_connection",
+    "spark_shell_connection", "spark_connection")
+  )
 methods::setOldClass(c("test_connection", "spark_connection"))
 
 #' spark_jobj class
@@ -161,12 +164,12 @@ spark_connect <- function(master,
       spark_home <- "/usr/lib/spark"
     } else {
       master <- spark_config_value(config, "spark.master", NULL)
-      if (is.null(master)) {
-        stop(
-          "You must either pass a value for master or include a spark.master ",
-          "entry in your config.yml"
-        )
-      }
+      # if (is.null(master)) {
+      #   stop(
+      #     "You must either pass a value for master or include a spark.master ",
+      #     "entry in your config.yml"
+      #   )
+      # }
     }
   }
 
@@ -181,40 +184,42 @@ spark_connect <- function(master,
     )
   }
 
-  if (is.null(spark_home) || !nzchar(spark_home)) spark_home <- spark_config_value(config, "spark.home", "")
-
-  # increase default memory
-  if (spark_master_is_local(master) &&
-    identical(spark_config_value(config, "sparklyr.shell.driver-memory"), NULL) &&
-    java_is_x64()) {
-    config$`sparklyr.shell.driver-memory` <- "2g"
+  if (is.null(spark_home) || !nzchar(spark_home)) {
+    spark_home <- spark_config_value(config, "spark.home", "")
   }
 
-  # determine whether we need cores in master
-  passedMaster <- master
-  master <- spark_master_local_cores(master, config)
+  if(!is.null(master)) {
+    # increase default memory
+    if (spark_master_is_local(master) &&
+        identical(spark_config_value(config, "sparklyr.shell.driver-memory"), NULL) &&
+        java_is_x64()) {
+      config$`sparklyr.shell.driver-memory` <- "2g"
+    }
 
-  # look for existing connection with the same method, master, and app_name
-  sconFound <- spark_connection_find(master, app_name, method)
-  if (length(sconFound) == 1) {
-    message("Re-using existing Spark connection to ", passedMaster)
-    return(sconFound[[1]])
+    # determine whether we need cores in master
+    passedMaster <- master
+    master <- spark_master_local_cores(master, config)
+
+    # look for existing connection with the same method, master, and app_name
+    sconFound <- spark_connection_find(master, app_name, method)
+    if (length(sconFound) == 1) {
+      message("Re-using existing Spark connection to ", passedMaster)
+      return(sconFound[[1]])
+    }
+
+    # if master is an example code, run in test mode
+    if (master == "spark://HOST:PORT") {
+      method <- "test"
+    }
+
+    if (spark_master_is_gateway(master)) {
+      method <- "gateway"
+    }
   }
 
   # clean spark_apply per-connection cache
   if (dir.exists(spark_apply_bundle_path())) {
     unlink(spark_apply_bundle_path(), recursive = TRUE)
-  }
-
-  # connect using the specified method
-
-  # if master is an example code, run in test mode
-  if (master == "spark://HOST:PORT") {
-    method <- "test"
-  }
-
-  if (spark_master_is_gateway(master)) {
-    method <- "gateway"
   }
 
   obj_method <- as_spark_method(method)
@@ -285,7 +290,8 @@ spark_connect <- function(master,
   }, onexit = TRUE)
 
   if (method == "databricks-connect") {
-    spark_context(scon) %>% invoke("setLocalProperty", "spark.databricks.service.client.type", "sparklyr")
+    spark_context(scon) %>%
+      invoke("setLocalProperty", "spark.databricks.service.client.type", "sparklyr")
   }
 
   # add to our internal list
@@ -478,7 +484,11 @@ spark_connection_is_local <- function(sc) {
 }
 
 spark_master_is_local <- function(master) {
-  grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
+  out <- FALSE
+  if(!is.null(master)) {
+    out <- grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
+  }
+  out
 }
 
 spark_connection_in_driver <- function(sc) {
