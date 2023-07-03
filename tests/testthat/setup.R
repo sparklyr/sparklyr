@@ -6,7 +6,7 @@ cat("\n----- sparklyr test setup ----")
 if(using_method()) {
   cat("\nMaster:", using_master_get())
   cat("\nMethod:", using_method_get())
-  cat("\n-----------")
+  cat("\n------------------------------")
 }
 cat("\nSpark:", testthat_spark_env_version())
 cat("\nLivy:", ul)
