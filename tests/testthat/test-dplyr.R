@@ -307,6 +307,7 @@ test_that("'head' uses 'limit' clause", {
 })
 
 test_that("'sdf_broadcast' forces broadcast hash join", {
+  skip_connection("sdf-broadcast")
   query_plan <- df1_tbl %>%
     sdf_broadcast() %>%
     left_join(df2_tbl, by = "b") %>%
