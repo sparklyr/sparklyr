@@ -280,7 +280,7 @@ spark_connect <- function(master,
 
   # let viewer know that we've opened a connection; guess that the result will
   # be assigned into the global environment
-  on_connection_opened(scon, globalenv(), connectCall)
+  spark_ide_connection_open(scon, globalenv(), connectCall)
 
   # Register a finalizer to sleep on R exit to support older versions of the RStudio IDE
   reg.finalizer(asNamespace("sparklyr"), function(x) {
@@ -438,7 +438,7 @@ spark_disconnect.spark_connection <- function(sc, ...) {
 
   spark_connections_remove(sc)
 
-  on_connection_closed(sc)
+  spark_ide_connection_closed(sc)
 
   stream_unregister_all(sc)
 
