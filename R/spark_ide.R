@@ -74,7 +74,7 @@ on_connection_opened <- function(scon, env, connectCall) {
           },
 
           # other actions that can be executed on this connection
-          actions = spark_ide_actions(scon),
+          actions = spark_ide_connection_actions(scon),
 
           # raw connection object
           connectionObject = scon
@@ -155,7 +155,7 @@ spark_ide_connection_updated <- function(con, hint) {
 
 #' @export
 spark_ide_connection_updated.default <- function(con, hint) {
-  on_connection_updated(scon = con, hit = hint)
+  on_connection_updated(scon = con, hint = hint)
 }
 
 on_connection_updated <- function(scon, hint) {
@@ -171,6 +171,16 @@ on_connection_updated <- function(scon, hint) {
 }
 
 # --------------------------- Action buttons -----------------------------------
+#' @export
+spark_ide_connection_actions <- function(con) {
+  UseMethod("spark_ide_connection_actions")
+}
+
+#' @export
+spark_ide_connection_actions.default <- function(con) {
+  spark_ide_actions(scon = con)
+}
+
 spark_ide_actions <- function(scon) {
   icons <- system.file(file.path("icons"), package = "sparklyr")
 
