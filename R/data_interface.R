@@ -372,6 +372,20 @@ spark_read_json <- function(sc,
                             overwrite = TRUE,
                             columns = NULL,
                             ...) {
+  UseMethod("spark_read_json")
+}
+
+#' @export
+spark_read_json.spark_connection <- function(
+    sc,
+    name = NULL,
+    path = name,
+    options = list(),
+    repartition = 0,
+    memory = TRUE,
+    overwrite = TRUE,
+    columns = NULL,
+    ...) {
   name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
@@ -941,6 +955,20 @@ spark_read_text <- function(sc,
                             options = list(),
                             whole = FALSE,
                             ...) {
+  UseMethod("spark_read_text")
+}
+
+#' @export
+spark_read_text.spark_connection <- function(
+    sc,
+    name = NULL,
+    path = name,
+    repartition = 0,
+    memory = TRUE,
+    overwrite = TRUE,
+    options = list(),
+    whole = FALSE,
+    ...) {
   name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
