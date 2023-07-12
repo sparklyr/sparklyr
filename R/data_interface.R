@@ -276,7 +276,7 @@ spark_read_parquet <- function(
 }
 
 #' @export
-spark_read_parquet.spark_connection <- function(
+spark_read_parquet.pyspark_connection <- function(
     sc,
     name = NULL,
     path = name,
@@ -1058,6 +1058,21 @@ spark_read_orc <- function(sc,
                            columns = NULL,
                            schema = NULL,
                            ...) {
+  UseMethod("spark_read_orc")
+}
+
+#' @export
+spark_read_orc.tbl_spark <- function(
+    sc,
+    name = NULL,
+    path = name,
+    options = list(),
+    repartition = 0,
+    memory = TRUE,
+    overwrite = TRUE,
+    columns = NULL,
+    schema = NULL,
+    ...) {
   name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
