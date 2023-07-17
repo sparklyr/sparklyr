@@ -276,7 +276,7 @@ spark_read_parquet <- function(
 }
 
 #' @export
-spark_read_parquet.pyspark_connection <- function(
+spark_read_parquet.spark_connection <- function(
     sc,
     name = NULL,
     path = name,
