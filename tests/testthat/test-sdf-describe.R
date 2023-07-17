@@ -1,3 +1,4 @@
+skip_connection("sdf-describe")
 skip_on_livy()
 skip_on_arrow_devel()
 

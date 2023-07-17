@@ -106,3 +106,11 @@ test_requires_package_version <- function(pkg, min_version) {
     skip(paste0("Test requires ", pkg," ", min_version," or above"))
   }
 }
+
+skip_connection <- function(x) {
+  sc <- testthat_spark_connection()
+  out <- spark_integ_test_skip(sc, x)
+  if(out) {
+    skip(paste0("Test '", x, "' not supported by backend"))
+  }
+}

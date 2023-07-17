@@ -1,3 +1,4 @@
+skip_connection("dplyr-spark")
 
 test_that("Connection functions work", {
   sc <- testthat_spark_connection()

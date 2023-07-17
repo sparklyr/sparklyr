@@ -1,3 +1,4 @@
+skip_connection("connect-synapse")
 skip_on_livy()
 skip_on_arrow_devel()
 skip_unless_synapse_connect()

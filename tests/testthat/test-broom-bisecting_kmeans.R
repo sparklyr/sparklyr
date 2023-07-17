@@ -1,3 +1,4 @@
+skip_connection("broom-bisecting_kmeans")
 skip_on_livy()
 skip_on_arrow_devel()
 

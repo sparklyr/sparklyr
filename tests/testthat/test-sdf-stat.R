@@ -1,3 +1,4 @@
+skip_connection("sdf-stat")
 skip_on_livy()
 skip_on_arrow_devel()
 test_requires_version("3.0.0")

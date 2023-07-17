@@ -1,3 +1,4 @@
+skip_connection("dplyr-top-n")
 skip_on_livy()
 sc <- testthat_spark_connection()
 

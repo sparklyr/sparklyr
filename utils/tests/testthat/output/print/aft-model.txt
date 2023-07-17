@@ -1,5 +1,0 @@
-Formula: label ~ V1 + V2
-
-Coefficients:
-(Intercept)          V1          V2 
-  2.6380946  -0.4963111   0.1984444 
