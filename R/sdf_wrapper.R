@@ -138,20 +138,14 @@ sdf_deserialize_column <- function(column, sc) {
 #' @param column The name of a column within \code{x}.
 #' @export
 sdf_read_column <- function(x, column) {
-  sc <- spark_connection(x)
+  UseMethod("sdf_read_column")
+}
+
+#' @export
+sdf_read_column.spark_jobj <- function(x, column) {
   sdf <- spark_dataframe(x)
-
-  # This is for integrating pyspark
-  # prevents adding a 'value' to the
-  # column name call
-  if(inherits(sdf, "shell_jobj")) {
-    col_df <- invoke(sdf, "select", column, list())
-  } else {
-    col_df <- invoke(sdf, "select", column)
-  }
-
+  col_df <- invoke(sdf, "select", column, list())
   col_df <- collect(col_df)
-
   col_df[[column]]
 }
 
