@@ -6,7 +6,7 @@
 \usage{
 spark_config_kubernetes(
   master,
-  version = "2.3.2",
+  version = "2.3.3",
   image = "spark:sparklyr",
   driver = random_string("sparklyr-"),
   account = "spark",
