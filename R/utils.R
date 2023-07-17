@@ -1,3 +1,10 @@
+#' It lets the package know if it should test a particular functionality or not
+#' @details
+#' It expects a boolean to be returned. If TRUE, the corresponding test will be
+#' skipped. If FALSE the test will be conducted.
+#'
+#' @param sc Spark connection
+#' @param test_name The name of the test
 #' @export
 spark_integ_test_skip <- function(sc, test_name) {
   UseMethod("spark_integ_test_skip")

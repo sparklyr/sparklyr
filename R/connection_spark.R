@@ -301,8 +301,11 @@ spark_connect <- function(master,
   scon
 }
 
+#' Function that negotiates the connection with the Spark back-end
+#' @inheritParams spark-connections
+#' @param x A dummy method object to determine which code to use to connect
+#' @param hadoop_version Version of Hadoop to use
 #' @export
-#' @rdname spark-connections
 spark_connect_method <- function(
     x,
     method,
@@ -319,7 +322,6 @@ spark_connect_method <- function(
 }
 
 #' @export
-#' @rdname spark-connections
 spark_connect_method.default <- function(
     x,
     method,

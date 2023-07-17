@@ -1,7 +1,25 @@
 # nocov start
-#' @include browse_url.R
 
-# ---------------------------- Open Connection ---------------------------------
+#' Set of functions to provide integration with the RStudio IDE
+#' @include browse_url.R
+#' @details These function are meant for downstream packages, that provide additional
+#' backends to `sparklyr`, to override the opening, closing, update, and preview
+#' functionality. The arguments are driven by what the RStudio IDE API expects them
+#' to be, so this is the reason why some use `type` to designated views or tables,
+#' and others have one argument for `table`, and another for `view`.
+#'
+#' @param con Valid Spark connection
+#' @param env R environment of the interactive R session
+#' @param connect_call R code that can be used to re-connect to the Spark connection
+#' @param hint Name of the Spark connection that the RStudio IDE can use as reference.
+#' @param catalog Name of the top level of the requested table or view
+#' @param schema Name of the second most top level of the requested level or view
+#' @param name The new of the view or table being requested
+#' @param type Type of the object being requested, 'view' or 'table'
+#' @param table Name of the requested table
+#' @param view Name of the requested view
+#' @param rowLimit The number of rows to show in the 'Preview' pane of the RStudio
+#' IDE
 #' @export
 spark_ide_connection_open <- function(con, env, connect_call) {
   UseMethod("spark_ide_connection_open")
@@ -130,6 +148,7 @@ on_connection_opened <- function(scon, env, connectCall) {
 }
 
 # ---------------------------- Close Connection --------------------------------
+#' @rdname spark_ide_connection_open
 #' @export
 spark_ide_connection_closed <- function(con) {
   UseMethod("spark_ide_connection_closed")
@@ -148,6 +167,7 @@ on_connection_closed <- function(scon) {
 }
 
 # ---------------------------- Update Connection -------------------------------
+#' @rdname spark_ide_connection_open
 #' @export
 spark_ide_connection_updated <- function(con, hint) {
   UseMethod("spark_ide_connection_updated")
@@ -171,6 +191,7 @@ on_connection_updated <- function(scon, hint) {
 }
 
 # --------------------------- Action buttons -----------------------------------
+#' @rdname spark_ide_connection_open
 #' @export
 spark_ide_connection_actions <- function(con) {
   UseMethod("spark_ide_connection_actions")
@@ -309,20 +330,21 @@ spark_ide_actions <- function(scon) {
 }
 
 # ----------------------------- DB Objects -------------------------------------
+#' @rdname spark_ide_connection_open
 #' @export
-spark_ide_objects <- function(sc, catalog, schema, name, type) {
+spark_ide_objects <- function(con, catalog, schema, name, type) {
   UseMethod("spark_ide_objects")
 }
 
 #' @export
-spark_ide_objects.spark_connection <- function(sc, catalog, schema, name, type) {
-  connection_list_tables(sc, includeType = TRUE)
+spark_ide_objects.spark_connection <- function(con, catalog, schema, name, type) {
+  connection_list_tables(con, includeType = TRUE)
 }
 
-connection_list_tables <- function(sc, includeType = FALSE) {
+connection_list_tables <- function(con, includeType = FALSE) {
   # extract a list of Spark tables
-  tables <- if (!is.null(sc) && connection_is_open(sc)) {
-    sort(dbListTables(sc))
+  tables <- if (!is.null(con) && connection_is_open(con)) {
+    sort(dbListTables(con))
   } else {
     character()
   }
@@ -340,9 +362,9 @@ connection_list_tables <- function(sc, includeType = FALSE) {
 }
 
 # ----------------------------- DB Columns -------------------------------------
-
+#' @rdname spark_ide_connection_open
 #' @export
-spark_ide_columns <- function(sc,
+spark_ide_columns <- function(con,
                               table = NULL,
                               view = NULL,
                               catalog = NULL,
@@ -351,18 +373,18 @@ spark_ide_columns <- function(sc,
 }
 
 #' @export
-spark_ide_columns.spark_connection <- function(sc,
+spark_ide_columns.spark_connection <- function(con,
                                                table = NULL,
                                                view = NULL,
                                                catalog = NULL,
                                                schema = NULL) {
-  connection_list_columns(sc, table = table)
+  connection_list_columns(con, table = table)
 }
 
-connection_list_columns <- function(sc, table) {
-  if (!is.null(sc) && connection_is_open(sc)) {
+connection_list_columns <- function(con, table) {
+  if (!is.null(con) && connection_is_open(con)) {
     sql <- paste("SELECT * FROM", table, "LIMIT 5")
-    df <- dbGetQuery(sc, sql)
+    df <- dbGetQuery(con, sql)
     data.frame(
       name = names(df),
       type = as.character(lapply(names(df), function(f) {
@@ -380,10 +402,10 @@ connection_list_columns <- function(sc, table) {
 }
 
 # ----------------------------- DB Preview -------------------------------------
-
+#' @rdname spark_ide_connection_open
 #' @export
 spark_ide_preview <- function(
-    sc,
+    con,
     rowLimit,
     table = NULL,
     view = NULL,
@@ -394,19 +416,19 @@ spark_ide_preview <- function(
 
 #' @export
 spark_ide_preview.spark_connection <- function(
-    sc,
+    con,
     rowLimit,
     table = NULL,
     view = NULL,
     catalog = NULL,
     schema = NULL) {
-  connection_preview_table(sc, table, rowLimit)
+  connection_preview_table(con, table, rowLimit)
 }
 
-connection_preview_table <- function(sc, table, limit) {
-  if (!is.null(sc) && connection_is_open(sc)) {
+connection_preview_table <- function(con, table, limit) {
+  if (!is.null(con) && connection_is_open(con)) {
     sql <- paste("SELECT * FROM", table, "LIMIT", limit)
-    dbGetQuery(sc, sql)
+    dbGetQuery(con, sql)
   } else {
     NULL
   }
