@@ -27,7 +27,7 @@ dplyr_across_test_cases_df <- tibble(
 dplyr_across_test_cases_tbl <- testthat_tbl("dplyr_across_test_cases_df")
 
 test_remote_name <- function(x, y) {
-  if (packageVersion("dbplyr") <= "2.3.2") {
+  if (packageVersion("dbplyr") <= "2.3.3") {
     y <- ident(y)
   }
   expect_equal(dbplyr::remote_name(x), y)
