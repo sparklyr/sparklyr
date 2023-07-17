@@ -1062,7 +1062,7 @@ spark_read_orc <- function(sc,
 }
 
 #' @export
-spark_read_orc.tbl_spark <- function(
+spark_read_orc.spark_connection <- function(
     sc,
     name = NULL,
     path = name,
