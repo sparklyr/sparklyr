@@ -14,11 +14,6 @@
 ## Sys.setenv("ARROW_VERSION" = "release") # Or "devel"
 ## devtools::test(reporter = sparklyr_reporter())
 
-## Methods work too:
-## Sys.setenv("TEST_SPARKLYR_METHOD" = "spark_connect")
-## Sys.setenv("TEST_SPARKLYR_MASTER" = "sc://localhost")
-## Sys.setenv("TEST_SPARKLYR_LIBRARIES" = "dplyr; pysparklyr;")
-
 ## For testing new versions of Spark, and need to prioritize the
 ## local versions.json file over the one in the GH repo use:
 ## Sys.setenv("R_SPARKINSTALL_INSTALL_INFO_PATH" = here::here("inst/extdata/versions.json"))

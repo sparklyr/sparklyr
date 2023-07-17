@@ -1,4 +1,3 @@
-skip_connection("ml-feature-one-hot-encoder")
 skip_on_livy()
 skip_on_arrow_devel()
 

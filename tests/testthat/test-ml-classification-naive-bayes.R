@@ -1,4 +1,3 @@
-skip_connection("ml-classification-naive-bayes")
 skip_on_livy()
 skip_on_arrow_devel()
 

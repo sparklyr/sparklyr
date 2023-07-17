@@ -1,4 +1,3 @@
-skip_connection("dplyr-row-sums")
 skip_on_livy()
 
 sc <- testthat_spark_connection()

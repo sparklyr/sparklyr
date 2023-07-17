@@ -1,4 +1,3 @@
-skip_connection("ml-feature-pca")
 skip_on_livy()
 skip_on_arrow_devel()
 

@@ -1,4 +1,3 @@
-skip_connection("broom-random_forest")
 skip_on_livy()
 skip_on_arrow_devel()
 

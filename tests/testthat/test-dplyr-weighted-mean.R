@@ -1,4 +1,3 @@
-skip_connection("dplyr-weighted-mean")
 
 sc <- testthat_spark_connection()
 

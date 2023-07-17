@@ -1,4 +1,3 @@
-skip_connection("jarray")
 skip_on_livy()
 skip_on_arrow_devel()
 

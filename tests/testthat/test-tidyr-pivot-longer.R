@@ -1,4 +1,3 @@
-skip_connection("tidyr-pivot-longer")
 skip_on_livy()
 skip_on_arrow_devel()
 

@@ -1,4 +1,3 @@
-skip_connection("pre-command-hooks")
 skip_on_livy()
 skip_on_arrow_devel()
 

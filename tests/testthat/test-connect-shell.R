@@ -1,4 +1,3 @@
-skip_connection("connect-shell")
 skip_on_livy()
 
 skip_databricks_connect()

@@ -1,4 +1,3 @@
-skip_connection("spark_compile")
 
 test_that("jar file is created", {
 

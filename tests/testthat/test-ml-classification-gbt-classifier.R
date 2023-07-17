@@ -1,4 +1,3 @@
-skip_connection("ml-classification-gbt-classifier")
 skip_on_livy()
 skip_on_arrow_devel()
 

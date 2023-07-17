@@ -1,0 +1,11 @@
+K-means clustering with 5 clusters
+
+Cluster centers:
+  Sepal_Length Sepal_Width Petal_Length Petal_Width
+1     4.750000    3.012500     1.666667   0.3166667
+2     5.217241    3.665517     1.472414   0.2689655
+3     5.596000    2.664000     4.052000   1.2520000
+4     6.205882    2.841176     4.750000   1.6029412
+5     6.850000    3.073684     5.742105   2.0710526
+
+Within Set Sum of Squared Errors =  60.60717

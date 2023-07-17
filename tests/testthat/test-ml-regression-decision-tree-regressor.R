@@ -1,4 +1,3 @@
-skip_connection("ml-regression-decision-tree-regressor")
 skip_on_livy()
 skip_on_arrow_devel()
 

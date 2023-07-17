@@ -1,12 +1,8 @@
-skip_connection("dplyr")
 
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
 mtcars_tbl <- testthat_tbl("mtcars")
-
-has_predicates <- tidyselect_data_has_predicates(mtcars_tbl)
-
 test_requires("dplyr")
 
 df1 <- tibble(a = 1:3, b = letters[1:3])
@@ -14,9 +10,6 @@ df2 <- tibble(b = letters[1:3], c = letters[24:26])
 
 df1_tbl <- testthat_tbl("df1")
 df2_tbl <- testthat_tbl("df2")
-
-sdf_5 <- copy_to(sc, data.frame(id = 1:5))
-sdf_10 <- copy_to(sc, data.frame(id = 1:10))
 
 dplyr_across_test_cases_df <- tibble(
   x = seq(3),
@@ -30,7 +23,7 @@ test_remote_name <- function(x, y) {
   if (packageVersion("dbplyr") <= "2.3.2") {
     y <- ident(y)
   }
-  expect_equal(dbplyr::remote_name(x), y)
+  expect_equal(sparklyr:::sdf_remote_name(x), y)
 }
 
 scalars_df <- tibble::tibble(
@@ -55,7 +48,7 @@ arrays_sdf <- copy_to(sc, arrays_df, overwrite = TRUE)
 
 test_that("'select' works with where(...) predicate", {
   test_requires("dplyr")
-  skip_if(!has_predicates)
+  skip_if(!tidyselect_data_has_predicates(sc))
 
   expect_equal(
     iris %>% select(where(is.numeric)) %>% tbl_vars() %>% gsub("\\.", "_", .),
@@ -78,16 +71,15 @@ test_that("'n_distinct' summarizer works as expected", {
   df <- tibble::tibble(x = c(-3:2, NA, NaN, NA))
   sdf <- copy_to(sc, df, name = random_string())
 
-  expect_equal(
+  expect_equivalent(
     df %>% summarize_n_distinct(),
-    sdf %>% summarize_n_distinct() %>% collect(),
-    ignore_attr = TRUE
+    sdf %>% summarize_n_distinct() %>% collect()
   )
 })
 
 test_that("'summarize' works with where(...) predicate", {
   test_requires("dplyr")
-  skip_if(!has_predicates)
+  skip_if(!tidyselect_data_has_predicates(sc))
 
   expect_equivalent(
     iris %>% summarize(across(where(is.numeric), mean)),
@@ -307,7 +299,6 @@ test_that("'head' uses 'limit' clause", {
 })
 
 test_that("'sdf_broadcast' forces broadcast hash join", {
-  skip_connection("sdf-broadcast")
   query_plan <- df1_tbl %>%
     sdf_broadcast() %>%
     left_join(df2_tbl, by = "b") %>%
@@ -321,12 +312,12 @@ test_that("'sdf_broadcast' forces broadcast hash join", {
 test_that("compute() works as expected", {
   test_requires("dplyr")
 
-  sdf <- sdf_10
+  sdf <- sdf_len(sc, 10L)
   sdf_even <- sdf %>% dplyr::filter(id %% 2 == 0)
   sdf_odd <- sdf %>% dplyr::filter(id %% 2 == 1)
 
-  expect_null(dbplyr::remote_name(sdf_even))
-  expect_null(dbplyr::remote_name(sdf_odd))
+  expect_null(sdf_even %>% sparklyr:::sdf_remote_name())
+  expect_null(sdf_odd %>% sparklyr:::sdf_remote_name())
 
   # caching Spark dataframes with random names
   sdf_even_cached <- sdf_even %>% dplyr::compute()
@@ -345,8 +336,8 @@ test_that("compute() works as expected", {
   sdf_congruent_to_1_mod_3 <- sdf %>% dplyr::filter(id %% 3 == 1)
   sdf_congruent_to_2_mod_3 <- sdf %>% dplyr::filter(id %% 3 == 2)
 
-  expect_null(sdf_congruent_to_1_mod_3 %>% dbplyr::remote_name())
-  expect_null(sdf_congruent_to_2_mod_3 %>% dbplyr::remote_name())
+  expect_null(sdf_congruent_to_1_mod_3 %>% sparklyr:::sdf_remote_name())
+  expect_null(sdf_congruent_to_2_mod_3 %>% sparklyr:::sdf_remote_name())
 
   sdf_congruent_to_1_mod_3_cached <- sdf_congruent_to_1_mod_3 %>%
     dplyr::compute(name = "congruent_to_1_mod_3")
@@ -364,7 +355,6 @@ test_that("compute() works as expected", {
 
 
   temp_view <- sdf_congruent_to_2_mod_3 %>% dplyr::compute("temp_view")
-
   test_remote_name(
     temp_view, "temp_view"
   )
@@ -380,7 +370,7 @@ test_that("compute() works as expected", {
 })
 
 test_that("mutate creates NA_real_ column correctly", {
-  sdf <- sdf_5 %>% dplyr::mutate(z = NA_real_, sq = id * id)
+  sdf <- sdf_len(sc, 5L) %>% dplyr::mutate(z = NA_real_, sq = id * id)
 
   expect_equivalent(
     sdf %>% collect(),
@@ -389,7 +379,7 @@ test_that("mutate creates NA_real_ column correctly", {
 })
 
 test_that("transmute creates NA_real_ column correctly", {
-  sdf <- sdf_5 %>% dplyr::transmute(z = NA_real_, sq = id * id)
+  sdf <- sdf_len(sc, 5L) %>% dplyr::transmute(z = NA_real_, sq = id * id)
 
   expect_equivalent(
     sdf %>% collect(),
@@ -398,14 +388,12 @@ test_that("transmute creates NA_real_ column correctly", {
 })
 
 test_that("overwriting a temp view", {
-  # Skipping while researching why override works on non-connect methods
-  skip()
   temp_view_name <- random_string()
 
-  sdf <- sdf_5 %>%
+  sdf <- sdf_len(sc, 5L) %>%
     dplyr::mutate(foo = "foo") %>%
     dplyr::compute(name = temp_view_name)
-  sdf <- sdf_5 %>%
+  sdf <- sdf_len(sc, 5L) %>%
     dplyr::compute(name = temp_view_name)
 
   expect_equivalent(sdf %>% collect(), tibble::tibble(id = seq(5)))
@@ -439,7 +427,6 @@ test_that("dplyr::distinct() impl is configurable", {
 })
 
 test_that("process_tbl_name works as expected", {
-  skip_if(any(grepl("connect_", class(sc))))
   expect_equal(sparklyr:::process_tbl_name("a"), "a")
   expect_equal(sparklyr:::process_tbl_name("xyz"), "xyz")
   expect_equal(sparklyr:::process_tbl_name("x.y"), dbplyr::in_schema("x", "y"))
@@ -455,44 +442,43 @@ test_that("process_tbl_name works as expected", {
     tbl(sc, query) %>% collect(),
     tibble::tibble(a = 1, b = 1, g = 2)
   )
-
 })
 
 test_that("in_schema() works as expected", {
   skip_on_arrow()
   skip_on_livy()
-  if(spark_version(sc) < "3.4.0") {
-    db_name <- random_string("test_db_")
 
-    queries <- c(
-      sprintf("CREATE DATABASE `%s`", db_name),
-      sprintf(
-        "CREATE TABLE IF NOT EXISTS `%s`.`hive_tbl` (`x` INT) USING hive",
-        db_name
-      )
-    )
-    for (query in queries) {
-      DBI::dbGetQuery(sc, query)
-    }
+  db_name <- random_string("test_db_")
 
-    expect_equivalent(
-      dplyr::tbl(sc, dbplyr::in_schema(db_name, "hive_tbl")) %>% collect(),
-      tibble::tibble(x = integer())
+  queries <- c(
+    sprintf("CREATE DATABASE `%s`", db_name),
+    sprintf(
+      "CREATE TABLE IF NOT EXISTS `%s`.`hive_tbl` (`x` INT) USING hive",
+      db_name
     )
+  )
+  for (query in queries) {
+    DBI::dbGetQuery(sc, query)
   }
+
+  expect_equivalent(
+    dplyr::tbl(sc, dbplyr::in_schema(db_name, "hive_tbl")) %>% collect(),
+    tibble::tibble(x = integer())
+  )
 })
 
 test_that("sdf_remote_name returns null for computed tables", {
   test_remote_name(iris_tbl, "iris")
 
   virginica_sdf <- iris_tbl %>% filter(Species == "virginica")
-  expect_equal(dbplyr::remote_name(virginica_sdf), NULL)
+  expect_equal(sparklyr:::sdf_remote_name(virginica_sdf), NULL)
 })
 
 test_that("sdf_remote_name ignores the last group_by() operation(s)", {
   sdf <- iris_tbl
   for (i in seq(4)) {
     sdf <- sdf %>% dplyr::group_by(Species)
+
     test_remote_name(sdf, "iris")
   }
 })
@@ -509,7 +495,7 @@ test_that("sdf_remote_name works with arrange followed by compute", {
   tbl <- copy_to(sc, tibble::tibble(lts = letters[26:24], nums = seq(3)))
   ordered_tbl <- tbl %>% arrange(lts) %>% compute(name = "ordered_tbl")
 
-test_remote_name(
+  test_remote_name(
     ordered_tbl,
     "ordered_tbl"
   )
@@ -522,7 +508,7 @@ test_remote_name(
 test_that("result from dplyr::compute() has remote name", {
   sdf <- iris_tbl
   sdf <- sdf %>% dplyr::mutate(y = 5) %>% dplyr::compute()
-  expect_false(is.null(sdf %>% dbplyr::remote_name()))
+  expect_false(is.null(sdf %>% sparklyr:::sdf_remote_name()))
 })
 
 test_that("tbl_ptype.tbl_spark works as expected", {
@@ -592,4 +578,3 @@ test_that("pmin and pmax work", {
   )
 
 })
-

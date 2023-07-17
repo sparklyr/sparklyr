@@ -1,4 +1,3 @@
-skip_connection("sdf-drop-duplicates")
 skip_on_livy()
 skip_on_arrow_devel()
 

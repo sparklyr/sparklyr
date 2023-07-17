@@ -1,4 +1,3 @@
-skip_connection("ml-feature-dplyr-transformer")
 skip_on_livy()
 
 skip_databricks_connect()

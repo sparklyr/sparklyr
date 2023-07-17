@@ -1,4 +1,3 @@
-skip_connection("ml_metrics")
 skip_on_livy()
 
 test_that("Multiclass metrics return expected results", {

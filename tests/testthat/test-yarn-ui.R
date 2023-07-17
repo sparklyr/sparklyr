@@ -1,4 +1,3 @@
-skip_connection("yarn-ui")
 skip_on_livy()
 skip_on_arrow_devel()
 

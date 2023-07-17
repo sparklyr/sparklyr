@@ -1,4 +1,3 @@
-skip_connection("sdf-expand-grid")
 skip_on_livy()
 skip_on_arrow_devel()
 

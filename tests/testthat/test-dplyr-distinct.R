@@ -1,4 +1,3 @@
-skip_connection("dplyr-distinct")
 skip_on_livy()
 
 sc <- testthat_spark_connection()

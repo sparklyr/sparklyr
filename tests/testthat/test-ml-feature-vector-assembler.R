@@ -1,4 +1,3 @@
-skip_connection("ml-feature-vector-assembler")
 skip_on_livy()
 skip_on_arrow_devel()
 

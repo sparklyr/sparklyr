@@ -1,4 +1,3 @@
-skip_connection("ml-feature-regex-tokenizer")
 skip_on_livy()
 skip_on_arrow_devel()
 

@@ -1,4 +1,3 @@
-skip_connection("sdf-subsetting-operator")
 skip_on_livy()
 skip_on_arrow_devel()
 

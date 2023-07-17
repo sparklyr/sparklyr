@@ -1,4 +1,3 @@
-skip_connection("dplyr-lead-lag")
 skip_on_livy()
 
 sc <- testthat_spark_connection()

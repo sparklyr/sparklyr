@@ -1,0 +1,5 @@
+Formula: Petal_Length ~ Petal_Width
+
+Coefficients:
+(Intercept) Petal_Width 
+   1.083558    2.229940 

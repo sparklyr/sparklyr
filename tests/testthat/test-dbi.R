@@ -1,4 +1,3 @@
-skip_connection("dbi")
 
 sc <- testthat_spark_connection()
 
@@ -43,8 +42,6 @@ test_that("dbGetQuery works with parameterized queries", {
 })
 
 test_that("dbGetQuery works with native parameterized queries", {
-  #TODO: databricks - Restore when we figure out how to run parametrized queries
-  skip("Temp skip")
   test_requires_version("3.4.0")
   setosa <- dbGetQuery(
     conn = sc,
@@ -55,7 +52,6 @@ test_that("dbGetQuery works with native parameterized queries", {
 
   virginica <- dbGetQuery(
     conn = sc,
-
     statement = "SELECT * FROM iris WHERE species = :virginica",
     params = list(virginica = "virginica")
     )

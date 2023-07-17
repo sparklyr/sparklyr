@@ -1,4 +1,3 @@
-skip_connection("broom-gaussian_mixture")
 skip_on_livy()
 skip_on_arrow_devel()
 

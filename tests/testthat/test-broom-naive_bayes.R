@@ -1,4 +1,3 @@
-skip_connection("broom-naive_bayes")
 skip_on_livy()
 skip_on_arrow_devel()
 

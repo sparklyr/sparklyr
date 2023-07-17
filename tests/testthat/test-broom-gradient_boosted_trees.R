@@ -1,4 +1,3 @@
-skip_connection("broom-gradient_boosted_trees")
 skip_on_livy()
 skip_on_arrow_devel()
 

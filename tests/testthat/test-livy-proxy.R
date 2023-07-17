@@ -1,4 +1,3 @@
-skip_connection("livy-proxy")
 skip_unless_livy()
 skip_on_arrow_devel()
 

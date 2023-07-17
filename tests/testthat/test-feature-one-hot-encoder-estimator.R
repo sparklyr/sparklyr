@@ -1,4 +1,3 @@
-skip_connection("feature-one-hot-encoder-estimator")
 skip_on_livy()
 skip_on_arrow_devel()
 
