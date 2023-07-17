@@ -149,6 +149,11 @@ sdf_read_column.spark_jobj <- function(x, column) {
   col_df[[column]]
 }
 
+#' @export
+sdf_read_column.tbl_spark <- function(x, column) {
+  dplyr::pull(x, column)
+}
+
 #' Collect a Spark DataFrame into R.
 #'
 #' Collects a Spark dataframe into R.

@@ -117,7 +117,7 @@ Suggests:
     reshape2,
     shiny (>= 1.0.1),
     parsnip,
-    testthat (>= 3.0.0),
+    testthat,
     rprojroot
 Encoding: UTF-8
 RoxygenNote: 7.2.3
