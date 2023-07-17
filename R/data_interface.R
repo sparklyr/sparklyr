@@ -100,22 +100,44 @@ spark_csv_options <- function(header,
 #' @family Spark serialization routines
 #'
 #' @export
-spark_read_csv <- function(sc,
-                           name = NULL,
-                           path = name,
-                           header = TRUE,
-                           columns = NULL,
-                           infer_schema = is.null(columns),
-                           delimiter = ",",
-                           quote = "\"",
-                           escape = "\\",
-                           charset = "UTF-8",
-                           null_value = NULL,
-                           options = list(),
-                           repartition = 0,
-                           memory = TRUE,
-                           overwrite = TRUE,
-                           ...) {
+spark_read_csv <- function(
+    sc,
+    name = NULL,
+    path = name,
+    header = TRUE,
+    columns = NULL,
+    infer_schema = is.null(columns),
+    delimiter = ",",
+    quote = "\"",
+    escape = "\\",
+    charset = "UTF-8",
+    null_value = NULL,
+    options = list(),
+    repartition = 0,
+    memory = TRUE,
+    overwrite = TRUE,
+    ...) {
+  UseMethod("spark_read_csv")
+}
+
+#' @export
+spark_read_csv.spark_connection <- function(
+    sc,
+    name = NULL,
+    path = name,
+    header = TRUE,
+    columns = NULL,
+    infer_schema = is.null(columns),
+    delimiter = ",",
+    quote = "\"",
+    escape = "\\",
+    charset = "UTF-8",
+    null_value = NULL,
+    options = list(),
+    repartition = 0,
+    memory = TRUE,
+    overwrite = TRUE,
+    ...) {
   name_provided <- !is.null(name)
   c(name, path) %<-% spark_read_compat_param(sc, name, path)
 
@@ -239,16 +261,32 @@ spark_write_csv.spark_jobj <- function(x,
 #' @family Spark serialization routines
 #'
 #' @export
-spark_read_parquet <- function(sc,
-                               name = NULL,
-                               path = name,
-                               options = list(),
-                               repartition = 0,
-                               memory = TRUE,
-                               overwrite = TRUE,
-                               columns = NULL,
-                               schema = NULL,
-                               ...) {
+spark_read_parquet <- function(
+    sc,
+    name = NULL,
+    path = name,
+    options = list(),
+    repartition = 0,
+    memory = TRUE,
+    overwrite = TRUE,
+    columns = NULL,
+    schema = NULL,
+    ...) {
+  UseMethod("spark_read_parquet")
+}
+
+#' @export
+spark_read_parquet.spark_connection <- function(
+    sc,
+    name = NULL,
+    path = name,
+    options = list(),
+    repartition = 0,
+    memory = TRUE,
+    overwrite = TRUE,
+    columns = NULL,
+    schema = NULL,
+    ...) {
   name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
@@ -334,6 +372,20 @@ spark_read_json <- function(sc,
                             overwrite = TRUE,
                             columns = NULL,
                             ...) {
+  UseMethod("spark_read_json")
+}
+
+#' @export
+spark_read_json.spark_connection <- function(
+    sc,
+    name = NULL,
+    path = name,
+    options = list(),
+    repartition = 0,
+    memory = TRUE,
+    overwrite = TRUE,
+    columns = NULL,
+    ...) {
   name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
@@ -477,8 +529,7 @@ spark_data_write_generic <- function(df,
     )
 
     invoke(options, fileMethod, url, path, properties)
-  }
-  else {
+  } else {
     options <- invoke(options, fileMethod, path)
     # Need to call save explicitly in case of generic 'format'
     if (fileMethod == "format") do.call(invoke, c(options, "save", save_args))
@@ -619,21 +670,21 @@ spark_write_table.spark_jobj <- function(x,
 #'
 #' @export
 spark_insert_table <- function(x,
-                              name,
-                              mode = NULL,
-                              overwrite = FALSE,
-                              options = list(),
-                              ...) {
+                               name,
+                               mode = NULL,
+                               overwrite = FALSE,
+                               options = list(),
+                               ...) {
   UseMethod("spark_insert_table")
 }
 
 #' @export
 spark_insert_table.tbl_spark <- function(x,
-                                        name,
-                                        mode = NULL,
-                                        overwrite = FALSE,
-                                        options = list(),
-                                        ...) {
+                                         name,
+                                         mode = NULL,
+                                         overwrite = FALSE,
+                                         options = list(),
+                                         ...) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
 
   mode <- if (isTRUE(overwrite)) "overwrite" else "append"
@@ -643,11 +694,11 @@ spark_insert_table.tbl_spark <- function(x,
 
 #' @export
 spark_insert_table.spark_jobj <- function(x,
-                                         name,
-                                         mode = NULL,
-                                         overwrite = FALSE,
-                                         options = list(),
-                                         ...) {
+                                          name,
+                                          mode = NULL,
+                                          overwrite = FALSE,
+                                          options = list(),
+                                          ...) {
   spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
 
   mode <- if (isTRUE(overwrite)) "overwrite" else "append"
@@ -904,6 +955,20 @@ spark_read_text <- function(sc,
                             options = list(),
                             whole = FALSE,
                             ...) {
+  UseMethod("spark_read_text")
+}
+
+#' @export
+spark_read_text.spark_connection <- function(
+    sc,
+    name = NULL,
+    path = name,
+    repartition = 0,
+    memory = TRUE,
+    overwrite = TRUE,
+    options = list(),
+    whole = FALSE,
+    ...) {
   name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
@@ -920,8 +985,7 @@ spark_read_text <- function(sc,
 
     rdd <- invoke_static(sc, "sparklyr.Utils", "readWholeFiles", spark_context(sc), path)
     df <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
-  }
-  else {
+  } else {
     df <- spark_data_read_generic(sc, as.list(spark_normalize_path(path)), "text", options, columns)
   }
 
@@ -994,6 +1058,21 @@ spark_read_orc <- function(sc,
                            columns = NULL,
                            schema = NULL,
                            ...) {
+  UseMethod("spark_read_orc")
+}
+
+#' @export
+spark_read_orc.spark_connection <- function(
+    sc,
+    name = NULL,
+    path = name,
+    options = list(),
+    repartition = 0,
+    memory = TRUE,
+    overwrite = TRUE,
+    columns = NULL,
+    schema = NULL,
+    ...) {
   name_provided <- !is.null(name)
   params <- spark_read_compat_param(sc, name, path)
   name <- params[1L]
@@ -1173,6 +1252,17 @@ spark_read_avro <- function(sc,
 #'
 #' @family Spark serialization routines
 #'
+#' @export
+spark_write_avro <- function(x,
+                             path,
+                             avro_schema = NULL,
+                             record_name = "topLevelRecord",
+                             record_namespace = "",
+                             compression = "snappy",
+                             partition_by = NULL) {
+  UseMethod("spark_write_avro")
+}
+
 #' @export
 spark_write_avro <- function(x,
                              path,

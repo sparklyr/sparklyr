@@ -7,15 +7,31 @@ testthat_init <- function() {
   if (using_arrow()) {
     suppressPackageStartupMessages(library(arrow))
   }
+  testthat_addl_libraries()
 }
 
 testthat_spark_connection <- function() {
-  if(!testthat_spark_connection_open()) testthat_init()
-  tp <- testthat_spark_connection_type()
-  if(tp == "databricks") sc <- testthat_shell_connection(method = "databricks")
-  if(tp == "synapse") sc <- testthat_shell_connection(method = "synapse")
-  if(tp == "local") sc <- testthat_shell_connection()
-  if(tp == "livy") sc <- testthat_livy_connection()
+  if(!testthat_spark_connection_open()) {
+    testthat_init()
+    tp <- testthat_spark_connection_type()
+    if(tp == "method") sc <- testthat_method_connection()
+    if(tp == "databricks") sc <- testthat_shell_connection(method = "databricks")
+    if(tp == "synapse") sc <- testthat_shell_connection(method = "synapse")
+    if(tp == "local") sc <- testthat_shell_connection()
+    if(tp == "livy") sc <- testthat_livy_connection()
+  } else {
+    sc <- testthat_spark_connection_object()
+  }
+
+  sc
+}
+
+testthat_method_connection <- function() {
+  sc <- spark_connect(
+    master = using_master_get(),
+    method = using_method_get()
+  )
+  testthat_spark_connection_object(sc)
   sc
 }
 
@@ -146,5 +162,20 @@ spark_install_winutils <- function(version) {
     )
 
     message("Installed winutils in ", winutils_path)
+  }
+}
+
+testthat_addl_libraries <- function() {
+  libs <- Sys.getenv("TEST_SPARKLYR_LIBRARIES", unset = NA)
+  if(!is.na(libs)) {
+    sep_libs <- unlist(strsplit(libs, ";"))
+    invisible(
+      lapply(sep_libs, function(x) {
+        c_libs <- trimws(x)
+        suppressPackageStartupMessages(
+          library(c_libs, character.only = TRUE)
+          )
+      })
+    )
   }
 }

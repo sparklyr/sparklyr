@@ -93,10 +93,7 @@ spark_connection <- function(x, ...) {
 
 #' @export
 spark_connection.default <- function(x, ...) {
-  stop("Unable to retrieve a spark_connection from object of class ",
-    paste(class(x), collapse = " "),
-    call. = FALSE
-  )
+  invisible()
 }
 
 #' @export
@@ -259,6 +256,10 @@ get_spark_sql_catalog_implementation <- function(sc) {
 
 initialize_connection <- function(sc) {
   UseMethod("initialize_connection")
+}
+
+initialize_connection.default <- function(sc) {
+  sc
 }
 
 new_spark_connection <- function(scon, ..., class = character()) {

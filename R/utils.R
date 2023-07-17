@@ -1,3 +1,20 @@
+#' It lets the package know if it should test a particular functionality or not
+#' @details
+#' It expects a boolean to be returned. If TRUE, the corresponding test will be
+#' skipped. If FALSE the test will be conducted.
+#'
+#' @param sc Spark connection
+#' @param test_name The name of the test
+#' @export
+spark_integ_test_skip <- function(sc, test_name) {
+  UseMethod("spark_integ_test_skip")
+}
+
+#' @export
+spark_integ_test_skip.default <- function(sc, test_name) {
+  FALSE
+}
+
 is.installed <- function(package) {
   is.element(package, installed.packages()[, 1])
 }
@@ -484,7 +501,11 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
 #' @importFrom tidyselect tidyselect_data_proxy tidyselect_data_has_predicates
 #' @export
 tidyselect_data_proxy.tbl_spark <- function(x) {
-  simulate_vars_spark(x, FALSE)
+  if(tidyselect_data_has_predicates(x)) {
+    simulate_vars_spark(x, FALSE)
+  } else {
+    NextMethod()
+  }
 }
 
 #' @export

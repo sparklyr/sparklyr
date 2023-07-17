@@ -1,3 +1,15 @@
+# Sparklyr 1.8.3.9000
+
+### New features
+
+- Adds functionality to allow other packages to provide `sparklyr` additional back-ends. This effort is mainly focused on adding the ability to integrate with Spark Connect and Databricks Connect through a new package. 
+
+- New exported functions to integrate with the RStudio IDE. They all have the same `spark_ide_` prefix
+
+- Modifies several read functions to become exported methods
+
+- Adds `spark_integ_test_skip()` function. This is to allow other packages to use `sparklyr`'s test suite. It enables a way to the external package to indicate wether to run or skip specific tests
+
 # Sparklyr 1.8.2
 
 ### New Features

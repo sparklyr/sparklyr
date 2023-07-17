@@ -112,7 +112,7 @@ Suggests:
     nnet,
     nycflights13,
     R6,
-    r2d3,    
+    r2d3,
     RCurl,
     reshape2,
     shiny (>= 1.0.1),
@@ -136,7 +136,6 @@ Collate:
     'connection_shinyapp.R'
     'spark_version.R'
     'connection_spark.R'
-    'connection_viewer.R'
     'core_arrow.R'
     'core_config.R'
     'core_connection.R'
@@ -321,6 +320,7 @@ Collate:
     'spark_globals.R'
     'spark_hive.R'
     'spark_home.R'
+    'spark_ide.R'
     'spark_submit.R'
     'spark_update_embedded_sources.R'
     'spark_utils.R'

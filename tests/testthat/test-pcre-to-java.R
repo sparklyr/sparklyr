@@ -1,3 +1,4 @@
+skip_connection("pcre-to-java")
 skip_on_livy()
 skip_on_arrow_devel()
 

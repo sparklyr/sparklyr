@@ -1,3 +1,4 @@
+skip_connection("ml-tuning-cross-validator")
 skip_on_livy()
 skip_on_arrow_devel()
 

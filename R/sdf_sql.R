@@ -5,7 +5,7 @@ df_from_sql <- function(sc, sql) {
 }
 
 df_from_sdf <- function(sc, sdf, take = -1) {
-  sdf_collect(sdf)
+  collect(sdf)
 }
 
 #' Spark DataFrame from SQL

@@ -1,3 +1,4 @@
+skip_connection("install_spark")
 skip_on_livy()
 skip_on_arrow_devel()
 skip_on_windows()

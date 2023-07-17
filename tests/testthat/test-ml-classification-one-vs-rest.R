@@ -1,3 +1,4 @@
+skip_connection("ml-classification-one-vs-rest")
 skip_on_livy()
 skip_on_arrow_devel()
 

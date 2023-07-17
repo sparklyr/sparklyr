@@ -252,7 +252,7 @@ Status: 1 NOTE
 * package encoding: UTF-8
 Examples with CPU (user + system) or elapsed time > 5s
                        user system elapsed
-asof_future_left_join 0.387   0.12  21.359
+asof_future_left_join 0.399  0.134  21.407
 * checking running R code from vignettes ... NONE
   ‘importing-time-series-data.Rmd’ using ‘UTF-8’... OK
   ‘overview.Rmd’ using ‘UTF-8’... OK
@@ -312,7 +312,7 @@ Status: 1 NOTE
 * this is package ‘sparkwarc’ version ‘0.1.6’
 * package encoding: UTF-8
 * used C++ compiler: ‘Apple clang version 14.0.3 (clang-1403.0.22.14.1)’
-* used SDK: ‘MacOSX13.3.sdk’
+* used SDK: ‘’
 * checking C++ specification ... NOTE
   Specified C++11: please drop specification unless essential
 * DONE

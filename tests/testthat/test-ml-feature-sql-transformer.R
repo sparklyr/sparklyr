@@ -1,3 +1,4 @@
+skip_connection("ml-feature-sql-transformer")
 skip_on_livy()
 skip_on_arrow_devel()
 

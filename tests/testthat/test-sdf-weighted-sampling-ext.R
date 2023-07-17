@@ -1,3 +1,4 @@
+skip_connection("sdf-weighted-sampling-ext")
 skip_on_livy()
 skip_on_arrow_devel()
 
