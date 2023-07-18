@@ -526,6 +526,7 @@ test_that("result from dplyr::compute() has remote name", {
 })
 
 test_that("tbl_ptype.tbl_spark works as expected", {
+  skip_if(!has_predicates)
   expect_equal(df1_tbl %>% dplyr::select_if(is.integer) %>% colnames(), "a")
   expect_equal(df1_tbl %>% dplyr::select_if(is.numeric) %>% colnames(), "a")
   expect_equal(df1_tbl %>% dplyr::select_if(is.character) %>% colnames(), "b")
