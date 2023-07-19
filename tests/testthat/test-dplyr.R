@@ -1,5 +1,7 @@
 skip_connection("dplyr")
 
+test_requires("dplyr")
+
 sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
@@ -7,7 +9,7 @@ mtcars_tbl <- testthat_tbl("mtcars")
 
 has_predicates <- tidyselect_data_has_predicates(mtcars_tbl)
 
-test_requires("dplyr")
+
 
 df1 <- tibble(a = 1:3, b = letters[1:3])
 df2 <- tibble(b = letters[1:3], c = letters[24:26])
@@ -54,7 +56,7 @@ arrays_df <- tibble::tibble(
 arrays_sdf <- copy_to(sc, arrays_df, overwrite = TRUE)
 
 test_that("'select' works with where(...) predicate", {
-  test_requires("dplyr")
+
   skip_if(!has_predicates)
 
   expect_equal(
@@ -64,8 +66,7 @@ test_that("'select' works with where(...) predicate", {
 })
 
 test_that("'n_distinct' summarizer works as expected", {
-  test_requires("dplyr")
-
+  skip_connection("supports-na")
   summarize_n_distinct <- function(input) {
     input %>%
       summarize(
@@ -75,7 +76,7 @@ test_that("'n_distinct' summarizer works as expected", {
       )
   }
 
-  df <- tibble::tibble(x = c(-3:2, NA, NaN, NA))
+  df <- tibble::tibble(x = c(-3L:2L, NA, NaN, NA))
   sdf <- copy_to(sc, df, name = random_string())
 
   expect_equal(
@@ -86,7 +87,6 @@ test_that("'n_distinct' summarizer works as expected", {
 })
 
 test_that("'summarize' works with where(...) predicate", {
-  test_requires("dplyr")
   skip_if(!has_predicates)
 
   expect_equivalent(
@@ -106,8 +106,6 @@ test_that("'summarize' works with where(...) predicate", {
 })
 
 test_that("'mutate' works as expected", {
-  test_requires("dplyr")
-
   expect_equal(
     iris %>% mutate(x = Species) %>% tbl_vars() %>% gsub("\\.", "_", .),
     iris_tbl %>% mutate(x = Species) %>% collect() %>% tbl_vars()
@@ -116,9 +114,7 @@ test_that("'mutate' works as expected", {
 
 
 test_that("'mutate' and 'transmute' work with NSE", {
-  test_requires("dplyr")
   col <- "mpg"
-
   expect_equivalent(
     mtcars_tbl %>% mutate(!!col := !!rlang::sym(col) * 2) %>% collect(),
     mtcars %>% mutate(!!col := !!rlang::sym(col) * 2)
@@ -130,8 +126,6 @@ test_that("'mutate' and 'transmute' work with NSE", {
 })
 
 test_that("the implementation of 'filter' functions as expected", {
-  test_requires("dplyr")
-
   expect_equivalent(
     iris_tbl %>%
       filter(Sepal_Length == 5.1) %>%
@@ -251,7 +245,6 @@ test_that("if_all and if_any work as expected with boolean predicates", {
     c(2L, 3L, 4L)
   )
 
-
   expect_equivalent(
     arrays_sdf %>%
       filter(if_all(starts_with("a_"), ~ array_contains(.x, 5L))) %>%
@@ -268,8 +261,6 @@ test_that("if_all and if_any work as expected with boolean predicates", {
 })
 
 test_that("grepl works as expected", {
-  test_requires("dplyr")
-
   regexes <- c(
     "a|c", ".", "b", "x|z", "", "y", "e", "^", "$", "^$", "[0-9]", "[a-z]", "[b-z]"
   )
@@ -295,7 +286,7 @@ test_that("grepl works as expected", {
 })
 
 test_that("'head' uses 'limit' clause", {
-  test_requires("dplyr")
+
   test_requires("dbplyr")
 
   expect_true(
@@ -319,8 +310,6 @@ test_that("'sdf_broadcast' forces broadcast hash join", {
 })
 
 test_that("compute() works as expected", {
-  test_requires("dplyr")
-
   sdf <- sdf_10
   sdf_even <- sdf %>% dplyr::filter(id %% 2 == 0)
   sdf_odd <- sdf %>% dplyr::filter(id %% 2 == 1)
@@ -361,7 +350,6 @@ test_that("compute() works as expected", {
     sdf_congruent_to_2_mod_3_cached,
     "congruent_to_2_mod_3"
   )
-
 
   temp_view <- sdf_congruent_to_2_mod_3 %>% dplyr::compute("temp_view")
 
@@ -559,7 +547,6 @@ test_that("summarise(.groups=)", {
     )
   }
 })
-
 
 test_that("tbl_spark prints", {
   print_output <- capture.output(print.tbl_spark(iris_tbl))
