@@ -139,6 +139,17 @@ spark_connect <- function(master,
                           packages = NULL,
                           scala_version = NULL,
                           ...) {
+
+  # Loads downstream packages if installed
+  pkgs <- c("pysparklyr")
+  purrr::walk(
+    pkgs, ~{
+      if(rlang::is_installed(.x)) {
+        library(.x, character.only = TRUE)
+      }
+    }
+  )
+
   method <- method[[1]]
 
   # A Databricks GUID indicates that it is running on a Databricks cluster,
