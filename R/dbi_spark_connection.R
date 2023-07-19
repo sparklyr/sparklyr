@@ -1,4 +1,4 @@
-# DBISparkConnection and methods.
+# ---- DBI connection methods ----
 
 setMethod("dbGetInfo", "spark_connection", function(dbObj, ...) {
   dbObj
@@ -86,8 +86,23 @@ setMethod("dbSetProperty", c("spark_connection", "character", "character"), func
   )
 })
 
+# ---- DBI Transactions ----
+
 #' @importFrom dbplyr dbplyr_edition
 #' @export
 dbplyr_edition.spark_connection <- function(con) {
   as.integer(spark_config_value(con$config, "sparklyr.dbplyr.edition", 2L))
 }
+
+
+setMethod("dbBegin", "spark_connection", function(conn) {
+  TRUE
+})
+
+setMethod("dbCommit", "spark_connection", function(conn) {
+  TRUE
+})
+
+setMethod("dbRollback", "spark_connection", function(conn) {
+  TRUE
+})

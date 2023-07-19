@@ -63,6 +63,9 @@ get_test_data_path <- function(file_name) {
     test_data_path <- paste0(Sys.getenv("DBFS_DATA_PATH"), "/", file_name)
   } else {
     test_data_path <- file.path(normalizePath(getwd()), "data", file_name)
+    if(!file.exists(test_data_path)) {
+      test_data_path <- normalizePath(test_path("data", file_name))
+    }
   }
 
   test_data_path
