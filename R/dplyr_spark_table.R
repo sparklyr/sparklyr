@@ -1,6 +1,3 @@
-#' @include prng_utils.R
-NULL
-
 #' @export
 #' @importFrom dplyr collect
 collect.spark_jobj <- function(x, ...) {
@@ -168,4 +165,12 @@ print.tbl_spark <- function(x, ...) {
 #' @importFrom dplyr tbl_ptype
 tbl_ptype.tbl_spark <- function(.data) {
   simulate_vars_spark(.data)
+}
+
+gen_prng_seed <- function() {
+  if (is.null(get0(".Random.seed"))) {
+    NULL
+  } else {
+    as.integer(sample.int(.Machine$integer.max, size = 1L))
+  }
 }
