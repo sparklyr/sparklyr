@@ -1,10 +1,11 @@
-skip_connection("read-write")
+#skip_connection("read-write")
 skip_on_livy()
 
 sc <- testthat_spark_connection()
 iris_table_name <- random_table_name("iris")
 
 test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
+  skip_connection("format-csv")
   if (.Platform$OS.type == "windows") {
     skip("CSV encoding is slightly different in windows")
   }
@@ -25,6 +26,7 @@ test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
 })
 
 test_that("spark_write_delta() and spark_read_delta() work as expected", {
+  skip_connection("format-delta")
   test_requires_version("2.4.2")
   test_requires("nycflights13")
 
@@ -46,6 +48,7 @@ test_that("spark_write_delta() and spark_read_delta() work as expected", {
 })
 
 test_that("spark_read_json() can load data using column names", {
+  skip_connection("format-json")
   jsonPath <- get_test_data_path(
     "spark-read-json-can-load-data-using-column-names.json"
   )
@@ -60,6 +63,7 @@ test_that("spark_read_json() can load data using column names", {
 })
 
 test_that("spark_read_json() can load data using column types", {
+  skip_connection("format-json")
   test_requires("dplyr")
 
   jsonPath <- get_test_data_path(
@@ -82,6 +86,7 @@ test_that("spark_read_json() can load data using column types", {
 })
 
 test_that("spark_read_json() can load nested structs using column types", {
+  skip_connection("format-json")
   jsonPath <- get_test_data_path(
     "spark-read-json-can-load-nested-structs-using-column-types.json"
   )
@@ -129,6 +134,7 @@ test_that("spark_read_json() can load nested structs using column types", {
 })
 
 test_that("spark_read_csv() can read long decimals", {
+  skip_connection("format-csv")
   csvPath <- get_test_data_path(
     "spark-read-csv-can-read-long-decimals.csv"
   )
@@ -142,6 +148,7 @@ test_that("spark_read_csv() can read long decimals", {
 })
 
 test_that("spark_read_text() and spark_write_text() read and write basic files", {
+  skip_connection("format-text")
   skip_databricks_connect()
   test_requires("dplyr")
 
@@ -174,6 +181,7 @@ test_that("spark_read_text() and spark_write_text() read and write basic files",
 })
 
 test_that("spark_write_table() can append data", {
+  skip_connection("format-table")
   skip_databricks_connect()
   if (spark_version(sc) < "2.0.0") skip("tables not supported before 2.0.0")
   test_requires("dplyr")
@@ -194,6 +202,7 @@ test_that("spark_write_table() can append data", {
 })
 
 test_that("spark_write_table() can write data", {
+  skip_connection("format-table")
   skip_databricks_connect()
   if (spark_version(sc) < "2.0.0") skip("tables not supported before 2.0.0")
   test_requires("dplyr")
@@ -209,6 +218,7 @@ test_that("spark_write_table() can write data", {
 })
 
 test_that("spark_write_table() overwrites existing table definition when overwriting", {
+  skip_connection("format-table")
   skip_databricks_connect()
   test_requires("dplyr")
 
@@ -290,6 +300,7 @@ test_that("spark_insert_table() inserts into existing table definition, even whe
 })
 
 test_that("spark_read_csv() can rename columns", {
+  skip_connection("format-csv")
   csvPath <- get_test_data_path(
     "spark-read-csv-can-rename-columns.csv"
   )
@@ -322,6 +333,7 @@ test_that("spark_read_text() can read a whole file", {
 })
 
 test_that("spark_read_csv() can read with no name", {
+  skip_connection("format-csv")
   test_requires("dplyr")
 
   csvPath <- get_test_data_path(
@@ -333,6 +345,7 @@ test_that("spark_read_csv() can read with no name", {
 })
 
 test_that("spark_read_csv() can read with named character name", {
+  skip_connection("format-csv")
   test_requires("dplyr")
 
   csvPath <- get_test_data_path(
@@ -345,6 +358,7 @@ test_that("spark_read_csv() can read with named character name", {
 
 
 test_that("spark_read_csv() can read column types", {
+  skip_connection("format-csv")
   csvPath <- get_test_data_path(
     "spark-read-csv-can-read-column-types.txt"
   )
@@ -367,6 +381,7 @@ test_that("spark_read_csv() can read column types", {
 })
 
 test_that("spark_read_csv() can read verbatim column types", {
+  skip_connection("format-csv")
   csvPath <- get_test_data_path(
     "spark-read-csv-can-read-verbatim-column-types.csv"
   )
@@ -389,6 +404,7 @@ test_that("spark_read_csv() can read verbatim column types", {
 })
 
 test_that("spark_read_csv() can read if embedded nuls present", {
+  skip_connection("format-csv")
   skip_on_arrow() # ARROW-6582
 
   fpath <- get_test_data_path("with_embedded_nul.csv")
@@ -447,6 +463,7 @@ test_that("spark_read() works as expected", {
 })
 
 test_that("spark_write() works as expected", {
+  skip_connection("format-write")
   test_requires_version("2.4.0")
 
   iris_tbl <- testthat_tbl("iris")
@@ -503,6 +520,7 @@ test_avro_schema <- list(
   as.character()
 
 test_that("spark_read_avro() works as expected", {
+  skip_connection("format-avro")
   test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
   skip_databricks_connect()
 
@@ -529,6 +547,7 @@ test_that("spark_read_avro() works as expected", {
 })
 
 test_that("spark_write_avro() works as expected", {
+  skip_connection("format-avro")
   test_requires_version("2.4.0", "spark_write_avro() requires Spark 2.4+")
   skip_databricks_connect()
 
@@ -553,6 +572,7 @@ test_that("spark_write_avro() works as expected", {
 })
 
 test_that("spark read/write methods avoid name collision on identical file names", {
+  skip_connection("format-avro")
   test_requires_version("2.4.0")
 
   tbl_1 <- tibble::tibble(name = c("foo_1", "bar_1"))
@@ -588,6 +608,7 @@ test_that("spark read/write methods avoid name collision on identical file names
 })
 
 test_that("spark_read_binary can process input directory without partition specs", {
+  skip_connection("format-binary")
   test_requires_version("3.0.0")
 
   dir <- get_test_data_path("test_spark_read_binary")
@@ -633,6 +654,7 @@ test_that("spark_read_binary can process input directory with flat partition spe
 })
 
 test_that("spark_read_binary can process input directory with nested partition specs", {
+  skip_connection("format-binary")
   test_requires_version("3.0.0")
 
   dir <- get_test_data_path(
@@ -659,6 +681,7 @@ test_that("spark_read_binary can process input directory with nested partition s
 })
 
 test_that("spark_read_binary can support 'pathGlobFilter' option correctly", {
+  skip_connection("format-binary")
   test_requires_version("3.0.0")
 
   dir <- get_test_data_path("test_spark_read_binary")
@@ -685,6 +708,7 @@ test_that("spark_read_binary can support 'pathGlobFilter' option correctly", {
 })
 
 test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
+  skip_connection("format-binary")
   test_requires_version("3.0.0")
 
   dir <- get_test_data_path("test_spark_read_binary_recursive_file_lookup")
@@ -709,6 +733,7 @@ test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
 })
 
 test_that("spark_read_image works as expected", {
+  skip_connection("format-image")
   test_requires_version("2.4.0")
 
   dir <- get_test_data_path("images")
