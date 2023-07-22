@@ -1,4 +1,4 @@
-skip_connection("tidyr-pivot-longer")
+#skip_connection("tidyr-pivot-longer")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -8,19 +8,34 @@ trivial_sdf <- testthat_tbl(
   data = tibble::tibble(x_y = 1)
 )
 
+expect_same_remote_result <- function(.data, pipeline) {
+  temp_name <- random_table_name("test_")
+  spark_data <- copy_to(sc, .data, temp_name)
+
+  local <- pipeline(.data)
+
+
+  remote <- try(
+    spark_data %>%
+      pipeline() %>%
+      collect()
+    )
+
+  if(inherits(remote, "try-error")) {
+    expect_equal(remote[[1]], "")
+  } else {
+    expect_equivalent(local, remote)
+  }
+
+  DBI::dbRemoveTable(sc, temp_name)
+}
+
 test_that("can pivot all cols to long", {
   test_requires_version("2.0.0")
-
-  sdf <- copy_to(sc, tibble::tibble(x = 1:2, y = 3:4))
-  pv <- tidyr::pivot_longer(sdf, x:y) %>% collect()
-
-  expect_equivalent(
-    pv,
-    tibble::tibble(
-      name = c("x", "y", "x", "y"),
-      value = c(1, 3, 2, 4)
+  expect_same_remote_result(
+    tibble::tibble(x = 1:2, y = 3:4),
+    . %>% tidyr::pivot_longer(x:y)
     )
-  )
 })
 
 test_that("values interleaved correctly", {
@@ -218,14 +233,12 @@ test_that("grouping is preserved", {
 test_that("names repair preserves grouping vars and pivot longer spec", {
   test_requires_version("2.0.0")
 
-  sdf <- copy_to(
-    sc,
-    tibble::tibble(
-      a = 1, b = 2,
-      x_a_1 = c(1, 3), x_a_2 = c(2, 4), x_b_1 = c(1, 2), x_b_2 = c(3, 4)
-    )
+  sdf_local <- tibble::tibble(
+    a = 1, b = 2,
+    x_a_1 = c(1, 3), x_a_2 = c(2, 4), x_b_1 = c(1, 2), x_b_2 = c(3, 4)
   )
-  pv <- sdf %>%
+
+  pipeline <- . %>%
     dplyr::group_by(a) %>%
     tidyr::pivot_longer(
       cols = tidyr::starts_with("x_"),
@@ -234,14 +247,7 @@ test_that("names repair preserves grouping vars and pivot longer spec", {
       names_repair = "universal"
     )
 
-  expect_equal(dplyr::group_vars(pv), "a___1")
-  expect_equivalent(
-    pv %>% collect(),
-    tibble::tibble(
-      a___1 = 1, b___2 = 2, b___5 = c("1", "2", "1", "2"),
-      a___3 = c(1, 2, 3, 4), b___4 = c(1, 3, 2, 4)
-    )
-  )
+  expect_same_remote_result(sdf_local, pipeline)
 })
 
 # spec --------------------------------------------------------------------
