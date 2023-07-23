@@ -74,3 +74,25 @@ test_default_args <- function(sc, fn) {
     ml_params()
   check_params(default_args, params)
 }
+
+expect_same_remote_result <- function(.data, pipeline) {
+  temp_name <- random_table_name("test_")
+  spark_data <- copy_to(sc, .data, temp_name)
+
+  local <- pipeline(.data)
+
+
+  remote <- try(
+    spark_data %>%
+      pipeline() %>%
+      collect()
+  )
+
+  if(inherits(remote, "try-error")) {
+    expect_equal(remote[[1]], "")
+  } else {
+    expect_equivalent(local, remote)
+  }
+
+  DBI::dbRemoveTable(sc, temp_name)
+}
