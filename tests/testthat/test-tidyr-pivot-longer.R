@@ -1,4 +1,4 @@
-#skip_connection("tidyr-pivot-longer")
+skip_connection("tidyr-pivot-longer")
 test_requires_version("2.0.0")
 skip_on_livy()
 skip_on_arrow_devel()

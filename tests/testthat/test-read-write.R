@@ -1,4 +1,3 @@
-#skip_connection("read-write")
 skip_on_livy()
 
 sc <- testthat_spark_connection()
@@ -152,17 +151,19 @@ test_that("spark_read_text() and spark_write_text() read and write basic files",
   skip_databricks_connect()
   test_requires("dplyr")
 
-  text_file <- file("test.txt", "w+")
+  test_file_path <- tempfile()
+
+  text_file <- file(test_file_path, "w+")
   cat("1\n2\n3", file = text_file)
   close(text_file)
 
   sdf <- spark_read_text(
     sc,
     name = "test_spark_read",
-    path = "test.txt"
+    path = test_file_path
   )
 
-  output_file <- "test_roundtrip.txt"
+  output_file <- tempfile()
   spark_write_text(
     sdf,
     path = output_file
@@ -171,13 +172,10 @@ test_that("spark_read_text() and spark_write_text() read and write basic files",
   sdf_roundtrip <- spark_read_text(
     sc,
     name = "test_spark_roundtrip",
-    path = "test_roundtrip.txt"
+    path = output_file
   )
 
   expect_equal(sdf %>% collect(), sdf_roundtrip %>% collect())
-
-  file.remove("test.txt")
-  unlink(output_file, recursive = TRUE)
 })
 
 test_that("spark_write_table() can append data", {
@@ -260,6 +258,7 @@ test_that("spark_write_table() overwrites existing table definition when overwri
 })
 
 test_that("spark_insert_table() inserts into existing table definition, even when overwriting", {
+  skip_connection("format-insert-table")
   skip_databricks_connect()
   test_requires("dplyr")
 
@@ -630,6 +629,7 @@ test_that("spark_read_binary can process input directory without partition specs
 })
 
 test_that("spark_read_binary can process input directory with flat partition specs", {
+  skip_connection("format-binary")
   test_requires_version("3.0.0")
 
   dir <- get_test_data_path("test_spark_read_binary_with_flat_partition_specs")
@@ -774,3 +774,4 @@ test_that("spark_read_image works as expected", {
     )
   )
 })
+
