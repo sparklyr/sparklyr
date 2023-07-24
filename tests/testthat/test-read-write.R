@@ -419,6 +419,7 @@ test_that("spark_read_csv() can read if embedded nuls present", {
 })
 
 test_that("spark_read() works as expected", {
+  skip_connection("format-generalized")
   paths <- c(
     "hdfs://localhost:9000/1/a/b",
     "hdfs://localhost:9000/2",
@@ -462,7 +463,7 @@ test_that("spark_read() works as expected", {
 })
 
 test_that("spark_write() works as expected", {
-  skip_connection("format-write")
+  skip_connection("format-generalized")
   test_requires_version("2.4.0")
 
   iris_tbl <- testthat_tbl("iris")
