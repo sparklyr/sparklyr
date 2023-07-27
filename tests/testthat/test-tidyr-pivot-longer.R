@@ -52,6 +52,7 @@ test_that("can handle missing combinations", {
 })
 
 test_that("can override default output column type", {
+  skip_connection("pivot-longer-values-transform")
   expect_same_remote_result(
     tibble::tibble(x = 1L, y = 2L),
     . %>% tidyr::pivot_longer(
@@ -146,6 +147,7 @@ test_that("grouping is preserved", {
 })
 
 test_that("names repair preserves grouping vars and pivot longer spec", {
+  skip_connection("pivot-longer-names-repair")
   sdf_local <- tibble::tibble(
     a = 1, b = 2,
     x_a_1 = c(1, 3), x_a_2 = c(2, 4), x_b_1 = c(1, 2), x_b_2 = c(3, 4)
