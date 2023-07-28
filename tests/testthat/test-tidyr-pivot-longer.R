@@ -1,4 +1,5 @@
 skip_connection("tidyr-pivot-longer")
+test_requires_version("2.0.0")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -9,156 +10,90 @@ trivial_sdf <- testthat_tbl(
 )
 
 test_that("can pivot all cols to long", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(sc, tibble::tibble(x = 1:2, y = 3:4))
-  pv <- tidyr::pivot_longer(sdf, x:y) %>% collect()
-
-  expect_equivalent(
-    pv,
-    tibble::tibble(
-      name = c("x", "y", "x", "y"),
-      value = c(1, 3, 2, 4)
+  expect_same_remote_result(
+    tibble::tibble(x = 1:2, y = 3:4),
+    . %>% tidyr::pivot_longer(x:y)
     )
-  )
 })
 
 test_that("values interleaved correctly", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(
-    sc,
-    tibble::tibble(x = c(1, 2), y = c(10, 20), z = c(100, 200))
-  )
-  pv <- tidyr::pivot_longer(sdf, 1:3) %>% collect()
-
-  expect_equivalent(
-    pv,
-    tibble::tibble(
-      name = c("x", "y", "z", "x", "y", "z"),
-      value = c(1, 10, 100, 2, 20, 200)
-    )
+  expect_same_remote_result(
+    tibble::tibble(x = c(1, 2), y = c(10, 20), z = c(100, 200)),
+    . %>% tidyr::pivot_longer(1:3)
   )
 })
 
 test_that("can drop missing values", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(sc, tibble::tibble(x = c(1, NA), y = c(NA, 2)))
-  pv <- tidyr::pivot_longer(sdf, x:y, values_drop_na = TRUE) %>% collect()
-
-  expect_equivalent(pv, tibble::tibble(name = c("x", "y"), value = c(1, 2)))
+  expect_same_remote_result(
+    tibble::tibble(x = c(1, NA), y = c(NA, 2)),
+    . %>% tidyr::pivot_longer(x:y, values_drop_na = TRUE)
+  )
 })
 
 test_that("preserves original keys", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(sc, tibble::tibble(x = 1:2, y = 2L, z = 1:2))
-  pv <- tidyr::pivot_longer(sdf, y:z) %>% collect()
-
-  expect_equivalent(
-    pv,
-    tibble::tibble(
-      x = rep(1:2, each = 2),
-      name = c("y", "z", "y", "z"),
-      value = c(2, 1, 2, 2)
-    )
+  expect_same_remote_result(
+    tibble::tibble(x = 1:2, y = 2L, z = 1:2),
+    . %>% tidyr::pivot_longer(y:z)
   )
 })
 
 test_that("can handle missing combinations", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(
-    sc,
+  expect_same_remote_result(
     tibble::tribble(
       ~id, ~x_1, ~x_2, ~y_2,
       "A",    1,    2,  "a",
       "B",    3,    4,  "b",
-    )
-  )
-  pv <- tidyr::pivot_longer(
-    sdf, -id,
-    names_to = c(".value", "n"), names_sep = "_"
-  ) %>%
-    collect()
-
-  expect_equivalent(
-    pv,
-    tibble::tribble(
-      ~id,  ~n, ~x,  ~y,
-      "A", "1",  1,  NA,
-      "A", "2",  2, "a",
-      "B", "1",  3,  NA,
-      "B", "2",  4, "b",
-    )
+    ),
+    . %>% tidyr::pivot_longer(
+        -id,
+        names_to = c(".value", "n"), names_sep = "_"
+      )
   )
 })
 
 test_that("can override default output column type", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(sc, tibble::tibble(x = 1L, y = 2L))
-  pv <- tidyr::pivot_longer(
-    sdf, x:y,
-    values_transform = list(value = as.character)
-  ) %>%
-    collect()
-
-  expect_equivalent(
-    pv,
-    tibble::tibble(name = c("x", "y"), value = c("1", "2"))
+  skip_connection("pivot-longer-values-transform")
+  expect_same_remote_result(
+    tibble::tibble(x = 1L, y = 2L),
+    . %>% tidyr::pivot_longer(
+      x:y,
+      values_transform = list(value = as.character)
+    )
   )
 })
 
 test_that("original col order is preserved", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(
-    sc,
+  expect_same_remote_result(
     tibble::tribble(
       ~id, ~z_1, ~y_1, ~x_1, ~z_2, ~y_2, ~x_2,
       "A", 1, 2, 3, 4, 5, 6,
       "B", 7, 8, 9, 10, 11, 12,
-    )
-  )
-  pv <- tidyr::pivot_longer(
-    sdf, -id,
-    names_to = c(".value", "n"), names_sep = "_"
-  ) %>%
-    collect()
-
-  expect_equivalent(
-    pv,
-    tibble::tribble(
-      ~id,  ~n, ~z, ~y, ~x,
-      "A", "1",  1,  2,  3,
-      "A", "2",  4,  5,  6,
-      "B", "1",  7,  8,  9,
-      "B", "2", 10, 11, 12,
+    ),
+    . %>% tidyr::pivot_longer(
+      -id,
+      names_to = c(".value", "n"), names_sep = "_"
     )
   )
 })
 
 test_that("can pivot duplicated names to .value", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(sc, tibble::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4))
-  pv <- lapply(
-    list(
-      tidyr::pivot_longer(sdf, -x, names_to = c(".value", NA), names_sep = "_"),
-      tidyr::pivot_longer(sdf, -x, names_to = c(".value", NA), names_pattern = "(.)_(.)"),
-      tidyr::pivot_longer(sdf, -x, names_to = ".value", names_pattern = "(.)_.")
-    ),
-    collect
+  expect_same_remote_result(
+    tibble::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4),
+    . %>% tidyr::pivot_longer(-x, names_to = c(".value", NA), names_sep = "_")
   )
-  for (x in pv) {
-    expect_equivalent(x, tibble::tibble(x = 1, a = 1:2, b = 3:4))
-  }
+
+  expect_same_remote_result(
+    tibble::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4),
+    . %>% tidyr::pivot_longer(-x, names_to = c(".value", NA), names_pattern = "(.)_(.)")
+  )
+
+  expect_same_remote_result(
+    tibble::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4),
+    . %>% tidyr::pivot_longer(-x, names_to = ".value", names_pattern = "(.)_.")
+  )
 })
 
 test_that(".value can be at any position in `names_to`", {
-  test_requires_version("2.0.0")
 
   samp_sdf <- copy_to(
     sc,
@@ -196,8 +131,6 @@ test_that(".value can be at any position in `names_to`", {
 })
 
 test_that("reporting data type mismatch", {
-  test_requires_version("2.0.0")
-
   sdf <- copy_to(sc, tibble::tibble(abc = 1, xyz = "b"))
   err <- capture_error(tidyr::pivot_longer(sdf, tidyr::everything()))
 
@@ -205,27 +138,22 @@ test_that("reporting data type mismatch", {
 })
 
 test_that("grouping is preserved", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(sc, tibble::tibble(g = 1, x1 = 1, x2 = 2))
-  out <- sdf %>%
-    dplyr::group_by(g) %>%
-    tidyr::pivot_longer(x1:x2, names_to = "x", values_to = "v")
-
-  expect_equal(dplyr::group_vars(out), "g")
+  expect_same_remote_result(
+    tibble::tibble(g = 1, x1 = 1, x2 = 2),
+    . %>%
+      dplyr::group_by(g) %>%
+      tidyr::pivot_longer(x1:x2, names_to = "x", values_to = "v")
+  )
 })
 
 test_that("names repair preserves grouping vars and pivot longer spec", {
-  test_requires_version("2.0.0")
-
-  sdf <- copy_to(
-    sc,
-    tibble::tibble(
-      a = 1, b = 2,
-      x_a_1 = c(1, 3), x_a_2 = c(2, 4), x_b_1 = c(1, 2), x_b_2 = c(3, 4)
-    )
+  skip_connection("pivot-longer-names-repair")
+  sdf_local <- tibble::tibble(
+    a = 1, b = 2,
+    x_a_1 = c(1, 3), x_a_2 = c(2, 4), x_b_1 = c(1, 2), x_b_2 = c(3, 4)
   )
-  pv <- sdf %>%
+
+  pipeline <- . %>%
     dplyr::group_by(a) %>%
     tidyr::pivot_longer(
       cols = tidyr::starts_with("x_"),
@@ -234,21 +162,12 @@ test_that("names repair preserves grouping vars and pivot longer spec", {
       names_repair = "universal"
     )
 
-  expect_equal(dplyr::group_vars(pv), "a___1")
-  expect_equivalent(
-    pv %>% collect(),
-    tibble::tibble(
-      a___1 = 1, b___2 = 2, b___5 = c("1", "2", "1", "2"),
-      a___3 = c(1, 2, 3, 4), b___4 = c(1, 3, 2, 4)
-    )
-  )
+  expect_same_remote_result(sdf_local, pipeline)
 })
 
 # spec --------------------------------------------------------------------
 
 test_that("validates inputs", {
-  test_requires_version("2.0.0")
-
   expect_error(
     build_longer_spec(trivial_sdf, x_y, values_to = letters[1:2]),
     class = "vctrs_error_assert"
@@ -256,8 +175,6 @@ test_that("validates inputs", {
 })
 
 test_that("no names doesn't generate names", {
-  test_requires_version("2.0.0")
-
   expect_equal(
     colnames(build_longer_spec(trivial_sdf, x_y, names_to = character())),
     c(".name", ".value")
@@ -265,8 +182,6 @@ test_that("no names doesn't generate names", {
 })
 
 test_that("multiple names requires names_sep/names_pattern", {
-  test_requires_version("2.0.0")
-
   expect_error(
     build_longer_spec(trivial_sdf, x_y, names_to = c("a", "b")),
     "multiple names"
@@ -283,8 +198,6 @@ test_that("multiple names requires names_sep/names_pattern", {
 })
 
 test_that("names_sep generates correct spec", {
-  test_requires_version("2.0.0")
-
   sp <- build_longer_spec(
     trivial_sdf, x_y,
     names_to = c("a", "b"), names_sep = "_"
@@ -295,8 +208,6 @@ test_that("names_sep generates correct spec", {
 })
 
 test_that("names_sep fails with single name", {
-  test_requires_version("2.0.0")
-
   expect_error(
     build_longer_spec(trivial_sdf, x_y, names_to = "x", names_sep = "_"),
     "`names_sep`"
@@ -304,8 +215,6 @@ test_that("names_sep fails with single name", {
 })
 
 test_that("names_pattern generates correct spec", {
-  test_requires_version("2.0.0")
-
   sdf <- copy_to(sc, tibble::tibble(zx_y = 1))
   sp <- build_longer_spec(
     sdf, zx_y,
@@ -333,8 +242,6 @@ test_that("names_to can override value_to", {
 })
 
 test_that("names_prefix strips off from beginning", {
-  test_requires_version("2.0.0")
-
   sdf <- copy_to(sc, tibble::tibble(zzyz = 1))
   sp <- build_longer_spec(sdf, zzyz, names_prefix = "z")
 
@@ -342,8 +249,6 @@ test_that("names_prefix strips off from beginning", {
 })
 
 test_that("can cast to custom type", {
-  test_requires_version("2.0.0")
-
   sdf <- copy_to(sc, tibble::tibble(w1 = 1))
   sp <- build_longer_spec(
     sdf,
@@ -356,8 +261,6 @@ test_that("can cast to custom type", {
 })
 
 test_that("Error if the `col` can't be selected.", {
-  test_requires_version("2.0.0")
-
   expect_error(
     tidyr::pivot_longer(trivial_sdf, tidyr::matches("foo")),
     "select at least one"

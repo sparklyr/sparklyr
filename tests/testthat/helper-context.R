@@ -109,6 +109,10 @@ using_databricks <- function() {
   dcs <- FALSE
   dc <- Sys.getenv("TEST_DATABRICKS_CONNECT")
   if(dc == 'true') dcs <- TRUE
+
+  #sc <- testthat_spark_connection()
+  #if(sc$method == "databricks_connect") dcs <- TRUE
+
   testthat_context$databricks <- dcs
   dcs
 }
