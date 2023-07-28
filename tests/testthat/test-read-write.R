@@ -314,6 +314,7 @@ test_that("spark_read_csv() can rename columns", {
 })
 
 test_that("spark_read_text() can read a whole file", {
+  skip_connection("format-csv")
   skip_databricks_connect()
   test_requires("dplyr")
 
