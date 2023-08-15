@@ -15,7 +15,7 @@ import org.apache.spark.TaskContext
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.CatalystTypeConverters
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SQLContext}
 import org.apache.spark.sql.types._
@@ -100,7 +100,7 @@ class ArrowConvertersImpl {
       timeZoneId: String,
       context: Option[TaskContext]): Iterator[Array[Byte]] = {
 
-    val arrowSchema = org.apache.spark.sql.util.__THIS_IS_THE_ROAD_TO_CLOWNTOWN__ArrowUtils.toArrowSchema(schema, timeZoneId)
+    val arrowSchema = org.apache.spark.sql.util.__THIS_IS_THE_ROAD_TO_CLOWNTOWN__ArrowUtils.toArrowSchema(schema, timeZoneId, true, false)
     val allocator =
       org.apache.spark.sql.util.__THIS_IS_THE_ROAD_TO_CLOWNTOWN__ArrowUtils.rootAllocator.newChildAllocator("toBatchIterator", 0, Long.MaxValue)
 

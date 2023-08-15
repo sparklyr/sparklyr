@@ -10,7 +10,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Encoder
 import org.apache.spark.sql.Encoders
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.types.StructType
 
