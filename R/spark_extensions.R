@@ -1,5 +1,3 @@
-
-
 #' Register a Package that Implements a Spark Extension
 #'
 #' Registering an extension package will result in the package being
@@ -131,7 +129,6 @@ spark_dependencies_from_extensions <- function(spark_version, scala_version, ext
 }
 
 spark_dependencies_from_extension <- function(spark_version, scala_version, extension) {
-
   # attempt to find the function
   spark_dependencies <- tryCatch(
     {
@@ -189,26 +186,39 @@ sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
     } else {
       "2.12"
     })
+
   spark_major_minor <- spark_version[1, 1:2]
 
   exact_jar <- sprintf("sparklyr-%s-%s.jar", spark_major_minor, scala_version)
-  if (grepl("sparklyr-3\\.[0-9]+-[0-9]+\\.[0-9]+\\.jar", exact_jar)) {
+
+  if (grepl("sparklyr-3\\.[5-9]-[0-9]+\\.[0-9]+\\.jar", exact_jar)) {
     # At the moment we ship sparklyr-3.0-2.12.jar as sparklyr-master-2.12.jar
     # for Databricks-related reasons, and do not duplicate the same jar file
     # twice under different names to avoid inflating the size of the R package,
-    # and sparklyr-3.0-2.12.jar should be considered compatible with Spark 3.x.
+    # and sparklyr-3.5-2.12.jar should be considered compatible with Spark 3.5+
     exact_jar <- "sparklyr-master-2.12.jar"
   }
-  all_jars <- dir(system.file("java", package = "sparklyr"), pattern = "sparklyr")
 
+  java_path <- system.file("java", package = "sparklyr")
+
+  all_jars <- dir(java_path, pattern = "sparklyr")
+
+  out <- ""
+
+  # When it finds a JAR with the exact same name
   if (exact_jar %in% all_jars) {
-    system.file(file.path("java", exact_jar), package = "sparklyr")
-  } else if (exists(".test_on_spark_master", envir = .GlobalEnv)) {
-    exact_jar <- "sparklyr-master-2.12.jar"
-    system.file(file.path("java", exact_jar), package = "sparklyr")
-  } else if (spark_version > "1.6") {
-    # Spark is backwards compatible so we can use a new version with the latest jar
-    all_versions <- sort(gsub("^sparklyr-|-[0-9]+\\.[0-9]+\\.jar$", "", all_jars), decreasing = TRUE)
+    out <- file.path(java_path, exact_jar)
+  }
+
+  # Overrides when there is a environment variable set
+  if (exists(".test_on_spark_master", envir = .GlobalEnv) && out == "") {
+    out <- file.path(java_path, "sparklyr-master-2.12.jar")
+  }
+
+  # If no exact match, it looks for the Jar with the closes version
+  if (spark_version > "1.6" && out == "") {
+    spark_pattern <- "^sparklyr-|-[0-9]+\\.[0-9]+\\.jar$"
+    all_versions <- sort(gsub(spark_pattern, "", all_jars), decreasing = TRUE)
 
     # Support preview versions and master builds
     all_versions <- all_versions[all_versions != "master"]
@@ -216,13 +226,16 @@ sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
 
     prev_versions <- all_versions[all_versions <= spark_version]
 
-    dir(system.file("java", package = "sparklyr"),
-      pattern = paste0("sparklyr-", prev_versions[1]),
-      full.names = TRUE
-    )
-  } else {
-    ""
+    if (length(prev_versions)) {
+      out <- dir(
+        java_path,
+        pattern = paste0("sparklyr-", prev_versions[1]),
+        full.names = TRUE
+      )
+    }
   }
+
+  out
 }
 
 # sparklyr's own declared dependencies
