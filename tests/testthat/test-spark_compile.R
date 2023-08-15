@@ -1,3 +1,4 @@
+skip("Skipping compilation until Spark 3.5 is GA")
 skip_connection("spark_compile")
 
 test_that("jar file is created", {
