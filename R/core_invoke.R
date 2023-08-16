@@ -190,14 +190,12 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, return_
       ), {
         if (nzchar(msg)) {
           core_handle_known_errors(sc, msg)
-
-          stop(msg, call. = FALSE)
         } else {
           # read the spark log
           msg <- core_read_spark_log_error(sc)
-          stop(msg, call. = FALSE)
         }
       })
+      spark_error(msg)
     }
 
     result_object <- readObject(sc)
@@ -256,4 +254,38 @@ core_read_spark_log_error <- function(sc) {
     msg <- paste("failed to invoke spark command", pasted, sep = "\n")
   })
   msg
+}
+
+
+spark_error <- function(message) {
+  split_message <- message %>%
+    strsplit("\n\t") %>%
+    unlist()
+  msg <- c(
+    split_message[[1]],
+    "{Sys.time()}"
+    )
+  genv_set_last_error(message)
+  rlang::abort(
+    message = msg,
+    use_cli_format = TRUE,
+    call = NULL
+    )
+}
+
+#' Surfaces the last error from Spark captured by internal `spark_error` function
+#' @export
+spark_last_error <- function() {
+  last_error <- genv_get_last_error()
+  if(!is.null(last_error)) {
+    rlang::inform(last_error)
+  } else {
+    rlang::inform("No error found")
+  }
+}
+
+rlang::on_load(rlang::local_use_cli())
+
+.onLoad <- function(lib, pkg) {
+  rlang::run_on_load()
 }
