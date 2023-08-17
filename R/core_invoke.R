@@ -261,11 +261,40 @@ spark_error <- function(message) {
   split_message <- message %>%
     strsplit("\n\t") %>%
     unlist()
+
+  msg_l <- "\u001B]8;;"
+  msg_r <- "\u001B\\"
+  msg_fn <- "sparklyr::spark_last_error()"
+
+  term <- Sys.getenv("TERM")
+  color_terms <- c("xterm-color","xterm-256color", "screen", "screen-256color")
+
+  check_rstudio <- try(RStudio.Version(), silent = TRUE)
+
+  in_rstudio <- TRUE
+  if (inherits(check_rstudio, "try-error")) {
+    in_rstudio <- FALSE
+  }
+  if(term %in% color_terms) {
+    if (in_rstudio) {
+      scheme <- "ide:run"
+    } else {
+      scheme <- "x-r-run"
+    }
+    msg_fun <- paste0(msg_l, scheme,":", msg_fn, msg_r, "`", msg_fn, "`", msg_l, msg_r)
+  } else {
+    msg_fun <- paste0("`", msg_fn, "`")
+  }
+
+  last_err <- paste0("Run ",  msg_fun, " to see the full Spark error (multiple lines)")
+
   msg <- c(
     split_message[[1]],
-    "{Sys.time()}"
+    last_err
     )
+
   genv_set_last_error(message)
+
   rlang::abort(
     message = msg,
     use_cli_format = TRUE,
@@ -282,10 +311,4 @@ spark_last_error <- function() {
   } else {
     rlang::inform("No error found")
   }
-}
-
-rlang::on_load(rlang::local_use_cli())
-
-.onLoad <- function(lib, pkg) {
-  rlang::run_on_load()
 }
