@@ -305,11 +305,13 @@ spark_error <- function(message) {
   )
 
   option_msg <- paste(
+    "\033[37m",
     "To use the previous style of error message",
-    "set `options(\"sparklyr.simple.errors\" = TRUE)`"
+    "set `options(\"sparklyr.simple.errors\" = TRUE)`",
+    "\033[0m"
   )
 
-  msg <- c(split_message[[1]], last_err, option_msg)
+  msg <- c(split_message[[1]], "", last_err, option_msg)
 
   genv_set_last_error(message)
 
