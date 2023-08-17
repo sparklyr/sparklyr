@@ -258,6 +258,20 @@ core_read_spark_log_error <- function(sc) {
 
 
 spark_error <- function(message) {
+
+  option_name <- "sparklyr.simple.errors"
+  simple_errors <- unlist(options(option_name))
+
+  if(is.null(simple_errors)) {
+    use_simple <- FALSE
+  } else {
+    use_simple <- simple_errors
+  }
+
+  if(use_simple) {
+    stop(message, call. = FALSE)
+  }
+
   split_message <- message %>%
     strsplit("\n\t") %>%
     unlist()
@@ -281,17 +295,24 @@ spark_error <- function(message) {
     } else {
       scheme <- "x-r-run"
     }
-    msg_fun <- paste0(msg_l, scheme,":", msg_fn, msg_r, "`", msg_fn, "`", msg_l, msg_r)
+
+    msg_fun <- paste0(
+      msg_l, scheme,":", msg_fn, msg_r, "`", msg_fn, "`", msg_l, msg_r
+      )
+
   } else {
     msg_fun <- paste0("`", msg_fn, "`")
   }
 
-  last_err <- paste0("Run ",  msg_fun, " to see the full Spark error (multiple lines)")
-
-  msg <- c(
-    split_message[[1]],
-    last_err
+  last_err <- paste0(
+    "Run ",  msg_fun, " to see the full Spark error (multiple lines)"
     )
+
+  option_msg <- paste("To use the previous style of error message",
+                      "set `options(\"sparklyr.simple.errors\" = TRUE)`"
+                      )
+
+  msg <- c(split_message[[1]], last_err, option_msg)
 
   genv_set_last_error(message)
 
