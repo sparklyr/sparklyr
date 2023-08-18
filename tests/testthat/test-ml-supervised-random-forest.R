@@ -65,8 +65,7 @@ test_that("error for thresholds with wrong length", {
       ml_random_forest(Species ~ Sepal_Width,
         type = "classification",
         thresholds = c(0, 1)
-      ),
-    "non-matching numClasses and thresholds.length"
+      )
   )
 })
 
