@@ -1,14 +1,41 @@
-# Sparklyr 1.8.3.9000
+# Sparklyr 1.8.3.9002
 
-### New features
+### Improvements
 
-- Adds functionality to allow other packages to provide `sparklyr` additional back-ends. This effort is mainly focused on adding the ability to integrate with Spark Connect and Databricks Connect through a new package. 
+- Spark error message relays are now cached instead of the entire content
+displayed as an R error. This used to overwhelm the interactive session's 
+console or Notebook, because of the amount of lines returned by the
+Spark message.  Now, by default, it will return the top of the Spark 
+error message, which is typically the most relevant part. The full error can
+still be accessed using a new function called `spark_last_error()`
 
-- New exported functions to integrate with the RStudio IDE. They all have the same `spark_ide_` prefix
+- Reduces redundancy on several tests
 
-- Modifies several read functions to become exported methods
+### Java
 
-- Adds `spark_integ_test_skip()` function. This is to allow other packages to use `sparklyr`'s test suite. It enables a way to the external package to indicate wether to run or skip specific tests
+- Adds Scala scripts to handle changes in the upcoming version of Spark (3.5)
+- Adds new JAR file to handle Spark 3.0 to 3.4
+- Adds new JAR file to handle Spark 3.5 and above
+
+### Package integration
+
+- Adds functionality to allow other packages to provide `sparklyr` additional 
+back-ends. This effort is mainly focused on adding the ability to integrate 
+with Spark Connect and Databricks Connect through a new package. 
+
+- New exported functions to integrate with the RStudio IDE. They all have the
+same `spark_ide_` prefix
+
+- Modifies several read functions to become exported methods, such as 
+`sdf_read_column()`. 
+
+- Adds `spark_integ_test_skip()` function. This is to allow other packages 
+to use `sparklyr`'s test suite. It enables a way to the external package to 
+indicate if a given test should run or be skipped.
+
+- If installed, `sparklyr` will load the `pysparklyr` package
+
+
 
 # Sparklyr 1.8.2
 

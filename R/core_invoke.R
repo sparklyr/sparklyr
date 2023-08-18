@@ -76,8 +76,7 @@ core_invoke_synced <- function(sc) {
 
   if (length(returnStatus) == 0 || returnStatus != 0) {
     FALSE
-  }
-  else {
+  } else {
     object <- readObject(sc)
     identical(object, echo_id)
   }
@@ -190,14 +189,12 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, return_
       ), {
         if (nzchar(msg)) {
           core_handle_known_errors(sc, msg)
-
-          stop(msg, call. = FALSE)
         } else {
           # read the spark log
           msg <- core_read_spark_log_error(sc)
-          stop(msg, call. = FALSE)
         }
       })
+      spark_error(msg)
     }
 
     result_object <- readObject(sc)
@@ -230,8 +227,7 @@ core_handle_known_errors <- function(sc, msg) {
       "Failed to retrieve localhost, please validate that the hostname is correctly mapped. ",
       "Consider running `hostname` and adding that entry to your `/etc/hosts` file."
     )
-  }
-  else if (grepl("check worker logs for details", msg, ignore.case = TRUE) &&
+  } else if (grepl("check worker logs for details", msg, ignore.case = TRUE) &&
     spark_master_is_local(sc$master)) {
     abort_shell(
       "sparklyr worker rscript failure, check worker logs for details",
@@ -256,4 +252,81 @@ core_read_spark_log_error <- function(sc) {
     msg <- paste("failed to invoke spark command", pasted, sep = "\n")
   })
   msg
+}
+
+
+spark_error <- function(message) {
+  option_name <- "sparklyr.simple.errors"
+  simple_errors <- unlist(options(option_name))
+
+  if (is.null(simple_errors)) {
+    use_simple <- FALSE
+  } else {
+    use_simple <- simple_errors
+  }
+
+  if (use_simple) {
+    stop(message, call. = FALSE)
+  }
+
+  split_message <- message %>%
+    strsplit("\n\t") %>%
+    unlist()
+
+  msg_l <- "\u001B]8;;"
+  msg_r <- "\u001B\\"
+  msg_fn <- "sparklyr::spark_last_error()"
+
+  term <- Sys.getenv("TERM")
+  color_terms <- c("xterm-color", "xterm-256color", "screen", "screen-256color")
+
+  check_rstudio <- try(RStudio.Version(), silent = TRUE)
+
+  in_rstudio <- TRUE
+  if (inherits(check_rstudio, "try-error")) {
+    in_rstudio <- FALSE
+  }
+  if (term %in% color_terms) {
+    if (in_rstudio) {
+      scheme <- "ide:run"
+    } else {
+      scheme <- "x-r-run"
+    }
+
+    msg_fun <- paste0(
+      msg_l, scheme, ":", msg_fn, msg_r, "`", msg_fn, "`", msg_l, msg_r
+    )
+  } else {
+    msg_fun <- paste0("`", msg_fn, "`")
+  }
+
+  last_err <- paste0(
+    "Run ", msg_fun, " to see the full Spark error (multiple lines)"
+  )
+
+  option_msg <- paste(
+    "To use the previous style of error message",
+    "set `options(\"sparklyr.simple.errors\" = TRUE)`"
+  )
+
+  msg <- c(split_message[[1]], "", last_err, option_msg)
+
+  genv_set_last_error(message)
+
+  rlang::abort(
+    message = msg,
+    use_cli_format = TRUE,
+    call = NULL
+  )
+}
+
+#' Surfaces the last error from Spark captured by internal `spark_error` function
+#' @export
+spark_last_error <- function() {
+  last_error <- genv_get_last_error()
+  if (!is.null(last_error)) {
+    rlang::inform(last_error)
+  } else {
+    rlang::inform("No error found")
+  }
 }

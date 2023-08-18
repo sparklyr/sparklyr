@@ -65,8 +65,7 @@ test_that("error for thresholds with wrong length", {
       ml_decision_tree(Species ~ Sepal_Width,
         type = "classification",
         thresholds = c(0, 1)
-      ),
-    "non-matching numClasses and thresholds.length"
+      )
   )
 })
 
