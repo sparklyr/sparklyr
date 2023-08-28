@@ -61,7 +61,11 @@ dbi_ensure_no_backtick <- function(x) {
 
 setMethod("dbQuoteIdentifier", c("spark_connection", "character"), function(conn, x, ...) {
   split_x <- unlist(strsplit(x, "\\."))
-  if (length(x) == 0L | inherits(x, "ident") | length(split_x) > 1) {
+  possible_schema <- FALSE
+  if(length(split_x) > 1) {
+    if(!any(split_x == "")) possible_schema <- TRUE
+  }
+  if (length(x) == 0L | inherits(x, "ident") | possible_schema) {
     out <- x
   } else {
     dbi_ensure_no_backtick(x)
