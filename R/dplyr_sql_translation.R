@@ -61,8 +61,12 @@ spark_sql_translation <- function(con) {
       xor = function(x, y) dbplyr::build_sql(x, " ^ ", y),
       or = function(x, y) dbplyr::build_sql(x, " OR ", y),
       and = function(x, y) dbplyr::build_sql(x, " AND ", y),
-      pmin = function(...) build_sql_if_compare(..., con = con, compare = "<="),
-      pmax = function(...) build_sql_if_compare(..., con = con, compare = ">="),
+      pmin = function(...) {
+        build_sql_if_compare(..., con = con, compare = "<=", fn_name = "pmin")
+      },
+      pmax = function(...) {
+        build_sql_if_compare(..., con = con, compare = ">=", fn_name = "pmax")
+      },
       `%like%` = function(x, y) dbplyr::build_sql(x, " LIKE ", y),
       `%rlike%` = function(x, y) dbplyr::build_sql(x, " RLIKE ", y),
       `%regexp%` = function(x, y) dbplyr::build_sql(x, " REGEXP ", y),
@@ -350,8 +354,23 @@ sql_query_fields.spark_connection <- function(con, sql, ...) {
 }
 
 #' @importFrom dbplyr sql
-build_sql_if_compare <- function(..., con, compare) {
+build_sql_if_compare <- function(..., con, compare, fn_name) {
   args <- list(...)
+
+  na_rm <- unlist(args["na.rm"])
+  if(!is.null(na_rm)) {
+    if(na_rm) {
+      args <- args[names(args) != "na.rm"]
+    } else {
+      rlang::abort(
+        c(
+          "Missing values are always removed in SQL aggregation functions.",
+          paste0("Use `na.rm = TRUE` in `", fn_name, "` to stop this error")
+        ),
+        call = NULL
+      )
+    }
+  }
 
   build_sql_if_parts <- function(ifParts, ifValues) {
     if (length(ifParts) == 1) {
