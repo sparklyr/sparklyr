@@ -66,8 +66,6 @@ Notes:
 
 ## Reverse dependencies
 
-1 Warning in sparkwarc, not related sparklyr]
-
 |Package|Version|Error|Warning|Note|OK|
 |:---|:---|:---|:---|:---|:---|
 |[apache.sedona](#apache.sedona)|1.4.1|0|0|0|40|
@@ -87,25 +85,3 @@ Notes:
 |[sparkwarc](#sparkwarc)|0.1.6|0|0|1|48|
 |[sparkxgb](#sparkxgb)|0.1.1|0|0|1|41|
 |[variantspark](#variantspark)|0.1.1|0|0|1|43|
-
-
-###  sparkwarc
-```
-* using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkwarc.Rcheck’
-* using R version 4.3.1 (2023-06-16)
-* using platform: aarch64-apple-darwin20 (64-bit)
-* R was compiled by
-    Apple clang version 14.0.0 (clang-1400.0.29.202)
-    GNU Fortran (GCC) 12.2.0
-* running under: macOS Ventura 13.4.1
-* using session charset: UTF-8
-* checking extension type ... Package
-* this is package ‘sparkwarc’ version ‘0.1.6’
-* package encoding: UTF-8
-* used C++ compiler: ‘Apple clang version 14.0.3 (clang-1403.0.22.14.1)’
-* used SDK: ‘MacOSX13.3.sdk’
-* checking C++ specification ... NOTE
-  Specified C++11: please drop specification unless essential
-* DONE
-Status: 1 NOTE
-```
