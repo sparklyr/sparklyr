@@ -1,4 +1,4 @@
-# Sparklyr 1.8.3.9002
+# Sparklyr 1.8.3
 
 ### Improvements
 
@@ -11,11 +11,27 @@ still be accessed using a new function called `spark_last_error()`
 
 - Reduces redundancy on several tests
 
+- Handles SQL quoting when the table reference contains multiple levels. The 
+common time someone would encounter an issue is when a table name is passed
+using `in_catalog()`, or `in_schema()`. 
+
 ### Java
 
 - Adds Scala scripts to handle changes in the upcoming version of Spark (3.5)
 - Adds new JAR file to handle Spark 3.0 to 3.4
 - Adds new JAR file to handle Spark 3.5 and above
+
+### Fixes
+
+- It prevents an error when `na.rm = TRUE` is explicitly set within `pmax()` and
+`pmin()`. It will now also purposely fail if `na.rm` is set to `FALSE`. The
+default of these functions in base R is for `na.rm` to be `FALSE`, but ever
+since these functions were released, there has been no warning or error. For now,
+we will keep that behavior until a better approach can be figured out. (#3353)
+
+- `spark_install()` will now properly match when a partial version is passed 
+to the function. The issue was that passing '2.3' would match to '3.2.3', instead
+of '2.3.x' (#3370)
 
 ### Package integration
 
@@ -34,8 +50,6 @@ to use `sparklyr`'s test suite. It enables a way to the external package to
 indicate if a given test should run or be skipped.
 
 - If installed, `sparklyr` will load the `pysparklyr` package
-
-
 
 # Sparklyr 1.8.2
 
