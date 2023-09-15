@@ -580,11 +580,11 @@ test_that("pmin and pmax work", {
   )
 
   expect_error(
-    mutate(tbl_pmin_df, x = pmin(x, y, na.rm = FALSE))
+    collect(mutate(tbl_pmin_df, x = pmin(x, y, na.rm = FALSE)))
     )
 
   expect_error(
-    mutate(tbl_pmin_df, x = pmax(x, y, na.rm = FALSE))
+    collect(mutate(tbl_pmin_df, x = pmax(x, y, na.rm = FALSE)))
     )
 })
 
