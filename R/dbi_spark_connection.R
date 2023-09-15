@@ -65,10 +65,9 @@ setMethod("dbQuoteIdentifier", c("spark_connection", "character"), function(conn
   if(length(split_x) > 1) {
     if(!any(split_x == "")) possible_schema <- TRUE
   }
-  if (length(x) == 0L |
-      (inherits(x, "ident") && possible_schema) |
-      (regexpr("`", x)[[1]] >= 0 && possible_schema)
-      ) {
+  if (length(x) == 0L ||
+      (inherits(x, "ident") && possible_schema) ||
+      (regexpr("`", x)[[1]] >= 0 && possible_schema)) {
     out <- x
   } else {
     dbi_ensure_no_backtick(x)
