@@ -579,12 +579,12 @@ test_that("pmin and pmax work", {
     all(remote_p == local_p)
   )
 
-  expect_error(
+  expect_error({
     collect(mutate(tbl_pmin_df, x = pmin(x, y, na.rm = FALSE)))
-    )
+  }, regexp = "na.rm = TRUE")
 
-  expect_error(
+  expect_error({
     collect(mutate(tbl_pmin_df, x = pmax(x, y, na.rm = FALSE)))
-    )
+  }, regexp = "na.rm = TRUE")
 })
 
