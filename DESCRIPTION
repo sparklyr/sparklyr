@@ -118,7 +118,6 @@ Suggests:
     shiny (>= 1.0.1),
     parsnip,
     testthat,
-    pysparklyr,
     rprojroot
 Encoding: UTF-8
 RoxygenNote: 7.2.3

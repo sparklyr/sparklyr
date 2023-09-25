@@ -148,7 +148,7 @@ spark_connect <- function(master,
   # Note: databricks_connect != databricks-connect !!
   # databricks-connect will eventually be deprecated and removed.
   if(method %in% c("databricks_connect", "spark_connect"))
-    if(!requireNamespace("pysparklyr", quietly = TRUE))
+    if(!requireNamespace2("pysparklyr", quietly = TRUE))
       rlang::abort(glue::glue("Please install {{pysparklyr}} for method = '{method}'"))
 
   # A Databricks GUID indicates that it is running on a Databricks cluster,
@@ -309,6 +309,12 @@ spark_connect <- function(master,
 
   # return scon
   scon
+}
+
+# work around R CMD check until pysparklyr is on CRAN
+requireNamespace2 <- function(...) {
+  fn <- baseenv()[["requireNamespace"]]
+  do.call(fn, list(...))
 }
 
 #' Function that negotiates the connection with the Spark back-end
