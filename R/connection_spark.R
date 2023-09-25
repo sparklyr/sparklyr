@@ -103,7 +103,7 @@ spark_config_shell_args <- function(config, master) {
 }
 
 no_databricks_guid <- function() {
-  mget("DATABRICKS_GUID", envir = .GlobalEnv, ifnotfound = "") == ""
+  !exists("DATABRICKS_GUID", envir = .GlobalEnv)
 }
 
 #' @name spark-connections
@@ -245,7 +245,7 @@ spark_connect <- function(master,
     hadoop_version = hadoop_version,
     extensions = extensions,
     scala_version = scala_version,
-    ... = ...
+    ...
   )
 
   scon$state$hive_support_enabled <- spark_config_value(
@@ -348,7 +348,7 @@ spark_connect_method.default <- function(
   shell_args <- spark_config_shell_args(config, master)
 
   # spark-shell (local install of spark)
-  if (method == "shell" || method == "qubole" || method == "databricks-connect") {
+  if (method %in% c("shell", "qubole", "databricks-connect")) {
     scon <- shell_connection(
       master = master,
       spark_home = spark_home,
