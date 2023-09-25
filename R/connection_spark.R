@@ -140,17 +140,16 @@ spark_connect <- function(master,
                           scala_version = NULL,
                           ...) {
 
-  # Loads downstream packages if installed
-  pkgs <- c("pysparklyr")
-  purrr::walk(
-    pkgs, ~{
-      if(rlang::is_installed(.x)) {
-        library(.x, character.only = TRUE)
-      }
-    }
-  )
+  method <- method[[1L]]
 
-  method <- method[[1]]
+  # pysparklyr provides S3 methods/support for
+  # `method = "databricks_connect"` and `method = "spark_connect"`
+  # load pysparklyr to make sure methods are available.
+  # Note: databricks_connect != databricks-connect !!
+  # databricks-connect will eventually be deprecated and removed.
+  if(method %in% c("databricks_connect", "spark_connect"))
+    if(!require("pysparklyr", quietly = TRUE))
+      rlang::abort(glue::glue("Please install {{pysparklyr}} for method = '{method}'"))
 
   # A Databricks GUID indicates that it is running on a Databricks cluster,
   # so if there is no GUID, then method = "databricks" must refer to Databricks Connect
