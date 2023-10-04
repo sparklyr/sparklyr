@@ -29,7 +29,7 @@ dplyr_across_test_cases_df <- tibble(
 dplyr_across_test_cases_tbl <- testthat_tbl("dplyr_across_test_cases_df")
 
 test_remote_name <- function(x, y) {
-  if (packageVersion("dbplyr") <= "2.3.3") {
+  if (packageVersion("dbplyr") <= "2.3.4") {
     y <- ident(y)
   }
   expect_equal(dbplyr::remote_name(x), y)
@@ -91,7 +91,7 @@ test_that("'summarize' works with where(...) predicate", {
 
   expect_equivalent(
     iris %>% summarize(across(where(is.numeric), mean)),
-    iris_tbl %>% summarize(across(where(is.numeric), mean)) %>% collect()
+    iris_tbl %>% summarize(across(where(is.numeric), ~mean(.x, na.rm = TRUE))) %>% collect()
   )
 
   expect_equivalent(
