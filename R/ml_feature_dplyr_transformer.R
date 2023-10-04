@@ -95,7 +95,7 @@ ft_extract_sql <- function(x) {
   }
 
   tbl_name <- get_base_name(x$lazy_query)
-  if (packageVersion("dbplyr") > "2.3.3") {
+  if (packageVersion("dbplyr") > "2.3.4") {
     tbl_name <- format(tbl_name)
     tbl_name <- substr(tbl_name, 2, nchar(tbl_name) - 1)
   }
