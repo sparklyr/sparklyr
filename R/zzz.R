@@ -7,4 +7,4 @@ set_option_default <- function(...) {
   })
 }
 
-utils::globalVariables(".")
+utils::globalVariables(c(".", "RStudio.Version"))

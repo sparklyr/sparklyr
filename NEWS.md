@@ -1,14 +1,55 @@
-# Sparklyr 1.8.3.9000
+# Sparklyr 1.8.3
 
-### New features
+### Improvements
 
-- Adds functionality to allow other packages to provide `sparklyr` additional back-ends. This effort is mainly focused on adding the ability to integrate with Spark Connect and Databricks Connect through a new package. 
+- Spark error message relays are now cached instead of the entire content
+displayed as an R error. This used to overwhelm the interactive session's 
+console or Notebook, because of the amount of lines returned by the
+Spark message.  Now, by default, it will return the top of the Spark 
+error message, which is typically the most relevant part. The full error can
+still be accessed using a new function called `spark_last_error()`
 
-- New exported functions to integrate with the RStudio IDE. They all have the same `spark_ide_` prefix
+- Reduces redundancy on several tests
 
-- Modifies several read functions to become exported methods
+- Handles SQL quoting when the table reference contains multiple levels. The 
+common time someone would encounter an issue is when a table name is passed
+using `in_catalog()`, or `in_schema()`. 
 
-- Adds `spark_integ_test_skip()` function. This is to allow other packages to use `sparklyr`'s test suite. It enables a way to the external package to indicate wether to run or skip specific tests
+### Java
+
+- Adds Scala scripts to handle changes in the upcoming version of Spark (3.5)
+- Adds new JAR file to handle Spark 3.0 to 3.4
+- Adds new JAR file to handle Spark 3.5 and above
+
+### Fixes
+
+- It prevents an error when `na.rm = TRUE` is explicitly set within `pmax()` and
+`pmin()`. It will now also purposely fail if `na.rm` is set to `FALSE`. The
+default of these functions in base R is for `na.rm` to be `FALSE`, but ever
+since these functions were released, there has been no warning or error. For now,
+we will keep that behavior until a better approach can be figured out. (#3353)
+
+- `spark_install()` will now properly match when a partial version is passed 
+to the function. The issue was that passing '2.3' would match to '3.2.3', instead
+of '2.3.x' (#3370)
+
+### Package integration
+
+- Adds functionality to allow other packages to provide `sparklyr` additional 
+back-ends. This effort is mainly focused on adding the ability to integrate 
+with Spark Connect and Databricks Connect through a new package. 
+
+- New exported functions to integrate with the RStudio IDE. They all have the
+same `spark_ide_` prefix
+
+- Modifies several read functions to become exported methods, such as 
+`sdf_read_column()`. 
+
+- Adds `spark_integ_test_skip()` function. This is to allow other packages 
+to use `sparklyr`'s test suite. It enables a way to the external package to 
+indicate if a given test should run or be skipped.
+
+- If installed, `sparklyr` will load the `pysparklyr` package
 
 # Sparklyr 1.8.2
 

@@ -1,30 +1,50 @@
 # Submission
 
-- Addresses issues from Windows pre-checks
+- Spark error message relays are now cached instead of the entire content
+displayed as an R error. This used to overwhelm the interactive session's 
+console or Notebook, because of the amount of lines returned by the
+Spark message.  Now, by default, it will return the top of the Spark 
+error message, which is typically the most relevant part. The full error can
+still be accessed using a new function called `spark_last_error()`
 
-## In this version
+- Reduces redundancy on several tests
 
-- Fix various rlang deprecation warnings (@mgirlich, #3333).
+- Handles SQL quoting when the table reference contains multiple levels. The 
+common time someone would encounter an issue is when a table name is passed
+using `in_catalog()`, or `in_schema()`. 
 
-- Adds Azure Synapse Analytics connectivity (@Bob-Chou , #3336)
+- Adds Scala scripts to handle changes in the upcoming version of Spark (3.5)
 
-- Adds support for "parameterized" queries now available in Spark 3.4 (@gregleleu #3335)
+- Adds new JAR file to handle Spark 3.0 to 3.4
 
-- Adds new DBI methods: `dbValid` and `dbDisconnect` (@alibell, #3296)
+- Adds new JAR file to handle Spark 3.5 and above
 
-- Adds `overwrite` parameter to `dbWriteTable()` (@alibell, #3296)
+- It prevents an error when `na.rm = TRUE` is explicitly set within `pmax()` and
+`pmin()`. It will now also purposely fail if `na.rm` is set to `FALSE`. The
+default of these functions in base R is for `na.rm` to be `FALSE`, but ever
+since these functions were released, there has been no warning or error. For now,
+we will keep that behavior until a better approach can be figured out. (#3353)
 
-- Adds `database` parameter to `dbListTables()` (@alibell, #3296)
+- `spark_install()` will now properly match when a partial version is passed 
+to the function. The issue was that passing '2.3' would match to '3.2.3', instead
+of '2.3.x' (#3370)
 
-- Fixes Spark download locations (#3331)
+- Adds functionality to allow other packages to provide `sparklyr` additional 
+back-ends. This effort is mainly focused on adding the ability to integrate 
+with Spark Connect and Databricks Connect through a new package. 
 
-- Switches upper version of Spark to 3.4, and updates JARS (#3334)
+- New exported functions to integrate with the RStudio IDE. They all have the
+same `spark_ide_` prefix
 
-- Adds ability to turn off predicate support (where(), across()) using 
-  options("sparklyr.support.predicates" = FALSE). Defaults to TRUE. This should
-  accelerate `dplyr` commands because it won't need to process column types
-  for every single piped command
-  
+- Modifies several read functions to become exported methods, such as 
+`sdf_read_column()`. 
+
+- Adds `spark_integ_test_skip()` function. This is to allow other packages 
+to use `sparklyr`'s test suite. It enables a way to the external package to 
+indicate if a given test should run or be skipped.
+
+- If installed, `sparklyr` will load the `pysparklyr` package
+
 ## Test environments
 
 - Ubuntu 22.04, R 4.3.1, Spark 3.3 (GH Actions)
@@ -49,24 +69,19 @@ Notes:
 
 ```
 ❯ checking package dependencies ... NOTE
-  Packages suggested but not available for checking:
-    'janeaustenr', 'Lahman', 'mlbench', 'RCurl', 'reshape2'
-  
   Imports includes 24 non-default packages.
   Importing from so many packages makes the package vulnerable to any of
   them becoming unavailable.  Move as many as possible to Suggests and
   use conditionally.
 
 ❯ checking installed package size ... NOTE
-    installed size is  6.8Mb
+    installed size is  7.1Mb
     sub-directories of 1Mb or more:
-      R      2.1Mb
-      java   3.4Mb
+      R      2.0Mb
+      java   3.8Mb
 ```
 
 ## Reverse dependencies
-
-1 Warning in sparkwarc, not related sparklyr]
 
 |Package|Version|Error|Warning|Note|OK|
 |:---|:---|:---|:---|:---|:---|
@@ -87,25 +102,3 @@ Notes:
 |[sparkwarc](#sparkwarc)|0.1.6|0|0|1|48|
 |[sparkxgb](#sparkxgb)|0.1.1|0|0|1|41|
 |[variantspark](#variantspark)|0.1.1|0|0|1|43|
-
-
-###  sparkwarc
-```
-* using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkwarc.Rcheck’
-* using R version 4.3.1 (2023-06-16)
-* using platform: aarch64-apple-darwin20 (64-bit)
-* R was compiled by
-    Apple clang version 14.0.0 (clang-1400.0.29.202)
-    GNU Fortran (GCC) 12.2.0
-* running under: macOS Ventura 13.4.1
-* using session charset: UTF-8
-* checking extension type ... Package
-* this is package ‘sparkwarc’ version ‘0.1.6’
-* package encoding: UTF-8
-* used C++ compiler: ‘Apple clang version 14.0.3 (clang-1403.0.22.14.1)’
-* used SDK: ‘MacOSX13.3.sdk’
-* checking C++ specification ... NOTE
-  Specified C++11: please drop specification unless essential
-* DONE
-Status: 1 NOTE
-```

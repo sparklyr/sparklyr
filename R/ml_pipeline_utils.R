@@ -99,11 +99,12 @@ jobj_set_param_helper <- function(jobj, setter, value, min_version = NULL, defau
 #' @template roxlate-ml-features-col
 #' @template roxlate-ml-label-col
 #' @template roxlate-ml-prediction-col
-#' @template roxlate-ml-probabilistic-classifier-params
 #' @template roxlate-ml-clustering-params
 #' @template roxlate-ml-feature-input-output-col
 #' @param input_cols Names of input columns.
 #' @param input_cols Names of output columns.
+#' @param probability_col Column name for predicted class conditional probabilities.
+#' @param raw_prediction_col Raw prediction (a.k.a. confidence) column name.
 #'
 #' @keywords internal
 #'

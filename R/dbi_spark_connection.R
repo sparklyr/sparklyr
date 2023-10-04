@@ -54,19 +54,27 @@ get_data_type <- function(obj) {
 }
 
 dbi_ensure_no_backtick <- function(x) {
-  if (regexpr("`", x)[[1]] >= 0) stop("Can't escape back tick from string")
+  if (regexpr("`", x)[[1]] >= 0) {
+    stop("Can't escape back tick from string")
+  }
 }
 
 setMethod("dbQuoteIdentifier", c("spark_connection", "character"), function(conn, x, ...) {
-  if (length(x) == 0L) {
-    x
+  split_x <- unlist(strsplit(x, "\\."))
+  possible_schema <- FALSE
+  if(length(split_x) > 1) {
+    if(!any(split_x == "")) possible_schema <- TRUE
+  }
+  if (length(x) == 0L ||
+      (inherits(x, "ident") && possible_schema) ||
+      (regexpr("`", x)[[1]] >= 0 && possible_schema)) {
+    out <- x
   } else {
     dbi_ensure_no_backtick(x)
-
     y <- paste("`", x, "`", sep = "")
-
-    SQL(y)
+    out <- SQL(y)
   }
+  out
 })
 
 setMethod("dbQuoteString", c("spark_connection", "character"), function(conn, x, ...) {

@@ -103,7 +103,7 @@ spark_config_shell_args <- function(config, master) {
 }
 
 no_databricks_guid <- function() {
-  mget("DATABRICKS_GUID", envir = .GlobalEnv, ifnotfound = "") == ""
+  !exists("DATABRICKS_GUID", envir = .GlobalEnv)
 }
 
 #' @name spark-connections
@@ -140,17 +140,16 @@ spark_connect <- function(master,
                           scala_version = NULL,
                           ...) {
 
-  # Loads downstream packages if installed
-  pkgs <- c("pysparklyr")
-  purrr::walk(
-    pkgs, ~{
-      if(rlang::is_installed(.x)) {
-        library(.x, character.only = TRUE)
-      }
-    }
-  )
+  method <- method[[1L]]
 
-  method <- method[[1]]
+  # pysparklyr provides S3 methods/support for
+  # `method = "databricks_connect"` and `method = "spark_connect"`
+  # load pysparklyr to make sure methods are available.
+  # Note: databricks_connect != databricks-connect !!
+  # databricks-connect will eventually be deprecated and removed.
+  if(method %in% c("databricks_connect", "spark_connect"))
+    if(!requireNamespace2("pysparklyr", quietly = TRUE))
+      rlang::abort(glue::glue("Please install {{pysparklyr}} for method = '{method}'"))
 
   # A Databricks GUID indicates that it is running on a Databricks cluster,
   # so if there is no GUID, then method = "databricks" must refer to Databricks Connect
@@ -246,7 +245,7 @@ spark_connect <- function(master,
     hadoop_version = hadoop_version,
     extensions = extensions,
     scala_version = scala_version,
-    ... = ...
+    ...
   )
 
   scon$state$hive_support_enabled <- spark_config_value(
@@ -312,6 +311,12 @@ spark_connect <- function(master,
   scon
 }
 
+# work around R CMD check until pysparklyr is on CRAN
+requireNamespace2 <- function(...) {
+  fn <- baseenv()[["requireNamespace"]]
+  do.call(fn, list(...))
+}
+
 #' Function that negotiates the connection with the Spark back-end
 #' @inheritParams spark-connections
 #' @param x A dummy method object to determine which code to use to connect
@@ -349,7 +354,7 @@ spark_connect_method.default <- function(
   shell_args <- spark_config_shell_args(config, master)
 
   # spark-shell (local install of spark)
-  if (method == "shell" || method == "qubole" || method == "databricks-connect") {
+  if (method %in% c("shell", "qubole", "databricks-connect")) {
     scon <- shell_connection(
       master = master,
       spark_home = spark_home,

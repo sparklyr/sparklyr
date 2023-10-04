@@ -53,8 +53,7 @@ The object returned depends on the class of \code{x}.
 \description{
 Implements the transforms required for fitting a dataset against an R model
   formula. Currently we support a limited subset of the R operators,
-  including \code{~}, \code{.}, \code{:}, \code{+}, and \code{-}. Also see the R formula docs here:
-  \url{https://stat.ethz.ch/R-manual/R-patched/library/stats/html/formula.html}
+  including \code{~}, \code{.}, \code{:}, \code{+}, and \code{-}.
 }
 \details{
 The basic operators in the formula are:

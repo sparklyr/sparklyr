@@ -34,7 +34,6 @@ sparklyr_jar_verify_spark <- function(install = TRUE) {
 #' Given a set of \code{scala} source files, compile them
 #' into a Java Archive (\code{jar}).
 #'
-#' @param name The name to assign to the target \code{jar}.
 #' @param spark_home The path to the Spark sources to be used
 #'   alongside compilation.
 #' @param filter An optional function, used to filter out discovered \code{scala}
