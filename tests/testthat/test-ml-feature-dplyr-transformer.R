@@ -22,7 +22,7 @@ test_that("ft_dplyr_transformer() works", {
 
   expect_equal(
     ml_param_map(dplyr_transformer),
-    if (packageVersion("dbplyr") > "2.3.3") {
+    if (packageVersion("dbplyr") > "2.3.4") {
       list(statement = "SELECT `__THIS__`.*, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
     } else {
       list(statement = "SELECT *, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
