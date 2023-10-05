@@ -18,12 +18,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {spark: '3.5.0', hadoop: '3',   arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 3.5'}
-          - {spark: '3.4.1', hadoop: '3',   arrow: 'release', livy: '',      dbplyr: '',      name: 'Spark 3.4 w Arrow'}
-          - {spark: '3.4.1', hadoop: '3',   arrow: 'devel',   livy: '',      dbplyr: '',      name: 'Spark 3.4 w Arrow Dev'}
-          - {spark: '3.3.2', hadoop: '3.2', arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 3.3'}
-          - {spark: '2.4.0', hadoop: '2.7', arrow: '',        livy: '',      dbplyr: '',      name: 'Spark 2.4'}
-          - {spark: '2.4.0', hadoop: '2.7', arrow: '',        livy: '0.6.0', dbplyr: '',      name: 'Spark 2.4 w Livy 6'}
+          - {spark: '3.5.0', hadoop: '3',   arrow: '',        livy: '',      dbplyr: '',    name: 'Spark 3.5'}
+          - {spark: '3.4.1', hadoop: '3',   arrow: 'release', livy: '',      dbplyr: '',    name: 'Spark 3.4 w Arrow'}
+          - {spark: '3.4.1', hadoop: '3',   arrow: '',        livy: '',      dbplyr: 'dev', name: 'Spark 3.4 dev dbplyr'}
+          - {spark: '3.3.2', hadoop: '3',   arrow: '',        livy: '',      dbplyr: '',    name: 'Spark 3.3'}
+          #- {spark: '2.4.0', hadoop: '2.7', arrow: '',        livy: '',      dbplyr: '',    name: 'Spark 2.4'}
+          #- {spark: '2.4.0', hadoop: '2.7', arrow: '',        livy: '0.6.0', dbplyr: '',    name: 'Spark 2.4 w Livy 6'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -68,7 +68,10 @@ jobs:
         if: steps.cache-spark.outputs.cache-hit != 'true'
         run: |
           devtools::load_all()
-          spark_install(version = Sys.getenv("SPARK_VERSION"), hadoop_version = Sys.getenv("HADOOP_VERSION"))
+          spark_install(
+            version = Sys.getenv("SPARK_VERSION"),
+            hadoop_version = Sys.getenv("HADOOP_VERSION")
+            )
         shell: Rscript {0}
 
       - name: Cache Livy
@@ -83,7 +86,10 @@ jobs:
         if: ${{ (steps.cache-livy.outputs.cache-hit != 'true') && (matrix.config.livy != '') }}
         run: |
           devtools::load_all()
-          livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
+          livy_install(
+            version = Sys.getenv("LIVY_VERSION"),
+            spark_version = Sys.getenv("SPARK_VERSION")
+            )
         shell: Rscript {0}
 
       - name: Cache Scala
@@ -101,11 +107,17 @@ jobs:
         shell: Rscript {0}
 
       - name: Switching to Arrow devel if needed
-        run: if(Sys.getenv("ARROW_VERSION") == "devel") arrow::install_arrow(nightly = TRUE)
+        run: |
+          if(Sys.getenv("ARROW_VERSION") == "devel") {
+            arrow::install_arrow(nightly = TRUE)
+          }
         shell: Rscript {0}
 
       - name: Installing specified version of dbplyr
-        run: if(Sys.getenv("DBPLYR_VERSION") != "") devtools::install_version("dbplyr", version = Sys.getenv("DBPLYR_VERSION"))
+        run: |
+          if(Sys.getenv("DBPLYR_VERSION") == "dev") {
+            devtools::install_github("tidyverse/dbplyr")
+          }
         shell: Rscript {0}
 
       - name: R Session Info
