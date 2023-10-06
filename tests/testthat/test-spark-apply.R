@@ -1,8 +1,6 @@
 # CI k8s POD is crashing when running these test with
 # dbplyr dev. Need to investigate.
-if(Sys.getenv("DBPLYR_VERSION") == "dev") {
-  skip("Skipping on dev version of `dbplyr`")
-}
+skip_if_dbplyr_dev()
 
 skip_connection("spark-apply")
 skip_on_livy()
