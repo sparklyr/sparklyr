@@ -1,3 +1,9 @@
+# CI k8s POD is crashing when running these test with
+# dbplyr dev. Need to investigate.
+if(Sys.getenv("DBPLYR_VERSION") == "dev") {
+  skip("Skipping on dev version of `dbplyr`")
+}
+
 skip_connection("spark-apply")
 skip_on_livy()
 test_requires("dplyr")
@@ -96,9 +102,6 @@ test_that("'spark_apply' works with fetch_result_as_sdf = FALSE", {
 })
 
 test_that("'spark_apply' supports partition index as parameter", {
-  if(Sys.getenv("DBPLYR_VERSION") == "dev") {
-    skip("Skipping on dev version of `dbplyr`")
-  }
   expect_equivalent(
     sdf_len(sc, 10, repartition = 5) %>%
       spark_apply(
