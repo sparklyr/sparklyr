@@ -82,7 +82,7 @@ to_partition_spec <- function(group_vars, order_exprs) {
       order_exprs %>%
         lapply(
           function(x) {
-            as.character(dbplyr::translate_sql(!!x))
+            as.character(dbplyr::translate_sql(!!x, con = dbplyr::simulate_hive()))
           }
         ) %>%
         paste0(collapse = ", ")
