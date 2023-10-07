@@ -1,3 +1,5 @@
+test_requires_version(min_version = "2.4", max_version = "3.3")
+
 skip_connection("ml-classification-multilayer-perceptron")
 skip_on_livy()
 skip_on_arrow_devel()

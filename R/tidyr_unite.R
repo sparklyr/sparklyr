@@ -34,7 +34,10 @@ unite.tbl_spark <- function(data, col, ..., sep = "_", remove = TRUE, na.rm = FA
     }
   )
   sql <- paste0(
-    append(list(dbplyr::translate_sql(!!sep)), concat_ws_args),
+    append(list(
+      dbplyr::translate_sql(!!sep, con = dbplyr::simulate_hive())),
+      concat_ws_args
+      ),
     collapse = ", "
   ) %>%
     paste0("CONCAT_WS(", ., ")") %>%

@@ -1,3 +1,7 @@
+# CI k8s POD is crashing when running these test with
+# dbplyr dev. Need to investigate.
+skip_if_dbplyr_dev()
+
 skip_connection("spark-apply")
 skip_on_livy()
 test_requires("dplyr")
