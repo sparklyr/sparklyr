@@ -230,7 +230,7 @@ sdf_pivot_wider <- function(data,
   val_sql_type <- invoke(combined_schema_obj, "fields")[[val_field_idx]] %>%
     invoke("%>%", list("dataType"), list("sql"))
   fv <- values_fill[[value]]
-  val_fill_sql <- dbplyr::translate_sql_(list(fv), con = dbplyr::simulate_dbi()) %>%
+  val_fill_sql <- dbplyr::translate_sql_(list(fv), con = dbplyr::simulate_hive()) %>%
     dplyr::sql() %>%
     list()
   names(val_fill_sql) <- value

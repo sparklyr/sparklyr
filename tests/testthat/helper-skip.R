@@ -114,3 +114,9 @@ skip_connection <- function(x) {
     skip(paste0("Test '", x, "' not supported by backend"))
   }
 }
+
+skip_if_dbplyr_dev <- function() {
+  if(Sys.getenv("DBPLYR_VERSION") == "dev") {
+    skip("Skipping on dev version of `dbplyr`")
+  }
+}

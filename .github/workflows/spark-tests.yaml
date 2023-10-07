@@ -68,7 +68,10 @@ jobs:
         if: steps.cache-spark.outputs.cache-hit != 'true'
         run: |
           devtools::load_all()
-          spark_install(version = Sys.getenv("SPARK_VERSION"), hadoop_version = Sys.getenv("HADOOP_VERSION"))
+          spark_install(
+            version = Sys.getenv("SPARK_VERSION"),
+            hadoop_version = Sys.getenv("HADOOP_VERSION")
+            )
         shell: Rscript {0}
 
       - name: Cache Livy
@@ -83,7 +86,10 @@ jobs:
         if: ${{ (steps.cache-livy.outputs.cache-hit != 'true') && (matrix.config.livy != '') }}
         run: |
           devtools::load_all()
-          livy_install(version = Sys.getenv("LIVY_VERSION"), spark_version = Sys.getenv("SPARK_VERSION"))
+          livy_install(
+            version = Sys.getenv("LIVY_VERSION"),
+            spark_version = Sys.getenv("SPARK_VERSION")
+            )
         shell: Rscript {0}
 
       - name: Cache Scala
@@ -101,11 +107,17 @@ jobs:
         shell: Rscript {0}
 
       - name: Switching to Arrow devel if needed
-        run: if(Sys.getenv("ARROW_VERSION") == "devel") arrow::install_arrow(nightly = TRUE)
+        run: |
+          if(Sys.getenv("ARROW_VERSION") == "devel") {
+            arrow::install_arrow(nightly = TRUE)
+          }
         shell: Rscript {0}
 
       - name: Installing specified version of dbplyr
-        run: if(Sys.getenv("DBPLYR_VERSION") != "") devtools::install_version("dbplyr", version = Sys.getenv("DBPLYR_VERSION"))
+        run: |
+          if(Sys.getenv("DBPLYR_VERSION") == "dev") {
+            devtools::install_github("tidyverse/dbplyr")
+          }
         shell: Rscript {0}
 
       - name: R Session Info
@@ -126,6 +138,9 @@ jobs:
       - name: R Tests
         run: |
           devtools::load_all()
+          if(Sys.getenv("ARROW_VERSION") != "") {
+            library(arrow)
+          }
           spark_major <- as.numeric(substr(Sys.getenv("SPARK_VERSION"), 1, 1))
           if(spark_major < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
           Sys.getenv("JAVA_HOME")

@@ -6,7 +6,7 @@ get_sdf_storage_level <- function(sdf_jobj) {
 #' @importFrom dbplyr sql_render
 #' @importFrom dbplyr sql_build
 spark_dataframe.tbl_spark <- function(x, ...) {
-  x$spark_dataframe(
+  x[["spark_dataframe"]](
     x,
     function(tbl_spark) {
       sc <- spark_connection(tbl_spark)
@@ -54,7 +54,7 @@ sdf_schema <- function(x,
 sdf_schema.tbl_spark <- function(x,
                                  expand_nested_cols = FALSE,
                                  expand_struct_cols = FALSE) {
-  x$schema(
+  x[["schema"]](
     x,
     sdf_schema_impl,
     expand_nested_cols = expand_nested_cols,
