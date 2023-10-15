@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.8.3.9000
+Version: 1.8.3.9001
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -80,7 +80,6 @@ Imports:
     dbplyr (>= 2.2.1),
     digest,
     dplyr (>= 1.0.9),
-    ellipsis (>= 0.1.0),
     generics,
     globals,
     glue,

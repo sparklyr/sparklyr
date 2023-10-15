@@ -1,3 +1,10 @@
+# Sparklyr (dev)
+
+### Fixes
+
+- Small fix to spark_connect_method() arguments. Removes 'hadoop_version', and
+adds 'packages'
+
 # Sparklyr 1.8.3
 
 ### Improvements

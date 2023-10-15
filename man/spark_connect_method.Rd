@@ -12,7 +12,7 @@ spark_connect_method(
   config,
   app_name,
   version,
-  hadoop_version,
+  packages,
   extensions,
   scala_version,
   ...
@@ -45,7 +45,12 @@ cluster.}
 \item{version}{The version of Spark to use. Required for \code{"local"} Spark
 connections, optional otherwise.}
 
-\item{hadoop_version}{Version of Hadoop to use}
+\item{packages}{A list of Spark packages to load. For example, \code{"delta"} or
+\code{"kafka"} to enable Delta Lake or Kafka. Also supports full versions like
+\code{"io.delta:delta-core_2.11:0.4.0"}. This is similar to adding packages into the
+\code{sparklyr.shell.packages} configuration option. Notice that the \code{version}
+parameter is used to choose the correct package, otherwise assumes the latest version
+is being used.}
 
 \item{extensions}{Extension R packages to enable for this connection. By
 default, all packages enabled through the use of

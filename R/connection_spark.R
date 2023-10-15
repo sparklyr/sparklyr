@@ -158,8 +158,6 @@ spark_connect <- function(master,
     master <- "local"
   }
 
-  hadoop_version <- list(...)$hadoop_version
-
   # ensure app_name is part of the spark-submit args
   config$`sparklyr.shell.name` <- config$`sparklyr.shell.name` %||% app_name
   master_override <- spark_config_value(config, "sparklyr.connect.master", NULL)
@@ -242,7 +240,7 @@ spark_connect <- function(master,
     config = config,
     app_name = app_name,
     version = version,
-    hadoop_version = hadoop_version,
+    packages = packages,
     extensions = extensions,
     scala_version = scala_version,
     ...
@@ -320,7 +318,6 @@ requireNamespace2 <- function(...) {
 #' Function that negotiates the connection with the Spark back-end
 #' @inheritParams spark-connections
 #' @param x A dummy method object to determine which code to use to connect
-#' @param hadoop_version Version of Hadoop to use
 #' @export
 spark_connect_method <- function(
     x,
@@ -330,7 +327,7 @@ spark_connect_method <- function(
     config,
     app_name,
     version,
-    hadoop_version,
+    packages,
     extensions,
     scala_version,
     ...) {
@@ -346,10 +343,12 @@ spark_connect_method.default <- function(
     config,
     app_name,
     version,
-    hadoop_version,
+    packages,
     extensions,
     scala_version,
     ...) {
+
+  hadoop_version <- list(...)$hadoop_version
 
   shell_args <- spark_config_shell_args(config, master)
 

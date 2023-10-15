@@ -19,5 +19,5 @@ generics::augment
 #' @export
 generics::glance
 
-#' @importFrom ellipsis check_dots_used
+#' @importFrom rlang check_dots_used check_dots_empty
 NULL
