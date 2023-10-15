@@ -47,7 +47,6 @@ sparklyr_jar_verify_spark <- function(install = TRUE) {
 #' @param embedded_srcs Embedded source file(s) under \code{<R package root>/java} to
 #'   be included in the root of the resulting jar file as resources
 #'
-#' @import digest
 #'
 #' @keywords internal
 #' @export

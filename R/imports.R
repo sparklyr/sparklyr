@@ -5,6 +5,7 @@
 #' @importFrom dplyr type_sum
 #' @importFrom rlang %||%
 #' @importFrom purrr map_chr
+#' @importFrom openssl multihash rand_num
 NULL
 
 #' @importFrom generics tidy
