@@ -36,7 +36,7 @@ livy_available_jars <- function() {
 #'
 #' @export
 #'
-#' @importFrom base64enc base64encode
+#' @importFrom openssl base64_encode base64_decode
 #'
 #' @param config Optional base configuration
 #' @param username The username to use in the Authorization header
