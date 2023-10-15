@@ -27,7 +27,7 @@ spark_connection.src_spark <- function(x, ...) {
 #' @importFrom dbplyr db_connection_describe
 #' @export
 db_connection_describe.src_spark <- function(con, ...) {
-  ellipsis::check_dots_empty()
+  check_dots_empty()
   spark_db_desc(con)
 }
 

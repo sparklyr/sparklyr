@@ -80,7 +80,6 @@ Imports:
     dbplyr (>= 2.2.1),
     digest,
     dplyr (>= 1.0.9),
-    ellipsis (>= 0.1.0),
     generics,
     globals,
     glue,
