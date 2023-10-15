@@ -74,7 +74,6 @@ BugReports: https://github.com/sparklyr/sparklyr/issues
 Depends:
     R (>= 3.2)
 Imports:
-    base64enc,
     config (>= 0.2),
     DBI (>= 1.0.0),
     dbplyr (>= 2.2.1),
