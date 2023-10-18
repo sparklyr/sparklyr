@@ -97,7 +97,7 @@ spark_session_id <- function(app_name, master) {
     sum((pos - 1L) * 16^(rev(seq_along(xx) - 1)))
   }
 
-  hashed <- multihash(x = paste(app_name, master, sep = ""), algo = "sha1")
+  hashed <- multihash(x = paste(app_name, master, sep = ""), algos = "sha1")
   hex_to_int(substr(hashed, 1, 20)) %% .Machine$integer.max
 }
 

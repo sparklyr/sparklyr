@@ -44,7 +44,7 @@ spark_apply_bundle_file <- function(packages, base_path, session_id) {
         substr(
           multihash(
             paste(packages, collapse = "-"),
-            algo = "sha256"
+            algos = "sha256"
           ),
           start = 1,
           stop = 7
