@@ -5,6 +5,7 @@
 \alias{is_ml_transformer}
 \alias{is_ml_estimator}
 \alias{ml_fit}
+\alias{ml_fit.default}
 \alias{ml_transform}
 \alias{ml_fit_and_transform}
 \alias{ml_predict}
@@ -16,6 +17,8 @@ is_ml_transformer(x)
 is_ml_estimator(x)
 
 ml_fit(x, dataset, ...)
+
+\method{ml_fit}{default}(x, dataset, ...)
 
 ml_transform(x, dataset, ...)
 
