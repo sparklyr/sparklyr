@@ -429,12 +429,13 @@ test_that("spark_read() works as expected", {
     "hdfs://localhost:9000/3/4/5"
   )
   reader <- function(path) {
-    data.frame(md5 = digest::digest(path, algo = "md5"), length = nchar(path))
+    data.frame(md5 = openssl::multihash(path, algos = "md5"), length = nchar(path))
   }
 
   expected_md5s <- sapply(
-    paths, function(x) digest::digest(x, algo = "md5")
-  )
+    paths, function(x) openssl::multihash(x, algos = "md5")
+  ) %>%
+    unlist()
   names(expected_md5s) <- NULL
 
   expected_lengths <- sapply(paths, function(x) nchar(x))
@@ -449,7 +450,7 @@ test_that("spark_read() works as expected", {
       sc,
       paths,
       reader,
-      packages = c("digest"),
+      packages = c("openssl"),
       columns = c("md5", "length")
     )
     expect_equivalent(
