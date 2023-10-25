@@ -9,7 +9,7 @@
 
 ## To change defaults, change these specific environment variables, before
 ## running the tests:
-## Sys.setenv("SPARK_VERSION" = "2.4.0")
+## Sys.setenv("SPARK_VERSION" = "3.3.0")
 ## Sys.setenv("LIVY_VERSION" = "0.6.0")
 ## Sys.setenv("ARROW_VERSION" = "release") # Or "devel"
 ## devtools::test(reporter = sparklyr_reporter())

@@ -434,7 +434,8 @@ test_that("spark_read() works as expected", {
 
   expected_md5s <- sapply(
     paths, function(x) openssl::multihash(x, algos = "md5")
-  )
+  ) %>%
+    unlist()
   names(expected_md5s) <- NULL
 
   expected_lengths <- sapply(paths, function(x) nchar(x))
