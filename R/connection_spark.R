@@ -240,7 +240,6 @@ spark_connect <- function(master,
     config = config,
     app_name = app_name,
     version = version,
-    packages = packages,
     extensions = extensions,
     scala_version = scala_version,
     ...
@@ -327,7 +326,6 @@ spark_connect_method <- function(
     config,
     app_name,
     version,
-    packages,
     extensions,
     scala_version,
     ...) {
@@ -343,7 +341,6 @@ spark_connect_method.default <- function(
     config,
     app_name,
     version,
-    packages,
     extensions,
     scala_version,
     ...) {
