@@ -12,6 +12,7 @@ spark_connect_method(
   config,
   app_name,
   version,
+  hadoop_version,
   extensions,
   scala_version,
   ...
@@ -43,6 +44,8 @@ cluster.}
 
 \item{version}{The version of Spark to use. Required for \code{"local"} Spark
 connections, optional otherwise.}
+
+\item{hadoop_version}{Version of Hadoop to use}
 
 \item{extensions}{Extension R packages to enable for this connection. By
 default, all packages enabled through the use of
