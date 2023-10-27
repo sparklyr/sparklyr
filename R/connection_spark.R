@@ -343,7 +343,7 @@ spark_connect_method.default <- function(
     config,
     app_name,
     version,
-    hadoop_version,
+    hadoop_version = NULL,
     extensions,
     scala_version,
     ...) {
