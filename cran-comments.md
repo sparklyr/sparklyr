@@ -55,24 +55,11 @@ Notes:
 0 errors ✔ | 0 warnings ✔ | 2 notes ✖
 ```
 
-## Reverse dependencies
+## revdepcheck results
 
-|Package|Version|Error|Warning|Note|OK|
-|:---|:---|:---|:---|:---|:---|
-|[apache.sedona](#apache.sedona)|1.4.1|0|0|0|40|
-|[catalog](#catalog)|0.1.1|0|0|0|42|
-|[geospark](#geospark)|0.3.1|0|0|2|42|
-|[graphframes](#graphframes)|0.1.2|0|0|1|43|
-|[rsparkling](#rsparkling)|0.2.19|0|0|2|34|
-|[s3.resourcer](#s3.resourcer)|1.1.1|0|0|0|42|
-|[shinyML](#shinyML)|1.0.1|0|0|1|40|
-|[spark.sas7bdat](#spark.sas7bdat)|1.4|0|0|0|47|
-|[sparkavro](#sparkavro)|0.3.0|0|0|1|43|
-|[sparkbq](#sparkbq)|0.1.1|0|0|1|41|
-|[sparkhail](#sparkhail)|0.1.1|0|0|1|43|
-|[sparklyr.flint](#sparklyr.flint)|0.2.2|0|0|0|47|
-|[sparklyr.nested](#sparklyr.nested)|0.0.4|0|0|0|43|
-|[sparktf](#sparktf)|0.1.0|0|0|1|43|
-|[sparkwarc](#sparkwarc)|0.1.6|0|0|1|48|
-|[sparkxgb](#sparkxgb)|0.1.1|0|0|1|41|
-|[variantspark](#variantspark)|0.1.1|0|0|1|43|
+We checked 27 reverse dependencies (26 from CRAN + 1 from Bioconductor), comparing
+R CMD check results across CRAN and dev versions of this package.
+
+ * We saw 0 new problems
+ * We failed to check 0 packages
+
