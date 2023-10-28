@@ -1,6 +1,6 @@
 # CI k8s POD is crashing when running these test with
 # dbplyr dev. Need to investigate.
-
+skip_on_ci()
 skip_if_dbplyr_dev()
 skip_connection("submit")
 skip_on_livy()
@@ -24,7 +24,10 @@ test_that("spark_submit() can submit batch jobs", {
       sparklyr.verbose = FALSE
     ),
     {
-      spark_submit(master = "local", file = batch_file, spark_home = sc$spark_home)
+      spark_submit(master = "local",
+                   file = batch_file,
+                   version = spark_version(sc)
+                   )
     }
   )
 

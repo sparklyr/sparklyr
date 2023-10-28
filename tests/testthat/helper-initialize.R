@@ -78,9 +78,6 @@ testthat_shell_connection <- function(method = "shell") {
       packages = packages
     )
 
-    # This makes the test_submit.R tests work
-    Sys.setenv("SPARK_HOME" = sc$spark_home)
-
     testthat_spark_connection_object(sc)
   }
   sc
