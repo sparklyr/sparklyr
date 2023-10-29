@@ -6,10 +6,10 @@ NULL
 #' Spark ML -- Power Iteration Clustering
 #'
 #' Power iteration clustering (PIC) is a scalable and efficient algorithm for clustering vertices of a graph given pairwise similarities as edge properties, described in the paper "Power Iteration Clustering" by Frank Lin and William W. Cohen. It computes a pseudo-eigenvector of the normalized affinity matrix of the graph via power iteration and uses it to cluster vertices. spark.mllib includes an implementation of PIC using GraphX as its backend. It takes an RDD of (srcId, dstId, similarity) tuples and outputs a model with the clustering assignments. The similarities must be nonnegative. PIC assumes that the similarity measure is symmetric. A pair (srcId, dstId) regardless of the ordering should appear at most once in the input data. If a pair is missing from input, their similarity is treated as zero.
-#' @param x A ‘spark_connection’  or a ‘tbl_spark’.
+#' @param x A `spark_connection`  or a `tbl_spark`.
 #' @param k The number of clusters to create.
 #' @param max_iter The maximum number of iterations to run.
-#' @param init_mode This can be either “random”, which is the default, to use a random vector as vertex properties, or “degree” to use normalized sum similarities.
+#' @param init_mode This can be either "random", which is the default, to use a random vector as vertex properties, or "degree" to use normalized sum similarities.
 #' @param src_col Column in the input Spark dataframe containing 0-based indexes of all source vertices in the affinity matrix described in the PIC paper.
 #' @param dst_col Column in the input Spark dataframe containing 0-based indexes of all destination vertices in the affinity matrix described in the PIC paper.
 #' @param weight_col Column in the input Spark dataframe containing non-negative edge weights in the affinity matrix described in the PIC paper.
