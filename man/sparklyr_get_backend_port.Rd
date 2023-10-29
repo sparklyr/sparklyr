@@ -2,7 +2,7 @@
 % Please edit documentation in R/connection_spark.R
 \name{sparklyr_get_backend_port}
 \alias{sparklyr_get_backend_port}
-\title{Return the port number of a {sparklyr} backend.}
+\title{Return the port number of a `sparklyr` backend.}
 \usage{
 sparklyr_get_backend_port(sc)
 }
@@ -10,9 +10,9 @@ sparklyr_get_backend_port(sc)
 \item{sc}{A \code{spark_connection}.}
 }
 \value{
-The port number of the {sparklyr} backend associated with \code{sc}.
+The port number of the `sparklyr` backend associated with \code{sc}.
 }
 \description{
-Retrieve the port number of the {sparklyr} backend associated with a Spark
+Retrieve the port number of the `sparklyr` backend associated with a Spark
 connection.
 }

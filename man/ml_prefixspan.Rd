@@ -20,8 +20,8 @@ ml_freq_seq_patterns(model)
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
-\item{seq_col}{The name of the sequence column in dataset (default
-“sequence”). Rows with nulls in this column are ignored.}
+\item{seq_col}{The name of the sequence column in dataset (defaults to
+"sequence"). Rows with nulls in this column are ignored.}
 
 \item{min_support}{The minimum support required to be considered a frequent
 sequential pattern.}

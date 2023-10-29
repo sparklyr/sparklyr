@@ -1300,10 +1300,10 @@ spark_write_avro <- function(x,
 #' within the resulting Spark dataframe. The output will be a Spark dataframe
 #' with the following columns and possibly partition columns:
 #'   \itemize{
-#'     \item{path: StringType}
-#'     \item{modificationTime: TimestampType}
-#'     \item{length: LongType}
-#'     \item{content: BinaryType}
+#'     \item path: StringType
+#'     \item modificationTime: TimestampType
+#'     \item length: LongType
+#'     \item content: BinaryType
 #'  }
 #'
 #' @inheritParams spark_read_csv
@@ -1353,12 +1353,12 @@ spark_read_binary <- function(sc,
 #' within the resulting Spark dataframe. The output will be a Spark dataframe
 #' consisting of struct types containing the following attributes:
 #'   \itemize{
-#'     \item{origin: StringType}
-#'     \item{height: IntegerType}
-#'     \item{width: IntegerType}
-#'     \item{nChannels: IntegerType}
-#'     \item{mode: IntegerType}
-#'     \item{data: BinaryType}
+#'     \item origin: StringType
+#'     \item height: IntegerType
+#'     \item width: IntegerType
+#'     \item nChannels: IntegerType
+#'     \item mode: IntegerType
+#'     \item data: BinaryType
 #'  }
 #'
 #' @inheritParams spark_read_csv
@@ -1526,8 +1526,8 @@ spark_read <- function(sc,
 #' parallel.
 #'
 #' @param x A Spark DataFrame to be exported
-#' @param dest_uri  Can be a URI template containing "{partitionId}" (e.g.,
-#'   \code{"hdfs://my_data_part_{partitionId}.rds"}) where "{partitionId}" will be
+#' @param dest_uri  Can be a URI template containing `partitionId` (e.g.,
+#'   \code{"hdfs://my_data_part_{partitionId}.rds"}) where `partitionId` will be
 #'   substituted with ID of each partition using `glue`, or a list of URIs
 #'   to be assigned to RDS output from all partitions (e.g.,
 #'   \code{"hdfs://my_data_part_0.rds"}, \code{"hdfs://my_data_part_1.rds"}, and so on)

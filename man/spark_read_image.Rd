@@ -38,12 +38,12 @@ Read image files within a directory and convert each file into a record
 within the resulting Spark dataframe. The output will be a Spark dataframe
 consisting of struct types containing the following attributes:
   \itemize{
-    \item{origin: StringType}
-    \item{height: IntegerType}
-    \item{width: IntegerType}
-    \item{nChannels: IntegerType}
-    \item{mode: IntegerType}
-    \item{data: BinaryType}
+    \item origin: StringType
+    \item height: IntegerType
+    \item width: IntegerType
+    \item nChannels: IntegerType
+    \item mode: IntegerType
+    \item data: BinaryType
  }
 }
 \seealso{

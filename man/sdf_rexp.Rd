@@ -12,7 +12,7 @@ sdf_rexp(sc, n, rate = 1, num_partitions = NULL, seed = NULL, output_col = "x")
 \item{n}{Sample Size (default: 1000).}
 
 \item{rate}{Rate of the exponential distribution (default: 1). The exponential
-distribution with rate lambda has mean 1 / lambda and density f(x) = lambda {e}^{- lambda x}.}
+distribution with rate lambda has mean 1 / lambda and density f(x) = lambda e ^ - lambda x.}
 
 \item{num_partitions}{Number of partitions in the resulting Spark dataframe
 (default: default parallelism of the Spark cluster).}

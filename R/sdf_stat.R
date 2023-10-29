@@ -162,7 +162,7 @@ sdf_rchisq <- function(sc, n, df, num_partitions = NULL, seed = NULL, output_col
 #'
 #' @inheritParams spark_statistical_routines
 #' @param rate Rate of the exponential distribution (default: 1). The exponential
-#'   distribution with rate lambda has mean 1 / lambda and density f(x) = lambda {e}^{- lambda x}.
+#'   distribution with rate lambda has mean 1 / lambda and density f(x) = lambda e ^ - lambda x.
 #'
 #' @family Spark statistical routines
 #' @export

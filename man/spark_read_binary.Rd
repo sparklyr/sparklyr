@@ -46,10 +46,10 @@ Read binary files within a directory and convert each file into a record
 within the resulting Spark dataframe. The output will be a Spark dataframe
 with the following columns and possibly partition columns:
   \itemize{
-    \item{path: StringType}
-    \item{modificationTime: TimestampType}
-    \item{length: LongType}
-    \item{content: BinaryType}
+    \item path: StringType
+    \item modificationTime: TimestampType
+    \item length: LongType
+    \item content: BinaryType
  }
 }
 \seealso{
