@@ -5,3 +5,6 @@ Outputs
 *.Rcheck
 timings.tab
 *tar.gz
+library.noindex
+checks.noindex
+data.sqlite

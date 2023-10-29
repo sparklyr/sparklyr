@@ -240,7 +240,6 @@ spark_connect <- function(master,
     config = config,
     app_name = app_name,
     version = version,
-    packages = packages,
     extensions = extensions,
     scala_version = scala_version,
     ...
@@ -318,6 +317,7 @@ requireNamespace2 <- function(...) {
 #' Function that negotiates the connection with the Spark back-end
 #' @inheritParams spark-connections
 #' @param x A dummy method object to determine which code to use to connect
+#' @param hadoop_version Version of Hadoop to use
 #' @export
 spark_connect_method <- function(
     x,
@@ -327,7 +327,7 @@ spark_connect_method <- function(
     config,
     app_name,
     version,
-    packages,
+    hadoop_version,
     extensions,
     scala_version,
     ...) {
@@ -343,12 +343,10 @@ spark_connect_method.default <- function(
     config,
     app_name,
     version,
-    packages,
+    hadoop_version = NULL,
     extensions,
     scala_version,
     ...) {
-
-  hadoop_version <- list(...)$hadoop_version
 
   shell_args <- spark_config_shell_args(config, master)
 
