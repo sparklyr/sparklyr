@@ -55,6 +55,7 @@ jobs:
             any::nycflights13
             any::reshape2
             any::survival
+            any:: pysparklyr
 
       - name: Cache Spark
         id: cache-spark
