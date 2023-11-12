@@ -68,7 +68,7 @@ NULL
 #'     }
 #'   }
 #'
-#'   tibble::tibble(src = src, dst = dst, sim = sim)
+#'   dplyr::tibble(src = src, dst = dst, sim = sim)
 #' }
 #'
 #' pic_data <- copy_to(sc, gen_pic_data())

@@ -35,7 +35,7 @@ test_that("Livy connection works with HTTP proxy", {
     )
     expect_gte(num_open_fds(proxy_port), 2)
 
-    expect_equivalent(sdf_len(sc, 10) %>% collect(), tibble::tibble(id = seq(10)))
+    expect_equivalent(sdf_len(sc, 10) %>% collect(), dplyr::tibble(id = seq(10)))
 
     spark_disconnect(sc)
   }

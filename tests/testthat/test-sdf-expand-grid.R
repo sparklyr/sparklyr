@@ -31,8 +31,8 @@ test_that("sdf_expand_grid works with R vectors", {
 test_that("sdf_expand_grid works Spark dataframes", {
   test_requires_version("2.0.0")
 
-  df1 <- tibble::tibble(x = var1, y = var2)
-  df2 <- tibble::tibble(z = var3, w = var4)
+  df1 <- dplyr::tibble(x = var1, y = var2)
+  df2 <- dplyr::tibble(z = var3, w = var4)
 
   expect_equivalent(
     sdf_expand_grid(
@@ -48,7 +48,7 @@ test_that("sdf_expand_grid works Spark dataframes", {
 test_that("sdf_expand_grid works with a mixture of R vectors and Spark dataframes", {
   test_requires_version("2.0.0")
 
-  df1 <- tibble::tibble(y = var1, z = var2)
+  df1 <- dplyr::tibble(y = var1, z = var2)
 
   expect_equivalent(
     sdf_expand_grid(
@@ -58,15 +58,15 @@ test_that("sdf_expand_grid works with a mixture of R vectors and Spark dataframe
       var4
     ) %>%
       collect(),
-    merge(tibble::tibble(x = var3), df1, all = TRUE) %>%
-      merge(tibble::tibble(Var3 = var4), all = TRUE)
+    merge(dplyr::tibble(x = var3), df1, all = TRUE) %>%
+      merge(dplyr::tibble(Var3 = var4), all = TRUE)
   )
 })
 
 test_that("sdf_expand_grid works with broadcast joins", {
   test_requires_version("2.0.0")
 
-  df1 <- tibble::tibble(y = var1, z = var2)
+  df1 <- dplyr::tibble(y = var1, z = var2)
   sdf1 <- copy_to(sc, df1, name = random_string("tmp"))
 
   expect_equivalent(
@@ -79,8 +79,8 @@ test_that("sdf_expand_grid works with broadcast joins", {
     ) %>%
       collect() %>%
       dplyr::arrange(dplyr::pick(dplyr::everything())),
-    merge(tibble::tibble(x = var3), df1, all = TRUE) %>%
-      merge(tibble::tibble(Var3 = var4), all = TRUE) %>%
+    merge(dplyr::tibble(x = var3), df1, all = TRUE) %>%
+      merge(dplyr::tibble(Var3 = var4), all = TRUE) %>%
       dplyr::arrange(dplyr::pick(dplyr::everything()))
   )
 
@@ -94,8 +94,8 @@ test_that("sdf_expand_grid works with broadcast joins", {
     ) %>%
       collect() %>%
       dplyr::arrange(x, y, z, Var3),
-    merge(tibble::tibble(x = var3), df1, all = TRUE) %>%
-      merge(tibble::tibble(Var3 = var4), all = TRUE) %>%
+    merge(dplyr::tibble(x = var3), df1, all = TRUE) %>%
+      merge(dplyr::tibble(Var3 = var4), all = TRUE) %>%
       dplyr::arrange(dplyr::pick(dplyr::everything()))
   )
 })

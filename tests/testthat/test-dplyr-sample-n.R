@@ -34,7 +34,7 @@ test_that("'sample_n' works as expected", {
 
 test_that("weighted sampling works as expected with integer weight columns", {
   skip_connection("sample-n-weights")
-  sdf <- copy_to(sc, tibble::tibble(id = seq(100), weight = seq(100)))
+  sdf <- copy_to(sc, dplyr::tibble(id = seq(100), weight = seq(100)))
   for (replace in list(FALSE, TRUE)) {
     sample_sdf <- sdf %>%
       sample_n(20, weight = weight, replace = replace)

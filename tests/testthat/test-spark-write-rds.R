@@ -79,7 +79,7 @@ test_that("spark_write_rds() works as expected with non-array columns", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       boolean_vals = test_lgl_vals,
       int_vals = test_int_vals,
       double_vals = test_double_vals,
@@ -191,7 +191,7 @@ test_that("spark_write_rds() works as expected with array columns", {
 
   arr_sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       lgl_arr = test_lgl_arr,
       long_arr = test_long_arr,
       double_arr = test_double_arr,

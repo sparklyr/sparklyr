@@ -85,7 +85,7 @@ build_longer_spec <- function(data,
     output_names[[col]] <- f(output_names[[col]])
   }
 
-  out <- tibble::tibble(.name = cols)
+  out <- dplyr::tibble(.name = cols)
   out[[".value"]] <- values_to
   out <- vctrs::vec_cbind(out, output_names)
   out
@@ -125,7 +125,7 @@ build_output_names <- function(cols,
       output_names <- .str_extract(output_names, names_to, regex = names_pattern)[[1]]
     }
 
-    output_names <- tibble::tibble(!!names_to := output_names)
+    output_names <- dplyr::tibble(!!names_to := output_names)
   }
 
   output_names

@@ -5,11 +5,11 @@ skip_on_arrow_devel()
 sc <- testthat_spark_connection()
 simple_sdf_1 <- testthat_tbl(
   name = "tidyr_nest_simple_sdf_1",
-  data = tibble::tibble(x = c(1, 1, 1), y = 1:3)
+  data = dplyr::tibble(x = c(1, 1, 1), y = 1:3)
 )
 simple_sdf_2 <- testthat_tbl(
   name = "tidyr_nest_simple_sdf_2",
-  data = tibble::tibble(x = 1:3, y = c("B", "A", "A"))
+  data = dplyr::tibble(x = 1:3, y = c("B", "A", "A"))
 )
 mtcars_tbl <- testthat_tbl("mtcars")
 
@@ -22,7 +22,7 @@ test_that("nest turns grouped values into one list-df", {
 
   expect_equivalent(
     out,
-    tibble::tibble(x = 1, data = list(lapply(seq(3), function(y) list(y = y))))
+    dplyr::tibble(x = 1, data = list(lapply(seq(3), function(y) list(y = y))))
   )
 })
 
@@ -40,20 +40,20 @@ test_that("nest uses grouping vars if present", {
 
   expect_equivalent(
     o_c,
-    tibble::tibble(x = 1, data = list(lapply(seq(3), function(y) list(y = y))))
+    dplyr::tibble(x = 1, data = list(lapply(seq(3), function(y) list(y = y))))
   )
 })
 
 test_that("provided grouping vars override grouped defaults", {
   test_requires_version("2.0.0")
 
-  sdf <- copy_to(sc, tibble::tibble(x = 1, y = 2, z = 3)) %>% dplyr::group_by(x)
+  sdf <- copy_to(sc, dplyr::tibble(x = 1, y = 2, z = 3)) %>% dplyr::group_by(x)
   out <- sdf %>% tidyr::nest(data = y)
 
   expect_equal(dplyr::group_vars(out), "x")
   expect_equivalent(
     expect_warning_on_arrow(out %>% collect()),
-    tibble::tibble(x = 1, z = 3, data = list(list(y = 2)))
+    dplyr::tibble(x = 1, z = 3, data = list(list(y = 2)))
   )
 })
 
@@ -92,7 +92,7 @@ test_that("puts data into the correct row", {
 
   expect_equivalent(
     out,
-    tibble::tibble(y = "B", data = list(list(x = 1)))
+    dplyr::tibble(y = "B", data = list(list(x = 1)))
   )
 })
 
@@ -105,7 +105,7 @@ test_that("nesting everything", {
 
   expect_equivalent(
     out,
-    tibble::tibble(
+    dplyr::tibble(
       data = list(
         list(list(x = 1, y = "B"), list(x = 2, y = "A"), list(x = 3, y = "A"))
       )
@@ -116,7 +116,7 @@ test_that("nesting everything", {
 test_that("can strip names", {
   test_requires_version("2.0.0")
 
-  sdf <- copy_to(sc, tibble::tibble(x = c(1, 1, 1), ya = 1:3, yb = 4:6))
+  sdf <- copy_to(sc, dplyr::tibble(x = c(1, 1, 1), ya = 1:3, yb = 4:6))
 
   expect_warning_on_arrow(
     out <- sdf %>%
@@ -127,7 +127,7 @@ test_that("can strip names", {
 
   expect_equivalent(
     out,
-    tibble::tibble(
+    dplyr::tibble(
       x = 1,
       y = list(list(list(a = 1, b = 4), list(a = 2, b = 5), list(a = 3, b = 6)))
     )
@@ -137,7 +137,7 @@ test_that("can strip names", {
 test_that("nesting works for empty data frames", {
   test_requires_version("2.0.0")
 
-  sdf <- copy_to(sc, tibble::tibble(x = integer(), y = character()))
+  sdf <- copy_to(sc, dplyr::tibble(x = integer(), y = character()))
 
   expect_warning_on_arrow(
     out <- tidyr::nest(sdf, data = x) %>% collect()
@@ -151,13 +151,13 @@ test_that("nesting works for empty data frames", {
   )
 
   expect_named(out, "data")
-  expect_equivalent(out, tibble::tibble(data = list(NA)))
+  expect_equivalent(out, dplyr::tibble(data = list(NA)))
 })
 
 test_that("can nest multiple columns", {
   test_requires_version("2.0.0")
 
-  sdf <- copy_to(sc, tibble::tibble(x = 1, a1 = 1, a2 = 2, b1 = 1, b2 = 2))
+  sdf <- copy_to(sc, dplyr::tibble(x = 1, a1 = 1, a2 = 2, b1 = 1, b2 = 2))
 
   expect_warning_on_arrow(
     out <- sdf %>%
@@ -167,7 +167,7 @@ test_that("can nest multiple columns", {
 
   expect_equivalent(
     out,
-    tibble::tibble(
+    dplyr::tibble(
       x = 1,
       a = list(list(list(a1 = 1, a2 = 2))),
       b = list(list(list(b1 = 1, b2 = 2)))
@@ -179,13 +179,13 @@ test_that("nesting no columns nests all inputs", {
   test_requires_version("2.0.0")
 
   # included only for backward compatibility
-  sdf <- copy_to(sc, tibble::tibble(a1 = 1, a2 = 2, b1 = 1, b2 = 2))
+  sdf <- copy_to(sc, dplyr::tibble(a1 = 1, a2 = 2, b1 = 1, b2 = 2))
 
   expect_warning(out <- tidyr::nest(sdf), "must not be empty")
 
   expect_equivalent(
     expect_warning_on_arrow(out %>% collect()),
-    tibble::tibble(
+    dplyr::tibble(
       data = list(list(list(a1 = 1, a2 = 2, b1 = 1, b2 = 2)))
     )
   )

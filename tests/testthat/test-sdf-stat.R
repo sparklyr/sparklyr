@@ -74,7 +74,7 @@ test_that("sdf_quantile() approximates weighted quantiles correctly", {
 
   range <- seq(-4, 4, 8e-6)
 
-  weighted_table <- tibble::tibble(
+  weighted_table <- dplyr::tibble(
     v = range,
     w = sapply(range, dnorm)
   )[sample(length(range)), ]

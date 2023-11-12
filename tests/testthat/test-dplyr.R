@@ -35,7 +35,7 @@ test_remote_name <- function(x, y) {
   expect_equal(dbplyr::remote_name(x), y)
 }
 
-scalars_df <- tibble::tibble(
+scalars_df <- dplyr::tibble(
   row_num = seq(4),
   b_a = c(FALSE, FALSE, TRUE, TRUE),
   b_b = c(FALSE, TRUE, FALSE, TRUE),
@@ -48,7 +48,7 @@ scalars_df <- tibble::tibble(
 )
 scalars_sdf <- copy_to(sc, scalars_df, overwrite = TRUE)
 
-arrays_df <- tibble::tibble(
+arrays_df <- dplyr::tibble(
   row_num = seq(4),
   a_a = list(1:4, 2:5, 3:6, 4:7),
   a_b = list(4:7, 3:6, 2:5, 1:4)
@@ -76,7 +76,7 @@ test_that("'n_distinct' summarizer works as expected", {
       )
   }
 
-  df <- tibble::tibble(x = c(-3L:2L, NA, NaN, NA))
+  df <- dplyr::tibble(x = c(-3L:2L, NA, NaN, NA))
   sdf <- copy_to(sc, df, name = random_string())
 
   expect_equal(
@@ -151,7 +151,7 @@ test_that("the implementation of 'filter' functions as expected", {
 })
 
 test_that("if_else works as expected", {
-  sdf <- copy_to(sc, tibble::tibble(x = c(0.9, NA_real_, 1.1)))
+  sdf <- copy_to(sc, dplyr::tibble(x = c(0.9, NA_real_, 1.1)))
 
   expect_equal(
     sdf %>% dplyr::mutate(x = ifelse(x > 1, "good", "bad")) %>% dplyr::pull(x),
@@ -323,11 +323,11 @@ test_that("compute() works as expected", {
 
   expect_equivalent(
     sdf_even_cached %>% collect(),
-    tibble::tibble(id = c(2L, 4L, 6L, 8L, 10L))
+    dplyr::tibble(id = c(2L, 4L, 6L, 8L, 10L))
   )
   expect_equivalent(
     sdf_odd_cached %>% collect(),
-    tibble::tibble(id = c(1L, 3L, 5L, 7L, 9L))
+    dplyr::tibble(id = c(1L, 3L, 5L, 7L, 9L))
   )
 
   # caching Spark dataframes with pre-determined names
@@ -359,11 +359,11 @@ test_that("compute() works as expected", {
 
   expect_equivalent(
     sdf_congruent_to_1_mod_3_cached %>% collect(),
-    tibble::tibble(id = c(1L, 4L, 7L, 10L))
+    dplyr::tibble(id = c(1L, 4L, 7L, 10L))
   )
   expect_equivalent(
     sdf_congruent_to_2_mod_3_cached %>% collect(),
-    tibble::tibble(id = c(2L, 5L, 8L))
+    dplyr::tibble(id = c(2L, 5L, 8L))
   )
 })
 
@@ -372,7 +372,7 @@ test_that("mutate creates NA_real_ column correctly", {
 
   expect_equivalent(
     sdf %>% collect(),
-    tibble::tibble(id = seq(5), z = NA_real_, sq = id * id)
+    dplyr::tibble(id = seq(5), z = NA_real_, sq = id * id)
   )
 })
 
@@ -381,7 +381,7 @@ test_that("transmute creates NA_real_ column correctly", {
 
   expect_equivalent(
     sdf %>% collect(),
-    tibble::tibble(z = NA_real_, sq = seq(5) * seq(5))
+    dplyr::tibble(z = NA_real_, sq = seq(5) * seq(5))
   )
 })
 
@@ -396,9 +396,9 @@ test_that("overwriting a temp view", {
   sdf <- sdf_5 %>%
     dplyr::compute(name = temp_view_name)
 
-  expect_equivalent(sdf %>% collect(), tibble::tibble(id = seq(5)))
+  expect_equivalent(sdf %>% collect(), dplyr::tibble(id = seq(5)))
   expect_equivalent(
-    dplyr::tbl(sc, temp_view_name) %>% collect(), tibble::tibble(id = seq(5))
+    dplyr::tbl(sc, temp_view_name) %>% collect(), dplyr::tibble(id = seq(5))
   )
 })
 
@@ -433,15 +433,15 @@ test_that("process_tbl_name works as expected", {
   expect_equal(sparklyr:::process_tbl_name("x.y"), dbplyr::in_schema("x", "y"))
   expect_equal(sparklyr:::process_tbl_name("x.y.z"), dbplyr::in_catalog("x", "y", "z"))
 
-  df1 <- tibble::tibble(a = 1, g = 2) %>%
+  df1 <- dplyr::tibble(a = 1, g = 2) %>%
     copy_to(sc, ., "df1", overwrite = TRUE)
-  df2 <- tibble::tibble(b = 1, g = 2) %>%
+  df2 <- dplyr::tibble(b = 1, g = 2) %>%
     copy_to(sc, ., "df2", overwrite = TRUE)
 
   query <- sql("SELECT df1.a, df2.b, df1.g FROM df1 LEFT JOIN df2 ON df1.g = df2.g")
   expect_equivalent(
     tbl(sc, query) %>% collect(),
-    tibble::tibble(a = 1, b = 1, g = 2)
+    dplyr::tibble(a = 1, b = 1, g = 2)
   )
 
 })
@@ -465,7 +465,7 @@ test_that("in_schema() works as expected", {
 
     expect_equivalent(
       dplyr::tbl(sc, dbplyr::in_schema(db_name, "hive_tbl")) %>% collect(),
-      tibble::tibble(x = integer())
+      dplyr::tibble(x = integer())
     )
   }
 })
@@ -494,7 +494,7 @@ test_that("sdf_remote_name ignores the last ungroup() operation(s)", {
 })
 
 test_that("sdf_remote_name works with arrange followed by compute", {
-  tbl <- copy_to(sc, tibble::tibble(lts = letters[26:24], nums = seq(3)))
+  tbl <- copy_to(sc, dplyr::tibble(lts = letters[26:24], nums = seq(3)))
   ordered_tbl <- tbl %>% arrange(lts) %>% compute(name = "ordered_tbl")
 
 test_remote_name(
@@ -503,7 +503,7 @@ test_remote_name(
   )
   expect_equivalent(
     tbl(sc, "ordered_tbl") %>% collect(),
-    tibble::tibble(lts = letters[24:26], nums = 3:1)
+    dplyr::tibble(lts = letters[24:26], nums = 3:1)
   )
 })
 
@@ -530,7 +530,7 @@ test_that("summarise(.groups=)", {
   expect_equal(sdf %>% summarise(.groups = "drop") %>% group_vars(), character())
   expect_equal(sdf %>% summarise(.groups = "keep") %>% group_vars(), c("x", "y"))
 
-  df <- tibble::tibble(val1 = c(1, 2, 1, 2), val2 = c(10, 20, 30, 40))
+  df <- dplyr::tibble(val1 = c(1, 2, 1, 2), val2 = c(10, 20, 30, 40))
   sdf <- copy_to(sc, df, name = random_string())
   for (groups in c("drop_last", "drop", "keep")) {
     expect_equivalent(

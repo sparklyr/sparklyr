@@ -7,33 +7,33 @@ sc <- testthat_spark_connection()
 test_that("can pivot all cols to wide", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(sc, tibble::tibble(key = c("x", "y", "z"), val = 1:3))
+  sdf <- copy_to(sc, dplyr::tibble(key = c("x", "y", "z"), val = 1:3))
   pv <- tidyr::pivot_wider(
     sdf,
     names_from = key, values_from = val, names_sort = TRUE
   ) %>%
     collect()
 
-  expect_equivalent(pv, tibble::tibble(x = 1, y = 2, z = 3))
+  expect_equivalent(pv, dplyr::tibble(x = 1, y = 2, z = 3))
 })
 
 test_that("non-pivoted cols are preserved", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(sc, tibble::tibble(a = 1, key = c("x", "y"), val = 1:2))
+  sdf <- copy_to(sc, dplyr::tibble(a = 1, key = c("x", "y"), val = 1:2))
   pv <- tidyr::pivot_wider(
     sdf,
     names_from = key, values_from = val, names_sort = TRUE
   ) %>%
     collect()
 
-  expect_equivalent(pv, tibble::tibble(a = 1, x = 1, y = 2))
+  expect_equivalent(pv, dplyr::tibble(a = 1, x = 1, y = 2))
 })
 
 test_that("implicit missings turn into explicit missings", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(sc, tibble::tibble(a = 1:2, key = c("x", "y"), val = 1:2))
+  sdf <- copy_to(sc, dplyr::tibble(a = 1:2, key = c("x", "y"), val = 1:2))
   pv <- tidyr::pivot_wider(
     sdf,
     names_from = key, values_from = val, names_sort = TRUE
@@ -41,13 +41,13 @@ test_that("implicit missings turn into explicit missings", {
     collect() %>%
     dplyr::arrange(a)
 
-  expect_equivalent(pv, tibble::tibble(a = 1:2, x = c(1, NaN), y = c(NaN, 2)))
+  expect_equivalent(pv, dplyr::tibble(a = 1:2, x = c(1, NaN), y = c(NaN, 2)))
 })
 
 test_that("error when overwriting existing column", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(sc, tibble::tibble(a = 1, key = c("a", "b"), val = 1:2))
+  sdf <- copy_to(sc, dplyr::tibble(a = 1, key = c("a", "b"), val = 1:2))
 
   expect_error(
     tidyr::pivot_wider(sdf, names_from = key, values_from = val),
@@ -58,7 +58,7 @@ test_that("error when overwriting existing column", {
 test_that("grouping is preserved", {
   test_requires_version("2.3.0")
 
-  df <- tibble::tibble(g = 1, k = "x", v = 2)
+  df <- dplyr::tibble(g = 1, k = "x", v = 2)
 
   sdf <- copy_to(sc, df, overwrite = TRUE)
 
@@ -72,7 +72,7 @@ test_that("grouping is preserved", {
 test_that("nested list column pivots correctly", {
   test_requires_version("2.4.0")
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     i = c(1, 2, 1, 2),
     g = c("a", "a", "b", "b"),
     d = list(
@@ -96,7 +96,7 @@ test_that("nested list column pivots correctly", {
 test_that("can specify output column names using names_glue", {
   test_requires_version("2.3.0")
 
-  df <- tibble::tibble(x = c("X", "Y"), y = 1:2, a = 1:2, b = 1:2)
+  df <- dplyr::tibble(x = c("X", "Y"), y = 1:2, a = 1:2, b = 1:2)
 
   sdf <- copy_to(sc, df, overwrite = TRUE)
 
@@ -109,7 +109,7 @@ test_that("can specify output column names using names_glue", {
       names_sort = TRUE
     ) %>%
       collect(),
-    tibble::tibble(X1_a = 1, Y2_a = 2, X1_b = 1, Y2_b = 2)
+    dplyr::tibble(X1_a = 1, Y2_a = 2, X1_b = 1, Y2_b = 2)
   )
 })
 
@@ -118,7 +118,7 @@ test_that("can sort column names", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(int = c(1, 3, 2), days = c("Mon", "Tues", "Wed"))
+    dplyr::tibble(int = c(1, 3, 2), days = c("Mon", "Tues", "Wed"))
   )
 
   expect_equivalent(
@@ -127,7 +127,7 @@ test_that("can sort column names", {
       names_from = days, values_from = int, names_sort = TRUE
     ) %>%
       collect(),
-    tibble::tibble(Mon = 1, Tues = 3, Wed = 2)
+    dplyr::tibble(Mon = 1, Tues = 3, Wed = 2)
   )
 })
 
@@ -206,7 +206,7 @@ test_that("values_fn can be a single function", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
+    dplyr::tibble(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
   )
 
   suppressWarnings(
@@ -218,13 +218,13 @@ test_that("values_fn can be a single function", {
       dplyr::arrange(a)
   )
 
-  expect_equivalent(pv, tibble::tibble(a = 1:2, x = c(11, 100)))
+  expect_equivalent(pv, dplyr::tibble(a = 1:2, x = c(11, 100)))
 })
 
 test_that("values_summarize applied even when no-duplicates", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(sc, tibble::tibble(a = c(1, 2), key = c("x", "x"), val = 1:2))
+  sdf <- copy_to(sc, dplyr::tibble(a = c(1, 2), key = c("x", "x"), val = 1:2))
   pv <- tidyr::pivot_wider(
     sdf,
     names_from = key,
@@ -235,13 +235,13 @@ test_that("values_summarize applied even when no-duplicates", {
     dplyr::arrange(a)
 
   expect_equal(pv$a, c(1, 2))
-  expect_equivalent(pv, tibble::tibble(a = 1:2, x = list(1, 2)))
+  expect_equivalent(pv, dplyr::tibble(a = 1:2, x = list(1, 2)))
 })
 
 test_that("can fill in missing cells", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(sc, tibble::tibble(g = 1:2, var = c("x", "y"), val = 1:2))
+  sdf <- copy_to(sc, dplyr::tibble(g = 1:2, var = c("x", "y"), val = 1:2))
 
   widen <- function(...) {
     sdf %>%
@@ -251,14 +251,14 @@ test_that("can fill in missing cells", {
   }
 
   expect_equivalent(
-    widen(), tibble::tibble(g = 1:2, x = c(1, NaN), y = c(NaN, 2))
+    widen(), dplyr::tibble(g = 1:2, x = c(1, NaN), y = c(NaN, 2))
   )
   expect_equivalent(
-    widen(values_fill = 0), tibble::tibble(g = 1:2, x = c(1, 0), y = c(0, 2))
+    widen(values_fill = 0), dplyr::tibble(g = 1:2, x = c(1, 0), y = c(0, 2))
   )
   expect_equivalent(
     widen(values_fill = list(val = 0)),
-    tibble::tibble(g = 1:2, x = c(1, 0), y = c(0, 2))
+    dplyr::tibble(g = 1:2, x = c(1, 0), y = c(0, 2))
   )
 })
 
@@ -267,39 +267,39 @@ test_that("values_fill only affects missing cells", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(g = c(1, 2), names = c("x", "y"), value = c(1, NA))
+    dplyr::tibble(g = c(1, 2), names = c("x", "y"), value = c(1, NA))
   )
   out <- sdf %>%
     tidyr::pivot_wider(names_from = names, values_from = value, values_fill = 0) %>%
     collect() %>%
     dplyr::arrange(g)
 
-  expect_equivalent(out, tibble::tibble(g = 1:2, x = c(1, 0), y = c(0, NaN)))
+  expect_equivalent(out, dplyr::tibble(g = 1:2, x = c(1, 0), y = c(0, NaN)))
 })
 
 test_that("can pivot from multiple measure cols", {
   test_requires_version("2.3.0")
 
   sdf <- copy_to(
-    sc, tibble::tibble(row = 1, var = c("x", "y"), a = 1:2, b = 3:4)
+    sc, dplyr::tibble(row = 1, var = c("x", "y"), a = 1:2, b = 3:4)
   )
   pv <- tidyr::pivot_wider(sdf, names_from = var, values_from = c(a, b)) %>%
     collect()
 
   expect_equivalent(
     pv,
-    tibble::tibble(row = 1, a_x = 1, a_y = 2, b_x = 3, b_y = 4)
+    dplyr::tibble(row = 1, a_x = 1, a_y = 2, b_x = 3, b_y = 4)
   )
 })
 
 test_that("can pivot from multiple measure cols using all keys", {
   test_requires_version("2.3.0")
 
-  sdf <- copy_to(sc, tibble::tibble(var = c("x", "y"), a = 1:2, b = 3:4))
+  sdf <- copy_to(sc, dplyr::tibble(var = c("x", "y"), a = 1:2, b = 3:4))
   pv <- tidyr::pivot_wider(sdf, names_from = var, values_from = c(a, b)) %>%
     collect()
 
-  expect_equivalent(pv, tibble::tibble(a_x = 1, a_y = 2, b_x = 3, b_y = 4))
+  expect_equivalent(pv, dplyr::tibble(a_x = 1, a_y = 2, b_x = 3, b_y = 4))
 })
 
 test_that("default `names_from` and `values_from` works as expected", {
@@ -307,13 +307,13 @@ test_that("default `names_from` and `values_from` works as expected", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(name = c("x", "y"), value = c(1, 2))
+    dplyr::tibble(name = c("x", "y"), value = c(1, 2))
   )
   pv <- sdf %>%
     tidyr::pivot_wider() %>%
     collect()
 
-  expect_equivalent(pv, tibble::tibble(x = 1, y = 2))
+  expect_equivalent(pv, dplyr::tibble(x = 1, y = 2))
 })
 
 

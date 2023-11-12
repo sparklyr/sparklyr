@@ -9,7 +9,7 @@ test_that("all missings left unchanged", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       lgl = c(NA, NA),
       int = c(NA_integer_, NA),
       dbl = c(NA_real_, NA),
@@ -27,7 +27,7 @@ test_that("all missings left unchanged", {
           dplyr::mutate(is_na = is.na(!!rlang::sym(col))) %>%
           dplyr::select(is_na) %>%
           collect(),
-        tibble::tibble(is_na = c(TRUE, TRUE))
+        dplyr::tibble(is_na = c(TRUE, TRUE))
       )
     }
   }
@@ -37,7 +37,7 @@ test_that("missings are filled correctly", {
   test_requires_version("2.0.0")
 
   # filled down from last non-missing
-  sdf <- copy_to(sc, tibble::tibble(x = c(NA, 1, NA, 2, NA, NA)))
+  sdf <- copy_to(sc, dplyr::tibble(x = c(NA, 1, NA, 2, NA, NA)))
 
   out <- tidyr::fill(sdf, x) %>% collect()
   expect_equal(out$x, c(NA, 1, 1, 2, 2, 2))
@@ -58,7 +58,7 @@ test_that("missings filled down for each atomic vector", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       lgl = c(TRUE, NA),
       int = c(1L, NA),
       dbl = c(1, NA),
@@ -84,7 +84,7 @@ test_that("missings filled up for each atomic vector", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       lgl = c(NA, TRUE),
       int = c(NA, 1L),
       dbl = c(NA, 1),
@@ -107,7 +107,7 @@ test_that("missings filled up for each atomic vector", {
 test_that("fill respects grouping", {
   test_requires_version("2.0.0")
 
-  sdf <- copy_to(sc, tibble::tibble(x = c(1, 1, 2), y = c(1, NA, NA)))
+  sdf <- copy_to(sc, dplyr::tibble(x = c(1, 1, 2), y = c(1, NA, NA)))
   out <- sdf %>%
     dplyr::group_by(x) %>%
     tidyr::fill(y) %>%
@@ -118,7 +118,7 @@ test_that("fill respects grouping", {
 test_that("fill respects grouping", {
   test_requires_version("2.0.0")
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     id1 = c(1, 4, 2, 8, 5, 7),
     id2 = c(4, 1, 7, 5, 8, 2),
     value = c(1, NA, 2, NA, 5, NA)

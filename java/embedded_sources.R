@@ -1332,7 +1332,7 @@ spark_worker_execute_closure <- function(
     serialize_impl <- spark_worker_get_serializer(sc)
     result <- lapply(result, function(x) serialize_impl(x, NULL))
     class(result) <- c("spark_apply_binary_result", class(result))
-    result <- tibble::tibble(spark_apply_binary_result = result)
+    result <- dplyr::tibble(spark_apply_binary_result = result)
   }
 
   if (!"data.frame" %in% class(result)) {
@@ -1357,7 +1357,7 @@ spark_worker_maybe_serialize_list_cols_as_json <- function(config, result) {
     config$spark_version >= "2.4.0" &&
     any(sapply(result, is.list))) {
     result <- do.call(
-      tibble::tibble,
+      dplyr::tibble,
       lapply(
         result,
         function(x) {
@@ -1636,7 +1636,7 @@ spark_worker_apply <- function(sc, config) {
 
     df <- (
       if (config$single_binary_column) {
-        tibble::tibble(encoded = lapply(data, function(x) x[[1]]))
+        dplyr::tibble(encoded = lapply(data, function(x) x[[1]]))
       } else {
         bind_rows <- core_get_package_function("dplyr", "bind_rows")
         as_tibble <- core_get_package_function("tibble", "as_tibble")

@@ -526,7 +526,7 @@ test_that("spark_read_avro() works as expected", {
   test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
   skip_databricks_connect()
 
-  expected <- tibble::tibble(
+  expected <- dplyr::tibble(
     a = c(1, NaN, 3, 4, NaN),
     b = c(-2L, 0L, 1L, 3L, 6L),
     c = c("ab", "cde", "zzzz", "", "fghi")
@@ -553,7 +553,7 @@ test_that("spark_write_avro() works as expected", {
   test_requires_version("2.4.0", "spark_write_avro() requires Spark 2.4+")
   skip_databricks_connect()
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     a = c(1, NaN, 3, 4, NaN),
     b = c(-2L, 0L, 1L, 3L, 6L),
     c = c("ab", "cde", "zzzz", "", "fghi")
@@ -577,8 +577,8 @@ test_that("spark read/write methods avoid name collision on identical file names
   skip_connection("format-avro")
   test_requires_version("2.4.0")
 
-  tbl_1 <- tibble::tibble(name = c("foo_1", "bar_1"))
-  tbl_2 <- tibble::tibble(name = c("foo_2", "bar_2"))
+  tbl_1 <- dplyr::tibble(name = c("foo_1", "bar_1"))
+  tbl_2 <- dplyr::tibble(name = c("foo_2", "bar_2"))
   sdf_1 <- copy_to(sc, tbl_1)
   sdf_2 <- copy_to(sc, tbl_2)
 
@@ -768,7 +768,7 @@ test_that("spark_read_image works as expected", {
       dplyr::transmute(origin = image[["origin"]]) %>%
       dplyr::arrange(origin) %>%
       dplyr::collect(),
-    tibble::tibble(
+    dplyr::tibble(
       origin = lapply(
         c("edit-sql", "help", "livy-ui", "livy", "spark-log", "spark-ui", "spark", "yarn-ui"),
         function(x) paste0("file://", file.path(dir, x), ".png")

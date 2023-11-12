@@ -6,33 +6,33 @@ skip_on_arrow_devel()
 sc <- testthat_spark_connection()
 trivial_sdf <- testthat_tbl(
   "testthat_tidyr_pivot_longer_trivial_sdf",
-  data = tibble::tibble(x_y = 1)
+  data = dplyr::tibble(x_y = 1)
 )
 
 test_that("can pivot all cols to long", {
   expect_same_remote_result(
-    tibble::tibble(x = 1:2, y = 3:4),
+    dplyr::tibble(x = 1:2, y = 3:4),
     . %>% tidyr::pivot_longer(x:y)
     )
 })
 
 test_that("values interleaved correctly", {
   expect_same_remote_result(
-    tibble::tibble(x = c(1, 2), y = c(10, 20), z = c(100, 200)),
+    dplyr::tibble(x = c(1, 2), y = c(10, 20), z = c(100, 200)),
     . %>% tidyr::pivot_longer(1:3)
   )
 })
 
 test_that("can drop missing values", {
   expect_same_remote_result(
-    tibble::tibble(x = c(1, NA), y = c(NA, 2)),
+    dplyr::tibble(x = c(1, NA), y = c(NA, 2)),
     . %>% tidyr::pivot_longer(x:y, values_drop_na = TRUE)
   )
 })
 
 test_that("preserves original keys", {
   expect_same_remote_result(
-    tibble::tibble(x = 1:2, y = 2L, z = 1:2),
+    dplyr::tibble(x = 1:2, y = 2L, z = 1:2),
     . %>% tidyr::pivot_longer(y:z)
   )
 })
@@ -54,7 +54,7 @@ test_that("can handle missing combinations", {
 test_that("can override default output column type", {
   skip_connection("pivot-longer-values-transform")
   expect_same_remote_result(
-    tibble::tibble(x = 1L, y = 2L),
+    dplyr::tibble(x = 1L, y = 2L),
     . %>% tidyr::pivot_longer(
       x:y,
       values_transform = list(value = as.character)
@@ -78,17 +78,17 @@ test_that("original col order is preserved", {
 
 test_that("can pivot duplicated names to .value", {
   expect_same_remote_result(
-    tibble::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4),
+    dplyr::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4),
     . %>% tidyr::pivot_longer(-x, names_to = c(".value", NA), names_sep = "_")
   )
 
   expect_same_remote_result(
-    tibble::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4),
+    dplyr::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4),
     . %>% tidyr::pivot_longer(-x, names_to = c(".value", NA), names_pattern = "(.)_(.)")
   )
 
   expect_same_remote_result(
-    tibble::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4),
+    dplyr::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4),
     . %>% tidyr::pivot_longer(-x, names_to = ".value", names_pattern = "(.)_.")
   )
 })
@@ -97,7 +97,7 @@ test_that(".value can be at any position in `names_to`", {
 
   samp_sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       i = 1:4,
       y_t1 = rnorm(4),
       y_t2 = rnorm(4),
@@ -131,7 +131,7 @@ test_that(".value can be at any position in `names_to`", {
 })
 
 test_that("reporting data type mismatch", {
-  sdf <- copy_to(sc, tibble::tibble(abc = 1, xyz = "b"))
+  sdf <- copy_to(sc, dplyr::tibble(abc = 1, xyz = "b"))
   err <- capture_error(tidyr::pivot_longer(sdf, tidyr::everything()))
 
   expect_true(grepl("data type mismatch", err$message, fixed = TRUE))
@@ -139,7 +139,7 @@ test_that("reporting data type mismatch", {
 
 test_that("grouping is preserved", {
   expect_same_remote_result(
-    tibble::tibble(g = 1, x1 = 1, x2 = 2),
+    dplyr::tibble(g = 1, x1 = 1, x2 = 2),
     . %>%
       dplyr::group_by(g) %>%
       tidyr::pivot_longer(x1:x2, names_to = "x", values_to = "v")
@@ -148,7 +148,7 @@ test_that("grouping is preserved", {
 
 test_that("names repair preserves grouping vars and pivot longer spec", {
   skip_connection("pivot-longer-names-repair")
-  sdf_local <- tibble::tibble(
+  sdf_local <- dplyr::tibble(
     a = 1, b = 2,
     x_a_1 = c(1, 3), x_a_2 = c(2, 4), x_b_1 = c(1, 2), x_b_2 = c(3, 4)
   )
@@ -215,7 +215,7 @@ test_that("names_sep fails with single name", {
 })
 
 test_that("names_pattern generates correct spec", {
-  sdf <- copy_to(sc, tibble::tibble(zx_y = 1))
+  sdf <- copy_to(sc, dplyr::tibble(zx_y = 1))
   sp <- build_longer_spec(
     sdf, zx_y,
     names_to = c("a", "b"), names_pattern = "z(.)_(.)"
@@ -242,14 +242,14 @@ test_that("names_to can override value_to", {
 })
 
 test_that("names_prefix strips off from beginning", {
-  sdf <- copy_to(sc, tibble::tibble(zzyz = 1))
+  sdf <- copy_to(sc, dplyr::tibble(zzyz = 1))
   sp <- build_longer_spec(sdf, zzyz, names_prefix = "z")
 
   expect_equal(sp$name, "zyz")
 })
 
 test_that("can cast to custom type", {
-  sdf <- copy_to(sc, tibble::tibble(w1 = 1))
+  sdf <- copy_to(sc, dplyr::tibble(w1 = 1))
   sp <- build_longer_spec(
     sdf,
     w1,

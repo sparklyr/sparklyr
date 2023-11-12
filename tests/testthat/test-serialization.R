@@ -262,7 +262,7 @@ test_that("collect() can retrieve NULL data types as NAs", {
 test_that("collect() can retrieve date types successfully", {
   skip_on_windows()
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     date = as.Date(
       c(
         "1000-01-01",
@@ -387,7 +387,7 @@ test_that("array of temporal values are preserved with Spark 3.0+", {
   test_requires_version("3.0.0")
   skip_on_arrow()
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     char = c("one", "two"),
     int = c(3L, 4L),
     int_arr = list(seq(5), seq(10)),

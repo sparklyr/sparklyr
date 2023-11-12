@@ -151,7 +151,7 @@ do_mutate <- function(x, dest_col_name, sql, ...) {
 #' library(sparklyr)
 #' sc <- spark_connect(master = "local")
 #' # applies the (x -> x * x) transformation to elements of all arrays
-#' copy_to(sc, tibble::tibble(arr = list(1:5, 21:25))) %>%
+#' copy_to(sc, dplyr::tibble(arr = list(1:5, 21:25))) %>%
 #'   hof_transform(~ .x * .x)
 #' }
 #'
@@ -196,7 +196,7 @@ hof_transform <- function(
 #' library(sparklyr)
 #' sc <- spark_connect(master = "local")
 #' # only keep odd elements in each array in `array_column`
-#' copy_to(sc, tibble::tibble(array_column = list(1:5, 21:25))) %>%
+#' copy_to(sc, dplyr::tibble(array_column = list(1:5, 21:25))) %>%
 #'   hof_filter(~ .x %% 2 == 1)
 #' }
 #'
@@ -240,7 +240,7 @@ hof_filter <- function(x, func, expr = NULL, dest_col = NULL, ...) {
 #' sc <- spark_connect(master = "local")
 #' # concatenates all numbers of each array in `array_column` and add parentheses
 #' # around the resulting string
-#' copy_to(sc, tibble::tibble(array_column = list(1:5, 21:25))) %>%
+#' copy_to(sc, dplyr::tibble(array_column = list(1:5, 21:25))) %>%
 #'   hof_aggregate(
 #'     start = "",
 #'     merge = ~ CONCAT(.y, .x),
@@ -334,7 +334,7 @@ hof_exists <- function(x, pred, expr = NULL, dest_col = NULL, ...) {
 #' # and store the resuling array in `res`
 #' copy_to(
 #'   sc,
-#'   tibble::tibble(
+#'   dplyr::tibble(
 #'     left = list(1:5, 21:25),
 #'     right = list(6:10, 16:20),
 #'     res = c(0, 0)
@@ -396,7 +396,7 @@ hof_zip_with <- function(
 #' sc <- spark_connect(master = "local", version = "3.0.0")
 #' copy_to(
 #'   sc,
-#'   tibble::tibble(
+#'   dplyr::tibble(
 #'     # x contains 2 arrays each having elements in ascending order
 #'     x = list(1:5, 6:10)
 #'   )
@@ -491,7 +491,7 @@ hof_map_filter <- function(
 #' \dontrun{
 #'
 #' sc <- spark_connect(master = "local", version = "3.0.0")
-#' df <- tibble::tibble(
+#' df <- dplyr::tibble(
 #'   x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
 #'   y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
 #' )
@@ -643,7 +643,7 @@ hof_transform_values <- function(
 #' # create a Spark dataframe with 2 columns of type MAP<STRING, INT>
 #' two_maps_tbl <- sdf_copy_to(
 #'   sc,
-#'   tibble::tibble(
+#'   dplyr::tibble(
 #'     m1 = c("{\"1\":2,\"3\":4,\"5\":6}", "{\"2\":1,\"4\":3,\"6\":5}"),
 #'     m2 = c("{\"1\":1,\"3\":3,\"5\":5}", "{\"2\":2,\"4\":4,\"6\":6}")
 #'   ),
