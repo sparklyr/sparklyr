@@ -88,12 +88,6 @@ dim.tbl_spark_print <- function(x) {
   attributes(x)$spark_dims
 }
 
-#' @importFrom tibble tbl_sum
-#' @export
-tbl_sum.tbl_spark_print <- function(x) {
-  attributes(x)$spark_summary
-}
-
 #' @export
 print.tbl_spark <- function(x, ...) {
   sdf <- spark_dataframe(x)
