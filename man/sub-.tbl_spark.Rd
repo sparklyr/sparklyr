@@ -22,7 +22,7 @@ selected using syntaxes similar to those supported by R dataframes
 \dontrun{
 library(sparklyr)
 sc <- spark_connect(master = "spark://HOST:PORT")
-example_sdf <- copy_to(sc, tibble::tibble(a = 1, b = 2))
+example_sdf <- copy_to(sc, dplyr::tibble(a = 1, b = 2))
 example_sdf["a"] \%>\% print()
 }
 

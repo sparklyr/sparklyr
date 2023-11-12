@@ -37,7 +37,7 @@ sc <- spark_connect(master = "local")
 # and store the resuling array in `res`
 copy_to(
   sc,
-  tibble::tibble(
+  dplyr::tibble(
     left = list(1:5, 21:25),
     right = list(6:10, 16:20),
     res = c(0, 0)

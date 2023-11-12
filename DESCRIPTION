@@ -89,7 +89,6 @@ Imports:
     rappdirs,
     rlang (>= 0.1.4),
     rstudioapi (>= 0.10),
-    tibble,
     tidyr (>= 1.2.0),
     tidyselect,
     uuid,
