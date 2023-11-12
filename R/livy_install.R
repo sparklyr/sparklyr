@@ -173,9 +173,22 @@ livy_versions_file_pattern <- function() {
 #' @rdname livy_install
 #' @export
 livy_install_dir <- function() {
-  normalizePath(
-    getOption("livy.install.dir", rappdirs::app_dir("livy", "rstudio")$cache())
-  )
+  option_dir <- getOption("livy.install.dir")
+  env_dir <- Sys.getenv("R_USER_CONFIG_DIR",unset = NA)
+  if(is.na(env_dir)) {
+    env_dir <- NULL
+  }
+  os <- get_os()
+  cache_dir <- NULL
+  # TODO: Use a more appropiate cache dir for Windows instead of
+  # a temp folder
+  if(os == "win") cache_dir <- file.path(tempdir(), "livy")
+  if(os == "mac") cache_dir <- "~/Library/Caches/livy"
+  if(os == "unix") {
+    cache_dir <- file.path(Sys.getenv("XDG_CACHE_HOME", "~/.cache"), "livy")
+  }
+  path <- option_dir %||% env_dir %||% cache_dir
+  normalizePath(path)
 }
 
 #' @rdname livy_install

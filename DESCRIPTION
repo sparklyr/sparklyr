@@ -86,7 +86,6 @@ Imports:
     methods,
     openssl (>= 0.8),
     purrr,
-    rappdirs,
     rlang (>= 0.1.4),
     rstudioapi (>= 0.10),
     tibble,
