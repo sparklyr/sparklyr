@@ -239,7 +239,7 @@ test_that("spark_write_table() overwrites existing table definition when overwri
 
   expect_equal(
     dplyr::as_tibble(desc),
-    tibble::tribble(
+    dplyr::tribble(
       ~col_name, ~data_type, ~comment,
       "foo", "int", NA_character_,
       "bar", "int", NA_character_,
@@ -250,7 +250,7 @@ test_that("spark_write_table() overwrites existing table definition when overwri
 
   expect_equal(
     dplyr::as_tibble(new_table),
-    tibble::tribble(
+    dplyr::tribble(
       ~foo, ~bar,
       1L, 2L
     )
@@ -279,7 +279,7 @@ test_that("spark_insert_table() inserts into existing table definition, even whe
 
   expect_equal(
     dplyr::as_tibble(desc),
-    tibble::tribble(
+    dplyr::tribble(
       ~col_name, ~data_type, ~comment,
       "foo", "int", NA_character_,
       "bar", "bigint", NA_character_,
@@ -291,7 +291,7 @@ test_that("spark_insert_table() inserts into existing table definition, even whe
   # bar is returned as a double when the table definition is bigint
   expect_equal(
     dplyr::as_tibble(new_table),
-    tibble::tribble(
+    dplyr::tribble(
       ~foo, ~bar,
       1L, 2
     )
@@ -621,7 +621,7 @@ test_that("spark_read_binary can process input directory without partition specs
   expect_equal(colnames(df), c("path", "modificationTime", "length", "content"))
   expect_equivalent(
     df %>% dplyr::select(path, length, content),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                         ~length,          ~content,
       paste0("file:", file.path(dir, "file0.dat")),        4, charToRaw("1234"),
       paste0("file:", file.path(dir, "file1.dat")),        4, charToRaw("5678"),
@@ -646,7 +646,7 @@ test_that("spark_read_binary can process input directory with flat partition spe
   )
   expect_equivalent(
     df %>% dplyr::select(path, length, content, partition),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                                       ~length,          ~content, ~partition,
       paste0("file:", file.path(dir, "partition=0", "file0.dat")),       4, charToRaw("1234"),         0L,
       paste0("file:", file.path(dir, "partition=1", "file1.dat")),       4, charToRaw("5678"),         1L,
@@ -673,7 +673,7 @@ test_that("spark_read_binary can process input directory with nested partition s
   )
   expect_equivalent(
     df %>% dplyr::select(path, length, content, a, b),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                                       ~length,          ~content, ~a, ~b,
       paste0("file:", file.path(dir, "a=0", "b=0", "file0.dat")),       4, charToRaw("1234"), 0L, 0L,
       paste0("file:", file.path(dir, "a=0", "b=1", "file2.dat")),       4, charToRaw("abcd"), 0L, 1L,
@@ -701,7 +701,7 @@ test_that("spark_read_binary can support 'pathGlobFilter' option correctly", {
   )
   expect_equivalent(
     df %>% dplyr::select(path, length, content),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                        ~length,          ~content,
       paste0("file:", file.path(dir, "file0.dat")),       4, charToRaw("1234"),
       paste0("file:", file.path(dir, "file1.dat")),       4, charToRaw("5678"),
@@ -725,7 +725,7 @@ test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
   expect_equal(colnames(df), c("path", "modificationTime", "length", "content"))
   expect_equivalent(
     df %>% dplyr::select(path, length, content),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                                      ~length,          ~content,
       paste0("file:", file.path(dir, "a=0", "b=0", "file0.dat")),       4, charToRaw("1234"),
       paste0("file:", file.path(dir, "a=1", "b=0", "file1.dat")),       4, charToRaw("5678"),

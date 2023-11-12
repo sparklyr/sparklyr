@@ -156,7 +156,7 @@ test_that("collect() can retrieve all data types correctly", {
   rtime <- "2010-01-01 01:01:10"
   atime <- as.character(as.POSIXct(utime, origin = "1970-01-01"))
 
-  hive_type <- tibble::tribble(
+  hive_type <- dplyr::tribble(
     ~stype,            ~svalue,      ~rtype,     ~rvalue,      ~atype,     ~avalue,
     "tinyint",             "1",   "integer",         "1",   "integer",         "1",
     "smallint",            "1",   "integer",         "1",   "integer",         "1",
@@ -215,7 +215,7 @@ test_that("collect() can retrieve all data types correctly", {
 test_that("collect() can retrieve NULL data types as NAs", {
   library(dplyr)
 
-  hive_type <- tibble::tribble(
+  hive_type <- dplyr::tribble(
     ~stype, ~rtype, ~atype,
     "tinyint", "integer", "integer",
     "smallint", "integer", "integer",

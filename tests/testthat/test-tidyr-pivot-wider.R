@@ -135,7 +135,7 @@ test_that("can override default keys", {
   test_requires_version("2.3.0")
   skip_databricks_connect()
 
-  df <- tibble::tribble(
+  df <- dplyr::tribble(
       ~row, ~name, ~var, ~value,
       1, "Sam", "age", 10,
       2, "Sam", "height", 1.5,

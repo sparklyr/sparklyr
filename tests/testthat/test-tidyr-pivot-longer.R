@@ -39,7 +39,7 @@ test_that("preserves original keys", {
 
 test_that("can handle missing combinations", {
   expect_same_remote_result(
-    tibble::tribble(
+    dplyr::tribble(
       ~id, ~x_1, ~x_2, ~y_2,
       "A",    1,    2,  "a",
       "B",    3,    4,  "b",
@@ -64,7 +64,7 @@ test_that("can override default output column type", {
 
 test_that("original col order is preserved", {
   expect_same_remote_result(
-    tibble::tribble(
+    dplyr::tribble(
       ~id, ~z_1, ~y_1, ~x_1, ~z_2, ~y_2, ~x_2,
       "A", 1, 2, 3, 4, 5, 6,
       "B", 7, 8, 9, 10, 11, 12,
