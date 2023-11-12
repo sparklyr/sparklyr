@@ -484,7 +484,7 @@ deduplicate_longer_spec <- function(spec) {
   names(out) <- rlang::as_utf8_character(into)
   out <- out[!is.na(names(out))]
 
-  tibble::as_tibble(out)
+  dplyr::as_tibble(out)
 }
 
 .str_extract <- function(x, into, regex, convert = FALSE) {
@@ -514,7 +514,7 @@ deduplicate_longer_spec <- function(spec) {
   out <- out[non_na_into]
   names(out) <- into[non_na_into]
 
-  out <- tibble::as_tibble(out)
+  out <- dplyr::as_tibble(out)
 
   if (convert) {
     out[] <- purrr::map(out, type.convert, as.is = TRUE)

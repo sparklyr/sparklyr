@@ -412,7 +412,7 @@ spark_worker_apply <- function(sc, config) {
             )
           )
         } else {
-          warning("dplyr::bind_rows or tibble::as_tibble is unavailable, ",
+          warning("dplyr::bind_rows or dplyr::as_tibble is unavailable, ",
                   "falling back to rbind implementation in base R. ",
                   "Inputs with list column(s) will not work.")
 

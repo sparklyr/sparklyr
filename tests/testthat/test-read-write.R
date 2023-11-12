@@ -238,7 +238,7 @@ test_that("spark_write_table() overwrites existing table definition when overwri
   desc <- DBI::dbGetQuery(sc, glue::glue("DESCRIBE TABLE {tbl}"))
 
   expect_equal(
-    tibble::as_tibble(desc),
+    dplyr::as_tibble(desc),
     tibble::tribble(
       ~col_name, ~data_type, ~comment,
       "foo", "int", NA_character_,
@@ -249,7 +249,7 @@ test_that("spark_write_table() overwrites existing table definition when overwri
   new_table <- tbl(sc, tbl)
 
   expect_equal(
-    tibble::as_tibble(new_table),
+    dplyr::as_tibble(new_table),
     tibble::tribble(
       ~foo, ~bar,
       1L, 2L
@@ -278,7 +278,7 @@ test_that("spark_insert_table() inserts into existing table definition, even whe
   desc <- DBI::dbGetQuery(sc, glue::glue("DESCRIBE TABLE {tbl}"))
 
   expect_equal(
-    tibble::as_tibble(desc),
+    dplyr::as_tibble(desc),
     tibble::tribble(
       ~col_name, ~data_type, ~comment,
       "foo", "int", NA_character_,
@@ -290,7 +290,7 @@ test_that("spark_insert_table() inserts into existing table definition, even whe
 
   # bar is returned as a double when the table definition is bigint
   expect_equal(
-    tibble::as_tibble(new_table),
+    dplyr::as_tibble(new_table),
     tibble::tribble(
       ~foo, ~bar,
       1L, 2
