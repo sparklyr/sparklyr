@@ -13,7 +13,7 @@ expect_regexes <- function(printed, regexes) {
 verify_table_src <- function(printed) {
   expect_regexes(
     printed,
-    c("# Source: spark<\\?> \\[\\?\\? x 1\\]", "id")
+    c("# Source:   table<\\?> \\[\\?\\? x 1\\]", "id")
   )
 }
 
