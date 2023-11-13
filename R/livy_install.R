@@ -180,9 +180,7 @@ livy_install_dir <- function() {
   }
   os <- get_os()
   cache_dir <- NULL
-  # TODO: Use a more appropiate cache dir for Windows instead of
-  # a temp folder
-  if(os == "win") cache_dir <- file.path(tempdir(), "livy")
+  if(os == "win") cache_dir <-" %LOCALAPPDATA%/livy"
   if(os == "mac") cache_dir <- "~/Library/Caches/livy"
   if(os == "unix") {
     cache_dir <- file.path(Sys.getenv("XDG_CACHE_HOME", "~/.cache"), "livy")
