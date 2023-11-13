@@ -549,7 +549,7 @@ test_that("summarise(.groups=)", {
 })
 
 test_that("tbl_spark prints", {
-  print_output <- capture.output(print.tbl_spark(iris_tbl))
+  print_output <- capture.output(print(iris_tbl))
   expect_equal(
     print_output[1],
     "# Source:   table<iris> [?? x 5]"
