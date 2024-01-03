@@ -3,7 +3,7 @@
 #' PrefixSpan algorithm for mining frequent itemsets.
 #'
 #' @template roxlate-ml-x
-#' @param seq_col The name of the sequence column in dataset (default
+#' @param seq_col The name of the sequence column in dataset (defaults to
 #'   "sequence"). Rows with nulls in this column are ignored.
 #' @param min_support The minimum support required to be considered a frequent
 #'   sequential pattern.
@@ -23,7 +23,7 @@
 #' library(sparklyr)
 #' sc <- spark_connect(master = "local", version = "2.4.0")
 #'
-#' items_df <- tibble::tibble(
+#' items_df <- dplyr::tibble(
 #'   seq = list(
 #'     list(list(1, 2), list(3)),
 #'     list(list(1), list(3, 2), list(1, 2)),

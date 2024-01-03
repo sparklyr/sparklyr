@@ -16,7 +16,7 @@ limitations of arrow, then return FALSE, otherwise return TRUE
 \examples{
 \dontrun{
 
-df <- tibble::tibble(x = seq(5))
+df <- dplyr::tibble(x = seq(5))
 arrow_enabled_object(df)
 }
 

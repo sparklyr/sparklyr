@@ -4,7 +4,7 @@ skip_on_arrow_devel()
 
 sc <- testthat_spark_connection()
 
-df <- tibble::tibble(
+df <- dplyr::tibble(
   col1 = rep(1L, 5L),
   col2 = rep("two", 5L),
   col3 = rep(3.33333, 5L),

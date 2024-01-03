@@ -1,9 +1,5 @@
 sparklyr_jar_spec_list <- function() {
   list(
-    list(spark = "1.5.2", scala = "2.10", remove_srcs = TRUE),
-    list(spark = "1.6.0", scala = "2.10", scala_filter = "1.6.1"),
-    list(spark = "2.0.0", scala = "2.11"),
-    list(spark = "2.3.0", scala = "2.11"),
     list(spark = "2.4.0", scala = "2.11"),
     list(spark = "2.4.0", scala = "2.12"),
     list(spark = "3.0.0", scala = "2.12"),

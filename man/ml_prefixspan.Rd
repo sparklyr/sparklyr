@@ -20,7 +20,7 @@ ml_freq_seq_patterns(model)
 \arguments{
 \item{x}{A \code{spark_connection}, \code{ml_pipeline}, or a \code{tbl_spark}.}
 
-\item{seq_col}{The name of the sequence column in dataset (default
+\item{seq_col}{The name of the sequence column in dataset (defaults to
 "sequence"). Rows with nulls in this column are ignored.}
 
 \item{min_support}{The minimum support required to be considered a frequent
@@ -49,7 +49,7 @@ PrefixSpan algorithm for mining frequent itemsets.
 library(sparklyr)
 sc <- spark_connect(master = "local", version = "2.4.0")
 
-items_df <- tibble::tibble(
+items_df <- dplyr::tibble(
   seq = list(
     list(list(1, 2), list(3)),
     list(list(1), list(3, 2), list(1, 2)),

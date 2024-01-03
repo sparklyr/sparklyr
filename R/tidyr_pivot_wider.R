@@ -61,7 +61,7 @@ pivot_wider.tbl_spark <- function(data,
 
 #' @importFrom purrr reduce map transpose
 #' @importFrom tidyselect eval_select
-#' @importFrom tibble tibble
+#' @importFrom dplyr tibble
 #' @importFrom rlang `!!` enquos enquo
 #' @importFrom dplyr ungroup arrange
 sdf_build_wider_spec <- function(data,

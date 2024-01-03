@@ -43,7 +43,7 @@ library(sparklyr)
 sc <- spark_connect(master = "local")
 # concatenates all numbers of each array in `array_column` and add parentheses
 # around the resulting string
-copy_to(sc, tibble::tibble(array_column = list(1:5, 21:25))) \%>\%
+copy_to(sc, dplyr::tibble(array_column = list(1:5, 21:25))) \%>\%
   hof_aggregate(
     start = "",
     merge = ~ CONCAT(.y, .x),

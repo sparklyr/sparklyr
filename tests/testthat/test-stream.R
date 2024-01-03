@@ -184,7 +184,7 @@ test_stream("stream_lag() works as expected", {
   weekdays_sdf <- stream_read_csv(sc, get_test_data_path("weekdays"))
   expect_true(weekdays_sdf %>% sdf_is_streaming())
 
-  expected <- tibble::tribble(
+  expected <- dplyr::tribble(
     ~day,         ~x,   ~yesterday, ~two_days_ago,
     "Monday",     1L,           NA,            NA,
     "Tuesday",    1L,     "Monday",            NA,
@@ -199,7 +199,7 @@ test_stream("stream_lag() works as expected", {
   expect_true(output_sdf %>% sdf_is_streaming())
   expect_equivalent(output_sdf %>% collect(), expected)
 
-  expected <- tibble::tribble(
+  expected <- dplyr::tribble(
     ~day,         ~x,   ~yesterday, ~two_days_ago,
     "Monday",     1L,           NA,            NA,
     "Tuesday",    1L,     "Monday",            NA,

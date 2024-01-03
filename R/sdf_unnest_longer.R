@@ -35,7 +35,7 @@ NULL
 #' # unnesting a struct column
 #' sdf <- copy_to(
 #'   sc,
-#'   tibble::tibble(
+#'   dplyr::tibble(
 #'     x = 1:3,
 #'     y = list(list(a = 1, b = 2), list(a = 3, b = 4), list(a = 5, b = 6))
 #'   )
@@ -46,7 +46,7 @@ NULL
 #' # unnesting an array column
 #' sdf <- copy_to(
 #'   sc,
-#'   tibble::tibble(
+#'   dplyr::tibble(
 #'     x = 1:3,
 #'     y = list(1:10, 1:5, 1:2)
 #'   )

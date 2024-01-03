@@ -97,7 +97,7 @@ spark_config_kubernetes_forward_cleanup <- function(
 #' @export
 spark_config_kubernetes <- function(
                                     master,
-                                    version = "2.3.3",
+                                    version = "3.2.3",
                                     image = "spark:sparklyr",
                                     driver = random_string("sparklyr-"),
                                     account = "spark",

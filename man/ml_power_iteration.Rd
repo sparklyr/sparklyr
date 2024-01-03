@@ -16,7 +16,7 @@ ml_power_iteration(
 )
 }
 \arguments{
-\item{x}{A `spark_connection`  or a `tbl_spark.`}
+\item{x}{A `spark_connection`  or a `tbl_spark`.}
 
 \item{k}{The number of clusters to create.}
 
@@ -90,7 +90,7 @@ gen_pic_data <- function() {
     }
   }
 
-  tibble::tibble(src = src, dst = dst, sim = sim)
+  dplyr::tibble(src = src, dst = dst, sim = sim)
 }
 
 pic_data <- copy_to(sc, gen_pic_data())

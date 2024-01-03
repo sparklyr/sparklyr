@@ -33,7 +33,7 @@ library(sparklyr)
 sc <- spark_connect(master = "local", version = "3.0.0")
 copy_to(
   sc,
-  tibble::tibble(
+  dplyr::tibble(
     # x contains 2 arrays each having elements in ascending order
     x = list(1:5, 6:10)
   )
