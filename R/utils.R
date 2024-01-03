@@ -587,8 +587,18 @@ infer_required_r_packages <- function(fn) {
   ls(deps)
 }
 
+get_os <- function() {
+  if (.Platform$OS.type == "windows") {
+    "win"
+  } else if (Sys.info()["sysname"] == "Darwin") {
+    "mac"
+  } else {
+    "unix"
+  }
+}
+
 os_is_windows <- function() {
-  .Platform$OS.type == "windows"
+  get_os() == "windows"
 }
 
 cast_string <- function(x) {

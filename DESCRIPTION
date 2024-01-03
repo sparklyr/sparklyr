@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.8.4
+Version: 1.8.4.9000
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -86,7 +86,6 @@ Imports:
     methods,
     openssl (>= 0.8),
     purrr,
-    rappdirs,
     rlang (>= 0.1.4),
     rstudioapi (>= 0.10),
     tidyr (>= 1.2.0),

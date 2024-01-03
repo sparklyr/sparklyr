@@ -359,7 +359,7 @@ spark_install_dir <- function() {
 
 # Used for backwards compatibility with sparklyr 0.5 installation path
 spark_install_old_dir <- function() {
-  getOption("spark.install.dir", rappdirs::app_dir("spark", "rstudio")$cache())
+  getOption("spark.install.dir")
 }
 
 #' @rdname spark_install

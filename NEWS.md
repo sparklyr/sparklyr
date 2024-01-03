@@ -1,3 +1,9 @@
+# Sparklyr (dev)
+
+- Removes dependency on `rapddirs`: 
+  - Deprecating backwards compatability with `sparklyr` 0.5 is no longer needed
+  - Replicates selection of cache directory 
+
 # Sparklyr 1.8.4
 
 ### Compatability with new `dbplyr` version
