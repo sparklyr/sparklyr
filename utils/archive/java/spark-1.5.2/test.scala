@@ -1,0 +1,48 @@
+package sparklyr
+
+class TestValue(x: Int) {
+}
+
+object Test {
+  def nullary() = 0
+
+  def unaryPrimitiveInt(i : Int) = i * i
+  def unaryInteger(i : Integer) = {
+    i == 0
+  }
+  def unaryNullableInteger(i : Integer) = Option(i) match {
+    case None => -1
+    case Some(j) => j * j
+  }
+
+  def unaryPrimitiveString(s : String) = s
+
+  def unarySeq(xs : Seq[Double]) = xs.map(x => x * x).sum
+  def unaryNullableSeq(xs : Seq[Double]) = Option(xs) match {
+    case None => -1
+    case Some(ys) => ys.map(y => y * y).sum
+  }
+
+  def infer(x: Double) = "Double"
+  def infer(s: String) = "String"
+  def infer(xs: Seq[Double]) = "Seq"
+
+  def roundtrip(data: Array[_]): Array[_] = data
+
+  def unaryArrayToClass(array: Array[_]): String = array.getClass.getName
+
+  var number: Int = 0
+  def setNumber(x: Int): Unit = { number = x }
+  def getNumber(): Int = number
+
+  def readMap(x: Map[_, _]): Map[_, _] = x
+
+  def readTestValueArray(x: Array[TestValue]): Int = x.length
+  def readFloat(x: Float): Float = x
+  def readJFloatArray(x: Array[java.lang.Float]): Array[java.lang.Float] = x
+  def readFloatArray(x: Array[Float]): Array[Float] = x
+}
+
+package object test {
+  def testPackageObject(s : String): String = s
+}
