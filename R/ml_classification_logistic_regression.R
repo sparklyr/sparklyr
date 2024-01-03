@@ -7,18 +7,30 @@
 #' @template roxlate-ml-linear-regression-params
 #' @template roxlate-ml-predictor-params
 #' @template roxlate-ml-probabilistic-classifier-params
-#' @param family (Spark 2.1.0+) Param for the name of family which is a description of the label distribution to be used in the model. Supported options: "auto", "binomial", and "multinomial."
+#' @param family (Spark 2.1.0+) Param for the name of family which is a
+#' description of the label distribution to be used in the model. Supported
+#' options: "auto", "binomial", and "multinomial."
 #' @template roxlate-ml-elastic-net-param
 #' @param threshold in binary classification prediction, in range [0, 1].
 #' @template roxlate-ml-aggregation-depth
-#' @param lower_bounds_on_coefficients (Spark 2.2.0+) Lower bounds on coefficients if fitting under bound constrained optimization.
-#'   The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.
-#' @param lower_bounds_on_intercepts (Spark 2.2.0+) Lower bounds on intercepts if fitting under bound constrained optimization.
-#'   The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.
-#' @param upper_bounds_on_coefficients (Spark 2.2.0+) Upper bounds on coefficients if fitting under bound constrained optimization.
-#'   The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.
-#' @param upper_bounds_on_intercepts (Spark 2.2.0+) Upper bounds on intercepts if fitting under bound constrained optimization.
-#'   The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.
+#' @param lower_bounds_on_coefficients (Spark 2.2.0+) Lower bounds on
+#' coefficients if fitting under bound constrained optimization.
+#' The bound matrix must be compatible with the shape (1, number of features)
+#' for binomial regression, or (number of classes, number of features) for
+#' multinomial regression.
+#' @param lower_bounds_on_intercepts (Spark 2.2.0+) Lower bounds on intercepts
+#' if fitting under bound constrained optimization.
+#' The bounds vector size must be equal with 1 for binomial regression, or
+#' the number of classes for multinomial regression.
+#' @param upper_bounds_on_coefficients (Spark 2.2.0+) Upper bounds on
+#' coefficients if fitting under bound constrained optimization.
+#' The bound matrix must be compatible with the shape (1, number of features)
+#' for binomial regression, or (number of classes, number of features) for
+#' multinomial regression.
+#' @param upper_bounds_on_intercepts (Spark 2.2.0+) Upper bounds on intercepts
+#' if fitting under bound constrained optimization.
+#' The bounds vector size must be equal with 1 for binomial regression, or
+#' the number of classes for multinomial regression.
 #'
 #' @examples
 #' \dontrun{
@@ -40,31 +52,33 @@
 #' }
 #'
 #' @export
-ml_logistic_regression <- function(x, formula = NULL, fit_intercept = TRUE,
-                                   elastic_net_param = 0, reg_param = 0, max_iter = 100,
-                                   threshold = 0.5, thresholds = NULL, tol = 1e-06,
-                                   weight_col = NULL, aggregation_depth = 2,
-                                   lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
-                                   upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
-                                   features_col = "features", label_col = "label", family = "auto",
-                                   prediction_col = "prediction", probability_col = "probability",
-                                   raw_prediction_col = "rawPrediction",
-                                   uid = random_string("logistic_regression_"), ...) {
+ml_logistic_regression <- function(
+    x, formula = NULL, fit_intercept = TRUE,
+    elastic_net_param = 0, reg_param = 0, max_iter = 100,
+    threshold = 0.5, thresholds = NULL, tol = 1e-06,
+    weight_col = NULL, aggregation_depth = 2,
+    lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
+    upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
+    features_col = "features", label_col = "label", family = "auto",
+    prediction_col = "prediction", probability_col = "probability",
+    raw_prediction_col = "rawPrediction",
+    uid = random_string("logistic_regression_"), ...) {
   check_dots_used()
   UseMethod("ml_logistic_regression")
 }
 
 #' @export
-ml_logistic_regression.spark_connection <- function(x, formula = NULL, fit_intercept = TRUE,
-                                                    elastic_net_param = 0, reg_param = 0, max_iter = 100,
-                                                    threshold = 0.5, thresholds = NULL, tol = 1e-06,
-                                                    weight_col = NULL, aggregation_depth = 2,
-                                                    lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
-                                                    upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
-                                                    features_col = "features", label_col = "label", family = "auto",
-                                                    prediction_col = "prediction", probability_col = "probability",
-                                                    raw_prediction_col = "rawPrediction",
-                                                    uid = random_string("logistic_regression_"), ...) {
+ml_logistic_regression.spark_connection <- function(
+    x, formula = NULL, fit_intercept = TRUE,
+    elastic_net_param = 0, reg_param = 0, max_iter = 100,
+    threshold = 0.5, thresholds = NULL, tol = 1e-06,
+    weight_col = NULL, aggregation_depth = 2,
+    lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
+    upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
+    features_col = "features", label_col = "label", family = "auto",
+    prediction_col = "prediction", probability_col = "probability",
+    raw_prediction_col = "rawPrediction",
+    uid = random_string("logistic_regression_"), ...) {
   .args <- list(
     formula = formula,
     fit_intercept = fit_intercept,
@@ -132,16 +146,17 @@ ml_logistic_regression.spark_connection <- function(x, formula = NULL, fit_inter
 }
 
 #' @export
-ml_logistic_regression.ml_pipeline <- function(x, formula = NULL, fit_intercept = TRUE,
-                                               elastic_net_param = 0, reg_param = 0, max_iter = 100,
-                                               threshold = 0.5, thresholds = NULL, tol = 1e-06,
-                                               weight_col = NULL, aggregation_depth = 2,
-                                               lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
-                                               upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
-                                               features_col = "features", label_col = "label", family = "auto",
-                                               prediction_col = "prediction", probability_col = "probability",
-                                               raw_prediction_col = "rawPrediction",
-                                               uid = random_string("logistic_regression_"), ...) {
+ml_logistic_regression.ml_pipeline <- function(
+    x, formula = NULL, fit_intercept = TRUE,
+    elastic_net_param = 0, reg_param = 0, max_iter = 100,
+    threshold = 0.5, thresholds = NULL, tol = 1e-06,
+    weight_col = NULL, aggregation_depth = 2,
+    lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
+    upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
+    features_col = "features", label_col = "label", family = "auto",
+    prediction_col = "prediction", probability_col = "probability",
+    raw_prediction_col = "rawPrediction",
+    uid = random_string("logistic_regression_"), ...) {
   stage <- ml_logistic_regression.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -172,18 +187,19 @@ ml_logistic_regression.ml_pipeline <- function(x, formula = NULL, fit_intercept 
 }
 
 #' @export
-ml_logistic_regression.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE,
-                                             elastic_net_param = 0, reg_param = 0, max_iter = 100,
-                                             threshold = 0.5, thresholds = NULL, tol = 1e-06,
-                                             weight_col = NULL, aggregation_depth = 2,
-                                             lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
-                                             upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
-                                             features_col = "features", label_col = "label", family = "auto",
-                                             prediction_col = "prediction", probability_col = "probability",
-                                             raw_prediction_col = "rawPrediction",
-                                             uid = random_string("logistic_regression_"),
-                                             response = NULL, features = NULL,
-                                             predicted_label_col = "predicted_label", ...) {
+ml_logistic_regression.tbl_spark <- function(
+    x, formula = NULL, fit_intercept = TRUE,
+    elastic_net_param = 0, reg_param = 0, max_iter = 100,
+    threshold = 0.5, thresholds = NULL, tol = 1e-06,
+    weight_col = NULL, aggregation_depth = 2,
+    lower_bounds_on_coefficients = NULL, lower_bounds_on_intercepts = NULL,
+    upper_bounds_on_coefficients = NULL, upper_bounds_on_intercepts = NULL,
+    features_col = "features", label_col = "label", family = "auto",
+    prediction_col = "prediction", probability_col = "probability",
+    raw_prediction_col = "rawPrediction",
+    uid = random_string("logistic_regression_"),
+    response = NULL, features = NULL,
+    predicted_label_col = "predicted_label", ...) {
   formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_logistic_regression.spark_connection(
