@@ -23,7 +23,7 @@
 #' library(sparklyr)
 #' sc <- spark_connect(master = "local", version = "2.4.0")
 #'
-#' items_df <- tibble::tibble(
+#' items_df <- dplyr::tibble(
 #'   seq = list(
 #'     list(list(1, 2), list(3)),
 #'     list(list(1), list(3, 2), list(1, 2)),

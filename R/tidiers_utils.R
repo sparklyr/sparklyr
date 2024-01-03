@@ -88,7 +88,7 @@ fix_data_frame <- function(x, newnames = NULL, newcol = "term") {
       colnames(ret)[-1] <- newnames
     }
   }
-  tibble::as_tibble(ret)
+  dplyr::as_tibble(ret)
 }
 
 # Checks for newdata argument in parsnip models

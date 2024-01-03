@@ -140,7 +140,7 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
 
     it <- iterators::iter(obj)
     accumulator <- foreach::makeAccum(it)
-    items <- tibble::tibble(
+    items <- dplyr::tibble(
       encoded = it %>% as.list() %>% lapply(serializer)
     )
     spark_items <- sdf_copy_to(

@@ -85,7 +85,7 @@ build_longer_spec <- function(data,
     output_names[[col]] <- f(output_names[[col]])
   }
 
-  out <- tibble::tibble(.name = cols)
+  out <- dplyr::tibble(.name = cols)
   out[[".value"]] <- values_to
   out <- vctrs::vec_cbind(out, output_names)
   out
@@ -116,7 +116,7 @@ build_output_names <- function(cols,
       output_names <- .str_extract(output_names, names_to, regex = names_pattern)
     }
   } else if (length(names_to) == 0) {
-    output_names <- tibble::new_tibble(x = list(), nrow = length(output_names))
+    output_names <- vctrs::data_frame(.size = length(output_names))
   } else {
     if (!is.null(names_sep)) {
       rlang::abort("`names_sep` can not be used with `names_to` of length 1")
@@ -125,7 +125,7 @@ build_output_names <- function(cols,
       output_names <- .str_extract(output_names, names_to, regex = names_pattern)[[1]]
     }
 
-    output_names <- tibble::tibble(!!names_to := output_names)
+    output_names <- dplyr::tibble(!!names_to := output_names)
   }
 
   output_names
@@ -484,7 +484,7 @@ deduplicate_longer_spec <- function(spec) {
   names(out) <- rlang::as_utf8_character(into)
   out <- out[!is.na(names(out))]
 
-  tibble::as_tibble(out)
+  dplyr::as_tibble(out)
 }
 
 .str_extract <- function(x, into, regex, convert = FALSE) {
@@ -514,7 +514,7 @@ deduplicate_longer_spec <- function(spec) {
   out <- out[non_na_into]
   names(out) <- into[non_na_into]
 
-  out <- tibble::as_tibble(out)
+  out <- dplyr::as_tibble(out)
 
   if (convert) {
     out[] <- purrr::map(out, type.convert, as.is = TRUE)

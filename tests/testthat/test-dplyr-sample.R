@@ -9,7 +9,7 @@ sc <- testthat_spark_connection()
 
 test_that("set.seed makes sampling outcomes deterministic", {
   skip_connection("sample-with-seed")
-  sdf <- copy_to(sc, tibble::tibble(id = seq(1000), weight = rep(seq(5), 200)))
+  sdf <- copy_to(sc, dplyr::tibble(id = seq(1000), weight = rep(seq(5), 200)))
 
   for (weight in list(NULL, rlang::sym("weight"))) {
     for (replace in list(FALSE, TRUE)) {

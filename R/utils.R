@@ -495,7 +495,7 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
         }
       }
     ) %>%
-    tibble::as_tibble()
+    dplyr::as_tibble()
 }
 
 #' @importFrom tidyselect tidyselect_data_proxy tidyselect_data_has_predicates

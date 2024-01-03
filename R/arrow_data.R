@@ -18,7 +18,7 @@ arrow_enabled <- function(sc, object) {
 #' @examples
 #' \dontrun{
 #'
-#' df <- tibble::tibble(x = seq(5))
+#' df <- dplyr::tibble(x = seq(5))
 #' arrow_enabled_object(df)
 #' }
 #'
@@ -84,7 +84,7 @@ arrow_read_stream <- function(stream) {
 
   entries <- list()
   while (!is.null(record_entry)) {
-    entries[[length(entries) + 1]] <- tibble::as_tibble(record_entry)
+    entries[[length(entries) + 1]] <- dplyr::as_tibble(record_entry)
     record_entry <- arrow_read_record_batch(reader)
   }
 

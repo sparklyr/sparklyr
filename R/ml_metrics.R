@@ -20,7 +20,7 @@
 #' @param ... Optional arguments; currently unused.
 #' @importFrom rlang as_name
 #' @importFrom purrr map_dfr imap
-#' @importFrom tibble tibble
+#' @importFrom dplyr tibble
 #' @examples
 #' \dontrun{
 #' sc <- spark_connect("local")

@@ -1577,7 +1577,7 @@ spark_write_rds <- function(x, dest_uri) {
     as.list(dest_uri)
   )
 
-  tibble::tibble(
+  dplyr::tibble(
     partition_id = seq(num_partitions) - 1,
     uri = dest_uri
   )

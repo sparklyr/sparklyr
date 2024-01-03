@@ -44,7 +44,7 @@ repair_names <- function(col_names, names_repair) {
   names(args) <- col_names
   args <- append(args, list(.name_repair = names_repair))
 
-  do.call(tibble::tibble, args) %>%
+  do.call(dplyr::tibble, args) %>%
     names() %>%
     lapply(function(x) gsub("\\.", "_", x)) %>%
     unlist()

@@ -204,7 +204,7 @@ collect_from_rds <- function(path) {
   struct_col_idxes <- data[[4]]
   col_data <- data[[5]]
   names(col_data) <- col_names
-  df <- tibble::as_tibble(col_data)
+  df <- dplyr::as_tibble(col_data)
 
   apply_conversion <- function(df, idx, fn) {
     if ("list" %in% class(df[[idx]])) {
