@@ -40,7 +40,7 @@ sc <- spark_connect(master = "local", version = "3.0.0")
 # create a Spark dataframe with 2 columns of type MAP<STRING, INT>
 two_maps_tbl <- sdf_copy_to(
   sc,
-  tibble::tibble(
+  dplyr::tibble(
     m1 = c("{\"1\":2,\"3\":4,\"5\":6}", "{\"2\":1,\"4\":3,\"6\":5}"),
     m2 = c("{\"1\":1,\"3\":3,\"5\":5}", "{\"2\":2,\"4\":4,\"6\":6}")
   ),

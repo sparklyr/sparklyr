@@ -137,7 +137,7 @@ test_that("'spark_apply' supports nested lists as input type", {
 
   expect_equivalent(
     spark_apply(sdf, fn) %>% arrange(a) %>% collect(),
-    tibble::tibble(a = c(1, 1, 1, 2, 2), b = 2)
+    dplyr::tibble(a = c(1, 1, 1, 2, 2), b = 2)
   )
 })
 
@@ -158,7 +158,7 @@ test_that("'spark_apply' supports nested lists as return type", {
     actual <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
       spark_apply(
         function(df) {
-          tibble::tibble(
+          dplyr::tibble(
             person = lapply(
               df$json,
               function(x) {

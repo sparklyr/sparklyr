@@ -215,12 +215,12 @@ test_that("'sdf_bind_rows' err for non-tbl_spark", {
 test_that("'sdf_bind_rows' handles column type upcasting (#804)", {
   test_requires("dplyr")
 
-  df5a <- tibble::tibble(
+  df5a <- dplyr::tibble(
     year = as.double(2005:2006),
     count = c(6, NaN),
     name = c("a", "b")
   )
-  df6a <- tibble::tibble(
+  df6a <- dplyr::tibble(
     year = 2007:2008,
     name = c("c", "d"),
     count = c(0, 0)

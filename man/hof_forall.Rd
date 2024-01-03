@@ -28,7 +28,7 @@ order function, which is supported since Spark 3.0)
 \dontrun{
 
 sc <- spark_connect(master = "local", version = "3.0.0")
-df <- tibble::tibble(
+df <- dplyr::tibble(
   x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
   y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
 )

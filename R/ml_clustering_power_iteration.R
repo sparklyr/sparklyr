@@ -68,7 +68,7 @@ NULL
 #'     }
 #'   }
 #'
-#'   tibble::tibble(src = src, dst = dst, sim = sim)
+#'   dplyr::tibble(src = src, dst = dst, sim = sim)
 #' }
 #'
 #' pic_data <- copy_to(sc, gen_pic_data())
@@ -151,7 +151,7 @@ ml_power_iteration.tbl_spark <- function(x, k = 4, max_iter = 20,
     lapply(unlist)
   names(clusters) <- c("id", "cluster")
 
-  clusters_df <- tibble::as_tibble(clusters)
+  clusters_df <- dplyr::as_tibble(clusters)
   clusters_df[order(clusters_df$id), ]
 }
 

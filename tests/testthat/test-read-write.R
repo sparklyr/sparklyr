@@ -238,8 +238,8 @@ test_that("spark_write_table() overwrites existing table definition when overwri
   desc <- DBI::dbGetQuery(sc, glue::glue("DESCRIBE TABLE {tbl}"))
 
   expect_equal(
-    tibble::as_tibble(desc),
-    tibble::tribble(
+    dplyr::as_tibble(desc),
+    dplyr::tribble(
       ~col_name, ~data_type, ~comment,
       "foo", "int", NA_character_,
       "bar", "int", NA_character_,
@@ -249,8 +249,8 @@ test_that("spark_write_table() overwrites existing table definition when overwri
   new_table <- tbl(sc, tbl)
 
   expect_equal(
-    tibble::as_tibble(new_table),
-    tibble::tribble(
+    dplyr::as_tibble(new_table),
+    dplyr::tribble(
       ~foo, ~bar,
       1L, 2L
     )
@@ -278,8 +278,8 @@ test_that("spark_insert_table() inserts into existing table definition, even whe
   desc <- DBI::dbGetQuery(sc, glue::glue("DESCRIBE TABLE {tbl}"))
 
   expect_equal(
-    tibble::as_tibble(desc),
-    tibble::tribble(
+    dplyr::as_tibble(desc),
+    dplyr::tribble(
       ~col_name, ~data_type, ~comment,
       "foo", "int", NA_character_,
       "bar", "bigint", NA_character_,
@@ -290,8 +290,8 @@ test_that("spark_insert_table() inserts into existing table definition, even whe
 
   # bar is returned as a double when the table definition is bigint
   expect_equal(
-    tibble::as_tibble(new_table),
-    tibble::tribble(
+    dplyr::as_tibble(new_table),
+    dplyr::tribble(
       ~foo, ~bar,
       1L, 2
     )
@@ -526,7 +526,7 @@ test_that("spark_read_avro() works as expected", {
   test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
   skip_databricks_connect()
 
-  expected <- tibble::tibble(
+  expected <- dplyr::tibble(
     a = c(1, NaN, 3, 4, NaN),
     b = c(-2L, 0L, 1L, 3L, 6L),
     c = c("ab", "cde", "zzzz", "", "fghi")
@@ -553,7 +553,7 @@ test_that("spark_write_avro() works as expected", {
   test_requires_version("2.4.0", "spark_write_avro() requires Spark 2.4+")
   skip_databricks_connect()
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     a = c(1, NaN, 3, 4, NaN),
     b = c(-2L, 0L, 1L, 3L, 6L),
     c = c("ab", "cde", "zzzz", "", "fghi")
@@ -577,8 +577,8 @@ test_that("spark read/write methods avoid name collision on identical file names
   skip_connection("format-avro")
   test_requires_version("2.4.0")
 
-  tbl_1 <- tibble::tibble(name = c("foo_1", "bar_1"))
-  tbl_2 <- tibble::tibble(name = c("foo_2", "bar_2"))
+  tbl_1 <- dplyr::tibble(name = c("foo_1", "bar_1"))
+  tbl_2 <- dplyr::tibble(name = c("foo_2", "bar_2"))
   sdf_1 <- copy_to(sc, tbl_1)
   sdf_2 <- copy_to(sc, tbl_2)
 
@@ -621,7 +621,7 @@ test_that("spark_read_binary can process input directory without partition specs
   expect_equal(colnames(df), c("path", "modificationTime", "length", "content"))
   expect_equivalent(
     df %>% dplyr::select(path, length, content),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                         ~length,          ~content,
       paste0("file:", file.path(dir, "file0.dat")),        4, charToRaw("1234"),
       paste0("file:", file.path(dir, "file1.dat")),        4, charToRaw("5678"),
@@ -646,7 +646,7 @@ test_that("spark_read_binary can process input directory with flat partition spe
   )
   expect_equivalent(
     df %>% dplyr::select(path, length, content, partition),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                                       ~length,          ~content, ~partition,
       paste0("file:", file.path(dir, "partition=0", "file0.dat")),       4, charToRaw("1234"),         0L,
       paste0("file:", file.path(dir, "partition=1", "file1.dat")),       4, charToRaw("5678"),         1L,
@@ -673,7 +673,7 @@ test_that("spark_read_binary can process input directory with nested partition s
   )
   expect_equivalent(
     df %>% dplyr::select(path, length, content, a, b),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                                       ~length,          ~content, ~a, ~b,
       paste0("file:", file.path(dir, "a=0", "b=0", "file0.dat")),       4, charToRaw("1234"), 0L, 0L,
       paste0("file:", file.path(dir, "a=0", "b=1", "file2.dat")),       4, charToRaw("abcd"), 0L, 1L,
@@ -701,7 +701,7 @@ test_that("spark_read_binary can support 'pathGlobFilter' option correctly", {
   )
   expect_equivalent(
     df %>% dplyr::select(path, length, content),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                        ~length,          ~content,
       paste0("file:", file.path(dir, "file0.dat")),       4, charToRaw("1234"),
       paste0("file:", file.path(dir, "file1.dat")),       4, charToRaw("5678"),
@@ -725,7 +725,7 @@ test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
   expect_equal(colnames(df), c("path", "modificationTime", "length", "content"))
   expect_equivalent(
     df %>% dplyr::select(path, length, content),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                                      ~length,          ~content,
       paste0("file:", file.path(dir, "a=0", "b=0", "file0.dat")),       4, charToRaw("1234"),
       paste0("file:", file.path(dir, "a=1", "b=0", "file1.dat")),       4, charToRaw("5678"),
@@ -768,7 +768,7 @@ test_that("spark_read_image works as expected", {
       dplyr::transmute(origin = image[["origin"]]) %>%
       dplyr::arrange(origin) %>%
       dplyr::collect(),
-    tibble::tibble(
+    dplyr::tibble(
       origin = lapply(
         c("edit-sql", "help", "livy-ui", "livy", "spark-log", "spark-ui", "spark", "yarn-ui"),
         function(x) paste0("file://", file.path(dir, x), ".png")

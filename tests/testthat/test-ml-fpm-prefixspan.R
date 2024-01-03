@@ -8,7 +8,7 @@ test_that("ml_prefixspan() works as expected", {
 
   sc <- testthat_spark_connection()
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     seq = list(
       list(list(1, 2), list(3)),
       list(list(1), list(3, 2), list(1, 2)),

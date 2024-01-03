@@ -35,7 +35,7 @@ test_that("ft_dplyr_transformer() supports all sampling use cases", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       id = seq(1000),
       grp = c(rep(0L, 250), rep(1L, 250), rep(2L, 250), rep(3L, 250)),
       weight = rep(seq(5), 200)
