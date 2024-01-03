@@ -173,7 +173,7 @@ spark_versions <- function(latest = TRUE) {
         newRow$base <- currentRow$base
         newRow$pattern <- currentRow$pattern
         newRow$download <- currentRow$download
-        newRow$default <- identical(currentRow$spark, "3.0.0")
+        newRow$default <- identical(currentRow$spark, "3.3.0")
 
         #newRow$hadoop_default <- identical(currentRow$hadoop, hadoop_default)
         newRow$hadoop_default <- currentRow$hadoop_default

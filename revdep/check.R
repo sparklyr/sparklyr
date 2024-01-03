@@ -8,13 +8,16 @@ revdeps <- tools::check_packages_in_dir("revdep", reverse =  list())
 
 rcheck_folders <- dir_ls(path = "revdep", glob = "*.Rcheck")
 
-sparklyr_folder <- rcheck_folders %>%
-  path_file() %>%
-  str_detect("sparklyr.Rcheck")
+sparklyr_folder_names <- rcheck_folders %>%
+  path_file()
+
+sparklyr_folder <- sparklyr_folder_names == "sparklyr.Rcheck"
 
 res <- map(
   rcheck_folders[!sparklyr_folder],
   ~ {
+    print(grepl("pysparklyr", .x))
+
     # Read log
     raw_log <- readLines(path(.x, "00check.log"))
 

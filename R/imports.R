@@ -5,6 +5,7 @@
 #' @importFrom dplyr type_sum
 #' @importFrom rlang %||%
 #' @importFrom purrr map_chr
+#' @importFrom openssl multihash rand_num
 NULL
 
 #' @importFrom generics tidy
@@ -19,5 +20,5 @@ generics::augment
 #' @export
 generics::glance
 
-#' @importFrom ellipsis check_dots_used
+#' @importFrom rlang check_dots_used check_dots_empty
 NULL

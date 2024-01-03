@@ -16,13 +16,13 @@ ml_power_iteration(
 )
 }
 \arguments{
-\item{x}{A ‘spark_connection’  or a ‘tbl_spark’.}
+\item{x}{A `spark_connection`  or a `tbl_spark`.}
 
 \item{k}{The number of clusters to create.}
 
 \item{max_iter}{The maximum number of iterations to run.}
 
-\item{init_mode}{This can be either “random”, which is the default, to use a random vector as vertex properties, or “degree” to use normalized sum similarities.}
+\item{init_mode}{This can be either "random", which is the default, to use a random vector as vertex properties, or "degree" to use normalized sum similarities.}
 
 \item{src_col}{Column in the input Spark dataframe containing 0-based indexes of all source vertices in the affinity matrix described in the PIC paper.}
 

@@ -15,7 +15,7 @@ registerDoSpark(spark_conn, parallelism = NULL, ...)
  of cores available to the `sparklyr` application)}
 
 \item{...}{additional options for sparklyr parallel backend
-(currently only the only valid option is nocompile = {T, F})}
+(currently only the only valid option is `nocompile`)}
 }
 \value{
 None

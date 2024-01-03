@@ -1,3 +1,53 @@
+# Sparklyr (dev)
+
+- Removes dependency on `rapddirs`: 
+  - Deprecating backwards compatability with `sparklyr` 0.5 is no longer needed
+  - Replicates selection of cache directory 
+
+# Sparklyr 1.8.4
+
+### Compatability with new `dbplyr` version
+
+- Fixes `db_connection_describe()` S3 consistency error (@t-kalinowski)
+
+- Addresses new error from `dbplyr` that fails when you try to access 
+components from a remote `tbl` using `$`
+
+- Bumps the version of `dbplyr` to switch between the two methods to create
+temporary tables 
+
+- Addresses new `translate_sql()` hard requirement to pass a `con` object. Done
+by passing the current connection or `simulate_hive()` 
+
+### Fixes
+
+- Small fix to spark_connect_method() arguments. Removes 'hadoop_version'
+
+- Improvements to handling `pysparklyr` load (@t-kalinowski)
+
+- Fixes 'subscript out of bounds' issue found by `pysparklyr` (@t-kalinowski)
+
+- Updates available Spark download links
+
+### Improvements
+
+- Removes dependency on the following packages:
+  - `digest`
+  - `base64enc`
+  - `ellipsis`
+  
+- Converts `ml_fit()` into a S3 method for `pysparklyr` compatibility
+
+### Test improvements
+
+- Improvements and fixes to tests (@t-kalinowski)
+
+- Fixes test jobs that include should have included Arrow but did not
+
+- Updates to the Spark versions to be tested 
+
+- Re-adds tests for development `dbplyr`
+
 # Sparklyr 1.8.3
 
 ### Improvements

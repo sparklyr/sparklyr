@@ -97,12 +97,12 @@ spark_session_id <- function(app_name, master) {
     sum((pos - 1L) * 16^(rev(seq_along(xx) - 1)))
   }
 
-  hashed <- digest(object = paste(app_name, master, sep = ""), algo = "crc32")
-  hex_to_int(hashed) %% .Machine$integer.max
+  hashed <- multihash(x = paste(app_name, master, sep = ""), algos = "sha1")
+  hex_to_int(substr(hashed, 1, 20)) %% .Machine$integer.max
 }
 
 spark_session_random <- function() {
-  floor(openssl::rand_num(1) * 100000)
+  floor(rand_num(1) * 100000)
 }
 
 abort_shell <- function(message, spark_submit_path, shell_args, output_file, error_file) {

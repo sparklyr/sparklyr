@@ -24,6 +24,12 @@ is_ml_estimator <- function(x) inherits(x, "ml_estimator")
 #' @rdname ml-transform-methods
 #' @export
 ml_fit <- function(x, dataset, ...) {
+  UseMethod("ml_fit")
+}
+
+#' @rdname ml-transform-methods
+#' @export
+ml_fit.default <- function(x, dataset, ...) {
   if (!is_ml_estimator(x)) {
     stop("'ml_fit()' is only applicable to 'ml_estimator' objects")
   }

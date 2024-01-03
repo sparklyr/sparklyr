@@ -3,8 +3,8 @@
 #' PrefixSpan algorithm for mining frequent itemsets.
 #'
 #' @template roxlate-ml-x
-#' @param seq_col The name of the sequence column in dataset (default
-#'   “sequence”). Rows with nulls in this column are ignored.
+#' @param seq_col The name of the sequence column in dataset (defaults to
+#'   "sequence"). Rows with nulls in this column are ignored.
 #' @param min_support The minimum support required to be considered a frequent
 #'   sequential pattern.
 #' @param max_pattern_length The maximum length of a frequent sequential

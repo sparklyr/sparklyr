@@ -158,8 +158,6 @@ spark_connect <- function(master,
     master <- "local"
   }
 
-  hadoop_version <- list(...)$hadoop_version
-
   # ensure app_name is part of the spark-submit args
   config$`sparklyr.shell.name` <- config$`sparklyr.shell.name` %||% app_name
   master_override <- spark_config_value(config, "sparklyr.connect.master", NULL)
@@ -242,7 +240,6 @@ spark_connect <- function(master,
     config = config,
     app_name = app_name,
     version = version,
-    hadoop_version = hadoop_version,
     extensions = extensions,
     scala_version = scala_version,
     ...
@@ -346,7 +343,7 @@ spark_connect_method.default <- function(
     config,
     app_name,
     version,
-    hadoop_version,
+    hadoop_version = NULL,
     extensions,
     scala_version,
     ...) {
@@ -588,14 +585,14 @@ initialize_method.default <- function(method, scon) {
   scon
 }
 
-#' Return the port number of a {sparklyr} backend.
+#' Return the port number of a `sparklyr` backend.
 #'
-#' Retrieve the port number of the {sparklyr} backend associated with a Spark
+#' Retrieve the port number of the `sparklyr` backend associated with a Spark
 #' connection.
 #'
 #' @param sc A \code{spark_connection}.
 #'
-#' @return The port number of the {sparklyr} backend associated with \code{sc}.
+#' @return The port number of the `sparklyr` backend associated with \code{sc}.
 #'
 #' @export
 sparklyr_get_backend_port <- function(sc) {

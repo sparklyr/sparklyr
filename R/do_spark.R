@@ -11,7 +11,7 @@ NULL
 #'    `SparkContext.defaultParallelism()` which by default is the number
 #'    of cores available to the `sparklyr` application)
 #' @param ... additional options for sparklyr parallel backend
-#'   (currently only the only valid option is nocompile = {T, F})
+#'   (currently only the only valid option is `nocompile`)
 #'
 #' @return None
 #'
