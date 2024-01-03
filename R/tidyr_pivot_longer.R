@@ -116,7 +116,7 @@ build_output_names <- function(cols,
       output_names <- .str_extract(output_names, names_to, regex = names_pattern)
     }
   } else if (length(names_to) == 0) {
-    output_names <- dplyr::tibble(x = list(), nrow = length(output_names))
+    output_names <- vctrs::data_frame(.size = length(output_names))
   } else {
     if (!is.null(names_sep)) {
       rlang::abort("`names_sep` can not be used with `names_to` of length 1")
