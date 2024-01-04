@@ -20,7 +20,8 @@ ft_ngram(
 
 \item{output_col}{The name of the output column.}
 
-\item{n}{Minimum n-gram length, greater than or equal to 1. Default: 2, bigram features}
+\item{n}{Minimum n-gram length, greater than or equal to 1. Default: 2,
+bigram features}
 
 \item{uid}{A character string used to uniquely identify the feature transformer.}
 
@@ -43,10 +44,15 @@ The object returned depends on the class of \code{x}.
 }
 }
 \description{
-A feature transformer that converts the input array of strings into an array of n-grams. Null values in the input array are ignored. It returns an array of n-grams where each n-gram is represented by a space-separated string of words.
+A feature transformer that converts the input array of strings into an array
+of n-grams. Null values in the input array are ignored. It returns an array
+of n-grams where each n-gram is represented by a space-separated string of
+words.
 }
 \details{
-When the input is empty, an empty array is returned. When the input array length is less than n (number of elements per n-gram), no n-grams are returned.
+When the input is empty, an empty array is returned. When the input
+array length is less than n (number of elements per n-gram), no n-grams are
+returned.
 }
 \seealso{
 See \url{https://spark.apache.org/docs/latest/ml-features.html} for
