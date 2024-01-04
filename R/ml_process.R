@@ -1,11 +1,16 @@
 # -------------------------- Feature Transformers ------------------------------
 
-ft_process_step <- function(x, r_class, step_class, invoke_steps) {
+ft_process_step <- function(x, uid, r_class, step_class, invoke_steps) {
   sc <- spark_connection(x)
 
   # Mapping R class to Spark model using /inst/sparkml/class_mapping.json
   class_mapping <- as.list(genv_get_ml_class_mapping())
   spark_class <- names(class_mapping[class_mapping == r_class])
+
+  if (!is.null(uid)) {
+    uid <- cast_string(uid)
+    args <- append(args, list(uid))
+  }
 
   args <- list(sc, spark_class)
 

@@ -26,6 +26,7 @@ ft_ngram_impl <- function(x, input_col = NULL, output_col = NULL, n = 2,
                           uid = random_string("ngram_"), ...) {
   ft_process_step(
     x = x,
+    uid = uid,
     r_class = "ml_ngram",
     step_class = "ml_ngram",
     invoke_steps = list(
