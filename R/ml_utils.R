@@ -113,7 +113,8 @@ make_stats_arranger <- function(fit_intercept) {
 # ----------------------------- ML helpers -------------------------------------
 
 ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
-                             formula = NULL, response = NULL, features = NULL) {
+                             formula = NULL, response = NULL, features = NULL,
+                             original_formula = NULL) {
   sc <- spark_connection(x)
 
   # Mapping R class to Spark model using /inst/sparkml/class_mapping.json
@@ -132,25 +133,27 @@ ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
 
   l_steps <- purrr::imap(pe, ~ list(.y, .x))
 
-  for(i in seq_along(l_steps)) {
-    if(!is.null(l_steps[[i]][[2]])) {
+  for (i in seq_along(l_steps)) {
+    if (!is.null(l_steps[[i]][[2]])) {
       jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
     }
   }
 
   new_estimator <- new_ml_estimator(jobj, class = r_class)
 
+  send_formula <- formula
+  if(!is.null(original_formula)) {
+    send_formula <- original_formula
+  }
   post_ml_obj(
     x = x,
     nm = new_estimator,
     ml_function = ml_function,
-    formula = formula,
+    formula = send_formula,
     response = response,
     features = features,
-    features_col = invoke_steps$features_col,
-    label_col = invoke_steps$label_col
+    invoke_steps = invoke_steps
   )
-
 }
 
 param_min_version <- function(x, value, min_version = NULL, default = NULL) {
@@ -160,7 +163,7 @@ param_min_version <- function(x, value, min_version = NULL, default = NULL) {
       sc <- spark_connection(x)
       ver <- spark_version(sc)
       if (ver < min_version) {
-        if(value != default) {
+        if (value != default) {
           stop(paste0(
             "Parameter `", deparse(substitute(value)),
             "` is only available for Spark ", min_version, " and later.",
@@ -177,36 +180,60 @@ param_min_version <- function(x, value, min_version = NULL, default = NULL) {
 
 # --------------------- Post conversion functions ------------------------------
 
-post_ml_obj <- function(x, nm, ml_function, formula, response,
-                        features, features_col, label_col) {
+post_ml_obj <- function(
+    x, nm, ml_function, formula, response, features, invoke_steps) {
   UseMethod("post_ml_obj")
 }
 
-post_ml_obj.spark_connection <- function(x, nm, ml_function, formula, response,
-                                         features, features_col, label_col) {
+post_ml_obj.spark_connection <- function(
+    x, nm, ml_function, formula, response, features, invoke_steps) {
   nm
 }
 
-post_ml_obj.ml_pipeline <- function(x, nm, ml_function, formula, response,
-                                    features, features_col, label_col) {
+post_ml_obj.ml_pipeline <- function(
+    x, nm, ml_function, formula, response, features, invoke_steps) {
   ml_add_stage(x, nm)
 }
 
-post_ml_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
-                                  features, features_col, label_col) {
-  formula <- ml_standardize_formula(formula, response, features)
-
+post_ml_obj.tbl_spark <- function(
+    x, nm, ml_function, formula, response, features, invoke_steps) {
   if (is.null(formula)) {
     ml_fit(nm, x)
   } else {
-    ml_construct_model_supervised(
-      ml_function,
+    formula <- ml_standardize_formula(formula, response, features)
+    post_ml_contruct(
       predictor = nm,
+      ml_function = ml_function,
       formula = formula,
       dataset = x,
-      features_col = features_col,
-      label_col = label_col
+      invoke_steps = invoke_steps
     )
   }
 }
 
+post_ml_contruct <- function(predictor, ml_function, formula, dataset, invoke_steps){
+  UseMethod("post_ml_contruct")
+}
+
+post_ml_contruct.default <- function(
+    predictor, ml_function, formula, dataset, invoke_steps){
+  ml_construct_model_supervised(
+    ml_function,
+    predictor = predictor,
+    formula = formula,
+    dataset = dataset,
+    features_col = invoke_steps$features_col,
+    label_col = invoke_steps$label_col
+  )
+}
+
+post_ml_contruct.ml_lda <- function(
+    predictor, ml_function, formula, dataset, invoke_steps){
+  ml_construct_model_lda(
+    ml_function,
+    predictor = predictor,
+    formula = formula,
+    dataset = dataset,
+    features_col = invoke_steps$features_col
+  )
+}
