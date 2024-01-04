@@ -53,23 +53,35 @@ ml_logistic_regression(
 
 \item{aggregation_depth}{(Spark 2.1.0+) Suggested depth for treeAggregate (>= 2).}
 
-\item{lower_bounds_on_coefficients}{(Spark 2.2.0+) Lower bounds on coefficients if fitting under bound constrained optimization.
-The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.}
+\item{lower_bounds_on_coefficients}{(Spark 2.2.0+) Lower bounds on
+coefficients if fitting under bound constrained optimization.
+The bound matrix must be compatible with the shape (1, number of features)
+for binomial regression, or (number of classes, number of features) for
+multinomial regression.}
 
-\item{lower_bounds_on_intercepts}{(Spark 2.2.0+) Lower bounds on intercepts if fitting under bound constrained optimization.
-The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.}
+\item{lower_bounds_on_intercepts}{(Spark 2.2.0+) Lower bounds on intercepts
+if fitting under bound constrained optimization.
+The bounds vector size must be equal with 1 for binomial regression, or the
+number of classes for multinomial regression.}
 
-\item{upper_bounds_on_coefficients}{(Spark 2.2.0+) Upper bounds on coefficients if fitting under bound constrained optimization.
-The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.}
+\item{upper_bounds_on_coefficients}{(Spark 2.2.0+) Upper bounds on
+coefficients if fitting under bound constrained optimization.
+The bound matrix must be compatible with the shape (1, number of features)
+for binomial regression, or (number of classes, number of features) for
+multinomial regression.}
 
-\item{upper_bounds_on_intercepts}{(Spark 2.2.0+) Upper bounds on intercepts if fitting under bound constrained optimization.
-The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.}
+\item{upper_bounds_on_intercepts}{(Spark 2.2.0+) Upper bounds on intercepts
+if fitting under bound constrained optimization. The bounds vector size must
+be equal with 1 for binomial regression, or the number of classes for
+multinomial regression.}
 
 \item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
 
 \item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
 
-\item{family}{(Spark 2.1.0+) Param for the name of family which is a description of the label distribution to be used in the model. Supported options: "auto", "binomial", and "multinomial."}
+\item{family}{(Spark 2.1.0+) Param for the name of family which is a
+description of the label distribution to be used in the model. Supported
+options: "auto", "binomial", and "multinomial."}
 
 \item{prediction_col}{Prediction column name.}
 
