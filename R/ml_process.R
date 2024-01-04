@@ -1,30 +1,16 @@
 # -------------------------- Feature Transformers ------------------------------
 
 ft_process_step <- function(x, uid, r_class, step_class, invoke_steps) {
-  sc <- spark_connection(x)
-
   # Mapping R class to Spark model using /inst/sparkml/class_mapping.json
   class_mapping <- as.list(genv_get_ml_class_mapping())
   spark_class <- names(class_mapping[class_mapping == r_class])
 
-  if (!is.null(uid)) {
-    uid <- cast_string(uid)
-    args <- append(args, list(uid))
-  }
-
-  args <- list(sc, spark_class)
-
-  jobj <- do.call(invoke_new, args)
-
-  pe <- params_validate_estimator_and_set(jobj, invoke_steps)
-
-  l_steps <- purrr::imap(pe, ~ list(.y, .x))
-
-  for(i in seq_along(l_steps)) {
-    if(!is.null(l_steps[[i]][[2]])) {
-      jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
-    }
-  }
+  jobj <- process_steps(
+    x = x,
+    uid = uid,
+    spark_class = spark_class,
+    invoke_steps = invoke_steps
+  )
 
   new_transformer <- new_ml_transformer(jobj, class = step_class)
 
@@ -46,7 +32,7 @@ post_ft_obj.ml_pipeline <- function(x, transformer) {
   ml_add_stage(x, transformer)
 }
 
-post_ft_obj.tbl_spark <- function(x, transformer){
+post_ft_obj.tbl_spark <- function(x, transformer) {
   ml_transform(transformer, x)
 }
 
@@ -60,23 +46,12 @@ ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
   class_mapping <- as.list(genv_get_ml_class_mapping())
   spark_class <- names(class_mapping[class_mapping == r_class])
 
-  args <- list(sc, spark_class)
-  if (!is.null(uid)) {
-    uid <- cast_string(uid)
-    args <- append(args, list(uid))
-  }
-
-  jobj <- do.call(invoke_new, args)
-
-  pe <- params_validate_estimator_and_set(jobj, invoke_steps)
-
-  l_steps <- purrr::imap(pe, ~ list(.y, .x))
-
-  for(i in seq_along(l_steps)) {
-    if(!is.null(l_steps[[i]][[2]])) {
-      jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
-    }
-  }
+  jobj <- process_steps(
+    x = x,
+    uid = uid,
+    spark_class = spark_class,
+    invoke_steps = invoke_steps
+  )
 
   new_estimator <- new_ml_estimator(jobj, class = r_class)
 
@@ -90,7 +65,6 @@ ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
     features_col = invoke_steps$features_col,
     label_col = invoke_steps$label_col
   )
-
 }
 
 post_ml_obj <- function(x, nm, ml_function, formula, response,
@@ -135,7 +109,7 @@ param_min_version <- function(x, value, min_version = NULL, default = NULL) {
       sc <- spark_connection(x)
       ver <- spark_version(sc)
       if (ver < min_version) {
-        if(value != default) {
+        if (value != default) {
           stop(paste0(
             "Parameter `", deparse(substitute(value)),
             "` is only available for Spark ", min_version, " and later.",
@@ -148,4 +122,22 @@ param_min_version <- function(x, value, min_version = NULL, default = NULL) {
     }
   }
   res
+}
+
+process_steps <- function(x, uid, spark_class, invoke_steps) {
+  sc <- spark_connection(x)
+  if (!is.null(uid)) {
+    uid <- cast_string(uid)
+    args <- append(args, list(uid))
+  }
+  args <- list(sc, spark_class)
+  jobj <- do.call(invoke_new, args)
+  pe <- params_validate_estimator_and_set(jobj, invoke_steps)
+  l_steps <- purrr::imap(pe, ~ list(.y, .x))
+  for (i in seq_along(l_steps)) {
+    if (!is.null(l_steps[[i]][[2]])) {
+      jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
+    }
+  }
+  jobj
 }
