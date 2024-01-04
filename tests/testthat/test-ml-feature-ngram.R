@@ -51,4 +51,13 @@ test_that("ft_ngram() works properly", {
       "bus go map", "go map map", "map map map"
     )
   )
+
+  pipeline <- ml_pipeline(sc) %>%
+    ft_tokenizer("sentence", "words") %>%
+    ft_ngram("words", "bigrams", n = 2)
+  fitted <- ml_fit(pipeline, sentence_tbl)
+  preds <- ml_transform(fitted, sentence_tbl)
+  expect_s3_class(pipeline, "ml_pipeline")
+  expect_s3_class(fitted, "ml_pipeline_model")
+  expect_s3_class(preds, "tbl_spark")
 })

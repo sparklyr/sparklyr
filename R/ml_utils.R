@@ -156,28 +156,6 @@ ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
   )
 }
 
-param_min_version <- function(x, value, min_version = NULL, default = NULL) {
-  res <- value
-  if (!is.null(value)) {
-    if (!is.null(min_version)) {
-      sc <- spark_connection(x)
-      ver <- spark_version(sc)
-      if (ver < min_version) {
-        if (value != default) {
-          stop(paste0(
-            "Parameter `", deparse(substitute(value)),
-            "` is only available for Spark ", min_version, " and later.",
-            "To avoid passing this variable, change the argument value to NULL."
-          ))
-        } else {
-          res <- NULL
-        }
-      }
-    }
-  }
-  res
-}
-
 # --------------------- Post conversion functions ------------------------------
 
 post_ml_obj <- function(
@@ -236,4 +214,26 @@ post_ml_contruct.ml_lda <- function(
     dataset = dataset,
     features_col = invoke_steps$features_col
   )
+}
+
+param_min_version <- function(x, value, min_version = NULL, default = NULL) {
+  res <- value
+  if (!is.null(value)) {
+    if (!is.null(min_version)) {
+      sc <- spark_connection(x)
+      ver <- spark_version(sc)
+      if (ver < min_version) {
+        if (value != default) {
+          stop(paste0(
+            "Parameter `", deparse(substitute(value)),
+            "` is only available for Spark ", min_version, " and later.",
+            "To avoid passing this variable, change the argument value to NULL."
+          ))
+        } else {
+          res <- NULL
+        }
+      }
+    }
+  }
+  res
 }

@@ -43,7 +43,7 @@ ft_ngram_impl <- function(
     features = NULL,
     response = NULL,
     uid = uid,
-    formula = formula,
+    formula = NULL,
     invoke_steps = list(
       n = cast_scalar_integer(n),
       input_col = cast_nullable_string(input_col),
@@ -63,10 +63,4 @@ ft_ngram.tbl_spark <- ft_ngram_impl
 
 new_ml_ngram <- function(jobj) {
   new_ml_transformer(jobj, class = "ml_ngram")
-}
-
-validator_ml_ngram <- function(.args) {
-  .args <- validate_args_transformer(.args)
-  .args[["n"]] <- cast_scalar_integer(.args[["n"]])
-  .args
 }
