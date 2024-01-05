@@ -298,6 +298,42 @@ spark_apply <- function(x,
     message("     sparklyr:::spark_worker_main(<sessionid>, <port>)")
   }
 
+  generic_invoke <- function(.class, .method, .x1, .x2 = NULL,
+                             .session = NULL, .time_zone = NULL,
+                             .schema = FALSE) {
+    ret <- invoke_static(
+      sc,
+      .class,
+      .method,
+      .x1,
+      .x2,
+      closure,
+      spark_apply_worker_config(
+        sc,
+        args$debug,
+        args$profile,
+        schema = .schema,
+        arrow = arrow,
+        fetch_result_as_sdf = fetch_result_as_sdf,
+        single_binary_column = args$single_binary_column
+      ),
+      as.integer(worker_port),
+      as.list(sdf_columns),
+      as.list(group_by),
+      closure_rlang,
+      bundle_path,
+      as.environment(proc_env),
+      as.integer(60),
+      context_serialize,
+      as.environment(spark_apply_options),
+      .session,
+      .time_zone,
+      serialize(serializer, NULL, version = serialize_version),
+      serialize(deserializer, NULL, version = serialize_version)
+    )
+    return(ret)
+  }
+
   if (grouped) {
     colpos <- which(colnames(x) %in% group_by)
     if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")
@@ -347,33 +383,8 @@ spark_apply <- function(x,
       class <- "sparklyr.WorkerHelper"
       method <- "computeRdd"
     }
-    rdd <- invoke_static(
-      sc,
-      class,
-      method,
-      rdd_base,
-      closure,
-      as.list(sdf_columns),
-      spark_apply_worker_config(
-        sc,
-        args$debug,
-        args$profile,
-        arrow = arrow,
-        fetch_result_as_sdf = fetch_result_as_sdf,
-        single_binary_column = args$single_binary_column
-      ),
-      as.integer(worker_port),
-      as.list(group_by),
-      closure_rlang,
-      bundle_path,
-      as.integer(60),
-      as.environment(proc_env),
-      context_serialize,
-      as.environment(spark_apply_options),
-      serialize(serializer, NULL, version = serialize_version),
-      serialize(deserializer, NULL, version = serialize_version)
-    )
 
+    rdd <- generic_invoke(class, method, rdd_base)
     # cache by default
     if (memory) rdd <- invoke(rdd, "cache")
 
@@ -392,35 +403,14 @@ spark_apply <- function(x,
         )
       )
 
-      columns_op <- invoke_static(
-        sc,
-        "sparklyr.WorkerHelper",
-        "computeSdf",
-        sdf_limit,
-        columns_schema,
-        closure,
-        spark_apply_worker_config(
-          sc,
-          args$debug,
-          args$profile,
-          schema = TRUE,
-          arrow = arrow,
-          fetch_result_as_sdf = fetch_result_as_sdf,
-          single_binary_column = args$single_binary_column
-        ),
-        as.integer(worker_port),
-        as.list(sdf_columns),
-        as.list(group_by),
-        closure_rlang,
-        bundle_path,
-        as.environment(proc_env),
-        as.integer(60),
-        context_serialize,
-        as.environment(spark_apply_options),
-        spark_session(sc),
-        time_zone,
-        serialize(serializer, NULL, version = serialize_version),
-        serialize(deserializer, NULL, version = serialize_version)
+      columns_op <- generic_invoke(
+        .class = "sparklyr.WorkerHelper",
+        .method = "computeSdf",
+        .x1 = sdf_limit,
+        .x2 = columns_schema,
+        .session = spark_session(sc),
+        .time_zone = time_zone,
+        .schema = TRUE
       )
 
       columns_query <- columns_op %>% sdf_collect()
@@ -442,35 +432,16 @@ spark_apply <- function(x,
 
     schema <- spark_data_build_types(sc, columns)
 
-    transformed <- invoke_static(
-      sc,
-      "sparklyr.WorkerHelper",
-      "computeSdf",
-      sdf,
-      schema,
-      closure,
-      spark_apply_worker_config(
-        sc,
-        args$debug,
-        args$profile,
-        arrow = arrow,
-        fetch_result_as_sdf = fetch_result_as_sdf,
-        single_binary_column = args$single_binary_column
-      ),
-      as.integer(worker_port),
-      as.list(sdf_columns),
-      as.list(group_by),
-      closure_rlang,
-      bundle_path,
-      as.environment(proc_env),
-      as.integer(60),
-      context_serialize,
-      as.environment(spark_apply_options),
-      spark_session(sc),
-      time_zone,
-      serialize(serializer, NULL, version = serialize_version),
-      serialize(deserializer, NULL, version = serialize_version)
+    transformed <- generic_invoke(
+      .class = "sparklyr.WorkerHelper",
+      .method = "computeSdf",
+      .x1 = sdf,
+      .x2 = schema,
+      .session = spark_session(sc),
+      .time_zone = time_zone,
+      .schema = FALSE
     )
+
 
     if (spark_version(sc) >= "2.4.0" && !is.na(json_cols) && length(json_cols) > 0) {
       transformed <- invoke_static(
