@@ -3,13 +3,14 @@
 #' @include utils.R
 NULL
 
-spark_apply_worker_config <- function(sc,
-                                      debug,
-                                      profile,
-                                      schema = FALSE,
-                                      arrow = FALSE,
-                                      fetch_result_as_sdf = TRUE,
-                                      single_binary_column = FALSE) {
+spark_apply_worker_config <- function(
+    sc,
+    debug,
+    profile,
+    schema = FALSE,
+    arrow = FALSE,
+    fetch_result_as_sdf = TRUE,
+    single_binary_column = FALSE) {
   worker_config_serialize(
     c(
       list(
@@ -160,7 +161,7 @@ spark_apply <- function(x,
       columns <- as.list(columns)
     }
   }
-  # assert_that(is.function(f) || is.raw(f) || is.language(f))
+  assert_that(is.function(f) || is.raw(f) || is.language(f))
   if (is.language(f)) f <- rlang::as_closure(f)
 
   sc <- spark_connection(x)
@@ -307,7 +308,7 @@ spark_apply <- function(x,
       columns <- c(group_by, columns)
     }
 
-    if (args$rdd) {
+    if (identical(args$rdd, TRUE)) {
       rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
     } else if (arrow) {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
@@ -339,10 +340,17 @@ spark_apply <- function(x,
   if (!is.null(records_per_batch)) spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
 
   if (identical(args$rdd, TRUE)) {
-    rdd_args <- list(
-      sc = sc,
-      class = "sparklyr.RDDBarrier",
-      method = "transformBarrier",
+    if (identical(barrier, TRUE)) {
+      class <- "sparklyr.RDDBarrier"
+      method <- "transformBarrier"
+    } else {
+      class <- "sparklyr.WorkerHelper"
+      method <- "computeRdd"
+    }
+    rdd <- invoke_static(
+      sc,
+      class,
+      method,
       rdd_base,
       closure,
       as.list(sdf_columns),
@@ -365,13 +373,6 @@ spark_apply <- function(x,
       serialize(serializer, NULL, version = serialize_version),
       serialize(deserializer, NULL, version = serialize_version)
     )
-    if (identical(barrier, TRUE)) {
-      rdd <- rlang::exec(invoke_static, !!!rdd_args)
-    } else {
-      rdd_args$class <- "sparklyr.WorkerHelper"
-      rdd_args$method <- "computeRdd"
-      rdd <- rlang::exec(invoke_static, !!!rdd_args)
-    }
 
     # cache by default
     if (memory) rdd <- invoke(rdd, "cache")
