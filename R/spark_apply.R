@@ -141,79 +141,79 @@ spark_apply <- function(x,
                         arrow_max_records_per_batch = NULL,
                         auto_deps = FALSE,
                         ...) {
-  # if (!is.character(partition_index_param)) {
-  #   stop("Expected 'partition_index_param' to be a string.")
-  # }
-  #
-  # memory <- force(memory)
-  # args <- list(...)
-  # if (identical(fetch_result_as_sdf, FALSE)) {
-  #   # If we are fetching R objects returned from the transformation function in their serialized form,
-  #   # then the result will contain a single binary column
-  #   columns <- list(spark_apply_binary_result = "spark_apply_binary_result")
-  # } else {
-  #   # If columns is of the form c("col_name1", "col_name2", ...)
-  #   # then leave it as-is
-  #   # Otherwise if it is of the form c(col_name1 = "col_type1", ...)
-  #   # or list(col_name1 = "col_type1", ...), etc, then make sure it gets coerced
-  #   # into a list instead of a character vector with names
-  #   if (!identical(names(columns), NULL)) {
-  #     columns <- as.list(columns)
-  #   }
-  # }
-  # assert_that(is.function(f) || is.raw(f) || is.language(f))
-  # if (is.language(f)) f <- rlang::as_closure(f)
-  #
-  # sc <- spark_connection(x)
-  # sdf <- spark_dataframe(x)
-  # sdf_columns <- colnames(x)
-  #
-  # if (identical(barrier, TRUE)) {
-  #   # barrier works in rdd
-  #   args$rdd <- TRUE
-  #
-  #   if (spark_version(sc) < "2.4.0") {
-  #     stop("Barrier execution is only available for spark 2.4.0 or greater.")
-  #   }
-  #
-  #   if (is.null(columns)) {
-  #     stop("Barrier execution requires explicit columns names.")
-  #   }
-  # }
-  #
-  # if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
-  # if (identical(args$rdd, TRUE)) {
-  #   rdd_base <- invoke(sdf, "rdd")
-  #   if (identical(columns, NULL)) columns <- colnames(x)
-  # }
-  #
-  # grouped <- !is.null(group_by)
-  #
-  # rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
-  # packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
-  # proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
-  # serialize_version <- spark_config_value(sc$config, "sparklyr.apply.serializer", 2)
-  #
-  # time_zone <- ""
-  # records_per_batch <- NULL
-  # arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
-  # if (identical(fetch_result_as_sdf, FALSE) &&
-  #   identical(arrow, TRUE)) {
-  #   warning("Disabling arrow due to its potential incompatibility with fetch_result_as_sdf = FALSE")
-  #   arrow <- FALSE
-  # }
-  # if (arrow) {
-  #   time_zone <- spark_session(sc) %>%
-  #     invoke("sessionState") %>%
-  #     invoke("conf") %>%
-  #     invoke("sessionLocalTimeZone")
-  #   records_per_batch <- as.integer(
-  #     arrow_max_records_per_batch %||%
-  #       spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||%
-  #       10000
-  #   )
-  # }
-  #
+  if (!is.character(partition_index_param)) {
+    stop("Expected 'partition_index_param' to be a string.")
+  }
+
+  memory <- force(memory)
+  args <- list(...)
+  if (identical(fetch_result_as_sdf, FALSE)) {
+    # If we are fetching R objects returned from the transformation function in their serialized form,
+    # then the result will contain a single binary column
+    columns <- list(spark_apply_binary_result = "spark_apply_binary_result")
+  } else {
+    # If columns is of the form c("col_name1", "col_name2", ...)
+    # then leave it as-is
+    # Otherwise if it is of the form c(col_name1 = "col_type1", ...)
+    # or list(col_name1 = "col_type1", ...), etc, then make sure it gets coerced
+    # into a list instead of a character vector with names
+    if (!identical(names(columns), NULL)) {
+      columns <- as.list(columns)
+    }
+  }
+  assert_that(is.function(f) || is.raw(f) || is.language(f))
+  if (is.language(f)) f <- rlang::as_closure(f)
+
+  sc <- spark_connection(x)
+  sdf <- spark_dataframe(x)
+  sdf_columns <- colnames(x)
+
+  if (identical(barrier, TRUE)) {
+    # barrier works in rdd
+    args$rdd <- TRUE
+
+    if (spark_version(sc) < "2.4.0") {
+      stop("Barrier execution is only available for spark 2.4.0 or greater.")
+    }
+
+    if (is.null(columns)) {
+      stop("Barrier execution requires explicit columns names.")
+    }
+  }
+
+  if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
+  if (identical(args$rdd, TRUE)) {
+    rdd_base <- invoke(sdf, "rdd")
+    if (identical(columns, NULL)) columns <- colnames(x)
+  }
+
+  grouped <- !is.null(group_by)
+
+  rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
+  packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
+  proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
+  serialize_version <- spark_config_value(sc$config, "sparklyr.apply.serializer", 2)
+
+  time_zone <- ""
+  records_per_batch <- NULL
+  arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
+  if (identical(fetch_result_as_sdf, FALSE) &&
+    identical(arrow, TRUE)) {
+    warning("Disabling arrow due to its potential incompatibility with fetch_result_as_sdf = FALSE")
+    arrow <- FALSE
+  }
+  if (arrow) {
+    time_zone <- spark_session(sc) %>%
+      invoke("sessionState") %>%
+      invoke("conf") %>%
+      invoke("sessionLocalTimeZone")
+    records_per_batch <- as.integer(
+      arrow_max_records_per_batch %||%
+        spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||%
+        10000
+    )
+  }
+
   # # build reduced size query plan in case schema needs to be inferred
   # if (sdf_is_streaming(sdf)) {
   #   sdf_limit <- sdf
