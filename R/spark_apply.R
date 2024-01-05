@@ -333,26 +333,26 @@ spark_apply <- function(x,
     )
   }
 
-  if (grouped) {
-    colpos <- which(colnames(x) %in% group_by)
-    if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")
-
-    group_by_list <- as.list(as.integer(colpos - 1))
-
-    if (!columns_typed) {
-      columns <- c(group_by, columns)
-    }
-
-    if (identical(args$rdd, TRUE)) {
-      rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
-    } else if (arrow) {
-      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
-      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone, records_per_batch)
-    } else {
-      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
-      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
-    }
-  }
+  # if (grouped) {
+  #   colpos <- which(colnames(x) %in% group_by)
+  #   if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")
+  #
+  #   group_by_list <- as.list(as.integer(colpos - 1))
+  #
+  #   if (!columns_typed) {
+  #     columns <- c(group_by, columns)
+  #   }
+  #
+  #   if (identical(args$rdd, TRUE)) {
+  #     rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
+  #   } else if (arrow) {
+  #     sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
+  #     sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone, records_per_batch)
+  #   } else {
+  #     sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
+  #     sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
+  #   }
+  # }
   #
   # worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
