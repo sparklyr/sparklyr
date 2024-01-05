@@ -214,74 +214,74 @@ spark_apply <- function(x,
     )
   }
 
-  # # build reduced size query plan in case schema needs to be inferred
-  # if (sdf_is_streaming(sdf)) {
-  #   sdf_limit <- sdf
-  # } else {
-  #   sdf_limit <- invoke(
-  #     sdf,
-  #     "limit",
-  #     cast_scalar_integer(
-  #       spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
-  #     )
-  #   )
-  # }
-  #
-  # # backward compatible support for names argument from 0.6
-  # if (!is.null(args$names)) {
-  #   columns <- args$names
-  # }
-  #
-  # if (!is.null(group_by) && sdf_is_streaming(sdf)) {
-  #   stop("'group_by' is unsupported with streams.")
-  # }
-  #
-  # # set default value for packages based on config
-  # if (identical(packages, NULL)) {
-  #   if (identical(packages_config, NULL)) {
-  #     packages <- TRUE
-  #   } else {
-  #     packages <- packages_config
-  #   }
-  # }
-  #
-  # columns_typed <- length(names(columns)) > 0
-  #
-  # if (rlang) warning("The `rlang` parameter is under active development.")
-  #
-  # # disable package distribution for local connections
-  # if (spark_master_is_local(sc$master)) packages <- FALSE
-  #
-  # # disable package distribution for livy connections and no package spec
-  # if (identical(tolower(sc$method), "livy") && identical(packages, TRUE)) packages <- FALSE
-  #
-  # # inject column types and partition_index_param to context
-  # context <- list(
-  #   column_types = translate_spark_column_types(x),
-  #   partition_index_param = partition_index_param,
-  #   user_context = context
-  # )
-  #
-  # rlang_serialize <- spark_apply_rlang_serialize()
-  # create_rlang_closure <- (rlang && !is.null(rlang_serialize))
-  #
-  # # create closure for the given function
-  # serializer <- spark_apply_serializer()
-  # serialize_impl <- (
-  #   if (is.list(serializer)) {
-  #     function(x, ...) serializer$serializer(x)
-  #   } else {
-  #     serializer
-  #   })
-  # deserializer <- spark_apply_deserializer()
-  # closure <- (
-  #   if (create_rlang_closure) {
-  #     serialize_impl(NULL, version = serialize_version)
-  #   } else if (is.function(f)) {
-  #     suppressWarnings(serialize_impl(f, version = serialize_version))
-  #   } else {
-  #     f
-  #   })
+  # build reduced size query plan in case schema needs to be inferred
+  if (sdf_is_streaming(sdf)) {
+    sdf_limit <- sdf
+  } else {
+    sdf_limit <- invoke(
+      sdf,
+      "limit",
+      cast_scalar_integer(
+        spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+      )
+    )
+  }
+
+  # backward compatible support for names argument from 0.6
+  if (!is.null(args$names)) {
+    columns <- args$names
+  }
+
+  if (!is.null(group_by) && sdf_is_streaming(sdf)) {
+    stop("'group_by' is unsupported with streams.")
+  }
+
+  # set default value for packages based on config
+  if (identical(packages, NULL)) {
+    if (identical(packages_config, NULL)) {
+      packages <- TRUE
+    } else {
+      packages <- packages_config
+    }
+  }
+
+  columns_typed <- length(names(columns)) > 0
+
+  if (rlang) warning("The `rlang` parameter is under active development.")
+
+  # disable package distribution for local connections
+  if (spark_master_is_local(sc$master)) packages <- FALSE
+
+  # disable package distribution for livy connections and no package spec
+  if (identical(tolower(sc$method), "livy") && identical(packages, TRUE)) packages <- FALSE
+
+  # inject column types and partition_index_param to context
+  context <- list(
+    column_types = translate_spark_column_types(x),
+    partition_index_param = partition_index_param,
+    user_context = context
+  )
+
+  rlang_serialize <- spark_apply_rlang_serialize()
+  create_rlang_closure <- (rlang && !is.null(rlang_serialize))
+
+  # create closure for the given function
+  serializer <- spark_apply_serializer()
+  serialize_impl <- (
+    if (is.list(serializer)) {
+      function(x, ...) serializer$serializer(x)
+    } else {
+      serializer
+    })
+  deserializer <- spark_apply_deserializer()
+  closure <- (
+    if (create_rlang_closure) {
+      serialize_impl(NULL, version = serialize_version)
+    } else if (is.function(f)) {
+      suppressWarnings(serialize_impl(f, version = serialize_version))
+    } else {
+      f
+    })
   # context_serialize <- serialize_impl(context, version = serialize_version)
   #
   # # create rlang closure
