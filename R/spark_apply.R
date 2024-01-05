@@ -3,8 +3,7 @@
 #' @include utils.R
 NULL
 
-spark_apply_worker_config <- function(
-                                      sc,
+spark_apply_worker_config <- function(sc,
                                       debug,
                                       profile,
                                       schema = FALSE,
@@ -161,7 +160,7 @@ spark_apply <- function(x,
       columns <- as.list(columns)
     }
   }
-  assert_that(is.function(f) || is.raw(f) || is.language(f))
+  # assert_that(is.function(f) || is.raw(f) || is.language(f))
   if (is.language(f)) f <- rlang::as_closure(f)
 
   sc <- spark_connection(x)
@@ -217,8 +216,7 @@ spark_apply <- function(x,
   # build reduced size query plan in case schema needs to be inferred
   if (sdf_is_streaming(sdf)) {
     sdf_limit <- sdf
-  }
-  else {
+  } else {
     sdf_limit <- invoke(
       sdf,
       "limit",
@@ -241,8 +239,7 @@ spark_apply <- function(x,
   if (identical(packages, NULL)) {
     if (identical(packages_config, NULL)) {
       packages <- TRUE
-    }
-    else {
+    } else {
       packages <- packages_config
     }
   }
@@ -310,14 +307,12 @@ spark_apply <- function(x,
       columns <- c(group_by, columns)
     }
 
-    if (identical(args$rdd, TRUE)) {
+    if (args$rdd) {
       rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
-    }
-    else if (arrow) {
+    } else if (arrow) {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
       sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone, records_per_batch)
-    }
-    else {
+    } else {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
       sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
     }
@@ -344,60 +339,38 @@ spark_apply <- function(x,
   if (!is.null(records_per_batch)) spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
 
   if (identical(args$rdd, TRUE)) {
+    rdd_args <- list(
+      sc = sc,
+      class = "sparklyr.RDDBarrier",
+      method = "transformBarrier",
+      rdd_base,
+      closure,
+      as.list(sdf_columns),
+      spark_apply_worker_config(
+        sc,
+        args$debug,
+        args$profile,
+        arrow = arrow,
+        fetch_result_as_sdf = fetch_result_as_sdf,
+        single_binary_column = args$single_binary_column
+      ),
+      as.integer(worker_port),
+      as.list(group_by),
+      closure_rlang,
+      bundle_path,
+      as.integer(60),
+      as.environment(proc_env),
+      context_serialize,
+      as.environment(spark_apply_options),
+      serialize(serializer, NULL, version = serialize_version),
+      serialize(deserializer, NULL, version = serialize_version)
+    )
     if (identical(barrier, TRUE)) {
-      rdd <- invoke_static(
-        sc,
-        "sparklyr.RDDBarrier",
-        "transformBarrier",
-        rdd_base,
-        closure,
-        as.list(sdf_columns),
-        spark_apply_worker_config(
-          sc,
-          args$debug,
-          args$profile,
-          arrow = arrow,
-          fetch_result_as_sdf = fetch_result_as_sdf,
-          single_binary_column = args$single_binary_column
-        ),
-        as.integer(worker_port),
-        as.list(group_by),
-        closure_rlang,
-        bundle_path,
-        as.integer(60),
-        as.environment(proc_env),
-        context_serialize,
-        as.environment(spark_apply_options),
-        serialize(serializer, NULL, version = serialize_version),
-        serialize(deserializer, NULL, version = serialize_version)
-      )
+      rdd <- rlang::exec(invoke_static, !!!rdd_args)
     } else {
-      rdd <- invoke_static(
-        sc,
-        "sparklyr.WorkerHelper",
-        "computeRdd",
-        rdd_base,
-        closure,
-        spark_apply_worker_config(
-          sc,
-          args$debug,
-          args$profile,
-          arrow = arrow,
-          fetch_result_as_sdf = fetch_result_as_sdf,
-          single_binary_column = args$single_binary_column
-        ),
-        as.integer(worker_port),
-        as.list(sdf_columns),
-        as.list(group_by),
-        closure_rlang,
-        bundle_path,
-        as.environment(proc_env),
-        as.integer(60),
-        context_serialize,
-        as.environment(spark_apply_options),
-        serialize(serializer, NULL, version = serialize_version),
-        serialize(deserializer, NULL, version = serialize_version)
-      )
+      rdd_args$class <- "sparklyr.WorkerHelper"
+      rdd_args$method <- "computeRdd"
+      rdd <- rlang::exec(invoke_static, !!!rdd_args)
     }
 
     # cache by default
@@ -406,8 +379,7 @@ spark_apply <- function(x,
     schema <- spark_schema_from_rdd(sc, rdd, columns)
 
     transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
-  }
-  else {
+  } else {
     json_cols <- c()
     if (identical(columns, NULL) || is.character(columns)) {
       columns_schema <- spark_data_build_types(
