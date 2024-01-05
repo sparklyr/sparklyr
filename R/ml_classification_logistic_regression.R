@@ -110,7 +110,7 @@ ml_logistic_regression_impl <- function(
       upper_bounds_on_coefficients = spark_dense_matrix(sc, upper_bounds_on_coefficients),
       lower_bounds_on_intercepts = spark_dense_vector(sc, lower_bounds_on_intercepts),
       upper_bounds_on_intercepts = spark_dense_vector(sc, upper_bounds_on_intercepts)
-      )) %>%
+    )) %>%
     new_ml_probabilistic_classifier(class = "ml_logistic_regression")
 
   ret <- NULL

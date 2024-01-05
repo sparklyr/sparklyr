@@ -1,5 +1,14 @@
 # Sparklyr (dev)
 
+- Removes Scala code, and JARs for Spark versions 2.3 and below. Spark 2.3 is 
+no longer considered maintained as of September 2019
+  - Removes Java folder for versions 2.3 and below
+  - Merges Scala file sets into Spark version 2.4
+  - Re-compiles JARs for version 2.4 and above
+
+- Removes dependency on `tibble` 
+  - All calls to `tibble()` are now redirected to `dplyr`
+
 - Removes dependency on `rapddirs`: 
   - Deprecating backwards compatability with `sparklyr` 0.5 is no longer needed
   - Replicates selection of cache directory 
