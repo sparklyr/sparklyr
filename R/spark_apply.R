@@ -282,77 +282,77 @@ spark_apply <- function(x,
     } else {
       f
     })
-  # context_serialize <- serialize_impl(context, version = serialize_version)
-  #
-  # # create rlang closure
-  # closure_rlang <- if (create_rlang_closure) rlang_serialize(f) else raw()
-  #
-  # # add debug connection message
-  # if (isTRUE(args$debug)) {
-  #   message("Debugging spark_apply(), connect to worker debugging session as follows:")
-  #   message("  1. Find the workers <sessionid> and <port> in the worker logs, from RStudio click")
-  #   message("     'Log' under the connection, look for the last entry with contents:")
-  #   message("     'Session (<sessionid>) is waiting for sparklyr client to connect to port <port>'")
-  #   message("  2. From a new R session run:")
-  #   message("     debugonce(sparklyr:::spark_worker_main)")
-  #   message("     sparklyr:::spark_worker_main(<sessionid>, <port>)")
-  # }
-  #
-  # generic_invoke <- function(.class, .method, .x1, .x2 = NULL,
-  #                            .session = NULL, .time_zone = NULL,
-  #                            .schema = FALSE) {
-  #   invoke_static(
-  #     sc,
-  #     .class,
-  #     .method,
-  #     .x1,
-  #     .x2,
-  #     closure,
-  #     spark_apply_worker_config(
-  #       sc,
-  #       args$debug,
-  #       args$profile,
-  #       schema = .schema,
-  #       arrow = arrow,
-  #       fetch_result_as_sdf = fetch_result_as_sdf,
-  #       single_binary_column = args$single_binary_column
-  #     ),
-  #     as.integer(worker_port),
-  #     as.list(sdf_columns),
-  #     as.list(group_by),
-  #     closure_rlang,
-  #     bundle_path,
-  #     as.environment(proc_env),
-  #     as.integer(60),
-  #     context_serialize,
-  #     as.environment(spark_apply_options),
-  #     .session,
-  #     .time_zone,
-  #     serialize(serializer, NULL, version = serialize_version),
-  #     serialize(deserializer, NULL, version = serialize_version)
-  #   )
-  # }
-  #
-  # if (grouped) {
-  #   colpos <- which(colnames(x) %in% group_by)
-  #   if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")
-  #
-  #   group_by_list <- as.list(as.integer(colpos - 1))
-  #
-  #   if (!columns_typed) {
-  #     columns <- c(group_by, columns)
-  #   }
-  #
-  #   if (identical(args$rdd, TRUE)) {
-  #     rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
-  #   } else if (arrow) {
-  #     sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
-  #     sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone, records_per_batch)
-  #   } else {
-  #     sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
-  #     sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
-  #   }
-  # }
+  context_serialize <- serialize_impl(context, version = serialize_version)
+
+  # create rlang closure
+  closure_rlang <- if (create_rlang_closure) rlang_serialize(f) else raw()
+
+  # add debug connection message
+  if (isTRUE(args$debug)) {
+    message("Debugging spark_apply(), connect to worker debugging session as follows:")
+    message("  1. Find the workers <sessionid> and <port> in the worker logs, from RStudio click")
+    message("     'Log' under the connection, look for the last entry with contents:")
+    message("     'Session (<sessionid>) is waiting for sparklyr client to connect to port <port>'")
+    message("  2. From a new R session run:")
+    message("     debugonce(sparklyr:::spark_worker_main)")
+    message("     sparklyr:::spark_worker_main(<sessionid>, <port>)")
+  }
+
+  generic_invoke <- function(.class, .method, .x1, .x2 = NULL,
+                             .session = NULL, .time_zone = NULL,
+                             .schema = FALSE) {
+    invoke_static(
+      sc,
+      .class,
+      .method,
+      .x1,
+      .x2,
+      closure,
+      spark_apply_worker_config(
+        sc,
+        args$debug,
+        args$profile,
+        schema = .schema,
+        arrow = arrow,
+        fetch_result_as_sdf = fetch_result_as_sdf,
+        single_binary_column = args$single_binary_column
+      ),
+      as.integer(worker_port),
+      as.list(sdf_columns),
+      as.list(group_by),
+      closure_rlang,
+      bundle_path,
+      as.environment(proc_env),
+      as.integer(60),
+      context_serialize,
+      as.environment(spark_apply_options),
+      .session,
+      .time_zone,
+      serialize(serializer, NULL, version = serialize_version),
+      serialize(deserializer, NULL, version = serialize_version)
+    )
+  }
+
+  if (grouped) {
+    colpos <- which(colnames(x) %in% group_by)
+    if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")
+
+    group_by_list <- as.list(as.integer(colpos - 1))
+
+    if (!columns_typed) {
+      columns <- c(group_by, columns)
+    }
+
+    if (identical(args$rdd, TRUE)) {
+      rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
+    } else if (arrow) {
+      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
+      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone, records_per_batch)
+    } else {
+      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
+      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
+    }
+  }
   #
   # worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
