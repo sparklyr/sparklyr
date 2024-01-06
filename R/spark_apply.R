@@ -202,10 +202,7 @@ spark_apply <- function(x,
     arrow <- FALSE
   }
   if (arrow) {
-    time_zone <- spark_session(sc) %>%
-      invoke("sessionState") %>%
-      invoke("conf") %>%
-      invoke("sessionLocalTimeZone")
+    time_zone <- time_zone(sc)
     records_per_batch <- as.integer(
       arrow_max_records_per_batch %||%
         spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||%

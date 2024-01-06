@@ -685,3 +685,10 @@ cast_double_list <- function(x, allow_null = FALSE) {
 cast_choice <- function(x, choices, error_arg = rlang::caller_arg(x), error_call = rlang::caller_env()) {
   rlang::arg_match(x, choices, error_arg = error_arg, error_call = error_call)
 }
+
+time_zone <- function(sc) {
+  spark_session(sc) %>%
+    invoke("sessionState") %>%
+    invoke("conf") %>%
+    invoke("sessionLocalTimeZone")
+}

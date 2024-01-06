@@ -128,10 +128,7 @@ arrow_collect <- function(tbl, ...) {
   }
   session <- spark_session(sc)
 
-  time_zone <- spark_session(sc) %>%
-    invoke("sessionState") %>%
-    invoke("conf") %>%
-    invoke("sessionLocalTimeZone")
+  time_zone <- time_zone(sc)
 
   if (!identical(args$callback, NULL)) {
     cb <- args$callback
