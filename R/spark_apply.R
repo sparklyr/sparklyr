@@ -127,20 +127,21 @@ spark_apply_worker_config <- function(
 #' }
 #'
 #' @export
-spark_apply <- function(x,
-                        f,
-                        columns = NULL,
-                        memory = TRUE,
-                        group_by = NULL,
-                        packages = NULL,
-                        context = NULL,
-                        name = NULL,
-                        barrier = NULL,
-                        fetch_result_as_sdf = TRUE,
-                        partition_index_param = "",
-                        arrow_max_records_per_batch = NULL,
-                        auto_deps = FALSE,
-                        ...) {
+spark_apply <- function(
+    x,
+    f,
+    columns = NULL,
+    memory = TRUE,
+    group_by = NULL,
+    packages = NULL,
+    context = NULL,
+    name = NULL,
+    barrier = NULL,
+    fetch_result_as_sdf = TRUE,
+    partition_index_param = "",
+    arrow_max_records_per_batch = NULL,
+    auto_deps = FALSE,
+    ...) {
   if (!is.character(partition_index_param)) {
     stop("Expected 'partition_index_param' to be a string.")
   }
@@ -305,15 +306,25 @@ spark_apply <- function(x,
     if (!columns_typed) {
       columns <- c(group_by, columns)
     }
-
+    group_invoke <- function(.group,.x, .time_zone = NULL, .batch = NULL) {
+      invoke_static(
+        sc,
+        "sparklyr.ApplyUtils",
+        .group,
+        .x,
+        group_by_list,
+        .time_zone,
+        .batch
+      )
+    }
     if (identical(args$rdd, TRUE)) {
-      rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
+      rdd_base <- group_invoke("groupBy", rdd_base)
     } else if (arrow) {
-      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
-      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone, records_per_batch)
+      sdf <- group_invoke("groupByArrow", sdf, time_zone, records_per_batch)
+      sdf_limit <-group_invoke("groupByArrow", sdf_limit, time_zone, records_per_batch)
     } else {
-      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
-      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
+      sdf <- group_invoke("groupBy", sdf)
+      sdf_limit <- group_invoke("groupBy", sdf_limit)
     }
   }
 
