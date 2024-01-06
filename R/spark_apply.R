@@ -147,7 +147,8 @@ spark_apply <- function(x,
 
   memory <- force(memory)
   args <- list(...)
-  if (!fetch_result_as_sdf) {
+  invoke_args <- list()
+  if (identical(fetch_result_as_sdf, FALSE)) {
     # If we are fetching R objects returned from the transformation function in
     # their serialized form, then the result will contain a single binary column
     columns <- list(spark_apply_binary_result = "spark_apply_binary_result")
@@ -166,9 +167,9 @@ spark_apply <- function(x,
 
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
-  sdf_columns <- colnames(x)
+  invoke_args$sdf_columns <- colnames(x)
 
-  if (barrier) {
+  if (identical(barrier, TRUE)) {
     # barrier works in rdd
     args$rdd <- TRUE
 
@@ -182,7 +183,8 @@ spark_apply <- function(x,
   }
 
   if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
-  if (args$rdd) {
+
+  if (identical(args$rdd, TRUE)) {
     rdd_base <- invoke(sdf, "rdd")
     if (is.null(columns)) columns <- colnames(x)
   }
@@ -191,7 +193,7 @@ spark_apply <- function(x,
 
   rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
   packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
-  proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
+  invoke_args$proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
   serialize_version <- spark_config_value(sc$config, "sparklyr.apply.serializer", 2)
 
   time_zone <- ""
@@ -270,7 +272,7 @@ spark_apply <- function(x,
       serializer
     })
   deserializer <- spark_apply_deserializer()
-  closure <- (
+  invoke_args$closure <- (
     if (create_rlang_closure) {
       serialize_impl(NULL, version = serialize_version)
     } else if (is.function(f)) {
@@ -278,11 +280,11 @@ spark_apply <- function(x,
     } else {
       f
     })
-  context_serialize <- serialize_impl(context, version = serialize_version)
+  invoke_args$context_serialize <- serialize_impl(context, version = serialize_version)
 
   # create rlang closure
-  closure_rlang <- if (create_rlang_closure) rlang_serialize(f) else raw()
-
+  invoke_args$closure_rlang <- if (create_rlang_closure) rlang_serialize(f) else raw()
+  invoke_args$debug <- args$debug
   # add debug connection message
   if (isTRUE(args$debug)) {
     message("Debugging spark_apply(), connect to worker debugging session as follows:")
@@ -292,41 +294,6 @@ spark_apply <- function(x,
     message("  2. From a new R session run:")
     message("     debugonce(sparklyr:::spark_worker_main)")
     message("     sparklyr:::spark_worker_main(<sessionid>, <port>)")
-  }
-
-  generic_invoke <- function(.class, .method, .x1, .x2 = NULL,
-                             .session = NULL, .time_zone = NULL,
-                             .schema = FALSE) {
-    invoke_static(
-      sc,
-      .class,
-      .method,
-      .x1,
-      .x2,
-      closure,
-      spark_apply_worker_config(
-        sc,
-        args$debug,
-        args$profile,
-        schema = .schema,
-        arrow = arrow,
-        fetch_result_as_sdf = fetch_result_as_sdf,
-        single_binary_column = args$single_binary_column
-      ),
-      as.integer(worker_port),
-      as.list(sdf_columns),
-      as.list(group_by),
-      closure_rlang,
-      bundle_path,
-      as.environment(proc_env),
-      as.integer(60),
-      context_serialize,
-      as.environment(spark_apply_options),
-      .session,
-      .time_zone,
-      serialize(serializer, NULL, version = serialize_version),
-      serialize(deserializer, NULL, version = serialize_version)
-    )
   }
 
   if (grouped) {
@@ -339,7 +306,7 @@ spark_apply <- function(x,
       columns <- c(group_by, columns)
     }
 
-    if (args$rdd) {
+    if (identical(args$rdd, TRUE)) {
       rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
     } else if (arrow) {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
@@ -350,7 +317,7 @@ spark_apply <- function(x,
     }
   }
 
-  worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
+  invoke_args$worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
 
   # packages should be either a boolean or a character vector
   packages <- unlist(packages)
@@ -362,15 +329,27 @@ spark_apply <- function(x,
       packages <- required_pkgs
     }
   }
-  bundle_path <- get_spark_apply_bundle_path(sc, packages)
+  invoke_args$bundle_path <- get_spark_apply_bundle_path(sc, packages)
 
-  spark_apply_options <- lapply(
+  invoke_args$spark_apply_options <- lapply(
     connection_config(sc, "sparklyr.apply.options."),
     as.character
   )
-  if (!is.null(records_per_batch)) spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
+  if (!is.null(records_per_batch)) {
+    invoke_args$spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
+  }
 
-  if (args$rdd) {
+  invoke_args$profile <- args$profile
+  invoke_args$fetch_result_as_sdf <- fetch_result_as_sdf
+  invoke_args$single_binary_column <- args$single_binary_column
+  invoke_args$group_by <- group_by
+
+  invoke_args$serializer <- serializer
+  invoke_args$deserializer <- deserializer
+  invoke_args$arrow <- arrow
+  invoke_args$serialize_version <- serialize_version
+
+  if (identical(args$rdd, TRUE)) {
     if (barrier) {
       class <- "sparklyr.RDDBarrier"
       method <- "transformBarrier"
@@ -379,7 +358,7 @@ spark_apply <- function(x,
       method <- "computeRdd"
     }
 
-    rdd <- generic_invoke(class, method, rdd_base)
+    rdd <- spark_apply_invoke(sc, class, method, rdd_base, .args = invoke_args)
     # cache by default
     if (memory) rdd <- invoke(rdd, "cache")
 
@@ -398,14 +377,16 @@ spark_apply <- function(x,
         )
       )
 
-      columns_op <- generic_invoke(
+      columns_op <- spark_apply_invoke(
+        sc,
         .class = "sparklyr.WorkerHelper",
         .method = "computeSdf",
         .x1 = sdf_limit,
         .x2 = columns_schema,
         .session = spark_session(sc),
         .time_zone = time_zone,
-        .schema = TRUE
+        .schema = TRUE,
+        .args = invoke_args
       )
 
       columns_query <- columns_op %>% sdf_collect()
@@ -420,21 +401,23 @@ spark_apply <- function(x,
 
       columns <- columns_infer
 
-      if (args$schema) {
+      if (identical(args$schema, TRUE)) {
         return(columns)
       }
     }
 
     schema <- spark_data_build_types(sc, columns)
 
-    transformed <- generic_invoke(
+    transformed <- spark_apply_invoke(
+      sc,
       .class = "sparklyr.WorkerHelper",
       .method = "computeSdf",
       .x1 = sdf,
       .x2 = schema,
       .session = spark_session(sc),
       .time_zone = time_zone,
-      .schema = FALSE
+      .schema = FALSE,
+      .args = invoke_args
     )
 
 
@@ -449,13 +432,13 @@ spark_apply <- function(x,
     }
   }
 
-  if (barrier) {
+  if (identical(barrier, TRUE)) {
     registered <- transformed
   } else {
     name <- name %||% random_string("sparklyr_tmp_")
     registered <- sdf_register(transformed, name = name)
 
-    if (memory && !args$rdd && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
+    if (memory && identical(args$rdd, FALSE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
   }
 
   if (!fetch_result_as_sdf) {
@@ -468,6 +451,42 @@ spark_apply <- function(x,
   } else {
     registered
   }
+}
+
+spark_apply_invoke <- function(
+    sc, .class, .method, .x1, .x2 = NULL,
+    .session = NULL, .time_zone = NULL,
+    .schema = FALSE, .args) {
+  invoke_static(
+    sc,
+    .class,
+    .method,
+    .x1,
+    .x2,
+    .args$closure,
+    spark_apply_worker_config(
+      sc,
+      .args$debug,
+      .args$profile,
+      schema = .schema,
+      arrow = .args$arrow,
+      fetch_result_as_sdf = .args$fetch_result_as_sdf,
+      single_binary_column = .args$single_binary_column
+    ),
+    as.integer(.args$worker_port),
+    as.list(.args$sdf_columns),
+    as.list(.args$group_by),
+    .args$closure_rlang,
+    .args$bundle_path,
+    as.environment(.args$proc_env),
+    as.integer(60),
+    .args$context_serialize,
+    as.environment(.args$spark_apply_options),
+    .session,
+    .time_zone,
+    serialize(.args$serializer, NULL, version = .args$serialize_version),
+    serialize(.args$deserializer, NULL, version = .args$serialize_version)
+  )
 }
 
 spark_apply_rlang_serialize <- function() {
