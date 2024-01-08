@@ -56,8 +56,8 @@ a pipeline with the transformer or estimator appended to it. If a
 Chi-Squared feature selection, which selects categorical features to use for predicting a categorical label
 }
 \details{
-In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
-  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator
+fits against \code{x} to obtain a transformer, returning a \code{tbl_spark}.
 }
 \seealso{
 Other feature transformers: 

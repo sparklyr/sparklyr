@@ -38,8 +38,8 @@ a pipeline with the transformer or estimator appended to it. If a
 Compute the Inverse Document Frequency (IDF) given a collection of documents.
 }
 \details{
-In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
-  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator
+fits against \code{x} to obtain a transformer, returning a \code{tbl_spark}.
 }
 \seealso{
 Other feature transformers: 

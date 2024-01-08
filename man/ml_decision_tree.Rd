@@ -102,16 +102,18 @@ criterion based on model type.}
 
 \item{thresholds}{Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values > 0 excepting that at most one value may be 0. The class with largest value \code{p/t} is predicted, where \code{p} is the original probability of that class and \code{t} is the class's threshold.}
 
-\item{cache_node_ids}{If \code{FALSE}, the algorithm will pass trees to executors to match instances with nodes.
-If \code{TRUE}, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.
-Defaults to \code{FALSE}.}
+\item{cache_node_ids}{If \code{FALSE}, the algorithm will pass trees to
+executors to match instances with nodes. If \code{TRUE}, the algorithm will
+cache node IDs for each instance. Caching can speed up training of deeper
+trees. Defaults to \code{FALSE}.}
 
-\item{checkpoint_interval}{Set checkpoint interval (>= 1) or disable checkpoint (-1).
-E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.}
+\item{checkpoint_interval}{Set checkpoint interval (>= 1) or disable
+checkpoint (-1). E.g. 10 means that the cache will get checkpointed every 10
+iterations, defaults to 10.}
 
 \item{max_memory_in_mb}{Maximum memory in MB allocated to histogram aggregation.
-If too small, then 1 node will be split per iteration,
-and its aggregates may exceed this size. Defaults to 256.}
+If too small, then 1 node will be split per iteration, and its aggregates
+may exceed this size. Defaults to 256.}
 
 \item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
 

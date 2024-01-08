@@ -48,8 +48,8 @@ Imputation estimator for completing missing values, either using the mean or
   columns should be of numeric type. This function requires Spark 2.2.0+.
 }
 \details{
-In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
-  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator
+fits against \code{x} to obtain a transformer, returning a \code{tbl_spark}.
 }
 \seealso{
 Other feature transformers: 

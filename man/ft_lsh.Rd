@@ -64,8 +64,8 @@ Locality Sensitive Hashing functions for Euclidean distance
   (Bucketed Random Projection) and Jaccard distance (MinHash).
 }
 \details{
-In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
-  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator
+fits against \code{x} to obtain a transformer, returning a \code{tbl_spark}.
 }
 \seealso{
 ft_lsh_utils

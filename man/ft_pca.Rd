@@ -46,8 +46,8 @@ a pipeline with the transformer or estimator appended to it. If a
 PCA trains a model to project vectors to a lower dimensional space of the top k principal components.
 }
 \details{
-In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
-  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator
+fits against \code{x} to obtain a transformer, returning a \code{tbl_spark}.
 
 \code{ml_pca()} is a wrapper around \code{ft_pca()} that returns a
   \code{ml_model}.

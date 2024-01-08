@@ -71,8 +71,8 @@ A label indexer that maps a string column of labels to an ML column of
   is the inverse of \code{\link{ft_index_to_string}}.
 }
 \details{
-In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
-  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator
+fits against \code{x} to obtain a transformer, returning a \code{tbl_spark}.
 }
 \seealso{
 \code{\link{ft_index_to_string}}

@@ -37,8 +37,8 @@ Rescale each feature individually to range [-1, 1] by dividing through the
   data, and thus does not destroy any sparsity.
 }
 \details{
-In the case where \code{x} is a \code{tbl_spark}, the estimator fits against \code{x}
-  to obtain a transformer, which is then immediately used to transform \code{x}, returning a \code{tbl_spark}.
+In the case where \code{x} is a \code{tbl_spark}, the estimator
+fits against \code{x} to obtain a transformer, returning a \code{tbl_spark}.
 }
 \examples{
 \dontrun{
