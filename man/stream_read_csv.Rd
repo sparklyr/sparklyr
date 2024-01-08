@@ -7,6 +7,7 @@
 \alias{stream_read_parquet}
 \alias{stream_read_orc}
 \alias{stream_read_kafka}
+\alias{stream_read_socket}
 \alias{stream_read_delta}
 \title{Read files created by the stream}
 \usage{
@@ -41,6 +42,8 @@ stream_read_parquet(
 stream_read_orc(sc, path, name = NULL, columns = NULL, options = list(), ...)
 
 stream_read_kafka(sc, name = NULL, options = list(), ...)
+
+stream_read_socket(sc, name = NULL, columns = NULL, options = list(), ...)
 
 stream_read_delta(sc, path, name = NULL, options = list(), ...)
 }

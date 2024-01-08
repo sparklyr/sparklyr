@@ -1,7 +1,6 @@
 #' @include spark_data_build_types.R
 NULL
 
-
 #' Read files created by the stream
 #'
 #' @inheritParams spark_read_csv
@@ -35,10 +34,6 @@ stream_read_csv <- function(
     null_value = NULL,
     options = list(),
     ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
   infer_schema <- identical(columns, NULL) || is.character(columns)
 
   streamOptions <- spark_csv_options(
@@ -107,8 +102,6 @@ stream_write_csv <- function(
     options = list(),
     partition_by = NULL,
     ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
   streamOptions <- spark_csv_options(
     header = header,
     inferSchema = NULL,
@@ -139,11 +132,8 @@ stream_read_text <- function(
     name = NULL,
     options = list(),
     ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
+  stream_read_generic(
+    sc,
     path = path,
     type = "text",
     name = name,
@@ -163,11 +153,8 @@ stream_write_text <- function(
     options = list(),
     partition_by = NULL,
     ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
+  stream_write_generic(
+    x,
     path = path,
     type = "text",
     mode = mode,
@@ -187,11 +174,8 @@ stream_read_json <- function(
     columns = NULL,
     options = list(),
     ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
+  stream_read_generic(
+    sc,
     path = path,
     type = "json",
     name = name,
@@ -211,11 +195,8 @@ stream_write_json <- function(
     options = list(),
     partition_by = NULL,
     ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
+  stream_write_generic(
+    x,
     path = path,
     type = "json",
     mode = mode,
@@ -235,11 +216,8 @@ stream_read_parquet <- function(
     columns = NULL,
     options = list(),
     ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
+  stream_read_generic(
+    sc,
     path = path,
     type = "parquet",
     name = name,
@@ -259,11 +237,8 @@ stream_write_parquet <- function(
     options = list(),
     partition_by = NULL,
     ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
+  stream_write_generic(
+    x,
     path = path,
     type = "parquet",
     mode = mode,
@@ -283,11 +258,8 @@ stream_read_orc <- function(
     columns = NULL,
     options = list(),
     ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
+  stream_read_generic(
+    sc,
     path = path,
     type = "orc",
     name = name,
@@ -307,11 +279,8 @@ stream_write_orc <- function(
     options = list(),
     partition_by = NULL,
     ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
+  stream_write_generic(
+    x,
     path = path,
     type = "orc",
     mode = mode,
@@ -329,11 +298,8 @@ stream_read_kafka <- function(
     name = NULL,
     options = list(),
     ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
+  stream_read_generic(
+    sc,
     path = NULL,
     type = "kafka",
     name = name,
@@ -352,11 +318,8 @@ stream_write_kafka <- function(
     options = list(),
     partition_by = NULL,
     ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
-  stream_write_generic(x,
+  stream_write_generic(
+    x,
     path = NULL,
     type = "kafka",
     mode = mode,
@@ -367,7 +330,7 @@ stream_write_kafka <- function(
   )
 }
 
-#' rdname stream_read_csv
+#' @rdname stream_read_csv
 #' @export
 stream_read_socket <- function(
     sc,
@@ -375,11 +338,8 @@ stream_read_socket <- function(
     columns = NULL,
     options = list(),
     ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
+  stream_read_generic(
+    sc,
     path = NULL,
     type = "socket",
     name = name,
@@ -397,10 +357,6 @@ stream_write_console <- function(
     trigger = stream_trigger_interval(),
     partition_by = NULL,
     ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
   stream_write_generic(x,
     path = NULL,
     type = "console",
@@ -420,11 +376,8 @@ stream_read_delta <- function(
     name = NULL,
     options = list(),
     ...) {
-  spark_require_version(sc, "2.0.0", "Spark streaming")
-
-  name <- name %||% random_string("sparklyr_tmp_")
-
-  stream_read_generic(sc,
+  stream_read_generic(
+    sc,
     path = path,
     type = "delta",
     name = name,
@@ -444,10 +397,6 @@ stream_write_delta <- function(
     options = list(),
     partition_by = NULL,
     ...) {
-  spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
-
-  sc <- spark_connection(x)
-
   stream_write_generic(x,
     path = path,
     type = "delta",
@@ -492,9 +441,8 @@ stream_read_generic <- function(
     stream_options,
     load = FALSE) {
   spark_require_version(sc, "2.0.0", "Spark streaming")
-
+  name <- name %||% random_string("sparklyr_tmp_")
   schema <- NULL
-
   streamOptions <- spark_session(sc) %>%
     invoke("readStream")
 
