@@ -142,362 +142,362 @@ spark_apply <- function(
     arrow_max_records_per_batch = NULL,
     auto_deps = FALSE,
     ...) {
-  if (!is.character(partition_index_param)) {
-    stop("Expected 'partition_index_param' to be a string.")
-  }
-
-  memory <- force(memory)
-  args <- list(...)
-  invoke_args <- list()
-  if (identical(fetch_result_as_sdf, FALSE)) {
-    # If we are fetching R objects returned from the transformation function in
-    # their serialized form, then the result will contain a single binary column
-    columns <- list(spark_apply_binary_result = "spark_apply_binary_result")
-  } else {
-    # If columns is of the form c("col_name1", "col_name2", ...)
-    # then leave it as-is
-    # Otherwise if it is of the form c(col_name1 = "col_type1", ...)
-    # or list(col_name1 = "col_type1", ...), etc, then make sure it gets coerced
-    # into a list instead of a character vector with names
-    if (!is.null(names(columns))) {
-      columns <- as.list(columns)
-    }
-  }
-  assert_that(is.function(f) || is.raw(f) || is.language(f))
-  if (is.language(f)) f <- rlang::as_closure(f)
-
-  sc <- spark_connection(x)
-  sdf <- spark_dataframe(x)
-  invoke_args$sdf_columns <- colnames(x)
-
-  if (identical(barrier, TRUE)) {
-    # barrier works in rdd
-    args$rdd <- TRUE
-
-    if (spark_version(sc) < "2.4.0") {
-      stop("Barrier execution is only available for spark 2.4.0 or greater.")
-    }
-
-    if (is.null(columns)) {
-      stop("Barrier execution requires explicit columns names.")
-    }
-  }
-
-  if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
-
-  if (identical(args$rdd, TRUE)) {
-    rdd_base <- invoke(sdf, "rdd")
-    if (is.null(columns)) columns <- colnames(x)
-  }
-
-  grouped <- !is.null(group_by)
-
-  rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
-  packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
-  invoke_args$proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
-  serialize_version <- spark_config_value(sc$config, "sparklyr.apply.serializer", 2)
-
-  time_zone <- ""
-  records_per_batch <- NULL
-  arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
-  if (!fetch_result_as_sdf && arrow) {
-    warning("Disabling arrow due to its potential incompatibility with fetch_result_as_sdf = FALSE")
-    arrow <- FALSE
-  }
-  if (arrow) {
-    time_zone <- time_zone(sc)
-    records_per_batch <- as.integer(
-      arrow_max_records_per_batch %||%
-        spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||%
-        10000
-    )
-  }
-
-  # build reduced size query plan in case schema needs to be inferred
-  if (sdf_is_streaming(sdf)) {
-    sdf_limit <- sdf
-  } else {
-    sdf_limit <- invoke(
-      sdf,
-      "limit",
-      cast_scalar_integer(
-        spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
-      )
-    )
-  }
-
-  # backward compatible support for names argument from 0.6
-  if (!is.null(args$names)) {
-    columns <- args$names
-  }
-
-  if (!is.null(group_by) && sdf_is_streaming(sdf)) {
-    stop("'group_by' is unsupported with streams.")
-  }
-
-  # set default value for packages based on config
-  if (is.null(packages)) {
-    if (is.null(packages_config)) {
-      packages <- TRUE
-    } else {
-      packages <- packages_config
-    }
-  }
-
-  columns_typed <- length(names(columns)) > 0
-
-  if (rlang) warning("The `rlang` parameter is under active development.")
-
-  # disable package distribution for local connections
-  if (spark_master_is_local(sc$master)) packages <- FALSE
-
-  # disable package distribution for livy connections and no package spec
-  if (identical(tolower(sc$method), "livy") && packages) packages <- FALSE
-
-  # inject column types and partition_index_param to context
-  context <- list(
-    column_types = translate_spark_column_types(x),
-    partition_index_param = partition_index_param,
-    user_context = context
-  )
-
-  rlang_serialize <- spark_apply_rlang_serialize()
-  create_rlang_closure <- (rlang && !is.null(rlang_serialize))
-
-  # create closure for the given function
-  serializer <- spark_apply_serializer()
-  serialize_impl <- (
-    if (is.list(serializer)) {
-      function(x, ...) serializer$serializer(x)
-    } else {
-      serializer
-    })
-  deserializer <- spark_apply_deserializer()
-  invoke_args$closure <- (
-    if (create_rlang_closure) {
-      serialize_impl(NULL, version = serialize_version)
-    } else if (is.function(f)) {
-      suppressWarnings(serialize_impl(f, version = serialize_version))
-    } else {
-      f
-    })
-  invoke_args$context_serialize <- serialize_impl(context, version = serialize_version)
-
-  # create rlang closure
-  invoke_args$closure_rlang <- if (create_rlang_closure) rlang_serialize(f) else raw()
-  invoke_args$debug <- args$debug
-  # add debug connection message
-  if (isTRUE(args$debug)) {
-    message("Debugging spark_apply(), connect to worker debugging session as follows:")
-    message("  1. Find the workers <sessionid> and <port> in the worker logs, from RStudio click")
-    message("     'Log' under the connection, look for the last entry with contents:")
-    message("     'Session (<sessionid>) is waiting for sparklyr client to connect to port <port>'")
-    message("  2. From a new R session run:")
-    message("     debugonce(sparklyr:::spark_worker_main)")
-    message("     sparklyr:::spark_worker_main(<sessionid>, <port>)")
-  }
-
-  if (grouped) {
-    colpos <- which(colnames(x) %in% group_by)
-    if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")
-
-    group_by_list <- as.list(as.integer(colpos - 1))
-
-    if (!columns_typed) {
-      columns <- c(group_by, columns)
-    }
-    group_invoke <- function(.group,.x, .time_zone = NULL, .batch = NULL) {
-      invoke_static(
-        sc,
-        "sparklyr.ApplyUtils",
-        .group,
-        .x,
-        group_by_list,
-        .time_zone,
-        .batch
-      )
-    }
-    if (identical(args$rdd, TRUE)) {
-      rdd_base <- group_invoke("groupBy", rdd_base)
-    } else if (arrow) {
-      sdf <- group_invoke("groupByArrow", sdf, time_zone, records_per_batch)
-      sdf_limit <-group_invoke("groupByArrow", sdf_limit, time_zone, records_per_batch)
-    } else {
-      sdf <- group_invoke("groupBy", sdf)
-      sdf_limit <- group_invoke("groupBy", sdf_limit)
-    }
-  }
-
-  invoke_args$worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
-
-  # packages should be either a boolean or a character vector
-  packages <- unlist(packages)
-  if (auto_deps && !spark_apply_packages_is_bundle(packages)) {
-    required_pkgs <- infer_required_r_packages(f)
-    if (is.character(packages)) {
-      packages <- union(packages, required_pkgs)
-    } else {
-      packages <- required_pkgs
-    }
-  }
-  invoke_args$bundle_path <- get_spark_apply_bundle_path(sc, packages)
-
-  invoke_args$spark_apply_options <- lapply(
-    connection_config(sc, "sparklyr.apply.options."),
-    as.character
-  )
-  if (!is.null(records_per_batch)) {
-    invoke_args$spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
-  }
-
-  invoke_args$profile <- args$profile
-  invoke_args$fetch_result_as_sdf <- fetch_result_as_sdf
-  invoke_args$single_binary_column <- args$single_binary_column
-  invoke_args$group_by <- group_by
-
-  invoke_args$serializer <- serializer
-  invoke_args$deserializer <- deserializer
-  invoke_args$arrow <- arrow
-  invoke_args$serialize_version <- serialize_version
-
-  if (identical(args$rdd, TRUE)) {
-    if (barrier) {
-      class <- "sparklyr.RDDBarrier"
-      method <- "transformBarrier"
-    } else {
-      class <- "sparklyr.WorkerHelper"
-      method <- "computeRdd"
-    }
-
-    rdd <- spark_apply_invoke(sc, class, method, rdd_base, .args = invoke_args)
-    # cache by default
-    if (memory) rdd <- invoke(rdd, "cache")
-
-    schema <- spark_schema_from_rdd(sc, rdd, columns)
-
-    transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
-  } else {
-    json_cols <- c()
-    if (is.null(columns) || is.character(columns)) {
-      columns_schema <- spark_data_build_types(
-        sc,
-        list(
-          names = "character",
-          types = "character",
-          json_cols = "character"
-        )
-      )
-
-      columns_op <- spark_apply_invoke(
-        sc,
-        .class = "sparklyr.WorkerHelper",
-        .method = "computeSdf",
-        .x1 = sdf_limit,
-        .x2 = columns_schema,
-        .session = spark_session(sc),
-        .time_zone = time_zone,
-        .schema = TRUE,
-        .args = invoke_args
-      )
-
-      columns_query <- columns_op %>% sdf_collect()
-
-      columns_infer <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
-      names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
-      json_cols <- array(strsplit(columns_query[1, ]$json_cols, split = "\\|")[[1]])
-
-      if (is.character(columns)) {
-        names(columns_infer)[seq_along(columns)] <- columns
-      }
-
-      columns <- columns_infer
-
-      if (identical(args$schema, TRUE)) {
-        return(columns)
-      }
-    }
-
-    schema <- spark_data_build_types(sc, columns)
-
-    transformed <- spark_apply_invoke(
-      sc,
-      .class = "sparklyr.WorkerHelper",
-      .method = "computeSdf",
-      .x1 = sdf,
-      .x2 = schema,
-      .session = spark_session(sc),
-      .time_zone = time_zone,
-      .schema = FALSE,
-      .args = invoke_args
-    )
-
-
-    if (spark_version(sc) >= "2.4.0" && !is.na(json_cols) && length(json_cols) > 0) {
-      transformed <- invoke_static(
-        sc,
-        "sparklyr.StructColumnUtils",
-        "parseJsonColumns",
-        transformed,
-        json_cols
-      )
-    }
-  }
-
-  if (identical(barrier, TRUE)) {
-    registered <- transformed
-  } else {
-    name <- name %||% random_string("sparklyr_tmp_")
-    registered <- sdf_register(transformed, name = name)
-
-    if (memory && identical(args$rdd, FALSE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
-  }
-
-  if (!fetch_result_as_sdf) {
-    registered %>%
-      sdf_collect(arrow = arrow) %>%
-      (
-        function(x) {
-          lapply(x$spark_apply_binary_result, function(res) deserializer(res[[1]]))
-        })
-  } else {
-    registered
-  }
-}
-
-spark_apply_invoke <- function(
-    sc, .class, .method, .x1, .x2 = NULL,
-    .session = NULL, .time_zone = NULL,
-    .schema = FALSE, .args) {
-  invoke_static(
-    sc,
-    .class,
-    .method,
-    .x1,
-    .x2,
-    .args$closure,
-    spark_apply_worker_config(
-      sc,
-      .args$debug,
-      .args$profile,
-      schema = .schema,
-      arrow = .args$arrow,
-      fetch_result_as_sdf = .args$fetch_result_as_sdf,
-      single_binary_column = .args$single_binary_column
-    ),
-    as.integer(.args$worker_port),
-    as.list(.args$sdf_columns),
-    as.list(.args$group_by),
-    .args$closure_rlang,
-    .args$bundle_path,
-    as.environment(.args$proc_env),
-    as.integer(60),
-    .args$context_serialize,
-    as.environment(.args$spark_apply_options),
-    .session,
-    .time_zone,
-    serialize(.args$serializer, NULL, version = .args$serialize_version),
-    serialize(.args$deserializer, NULL, version = .args$serialize_version)
-  )
+#   if (!is.character(partition_index_param)) {
+#     stop("Expected 'partition_index_param' to be a string.")
+#   }
+#
+#   memory <- force(memory)
+#   args <- list(...)
+#   invoke_args <- list()
+#   if (identical(fetch_result_as_sdf, FALSE)) {
+#     # If we are fetching R objects returned from the transformation function in
+#     # their serialized form, then the result will contain a single binary column
+#     columns <- list(spark_apply_binary_result = "spark_apply_binary_result")
+#   } else {
+#     # If columns is of the form c("col_name1", "col_name2", ...)
+#     # then leave it as-is
+#     # Otherwise if it is of the form c(col_name1 = "col_type1", ...)
+#     # or list(col_name1 = "col_type1", ...), etc, then make sure it gets coerced
+#     # into a list instead of a character vector with names
+#     if (!is.null(names(columns))) {
+#       columns <- as.list(columns)
+#     }
+#   }
+#   assert_that(is.function(f) || is.raw(f) || is.language(f))
+#   if (is.language(f)) f <- rlang::as_closure(f)
+#
+#   sc <- spark_connection(x)
+#   sdf <- spark_dataframe(x)
+#   invoke_args$sdf_columns <- colnames(x)
+#
+#   if (identical(barrier, TRUE)) {
+#     # barrier works in rdd
+#     args$rdd <- TRUE
+#
+#     if (spark_version(sc) < "2.4.0") {
+#       stop("Barrier execution is only available for spark 2.4.0 or greater.")
+#     }
+#
+#     if (is.null(columns)) {
+#       stop("Barrier execution requires explicit columns names.")
+#     }
+#   }
+#
+#   if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
+#
+#   if (identical(args$rdd, TRUE)) {
+#     rdd_base <- invoke(sdf, "rdd")
+#     if (is.null(columns)) columns <- colnames(x)
+#   }
+#
+#   grouped <- !is.null(group_by)
+#
+#   rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
+#   packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
+#   invoke_args$proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
+#   serialize_version <- spark_config_value(sc$config, "sparklyr.apply.serializer", 2)
+#
+#   time_zone <- ""
+#   records_per_batch <- NULL
+#   arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
+#   if (!fetch_result_as_sdf && arrow) {
+#     warning("Disabling arrow due to its potential incompatibility with fetch_result_as_sdf = FALSE")
+#     arrow <- FALSE
+#   }
+#   if (arrow) {
+#     time_zone <- time_zone(sc)
+#     records_per_batch <- as.integer(
+#       arrow_max_records_per_batch %||%
+#         spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||%
+#         10000
+#     )
+#   }
+#
+#   # build reduced size query plan in case schema needs to be inferred
+#   if (sdf_is_streaming(sdf)) {
+#     sdf_limit <- sdf
+#   } else {
+#     sdf_limit <- invoke(
+#       sdf,
+#       "limit",
+#       cast_scalar_integer(
+#         spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+#       )
+#     )
+#   }
+#
+#   # backward compatible support for names argument from 0.6
+#   if (!is.null(args$names)) {
+#     columns <- args$names
+#   }
+#
+#   if (!is.null(group_by) && sdf_is_streaming(sdf)) {
+#     stop("'group_by' is unsupported with streams.")
+#   }
+#
+#   # set default value for packages based on config
+#   if (is.null(packages)) {
+#     if (is.null(packages_config)) {
+#       packages <- TRUE
+#     } else {
+#       packages <- packages_config
+#     }
+#   }
+#
+#   columns_typed <- length(names(columns)) > 0
+#
+#   if (rlang) warning("The `rlang` parameter is under active development.")
+#
+#   # disable package distribution for local connections
+#   if (spark_master_is_local(sc$master)) packages <- FALSE
+#
+#   # disable package distribution for livy connections and no package spec
+#   if (identical(tolower(sc$method), "livy") && packages) packages <- FALSE
+#
+#   # inject column types and partition_index_param to context
+#   context <- list(
+#     column_types = translate_spark_column_types(x),
+#     partition_index_param = partition_index_param,
+#     user_context = context
+#   )
+#
+#   rlang_serialize <- spark_apply_rlang_serialize()
+#   create_rlang_closure <- (rlang && !is.null(rlang_serialize))
+#
+#   # create closure for the given function
+#   serializer <- spark_apply_serializer()
+#   serialize_impl <- (
+#     if (is.list(serializer)) {
+#       function(x, ...) serializer$serializer(x)
+#     } else {
+#       serializer
+#     })
+#   deserializer <- spark_apply_deserializer()
+#   invoke_args$closure <- (
+#     if (create_rlang_closure) {
+#       serialize_impl(NULL, version = serialize_version)
+#     } else if (is.function(f)) {
+#       suppressWarnings(serialize_impl(f, version = serialize_version))
+#     } else {
+#       f
+#     })
+#   invoke_args$context_serialize <- serialize_impl(context, version = serialize_version)
+#
+#   # create rlang closure
+#   invoke_args$closure_rlang <- if (create_rlang_closure) rlang_serialize(f) else raw()
+#   invoke_args$debug <- args$debug
+#   # add debug connection message
+#   if (isTRUE(args$debug)) {
+#     message("Debugging spark_apply(), connect to worker debugging session as follows:")
+#     message("  1. Find the workers <sessionid> and <port> in the worker logs, from RStudio click")
+#     message("     'Log' under the connection, look for the last entry with contents:")
+#     message("     'Session (<sessionid>) is waiting for sparklyr client to connect to port <port>'")
+#     message("  2. From a new R session run:")
+#     message("     debugonce(sparklyr:::spark_worker_main)")
+#     message("     sparklyr:::spark_worker_main(<sessionid>, <port>)")
+#   }
+#
+#   if (grouped) {
+#     colpos <- which(colnames(x) %in% group_by)
+#     if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")
+#
+#     group_by_list <- as.list(as.integer(colpos - 1))
+#
+#     if (!columns_typed) {
+#       columns <- c(group_by, columns)
+#     }
+#     group_invoke <- function(.group,.x, .time_zone = NULL, .batch = NULL) {
+#       invoke_static(
+#         sc,
+#         "sparklyr.ApplyUtils",
+#         .group,
+#         .x,
+#         group_by_list,
+#         .time_zone,
+#         .batch
+#       )
+#     }
+#     if (identical(args$rdd, TRUE)) {
+#       rdd_base <- group_invoke("groupBy", rdd_base)
+#     } else if (arrow) {
+#       sdf <- group_invoke("groupByArrow", sdf, time_zone, records_per_batch)
+#       sdf_limit <-group_invoke("groupByArrow", sdf_limit, time_zone, records_per_batch)
+#     } else {
+#       sdf <- group_invoke("groupBy", sdf)
+#       sdf_limit <- group_invoke("groupBy", sdf_limit)
+#     }
+#   }
+#
+#   invoke_args$worker_port <- spark_config_value(sc$config, "sparklyr.gateway.port", "8880")
+#
+#   # packages should be either a boolean or a character vector
+#   packages <- unlist(packages)
+#   if (auto_deps && !spark_apply_packages_is_bundle(packages)) {
+#     required_pkgs <- infer_required_r_packages(f)
+#     if (is.character(packages)) {
+#       packages <- union(packages, required_pkgs)
+#     } else {
+#       packages <- required_pkgs
+#     }
+#   }
+#   invoke_args$bundle_path <- get_spark_apply_bundle_path(sc, packages)
+#
+#   invoke_args$spark_apply_options <- lapply(
+#     connection_config(sc, "sparklyr.apply.options."),
+#     as.character
+#   )
+#   if (!is.null(records_per_batch)) {
+#     invoke_args$spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
+#   }
+#
+#   invoke_args$profile <- args$profile
+#   invoke_args$fetch_result_as_sdf <- fetch_result_as_sdf
+#   invoke_args$single_binary_column <- args$single_binary_column
+#   invoke_args$group_by <- group_by
+#
+#   invoke_args$serializer <- serializer
+#   invoke_args$deserializer <- deserializer
+#   invoke_args$arrow <- arrow
+#   invoke_args$serialize_version <- serialize_version
+#
+#   if (identical(args$rdd, TRUE)) {
+#     if (barrier) {
+#       class <- "sparklyr.RDDBarrier"
+#       method <- "transformBarrier"
+#     } else {
+#       class <- "sparklyr.WorkerHelper"
+#       method <- "computeRdd"
+#     }
+#
+#     rdd <- spark_apply_invoke(sc, class, method, rdd_base, .args = invoke_args)
+#     # cache by default
+#     if (memory) rdd <- invoke(rdd, "cache")
+#
+#     schema <- spark_schema_from_rdd(sc, rdd, columns)
+#
+#     transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
+#   } else {
+#     json_cols <- c()
+#     if (is.null(columns) || is.character(columns)) {
+#       columns_schema <- spark_data_build_types(
+#         sc,
+#         list(
+#           names = "character",
+#           types = "character",
+#           json_cols = "character"
+#         )
+#       )
+#
+#       columns_op <- spark_apply_invoke(
+#         sc,
+#         .class = "sparklyr.WorkerHelper",
+#         .method = "computeSdf",
+#         .x1 = sdf_limit,
+#         .x2 = columns_schema,
+#         .session = spark_session(sc),
+#         .time_zone = time_zone,
+#         .schema = TRUE,
+#         .args = invoke_args
+#       )
+#
+#       columns_query <- columns_op %>% sdf_collect()
+#
+#       columns_infer <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
+#       names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
+#       json_cols <- array(strsplit(columns_query[1, ]$json_cols, split = "\\|")[[1]])
+#
+#       if (is.character(columns)) {
+#         names(columns_infer)[seq_along(columns)] <- columns
+#       }
+#
+#       columns <- columns_infer
+#
+#       if (identical(args$schema, TRUE)) {
+#         return(columns)
+#       }
+#     }
+#
+#     schema <- spark_data_build_types(sc, columns)
+#
+#     transformed <- spark_apply_invoke(
+#       sc,
+#       .class = "sparklyr.WorkerHelper",
+#       .method = "computeSdf",
+#       .x1 = sdf,
+#       .x2 = schema,
+#       .session = spark_session(sc),
+#       .time_zone = time_zone,
+#       .schema = FALSE,
+#       .args = invoke_args
+#     )
+#
+#
+#     if (spark_version(sc) >= "2.4.0" && !is.na(json_cols) && length(json_cols) > 0) {
+#       transformed <- invoke_static(
+#         sc,
+#         "sparklyr.StructColumnUtils",
+#         "parseJsonColumns",
+#         transformed,
+#         json_cols
+#       )
+#     }
+#   }
+#
+#   if (identical(barrier, TRUE)) {
+#     registered <- transformed
+#   } else {
+#     name <- name %||% random_string("sparklyr_tmp_")
+#     registered <- sdf_register(transformed, name = name)
+#
+#     if (memory && identical(args$rdd, FALSE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
+#   }
+#
+#   if (!fetch_result_as_sdf) {
+#     registered %>%
+#       sdf_collect(arrow = arrow) %>%
+#       (
+#         function(x) {
+#           lapply(x$spark_apply_binary_result, function(res) deserializer(res[[1]]))
+#         })
+#   } else {
+#     registered
+#   }
+# }
+#
+# spark_apply_invoke <- function(
+#     sc, .class, .method, .x1, .x2 = NULL,
+#     .session = NULL, .time_zone = NULL,
+#     .schema = FALSE, .args) {
+#   invoke_static(
+#     sc,
+#     .class,
+#     .method,
+#     .x1,
+#     .x2,
+#     .args$closure,
+#     spark_apply_worker_config(
+#       sc,
+#       .args$debug,
+#       .args$profile,
+#       schema = .schema,
+#       arrow = .args$arrow,
+#       fetch_result_as_sdf = .args$fetch_result_as_sdf,
+#       single_binary_column = .args$single_binary_column
+#     ),
+#     as.integer(.args$worker_port),
+#     as.list(.args$sdf_columns),
+#     as.list(.args$group_by),
+#     .args$closure_rlang,
+#     .args$bundle_path,
+#     as.environment(.args$proc_env),
+#     as.integer(60),
+#     .args$context_serialize,
+#     as.environment(.args$spark_apply_options),
+#     .session,
+#     .time_zone,
+#     serialize(.args$serializer, NULL, version = .args$serialize_version),
+#     serialize(.args$deserializer, NULL, version = .args$serialize_version)
+#   )
 }
 
 spark_apply_rlang_serialize <- function() {
