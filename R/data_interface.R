@@ -85,15 +85,6 @@ spark_csv_options <- function(header,
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}),
 #'   as well as the local file system (\code{file://}).
 #'
-#' If you are reading from a secure S3 bucket be sure to set the following in your spark-defaults.conf
-#' \code{spark.hadoop.fs.s3a.access.key}, \code{spark.hadoop.fs.s3a.secret.key} or any of the methods outlined in the aws-sdk
-#' documentation \href{https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html}{Working with AWS credentials}
-#' In order to work with the newer \code{s3a://} protocol also set the values for \code{spark.hadoop.fs.s3a.impl} and \code{spark.hadoop.fs.s3a.endpoint }.
-#' In addition, to support v4 of the S3 api be sure to pass the \code{-Dcom.amazonaws.services.s3.enableV4} driver options
-#' for the config key \code{spark.driver.extraJavaOptions }
-#' For instructions on how to configure \code{s3n://} check the hadoop documentation:
-#' \href{https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html#Authentication_properties}{s3n authentication properties}
-#'
 #' When \code{header} is \code{FALSE}, the column names are generated with a
 #' \code{V} prefix; e.g. \code{V1, V2, ...}.
 #'
@@ -248,16 +239,6 @@ spark_write_csv.spark_jobj <- function(x,
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}), as well as
 #'   the local file system (\code{file://}).
 #'
-#' If you are reading from a secure S3 bucket be sure to set the following in your spark-defaults.conf
-#' \code{spark.hadoop.fs.s3a.access.key}, \code{spark.hadoop.fs.s3a.secret.key} or any of the methods outlined in the aws-sdk
-#' documentation \href{https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html}{Working with AWS credentials}
-#' In order to work with the newer \code{s3a://} protocol also set the values for \code{spark.hadoop.fs.s3a.impl} and \code{spark.hadoop.fs.s3a.endpoint }.
-#' In addition, to support v4 of the S3 api be sure to pass the \code{-Dcom.amazonaws.services.s3.enableV4} driver options
-#' for the config key \code{spark.driver.extraJavaOptions }
-#' For instructions on how to configure \code{s3n://} check the hadoop documentation:
-#' \href{https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html#Authentication_properties}{s3n authentication properties}
-#'
-#'
 #' @family Spark serialization routines
 #'
 #' @export
@@ -349,15 +330,6 @@ spark_write_parquet.spark_jobj <- function(x,
 #'
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}), as well as
 #'   the local file system (\code{file://}).
-#'
-#' If you are reading from a secure S3 bucket be sure to set the following in your spark-defaults.conf
-#' \code{spark.hadoop.fs.s3a.access.key}, \code{spark.hadoop.fs.s3a.secret.key} or any of the methods outlined in the aws-sdk
-#' documentation \href{https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html}{Working with AWS credentials}
-#' In order to work with the newer \code{s3a://} protocol also set the values for \code{spark.hadoop.fs.s3a.impl} and \code{spark.hadoop.fs.s3a.endpoint }.
-#' In addition, to support v4 of the S3 api be sure to pass the \code{-Dcom.amazonaws.services.s3.enableV4} driver options
-#' for the config key \code{spark.driver.extraJavaOptions }
-#' For instructions on how to configure \code{s3n://} check the hadoop documentation:
-#' \href{https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html#Authentication_properties}{s3n authentication properties}
 #'
 #'
 #' @family Spark serialization routines
@@ -540,13 +512,10 @@ spark_data_write_generic <- function(df,
 
 #' Reads from a Spark Table into a Spark DataFrame.
 #'
-#' Reads from a Spark Table into a Spark DataFrame.
-#'
 #' @inheritParams spark_read_csv
-#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
-#'
+#' @param options A list of strings with additional options.
+#' See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' @family Spark serialization routines
-#'
 #' @export
 spark_read_table <- function(sc,
                              name,
@@ -561,13 +530,10 @@ spark_read_table <- function(sc,
 
 #' Reads from a Spark Table into a Spark DataFrame.
 #'
-#' Reads from a Spark Table into a Spark DataFrame.
-#'
 #' @inheritParams spark_read_csv
-#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
-#'
+#' @param options A list of strings with additional options. See
+#' \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' @family Spark serialization routines
-#'
 #' @export
 spark_load_table <- function(sc,
                              name,
@@ -589,12 +555,9 @@ spark_load_table <- function(sc,
 
 #' Writes a Spark DataFrame into a Spark table
 #'
-#' Writes a Spark DataFrame into a Spark table.
-#'
 #' @inheritParams spark_write_csv
 #' @param name The name to assign to the newly generated table.
 #' @param ... Optional arguments; currently unused.
-#'
 #' @family Spark serialization routines
 #'
 #' @export
@@ -659,15 +622,11 @@ spark_write_table.spark_jobj <- function(x,
 
 #' Inserts a Spark DataFrame into a Spark table
 #'
-#' Inserts a Spark DataFrame into a Spark table.
-#'
 #' @inheritParams spark_write_csv
 #' @inheritParams spark_read_csv
 #' @param name The name to assign to the newly generated table.
 #' @param ... Optional arguments; currently unused.
-#'
 #' @family Spark serialization routines
-#'
 #' @export
 spark_insert_table <- function(x,
                                name,
@@ -708,13 +667,10 @@ spark_insert_table.spark_jobj <- function(x,
 
 #' Read from JDBC connection into a Spark DataFrame.
 #'
-#' Read from JDBC connection into a Spark DataFrame.
-#'
 #' @inheritParams spark_read_csv
-#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
-#'
+#' @param options A list of strings with additional options.
+#' See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' @family Spark serialization routines
-#'
 #' @examples
 #' \dontrun{
 #' sc <- spark_connect(
@@ -753,12 +709,8 @@ spark_read_jdbc <- function(sc,
 
 #' Read libsvm file into a Spark DataFrame.
 #'
-#' Read libsvm file into a Spark DataFrame.
-#'
 #' @inheritParams spark_read_csv
-#'
 #' @family Spark serialization routines
-#'
 #' @export
 spark_read_libsvm <- function(sc,
                               name = NULL,
@@ -779,14 +731,11 @@ spark_read_libsvm <- function(sc,
 
 #' Read from a generic source into a Spark DataFrame.
 #'
-#' Read from a generic source into a Spark DataFrame.
-#'
 #' @inheritParams spark_read_csv
 #' @param source A data source capable of reading data.
-#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
-#'
+#' @param options A list of strings with additional options.
+#' See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' @family Spark serialization routines
-#'
 #' @export
 spark_read_source <- function(sc,
                               name = NULL,
@@ -817,8 +766,6 @@ spark_read_source <- function(sc,
 }
 
 #' Writes a Spark DataFrame into a JDBC table
-#'
-#' Writes a Spark DataFrame into a JDBC table.
 #'
 #' @inheritParams spark_write_csv
 #' @param name The name to assign to the newly generated table.
@@ -910,7 +857,9 @@ spark_write_source.tbl_spark <- function(x,
                                          partition_by = NULL,
                                          ...) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, source, "format", mode, options, partition_by, ...)
+  spark_data_write_generic(
+    sqlResult, source, "format", mode, options, partition_by, ...
+  )
 }
 
 #' @export
@@ -925,26 +874,11 @@ spark_write_source.spark_jobj <- function(x,
 }
 
 #' Read a Text file into a Spark DataFrame
-#'
-#' Read a text file into a Spark DataFrame.
-#'
 #' @inheritParams spark_read_csv
 #' @param whole Read the entire text file as a single entry? Defaults to \code{FALSE}.
-#'
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}), as well as
 #'   the local file system (\code{file://}).
-#'
-#' If you are reading from a secure S3 bucket be sure to set the following in your spark-defaults.conf
-#' \code{spark.hadoop.fs.s3a.access.key}, \code{spark.hadoop.fs.s3a.secret.key} or any of the methods outlined in the aws-sdk
-#' documentation \href{https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html}{Working with AWS credentials}
-#' In order to work with the newer \code{s3a://} protocol also set the values for \code{spark.hadoop.fs.s3a.impl} and \code{spark.hadoop.fs.s3a.endpoint }.
-#' In addition, to support v4 of the S3 api be sure to pass the \code{-Dcom.amazonaws.services.s3.enableV4} driver options
-#' for the config key \code{spark.driver.extraJavaOptions }
-#' For instructions on how to configure \code{s3n://} check the hadoop documentation:
-#' \href{https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html#Authentication_properties}{s3n authentication properties}
-#'
 #' @family Spark serialization routines
-#'
 #' @export
 spark_read_text <- function(sc,
                             name = NULL,
@@ -1019,7 +953,9 @@ spark_write_text.tbl_spark <- function(x,
                                        partition_by = NULL,
                                        ...) {
   sqlResult <- spark_sqlresult_from_dplyr(x)
-  spark_data_write_generic(sqlResult, spark_normalize_path(path), "text", mode, options, partition_by)
+  spark_data_write_generic(
+    sqlResult, spark_normalize_path(path), "text", mode, options, partition_by
+  )
 }
 
 #' @export
@@ -1037,16 +973,13 @@ spark_write_text.spark_jobj <- function(x,
 #'
 #' Read a \href{https://orc.apache.org/}{ORC} file into a Spark
 #' DataFrame.
-#'
 #' @inheritParams spark_read_csv
-#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param options A list of strings with additional options.
+#' See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' @param schema A (java) read schema. Useful for optimizing read operation on nested data.
-#'
 #' @details You can read data from HDFS (\code{hdfs://}), S3 (\code{s3a://}), as well as
 #'   the local file system (\code{file://}).
-#'
 #' @family Spark serialization routines
-#'
 #' @export
 spark_read_orc <- function(sc,
                            name = NULL,
@@ -1092,13 +1025,11 @@ spark_read_orc.spark_connection <- function(
 #'
 #' Serialize a Spark DataFrame to the
 #' \href{https://orc.apache.org/}{ORC} format.
-#'
 #' @inheritParams spark_write_csv
-#' @param options A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
+#' @param options A list of strings with additional options.
+#' See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.
 #' @param ... Optional arguments; currently unused.
-#'
 #' @family Spark serialization routines
-#'
 #' @export
 spark_write_orc <- function(x,
                             path,
@@ -1159,9 +1090,7 @@ spark_write_delta <- function(x,
 #' @param version The version of the delta table to read.
 #' @param timestamp The timestamp of the delta table to read. For example,
 #'   \code{"2019-01-01"} or \code{"2019-01-01'T'00:00:00.000Z"}.
-#'
 #' @family Spark serialization routines
-#'
 #' @export
 spark_read_delta <- function(sc,
                              path,
@@ -1189,20 +1118,16 @@ spark_read_delta <- function(sc,
 
 #' Read Apache Avro data into a Spark DataFrame.
 #'
-#' Read Apache Avro data into a Spark DataFrame.
 #' Notice this functionality requires the Spark connection \code{sc} to be instantiated with either
 #' an explicitly specified Spark version (i.e.,
 #' \code{spark_connect(..., version = <version>, packages = c("avro", <other package(s)>), ...)})
 #' or a specific version of Spark avro package to use (e.g.,
 #' \code{spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0", <other package(s)>), ...)}).
-#'
 #' @inheritParams spark_read_csv
 #' @param avro_schema Optional Avro schema in JSON format
 #' @param ignore_extension If enabled, all files with and without .avro extension
-#'   are loaded (default: \code{TRUE})
-#'
+#' are loaded (default: \code{TRUE})
 #' @family Spark serialization routines
-#'
 #' @export
 spark_read_avro <- function(sc,
                             name = NULL,
@@ -1237,21 +1162,20 @@ spark_read_avro <- function(sc,
 
 #' Serialize a Spark DataFrame into Apache Avro format
 #'
-#' Serialize a Spark DataFrame into Apache Avro format.
-#' Notice this functionality requires the Spark connection \code{sc} to be instantiated with either
+#' Notice this functionality requires the Spark connection \code{sc} to be
+#' instantiated with either
 #' an explicitly specified Spark version (i.e.,
 #' \code{spark_connect(..., version = <version>, packages = c("avro", <other package(s)>), ...)})
 #' or a specific version of Spark avro package to use (e.g.,
-#' \code{spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0", <other package(s)>), ...)}).
-#'
+#' \code{spark_connect(..., packages =
+#' c("org.apache.spark:spark-avro_2.12:3.0.0", <other package(s)>), ...)}).
 #' @inheritParams spark_write_csv
 #' @param avro_schema Optional Avro schema in JSON format
-#' @param record_name Optional top level record name in write result (default: "topLevelRecord")
+#' @param record_name Optional top level record name in write result
+#' (default: "topLevelRecord")
 #' @param record_namespace Record namespace in write result (default: "")
 #' @param compression Compression codec to use (default: "snappy")
-#'
 #' @family Spark serialization routines
-#'
 #' @export
 spark_write_avro <- function(x,
                              path,
