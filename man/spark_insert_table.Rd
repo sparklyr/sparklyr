@@ -33,7 +33,7 @@ already exists?}
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Inserts a Spark DataFrame into a Spark table.
+Inserts a Spark DataFrame into a Spark table
 }
 \seealso{
 Other Spark serialization routines: 

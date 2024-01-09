@@ -2,7 +2,14 @@
 % Please edit documentation in R/stream_data.R
 \name{stream_read_csv}
 \alias{stream_read_csv}
-\title{Read CSV Stream}
+\alias{stream_read_text}
+\alias{stream_read_json}
+\alias{stream_read_parquet}
+\alias{stream_read_orc}
+\alias{stream_read_kafka}
+\alias{stream_read_socket}
+\alias{stream_read_delta}
+\title{Read files created by the stream}
 \usage{
 stream_read_csv(
   sc,
@@ -18,6 +25,27 @@ stream_read_csv(
   options = list(),
   ...
 )
+
+stream_read_text(sc, path, name = NULL, options = list(), ...)
+
+stream_read_json(sc, path, name = NULL, columns = NULL, options = list(), ...)
+
+stream_read_parquet(
+  sc,
+  path,
+  name = NULL,
+  columns = NULL,
+  options = list(),
+  ...
+)
+
+stream_read_orc(sc, path, name = NULL, columns = NULL, options = list(), ...)
+
+stream_read_kafka(sc, name = NULL, options = list(), ...)
+
+stream_read_socket(sc, name = NULL, columns = NULL, options = list(), ...)
+
+stream_read_delta(sc, path, name = NULL, options = list(), ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -52,7 +80,7 @@ If specified, the elements can be \code{"binary"} for \code{BinaryType},
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Reads a CSV stream as a Spark dataframe stream.
+Read files created by the stream
 }
 \examples{
 \dontrun{
@@ -70,23 +98,3 @@ stream_stop(stream)
 }
 
 }
-\seealso{
-Other Spark stream serialization: 
-\code{\link{stream_read_delta}()},
-\code{\link{stream_read_json}()},
-\code{\link{stream_read_kafka}()},
-\code{\link{stream_read_orc}()},
-\code{\link{stream_read_parquet}()},
-\code{\link{stream_read_socket}()},
-\code{\link{stream_read_text}()},
-\code{\link{stream_write_console}()},
-\code{\link{stream_write_csv}()},
-\code{\link{stream_write_delta}()},
-\code{\link{stream_write_json}()},
-\code{\link{stream_write_kafka}()},
-\code{\link{stream_write_memory}()},
-\code{\link{stream_write_orc}()},
-\code{\link{stream_write_parquet}()},
-\code{\link{stream_write_text}()}
-}
-\concept{Spark stream serialization}

@@ -43,20 +43,6 @@ partition. This implies that partitioning a DataFrame with, for example,
 is not guaranteed to produce \code{training} and \code{test} partitions
 of equal size.
 }
-\section{Transforming Spark DataFrames}{
-
-
-The family of functions prefixed with \code{sdf_} generally access the Scala
-Spark DataFrame API directly, as opposed to the \code{dplyr} interface which
-uses Spark SQL. These functions will 'force' any pending SQL in a
-\code{dplyr} pipeline, such that the resulting \code{tbl_spark} object
-returned will no longer have the attached 'lazy' SQL operations. Note that
-the underlying Spark DataFrame \emph{does} execute its operations lazily, so
-that even though the pending set of operations (currently) are not exposed at
-the \R level, these operations will only be executed when you explicitly
-\code{collect()} the table.
-}
-
 \examples{
 \dontrun{
 # randomly partition data into a 'training' and 'test'

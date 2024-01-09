@@ -38,7 +38,6 @@ is, should the table be cached?)}
 already exists?}
 }
 \description{
-Read Apache Avro data into a Spark DataFrame.
 Notice this functionality requires the Spark connection \code{sc} to be instantiated with either
 an explicitly specified Spark version (i.e.,
 \code{spark_connect(..., version = <version>, packages = c("avro", <other package(s)>), ...)})

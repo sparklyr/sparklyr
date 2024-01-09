@@ -42,20 +42,12 @@ element in this array can be used to map continuous features into buckets.}
 \item{...}{Optional arguments; currently unused.}
 }
 \value{
-The object returned depends on the class of \code{x}.
-
-\itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns a \code{ml_transformer},
-  a \code{ml_estimator}, or one of their subclasses. The object contains a pointer to
-  a Spark \code{Transformer} or \code{Estimator} object and can be used to compose
-  \code{Pipeline} objects.
-
-  \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
-  the transformer or estimator appended to the pipeline.
-
-  \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a transformer is constructed then
-  immediately applied to the input \code{tbl_spark}, returning a \code{tbl_spark}
-}
+The object returned depends on the class of \code{x}. If it is a
+\code{spark_connection}, the function returns a \code{ml_estimator} or a
+\code{ml_estimator} object. If it is a \code{ml_pipeline}, it will return
+a pipeline with the transformer or estimator appended to it. If a
+\code{tbl_spark}, it will return a \code{tbl_spark} with the transformation
+ applied to it.
 }
 \description{
 Similar to \R's \code{\link{cut}} function, this transforms a numeric column
@@ -80,10 +72,6 @@ iris_tbl \%>\%
 
 }
 \seealso{
-See \url{https://spark.apache.org/docs/latest/ml-features.html} for
-  more information on the set of transformations available for DataFrame
-  columns in Spark.
-
 Other feature transformers: 
 \code{\link{ft_binarizer}()},
 \code{\link{ft_chisq_selector}()},
