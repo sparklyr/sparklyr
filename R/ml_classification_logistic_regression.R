@@ -77,9 +77,12 @@ ml_logistic_regression_impl <- function(
     features_col = "features", label_col = "label", family = "auto",
     prediction_col = "prediction", probability_col = "probability",
     raw_prediction_col = "rawPrediction",
-    response = NULL, features = NULL,
-    predicted_label_col = "predicted_label",
     uid = random_string("logistic_regression_"), ...) {
+
+  args <- as.list(...)
+  response <- args$response
+  features <- args$features
+  predicted_label_col <- args$predicted_label_col %||% "predicted_label"
 
   if (!is.null(formula) && !inherits(x, "tbl_spark")) {
     stop("`formula` may only be specified when `x` is a `tbl_spark`.")
