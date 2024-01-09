@@ -79,7 +79,7 @@ ml_logistic_regression_impl <- function(
     raw_prediction_col = "rawPrediction",
     uid = random_string("logistic_regression_"), ...) {
 
-  args <- as.list(...)
+  args <- list(...)
   response <- args$response
   features <- args$features
   predicted_label_col <- args$predicted_label_col %||% "predicted_label"
