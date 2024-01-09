@@ -12,7 +12,6 @@
 #' is not guaranteed to produce \code{training} and \code{test} partitions
 #' of equal size.
 #'
-#' @template roxlate-sdf
 #'
 #' @param x An object coercable to a Spark DataFrame.
 #' @param ... Named parameters, mapping table names to weights. The weights
@@ -71,7 +70,6 @@ sdf_partition <- function(x,
 
 #' Project features onto principal components
 #'
-#' @template roxlate-sdf
 #' @param object A Spark PCA model object
 #' @param newdata An object coercible to a Spark DataFrame
 #' @param features A vector of names of columns to be projected

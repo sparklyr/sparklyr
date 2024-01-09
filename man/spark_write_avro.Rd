@@ -22,7 +22,8 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 
 \item{avro_schema}{Optional Avro schema in JSON format}
 
-\item{record_name}{Optional top level record name in write result (default: "topLevelRecord")}
+\item{record_name}{Optional top level record name in write result
+(default: "topLevelRecord")}
 
 \item{record_namespace}{Record namespace in write result (default: "")}
 
@@ -31,12 +32,13 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \item{partition_by}{A \code{character} vector. Partitions the output by the given columns on the file system.}
 }
 \description{
-Serialize a Spark DataFrame into Apache Avro format.
-Notice this functionality requires the Spark connection \code{sc} to be instantiated with either
+Notice this functionality requires the Spark connection \code{sc} to be
+instantiated with either
 an explicitly specified Spark version (i.e.,
 \code{spark_connect(..., version = <version>, packages = c("avro", <other package(s)>), ...)})
 or a specific version of Spark avro package to use (e.g.,
-\code{spark_connect(..., packages = c("org.apache.spark:spark-avro_2.12:3.0.0", <other package(s)>), ...)}).
+\code{spark_connect(..., packages =
+c("org.apache.spark:spark-avro_2.12:3.0.0", <other package(s)>), ...)}).
 }
 \seealso{
 Other Spark serialization routines: 

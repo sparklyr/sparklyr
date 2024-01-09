@@ -1,6 +1,5 @@
 #' Invoke distinct on a Spark DataFrame
 #'
-#' @template roxlate-sdf
 #'
 #' @param x A Spark DataFrame.
 #' @param ... Optional variables to use when determining uniqueness.

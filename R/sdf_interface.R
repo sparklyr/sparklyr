@@ -132,7 +132,7 @@ sdf_import.default <- function(x,
 #' Registers a Spark DataFrame (giving it a table name for the
 #' Spark SQL context), and returns a \code{tbl_spark}.
 #'
-#' @template roxlate-sdf
+
 #'
 #' @param x A Spark DataFrame.
 #' @param name A name to assign this table.
@@ -178,7 +178,6 @@ sdf_register.spark_jobj <- function(x, name = NULL) {
 #' Draw a random sample of rows (with or without replacement)
 #' from a Spark DataFrame.
 #'
-#' @template roxlate-sdf
 #'
 #' @param x An object coercable to a Spark DataFrame.
 #' @param fraction The fraction to sample.
@@ -211,7 +210,6 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL) {
 #' adding a row to the sample set is equal to its weight divided by summation of
 #' weights of all rows that are not in the sample set yet in that step.
 #'
-#' @template roxlate-sdf
 #'
 #' @param x An object coercable to a Spark DataFrame.
 #' @param weight_col Name of the weight column
@@ -247,7 +245,7 @@ sdf_weighted_sample <- function(x, weight_col, k, replacement = TRUE, seed = NUL
 #' Sort a Spark DataFrame by one or more columns, with each column
 #' sorted in ascending order.
 #'
-#' @template roxlate-sdf
+
 #'
 #' @param x An object coercable to a Spark DataFrame.
 #' @param columns The column(s) to sort by.
@@ -866,16 +864,6 @@ sdf_partition_sizes <- function(x) {
 #' @param i Expression specifying subset of column(s) to include or exclude
 #'   from the result (e.g., `["col1"]`, `[c("col1", "col2")]`, `[1:10]`, `[-1]`,
 #'   `[NULL]`, or `[]`)
-#'
-#' @examples
-#'
-#' \dontrun{
-#' library(sparklyr)
-#' sc <- spark_connect(master = "spark://HOST:PORT")
-#' example_sdf <- copy_to(sc, dplyr::tibble(a = 1, b = 2))
-#' example_sdf["a"] %>% print()
-#' }
-#'
 #' @export
 `[.tbl_spark` <- function(x, i) {
   if (missing(i)) {

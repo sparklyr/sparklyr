@@ -26,7 +26,8 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
   For more details see also \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#save-modes}
   for your version of Spark.}
 
-\item{options}{A list of strings with additional options. See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.}
+\item{options}{A list of strings with additional options.
+See \url{https://spark.apache.org/docs/latest/sql-programming-guide.html#configuration}.}
 
 \item{partition_by}{A \code{character} vector. Partitions the output by the given columns on the file system.}
 

@@ -32,7 +32,7 @@ spark_write_jdbc(
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Writes a Spark DataFrame into a JDBC table.
+Writes a Spark DataFrame into a JDBC table
 }
 \examples{
 \dontrun{

@@ -107,26 +107,6 @@ mixture distribution for each document (often called "theta" in the
 \item{dataset}{test corpus to use for calculating log likelihood or log perplexity}
 }
 \value{
-The object returned depends on the class of \code{x}.
-
-\itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
-  a Spark \code{Estimator} object and can be used to compose
-  \code{Pipeline} objects.
-
-  \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
-  the clustering estimator appended to the pipeline.
-
-  \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, an estimator is constructed then
-  immediately fit with the input \code{tbl_spark}, returning a clustering model.
-
-  \item \code{tbl_spark}, with \code{formula} or \code{features} specified: When \code{formula}
-    is specified, the input \code{tbl_spark} is first transformed using a
-    \code{RFormula} transformer before being fit by
-    the estimator. The object returned in this case is a \code{ml_model} which is a
-    wrapper of a \code{ml_pipeline_model}. This signature does not apply to \code{ml_lda()}.
-}
-
 \code{ml_describe_topics} returns a DataFrame with topics and their top-weighted terms.
 
 \code{ml_log_likelihood} calculates a lower bound on the log likelihood of
@@ -266,12 +246,19 @@ tidy(lda_model)
 
 }
 \seealso{
-See \url{https://spark.apache.org/docs/latest/ml-clustering.html} for
-  more information on the set of clustering algorithms.
-
-Other ml clustering algorithms: 
+Other ml clustering algorithms
+#' @return The object returned depends on the class of \code{x}. If it is a
+\code{spark_connection}, the function returns a \code{ml_estimator} object. If
+it is a \code{ml_pipeline}, it will return a pipeline with the predictor
+appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
+the predictions added to it.: 
 \code{\link{ml_bisecting_kmeans}()},
 \code{\link{ml_gaussian_mixture}()},
 \code{\link{ml_kmeans}()}
 }
-\concept{ml clustering algorithms}
+\concept{ml clustering algorithms
+#' @return The object returned depends on the class of \code{x}. If it is a
+\code{spark_connection}, the function returns a \code{ml_estimator} object. If
+it is a \code{ml_pipeline}, it will return a pipeline with the predictor
+appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
+the predictions added to it.}
