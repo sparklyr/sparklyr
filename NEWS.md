@@ -13,6 +13,9 @@ no longer considered maintained as of September 2019
   - Deprecating backwards compatability with `sparklyr` 0.5 is no longer needed
   - Replicates selection of cache directory 
 
+- Updates Delta-to-Spark version matching when using `delta` as one of the
+`packages` when connecting
+
 # Sparklyr 1.8.4
 
 ### Compatability with new `dbplyr` version
