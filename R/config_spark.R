@@ -178,6 +178,7 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
       list(spark = "3.0", delta = "0.8.0"),
       list(spark = "3.1", delta = "1.0.1"),
       list(spark = "3.2", delta = "2.0.2"),
+      list(spark = "3.3", delta = "2.3.0"),
       list(spark = "3.4", delta = "2.4.0"),
       list(spark = "3.5", delta = "3.0.0")
     ) %>%
