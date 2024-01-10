@@ -173,10 +173,18 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
 
     if (version < "2.4.2") stop("Delta Lake requires Spark 2.4.2 or newer")
 
-    delta_version <- "0.6.1"
-    if(version >= "3.0") delta_version <- "0.8.0"
-    if(version >= "3.1") delta_version <- "1.0.0"
-    if(version >= "3.2") delta_version <- "1.2.1"
+    delta_version <- list(
+      list(spark = "2.4", delta = "0.7.0"),
+      list(spark = "3.0", delta = "0.8.0"),
+      list(spark = "3.1", delta = "1.0.1"),
+      list(spark = "3.2", delta = "2.0.2"),
+      list(spark = "3.4", delta = "2.4.0"),
+      list(spark = "3.5", delta = "3.0.0")
+    ) %>%
+      purrr::keep(~ .x$spark >= substr(version, 1, 3)) %>%
+      head(1) %>%
+      unlist() %>%
+      .[2]
 
     config$sparklyr.shell.packages <- c(
       config$sparklyr.shell.packages,
