@@ -135,22 +135,16 @@ spark_version_from_home <- function(spark_home, default = NULL) {
 }
 
 spark_version_latest <- function(version = NULL) {
-  versions <- spark_available_versions(show_minor = TRUE, show_future = TRUE)$spark
-
-  if (is.null(version)) {
-    versions[length(versions)]
-  } else {
-    # suppress 'no non-missing arguments, returning NA' warnings (handled below)
-    version <- suppressWarnings(
-      max(versions[grepl(version, versions, fixed = TRUE)])
+  versions_full <- spark_available_versions(
+    show_minor = TRUE, show_future = TRUE
     )
-
-    if (is.na(version)) {
-      # If the user-supplied version does not match any of the known version numbers,
-      # then return the highest Spark version we know so far.
-      versions[length(versions)]
-    } else {
-      version
+  versions <- sort(versions_full$spark, decreasing = TRUE)
+  ret <- head(versions, 1)
+  if(!is.null(version)) {
+    match_versions <- versions[substr(versions, 1, nchar(version)) == version]
+    if(length(match_versions) > 0) {
+      ret <- head(match_versions, 1)
     }
   }
+  ret
 }
