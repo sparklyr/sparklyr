@@ -195,6 +195,10 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
         delta_version
       )
     )
+    if(version >= 3.3) {
+      config$`spark.sql.extensions` <- "io.delta.sql.DeltaSparkSessionExtension"
+      config$`spark.sql.catalog.spark_catalog` <- "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+    }
   }
 
   if ("avro" %in% packages) {
