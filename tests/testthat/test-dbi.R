@@ -9,7 +9,8 @@ persisted_table_name <- random_table_name("persisted_")
 temp_table_name <- random_table_name("temporary_")
 
 test_that("dbWriteTable can write a table", {
-  if (spark_version(sc) < "2.2.0") skip("tables not supported before 2.0.0")
+  if (spark_version(sc) < "2.2.0") skip("Tables not supported before 2.0.0")
+  if (spark_version(sc) >= "3.3.0") skip("Show Tables with Delta does not works")
 
   test_requires("DBI")
 
@@ -80,6 +81,7 @@ test_that("dbColumnInfo list the columns with its type and sql type", {
 })
 
 test_that("dbListTables list all the existing tables", {
+  if (spark_version(sc) >= "3.3.0") skip("Show Tables with Delta does not works")
   expect_true(persisted_table_name %in% dbListTables(sc))
 })
 

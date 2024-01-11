@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.8.4.9002
+Version: 1.8.4.9003
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",

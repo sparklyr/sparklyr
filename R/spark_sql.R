@@ -10,6 +10,15 @@ spark_db_analyze <- function(con, table, ...) {
     return(NULL)
   }
 
+  # Disabling table analysis if the connection is using Delta catalog
+  # It does this because SHOW TABLES does not correctly return isTemporary
+  # TODO: Find a better way to determine if the table is Temporary when using
+  # Delta on Spark 3.3 and above
+  if("org.apache.spark.sql.delta.catalog.DeltaCatalog" %in%
+     con$config$spark.sql.catalog.spark_catalog) {
+    return(NULL)
+  }
+
   table_q <- as.character(escape(table, con = con))
   table_name <- substr(table_q, 2, nchar(table_q) - 1)
   info <- dbGetQuery(con, build_sql("SHOW TABLES LIKE ", table_name, con = con))
