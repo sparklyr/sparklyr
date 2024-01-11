@@ -96,3 +96,5 @@ test_that("sdf_weighted_sample returns repeatable results from a fixed PRNG seed
     )
   }
 })
+
+test_clear_cache()

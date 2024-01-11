@@ -116,3 +116,5 @@ test_that("sdf_copy_to preserves NA_real_ correctly", {
     c(TRUE, FALSE, FALSE)
   )
 })
+
+test_clear_cache()

@@ -53,3 +53,5 @@ test_that("regex relational operators work", {
       ))
   )
 })
+
+test_clear_cache()

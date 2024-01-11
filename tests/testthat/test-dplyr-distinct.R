@@ -171,3 +171,5 @@ test_that("distinct followed by another lazy op works as expected", {
     )
   )
 })
+
+test_clear_cache()

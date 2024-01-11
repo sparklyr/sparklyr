@@ -39,3 +39,5 @@ test_that("ml_multilayer_perceptron returns correct number of weights", {
   )
   expect_equal(length(mlp$model$weights), 4 * 10 + 10 + 10 * 3 + 3)
 })
+
+test_clear_cache()

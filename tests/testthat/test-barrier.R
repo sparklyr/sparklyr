@@ -18,3 +18,5 @@ test_that("barrier-spark_apply works", {
     perl = TRUE
   ))
 })
+
+test_clear_cache()

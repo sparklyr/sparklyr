@@ -349,7 +349,4 @@ test_that("Simple cases work", {
 
 })
 
-
-
-
-
+test_clear_cache()

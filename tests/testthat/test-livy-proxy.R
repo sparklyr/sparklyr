@@ -43,3 +43,5 @@ test_that("Livy connection works with HTTP proxy", {
 
 
 })
+
+test_clear_cache()

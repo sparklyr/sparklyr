@@ -79,3 +79,5 @@ test_that("count() works in grouped mutate", {
 
   expect_equal(c1, c2)
 })
+
+test_clear_cache()

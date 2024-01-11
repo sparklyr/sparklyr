@@ -2143,3 +2143,5 @@ test_that("accessing struct field inside formula", {
     )
   )
 })
+
+test_clear_cache()

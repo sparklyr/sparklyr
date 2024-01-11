@@ -30,3 +30,5 @@ test_that("cumprod works as expected", {
     expect_equal(actual, expected)
   }
 })
+
+test_clear_cache()

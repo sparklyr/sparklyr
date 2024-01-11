@@ -588,3 +588,4 @@ test_that("pmin and pmax work", {
   }, regexp = "na.rm = TRUE")
 })
 
+test_clear_cache()

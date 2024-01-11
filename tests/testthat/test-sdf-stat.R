@@ -164,3 +164,5 @@ test_that("Can generate i.i.d samples from distributions correctly", {
     )
   }
 })
+
+test_clear_cache()

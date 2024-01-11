@@ -109,3 +109,5 @@ test_that("train validation split print methods", {
     print = TRUE
   )
 })
+
+test_clear_cache()
