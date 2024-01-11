@@ -20,4 +20,4 @@ spark_config_packages(config, packages, version, scala_version = NULL, ...)
 \description{
 Creates Spark Configuration
 }
-\keyword{interenal}
+\keyword{internal}
