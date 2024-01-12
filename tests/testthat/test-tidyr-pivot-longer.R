@@ -266,3 +266,6 @@ test_that("Error if the `col` can't be selected.", {
     "select at least one"
   )
 })
+
+test_clear_cache()
+

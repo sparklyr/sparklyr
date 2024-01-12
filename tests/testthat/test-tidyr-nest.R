@@ -190,3 +190,6 @@ test_that("nesting no columns nests all inputs", {
     )
   )
 })
+
+test_clear_cache()
+

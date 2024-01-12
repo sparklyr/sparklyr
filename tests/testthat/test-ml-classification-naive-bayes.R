@@ -96,3 +96,6 @@ test_that("ml_naive_bayes() print outputs are correct", {
     update = FALSE
   )
 })
+
+test_clear_cache()
+

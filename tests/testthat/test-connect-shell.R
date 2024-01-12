@@ -155,3 +155,6 @@ test_that("Misc tests", {
     spark_log_file(testthat_spark_connection())
     )
 })
+
+test_clear_cache()
+

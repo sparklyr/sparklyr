@@ -10,3 +10,6 @@ test_that("input_cols print correctly", {
     output_file("print/vector-assembler.txt")
   )
 })
+
+test_clear_cache()
+

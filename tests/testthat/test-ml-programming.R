@@ -56,3 +56,6 @@ test_that("one can program with ft_ function (.spark_connection)", {
     )
   }
 })
+
+test_clear_cache()
+

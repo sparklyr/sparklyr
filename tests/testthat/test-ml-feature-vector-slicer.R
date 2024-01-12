@@ -31,3 +31,6 @@ test_that("ft_vector_slicer works", {
 
   expect_identical(sliced, list(c(1, 2)))
 })
+
+test_clear_cache()
+

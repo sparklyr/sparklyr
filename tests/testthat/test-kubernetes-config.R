@@ -32,3 +32,6 @@ test_that("spark_kubernetes_config can generate correct config", {
     )
   )
 })
+
+test_clear_cache()
+

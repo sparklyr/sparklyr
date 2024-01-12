@@ -186,3 +186,6 @@ test_that("pcre_to_java converts [:xdigits:] correctly", {
     expect_split(sprintf("G%sH|I", delim), "[|[:xdigit:]]", list("G", "H", "I"))
   }
 })
+
+test_clear_cache()
+

@@ -63,3 +63,6 @@ test_that("ml evaluator print methods work", {
     print = TRUE
   )
 })
+
+test_clear_cache()
+

@@ -69,3 +69,6 @@ test_that("ft_normalizer errors for bad p", {
     "`p` must be at least 1\\."
   )
 })
+
+test_clear_cache()
+

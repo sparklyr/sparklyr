@@ -144,3 +144,6 @@ test_that("unnest() supports ptype", {
     dplyr::tibble(g = c(1L, 4L, 9L), x = as.character(seq(3)))
   )
 })
+
+test_clear_cache()
+

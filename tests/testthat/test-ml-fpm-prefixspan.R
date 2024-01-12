@@ -40,3 +40,6 @@ test_that("ml_prefixspan() works as expected", {
     )
   )
 })
+
+test_clear_cache()
+

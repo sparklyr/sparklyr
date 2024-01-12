@@ -39,3 +39,6 @@ test_that("ft_feature_hasher() works", {
 
   expect_identical(f_h, 32L)
 })
+
+test_clear_cache()
+

@@ -85,3 +85,6 @@ test_that("ml_lda/ft_count_vectorizer helper functions (#1353)", {
     unlist(count_vectorizer_model$vocabulary)
   )
 })
+
+test_clear_cache()
+

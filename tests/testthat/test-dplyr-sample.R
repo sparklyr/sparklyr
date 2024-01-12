@@ -62,3 +62,6 @@ test_that("dplyr query is executed before sampling (frac)", {
     c(3, 2)
   )
 })
+
+test_clear_cache()
+

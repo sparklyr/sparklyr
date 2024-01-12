@@ -115,3 +115,6 @@ test_that("spark_config warns() if non-existent file is passed", {
     "Error reading config file:"
   )
 })
+
+test_clear_cache()
+

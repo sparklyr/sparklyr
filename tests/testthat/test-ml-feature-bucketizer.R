@@ -58,3 +58,6 @@ test_that("ft_bucketizer() can mutate multiple columns", {
     c("drat", "hp", "drat_out", "hp_out")
   )
 })
+
+test_clear_cache()
+

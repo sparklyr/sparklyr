@@ -50,3 +50,6 @@ test_that("ml_fpgrowth() works properly", {
     list(list(), list(), list("5"))
   )
 })
+
+test_clear_cache()
+

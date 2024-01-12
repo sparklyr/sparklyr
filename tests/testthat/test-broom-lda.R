@@ -68,3 +68,6 @@ test_that("lda.tidy() works", {
     )
   )
 })
+
+test_clear_cache()
+

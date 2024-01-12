@@ -249,3 +249,6 @@ test_that("cross validator print methods", {
     print = TRUE
   )
 })
+
+test_clear_cache()
+

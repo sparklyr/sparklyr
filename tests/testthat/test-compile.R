@@ -37,3 +37,6 @@ test_that("'spark_default_compilation_spec' can create default specification", {
   dp <- list.files(scalac_download_path)
   expect_gte(length(dp), 3)
 })
+
+test_clear_cache()
+

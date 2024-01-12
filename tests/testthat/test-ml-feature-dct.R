@@ -64,3 +64,6 @@ test_that("ft_discrete_cosine_transform() backwards compat", {
 
   expect_equal(out2, expected_out)
 })
+
+test_clear_cache()
+

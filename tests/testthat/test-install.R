@@ -61,3 +61,6 @@ test_that("spark_versions downloads use https", {
       )
   }
 })
+
+test_clear_cache()
+

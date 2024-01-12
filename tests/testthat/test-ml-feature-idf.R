@@ -56,3 +56,6 @@ test_that("ft_idf() works properly", {
   expect_equal(which(idf_1 != 0), expected_non_zero_idxes[[1]])
   expect_equal(idf_1[which(idf_1 != 0)], expected_res[[1]], tol = 1e-4)
 })
+
+test_clear_cache()
+

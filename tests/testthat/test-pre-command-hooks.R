@@ -12,3 +12,6 @@ test_that("pre-command hooks are successfully executed", {
   lines <- readLines(path)
   expect_equal(lines[1], "Running pre-command hooks")
 })
+
+test_clear_cache()
+

@@ -12,3 +12,6 @@ test_that("ft_vector_assembler() param setting", {
   )
   test_param_setting(sc, ft_vector_assembler, test_args)
 })
+
+test_clear_cache()
+

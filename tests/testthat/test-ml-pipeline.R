@@ -102,3 +102,6 @@ test_that("Error when specifying formula without tbl_spark for ml_ routines", {
     "`formula` may only be specified when `x` is a `tbl_spark`\\."
   )
 })
+
+test_clear_cache()
+

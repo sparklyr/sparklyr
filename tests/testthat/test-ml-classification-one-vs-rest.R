@@ -55,3 +55,6 @@ test_that("ml_one_vs_rest() errors when not given classifier", {
     "`classifier` must be an `ml_classifier`\\."
   )
 })
+
+test_clear_cache()
+

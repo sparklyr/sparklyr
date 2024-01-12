@@ -164,3 +164,6 @@ test_that("Tuning works with Linear Regression", {
 })
 
 
+
+test_clear_cache()
+

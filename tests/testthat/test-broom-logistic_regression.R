@@ -74,3 +74,6 @@ test_that("logistic_regression tidiers work", {
 
   expect_true(all(glance(lr_parsnip) == gu1))
 })
+
+test_clear_cache()
+

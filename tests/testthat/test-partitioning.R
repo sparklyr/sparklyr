@@ -68,3 +68,6 @@ test_that("'sdf_coalesce' works as expected", {
     1
   )
 })
+
+test_clear_cache()
+

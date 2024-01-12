@@ -88,3 +88,6 @@ test_that("ml_gaussian_mixture() works properly", {
     )
   )
 })
+
+test_clear_cache()
+

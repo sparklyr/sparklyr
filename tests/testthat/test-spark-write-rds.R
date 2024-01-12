@@ -278,3 +278,6 @@ test_that("spark_write_rds() works as expected with multiple Spark dataframe par
   attributes(flights_df$time_hour) <- attributes(actual_df$time_hour)
   expect_equivalent(actual_df, flights_df)
 })
+
+test_clear_cache()
+

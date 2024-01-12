@@ -56,3 +56,6 @@ test_that("ft_vector_indexer() works properly", {
     )
   )
 })
+
+test_clear_cache()
+

@@ -117,3 +117,6 @@ test_that("ml_transform take list of transformers (#1444)", {
     dplyr::pull(prediction)
   expect_equal(transformed1, transformed2)
 })
+
+test_clear_cache()
+

@@ -405,3 +405,6 @@ test_that("array of temporal values are preserved with Spark 3.0+", {
 
   expect_equivalent(sdf %>% collect(), df)
 })
+
+test_clear_cache()
+

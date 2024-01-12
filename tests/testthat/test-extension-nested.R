@@ -16,3 +16,6 @@ test_that("sparklyr.nested can query nested columns", {
     50
   )
 })
+
+test_clear_cache()
+

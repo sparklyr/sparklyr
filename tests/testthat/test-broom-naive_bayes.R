@@ -53,3 +53,6 @@ test_that("naive_bayes.tidy() works", {
     exp.names = c("model_type", "smoothing")
   )
 })
+
+test_clear_cache()
+

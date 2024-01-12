@@ -36,3 +36,6 @@ test_that("ml_corr() errors on bad column specification", {
     "All columns specified must be in x\\. Failed to find foo, bar."
   )
 })
+
+test_clear_cache()
+

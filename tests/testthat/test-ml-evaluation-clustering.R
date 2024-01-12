@@ -55,3 +55,6 @@ test_that("ml_clustering_evalator() can be used in a CV pipeline", {
     NA
   )
 })
+
+test_clear_cache()
+

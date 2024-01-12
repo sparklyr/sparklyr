@@ -39,3 +39,6 @@ test_that("spark_submit() can submit batch jobs", {
 
   expect_gt(retries, 0)
 })
+
+test_clear_cache()
+

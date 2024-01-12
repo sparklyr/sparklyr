@@ -78,3 +78,6 @@ test_that("Finding invalid Spark version fails", {
 })
 
 
+
+test_clear_cache()
+

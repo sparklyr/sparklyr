@@ -56,3 +56,6 @@ test_that("aft_survival_regression.tidy() works", {
     exp.names = c("scale", "aggregation_depth")
   )
 })
+
+test_clear_cache()
+

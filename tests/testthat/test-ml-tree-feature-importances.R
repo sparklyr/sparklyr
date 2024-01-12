@@ -81,3 +81,6 @@ test_that("ml_feature_importances work properly (#1436)", {
 
   expect_equal(importances1, importances2)
 })
+
+test_clear_cache()
+

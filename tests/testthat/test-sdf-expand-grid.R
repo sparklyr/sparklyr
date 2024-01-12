@@ -99,3 +99,6 @@ test_that("sdf_expand_grid works with broadcast joins", {
       dplyr::arrange(dplyr::pick(dplyr::everything()))
   )
 })
+
+test_clear_cache()
+

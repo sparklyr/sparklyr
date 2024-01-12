@@ -16,3 +16,6 @@ test_that("jarray() works as expected", {
     num_elems
   )
 })
+
+test_clear_cache()
+

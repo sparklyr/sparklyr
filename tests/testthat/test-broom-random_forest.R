@@ -118,3 +118,6 @@ test_that("random_forest.tidy() works", {
     names(gl2)
   )
 })
+
+test_clear_cache()
+

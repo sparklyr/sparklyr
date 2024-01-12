@@ -35,3 +35,6 @@ test_that("ft_binarizer() input checking", {
   sc <- testthat_spark_connection()
   expect_error(ft_binarizer(sc, threshold = "foo"), "")
 })
+
+test_clear_cache()
+

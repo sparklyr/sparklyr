@@ -10,3 +10,6 @@ test_that("'spark_connection_yarn_ui()' can build a default URL", {
     nchar(spark_connection_yarn_ui(sc)) > 0
   )
 })
+
+test_clear_cache()
+

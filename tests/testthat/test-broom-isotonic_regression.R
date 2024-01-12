@@ -43,3 +43,6 @@ test_that("isotonic_regression.tidy() works", {
     exp.names = c("isotonic", "num_boundaries")
   )
 })
+
+test_clear_cache()
+

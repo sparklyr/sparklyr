@@ -20,3 +20,6 @@ test_that("ft_hashing_tf() param setting", {
   )
   test_param_setting(sc, ft_hashing_tf, test_args)
 })
+
+test_clear_cache()
+

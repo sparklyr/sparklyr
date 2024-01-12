@@ -75,3 +75,6 @@ test_that("to_avro and from_avro work properly", {
     }
   }
 })
+
+test_clear_cache()
+

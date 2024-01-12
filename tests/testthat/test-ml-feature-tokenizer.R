@@ -36,3 +36,6 @@ test_that("ft_tokenizer.tbl_spark() works as expected", {
 
   expect_identical(spark_tokens, r_tokens)
 })
+
+test_clear_cache()
+

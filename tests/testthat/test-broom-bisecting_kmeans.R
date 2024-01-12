@@ -61,3 +61,6 @@ test_that("bisecting_kmeans.tidy() works", {
     )
   }
 })
+
+test_clear_cache()
+

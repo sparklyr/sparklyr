@@ -30,3 +30,6 @@ test_that("spark_config_packages() defaults to latest veresion", {
       strsplit("\\.") %>% `[[`(1) %>% length()
   )
 })
+
+test_clear_cache()
+

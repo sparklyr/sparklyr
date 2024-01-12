@@ -778,3 +778,6 @@ test_that("spark_read_image works as expected", {
   )
 })
 
+
+test_clear_cache()
+

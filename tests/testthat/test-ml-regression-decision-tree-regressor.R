@@ -73,3 +73,6 @@ test_that("Tuning works with Decision Tree Reg", {
   expect_equal(dim(cv_metrics), c(4, 3))
 })
 
+
+test_clear_cache()
+

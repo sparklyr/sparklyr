@@ -157,3 +157,6 @@ test_that("doSpark works with 'qs' serializer", {
     foreach(x = .test_objs) %test% quote(x)
   )
 })
+
+test_clear_cache()
+

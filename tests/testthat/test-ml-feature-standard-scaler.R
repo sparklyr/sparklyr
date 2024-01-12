@@ -55,3 +55,6 @@ test_that("ft_standard_scaler() works properly", {
     output_file("print/standard-scaler-model.txt")
   )
 })
+
+test_clear_cache()
+
