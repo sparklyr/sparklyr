@@ -1,36 +1,33 @@
 # Submission
 
-- Addresses issues found by CRAN checks. Fixes `db_connection_describe()` 
-S3 consistency error 
+- Removes Scala code, and JARs for Spark versions 2.3 and below. Spark 2.3 is 
+no longer considered maintained as of September 2019
+  - Removes Java folder for versions 2.3 and below
+  - Merges Scala file sets into Spark version 2.4
+  - Re-compiles JARs for version 2.4 and above
 
-- Addresses new error from `dbplyr` that fails when you try to access 
-components from a remote `tbl` using `$`
+- Removes dependency on `tibble` 
+  - All calls to `tibble()` are now redirected to `dplyr`
 
-- Bumps the version of `dbplyr` to switch between the two methods to create
-temporary tables 
+- Removes dependency on `rapddirs`: 
+  - Deprecating backwards compatibility with `sparklyr` 0.5 is no longer needed
+  - Replicates selection of cache directory 
 
-- Addresses new `translate_sql()` hard requirement to pass a `con` object. Done
-by passing the current connection or `simulate_hive()` 
-
-- Removes dependency on the following packages:
-  - `digest`
-  - `base64enc`
-  - `ellipsis`
-  
-- Converts `ml_fit()` into a S3 method for `pysparklyr` compatibility
+- Updates Delta-to-Spark version matching when using `delta` as one of the
+`packages` when connecting
 
 ## Test environments
 
-- Ubuntu 22.04, R 4.3.1, Spark 3.3 (GH Actions)
-- Ubuntu 22.04, R 4.3.1, Spark 3.2 (GH Actions)
-- Ubuntu 22.04, R 4.3.1, Spark 2.4 (GH Actions)
+- Ubuntu 22.04, R 4.3.2, Spark 3.3 (GH Actions)
+- Ubuntu 22.04, R 4.3.2, Spark 3.2 (GH Actions)
+- Ubuntu 22.04, R 4.3.2, Spark 2.4 (GH Actions)
 
 ## R CMD check environments
 
-- Local Mac OS M1 (aarch64-apple-darwin20), R 4.3.1
-- Mac OS x86_64-apple-darwin17.0 (64-bit), R 4.3.1
-- Windows  x86_64-w64-mingw32 (64-bit), R 4.3.1
-- Linux x86_64-pc-linux-gnu (64-bit), R 4.3.1
+- Local Mac OS M1 (aarch64-apple-darwin20), R 4.3.2
+- Mac OS x86_64-apple-darwin17.0 (64-bit), R 4.3.2
+- Windows  x86_64-w64-mingw32 (64-bit), R 4.3.2
+- Linux x86_64-pc-linux-gnu (64-bit), R 4.3.2
 
 
 ## R CMD check results
