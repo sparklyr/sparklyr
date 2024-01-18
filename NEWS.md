@@ -1,4 +1,4 @@
-# Sparklyr (dev)
+# Sparklyr 1.8.5
 
 - Removes Scala code, and JARs for Spark versions 2.3 and below. Spark 2.3 is 
 no longer considered maintained as of September 2019
@@ -10,7 +10,7 @@ no longer considered maintained as of September 2019
   - All calls to `tibble()` are now redirected to `dplyr`
 
 - Removes dependency on `rapddirs`: 
-  - Deprecating backwards compatability with `sparklyr` 0.5 is no longer needed
+  - Deprecating backwards compatibility with `sparklyr` 0.5 is no longer needed
   - Replicates selection of cache directory 
 
 - Updates Delta-to-Spark version matching when using `delta` as one of the
@@ -24,7 +24,7 @@ no longer considered maintained as of September 2019
 
 - Addresses new error from `dbplyr` that fails when you try to access 
 components from a remote `tbl` using `$`
-
+ 
 - Bumps the version of `dbplyr` to switch between the two methods to create
 temporary tables 
 

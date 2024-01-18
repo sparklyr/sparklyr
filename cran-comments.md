@@ -37,19 +37,13 @@ no longer considered maintained as of September 2019
 Notes:
 
 ```
-❯ checking package dependencies ... NOTE
-  Imports includes 21 non-default packages.
-  Importing from so many packages makes the package vulnerable to any of
-  them becoming unavailable.  Move as many as possible to Suggests and
-  use conditionally.
-
 ❯ checking installed package size ... NOTE
-    installed size is  7.1Mb
+    installed size is  5.1Mb
     sub-directories of 1Mb or more:
-      R      2.0Mb
-      java   3.8Mb
+      R      2.1Mb
+      java   1.8Mb
 
-0 errors ✔ | 0 warnings ✔ | 2 notes ✖
+0 errors ✔ | 0 warnings ✔ | 1 note ✖
 ```
 
 ## revdepcheck results

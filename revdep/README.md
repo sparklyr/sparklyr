@@ -1,30 +1,32 @@
 ## Reverse dependencies
 
-|Package|Version|Error|Warning|Note|OK|
-|:---|:---|:---|:---|:---|:---|
-|[apache.sedona](#apache.sedona)|1.5.0|0|0|0|41|
-|[catalog](#catalog)|0.1.1|0|0|0|42|
-|[geospark](#geospark)|0.3.1|0|0|2|42|
-|[graphframes](#graphframes)|0.1.2|0|0|1|43|
-|[pathling](#pathling)|6.4.2|0|0|0|45|
-|[pysparklyr](#pysparklyr)|0.1.2|0|0|0|41|
-|[rsparkling](#rsparkling)|0.2.19|0|0|2|34|
-|[s3.resourcer](#s3.resourcer)|1.1.1|0|0|0|42|
-|[shinyML](#shinyML)|1.0.1|0|0|1|40|
-|[spark.sas7bdat](#spark.sas7bdat)|1.4|0|0|0|47|
-|[sparkavro](#sparkavro)|0.3.0|0|0|1|43|
-|[sparkbq](#sparkbq)|0.1.1|0|0|1|41|
-|[sparkhail](#sparkhail)|0.1.1|0|0|1|43|
-|[sparklyr.flint](#sparklyr.flint)|0.2.2|1|0|0|46|
-|[sparklyr.nested](#sparklyr.nested)|0.0.4|0|0|0|43|
-|[sparktf](#sparktf)|0.1.0|0|0|1|43|
-|[sparkwarc](#sparkwarc)|0.1.6|0|0|1|48|
-|[sparkxgb](#sparkxgb)|0.1.1|0|0|1|42|
-|[variantspark](#variantspark)|0.1.1|0|0|1|43|
+| Package                             | Version | Error | Warning | Note | OK  |
+|:------------------------------------|:--------|:------|:--------|:-----|:----|
+| [apache.sedona](#apache.sedona)     | 1.5.1   | 0     | 0       | 0    | 41  |
+| [catalog](#catalog)                 | 0.1.1   | 0     | 0       | 0    | 42  |
+| [geospark](#geospark)               | 0.3.1   | 0     | 0       | 2    | 42  |
+| [graphframes](#graphframes)         | 0.1.2   | 0     | 0       | 1    | 43  |
+| [pathling](#pathling)               | 6.4.2   | 0     | 0       | 0    | 45  |
+| [pysparklyr](#pysparklyr)           | 0.1.3   | 0     | 0       | 0    | 41  |
+| [rsparkling](#rsparkling)           | 0.2.19  | 0     | 0       | 2    | 34  |
+| [s3.resourcer](#s3.resourcer)       | 1.1.1   | 0     | 0       | 0    | 42  |
+| [shinyML](#shinyML)                 | 1.0.1   | 0     | 0       | 1    | 40  |
+| [spark.sas7bdat](#spark.sas7bdat)   | 1.4     | 0     | 0       | 0    | 47  |
+| [sparkavro](#sparkavro)             | 0.3.0   | 0     | 0       | 1    | 43  |
+| [sparkbq](#sparkbq)                 | 0.1.1   | 0     | 0       | 1    | 41  |
+| [sparkhail](#sparkhail)             | 0.1.1   | 0     | 0       | 1    | 43  |
+| [sparklyr.flint](#sparklyr.flint)   | 0.2.2   | 1     | 0       | 0    | 46  |
+| [sparklyr.nested](#sparklyr.nested) | 0.0.4   | 0     | 0       | 0    | 43  |
+| [sparktf](#sparktf)                 | 0.1.0   | 0     | 0       | 1    | 43  |
+| [sparkwarc](#sparkwarc)             | 0.1.6   | 0     | 0       | 1    | 48  |
+| [sparkxgb](#sparkxgb)               | 0.1.1   | 0     | 0       | 1    | 42  |
+| [variantspark](#variantspark)       | 0.1.1   | 0     | 0       | 1    | 43  |
 
 ## Details
-###  apache.sedona
-```
+
+### apache.sedona {#apache.sedona}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/apache.sedona.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -34,14 +36,15 @@
 * running under: macOS Sonoma 14.2.1
 * using session charset: UTF-8
 * checking extension type ... Package
-* this is package ‘apache.sedona’ version ‘1.5.0’
+* this is package ‘apache.sedona’ version ‘1.5.1’
 * package encoding: UTF-8
 * DONE
 Status: OK
 ```
 
-###  catalog
-```
+### catalog {#catalog}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/catalog.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -58,8 +61,9 @@ Status: OK
 Status: OK
 ```
 
-###  geospark
-```
+### geospark {#geospark}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/geospark.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -81,8 +85,9 @@ Namespace in Imports field not imported from: ‘dbplyr’
 Status: 2 NOTEs
 ```
 
-###  graphframes
-```
+### graphframes {#graphframes}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/graphframes.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -101,8 +106,9 @@ Status: 2 NOTEs
 Status: 1 NOTE
 ```
 
-###  pathling
-```
+### pathling {#pathling}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/pathling.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -116,38 +122,39 @@ Status: 1 NOTE
 * package encoding: UTF-8
 Examples with CPU (user + system) or elapsed time > 5s
                            user system elapsed
-ds_aggregate              0.389  0.126  23.833
-pathling_connect          0.293  0.089   9.112
-pathling_encode           0.318  0.043   8.839
-pathling_encode_bundle    0.317  0.043   8.765
-pathling_read_datasets    0.318  0.041   8.629
-pathling_example_resource 0.306  0.043   8.336
-tx_translate              0.290  0.050  16.989
-tx_designation            0.295  0.044  16.292
-tx_property_of            0.278  0.045  15.729
-tx_subsumed_by            0.277  0.043  14.811
-tx_subsumes               0.270  0.043  14.941
-tx_display                0.253  0.044  15.965
-tx_to_coding              0.239  0.042   7.018
-tx_to_snomed_coding       0.231  0.042   7.045
-tx_to_loinc_coding        0.230  0.041   7.109
-pathling_read_ndjson      0.226  0.043   6.741
-ds_read                   0.209  0.038   6.800
-pathling_read_bundles     0.205  0.041   6.939
-ds_extract                0.201  0.037   8.128
-pathling_read_delta       0.184  0.041   8.613
-pathling_read_parquet     0.168  0.043   6.104
-pathling_read_tables      0.167  0.040   7.303
-ds_write_tables           0.148  0.043  18.620
-ds_write_ndjson           0.147  0.043   7.970
-ds_write_parquet          0.146  0.040   7.736
-ds_write_delta            0.137  0.039  11.207
+pathling_encode_bundle    0.386  0.064  11.793
+pathling_connect          0.325  0.116  11.185
+pathling_read_datasets    0.365  0.065  11.348
+pathling_encode           0.361  0.064  11.684
+pathling_example_resource 0.345  0.060  10.843
+tx_subsumes               0.322  0.068  17.587
+tx_designation            0.321  0.064  19.180
+tx_subsumed_by            0.303  0.063  17.825
+tx_translate              0.301  0.063  18.645
+tx_display                0.297  0.066  18.386
+tx_property_of            0.298  0.063  18.193
+ds_aggregate              0.260  0.085  12.618
+tx_to_loinc_coding        0.283  0.062   9.318
+tx_to_coding              0.281  0.063   9.319
+tx_to_snomed_coding       0.266  0.053   9.388
+ds_read                   0.257  0.061   8.991
+pathling_read_ndjson      0.258  0.060   8.575
+ds_extract                0.243  0.063  11.043
+pathling_read_delta       0.225  0.052  11.494
+pathling_read_bundles     0.220  0.050   9.147
+pathling_read_parquet     0.192  0.054   7.952
+pathling_read_tables      0.186  0.051   9.459
+ds_write_delta            0.169  0.058  16.319
+ds_write_tables           0.174  0.049  25.997
+ds_write_ndjson           0.157  0.056  10.733
+ds_write_parquet          0.158  0.049  10.118
 * DONE
 Status: OK
 ```
 
-###  pysparklyr
-```
+### pysparklyr {#pysparklyr}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/pysparklyr.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -156,7 +163,7 @@ Status: OK
     GNU Fortran (GCC) 12.2.0
 * running under: macOS Sonoma 14.2.1
 * using session charset: UTF-8
-* this is package ‘pysparklyr’ version ‘0.1.2’
+* this is package ‘pysparklyr’ version ‘0.1.3’
 * package encoding: UTF-8
 * checking examples ... NONE
   Running ‘testthat.R’
@@ -164,8 +171,9 @@ Status: OK
 Status: OK
 ```
 
-###  rsparkling
-```
+### rsparkling {#rsparkling}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/rsparkling.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -187,8 +195,9 @@ Namespace in Imports field not imported from: ‘h2o’
 Status: 2 NOTEs
 ```
 
-###  s3.resourcer
-```
+### s3.resourcer {#s3.resourcer}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/s3.resourcer.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -206,8 +215,9 @@ Status: 2 NOTEs
 Status: OK
 ```
 
-###  shinyML
-```
+### shinyML {#shinyml}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/shinyML.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -225,8 +235,9 @@ Status: OK
 Status: 1 NOTE
 ```
 
-###  spark.sas7bdat
-```
+### spark.sas7bdat {#spark.sas7bdat}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/spark.sas7bdat.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -243,8 +254,9 @@ Status: 1 NOTE
 Status: OK
 ```
 
-###  sparkavro
-```
+### sparkavro {#sparkavro}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkavro.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -263,8 +275,9 @@ Status: OK
 Status: 1 NOTE
 ```
 
-###  sparkbq
-```
+### sparkbq {#sparkbq}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkbq.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -282,8 +295,9 @@ Status: 1 NOTE
 Status: 1 NOTE
 ```
 
-###  sparkhail
-```
+### sparkhail {#sparkhail}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkhail.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -302,8 +316,9 @@ Status: 1 NOTE
 Status: 1 NOTE
 ```
 
-###  sparklyr.flint
-```
+### sparklyr.flint {#sparklyr.flint}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparklyr.flint.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -348,9 +363,11 @@ The following object is masked from ‘package:stats’:
 +   message("Unable to establish a Spark connection!")
 + }
 Error:
-! java.lang.AbstractMethodError: Method
-  org/apache/spark/sql/NanosToTimestamp.child()Lorg/apache/spark/sql/catalyst/trees/TreeNode;
-  is abstract
+! java.lang.AbstractMethodError: Receiver class
+  org.apache.spark.sql.NanosToTimestamp does not define or inherit an
+  implementation of the resolved method 'abstract
+  org.apache.spark.sql.catalyst.trees.TreeNode child()' of interface
+  org.apache.spark.sql.catalyst.trees.UnaryLike.
 
 Run ]8;;x-r-run:sparklyr::spark_last_error()`sparklyr::spark_last_error()`]8;; to see the full Spark error (multiple lines)
 To use the previous style of error message set
@@ -379,8 +396,9 @@ Execution halted
 Status: 1 ERROR
 ```
 
-###  sparklyr.nested
-```
+### sparklyr.nested {#sparklyr.nested}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparklyr.nested.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -396,8 +414,9 @@ Status: 1 ERROR
 Status: OK
 ```
 
-###  sparktf
-```
+### sparktf {#sparktf}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparktf.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -416,8 +435,9 @@ Status: OK
 Status: 1 NOTE
 ```
 
-###  sparkwarc
-```
+### sparkwarc {#sparkwarc}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkwarc.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -437,8 +457,9 @@ Status: 1 NOTE
 Status: 1 NOTE
 ```
 
-###  sparkxgb
-```
+### sparkxgb {#sparkxgb}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkxgb.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -458,8 +479,9 @@ Status: 1 NOTE
 Status: 1 NOTE
 ```
 
-###  variantspark
-```
+### variantspark {#variantspark}
+
+```         
 * using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/variantspark.Rcheck’
 * using R version 4.3.2 (2023-10-31)
 * using platform: aarch64-apple-darwin20 (64-bit)
@@ -477,4 +499,3 @@ Status: 1 NOTE
 * DONE
 Status: 1 NOTE
 ```
-
