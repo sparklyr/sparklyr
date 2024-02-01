@@ -1,5 +1,7 @@
 # Sparklyr (dev)
 
+- Converts `spark_apply()` to a method.
+
 - Removes Scala code, and JARs for Spark versions 2.3 and below. Spark 2.3 is 
 no longer considered maintained as of September 2019
   - Removes Java folder for versions 2.3 and below
