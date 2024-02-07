@@ -62,14 +62,17 @@ spark_csv_options <- function(header,
 #'   is, should the table be cached?)
 #' @param header Boolean; should the first row of data be used as a header?
 #'   Defaults to \code{TRUE}.
-#' @param columns A vector of column names or a named vector of column types.
+#' @param columns A vector of column names (e.g., list("column_1", "column_2") 
+#'   or a named vector of column types (e.g. list(column_1 = "integer", column_2 = "character")).
 #'   If specified, the elements can be \code{"binary"} for \code{BinaryType},
 #'   \code{"boolean"} for \code{BooleanType}, \code{"byte"} for \code{ByteType},
 #'   \code{"integer"} for \code{IntegerType}, \code{"integer64"} for \code{LongType},
 #'   \code{"double"} for \code{DoubleType}, \code{"character"} for \code{StringType},
 #'   \code{"timestamp"} for \code{TimestampType} and \code{"date"} for \code{DateType}.
+#'   A partial set of columns can be specified; columns without type specification will be inferred or excluded (depending on infer_schema).
 #' @param infer_schema Boolean; should column types be automatically inferred?
-#'   Requires one extra pass over the data. Defaults to \code{is.null(columns)}.
+#'   Requires one extra pass over the data. Parameter defaults to \code{is.null(columns)}.
+#'   Column types that cannot be automatically inferred will default to StringType.
 #' @param delimiter The character used to delimit each column. Defaults to \samp{','}.
 #' @param quote The character used as a quote. Defaults to \samp{'"'}.
 #' @param escape The character used to escape other characters. Defaults to \samp{'\'}.
