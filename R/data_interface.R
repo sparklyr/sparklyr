@@ -69,10 +69,9 @@ spark_csv_options <- function(header,
 #'   \code{"integer"} for \code{IntegerType}, \code{"integer64"} for \code{LongType},
 #'   \code{"double"} for \code{DoubleType}, \code{"character"} for \code{StringType},
 #'   \code{"timestamp"} for \code{TimestampType} and \code{"date"} for \code{DateType}.
-#'   A partial set of columns can be specified; columns without type specification will be inferred or excluded (depending on infer_schema).
+#'   A partial set of columns can be specified.
 #' @param infer_schema Boolean; should column types be automatically inferred?
 #'   Requires one extra pass over the data. Parameter defaults to \code{is.null(columns)}.
-#'   Column types that cannot be automatically inferred will default to StringType.
 #' @param delimiter The character used to delimit each column. Defaults to \samp{','}.
 #' @param quote The character used as a quote. Defaults to \samp{'"'}.
 #' @param escape The character used to escape other characters. Defaults to \samp{'\'}.
