@@ -204,7 +204,7 @@ class Backend() {
     // Delay load workers to retrieve ports from backend
     if (!isWorker) run()
 
-    if (!isService) System.exit(0)
+    if (!isService && !isBatch) System.exit(0)
   }
 
   def batch(): Unit = {
