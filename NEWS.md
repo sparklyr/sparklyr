@@ -1,5 +1,7 @@
 # Sparklyr (dev)
 
+- Fixes quoting issue with `dbplyr` 2.5.0 (#3429)
+
 - Fixes Windows OS identification (#3426)
 
 - Converts `spark_apply()` to a method.
