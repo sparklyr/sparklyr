@@ -76,7 +76,7 @@ Depends:
 Imports:
     config (>= 0.2),
     DBI (>= 1.0.0),
-    dbplyr (>= 2.2.1),
+    dbplyr (>= 2.5.0),
     dplyr (>= 1.0.9),
     generics,
     globals,
