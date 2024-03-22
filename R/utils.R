@@ -598,7 +598,7 @@ get_os <- function() {
 }
 
 os_is_windows <- function() {
-  get_os() == "windows"
+  get_os() == "win"
 }
 
 cast_string <- function(x) {

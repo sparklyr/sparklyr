@@ -552,7 +552,7 @@ test_that("tbl_spark prints", {
   print_output <- capture.output(print(iris_tbl))
   expect_equal(
     print_output[1],
-    "# Source:   table<iris> [?? x 5]"
+    "# Source:   table<`iris`> [?? x 5]"
   )
 })
 

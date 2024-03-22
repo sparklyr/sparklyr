@@ -1,5 +1,9 @@
 # Sparklyr 1.8.5
 
+- Fixes quoting issue with `dbplyr` 2.5.0 (#3429)
+
+- Fixes Windows OS identification (#3426)
+
 - Converts `spark_apply()` to a method.
 
 - Removes Scala code, and JARs for Spark versions 2.3 and below. Spark 2.3 is 
