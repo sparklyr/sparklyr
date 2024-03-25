@@ -30,3 +30,5 @@ test_that("the (serial) implementation of 'do' functions as expected", {
     expect_equal(lhs$coefficients, rhs$coefficients)
   }
 })
+
+test_clear_cache()

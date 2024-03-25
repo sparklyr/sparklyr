@@ -23,3 +23,6 @@ test_that("sdf_describe() checks column name", {
     "The following columns are not in the data frame: foo"
   )
 })
+
+test_clear_cache()
+

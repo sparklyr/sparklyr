@@ -83,3 +83,6 @@ test_that("ft_count_vectorizer() works", {
     )
   )
 })
+
+test_clear_cache()
+

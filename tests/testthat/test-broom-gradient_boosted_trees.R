@@ -121,3 +121,6 @@ test_that("gradient_boosted_trees.tidy() works", {
 
   expect_true(all(glance(bt_regression_parsnip) == gl2))
 })
+
+test_clear_cache()
+

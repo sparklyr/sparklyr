@@ -205,3 +205,6 @@ test_that("stratified sampling returns repeatable results from a fixed PRNG seed
     }
   }
 })
+
+test_clear_cache()
+

@@ -59,3 +59,6 @@ test_that("pca tidiers work", {
     )
   )
 })
+
+test_clear_cache()
+

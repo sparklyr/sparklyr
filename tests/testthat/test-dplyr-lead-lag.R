@@ -24,3 +24,5 @@ test_that("lead and lag take numeric values for 'n' (#925)", {
       arrange(ID)
   )
 })
+
+test_clear_cache()

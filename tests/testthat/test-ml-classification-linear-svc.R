@@ -45,3 +45,6 @@ test_that("ml_linear_svc() runs", {
     NA
   )
 })
+
+test_clear_cache()
+

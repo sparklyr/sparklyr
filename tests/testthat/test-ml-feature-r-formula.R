@@ -90,3 +90,6 @@ test_that("ft_r_formula takes formula", {
 
   expect_equal(v1, v2)
 })
+
+test_clear_cache()
+

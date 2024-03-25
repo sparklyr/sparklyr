@@ -15,3 +15,6 @@ test_that("can connect to an existing session via gateway", {
   )
   expect_equal(spark_context(gw)$backend, spark_context(sc)$backend)
 })
+
+test_clear_cache()
+

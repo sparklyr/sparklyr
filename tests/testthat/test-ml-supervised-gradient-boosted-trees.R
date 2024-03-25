@@ -116,3 +116,6 @@ test_that("ml_gradient_boosted_trees() supports response-features syntax", {
     NA
   )
 })
+
+test_clear_cache()
+

@@ -9,3 +9,6 @@ test_that("'project_template' creation succeeds", {
 test_that("'spark_extension' creation succeeds", {
   expect_true(spark_extension(tempdir()))
 })
+
+test_clear_cache()
+

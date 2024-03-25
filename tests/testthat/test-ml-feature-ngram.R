@@ -52,3 +52,6 @@ test_that("ft_ngram() works properly", {
     )
   )
 })
+
+test_clear_cache()
+

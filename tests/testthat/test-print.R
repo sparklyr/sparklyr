@@ -49,3 +49,6 @@ test_that("print supports spark context", {
     )
   )
 })
+
+test_clear_cache()
+

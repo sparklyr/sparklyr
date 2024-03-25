@@ -55,3 +55,6 @@ test_that("'spark_config_settings()' returns a data.frame", {
     "data.frame"
   )
 })
+
+test_clear_cache()
+

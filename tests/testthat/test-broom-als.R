@@ -55,3 +55,6 @@ test_that("als tidiers works", {
     exp.names = c("rank", "cold_start_strategy")
   )
 })
+
+test_clear_cache()
+

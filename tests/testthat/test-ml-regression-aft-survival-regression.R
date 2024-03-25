@@ -142,3 +142,6 @@ test_that("Tuning works with AFT", {
 })
 
 
+
+test_clear_cache()
+

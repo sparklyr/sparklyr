@@ -93,3 +93,6 @@ teardown({
   dbRemoveTable(sc, persisted_table_name)
   dbRemoveTable(sc, temp_table_name)
 })
+
+test_clear_cache()
+

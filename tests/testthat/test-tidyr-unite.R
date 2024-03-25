@@ -94,3 +94,6 @@ test_that("regardless of the type of the NA", {
   expect_equal(vec_unite(c("x", "dbl")), c("x", "y", "z"))
   expect_equal(vec_unite(c("x", "chr")), c("x", "y", "z"))
 })
+
+test_clear_cache()
+

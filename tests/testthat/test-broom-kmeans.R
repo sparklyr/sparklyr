@@ -61,3 +61,6 @@ test_that("kmeans.tidy() works", {
     )
   }
 })
+
+test_clear_cache()
+

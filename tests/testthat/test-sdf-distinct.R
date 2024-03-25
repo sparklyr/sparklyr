@@ -50,3 +50,6 @@ test_that("sdf_distinct works properly", {
       arrange_all() %>% collect() %>% as.data.frame()
   )
 })
+
+test_clear_cache()
+

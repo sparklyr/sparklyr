@@ -84,3 +84,6 @@ test_that("ft_minhash_lsh() works properly", {
     list(c(0, 5), c(1, 4), c(1, 5), c(2, 5))
   )
 })
+
+test_clear_cache()
+

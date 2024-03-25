@@ -72,3 +72,5 @@ test_that("we can pivot with an R list", {
 
   expect_equal(unname(s), unname(r))
 })
+
+test_clear_cache()

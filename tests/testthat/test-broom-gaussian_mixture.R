@@ -63,3 +63,6 @@ test_that("gaussian_mixture.tidy() works", {
     )
   }
 })
+
+test_clear_cache()
+

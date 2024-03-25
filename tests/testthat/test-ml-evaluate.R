@@ -257,3 +257,6 @@ test_that("ml_evaluate() works for svc model", {
   expect_equal(names(svc_acc), "Accuracy")
   expect_gt(svc_acc$Accuracy, 0.94)
 })
+
+test_clear_cache()
+

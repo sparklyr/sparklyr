@@ -22,3 +22,6 @@ test_that("sparklyr spark session should be configured properly", {
     invoke_method(sc, FALSE, sc$state$hive_context, "hashCode")
   )
 })
+
+test_clear_cache()
+

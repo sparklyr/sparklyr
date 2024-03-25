@@ -29,3 +29,6 @@ test_that("`[.tbl_spark` works as expected", {
 
   expect_equivalent(df[], sdf[] %>% collect())
 })
+
+test_clear_cache()
+

@@ -117,3 +117,6 @@ test_that("decision_tree.tidy() works", {
 
 })
 
+
+test_clear_cache()
+

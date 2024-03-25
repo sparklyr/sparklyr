@@ -10,3 +10,6 @@ test_that("'spark_apply' can pass environemnt variables from config", {
     "env-test"
   )
 })
+
+test_clear_cache()
+

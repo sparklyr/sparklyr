@@ -47,3 +47,5 @@ test_that("rowSums works as expected", {
     }
   }
 })
+
+test_clear_cache()

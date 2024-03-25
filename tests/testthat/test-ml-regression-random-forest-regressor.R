@@ -58,3 +58,6 @@ test_that("Tuning works RF", {
   cv_metrics <- ml_validation_metrics(cv_model)
   expect_equal(dim(cv_metrics), c(2, 2))
 })
+
+
+test_clear_cache()

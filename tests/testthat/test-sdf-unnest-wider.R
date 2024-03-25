@@ -69,3 +69,6 @@ test_that("`transform` works as expected", {
     dplyr::tibble(x = c("1", "2", "3"), a = c(1L, 3L, 5L), b = c(2, 4, 6))
   )
 })
+
+test_clear_cache()
+

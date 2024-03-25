@@ -118,3 +118,5 @@ test_that("ml_power_iteration() works as expected with 'degree' initialization m
 
   verify_clusters(clusters)
 })
+
+test_clear_cache()

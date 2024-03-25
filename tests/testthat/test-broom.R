@@ -133,3 +133,6 @@ test_that("tidy.{glm type models} works", {
     )
   )
 })
+
+test_clear_cache()
+

@@ -277,3 +277,6 @@ test_that("to_milliseconds() responds as expected", {
   expect_error(to_milliseconds("zzz"))
   expect_error(to_milliseconds(list()))
 })
+
+test_clear_cache()
+

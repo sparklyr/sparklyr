@@ -50,3 +50,6 @@ test_that("ft_chisq_select() works properly", {
 
   expect_equal(r_features, list(18, 12, 15))
 })
+
+test_clear_cache()
+

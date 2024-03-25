@@ -56,3 +56,5 @@ test_that("Connection functions work", {
 
 
 })
+
+test_clear_cache()

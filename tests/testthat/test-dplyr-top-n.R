@@ -34,3 +34,5 @@ test_that("slice_max works as expected", {
 
   expect_equal(tn1, tn2)
 })
+
+test_clear_cache()

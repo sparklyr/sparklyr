@@ -45,3 +45,6 @@ test_that("ft_min_max_scaler() works properly", {
     )
   )
 })
+
+test_clear_cache()
+

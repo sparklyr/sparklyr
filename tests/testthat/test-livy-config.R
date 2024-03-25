@@ -32,3 +32,6 @@ test_that("'livy_config()' works with additional_curl_opts", {
   config <- livy_config(curl_opts = curl_opts)
   expect_equal(config$sparklyr.livy.curl_opts, curl_opts)
 })
+
+test_clear_cache()
+

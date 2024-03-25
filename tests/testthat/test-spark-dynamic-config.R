@@ -144,3 +144,6 @@ test_that("spark_auto_broadcast_join_threshold() works", {
     as.character(threshold)
   )
 })
+
+test_clear_cache()
+

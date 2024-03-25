@@ -287,3 +287,6 @@ test_that("can infer R package dependencies", {
     sparklyr:::infer_required_r_packages(fn4)
   )
 })
+
+test_clear_cache()
+

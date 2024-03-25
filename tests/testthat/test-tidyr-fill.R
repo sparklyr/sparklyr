@@ -165,3 +165,6 @@ test_that("fill respects grouping", {
       tidyr::fill(value, .direction = "downup")
   )
 })
+
+test_clear_cache()
+

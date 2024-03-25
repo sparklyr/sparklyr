@@ -100,3 +100,6 @@ test_that("ft_string_indexer_model works", {
     c(1, 0, 1, 1)
   )
 })
+
+test_clear_cache()
+

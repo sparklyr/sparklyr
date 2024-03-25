@@ -52,3 +52,6 @@ test_that("jar file is created", {
     "function"
   )
 })
+
+test_clear_cache()
+

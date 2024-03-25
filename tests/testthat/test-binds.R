@@ -240,3 +240,5 @@ test_that("'sdf_bind_rows' handles column type upcasting (#804)", {
       collect()
   )
 })
+
+test_clear_cache()

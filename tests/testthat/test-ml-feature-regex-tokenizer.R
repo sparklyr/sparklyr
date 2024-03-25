@@ -63,3 +63,6 @@ test_that("ft_regex_tokenizer() works", {
     )
   )
 })
+
+test_clear_cache()
+

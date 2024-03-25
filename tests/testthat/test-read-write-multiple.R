@@ -107,3 +107,6 @@ test_that(
     "spark_read_text is only suppored with path of length 1 if whole=TRUE"
   )
 )
+
+test_clear_cache()
+

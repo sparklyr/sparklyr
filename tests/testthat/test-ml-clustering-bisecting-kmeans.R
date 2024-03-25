@@ -268,3 +268,6 @@ test_that("ml_bisecting_kmeans() works properly with iris", {
     output_file("print/bisecting-kmeans.txt")
   )
 })
+
+test_clear_cache()
+

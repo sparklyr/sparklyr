@@ -33,3 +33,6 @@ test_that("ft_interaction() works properly", {
     list(c(8, 4, 5, 16, 8, 10, 24, 12, 15))
   )
 })
+
+test_clear_cache()
+

@@ -8,3 +8,6 @@ test_that("test connection does not fail", {
 
   expect_true(!is.null(sc))
 })
+
+test_clear_cache()
+

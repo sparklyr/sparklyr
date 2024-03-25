@@ -129,3 +129,6 @@ test_that("ml_decision_tree() supports response-features syntax (#1302)", {
     NA
   )
 })
+
+test_clear_cache()
+

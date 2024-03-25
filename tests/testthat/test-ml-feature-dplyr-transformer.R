@@ -146,3 +146,6 @@ test_that("ft_dplyr_transformer() handles cases where table name isn't quoted (#
     )
   )
 })
+
+test_clear_cache()
+

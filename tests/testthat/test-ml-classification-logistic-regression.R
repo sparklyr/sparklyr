@@ -315,3 +315,6 @@ test_that("logistic regression bounds on coefficients", {
   expect_equal(max(coef(lr)), 1)
   expect_equal(min(coef(lr)), -1)
 })
+
+test_clear_cache()
+

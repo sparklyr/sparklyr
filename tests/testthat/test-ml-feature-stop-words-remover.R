@@ -78,3 +78,6 @@ test_that("ml_default_stop_words() defaults to English (#1280)", {
     list("i", "me", "my", "myself", "we")
   )
 })
+
+test_clear_cache()
+

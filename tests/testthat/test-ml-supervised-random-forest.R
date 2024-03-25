@@ -187,3 +187,6 @@ test_that("ml_random_forest() supports response-features syntax", {
     NA
   )
 })
+
+test_clear_cache()
+

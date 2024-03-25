@@ -49,3 +49,6 @@ test_that("ft_elementwise_product() works", {
     )
   )
 })
+
+test_clear_cache()
+

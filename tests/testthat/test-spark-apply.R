@@ -193,3 +193,6 @@ test_that("'spark_apply' supports nested lists as return type", {
   expect_equal(colnames(actual), "person")
   expect_equal(actual$person, expected)
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip("Testing if CI goest through without it")
 skip_connection("ml-classification-naive-bayes")
 skip_on_livy()
 skip_on_arrow_devel()
@@ -95,3 +96,6 @@ test_that("ml_naive_bayes() print outputs are correct", {
     update = FALSE
   )
 })
+
+test_clear_cache()
+

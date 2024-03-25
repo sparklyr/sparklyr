@@ -45,3 +45,5 @@ test_that("weighted.mean works as expected", {
       dplyr::pull(wm)
   )
 })
+
+test_clear_cache()

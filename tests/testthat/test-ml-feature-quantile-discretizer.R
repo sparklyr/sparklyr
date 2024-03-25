@@ -91,3 +91,6 @@ test_that("ft_quantile_discretizer can approximate weighted percentiles", {
     c(rep(0, 23), rep(1, 2), rep(2, 10), rep(3, 11))
   )
 })
+
+test_clear_cache()
+

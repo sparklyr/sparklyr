@@ -7,3 +7,6 @@ test_that("ml_kmeans() default params", {
   sc <- testthat_spark_connection()
   test_default_args(sc, ml_kmeans)
 })
+
+test_clear_cache()
+

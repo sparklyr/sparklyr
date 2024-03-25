@@ -115,3 +115,6 @@ test_that("sdf_project() takes newdata argument", {
       collect()
   )
 })
+
+test_clear_cache()
+

@@ -107,3 +107,10 @@ local_tcp_proxy <- function(proxy_port, dest_port) {
 
   handle
 }
+
+test_clear_cache <- function() {
+  dbGetQuery(
+    testthat_spark_connection(),
+    "CLEAR CACHE"
+    )
+}

@@ -401,3 +401,6 @@ test_that("sdf_collect() preserves NA_real_", {
 
   expect_equal(sdf %>% collect(), df)
 })
+
+test_clear_cache()
+

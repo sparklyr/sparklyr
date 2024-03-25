@@ -66,3 +66,5 @@ test_that("ml_find_synonyms works properly", {
   # synonym-wise "b" should be closer to "a" than "c" is
   expect_equal(synonyms, c("b", "c"))
 })
+
+test_clear_cache()

@@ -186,3 +186,6 @@ test_that("we can fit a pipeline saved then loaded from ml_model", {
     ml_stage(m2, 2)$coefficients
   )
 })
+
+test_clear_cache()
+

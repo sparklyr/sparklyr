@@ -141,3 +141,6 @@ test_that("checks type of `into` and `sep`", {
     "must be a character vector"
   )
 })
+
+test_clear_cache()
+

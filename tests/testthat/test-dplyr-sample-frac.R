@@ -36,3 +36,5 @@ test_that("'sample_frac' works as expected", {
     }
   }
 })
+
+test_clear_cache()
