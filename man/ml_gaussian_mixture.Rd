@@ -40,7 +40,12 @@ reproducible across repeated calls.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
-\item{...}{Optional arguments, see Details.}
+\item{...}{Optional arguments, see Details.
+#' @return The object returned depends on the class of \code{x}. If it is a
+\code{spark_connection}, the function returns a \code{ml_estimator} object. If
+it is a \code{ml_pipeline}, it will return a pipeline with the predictor
+appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
+the predictions added to it.}
 }
 \description{
 This class performs expectation maximization for multivariate Gaussian Mixture Models (GMMs). A GMM represents a composite distribution of independent Gaussian distributions with associated "mixing" weights specifying each's contribution to the composite. Given a set of sample points, this class will maximize the log-likelihood for a mixture of k Gaussians, iterating until the log-likelihood changes by less than \code{tol}, or until it has reached the max number of iterations. While this process is generally guaranteed to converge, it is not guaranteed to find a global optimum.
@@ -56,20 +61,3 @@ ml_clustering_evaluator(pred)
 }
 
 }
-\seealso{
-Other ml clustering algorithms
-#' @return The object returned depends on the class of \code{x}. If it is a
-\code{spark_connection}, the function returns a \code{ml_estimator} object. If
-it is a \code{ml_pipeline}, it will return a pipeline with the predictor
-appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
-the predictions added to it.: 
-\code{\link{ml_bisecting_kmeans}()},
-\code{\link{ml_kmeans}()},
-\code{\link{ml_lda}()}
-}
-\concept{ml clustering algorithms
-#' @return The object returned depends on the class of \code{x}. If it is a
-\code{spark_connection}, the function returns a \code{ml_estimator} object. If
-it is a \code{ml_pipeline}, it will return a pipeline with the predictor
-appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
-the predictions added to it.}
