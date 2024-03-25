@@ -320,7 +320,7 @@ spark_ide_actions <- function(scon) {
       Help = list(
         icon = file.path(icons, "help.png"),
         callback = function() {
-          utils::browseURL("https://spark.rstudio.com")
+          utils::browseURL("https://spark.posit.co")
         }
       )
     )

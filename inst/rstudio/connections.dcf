@@ -1,8 +1,8 @@
 Name: Spark
 ShinyApp: connection_spark_shinyapp
-HelpUrl: http://spark.rstudio.com
+HelpUrl: http://spark.posit.co
 Icon: icons/spark.png
 
 Name: Livy
-HelpUrl: https://spark.rstudio.com/deployment/#livy-connections
+HelpUrl: https://spark.posit.co/deployment/#livy-connections
 Icon: icons/livy.png

@@ -17,16 +17,16 @@ coverage](https://codecov.io/gh/sparklyr/sparklyr/branch/main/graph/badge.svg)](
 - Install and connect to [Spark](https://spark.apache.org/) using YARN,
   Mesos, Livy or Kubernetes.
 - Use [dplyr](#using-dplyr) to filter and aggregate Spark datasets and
-  [streams](https://spark.rstudio.com/guides/streaming/) then bring them
+  [streams](https://spark.posit.co/guides/streaming/) then bring them
   into R for analysis and visualization.
 - Use [MLlib](#machine-learning), [H2O](#using-h2o),
-  [XGBoost](https://spark.rstudio.com/packages/sparkxgb/latest/) and
-  [GraphFrames](https://spark.rstudio.com/packages/graphframes/latest/)
+  [XGBoost](https://spark.posit.co/packages/sparkxgb/latest/) and
+  [GraphFrames](https://spark.posit.co/packages/graphframes/latest/)
   to train models at scale in Spark.
 - Create interoperable machine learning
-  [pipelines](https://spark.rstudio.com/guides/pipelines.html) and
+  [pipelines](https://spark.posit.co/guides/pipelines.html) and
   productionize them with
-  [MLeap](https://spark.rstudio.com/packages/mleap/latest/).
+  [MLeap](https://spark.posit.co/packages/mleap/latest/).
 - Create [extensions](#extensions) that call the full Spark API or run
   [distributed R](#distributed-r) code to support new functionality.
 
@@ -78,7 +78,7 @@ devtools::install_github("sparklyr/sparklyr")
 
 You can connect to both local instances of Spark as well as remote Spark
 clusters. Here we’ll connect to a local instance of Spark via the
-[spark_connect](https://spark.rstudio.com/packages/sparklyr/latest/reference/spark-connections.html)
+[spark_connect](https://spark.posit.co/packages/sparklyr/latest/reference/spark-connections.html)
 function:
 
 ``` r
@@ -90,7 +90,7 @@ The returned Spark connection (`sc`) provides a remote dplyr data source
 to the Spark cluster.
 
 For more information on connecting to remote Spark clusters see the
-[Deployment](https://spark.rstudio.com/deployment.html) section of the
+[Deployment](https://spark.posit.co/deployment.html) section of the
 sparklyr website.
 
 ## Using dplyr
@@ -141,7 +141,7 @@ flights_tbl %>% filter(dep_delay == 2)
 #> #   minute <dbl>, time_hour <dttm>
 ```
 
-[Introduction to dplyr](https://spark.rstudio.com/guides/dplyr.html)
+[Introduction to dplyr](https://spark.posit.co/guides/dplyr.html)
 provides additional `dplyr` examples you can try. For example, consider
 the last example from the tutorial which plots data on flight delays:
 
@@ -167,7 +167,7 @@ ggplot(delay, aes(dist, delay)) +
 ### Window Functions
 
 dplyr [window
-functions](https://spark.rstudio.com/guides/dplyr.html#grouping) are
+functions](https://spark.posit.co/guides/dplyr.html#grouping) are
 also supported, for example:
 
 ``` r
@@ -195,7 +195,7 @@ batting_tbl %>%
 ```
 
 For additional documentation on using dplyr with Spark see the
-[dplyr](https://spark.rstudio.com/dplyr.html) section of the sparklyr
+[dplyr](https://spark.posit.co/dplyr.html) section of the sparklyr
 website.
 
 ## Using SQL
@@ -243,7 +243,7 @@ high-level APIs built on top of DataFrames that help you create and tune
 machine learning workflows.
 
 Here’s an example where we use
-[ml_linear_regression](https://spark.rstudio.com/packages/sparklyr/latest/reference/ml_linear_regression/)
+[ml_linear_regression](https://spark.posit.co/packages/sparklyr/latest/reference/ml_linear_regression/)
 to fit a linear regression model. We’ll use the built-in `mtcars`
 dataset, and see if we can predict a car’s fuel consumption (`mpg`)
 based on its weight (`wt`), and the number of cylinders the engine
@@ -292,7 +292,7 @@ summary(fit)
 Spark machine learning supports a wide array of algorithms and feature
 transformations and as illustrated above it’s easy to chain these
 functions together with dplyr pipelines. To learn more see the [machine
-learning](https://spark.rstudio.com/mlib/) section.
+learning](https://spark.posit.co/mlib/) section.
 
 ## Reading and Writing Data
 
@@ -395,7 +395,7 @@ count_lines(sc, tempfile)
 ```
 
 To learn more about creating extensions see the
-[Extensions](https://spark.rstudio.com/guides/extensions.html) section
+[Extensions](https://spark.posit.co/guides/extensions.html) section
 of the sparklyr website.
 
 ## Table Utilities
@@ -477,7 +477,7 @@ through a new connection dialog:
 
 [rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN
 package from [H2O](https://h2o.ai/) that extends
-[sparklyr](https://spark.rstudio.com/) to provide an interface into
+[sparklyr](https://spark.posit.co/) to provide an interface into
 [Sparkling Water](https://github.com/h2oai/sparkling-water). For
 instance, the following example installs, configures and runs
 [h2o.glm](https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
@@ -595,4 +595,4 @@ v2](https://docs.databricks.com/en/dev-tools/databricks-connect/index.html)
 via a new extension called `pysparklyr`. To learn how to use, and the
 latest updates on this integration see [the article in `sparklyr`’s
 official
-website](https://spark.rstudio.com/deployment/databricks-connect.html).
+website](https://spark.posit.co/deployment/databricks-connect.html).
