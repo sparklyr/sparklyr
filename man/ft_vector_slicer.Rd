@@ -36,7 +36,8 @@ a pipeline with the transformer or estimator appended to it. If a
  applied to it.
 }
 \description{
-Takes a feature vector and outputs a new feature vector with a subarray of the original features.
+Takes a feature vector and outputs a new feature vector with a subarray of
+the original features.
 }
 \seealso{
 Other feature transformers: 

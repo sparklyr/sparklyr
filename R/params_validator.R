@@ -26,7 +26,7 @@ params_base_validator <- function(x) {
     loss = function(x) cast_choice(x, c("squaredError", "huber")),
     weight_col = function(x) cast_nullable_string(x),
     # GLM
-    family = function(x) cast_choice(x, c("gaussian", "binomial", "poisson", "gamma", "tweedie")),
+    #family = function(x) cast_choice(x, c("gaussian", "binomial", "poisson", "gamma", "tweedie")),
     link = function(x) cast_nullable_string(x),
     link_power = function(x) cast_nullable_scalar_double(x),
     variance_power = function(x) cast_nullable_scalar_double(x),

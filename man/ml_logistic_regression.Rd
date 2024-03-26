@@ -61,8 +61,8 @@ multinomial regression.}
 
 \item{lower_bounds_on_intercepts}{(Spark 2.2.0+) Lower bounds on intercepts
 if fitting under bound constrained optimization.
-The bounds vector size must be equal with 1 for binomial regression, or
-the number of classes for multinomial regression.}
+The bounds vector size must be equal with 1 for binomial regression, or the
+number of classes for multinomial regression.}
 
 \item{upper_bounds_on_coefficients}{(Spark 2.2.0+) Upper bounds on
 coefficients if fitting under bound constrained optimization.
@@ -71,9 +71,9 @@ for binomial regression, or (number of classes, number of features) for
 multinomial regression.}
 
 \item{upper_bounds_on_intercepts}{(Spark 2.2.0+) Upper bounds on intercepts
-if fitting under bound constrained optimization.
-The bounds vector size must be equal with 1 for binomial regression, or
-the number of classes for multinomial regression.}
+if fitting under bound constrained optimization. The bounds vector size must
+be equal with 1 for binomial regression, or the number of classes for
+multinomial regression.}
 
 \item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
 
