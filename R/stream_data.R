@@ -408,6 +408,25 @@ stream_write_delta <- function(
   )
 }
 
+#' @rdname stream_read_csv
+#' @export
+stream_read_cloudfiles <- function(
+    sc,
+    path,
+    name = NULL,
+    options = list(),
+    ...) {
+  stream_read_generic(
+    sc,
+    path = path,
+    type = "cloudFiles",
+    name = name,
+    columns = FALSE,
+    stream_options = options,
+    load = TRUE
+  )
+}
+
 stream_read_generic_type <- function(
     sc,
     path,
