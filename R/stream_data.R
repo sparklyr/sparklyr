@@ -438,7 +438,7 @@ stream_read_table <- function(
   stream_read_generic(
     sc,
     path = path,
-    type = "table",
+    type = "toTable",
     name = name,
     columns = FALSE,
     stream_options = options,
