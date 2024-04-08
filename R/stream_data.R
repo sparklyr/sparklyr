@@ -438,7 +438,7 @@ stream_read_table <- function(
   stream_read_generic(
     sc,
     path = path,
-    type = "toTable",
+    type = "table",
     name = name,
     columns = FALSE,
     stream_options = options,
@@ -458,7 +458,7 @@ stream_write_table <- function(
     ...) {
   stream_write_generic(x,
                        path = path,
-                       type = "table",
+                       type = "toTable",
                        mode = mode,
                        trigger = FALSE,
                        checkpoint = checkpoint,
