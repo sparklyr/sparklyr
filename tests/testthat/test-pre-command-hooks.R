@@ -1,3 +1,4 @@
+skip_connection("pre-command-hooks")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -11,3 +12,6 @@ test_that("pre-command hooks are successfully executed", {
   lines <- readLines(path)
   expect_equal(lines[1], "Running pre-command hooks")
 })
+
+test_clear_cache()
+

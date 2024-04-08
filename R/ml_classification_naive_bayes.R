@@ -146,7 +146,7 @@ ml_naive_bayes.tbl_spark <- function(x, formula = NULL, model_type = "multinomia
 
 # Validator
 validator_ml_naive_bayes <- function(.args) {
-  .args[["thresholds"]] <- cast_nullable_double_list(.args[["thresholds"]])
+  .args[["thresholds"]] <- cast_double_list(.args[["thresholds"]], allow_null = TRUE)
   .args[["smoothing"]] <- cast_scalar_double(.args[["smoothing"]])
   .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])
   .args[["model_type"]] <- cast_choice(.args[["model_type"]], c("multinomial", "bernoulli"))

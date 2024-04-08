@@ -1,3 +1,4 @@
+skip_connection("dplyr-do")
 skip_on_livy()
 
 skip_databricks_connect()
@@ -29,3 +30,5 @@ test_that("the (serial) implementation of 'do' functions as expected", {
     expect_equal(lhs$coefficients, rhs$coefficients)
   }
 })
+
+test_clear_cache()

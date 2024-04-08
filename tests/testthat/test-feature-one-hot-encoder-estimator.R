@@ -1,3 +1,4 @@
+skip_connection("feature-one-hot-encoder-estimator")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -31,3 +32,6 @@ test_that("ft_one_hot_encoder_estimator() works", {
     list(c(0, 0), c(1, 0), c(0, 1))
   )
 })
+
+test_clear_cache()
+

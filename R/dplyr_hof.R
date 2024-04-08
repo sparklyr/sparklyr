@@ -32,7 +32,7 @@ translate_formula <- function(f) {
       as.character(vars)
     }
   )
-  body_sql <- dbplyr::translate_sql(!!f[[2]])
+  body_sql <- dbplyr::translate_sql(!!f[[2]], con = dbplyr::simulate_hive())
   lambda <- dbplyr::sql(paste(params_sql, "->", body_sql))
 
   lambda
@@ -115,7 +115,7 @@ process_dest_col <- function(expr, dest_col) {
     c(sep = ",") %>%
     do.call(paste, .)
 
-  body_sql <- dbplyr::translate_sql(...)
+  body_sql <- dbplyr::translate_sql(..., con = dbplyr::simulate_hive())
 
   lambda <- dbplyr::sql(paste(params_sql, "->", body_sql))
   class(lambda) <- c(class(lambda), "spark_sql_lambda")
@@ -123,7 +123,7 @@ process_dest_col <- function(expr, dest_col) {
   lambda
 }
 
-do.mutate <- function(x, dest_col_name, sql, ...) {
+do_mutate <- function(x, dest_col_name, sql, ...) {
   args <- list(dbplyr::sql(sql))
   names(args) <- as.character(dest_col_name)
 
@@ -151,7 +151,7 @@ do.mutate <- function(x, dest_col_name, sql, ...) {
 #' library(sparklyr)
 #' sc <- spark_connect(master = "local")
 #' # applies the (x -> x * x) transformation to elements of all arrays
-#' copy_to(sc, tibble::tibble(arr = list(1:5, 21:25))) %>%
+#' copy_to(sc, dplyr::tibble(arr = list(1:5, 21:25))) %>%
 #'   hof_transform(~ .x * .x)
 #' }
 #'
@@ -168,13 +168,13 @@ hof_transform <- function(
 
   sql <- paste(
     "TRANSFORM(",
-    as.character(dbplyr::translate_sql(!!expr)),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
     ",",
     as.character(func),
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Filter Array Column
@@ -196,7 +196,7 @@ hof_transform <- function(
 #' library(sparklyr)
 #' sc <- spark_connect(master = "local")
 #' # only keep odd elements in each array in `array_column`
-#' copy_to(sc, tibble::tibble(array_column = list(1:5, 21:25))) %>%
+#' copy_to(sc, dplyr::tibble(array_column = list(1:5, 21:25))) %>%
 #'   hof_filter(~ .x %% 2 == 1)
 #' }
 #'
@@ -208,13 +208,13 @@ hof_filter <- function(x, func, expr = NULL, dest_col = NULL, ...) {
 
   sql <- paste(
     "FILTER(",
-    as.character(dbplyr::translate_sql(!!expr)),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
     ",",
     as.character(func),
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Apply Aggregate Function to Array Column
@@ -240,7 +240,7 @@ hof_filter <- function(x, func, expr = NULL, dest_col = NULL, ...) {
 #' sc <- spark_connect(master = "local")
 #' # concatenates all numbers of each array in `array_column` and add parentheses
 #' # around the resulting string
-#' copy_to(sc, tibble::tibble(array_column = list(1:5, 21:25))) %>%
+#' copy_to(sc, dplyr::tibble(array_column = list(1:5, 21:25))) %>%
 #'   hof_aggregate(
 #'     start = "",
 #'     merge = ~ CONCAT(.y, .x),
@@ -265,9 +265,9 @@ hof_aggregate <- function(
 
   sql <- do.call(paste, as.list(c(
     "AGGREGATE(",
-    as.character(dbplyr::translate_sql(!!expr)),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
     ",",
-    as.character(dbplyr::translate_sql(!!rlang::enexpr(start))),
+    as.character(dbplyr::translate_sql(!!rlang::enexpr(start), con = dbplyr::simulate_hive())),
     ",",
     as.character(merge),
     if (identical(finish, NULL)) NULL else c(",", as.character(finish)),
@@ -275,7 +275,7 @@ hof_aggregate <- function(
   )))
 
   x %>>%
-    do.mutate %@% c(list(as.character(dest_col), sql), args)
+    do_mutate %@% c(list(as.character(dest_col), sql), args)
 }
 
 #' Determine Whether Some Element Exists in an Array Column
@@ -299,13 +299,13 @@ hof_exists <- function(x, pred, expr = NULL, dest_col = NULL, ...) {
 
   sql <- paste(
     "EXISTS(",
-    as.character(dbplyr::translate_sql(!!expr)),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
     ",",
     as.character(pred),
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Combines 2 Array Columns
@@ -334,7 +334,7 @@ hof_exists <- function(x, pred, expr = NULL, dest_col = NULL, ...) {
 #' # and store the resuling array in `res`
 #' copy_to(
 #'   sc,
-#'   tibble::tibble(
+#'   dplyr::tibble(
 #'     left = list(1:5, 21:25),
 #'     right = list(6:10, 16:20),
 #'     res = c(0, 0)
@@ -362,15 +362,15 @@ hof_zip_with <- function(
 
   sql <- paste(
     "ZIP_WITH(",
-    as.character(dbplyr::translate_sql(!!left)),
+    as.character(dbplyr::translate_sql(!!left, con = dbplyr::simulate_hive())),
     ",",
-    as.character(dbplyr::translate_sql(!!right)),
+    as.character(dbplyr::translate_sql(!!right, con = dbplyr::simulate_hive())),
     ",",
     as.character(func),
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Sorts array using a custom comparator
@@ -396,7 +396,7 @@ hof_zip_with <- function(
 #' sc <- spark_connect(master = "local", version = "3.0.0")
 #' copy_to(
 #'   sc,
-#'   tibble::tibble(
+#'   dplyr::tibble(
 #'     # x contains 2 arrays each having elements in ascending order
 #'     x = list(1:5, 6:10)
 #'   )
@@ -418,13 +418,13 @@ hof_array_sort <- function(
 
   sql <- paste(
     "ARRAY_SORT(",
-    as.character(dbplyr::translate_sql(!!expr)),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
     ",",
     as.character(func),
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Filters a map
@@ -464,13 +464,13 @@ hof_map_filter <- function(
 
   sql <- paste(
     "MAP_FILTER(",
-    as.character(dbplyr::translate_sql(!!expr)),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
     ",",
     as.character(func),
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Checks whether all elements in an array satisfy a predicate
@@ -491,7 +491,7 @@ hof_map_filter <- function(
 #' \dontrun{
 #'
 #' sc <- spark_connect(master = "local", version = "3.0.0")
-#' df <- tibble::tibble(
+#' df <- dplyr::tibble(
 #'   x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
 #'   y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
 #' )
@@ -515,13 +515,13 @@ hof_forall <- function(
 
   sql <- paste(
     "FORALL(",
-    as.character(dbplyr::translate_sql(!!expr)),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
     ",",
     as.character(pred),
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Transforms keys of a map
@@ -560,13 +560,13 @@ hof_transform_keys <- function(
 
   sql <- paste(
     "TRANSFORM_KEYS(",
-    as.character(dbplyr::translate_sql(!!expr)),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
     ",",
     as.character(func),
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Transforms values of a map
@@ -605,13 +605,13 @@ hof_transform_values <- function(
 
   sql <- paste(
     "TRANSFORM_VALUES(",
-    as.character(dbplyr::translate_sql(!!expr)),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
     ",",
     as.character(func),
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }
 
 #' Merges two maps into one
@@ -643,7 +643,7 @@ hof_transform_values <- function(
 #' # create a Spark dataframe with 2 columns of type MAP<STRING, INT>
 #' two_maps_tbl <- sdf_copy_to(
 #'   sc,
-#'   tibble::tibble(
+#'   dplyr::tibble(
 #'     m1 = c("{\"1\":2,\"3\":4,\"5\":6}", "{\"2\":1,\"4\":3,\"6\":5}"),
 #'     m2 = c("{\"1\":1,\"3\":3,\"5\":5}", "{\"2\":2,\"4\":4,\"6\":6}")
 #'   ),
@@ -681,13 +681,13 @@ hof_map_zip_with <- function(
 
   sql <- paste(
     "MAP_ZIP_WITH(",
-    as.character(dbplyr::translate_sql(!!map1)),
+    as.character(dbplyr::translate_sql(!!map1, con = dbplyr::simulate_hive())),
     ",",
-    as.character(dbplyr::translate_sql(!!map2)),
+    as.character(dbplyr::translate_sql(!!map2, con = dbplyr::simulate_hive())),
     ",",
     as.character(func),
     ")"
   )
 
-  do.mutate(x, dest_col, sql, ...)
+  do_mutate(x, dest_col, sql, ...)
 }

@@ -1,3 +1,4 @@
+skip_connection("dplyr-spark")
 
 test_that("Connection functions work", {
   sc <- testthat_spark_connection()
@@ -9,7 +10,7 @@ test_that("Connection functions work", {
 
   expect_equal(
     capture.output(copy_to.src_spark(sc, mtcars, "src_mtcars", overwrite = TRUE))[[1]],
-    "# Source: spark<src_mtcars> [?? x 11]"
+    "# Source:   table<`src_mtcars`> [?? x 11]"
   )
 
   if(using_livy()) {
@@ -55,3 +56,5 @@ test_that("Connection functions work", {
 
 
 })
+
+test_clear_cache()

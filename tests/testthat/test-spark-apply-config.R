@@ -1,3 +1,4 @@
+skip_connection("spark-apply-config")
 skip_on_livy()
 test_requires("dplyr")
 sc <- testthat_spark_connection()
@@ -9,3 +10,6 @@ test_that("'spark_apply' can pass environemnt variables from config", {
     "env-test"
   )
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip_connection("ml-clustering-kmeans-ext")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -138,3 +139,6 @@ test_that("ml_compute_silhouette_measure() for kmeans", {
     tolerance = 0.01, scale = 1
   )
 })
+
+test_clear_cache()
+

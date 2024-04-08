@@ -1,12 +1,9 @@
 sparklyr_jar_spec_list <- function() {
   list(
-    list(spark = "1.5.2", scala = "2.10", remove_srcs = TRUE),
-    list(spark = "1.6.0", scala = "2.10", scala_filter = "1.6.1"),
-    list(spark = "2.0.0", scala = "2.11"),
-    list(spark = "2.3.0", scala = "2.11"),
     list(spark = "2.4.0", scala = "2.11"),
     list(spark = "2.4.0", scala = "2.12"),
-    list(spark = "3.0.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
+    list(spark = "3.0.0", scala = "2.12"),
+    list(spark = "3.5.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
   )
 }
 
@@ -33,7 +30,6 @@ sparklyr_jar_verify_spark <- function(install = TRUE) {
 #' Given a set of \code{scala} source files, compile them
 #' into a Java Archive (\code{jar}).
 #'
-#' @param name The name to assign to the target \code{jar}.
 #' @param spark_home The path to the Spark sources to be used
 #'   alongside compilation.
 #' @param filter An optional function, used to filter out discovered \code{scala}
@@ -47,8 +43,6 @@ sparklyr_jar_verify_spark <- function(install = TRUE) {
 #' @param embedded_srcs Embedded source file(s) under \code{<R package root>/java} to
 #'   be included in the root of the resulting jar file as resources
 #'
-#' @import rprojroot
-#' @import digest
 #'
 #' @keywords internal
 #' @export
@@ -72,7 +66,7 @@ spark_compile <- function(jar_name,
   scalac_version <- get_scalac_version(scalac)
   spark_version <- numeric_version(spark_version_from_home(spark_home))
 
-  root <- rprojroot::find_package_root_file()
+  root <- package_root()
 
   env_jar_path <- Sys.getenv("R_SPARKINSTALL_COMPILE_JAR_PATH", unset = NA)
   if(is.na(env_jar_path)) {
@@ -214,7 +208,12 @@ compile_package_jars <- function(..., spec = NULL) {
     # try to automatically download + install Spark
     if (is.null(spark_home) && !is.null(spark_version)) {
       if (spark_version == "master") {
-        installInfo <- spark_install_find(version = NULL, hadoop_version = NULL, installed_only = TRUE, latest = FALSE)
+        installInfo <- spark_install_find(
+          version = NULL,
+          hadoop_version = NULL,
+          installed_only = TRUE,
+          latest = FALSE
+          )
         spark_version <- installInfo$sparkVersion
         spark_home <- installInfo$sparkVersionDir
       } else {
@@ -515,7 +514,13 @@ make_version_filter <- function(version_upper) {
 #' list all sparklyr-*.jar files that have been built
 list_sparklyr_jars <- function() {
   normalizePath(dir(
-      file.path(rprojroot::find_package_root_file(), "inst", "java"),
+      file.path(package_root(), "inst", "java"),
       full.names = TRUE, pattern = "sparklyr-.+\\.jar"
     ))
+}
+
+package_root <- function() {
+  rlang::check_installed("rprojroot")
+  root <- get("find_package_root_file", envir = asNamespace("rprojroot"))
+  root()
 }

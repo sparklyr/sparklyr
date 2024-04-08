@@ -16,15 +16,18 @@ spark_install_version_expand <- function(version, installed_only) {
     versions <- spark_available_versions(show_minor = TRUE)$spark
   }
 
-  versions <- versions[grepl(version, versions)]
+  sub_versions <- substr(versions, 1, nchar(version))
+
+  versions <- versions[version == sub_versions]
 
   if (length(versions) > 0) {
-    sort(versions, decreasing = TRUE)[1]
+    out <- sort(versions, decreasing = TRUE)[1]
   } else {
     # If the version specified is not a known available version, then don't
     # attempt to exapnd it.
-    version
+    out <- version
   }
+  out
 }
 
 #' Find a given Spark installation by version.
@@ -356,7 +359,7 @@ spark_install_dir <- function() {
 
 # Used for backwards compatibility with sparklyr 0.5 installation path
 spark_install_old_dir <- function() {
-  getOption("spark.install.dir", rappdirs::app_dir("spark", "rstudio")$cache())
+  getOption("spark.install.dir")
 }
 
 #' @rdname spark_install

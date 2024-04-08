@@ -1,14 +1,15 @@
+skip_connection("dplyr-sample")
+test_requires_version("2.0.0")
+test_requires("dplyr")
 skip_on_livy()
 
 sc <- testthat_spark_connection()
 
-test_requires("dplyr")
+
 
 test_that("set.seed makes sampling outcomes deterministic", {
-  test_requires_version("2.0.0")
-  test_requires("dplyr")
-
-  sdf <- copy_to(sc, tibble::tibble(id = seq(1000), weight = rep(seq(5), 200)))
+  skip_connection("sample-with-seed")
+  sdf <- copy_to(sc, dplyr::tibble(id = seq(1000), weight = rep(seq(5), 200)))
 
   for (weight in list(NULL, rlang::sym("weight"))) {
     for (replace in list(FALSE, TRUE)) {
@@ -39,8 +40,7 @@ test_that("set.seed makes sampling outcomes deterministic", {
   }
 })
 
-test_that("dplyr query is executed before sampling", {
-
+test_that("dplyr query is executed before sampling (n)", {
   expect_equal(
     testthat_tbl("mtcars") %>%
       select(hp, mpg) %>%
@@ -49,7 +49,10 @@ test_that("dplyr query is executed before sampling", {
       dim(),
     c(5, 2)
   )
+})
 
+test_that("dplyr query is executed before sampling (frac)", {
+  skip_connection("sample-frac-exact")
   expect_equal(
     testthat_tbl("mtcars") %>%
       select(hp, mpg) %>%
@@ -59,3 +62,6 @@ test_that("dplyr query is executed before sampling", {
     c(3, 2)
   )
 })
+
+test_clear_cache()
+

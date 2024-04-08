@@ -1,3 +1,4 @@
+skip_connection("databricks-connect")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -25,3 +26,6 @@ test_that("spark libpaths config is set", {
 
   expect_false(is.null(sc$config$spark.r.libpaths))
 })
+
+test_clear_cache()
+

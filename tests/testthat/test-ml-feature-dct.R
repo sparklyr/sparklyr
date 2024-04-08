@@ -1,3 +1,4 @@
+skip_connection("ml-feature-dct")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -63,3 +64,6 @@ test_that("ft_discrete_cosine_transform() backwards compat", {
 
   expect_equal(out2, expected_out)
 })
+
+test_clear_cache()
+

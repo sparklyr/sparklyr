@@ -3,8 +3,7 @@
 #' @include utils.R
 NULL
 
-spark_apply_worker_config <- function(
-                                      sc,
+spark_apply_worker_config <- function(sc,
                                       debug,
                                       profile,
                                       schema = FALSE,
@@ -127,20 +126,40 @@ spark_apply_worker_config <- function(
 #' }
 #'
 #' @export
-spark_apply <- function(x,
-                        f,
-                        columns = NULL,
-                        memory = TRUE,
-                        group_by = NULL,
-                        packages = NULL,
-                        context = NULL,
-                        name = NULL,
-                        barrier = NULL,
-                        fetch_result_as_sdf = TRUE,
-                        partition_index_param = "",
-                        arrow_max_records_per_batch = NULL,
-                        auto_deps = FALSE,
-                        ...) {
+spark_apply <- function(
+    x,
+    f,
+    columns = NULL,
+    memory = TRUE,
+    group_by = NULL,
+    packages = NULL,
+    context = NULL,
+    name = NULL,
+    barrier = NULL,
+    fetch_result_as_sdf = TRUE,
+    partition_index_param = "",
+    arrow_max_records_per_batch = NULL,
+    auto_deps = FALSE,
+    ...) {
+  UseMethod("spark_apply")
+}
+
+#' @export
+spark_apply.default <- function(
+    x,
+    f,
+    columns = NULL,
+    memory = TRUE,
+    group_by = NULL,
+    packages = NULL,
+    context = NULL,
+    name = NULL,
+    barrier = NULL,
+    fetch_result_as_sdf = TRUE,
+    partition_index_param = "",
+    arrow_max_records_per_batch = NULL,
+    auto_deps = FALSE,
+    ...) {
   if (!is.character(partition_index_param)) {
     stop("Expected 'partition_index_param' to be a string.")
   }
@@ -217,8 +236,7 @@ spark_apply <- function(x,
   # build reduced size query plan in case schema needs to be inferred
   if (sdf_is_streaming(sdf)) {
     sdf_limit <- sdf
-  }
-  else {
+  } else {
     sdf_limit <- invoke(
       sdf,
       "limit",
@@ -241,8 +259,7 @@ spark_apply <- function(x,
   if (identical(packages, NULL)) {
     if (identical(packages_config, NULL)) {
       packages <- TRUE
-    }
-    else {
+    } else {
       packages <- packages_config
     }
   }
@@ -312,12 +329,10 @@ spark_apply <- function(x,
 
     if (identical(args$rdd, TRUE)) {
       rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
-    }
-    else if (arrow) {
+    } else if (arrow) {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
       sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone, records_per_batch)
-    }
-    else {
+    } else {
       sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
       sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
     }
@@ -406,8 +421,7 @@ spark_apply <- function(x,
     schema <- spark_schema_from_rdd(sc, rdd, columns)
 
     transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
-  }
-  else {
+  } else {
     json_cols <- c()
     if (identical(columns, NULL) || is.character(columns)) {
       columns_schema <- spark_data_build_types(

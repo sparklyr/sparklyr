@@ -1,3 +1,4 @@
+skip_connection("ml-classification-random-forest-classifier")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -32,3 +33,5 @@ test_that("ml_random_forest_classifier() param setting", {
   )
   test_param_setting(sc, ml_random_forest_classifier, test_args)
 })
+
+test_clear_cache()

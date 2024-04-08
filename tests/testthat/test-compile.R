@@ -1,5 +1,7 @@
+skip_connection("compile")
 skip_on_livy()
 skip_on_arrow_devel()
+skip_on_ci()
 
 scalac_is_available <- function(version, download_path) {
   tryCatch(
@@ -35,3 +37,6 @@ test_that("'spark_default_compilation_spec' can create default specification", {
   dp <- list.files(scalac_download_path)
   expect_gte(length(dp), 3)
 })
+
+test_clear_cache()
+

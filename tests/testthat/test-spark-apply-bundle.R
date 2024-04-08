@@ -1,3 +1,4 @@
+skip_connection("spark-apply-bundle")
 skip_on_livy()
 sc <- testthat_spark_connection()
 
@@ -39,3 +40,6 @@ test_that("'spark_apply_bundle_file' uses different names for different packages
 
   expect_true(purrr_file != tidyr_file)
 })
+
+test_clear_cache()
+

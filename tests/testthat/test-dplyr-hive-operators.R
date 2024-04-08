@@ -1,3 +1,4 @@
+skip_connection("dplyr-hive-operators")
 skip_on_livy()
 
 sc <- testthat_spark_connection()
@@ -52,3 +53,5 @@ test_that("regex relational operators work", {
       ))
   )
 })
+
+test_clear_cache()

@@ -1,3 +1,4 @@
+skip_connection("dplyr-join")
 
 sc <- testthat_spark_connection()
 
@@ -88,3 +89,5 @@ test_that("joins works with user-supplied `.` suffixes", {
     "Replacing '.' with '_' in suffixes. New suffixes: _x, _y"
   )
 })
+
+test_clear_cache()

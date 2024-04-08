@@ -1,3 +1,4 @@
+skip_connection("ml-feature-chisq-selector")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -49,3 +50,6 @@ test_that("ft_chisq_select() works properly", {
 
   expect_equal(r_features, list(18, 12, 15))
 })
+
+test_clear_cache()
+

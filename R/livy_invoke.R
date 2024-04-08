@@ -1,6 +1,5 @@
 # nocov start
 
-#' @import base64enc
 livy_invoke_serialize <- function(sc, static, object, method, ...) {
   if (is.null(sc)) {
     stop("The connection is no longer valid.")
@@ -22,12 +21,12 @@ livy_invoke_serialize <- function(sc, static, object, method, ...) {
   bytes <- rawConnectionValue(rc)
   close(rc)
 
-  base64 <- base64encode(bytes)
+  base64 <- base64_encode(bytes)
   base64
 }
 
 livy_invoke_deserialize <- function(sc, base64) {
-  rv <- base64decode(base64)
+  rv <- base64_decode(base64)
 
   rc <- rawConnection(rv, "r+")
 

@@ -1,3 +1,4 @@
+skip_connection("broom-decision_tree")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -115,4 +116,7 @@ test_that("decision_tree.tidy() works", {
 
 
 })
+
+
+test_clear_cache()
 

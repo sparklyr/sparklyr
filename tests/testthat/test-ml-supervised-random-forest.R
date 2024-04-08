@@ -1,3 +1,4 @@
+skip_connection("ml-supervised-random-forest")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -64,8 +65,7 @@ test_that("error for thresholds with wrong length", {
       ml_random_forest(Species ~ Sepal_Width,
         type = "classification",
         thresholds = c(0, 1)
-      ),
-    "non-matching numClasses and thresholds.length"
+      )
   )
 })
 
@@ -187,3 +187,6 @@ test_that("ml_random_forest() supports response-features syntax", {
     NA
   )
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip_connection("ml-feature-regex-tokenizer")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -62,3 +63,6 @@ test_that("ft_regex_tokenizer() works", {
     )
   )
 })
+
+test_clear_cache()
+

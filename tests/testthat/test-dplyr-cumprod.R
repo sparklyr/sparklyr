@@ -1,5 +1,5 @@
+skip_connection("dplyr-cumprod")
 skip_on_livy()
-
 sc <- testthat_spark_connection()
 
 test_that("cumprod works as expected", {
@@ -30,3 +30,5 @@ test_that("cumprod works as expected", {
     expect_equal(actual, expected)
   }
 })
+
+test_clear_cache()

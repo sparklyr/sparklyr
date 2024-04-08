@@ -1,3 +1,4 @@
+skip_connection("sdf-avro")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -7,7 +8,7 @@ test_that("to_avro and from_avro work properly", {
   test_requires_version("2.4.0")
   skip_databricks_connect()
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     student = list(
       list(name = "Alice", id = 1L, grade = 3.9),
       list(name = "Bob", id = 2L, grade = 3.7),
@@ -74,3 +75,6 @@ test_that("to_avro and from_avro work properly", {
     }
   }
 })
+
+test_clear_cache()
+

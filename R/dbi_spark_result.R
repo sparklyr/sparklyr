@@ -38,16 +38,42 @@ setMethod("dbGetRowsAffected", "DBISparkResult", function(res, ...) {
 })
 
 setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
-  ""
+  # Retrieving an empty result
+  tinyres <- dbSendQuery(res@conn, res@sql)
+  tinyres@sdf <- tinyres@sdf %>% invoke("limit", as.integer(1))
+  sdf_columns <- tinyres@sdf %>% invoke("dtypes")
+  df <- dbFetch(tinyres, n=0)
+
+  columns <- colnames(df)
+  columns_types <- sapply(df, function (x) class(x)[1])
+  columns_sql_types <- sapply(sdf_columns, function(x) { x %>% invoke("_2") })
+
+  columns_info <- data.frame(
+    name=columns,
+    type=columns_types,
+    sql.type=columns_sql_types
+  )
+  rownames(columns_info) <- NULL
+
+  columns_info
 })
 
 setMethod(
   "dbSendQuery",
   "spark_connection",
-  function(conn, statement, ...) {
+  function(conn, statement, ..., params = list()) {
     sql <- as.character(DBI::sqlInterpolate(conn, statement, ...))
 
-    sdf <- invoke(hive_context(conn), "sql", sql)
+    if (spark_version(conn) < "3.4.0" && hasArg("params")) {
+      stop("Native paramtereized queries require Spark 3.4.0 or newer")
+    }
+
+    if(length(params) == 0) {
+      sdf <- invoke(hive_context(conn), "sql", sql)
+    } else {
+      sdf <- invoke(hive_context(conn), "sql", sql, as.environment(params))
+    }
+
     rs <- new("DBISparkResult",
       sql = sql,
       conn = conn,
@@ -101,10 +127,12 @@ setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA
   if (n > 0) {
     range <- 0
     if (nrow(df) > 0) {
-      end <- min(nrow(df), nrow(df))
+      end <- min(nrow(df), end)
       range <- start:end
     }
     df <- df[range, ]
+  } else if (n == 0) {
+    df <- df[0,]
   }
 
   if (nrow(df) == 0) {

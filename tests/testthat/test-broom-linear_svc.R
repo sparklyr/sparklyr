@@ -1,3 +1,4 @@
+skip_connection("broom-linear_svc")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -54,3 +55,6 @@ test_that("broom interface for Linear SVC works", {
     exp.names = c("reg_param", "standardization", "aggregation_depth")
   )
 })
+
+test_clear_cache()
+

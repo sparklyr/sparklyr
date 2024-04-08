@@ -1,3 +1,4 @@
+skip_connection("read-write-multiple")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -106,3 +107,6 @@ test_that(
     "spark_read_text is only suppored with path of length 1 if whole=TRUE"
   )
 )
+
+test_clear_cache()
+

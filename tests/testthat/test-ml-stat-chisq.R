@@ -1,3 +1,4 @@
+skip_connection("ml-stat-chisq")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -41,3 +42,6 @@ test_that("ml_chisquare_test() errors on bad column spec", {
     "All columns specified must be in x\\. Failed to find foo, bar\\."
   )
 })
+
+test_clear_cache()
+

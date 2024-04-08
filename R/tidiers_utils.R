@@ -39,8 +39,8 @@ broom_augment_supervised <- function(x, newdata = NULL, ...) {
 
   preds <- ml_predict(x, newdata)
 
-  orig_vars <- dplyr::tbl_vars(newdata)
-  preds_vars <- dplyr::tbl_vars(preds)
+  orig_vars <- as.character(dplyr::tbl_vars(newdata))
+  preds_vars <- as.character(dplyr::tbl_vars(preds))
 
   rd <- lapply(preds_vars, function(x) ifelse(any(x == orig_vars), "", x))
   rd1 <- as.character(rd)[as.character(rd) != ""]
@@ -88,7 +88,7 @@ fix_data_frame <- function(x, newnames = NULL, newcol = "term") {
       colnames(ret)[-1] <- newnames
     }
   }
-  tibble::as_tibble(ret)
+  dplyr::as_tibble(ret)
 }
 
 # Checks for newdata argument in parsnip models

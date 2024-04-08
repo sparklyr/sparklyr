@@ -1,3 +1,4 @@
+skip_connection("invoke")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -119,3 +120,6 @@ test_that("NaN is handled correctly", {
   jflt <- jfloat(sc, NaN)
   expect_equal(invoke_static(sc, "sparklyr.Test", "readFloat", jflt), NaN)
 })
+
+test_clear_cache()
+

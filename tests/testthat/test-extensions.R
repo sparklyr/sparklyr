@@ -1,3 +1,4 @@
+skip_connection("extensions")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -17,3 +18,6 @@ test_that("spark_dependency_fallback() works correctly", {
     "2.1"
   )
 })
+
+test_clear_cache()
+

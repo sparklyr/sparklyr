@@ -1,3 +1,4 @@
+skip_connection("broom-logistic_regression")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -73,3 +74,6 @@ test_that("logistic_regression tidiers work", {
 
   expect_true(all(glance(lr_parsnip) == gu1))
 })
+
+test_clear_cache()
+

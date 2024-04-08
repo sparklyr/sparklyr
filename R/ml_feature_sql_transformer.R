@@ -68,6 +68,10 @@ new_ml_sql_transformer <- function(jobj) {
 }
 
 validator_ml_sql_transformer <- function(.args) {
+  if (inherits(.args[["statement"]], "sql")) {
+    .args[["statement"]] <- as.character(.args[["statement"]])
+  }
+
   .args[["statement"]] <- cast_nullable_string(.args[["statement"]])
   .args[["uid"]] <- cast_string(.args[["uid"]])
   .args

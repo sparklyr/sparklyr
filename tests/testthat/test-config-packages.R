@@ -1,3 +1,4 @@
+skip_connection("config-packages")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -29,3 +30,6 @@ test_that("spark_config_packages() defaults to latest veresion", {
       strsplit("\\.") %>% `[[`(1) %>% length()
   )
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip_connection("ml-tree-feature-importances")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -80,3 +81,6 @@ test_that("ml_feature_importances work properly (#1436)", {
 
   expect_equal(importances1, importances2)
 })
+
+test_clear_cache()
+

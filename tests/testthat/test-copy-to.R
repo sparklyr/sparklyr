@@ -1,3 +1,4 @@
+skip_connection("copy-to")
 skip_on_livy()
 
 sc <- testthat_spark_connection()
@@ -34,12 +35,12 @@ test_that("sdf_copy_to supports list of callbacks", {
 })
 
 test_that("sdf_copy_to works for json serializer", {
-  dfjson <- tibble::tibble(
+  dfjson <- dplyr::tibble(
     g = c(1, 2, 3),
     data = list(
-      tibble::tibble(x = 1, y = 2),
-      tibble::tibble(x = 4:5, y = 6:7),
-      tibble::tibble(x = 10)
+      dplyr::tibble(x = 1, y = 2),
+      dplyr::tibble(x = 4:5, y = 6:7),
+      dplyr::tibble(x = 10)
     )
   )
 
@@ -60,7 +61,7 @@ test_that("sdf_copy_to can preserve list columns", {
     skip("preserving list columns is only supported with Spark 2.4+")
   }
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     a = list(
       c(11.2, -222.345, NaN, 6.78901234),
       c(22.3333, NA_real_, 333.456789),
@@ -94,7 +95,7 @@ test_that("sdf_copy_to supports binary columns", {
   expect_warning_on_arrow(
     sdf <- sdf_copy_to(
       sc,
-      tibble::tibble(x = lapply(expected, function(x) serialize(x, NULL)))
+      dplyr::tibble(x = lapply(expected, function(x) serialize(x, NULL)))
     )
   )
 
@@ -107,7 +108,7 @@ test_that("sdf_copy_to supports binary columns", {
 test_that("sdf_copy_to preserves NA_real_ correctly", {
   sdf <- sdf_copy_to(
     sc,
-    tibble::tibble(x = c(NA_real_, 1.1, 2.2))
+    dplyr::tibble(x = c(NA_real_, 1.1, 2.2))
   )
 
   expect_equal(
@@ -115,3 +116,5 @@ test_that("sdf_copy_to preserves NA_real_ correctly", {
     c(TRUE, FALSE, FALSE)
   )
 })
+
+test_clear_cache()

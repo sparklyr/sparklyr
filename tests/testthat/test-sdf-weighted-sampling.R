@@ -1,3 +1,4 @@
+skip_connection("sdf-weighted-sampling")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -95,3 +96,5 @@ test_that("sdf_weighted_sample returns repeatable results from a fixed PRNG seed
     )
   }
 })
+
+test_clear_cache()

@@ -1,3 +1,20 @@
+#' It lets the package know if it should test a particular functionality or not
+#' @details
+#' It expects a boolean to be returned. If TRUE, the corresponding test will be
+#' skipped. If FALSE the test will be conducted.
+#'
+#' @param sc Spark connection
+#' @param test_name The name of the test
+#' @export
+spark_integ_test_skip <- function(sc, test_name) {
+  UseMethod("spark_integ_test_skip")
+}
+
+#' @export
+spark_integ_test_skip.default <- function(sc, test_name) {
+  FALSE
+}
+
 is.installed <- function(package) {
   is.element(package, installed.packages()[, 1])
 }
@@ -288,7 +305,7 @@ path_program <- function(program, fmt = NULL) {
 }
 
 infer_active_package_name <- function() {
-  root <- rprojroot::find_package_root_file()
+  root <- package_root()
   dcf <- read.dcf(file.path(root, "DESCRIPTION"), all = TRUE)
   dcf$Package
 }
@@ -478,14 +495,28 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
         }
       }
     ) %>%
-    tibble::as_tibble()
+    dplyr::as_tibble()
 }
 
-simulate_vars.tbl_spark <- function(x, drop_groups = FALSE) {
-  simulate_vars_spark(x, drop_groups)
+#' @importFrom tidyselect tidyselect_data_proxy tidyselect_data_has_predicates
+#' @export
+tidyselect_data_proxy.tbl_spark <- function(x) {
+  if(tidyselect_data_has_predicates(x)) {
+    simulate_vars_spark(x, FALSE)
+  } else {
+    NextMethod()
+  }
 }
 
-simulate_vars_is_typed.tbl_spark <- function(x) TRUE
+#' @export
+tidyselect_data_has_predicates.tbl_spark <- function(x) {
+  supported <- unlist(options("sparklyr.support.predicates"))
+  out <- TRUE
+  if(!is.null(supported)) {
+    out <- supported
+  }
+  out
+}
 
 # wrapper for download.file()
 download_file <- function(...) {
@@ -522,7 +553,7 @@ infer_required_r_packages <- function(fn) {
   rlang::fn_body(fn) %>%
     globals::walkAST(
       call = function(x) {
-        cfn <- rlang::call_fn(x)
+        cfn <- rlang::eval_bare(x[[1]])
 
         for (mfn in list(base::library,
                          base::require,
@@ -556,6 +587,101 @@ infer_required_r_packages <- function(fn) {
   ls(deps)
 }
 
+get_os <- function() {
+  if (.Platform$OS.type == "windows") {
+    "win"
+  } else if (Sys.info()["sysname"] == "Darwin") {
+    "mac"
+  } else {
+    "unix"
+  }
+}
+
 os_is_windows <- function() {
-  .Platform$OS.type == "windows"
+  get_os() == "win"
+}
+
+cast_string <- function(x) {
+  vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
+  vctrs::vec_cast(x, character())
+}
+
+cast_scalar_logical <- function(x) {
+  vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
+  vctrs::vec_cast(x, logical())
+}
+
+cast_scalar_double <- function(x) {
+  vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
+  vctrs::vec_cast(x, numeric())
+}
+
+cast_scalar_integer <- function(x) {
+  vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
+  vctrs::vec_cast(x, integer())
+}
+
+cast_nullable_string <- function(x) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+
+  cast_string(x)
+}
+
+cast_nullable_scalar_double <- function(x) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+
+  cast_scalar_double(x)
+}
+
+cast_nullable_scalar_integer <- function(x) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+
+  cast_scalar_integer(x)
+}
+
+
+cast_double <- function(x) {
+  vctrs::vec_cast(x, numeric())
+}
+
+cast_integer <- function(x) {
+  vctrs::vec_cast(x, integer())
+}
+
+cast_list <- function(x, ptype, allow_null = FALSE) {
+  if (is.null(x)) {
+    if (allow_null) {
+      return(NULL)
+    } else {
+      rlang::abort("{.arg x} must not be `NULL`.")
+    }
+  }
+
+  if (is.list(x)) {
+    x <- vctrs::list_unchop(x)
+  }
+  x <- vctrs::vec_cast(x, to = ptype)
+  vctrs::vec_chop(x)
+}
+
+cast_string_list <- function(x, allow_null = FALSE) {
+  cast_list(x, character(), allow_null = allow_null)
+}
+
+cast_integer_list <- function(x, allow_null = FALSE) {
+  cast_list(x, integer(), allow_null = allow_null)
+}
+
+cast_double_list <- function(x, allow_null = FALSE) {
+  cast_list(x, numeric(), allow_null = allow_null)
+}
+
+cast_choice <- function(x, choices, error_arg = rlang::caller_arg(x), error_call = rlang::caller_env()) {
+  rlang::arg_match(x, choices, error_arg = error_arg, error_call = error_call)
 }

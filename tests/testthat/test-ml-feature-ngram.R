@@ -1,3 +1,4 @@
+skip_connection("ml-feature-ngram")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -51,3 +52,6 @@ test_that("ft_ngram() works properly", {
     )
   )
 })
+
+test_clear_cache()
+

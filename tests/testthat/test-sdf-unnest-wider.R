@@ -1,3 +1,4 @@
+skip_connection("sdf-unnest-wider")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -5,7 +6,7 @@ sc <- testthat_spark_connection()
 
 sdf <- copy_to(
   sc,
-  tibble::tibble(
+  dplyr::tibble(
     x = 1:3,
     y = list(list(a = 1, b = 2), list(a = 3, b = 4), list(a = 5, b = 6))
   )
@@ -16,7 +17,7 @@ test_that("can unnest a struct column", {
 
   expect_equivalent(
     sdf %>% sdf_unnest_wider(y) %>% collect(),
-    tibble::tibble(x = 1:3, a = c(1, 3, 5), b = c(2, 4, 6))
+    dplyr::tibble(x = 1:3, a = c(1, 3, 5), b = c(2, 4, 6))
   )
 })
 
@@ -31,7 +32,7 @@ test_that("`names_sep` works as expected", {
 
   expect_equivalent(
     sdf %>% sdf_unnest_wider(y, names_sep = "_") %>% collect(),
-    tibble::tibble(x = 1:3, y_a = c(1, 3, 5), y_b = c(2, 4, 6))
+    dplyr::tibble(x = 1:3, y_a = c(1, 3, 5), y_b = c(2, 4, 6))
   )
 })
 
@@ -43,7 +44,7 @@ test_that("`names_repair` works as expected", {
       dplyr::rename(y_a = x) %>%
       sdf_unnest_wider(y, names_sep = "_", names_repair = "universal") %>%
       collect(),
-    tibble::tibble(y_a___1 = 1:3, y_a___2 = c(1, 3, 5), y_b = c(2, 4, 6))
+    dplyr::tibble(y_a___1 = 1:3, y_a___2 = c(1, 3, 5), y_b = c(2, 4, 6))
   )
 })
 
@@ -54,7 +55,7 @@ test_that("`ptype` works as expected", {
 
   expect_equivalent(
     sdf %>% sdf_unnest_wider(y, ptype = ptype) %>% collect(),
-    tibble::tibble(x = c(1, 2, 3), a = c("1", "3", "5"), b = c(2L, 4L, 6L))
+    dplyr::tibble(x = c(1, 2, 3), a = c("1", "3", "5"), b = c(2L, 4L, 6L))
   )
 })
 
@@ -65,6 +66,9 @@ test_that("`transform` works as expected", {
 
   expect_equivalent(
     sdf %>% sdf_unnest_wider(y, transform = transform) %>% collect(),
-    tibble::tibble(x = c("1", "2", "3"), a = c(1L, 3L, 5L), b = c(2, 4, 6))
+    dplyr::tibble(x = c("1", "2", "3"), a = c(1L, 3L, 5L), b = c(2, 4, 6))
   )
 })
+
+test_clear_cache()
+

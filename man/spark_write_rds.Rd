@@ -9,8 +9,8 @@ spark_write_rds(x, dest_uri)
 \arguments{
 \item{x}{A Spark DataFrame to be exported}
 
-\item{dest_uri}{Can be a URI template containing "{partitionId}" (e.g.,
-\code{"hdfs://my_data_part_{partitionId}.rds"}) where "{partitionId}" will be
+\item{dest_uri}{Can be a URI template containing `partitionId` (e.g.,
+\code{"hdfs://my_data_part_{partitionId}.rds"}) where `partitionId` will be
 substituted with ID of each partition using `glue`, or a list of URIs
 to be assigned to RDS output from all partitions (e.g.,
 \code{"hdfs://my_data_part_0.rds"}, \code{"hdfs://my_data_part_1.rds"}, and so on)

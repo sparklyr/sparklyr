@@ -1,3 +1,4 @@
+skip_connection("connect-shell")
 skip_on_livy()
 
 skip_databricks_connect()
@@ -154,3 +155,6 @@ test_that("Misc tests", {
     spark_log_file(testthat_spark_connection())
     )
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip_connection("broom-lda")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -67,3 +68,6 @@ test_that("lda.tidy() works", {
     )
   )
 })
+
+test_clear_cache()
+

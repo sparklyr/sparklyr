@@ -1,3 +1,4 @@
+skip_connection("ml-regression-aft-survival-regression")
 skip_on_livy()
 skip_on_arrow_devel()
 skip_databricks_connect()
@@ -140,4 +141,7 @@ test_that("Tuning works with AFT", {
   expect_equal(dim(cv_metrics), c(4, 3))
 })
 
+
+
+test_clear_cache()
 

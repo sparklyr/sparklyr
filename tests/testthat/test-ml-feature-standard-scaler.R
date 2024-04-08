@@ -1,3 +1,4 @@
+skip_connection("ml-feature-standard-scaler")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -54,3 +55,6 @@ test_that("ft_standard_scaler() works properly", {
     output_file("print/standard-scaler-model.txt")
   )
 })
+
+test_clear_cache()
+

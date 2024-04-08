@@ -1,3 +1,4 @@
+skip_connection("ml-regression-linear-regression")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -162,4 +163,7 @@ test_that("Tuning works with Linear Regression", {
   expect_equal(dim(cv_metrics), c(4, 3))
 })
 
+
+
+test_clear_cache()
 

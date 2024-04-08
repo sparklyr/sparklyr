@@ -1,3 +1,4 @@
+skip_connection("broom-random_forest")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -117,3 +118,6 @@ test_that("random_forest.tidy() works", {
     names(gl2)
   )
 })
+
+test_clear_cache()
+

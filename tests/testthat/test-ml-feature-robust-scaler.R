@@ -1,3 +1,4 @@
+skip_connection("ml-feature-robust-scaler")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -30,3 +31,6 @@ test_that("ft_robust_scaler() works properly", {
     )
   )
 })
+
+test_clear_cache()
+

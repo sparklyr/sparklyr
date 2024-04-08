@@ -1,3 +1,4 @@
+skip_connection("ml-evaluation-clustering")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -54,3 +55,6 @@ test_that("ml_clustering_evalator() can be used in a CV pipeline", {
     NA
   )
 })
+
+test_clear_cache()
+

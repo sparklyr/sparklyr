@@ -1,3 +1,4 @@
+skip_connection("dplyr-hof")
 skip_on_livy()
 
 test_requires("dplyr")
@@ -5,7 +6,7 @@ test_requires("dplyr")
 sc <- testthat_spark_connection()
 test_tbl <- testthat_tbl(
   name = "hof_test_data",
-  data = tibble::tibble(
+  data = dplyr::tibble(
     x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
     y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
     z = c(11, 12)
@@ -14,13 +15,13 @@ test_tbl <- testthat_tbl(
 
 single_col_tbl <- testthat_tbl(
   name = "hof_test_data_single_col",
-  data = tibble::tibble(x = list(1:5, 6:10))
+  data = dplyr::tibble(x = list(1:5, 6:10))
 )
 
 build_map_tbl <- function() {
   sdf_copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       m1 = c("{\"1\":2,\"4\":3,\"6\":5}", "{\"2\":1,\"3\":4,\"8\":7}"),
       m2 = c("{\"2\":1,\"3\":4,\"8\":7}", "{\"6\":5,\"4\":3,\"1\":2}")
     ),
@@ -35,7 +36,7 @@ build_map_tbl <- function() {
 build_map_zip_with_test_tbl <- function() {
   sdf_copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       m1 = c("{\"1\":2,\"3\":4,\"5\":6}", "{\"2\":1,\"4\":3,\"6\":5}"),
       m2 = c("{\"1\":1,\"3\":3,\"5\":5}", "{\"2\":2,\"4\":4,\"6\":6}")
     ),
@@ -62,7 +63,7 @@ test_that("'hof_transform' creating a new column", {
 
   expect_equivalent(
     sq,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -80,7 +81,7 @@ test_that("'hof_transform' overwriting an existing column", {
 
   expect_equivalent(
     sq,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 4, 9, 16, 25), c(36, 49, 64, 81, 100)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -97,7 +98,7 @@ test_that("'hof_transform' works with array(...) expression", {
 
   expect_equivalent(
     sq,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = list(c(4, 9), c(9, 16))
@@ -114,7 +115,7 @@ test_that("'hof_transform' works with formula", {
 
   expect_equivalent(
     sq,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 4, 9, 16, 25), c(36, 49, 64, 81, 100)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -131,7 +132,7 @@ test_that("'hof_transform' works with default args", {
 
   expect_equivalent(
     sq,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 4, 9, 16, 25), c(36, 49, 64, 81, 100)),
     )
   )
@@ -147,7 +148,7 @@ test_that("transform() works through dbplyr", {
 
     expect_equivalent(
       sq,
-      tibble::tibble(
+      dplyr::tibble(
         x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
         y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
         z = c(11, 12),
@@ -166,7 +167,7 @@ test_that("'hof_filter' creating a new column", {
 
   expect_equivalent(
     filtered,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -184,7 +185,7 @@ test_that("'hof_filter' overwriting an existing column", {
 
   expect_equivalent(
     filtered,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 3, 4), c(6, 7, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -201,7 +202,7 @@ test_that("'hof_filter' works with array(...) expression", {
 
   expect_equivalent(
     filtered,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = list(c(8), c(8, 11))
@@ -218,7 +219,7 @@ test_that("'hof_filter' works with formula", {
 
   expect_equivalent(
     filtered,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 3, 4), c(6, 7, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -235,7 +236,7 @@ test_that("'hof_filter' works with default args", {
 
   expect_equivalent(
     sq,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 3, 5), c(7, 9)),
     )
   )
@@ -251,7 +252,7 @@ test_that("filter() works through dbplyr", {
 
     expect_equivalent(
       filtered,
-      tibble::tibble(
+      dplyr::tibble(
         x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
         y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
         z = c(11, 12),
@@ -275,7 +276,7 @@ test_that("'hof_aggregate' creating a new column", {
 
   expect_equivalent(
     agg,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -298,7 +299,7 @@ test_that("'hof_aggregate' overwriting an existing column", {
 
   expect_equivalent(
     agg,
-    tibble::tibble(
+    dplyr::tibble(
       x = c(26, 52),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -320,7 +321,7 @@ test_that("'hof_aggregate' works with array(...) expression", {
 
   expect_equivalent(
     agg,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -344,7 +345,7 @@ test_that("'hof_aggregate' applies 'finish' transformation correctly", {
 
   expect_equivalent(
     agg,
-    tibble::tibble(
+    dplyr::tibble(
       x = c(676, 2704),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -367,7 +368,7 @@ test_that("'hof_aggregate' can apply formula as 'finish' transformation", {
 
   expect_equivalent(
     agg,
-    tibble::tibble(
+    dplyr::tibble(
       x = c(676, 2704),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -389,7 +390,7 @@ test_that("'hof_aggregate' works with formula", {
 
   expect_equivalent(
     agg,
-    tibble::tibble(
+    dplyr::tibble(
       x = c(26, 52),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -406,7 +407,7 @@ test_that("'hof_aggregate' works with default args", {
 
   expect_equivalent(
     agg,
-    tibble::tibble(x = c("(54321-)", "(109876-)"))
+    dplyr::tibble(x = c("(54321-)", "(109876-)"))
   )
 })
 
@@ -420,7 +421,7 @@ test_that("aggregate() works through dbplyr", {
 
     expect_equivalent(
       agg,
-      tibble::tibble(
+      dplyr::tibble(
         x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
         y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
         z = c(11, 12),
@@ -435,7 +436,7 @@ test_that("aggregate() works through dbplyr", {
 
       expect_equivalent(
         agg,
-        tibble::tibble(
+        dplyr::tibble(
           x = c(676, 2704),
           y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
           z = c(11, 12)
@@ -458,7 +459,7 @@ test_that("'hof_exists' creating a new column", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -480,7 +481,7 @@ test_that("'hof_exists' overwriting an existing column", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = c(TRUE, FALSE),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -501,7 +502,7 @@ test_that("'hof_exists' works with array(...) expression", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = c(FALSE, TRUE),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -518,7 +519,7 @@ test_that("'hof_exists' works with array(...) expression", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = c(TRUE, TRUE),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -535,7 +536,7 @@ test_that("'hof_exists' works with array(...) expression", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = c(FALSE, FALSE),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -556,7 +557,7 @@ test_that("'hof_exists' works with formula", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = c(TRUE, FALSE),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -573,7 +574,7 @@ test_that("'hof_exists' works with default args", {
 
   expect_equivalent(
     res,
-    tibble::tibble(x = c(TRUE, FALSE))
+    dplyr::tibble(x = c(TRUE, FALSE))
   )
 })
 
@@ -587,7 +588,7 @@ test_that("exists() works through dbplyr", {
 
     expect_equivalent(
       res,
-      tibble::tibble(
+      dplyr::tibble(
         x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
         y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
         z = c(11, 12),
@@ -611,7 +612,7 @@ test_that("'hof_zip_with' creating a new column", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -634,7 +635,7 @@ test_that("'hof_zip_with' overwriting an existing column", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 8, 6, 32, 25), c(42, 7, 32, 18, 80)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -656,7 +657,7 @@ test_that("'hof_zip_with' works with array(...) expression", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(6, 11, 55, 68), c(6, 12, 60, 68)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -678,7 +679,7 @@ test_that("'hof_zip_with' works with formula", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 8, 6, 32, 25), c(42, 7, 32, 18, 80)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -695,7 +696,7 @@ test_that("'hof_zip_with' works with default args", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = list(c(1, 8, 6, 32, 25), c(42, 7, 32, 18, 80))
@@ -713,7 +714,7 @@ test_that("zip_with() works through dbplyr", {
 
     expect_equivalent(
       res,
-      tibble::tibble(
+      dplyr::tibble(
         x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
         y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
         z = c(11, 12),
@@ -736,7 +737,7 @@ test_that("'hof_array_sort' creating a new column", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -757,7 +758,7 @@ test_that("'hof_array_sort' overwriting an existing column", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(5, 4, 3, 2, 1), c(10, 9, 8, 7, 6)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -778,7 +779,7 @@ test_that("'hof_array_sort' works with array(...) expression", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -800,7 +801,7 @@ test_that("'hof_array_sort' works with formula", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -818,7 +819,7 @@ test_that("'hof_array_sort' works with default args", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(5:1, 10:6)
     )
   )
@@ -833,7 +834,7 @@ test_that("array_sort() works through dbplyr", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 2, 4, 5, 8), c(1, 2, 4, 7, 8)),
       z = c(11, 12)
@@ -851,7 +852,7 @@ test_that("array_sort() works through dbplyr", {
 
     expect_equivalent(
       res,
-      tibble::tibble(
+      dplyr::tibble(
         x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
         y = list(c(8, 5, 4, 2, 1), c(8, 7, 4, 2, 1)),
         z = c(11, 12)
@@ -1157,7 +1158,7 @@ test_that("'hof_forall' creating a new column", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -1178,7 +1179,7 @@ test_that("'hof_forall' overwriting an existing column", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = c(FALSE, TRUE),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12)
@@ -1199,7 +1200,7 @@ test_that("'hof_forall' works with array(...) expression", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -1221,7 +1222,7 @@ test_that("'hof_forall' works with formula", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -1237,7 +1238,7 @@ test_that("'hof_forall' works with default args", {
     hof_forall(~ .x != 5) %>%
     collect()
 
-  expect_equivalent(res, tibble::tibble(x = c(FALSE, TRUE)))
+  expect_equivalent(res, dplyr::tibble(x = c(FALSE, TRUE)))
 })
 
 test_that("forall() works through dbplyr", {
@@ -1250,7 +1251,7 @@ test_that("forall() works through dbplyr", {
 
     expect_equivalent(
       res,
-      tibble::tibble(
+      dplyr::tibble(
         x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
         y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
         z = c(11, 12),
@@ -2101,7 +2102,7 @@ test_that("accessing struct field inside lambda expression", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -2131,7 +2132,7 @@ test_that("accessing struct field inside formula", {
 
   expect_equivalent(
     res,
-    tibble::tibble(
+    dplyr::tibble(
       x = list(c(1, 2, 3, 4, 5), c(6, 7, 8, 9, 10)),
       y = list(c(1, 4, 2, 8, 5), c(7, 1, 4, 2, 8)),
       z = c(11, 12),
@@ -2142,3 +2143,5 @@ test_that("accessing struct field inside formula", {
     )
   )
 })
+
+test_clear_cache()

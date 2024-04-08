@@ -1,3 +1,4 @@
+skip_connection("ml-classification-gbt-classifier")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -33,3 +34,6 @@ test_that("ml_gbt_classifier() param setting", {
   )
   test_param_setting(sc, ml_gbt_classifier, test_args)
 })
+
+test_clear_cache()
+

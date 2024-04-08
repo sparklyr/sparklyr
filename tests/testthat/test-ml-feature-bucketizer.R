@@ -1,3 +1,4 @@
+skip_connection("ml-feature-bucketizer")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -57,3 +58,6 @@ test_that("ft_bucketizer() can mutate multiple columns", {
     c("drat", "hp", "drat_out", "hp_out")
   )
 })
+
+test_clear_cache()
+

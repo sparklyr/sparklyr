@@ -1,3 +1,4 @@
+skip_connection("config")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -114,3 +115,6 @@ test_that("spark_config warns() if non-existent file is passed", {
     "Error reading config file:"
   )
 })
+
+test_clear_cache()
+

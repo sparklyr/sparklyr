@@ -1,3 +1,4 @@
+skip_connection("ml-regression-gbt-regressor")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -73,3 +74,6 @@ test_that("Tuning works GBT", {
   cv_metrics <- ml_validation_metrics(cv_model)
   expect_equal(dim(cv_metrics), c(4, 3))
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip_connection("broom-gradient_boosted_trees")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -120,3 +121,6 @@ test_that("gradient_boosted_trees.tidy() works", {
 
   expect_true(all(glance(bt_regression_parsnip) == gl2))
 })
+
+test_clear_cache()
+

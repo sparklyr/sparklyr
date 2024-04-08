@@ -1,3 +1,4 @@
+skip_connection("broom-kmeans")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -60,3 +61,6 @@ test_that("kmeans.tidy() works", {
     )
   }
 })
+
+test_clear_cache()
+

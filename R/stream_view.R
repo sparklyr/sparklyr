@@ -32,12 +32,11 @@ stream_progress <- function(stream) {
 #'   stream_view() %>%
 #'   stream_stop()
 #' }
-#' @import r2d3
 #' @export
 stream_view <- function(
                         stream,
                         ...) {
-  if (!"shiny" %in% installed.packages()) stop("The 'shiny' package is required for this operation.")
+  stream_package_check("shiny")
 
   validate <- stream_progress(stream)
   interval <- 1000
@@ -46,6 +45,12 @@ stream_view <- function(
   tags <- get("tags", envir = asNamespace("shiny"))
   div <- get("div", envir = asNamespace("shiny"))
   HTML <- get("HTML", envir = asNamespace("shiny"))
+
+  stream_package_check("r2d3")
+  d3Output <- get("d3Output", envir = asNamespace("r2d3"))
+  renderD3 <- get("renderD3", envir = asNamespace("r2d3"))
+  r2d3 <- get("r2d3", envir = asNamespace("r2d3"))
+
   ui <- shinyUI(
     div(
       tags$head(
@@ -170,13 +175,16 @@ stream_stats <- function(stream, stats = list()) {
 #' stream_render(stream)
 #' stream_stop(stream)
 #' }
-#' @import r2d3
 #' @export
 stream_render <- function(
                           stream = NULL,
                           collect = 10,
                           stats = NULL,
                           ...) {
+
+  stream_package_check("r2d3")
+  r2d3 <- get("r2d3", envir = asNamespace("r2d3"))
+
   if (is.null(stats)) {
     stats <- stream_stats(stream)
 
@@ -196,4 +204,11 @@ stream_render <- function(
     container = "div",
     options = options
   )
+}
+
+
+stream_package_check <- function(x) {
+  if (!(x %in% installed.packages())) {
+    stop(glue::glue("The '{x}' package is required for this operation.") )
+  }
 }

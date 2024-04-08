@@ -149,20 +149,23 @@ spark_config_value_retries <- function(config, name, default, retries) {
 #' @param scala_version Acceptable Scala version of packages to be loaded
 #' @param ... Additional configurations
 #'
-#' @keywords interenal
+#' @keywords internal
 #' @export
 spark_config_packages <- function(config, packages, version, scala_version = NULL, ...) {
   version <- spark_version_latest(version)
+
+  if (version >= "2.4.1") {
+    scala_version <- "2.12"
+    } else {
+      scala_version <- scala_version %||% "2.11"
+    }
 
   if ("kafka" %in% packages) {
     packages <- packages[-which(packages == "kafka")]
 
     if (version < "2.0.0") stop("Kafka requires Spark 2.x")
 
-    kafka_package <- sprintf(
-      "org.apache.spark:spark-sql-kafka-0-10_%s:",
-      if (version >= "2.4.1") "2.12" else scala_version %||% "2.11"
-    )
+    kafka_package <- sprintf("org.apache.spark:spark-sql-kafka-0-10_%s:", scala_version)
     kafka_package <- paste0(kafka_package, version)
 
     config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, kafka_package)
@@ -173,19 +176,40 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
 
     if (version < "2.4.2") stop("Delta Lake requires Spark 2.4.2 or newer")
 
-    delta_version <- "0.6.1"
-    if(version >= "3.0") delta_version <- "0.8.0"
-    if(version >= "3.1") delta_version <- "1.0.0"
-    if(version >= "3.2") delta_version <- "1.2.1"
+    delta <- list(
+      list(spark = "2.4", delta = "0.7.0"),
+      list(spark = "3.0", delta = "0.8.0"),
+      list(spark = "3.1", delta = "1.0.1"),
+      list(spark = "3.2", delta = "2.0.2"),
+      list(spark = "3.3", delta = "2.3.0"),
+      list(spark = "3.4", delta = "2.4.0"),
+      list(spark = "3.5", delta = "3.0.0")
+    ) %>%
+      purrr::keep(~ .x$spark >= substr(version, 1, 3)) %>%
+      head(1) %>%
+      unlist()
+
+    delta_version <- delta[2]
+
+    if(version >= "3.5") {
+      delta_name <- "delta-spark"
+    } else{
+      delta_name <- "delta-core"
+    }
 
     config$sparklyr.shell.packages <- c(
       config$sparklyr.shell.packages,
       sprintf(
-        "io.delta:delta-core_%s:%s",
-        if (version >= "3.0.0") "2.12" else scala_version %||% "2.11",
+        "io.delta:%s_%s:%s",
+        delta_name,
+        scala_version,
         delta_version
-      )
+        )
     )
+    if(version >= 3.3) {
+      config$`spark.sql.extensions` <- "io.delta.sql.DeltaSparkSessionExtension"
+      config$`spark.sql.catalog.spark_catalog` <- "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+    }
   }
 
   if ("avro" %in% packages) {

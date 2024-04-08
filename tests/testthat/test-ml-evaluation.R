@@ -1,3 +1,4 @@
+skip_connection("ml-evaluation")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -62,3 +63,6 @@ test_that("ml evaluator print methods work", {
     print = TRUE
   )
 })
+
+test_clear_cache()
+

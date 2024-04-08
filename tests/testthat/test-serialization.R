@@ -1,3 +1,4 @@
+skip_connection("serialization")
 skip_on_livy()
 
 sc <- testthat_spark_connection()
@@ -155,7 +156,7 @@ test_that("collect() can retrieve all data types correctly", {
   rtime <- "2010-01-01 01:01:10"
   atime <- as.character(as.POSIXct(utime, origin = "1970-01-01"))
 
-  hive_type <- tibble::tribble(
+  hive_type <- dplyr::tribble(
     ~stype,            ~svalue,      ~rtype,     ~rvalue,      ~atype,     ~avalue,
     "tinyint",             "1",   "integer",         "1",   "integer",         "1",
     "smallint",            "1",   "integer",         "1",   "integer",         "1",
@@ -214,7 +215,7 @@ test_that("collect() can retrieve all data types correctly", {
 test_that("collect() can retrieve NULL data types as NAs", {
   library(dplyr)
 
-  hive_type <- tibble::tribble(
+  hive_type <- dplyr::tribble(
     ~stype, ~rtype, ~atype,
     "tinyint", "integer", "integer",
     "smallint", "integer", "integer",
@@ -261,7 +262,7 @@ test_that("collect() can retrieve NULL data types as NAs", {
 test_that("collect() can retrieve date types successfully", {
   skip_on_windows()
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     date = as.Date(
       c(
         "1000-01-01",
@@ -386,7 +387,7 @@ test_that("array of temporal values are preserved with Spark 3.0+", {
   test_requires_version("3.0.0")
   skip_on_arrow()
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     char = c("one", "two"),
     int = c(3L, 4L),
     int_arr = list(seq(5), seq(10)),
@@ -404,3 +405,6 @@ test_that("array of temporal values are preserved with Spark 3.0+", {
 
   expect_equivalent(sdf %>% collect(), df)
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip_connection("broom-multilayer_perceptron")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -73,3 +74,6 @@ test_that("multilayer_perceptron.tidy() works", {
     exp.names = c("input_units", "hidden_1_units", "hidden_2_units","output_units")
   )
 })
+
+test_clear_cache()
+

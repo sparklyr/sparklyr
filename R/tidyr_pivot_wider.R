@@ -61,7 +61,7 @@ pivot_wider.tbl_spark <- function(data,
 
 #' @importFrom purrr reduce map transpose
 #' @importFrom tidyselect eval_select
-#' @importFrom tibble tibble
+#' @importFrom dplyr tibble
 #' @importFrom rlang `!!` enquos enquo
 #' @importFrom dplyr ungroup arrange
 sdf_build_wider_spec <- function(data,
@@ -146,7 +146,7 @@ sdf_pivot_wider <- function(data,
   if (!rlang::quo_is_null(id_cols)) {
     key_vars <- names(tidyselect::eval_select(id_cols, colnames_df))
   } else {
-    key_vars <- dplyr::tbl_vars(colnames_df)
+    key_vars <- as.character(dplyr::tbl_vars(colnames_df))
   }
   key_vars <- setdiff(key_vars, spec_cols)
 
@@ -230,7 +230,7 @@ sdf_pivot_wider <- function(data,
   val_sql_type <- invoke(combined_schema_obj, "fields")[[val_field_idx]] %>%
     invoke("%>%", list("dataType"), list("sql"))
   fv <- values_fill[[value]]
-  val_fill_sql <- dbplyr::translate_sql_(list(fv), con = dbplyr::simulate_dbi()) %>%
+  val_fill_sql <- dbplyr::translate_sql_(list(fv), con = dbplyr::simulate_hive()) %>%
     dplyr::sql() %>%
     list()
   names(val_fill_sql) <- value

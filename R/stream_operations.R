@@ -386,7 +386,7 @@ to_milliseconds <- function(dur) {
 #' sc <- spark_connect(master = "local", version = "2.2.0")
 #'
 #' streaming_path <- tempfile("days_df_")
-#' days_df <- tibble::tibble(
+#' days_df <- dplyr::tibble(
 #'   today = weekdays(as.Date(seq(7), origin = "1970-01-01"))
 #' )
 #' num_iters <- 7

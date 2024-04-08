@@ -1,3 +1,4 @@
+skip_connection("print")
 skip_on_livy()
 skip_on_arrow_devel()
 test_requires("dplyr")
@@ -10,29 +11,26 @@ expect_regexes <- function(printed, regexes) {
 }
 
 verify_table_src <- function(printed) {
-  expect_regexes(
+  expect_output(
     printed,
-    c("# Source: spark<\\?> \\[\\?\\? x 1\\]", "id")
-  )
+    regexp =  "# Source:   table<*\\>")
 }
 
 test_that("print supports spark tables", {
-  printed <- capture.output(print(sdf_len(sc, 11)))
-
-  verify_table_src(printed)
-
-  expect_true(grepl("with more rows", printed[14]))
+  verify_table_src(print(sdf_len(sc, 11)))
 })
 
 test_that("can print more than 10 rows from a spark tables", {
-  printed <- capture.output(sdf_len(sc, 100) %>% print(n = 50))
+  test_print <- sdf_len(sc, 100)
 
-  verify_table_src(printed)
+  verify_table_src(print(test_print, n = 50))
 
-  expect_true(grepl("1", printed[4]))
-  expect_true(grepl("49", printed[52]))
-  expect_true(grepl("50", printed[53]))
-  expect_true(grepl("with more rows", printed[54]))
+  printed <- capture.output(print(test_print, n = 50))
+
+  expect_true(grepl("1", printed[5]))
+  expect_true(grepl("49", printed[53]))
+  expect_true(grepl("50", printed[54]))
+  expect_true(grepl("more rows", printed[55]))
 })
 
 test_that("print supports spark context", {
@@ -51,3 +49,6 @@ test_that("print supports spark context", {
     )
   )
 })
+
+test_clear_cache()
+

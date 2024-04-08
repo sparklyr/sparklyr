@@ -1,3 +1,4 @@
+skip_connection("ml-feature-polynomial-expansion")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -35,3 +36,6 @@ test_that("ft_polynomial_expansion() works properly", {
     list(c(2, 4, 8, 1, 2, 4, 1, 2, 1))
   )
 })
+
+test_clear_cache()
+

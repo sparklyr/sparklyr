@@ -8,12 +8,13 @@
 #' @param min_instances_per_node Minimum number of instances each child must
 #'   have after split.
 #' @param seed Seed for random numbers.
-#' @param checkpoint_interval Set checkpoint interval (>= 1) or disable checkpoint (-1).
-#'   E.g. 10 means that the cache will get checkpointed every 10 iterations, defaults to 10.
-
-#' @param cache_node_ids If \code{FALSE}, the algorithm will pass trees to executors to match instances with nodes.
-#'   If \code{TRUE}, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.
-#'   Defaults to \code{FALSE}.
+#' @param checkpoint_interval Set checkpoint interval (>= 1) or disable
+#' checkpoint (-1). E.g. 10 means that the cache will get checkpointed every 10
+#' iterations, defaults to 10.
+#' @param cache_node_ids If \code{FALSE}, the algorithm will pass trees to
+#' executors to match instances with nodes. If \code{TRUE}, the algorithm will
+#' cache node IDs for each instance. Caching can speed up training of deeper
+#' trees. Defaults to \code{FALSE}.
 #' @param max_memory_in_mb Maximum memory in MB allocated to histogram aggregation.
-#'   If too small, then 1 node will be split per iteration,
-#'   and its aggregates may exceed this size. Defaults to 256.
+#' If too small, then 1 node will be split per iteration, and its aggregates
+#' may exceed this size. Defaults to 256.

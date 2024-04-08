@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.8.1
+Version: 1.8.5
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -69,20 +69,15 @@ Description: R interface to Apache Spark, a fast and general
     provides a 'dplyr' compatible back-end, and provides an interface to
     Spark's built-in machine learning algorithms.
 License: Apache License 2.0 | file LICENSE
-URL: https://spark.rstudio.com/
+URL: https://spark.posit.co/
 BugReports: https://github.com/sparklyr/sparklyr/issues
 Depends:
     R (>= 3.2)
 Imports:
-    assertthat,
-    base64enc,
     config (>= 0.2),
     DBI (>= 1.0.0),
-    dbplyr (>= 2.2.1),
-    digest,
+    dbplyr (>= 2.5.0),
     dplyr (>= 1.0.9),
-    ellipsis (>= 0.1.0),
-    forge,
     generics,
     globals,
     glue,
@@ -91,12 +86,8 @@ Imports:
     methods,
     openssl (>= 0.8),
     purrr,
-    r2d3,
-    rappdirs,
     rlang (>= 0.1.4),
-    rprojroot,
     rstudioapi (>= 0.10),
-    tibble,
     tidyr (>= 1.2.0),
     tidyselect,
     uuid,
@@ -116,13 +107,15 @@ Suggests:
     nnet,
     nycflights13,
     R6,
+    r2d3,
     RCurl,
     reshape2,
     shiny (>= 1.0.1),
     parsnip,
-    testthat
+    testthat,
+    rprojroot
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 SystemRequirements: Spark: 1.6.x, 2.x, or 3.x
 Collate:
     'spark_data_build_types.R'
@@ -138,7 +131,6 @@ Collate:
     'connection_shinyapp.R'
     'spark_version.R'
     'connection_spark.R'
-    'connection_viewer.R'
     'core_arrow.R'
     'core_config.R'
     'core_connection.R'
@@ -167,13 +159,11 @@ Collate:
     'dbi_spark_connection.R'
     'dbi_spark_result.R'
     'dbi_spark_table.R'
-    'dbi_spark_transactions.R'
     'do_spark.R'
     'dplyr_do.R'
     'dplyr_hof.R'
     'dplyr_join.R'
     'dplyr_spark_data.R'
-    'prng_utils.R'
     'dplyr_spark_table.R'
     'stratified_sample.R'
     'sdf_sql.R'
@@ -323,6 +313,7 @@ Collate:
     'spark_globals.R'
     'spark_hive.R'
     'spark_home.R'
+    'spark_ide.R'
     'spark_submit.R'
     'spark_update_embedded_sources.R'
     'spark_utils.R'
@@ -332,6 +323,7 @@ Collate:
     'stream_operations.R'
     'stream_shiny.R'
     'stream_view.R'
+    'synapse_connection.R'
     'test_connection.R'
     'tidiers_ml_aft_survival_regression.R'
     'tidiers_ml_als.R'

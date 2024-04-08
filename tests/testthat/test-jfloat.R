@@ -1,3 +1,4 @@
+skip_connection("jfloat")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -12,3 +13,6 @@ test_that("jfloat() works as expected", {
     invoke_static(sc, "sparklyr.Test", "readFloat", jflt), x
   )
 })
+
+test_clear_cache()
+

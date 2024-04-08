@@ -32,7 +32,7 @@ spark_write_table(
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Writes a Spark DataFrame into a Spark table.
+Writes a Spark DataFrame into a Spark table
 }
 \seealso{
 Other Spark serialization routines: 

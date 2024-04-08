@@ -53,23 +53,35 @@ ml_logistic_regression(
 
 \item{aggregation_depth}{(Spark 2.1.0+) Suggested depth for treeAggregate (>= 2).}
 
-\item{lower_bounds_on_coefficients}{(Spark 2.2.0+) Lower bounds on coefficients if fitting under bound constrained optimization.
-The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.}
+\item{lower_bounds_on_coefficients}{(Spark 2.2.0+) Lower bounds on
+coefficients if fitting under bound constrained optimization.
+The bound matrix must be compatible with the shape (1, number of features)
+for binomial regression, or (number of classes, number of features) for
+multinomial regression.}
 
-\item{lower_bounds_on_intercepts}{(Spark 2.2.0+) Lower bounds on intercepts if fitting under bound constrained optimization.
-The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.}
+\item{lower_bounds_on_intercepts}{(Spark 2.2.0+) Lower bounds on intercepts
+if fitting under bound constrained optimization.
+The bounds vector size must be equal with 1 for binomial regression, or
+the number of classes for multinomial regression.}
 
-\item{upper_bounds_on_coefficients}{(Spark 2.2.0+) Upper bounds on coefficients if fitting under bound constrained optimization.
-The bound matrix must be compatible with the shape (1, number of features) for binomial regression, or (number of classes, number of features) for multinomial regression.}
+\item{upper_bounds_on_coefficients}{(Spark 2.2.0+) Upper bounds on
+coefficients if fitting under bound constrained optimization.
+The bound matrix must be compatible with the shape (1, number of features)
+for binomial regression, or (number of classes, number of features) for
+multinomial regression.}
 
-\item{upper_bounds_on_intercepts}{(Spark 2.2.0+) Upper bounds on intercepts if fitting under bound constrained optimization.
-The bounds vector size must be equal with 1 for binomial regression, or the number of classes for multinomial regression.}
+\item{upper_bounds_on_intercepts}{(Spark 2.2.0+) Upper bounds on intercepts
+if fitting under bound constrained optimization.
+The bounds vector size must be equal with 1 for binomial regression, or
+the number of classes for multinomial regression.}
 
 \item{features_col}{Features column name, as a length-one character vector. The column should be single vector column of numeric values. Usually this column is output by \code{\link{ft_r_formula}}.}
 
 \item{label_col}{Label column name. The column should be a numeric column. Usually this column is output by \code{\link{ft_r_formula}}.}
 
-\item{family}{(Spark 2.1.0+) Param for the name of family which is a description of the label distribution to be used in the model. Supported options: "auto", "binomial", and "multinomial."}
+\item{family}{(Spark 2.1.0+) Param for the name of family which is a
+description of the label distribution to be used in the model. Supported
+options: "auto", "binomial", and "multinomial."}
 
 \item{prediction_col}{Prediction column name.}
 
@@ -82,31 +94,14 @@ The bounds vector size must be equal with 1 for binomial regression, or the numb
 \item{...}{Optional arguments; see Details.}
 }
 \value{
-The object returned depends on the class of \code{x}.
-
-\itemize{
-  \item \code{spark_connection}: When \code{x} is a \code{spark_connection}, the function returns an instance of a \code{ml_estimator} object. The object contains a pointer to
-  a Spark \code{Predictor} object and can be used to compose
-  \code{Pipeline} objects.
-
-  \item \code{ml_pipeline}: When \code{x} is a \code{ml_pipeline}, the function returns a \code{ml_pipeline} with
-  the predictor appended to the pipeline.
-
-  \item \code{tbl_spark}: When \code{x} is a \code{tbl_spark}, a predictor is constructed then
-  immediately fit with the input \code{tbl_spark}, returning a prediction model.
-
-  \item \code{tbl_spark}, with \code{formula}: specified When \code{formula}
-    is specified, the input \code{tbl_spark} is first transformed using a
-    \code{RFormula} transformer before being fit by
-    the predictor. The object returned in this case is a \code{ml_model} which is a
-    wrapper of a \code{ml_pipeline_model}.
-}
+The object returned depends on the class of \code{x}. If it is a
+\code{spark_connection}, the function returns a \code{ml_estimator} object. If
+it is a \code{ml_pipeline}, it will return a pipeline with the predictor
+appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
+the predictions added to it.
 }
 \description{
 Perform classification using logistic regression.
-}
-\details{
-When \code{x} is a \code{tbl_spark} and \code{formula} (alternatively, \code{response} and \code{features}) is specified, the function returns a \code{ml_model} object wrapping a \code{ml_pipeline_model} which contains data pre-processing transformers, the ML predictor, and, for classification models, a post-processing transformer that converts predictions into class labels. For classification, an optional argument \code{predicted_label_col} (defaults to \code{"predicted_label"}) can be used to specify the name of the predicted label column. In addition to the fitted \code{ml_pipeline_model}, \code{ml_model} objects also contain a \code{ml_pipeline} object where the ML predictor stage is an estimator ready to be fit against data. This is utilized by \code{\link{ml_save}} with \code{type = "pipeline"} to faciliate model refresh workflows.
 }
 \examples{
 \dontrun{
@@ -129,9 +124,6 @@ ml_binary_classification_evaluator(pred)
 
 }
 \seealso{
-See \url{https://spark.apache.org/docs/latest/ml-classification-regression.html} for
-  more information on the set of supervised learning algorithms.
-
 Other ml algorithms: 
 \code{\link{ml_aft_survival_regression}()},
 \code{\link{ml_decision_tree_classifier}()},

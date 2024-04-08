@@ -1,3 +1,4 @@
+skip_connection("ml-feature-imputer")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -29,3 +30,6 @@ test_that("ft_imputer() works properly", {
     ft_imputer("V1", "imputed")
   expect_equal(pull(imputed_tbl, imputed)[[3]], 3)
 })
+
+test_clear_cache()
+

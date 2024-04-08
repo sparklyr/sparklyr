@@ -1,3 +1,4 @@
+skip_connection("ml-regression-generalized-linear-regression")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -151,3 +152,6 @@ test_that("Tuning works GLM", {
   cv_metrics <- ml_validation_metrics(cv_model)
   expect_equal(dim(cv_metrics), c(2, 2))
 })
+
+test_clear_cache()
+

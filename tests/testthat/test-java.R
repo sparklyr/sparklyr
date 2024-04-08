@@ -1,3 +1,4 @@
+skip_connection("java")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -83,3 +84,6 @@ test_that("'validate_java_version_line' works when date is present and version h
 
   succeed()
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip_connection("ml-clustering-power-iteration")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -45,7 +46,7 @@ gen_pic_data <- function() {
     }
   }
 
-  tibble::tibble(src = src, dst = dst, sim = sim)
+  dplyr::tibble(src = src, dst = dst, sim = sim)
 }
 
 verify_clusters <- function(clusters) {
@@ -117,3 +118,5 @@ test_that("ml_power_iteration() works as expected with 'degree' initialization m
 
   verify_clusters(clusters)
 })
+
+test_clear_cache()

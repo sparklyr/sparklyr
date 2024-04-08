@@ -1,3 +1,4 @@
+skip_connection("sdf-drop-duplicates")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -25,3 +26,6 @@ test_that("sdf_drop_duplicates() checks column name", {
     "The following columns are not in the data frame: foo"
   )
 })
+
+test_clear_cache()
+

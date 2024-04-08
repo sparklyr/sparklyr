@@ -1,3 +1,4 @@
+skip_connection("connect-gateway")
 skip_on_livy()
 skip_on_arrow_devel()
 sc <- testthat_spark_connection()
@@ -14,3 +15,6 @@ test_that("can connect to an existing session via gateway", {
   )
   expect_equal(spark_context(gw)$backend, spark_context(sc)$backend)
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip_connection("ml-persistence")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -185,3 +186,6 @@ test_that("we can fit a pipeline saved then loaded from ml_model", {
     ml_stage(m2, 2)$coefficients
   )
 })
+
+test_clear_cache()
+

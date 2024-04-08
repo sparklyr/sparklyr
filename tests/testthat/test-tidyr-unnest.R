@@ -1,3 +1,4 @@
+skip_connection("tidyr-unnest")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -8,7 +9,7 @@ test_that("can keep empty rows", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       a = seq(3), b = seq(3), c = seq(3), d = seq(3), e = seq(3)
     )
   )
@@ -24,7 +25,7 @@ test_that("can keep empty rows", {
       tidyr::unnest(c(n1, n2), keep_empty = TRUE) %>%
       collect() %>%
       dplyr::arrange(a),
-    tibble::tibble(
+    dplyr::tibble(
       a = seq(3), b = c(NA, 2, 3), c = c(NA, 2, 3), d = c(1, 2, NA), e = c(1, 2, NA)
     )
   )
@@ -42,7 +43,7 @@ test_that("bad inputs generate errors", {
 test_that("can unnest nested lists", {
   test_requires_version("2.4.0")
 
-  tbl <- tibble::tibble(
+  tbl <- dplyr::tibble(
     a = c(1, 1, 2, 2, 3, 3, 3),
     b = lapply(seq(7), function(x) rep(1, x)),
     c = seq(7),
@@ -65,7 +66,7 @@ test_that("can unnest nested lists", {
 test_that("grouping is preserved", {
   test_requires_version("2.0.0")
 
-  sdf.nested <- copy_to(sc, tibble::tibble(g = 1, x = seq(3))) %>%
+  sdf.nested <- copy_to(sc, dplyr::tibble(g = 1, x = seq(3))) %>%
     tidyr::nest(x = x) %>%
     dplyr::group_by(g)
   sdf <- sdf.nested %>% tidyr::unnest(x)
@@ -76,7 +77,7 @@ test_that("grouping is preserved", {
 test_that("handling names_sep correctly", {
   test_requires_version("2.0.0")
 
-  tbl <- tibble::tibble(
+  tbl <- dplyr::tibble(
     a = seq(3), b = c(1, -1, 4), c = 1
   )
   sdf.nested <- copy_to(sc, tbl, overwrite = TRUE) %>%
@@ -99,7 +100,7 @@ test_that("handling names_repair correctly", {
 
   sdf.nested <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       a = seq(3), data_b = NA, data_c = NA, b = c(1, -1, 4), c = rep(1, 3)
     )
   ) %>%
@@ -115,7 +116,7 @@ test_that("handling names_repair correctly", {
       tidyr::unnest(data, names_sep = "_", names_repair = "universal") %>%
       collect() %>%
       dplyr::arrange(a),
-    tibble::tibble(
+    dplyr::tibble(
       a = seq(3),
       data_b___2 = NA,
       data_c___3 = NA,
@@ -129,17 +130,20 @@ test_that("unnest() supports ptype", {
   test_requires_version("2.0.0")
 
   sdf.nested <- copy_to(
-    sc, tibble::tibble(g = c(1.0, 4.0, 9.0), x = seq(3))
+    sc, dplyr::tibble(g = c(1.0, 4.0, 9.0), x = seq(3))
   ) %>%
     tidyr::nest(x = x)
 
   expect_equivalent(
     tidyr::unnest(
       sdf.nested, x,
-      ptype = tibble::tibble(g = integer(), x = character())
+      ptype = dplyr::tibble(g = integer(), x = character())
     ) %>%
       collect() %>%
       dplyr::arrange(x),
-    tibble::tibble(g = c(1L, 4L, 9L), x = as.character(seq(3)))
+    dplyr::tibble(g = c(1L, 4L, 9L), x = as.character(seq(3)))
   )
 })
+
+test_clear_cache()
+

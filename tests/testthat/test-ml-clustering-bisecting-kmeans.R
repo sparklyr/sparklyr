@@ -1,3 +1,4 @@
+skip_connection("ml-clustering-bisecting-kmeans")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -267,3 +268,6 @@ test_that("ml_bisecting_kmeans() works properly with iris", {
     output_file("print/bisecting-kmeans.txt")
   )
 })
+
+test_clear_cache()
+

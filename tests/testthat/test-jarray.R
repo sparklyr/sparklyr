@@ -1,3 +1,4 @@
+skip_connection("jarray")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -15,3 +16,6 @@ test_that("jarray() works as expected", {
     num_elems
   )
 })
+
+test_clear_cache()
+

@@ -1,10 +1,11 @@
+skip_connection("dplyr-row-sums")
 skip_on_livy()
 
 sc <- testthat_spark_connection()
 
 test_that("rowSums works as expected", {
   df <- do.call(
-    tibble::tibble,
+    dplyr::tibble,
     lapply(
       seq(6L),
       function(x) {
@@ -46,3 +47,5 @@ test_that("rowSums works as expected", {
     }
   }
 })
+
+test_clear_cache()

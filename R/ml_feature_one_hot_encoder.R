@@ -48,8 +48,8 @@ ft_one_hot_encoder.spark_connection <- function(x, input_cols = NULL, output_col
     if (length(.args[["input_cols"]]) > 1 || length(.args[["output_cols"]]) > 1) {
       stop("OneHotEncoder does not support encoding multiple columns", call. = FALSE)
     }
-    .args[["input_cols"]] <- cast_nullable_string(.args[["input_cols"]])
-    .args[["output_cols"]] <- cast_nullable_string(.args[["output_cols"]])
+    .args[["input_cols"]] <- cast_nullable_string(.args[["input_cols"]][[1]])
+    .args[["output_cols"]] <- cast_nullable_string(.args[["output_cols"]][[1]])
     estimator <- spark_pipeline_stage(
       x, "org.apache.spark.ml.feature.OneHotEncoder",
       input_col = .args[["input_cols"]], output_col = .args[["output_cols"]], uid = .args[["uid"]]

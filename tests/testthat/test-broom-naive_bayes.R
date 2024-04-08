@@ -1,3 +1,4 @@
+skip_connection("broom-naive_bayes")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -52,3 +53,6 @@ test_that("naive_bayes.tidy() works", {
     exp.names = c("model_type", "smoothing")
   )
 })
+
+test_clear_cache()
+

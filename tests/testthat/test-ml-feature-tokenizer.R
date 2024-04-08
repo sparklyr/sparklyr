@@ -1,3 +1,4 @@
+skip_connection("ml-feature-tokenizer")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -35,3 +36,6 @@ test_that("ft_tokenizer.tbl_spark() works as expected", {
 
   expect_identical(spark_tokens, r_tokens)
 })
+
+test_clear_cache()
+

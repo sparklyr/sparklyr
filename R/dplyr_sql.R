@@ -72,7 +72,7 @@ sql_build.lazy_sample_query <- function(op, con, ...) {
       )
     })
 
-  sample_sdf %>% dbplyr::remote_query()
+  dbplyr::sql_build(sample_sdf)
 }
 
 #' @export
@@ -102,18 +102,6 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
     distinct_cols <- union(dplyr::group_vars(.data), distinct_cols)
     all_cols <- colnames(.data)
 
-    row_num <- random_string("__row_num")
-    args <- list(
-      .keep_all = .keep_all,
-      .row_num = row_num,
-      .all_cols = all_cols,
-      .distinct_cols = distinct_cols
-    )
-
-    row_num_sql <- list(dplyr::sql("ROW_NUMBER() OVER (ORDER BY NULL)"))
-    names(row_num_sql) <- row_num
-    .data <- .data %>% dplyr::mutate(!!!row_num_sql)
-
     if (.keep_all) {
       out_cols <- all_cols
     } else {
@@ -121,7 +109,7 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
     }
 
     exprs <- lapply(
-      purrr::set_names(c(row_num, out_cols)),
+      purrr::set_names(out_cols),
       function(x) rlang::expr(FIRST(!!sym(x), FALSE))
     )
 
@@ -129,7 +117,6 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
     out <- .data %>%
       dplyr::group_by(!!!syms(distinct_cols)) %>%
       summarise(!!!exprs) %>%
-      arrange(row_num) %>%
       select(all_of(out_cols)) %>%
       dplyr::group_by(!!!syms(grps))
     out$order_vars <- NULL
@@ -154,11 +141,8 @@ to_sdf <- function(op, con) {
   sdf_sql(
     con,
     dbplyr::select_query(
-      from = dbplyr::sql(
-        dbplyr::sql_render(dbplyr::sql_build(op$x, con = con), con = con),
-        con = con
-      ),
-      select = dbplyr::build_sql("*", con = con)
+      from = dbplyr::sql_build(op$x, con = con),
+      select = dbplyr::sql("*")
     ) %>%
       dbplyr::sql_render(con = con) %>%
       dbplyr::sql() %>%

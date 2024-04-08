@@ -29,9 +29,13 @@ testthat_spark_connection_type <- function() {
     ct <- "local"
     lv <- using_livy()
     db <- using_databricks()
+    sy <- using_synapse()
+    mt <- using_method()
     if(lv && db) stop("Databricks and Livy cannot be tested simultaneously")
     if(lv) ct <- "livy"
     if(db) ct <- "databricks"
+    if(sy) ct <- "synapse"
+    if(mt) ct <- "method"
   }
   ct
 }
@@ -56,6 +60,18 @@ testthat_spark_env_version <- function(set_to = NULL) {
 }
 
 ## ----------------------------- Using -----------------------------------------
+
+using_master_get <- function() {
+  Sys.getenv("TEST_SPARKLYR_MASTER", unset = NA)
+}
+
+using_method_get <- function() {
+  Sys.getenv("TEST_SPARKLYR_METHOD", unset = NA)
+}
+
+using_method <- function() {
+  !is.na(using_method_get())
+}
 
 using_livy_version <- function() {
   lv <- Sys.getenv("LIVY_VERSION")
@@ -93,6 +109,18 @@ using_databricks <- function() {
   dcs <- FALSE
   dc <- Sys.getenv("TEST_DATABRICKS_CONNECT")
   if(dc == 'true') dcs <- TRUE
+
+  #sc <- testthat_spark_connection()
+  #if(sc$method == "databricks_connect") dcs <- TRUE
+
   testthat_context$databricks <- dcs
   dcs
+}
+
+using_synapse <- function() {
+  if(Sys.getenv("TEST_SYNAPSE_CONNECT") == "true") {
+    TRUE
+  } else {
+    FALSE
+  }
 }

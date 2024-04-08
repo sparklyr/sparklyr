@@ -1,3 +1,4 @@
+skip_connection("spark-write-rds")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -78,7 +79,7 @@ test_that("spark_write_rds() works as expected with non-array columns", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       boolean_vals = test_lgl_vals,
       int_vals = test_int_vals,
       double_vals = test_double_vals,
@@ -190,7 +191,7 @@ test_that("spark_write_rds() works as expected with array columns", {
 
   arr_sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       lgl_arr = test_lgl_arr,
       long_arr = test_long_arr,
       double_arr = test_double_arr,
@@ -277,3 +278,6 @@ test_that("spark_write_rds() works as expected with multiple Spark dataframe par
   attributes(flights_df$time_hour) <- attributes(actual_df$time_hour)
   expect_equivalent(actual_df, flights_df)
 })
+
+test_clear_cache()
+

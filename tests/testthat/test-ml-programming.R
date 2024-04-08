@@ -1,3 +1,4 @@
+skip_connection("ml-programming")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -55,3 +56,6 @@ test_that("one can program with ft_ function (.spark_connection)", {
     )
   }
 })
+
+test_clear_cache()
+

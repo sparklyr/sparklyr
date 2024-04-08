@@ -1,3 +1,8 @@
+# CI k8s POD is crashing when running these test with
+# dbplyr dev. Need to investigate.
+skip_if_dbplyr_dev()
+
+skip_connection("spark-apply")
 skip_on_livy()
 test_requires("dplyr")
 sc <- testthat_spark_connection()
@@ -131,8 +136,8 @@ test_that("'spark_apply' supports nested lists as input type", {
   }
 
   expect_equivalent(
-    spark_apply(sdf, fn) %>% collect(),
-    tibble::tibble(a = c(1, 1, 1, 2, 2), b = 2)
+    spark_apply(sdf, fn) %>% arrange(a) %>% collect(),
+    dplyr::tibble(a = c(1, 1, 1, 2, 2), b = 2)
   )
 })
 
@@ -153,7 +158,7 @@ test_that("'spark_apply' supports nested lists as return type", {
     actual <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
       spark_apply(
         function(df) {
-          tibble::tibble(
+          dplyr::tibble(
             person = lapply(
               df$json,
               function(x) {
@@ -188,3 +193,6 @@ test_that("'spark_apply' supports nested lists as return type", {
   expect_equal(colnames(actual), "person")
   expect_equal(actual$person, expected)
 })
+
+test_clear_cache()
+

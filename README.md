@@ -17,16 +17,16 @@ coverage](https://codecov.io/gh/sparklyr/sparklyr/branch/main/graph/badge.svg)](
 - Install and connect to [Spark](https://spark.apache.org/) using YARN,
   Mesos, Livy or Kubernetes.
 - Use [dplyr](#using-dplyr) to filter and aggregate Spark datasets and
-  [streams](https://spark.rstudio.com/guides/streaming/) then bring them
+  [streams](https://spark.posit.co/guides/streaming/) then bring them
   into R for analysis and visualization.
 - Use [MLlib](#machine-learning), [H2O](#using-h2o),
-  [XGBoost](https://spark.rstudio.com/packages/sparkxgb/latest/) and
-  [GraphFrames](https://spark.rstudio.com/packages/graphframes/latest/)
+  [XGBoost](https://spark.posit.co/packages/sparkxgb/latest/) and
+  [GraphFrames](https://spark.posit.co/packages/graphframes/latest/)
   to train models at scale in Spark.
 - Create interoperable machine learning
-  [pipelines](https://spark.rstudio.com/guides/pipelines.html) and
+  [pipelines](https://spark.posit.co/guides/pipelines.html) and
   productionize them with
-  [MLeap](https://spark.rstudio.com/packages/mleap/latest/).
+  [MLeap](https://spark.posit.co/packages/mleap/latest/).
 - Create [extensions](#extensions) that call the full Spark API or run
   [distributed R](#distributed-r) code to support new functionality.
 
@@ -47,7 +47,7 @@ coverage](https://codecov.io/gh/sparklyr/sparklyr/branch/main/graph/badge.svg)](
 - [Using H2O](#using-h2o)
 - [Connecting through Livy](#connecting-through-livy)
 - [Connecting through Databricks
-  Connect](#connecting-through-databricks-connect)
+  Connect](#connecting-through-databricks-connect-v2)
 
 ## Installation
 
@@ -78,7 +78,7 @@ devtools::install_github("sparklyr/sparklyr")
 
 You can connect to both local instances of Spark as well as remote Spark
 clusters. Here we’ll connect to a local instance of Spark via the
-[spark_connect](https://spark.rstudio.com/packages/sparklyr/latest/reference/spark-connections.html)
+[spark_connect](https://spark.posit.co/packages/sparklyr/latest/reference/spark-connections.html)
 function:
 
 ``` r
@@ -90,7 +90,7 @@ The returned Spark connection (`sc`) provides a remote dplyr data source
 to the Spark cluster.
 
 For more information on connecting to remote Spark clusters see the
-[Deployment](https://spark.rstudio.com/deployment.html) section of the
+[Deployment](https://spark.posit.co/deployment.html) section of the
 sparklyr website.
 
 ## Using dplyr
@@ -121,28 +121,27 @@ To start with here’s a simple filtering example:
 # filter by departure delay and print the first few records
 flights_tbl %>% filter(dep_delay == 2)
 #> # Source: spark<?> [?? x 19]
-#>     year month   day dep_t…¹ sched…² dep_d…³ arr_t…⁴ sched…⁵
-#>    <int> <int> <int>   <int>   <int>   <dbl>   <int>   <int>
-#>  1  2013     1     1     517     515       2     830     819
-#>  2  2013     1     1     542     540       2     923     850
-#>  3  2013     1     1     702     700       2    1058    1014
-#>  4  2013     1     1     715     713       2     911     850
-#>  5  2013     1     1     752     750       2    1025    1029
-#>  6  2013     1     1     917     915       2    1206    1211
-#>  7  2013     1     1     932     930       2    1219    1225
-#>  8  2013     1     1    1028    1026       2    1350    1339
-#>  9  2013     1     1    1042    1040       2    1325    1326
-#> 10  2013     1     1    1231    1229       2    1523    1529
-#> # … with more rows, 11 more variables: arr_delay <dbl>,
-#> #   carrier <chr>, flight <int>, tailnum <chr>,
-#> #   origin <chr>, dest <chr>, air_time <dbl>,
-#> #   distance <dbl>, hour <dbl>, minute <dbl>,
-#> #   time_hour <dttm>, and abbreviated variable names
-#> #   ¹​dep_time, ²​sched_dep_time, ³​dep_delay, ⁴​arr_time,
-#> #   ⁵​sched_arr_time
+#>     year month   day dep_time sched_dep_time dep_delay
+#>    <int> <int> <int>    <int>          <int>     <dbl>
+#>  1  2013     1     1      517            515         2
+#>  2  2013     1     1      542            540         2
+#>  3  2013     1     1      702            700         2
+#>  4  2013     1     1      715            713         2
+#>  5  2013     1     1      752            750         2
+#>  6  2013     1     1      917            915         2
+#>  7  2013     1     1      932            930         2
+#>  8  2013     1     1     1028           1026         2
+#>  9  2013     1     1     1042           1040         2
+#> 10  2013     1     1     1231           1229         2
+#> # ℹ more rows
+#> # ℹ 13 more variables: arr_time <int>,
+#> #   sched_arr_time <int>, arr_delay <dbl>, carrier <chr>,
+#> #   flight <int>, tailnum <chr>, origin <chr>, dest <chr>,
+#> #   air_time <dbl>, distance <dbl>, hour <dbl>,
+#> #   minute <dbl>, time_hour <dttm>
 ```
 
-[Introduction to dplyr](https://spark.rstudio.com/guides/dplyr.html)
+[Introduction to dplyr](https://spark.posit.co/guides/dplyr.html)
 provides additional `dplyr` examples you can try. For example, consider
 the last example from the tutorial which plots data on flight delays:
 
@@ -168,7 +167,7 @@ ggplot(delay, aes(dist, delay)) +
 ### Window Functions
 
 dplyr [window
-functions](https://spark.rstudio.com/guides/dplyr.html#grouping) are
+functions](https://spark.posit.co/guides/dplyr.html#grouping) are
 also supported, for example:
 
 ``` r
@@ -182,21 +181,21 @@ batting_tbl %>%
 #> # Ordered by: playerID, yearID, teamID
 #>    playerID  yearID teamID     G    AB     R     H
 #>    <chr>      <int> <chr>  <int> <int> <int> <int>
-#>  1 aaronha01   1959 ML1      154   629   116   223
-#>  2 aaronha01   1963 ML1      161   631   121   201
-#>  3 abbotji01   1999 MIL       20    21     0     2
-#>  4 abnersh01   1992 CHA       97   208    21    58
-#>  5 abnersh01   1990 SDN       91   184    17    45
-#>  6 acklefr01   1963 CHA        2     5     0     1
-#>  7 acklefr01   1964 CHA        3     1     0     1
-#>  8 acunaro01   2019 ATL      156   626   127   175
-#>  9 acunaro01   2018 ATL      111   433    78   127
-#> 10 adamecr01   2016 COL      121   225    25    49
-#> # … with more rows
+#>  1 abadijo01   1875 PH3       11    45     3    10
+#>  2 abadijo01   1875 BR2        1     4     1     1
+#>  3 abbeybe01   1896 BRO       25    63     7    12
+#>  4 abbeybe01   1892 WAS       27    75     5     9
+#>  5 abbeych01   1894 WAS      129   523    95   164
+#>  6 abbeych01   1895 WAS      133   516   102   142
+#>  7 abbotfr01   1903 CLE       77   255    25    60
+#>  8 abbotfr01   1905 PHI       42   128     9    25
+#>  9 abbotky01   1992 PHI       31    29     1     2
+#> 10 abbotky01   1995 PHI       18     2     1     1
+#> # ℹ more rows
 ```
 
 For additional documentation on using dplyr with Spark see the
-[dplyr](https://spark.rstudio.com/dplyr.html) section of the sparklyr
+[dplyr](https://spark.posit.co/dplyr.html) section of the sparklyr
 website.
 
 ## Using SQL
@@ -244,7 +243,7 @@ high-level APIs built on top of DataFrames that help you create and tune
 machine learning workflows.
 
 Here’s an example where we use
-[ml_linear_regression](https://spark.rstudio.com/packages/sparklyr/latest/reference/ml_linear_regression/)
+[ml_linear_regression](https://spark.posit.co/packages/sparklyr/latest/reference/ml_linear_regression/)
 to fit a linear regression model. We’ll use the built-in `mtcars`
 dataset, and see if we can predict a car’s fuel consumption (`mpg`)
 based on its weight (`wt`), and the number of cylinders the engine
@@ -293,7 +292,7 @@ summary(fit)
 Spark machine learning supports a wide array of algorithms and feature
 transformations and as illustrated above it’s easy to chain these
 functions together with dplyr pipelines. To learn more see the [machine
-learning](https://spark.rstudio.com/mlib/) section.
+learning](https://spark.posit.co/mlib/) section.
 
 ## Reading and Writing Data
 
@@ -333,17 +332,17 @@ spark_apply(iris_tbl, function(data) {
 #> # Source: spark<?> [?? x 4]
 #>    Sepal_Length Sepal_Width Petal_Length Petal_Width
 #>           <dbl>       <dbl>        <dbl>       <dbl>
-#>  1         5.51        3.91         1.81       0.610
-#>  2         5.31        3.41         1.81       0.610
-#>  3         5.11        3.61         1.71       0.610
-#>  4         5.01        3.51         1.91       0.610
-#>  5         5.41        4.01         1.81       0.610
-#>  6         5.81        4.31         2.11       0.810
-#>  7         5.01        3.81         1.81       0.710
-#>  8         5.41        3.81         1.91       0.610
-#>  9         4.81        3.31         1.81       0.610
-#> 10         5.31        3.51         1.91       0.510
-#> # … with more rows
+#>  1         5.75        4.15         2.05       0.846
+#>  2         5.55        3.65         2.05       0.846
+#>  3         5.35        3.85         1.95       0.846
+#>  4         5.25        3.75         2.15       0.846
+#>  5         5.65        4.25         2.05       0.846
+#>  6         6.05        4.55         2.35       1.05 
+#>  7         5.25        4.05         2.05       0.946
+#>  8         5.65        4.05         2.15       0.846
+#>  9         5.05        3.55         2.05       0.846
+#> 10         5.55        3.75         2.15       0.746
+#> # ℹ more rows
 ```
 
 You can also group by columns to perform an operation over each group of
@@ -357,15 +356,14 @@ spark_apply(
   group_by = "Species"
 )
 #> # Source: spark<?> [?? x 6]
-#>   Species    term         estimate std.er…¹ stati…²  p.value
-#>   <chr>      <chr>           <dbl>    <dbl>   <dbl>    <dbl>
-#> 1 versicolor (Intercept)   -0.0843   0.161   -0.525 6.02e- 1
-#> 2 versicolor Petal_Length   0.331    0.0375   8.83  1.27e-11
-#> 3 virginica  (Intercept)    1.14     0.379    2.99  4.34e- 3
-#> 4 virginica  Petal_Length   0.160    0.0680   2.36  2.25e- 2
-#> 5 setosa     (Intercept)   -0.0482   0.122   -0.396 6.94e- 1
-#> 6 setosa     Petal_Length   0.201    0.0826   2.44  1.86e- 2
-#> # … with abbreviated variable names ¹​std.error, ²​statistic
+#>   Species    term      estimate std.error statistic  p.value
+#>   <chr>      <chr>        <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 versicolor (Interce…  -0.0843    0.161     -0.525 6.02e- 1
+#> 2 versicolor Petal_Le…   0.331     0.0375     8.83  1.27e-11
+#> 3 virginica  (Interce…   1.14      0.379      2.99  4.34e- 3
+#> 4 virginica  Petal_Le…   0.160     0.0680     2.36  2.25e- 2
+#> 5 setosa     (Interce…  -0.0482    0.122     -0.396 6.94e- 1
+#> 6 setosa     Petal_Le…   0.201     0.0826     2.44  1.86e- 2
 ```
 
 ## Extensions
@@ -373,7 +371,7 @@ spark_apply(
 The facilities used internally by sparklyr for its `dplyr` and machine
 learning interfaces are available to extension packages. Since Spark is
 a general purpose cluster computing system there are many potential
-applications for extensions (e.g. interfaces to custom machine learning
+applications for extensions (e.g.  interfaces to custom machine learning
 pipelines, interfaces to 3rd party Spark packages, etc.).
 
 Here’s a simple example that wraps a Spark text file line counting
@@ -397,7 +395,7 @@ count_lines(sc, tempfile)
 ```
 
 To learn more about creating extensions see the
-[Extensions](https://spark.rstudio.com/guides/extensions.html) section
+[Extensions](https://spark.posit.co/guides/extensions.html) section
 of the sparklyr website.
 
 ## Table Utilities
@@ -426,16 +424,16 @@ You can show the log using the `spark_log()` function:
 
 ``` r
 spark_log(sc, n = 10)
-#> 22/12/08 10:13:49 INFO BlockManagerInfo: Removed broadcast_84_piece0 on localhost:54296 in memory (size: 9.2 KiB, free: 912.1 MiB)
-#> 22/12/08 10:13:49 INFO BlockManagerInfo: Removed broadcast_86_piece0 on localhost:54296 in memory (size: 5.0 KiB, free: 912.1 MiB)
-#> 22/12/08 10:13:49 INFO BlockManagerInfo: Removed broadcast_76_piece0 on localhost:54296 in memory (size: 8.7 KiB, free: 912.1 MiB)
-#> 22/12/08 10:13:49 INFO Executor: Finished task 0.0 in stage 67.0 (TID 83). 1004 bytes result sent to driver
-#> 22/12/08 10:13:49 INFO TaskSetManager: Finished task 0.0 in stage 67.0 (TID 83) in 187 ms on localhost (executor driver) (1/1)
-#> 22/12/08 10:13:49 INFO TaskSchedulerImpl: Removed TaskSet 67.0, whose tasks have all completed, from pool 
-#> 22/12/08 10:13:49 INFO DAGScheduler: ResultStage 67 (count at NativeMethodAccessorImpl.java:0) finished in 0.199 s
-#> 22/12/08 10:13:49 INFO DAGScheduler: Job 49 is finished. Cancelling potential speculative or zombie tasks for this job
-#> 22/12/08 10:13:49 INFO TaskSchedulerImpl: Killing all running tasks in stage 67: Stage finished
-#> 22/12/08 10:13:49 INFO DAGScheduler: Job 49 finished: count at NativeMethodAccessorImpl.java:0, took 0.204972 s
+#> 24/01/08 15:49:41 INFO Executor: Running task 0.0 in stage 87.0 (TID 115)
+#> 24/01/08 15:49:41 INFO HadoopRDD: Input split: file:/var/folders/l8/v1ym1mc10_b0dftql5wrrm8w0000gn/T/Rtmpl48w30/file213f56a22695.csv:0+33313106
+#> 24/01/08 15:49:41 INFO BlockManagerInfo: Removed broadcast_94_piece0 on localhost:56103 in memory (size: 20.0 KiB, free: 1048.6 MiB)
+#> 24/01/08 15:49:41 INFO Executor: Finished task 0.0 in stage 87.0 (TID 115). 969 bytes result sent to driver
+#> 24/01/08 15:49:41 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 115) in 102 ms on localhost (executor driver) (1/1)
+#> 24/01/08 15:49:41 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
+#> 24/01/08 15:49:41 INFO DAGScheduler: ResultStage 87 (count at DirectMethodHandleAccessor.java:104) finished in 0.105 s
+#> 24/01/08 15:49:41 INFO DAGScheduler: Job 70 is finished. Cancelling potential speculative or zombie tasks for this job
+#> 24/01/08 15:49:41 INFO TaskSchedulerImpl: Killing all running tasks in stage 87: Stage finished
+#> 24/01/08 15:49:41 INFO DAGScheduler: Job 70 finished: count at DirectMethodHandleAccessor.java:104, took 0.106307 s
 ```
 
 Finally, we disconnect from Spark:
@@ -479,7 +477,7 @@ through a new connection dialog:
 
 [rsparkling](https://cran.r-project.org/package=rsparkling) is a CRAN
 package from [H2O](https://h2o.ai/) that extends
-[sparklyr](https://spark.rstudio.com/) to provide an interface into
+[sparklyr](https://spark.posit.co/) to provide an interface into
 [Sparkling Water](https://github.com/h2oai/sparkling-water). For
 instance, the following example installs, configures and runs
 [h2o.glm](https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/glm.html):
@@ -590,51 +588,11 @@ sc <- spark_connect(master = "<address>", method = "livy", config = config)
 spark_disconnect(sc)
 ```
 
-## Connecting through Databricks Connect
+## Connecting through Databricks Connect v2
 
-[Databricks
-Connect](https://docs.databricks.com/dev-tools/databricks-connect.html#databricks-connect)
-allows you to connect sparklyr to a remote Databricks Cluster. You can
-install [Databricks Connect python
-package](https://pypi.org/project/databricks-connect/) and use it to
-submit Spark jobs written in sparklyr APIs and have them execute
-remotely on a Databricks cluster instead of in the local Spark session.
-
-To use sparklyr with Databricks Connect first launch a Cluster on
-Databricks. Then follow [these
-instructions](https://docs.databricks.com/dev-tools/databricks-connect.html#client-setup)
-to setup the client:
-
-1.  Make sure pyspark is not installed
-2.  Install the Databricks Connect python package. The latest supported
-    version is 6.4.1.
-3.  Run `databricks-connect configure` and provide the configuration
-    information
-    - Databricks account URL of the form
-      `https://<account>.cloud.databricks.com`.
-    - [User
-      token](https://docs.databricks.com/dev-tools/api/latest/authentication.html#token-management)
-    - Cluster ID
-    - Port (default port number is `15001`)
-
-To configure `sparklyr` with Databricks Connect, set the following
-environment variables:
-
-``` bash
-export SPARK_VERSION=2.4.4
-```
-
-Now simply create a spark connection as follows
-
-``` r
-spark_home <- system("databricks-connect get-spark-home")
-sc <- spark_connect(method = "databricks",
-                    spark_home = spark_home)
-copy_to(sc, iris, overwrite = TRUE)
-```
-
-<img src="tools/readme/databricks-connect.png" class="screenshot" width=750 />
-
-``` r
-spark_disconnect(sc)
-```
+`sparklyr` is able to interact with [Databricks Connect
+v2](https://docs.databricks.com/en/dev-tools/databricks-connect/index.html)
+via a new extension called `pysparklyr`. To learn how to use, and the
+latest updates on this integration see [the article in `sparklyr`’s
+official
+website](https://spark.posit.co/deployment/databricks-connect.html).

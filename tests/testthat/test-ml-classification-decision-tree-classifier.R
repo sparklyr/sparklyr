@@ -1,3 +1,4 @@
+skip_connection("ml-classification-decision-tree-classifier")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -29,3 +30,6 @@ test_that("ml_decision_tree_classifier() param setting", {
   )
   test_param_setting(sc, ml_decision_tree_classifier, test_args)
 })
+
+test_clear_cache()
+

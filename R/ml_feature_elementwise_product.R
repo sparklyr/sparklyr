@@ -77,6 +77,6 @@ new_ml_elementwise_product <- function(jobj) {
 # ElementwiseProduct
 validator_ml_elementwise_product <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["scaling_vec"]] <- cast_nullable_double_list(.args[["scaling_vec"]])
+  .args[["scaling_vec"]] <- cast_double_list(.args[["scaling_vec"]], allow_null = TRUE)
   .args
 }

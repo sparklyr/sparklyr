@@ -1,3 +1,4 @@
+skip_connection("ml-feature-r-formula")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -89,3 +90,6 @@ test_that("ft_r_formula takes formula", {
 
   expect_equal(v1, v2)
 })
+
+test_clear_cache()
+

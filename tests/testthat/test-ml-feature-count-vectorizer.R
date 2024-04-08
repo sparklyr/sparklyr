@@ -1,3 +1,4 @@
+skip_connection("ml-feature-count-vectorizer")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -82,3 +83,6 @@ test_that("ft_count_vectorizer() works", {
     )
   )
 })
+
+test_clear_cache()
+

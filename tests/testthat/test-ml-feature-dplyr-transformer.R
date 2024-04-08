@@ -1,3 +1,4 @@
+skip_connection("ml-feature-dplyr-transformer")
 skip_on_livy()
 
 skip_databricks_connect()
@@ -21,7 +22,11 @@ test_that("ft_dplyr_transformer() works", {
 
   expect_equal(
     ml_param_map(dplyr_transformer),
-    list(statement = "SELECT *, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
+    if (packageVersion("dbplyr") > "2.3.4") {
+      list(statement = "SELECT `__THIS__`.*, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
+    } else {
+      list(statement = "SELECT *, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
+    }
   )
 })
 
@@ -30,7 +35,7 @@ test_that("ft_dplyr_transformer() supports all sampling use cases", {
 
   sdf <- copy_to(
     sc,
-    tibble::tibble(
+    dplyr::tibble(
       id = seq(1000),
       grp = c(rep(0L, 250), rep(1L, 250), rep(2L, 250), rep(3L, 250)),
       weight = rep(seq(5), 200)
@@ -141,3 +146,6 @@ test_that("ft_dplyr_transformer() handles cases where table name isn't quoted (#
     )
   )
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip_connection("sdf-distinct")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -49,3 +50,6 @@ test_that("sdf_distinct works properly", {
       arrange_all() %>% collect() %>% as.data.frame()
   )
 })
+
+test_clear_cache()
+

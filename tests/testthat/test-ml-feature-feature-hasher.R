@@ -1,3 +1,4 @@
+skip_connection("ml-feature-feature-hasher")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -38,3 +39,6 @@ test_that("ft_feature_hasher() works", {
 
   expect_identical(f_h, 32L)
 })
+
+test_clear_cache()
+

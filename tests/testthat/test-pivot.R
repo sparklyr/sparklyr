@@ -1,3 +1,4 @@
+skip_connection("pivot")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -71,3 +72,5 @@ test_that("we can pivot with an R list", {
 
   expect_equal(unname(s), unname(r))
 })
+
+test_clear_cache()

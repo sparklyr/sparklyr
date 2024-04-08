@@ -1,3 +1,4 @@
+skip_connection("partitioning")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -67,3 +68,6 @@ test_that("'sdf_coalesce' works as expected", {
     1
   )
 })
+
+test_clear_cache()
+

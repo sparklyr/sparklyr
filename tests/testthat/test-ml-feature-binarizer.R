@@ -1,3 +1,4 @@
+skip_connection("ml-feature-binarizer")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -34,3 +35,6 @@ test_that("ft_binarizer() input checking", {
   sc <- testthat_spark_connection()
   expect_error(ft_binarizer(sc, threshold = "foo"), "")
 })
+
+test_clear_cache()
+

@@ -1,3 +1,4 @@
+skip_connection("ml-feature-random-projection-lsh")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -81,3 +82,6 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
     list(c(0, 4), c(0, 6), c(1, 4), c(1, 7), c(2, 5), c(2, 7), c(3, 5), c(3, 6))
   )
 })
+
+test_clear_cache()
+

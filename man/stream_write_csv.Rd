@@ -2,7 +2,14 @@
 % Please edit documentation in R/stream_data.R
 \name{stream_write_csv}
 \alias{stream_write_csv}
-\title{Write CSV Stream}
+\alias{stream_write_text}
+\alias{stream_write_json}
+\alias{stream_write_parquet}
+\alias{stream_write_orc}
+\alias{stream_write_kafka}
+\alias{stream_write_console}
+\alias{stream_write_delta}
+\title{Write files to the stream}
 \usage{
 stream_write_csv(
   x,
@@ -20,6 +27,79 @@ stream_write_csv(
   partition_by = NULL,
   ...
 )
+
+stream_write_text(
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path(path, "checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+)
+
+stream_write_json(
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path(path, "checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+)
+
+stream_write_parquet(
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path(path, "checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+)
+
+stream_write_orc(
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path(path, "checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+)
+
+stream_write_kafka(
+  x,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path("checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+)
+
+stream_write_console(
+  x,
+  mode = c("append", "complete", "update"),
+  options = list(),
+  trigger = stream_trigger_interval(),
+  partition_by = NULL,
+  ...
+)
+
+stream_write_delta(
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  checkpoint = file.path("checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -30,9 +110,9 @@ Supports the \samp{"hdfs://"}, \samp{"s3a://"} and \samp{"file://"} protocols.}
 \item{mode}{Specifies how data is written to a streaming sink. Valid values are
 \code{"append"}, \code{"complete"} or \code{"update"}.}
 
-\item{trigger}{The trigger for the stream query, defaults to micro-batches runnnig
-every 5 seconds. See \code{\link{stream_trigger_interval}} and
-\code{\link{stream_trigger_continuous}}.}
+\item{trigger}{The trigger for the stream query, defaults to micro-batches
+running every 5 seconds. See \code{\link{stream_trigger_interval}} and
+  \code{\link{stream_trigger_continuous}}.}
 
 \item{checkpoint}{The location where the system will write all the checkpoint
 information to guarantee end-to-end fault-tolerance.}
@@ -56,7 +136,7 @@ information to guarantee end-to-end fault-tolerance.}
 \item{...}{Optional arguments; currently unused.}
 }
 \description{
-Writes a Spark dataframe stream into a tabular (typically, comma-separated) stream.
+Write files to the stream
 }
 \examples{
 \dontrun{
@@ -76,21 +156,6 @@ stream_stop(stream)
 }
 \seealso{
 Other Spark stream serialization: 
-\code{\link{stream_read_csv}()},
-\code{\link{stream_read_delta}()},
-\code{\link{stream_read_json}()},
-\code{\link{stream_read_kafka}()},
-\code{\link{stream_read_orc}()},
-\code{\link{stream_read_parquet}()},
-\code{\link{stream_read_socket}()},
-\code{\link{stream_read_text}()},
-\code{\link{stream_write_console}()},
-\code{\link{stream_write_delta}()},
-\code{\link{stream_write_json}()},
-\code{\link{stream_write_kafka}()},
-\code{\link{stream_write_memory}()},
-\code{\link{stream_write_orc}()},
-\code{\link{stream_write_parquet}()},
-\code{\link{stream_write_text}()}
+\code{\link{stream_write_memory}()}
 }
 \concept{Spark stream serialization}

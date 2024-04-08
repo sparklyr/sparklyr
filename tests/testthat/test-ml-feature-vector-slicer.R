@@ -1,3 +1,4 @@
+skip_connection("ml-feature-vector-slicer")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -30,3 +31,6 @@ test_that("ft_vector_slicer works", {
 
   expect_identical(sliced, list(c(1, 2)))
 })
+
+test_clear_cache()
+

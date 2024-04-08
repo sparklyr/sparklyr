@@ -1,3 +1,4 @@
+skip_connection("ml-feature-sql-transformer")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -35,3 +36,6 @@ test_that("ft_sql_transformer() works", {
     list(statement = "select *, petal_width * 2 as pw2 from `__THIS__`")
   )
 })
+
+test_clear_cache()
+

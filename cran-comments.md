@@ -1,21 +1,38 @@
 # Submission
 
-- Addresses Warning from CRAN checks
+- The main motivation of the timing for this release is to address an bug in
+translating SQL introduced when 'dbplyr' was upgraded to 2.5.0.
+
+- There are two other noteworthy improvements in this release:
+  - After constantly cleaning up dependencies across multiple releases, and after
+  removing two additional Imports, R checks do not longer return a NOTE warning
+  of too many dependencies.
+  - Started an effort to reduce size of the package itself. This is the reason
+  for the remaining NOTE in the package. The major reduction in size, in this 
+  release, was from removing support for Spark 1.6 (No longer supported by the
+  Spark project itself). This reduced the size of that directory almost 2
+  megabytes.
+
+- Was able to run reverse dependency checks for all packages but 1. 'pathling' 
+timed out when I attempted to run the checks. It seems that the package is trying
+to start a Spark session, and it has a configuration that does not seem to 
+be able to run on my machine. Judging by the types of changes I made in this release,
+I doubt that checks would fail in CRAN, so this is why I decided to submit
+despite this failure. 
 
 ## Test environments
 
-- Ubuntu 20.04, R 4.2.3, Spark 3.3 (GH Actions)
-- Ubuntu 20.04, R 4.2.3, Spark 3.2 (GH Actions)
-- Ubuntu 20.04, R 4.2.3, Spark 3.1 (GH Actions)
-- Ubuntu 20.04, R 4.2.3, Spark 2.4 (GH Actions)
-- Ubuntu 20.04, R 4.2.3, Spark 2.2 (GH Actions)
-  
+- Ubuntu 22.04, R 4.3.3, Spark 3.3 (GH Actions)
+- Ubuntu 22.04, R 4.3.3, Spark 3.2 (GH Actions)
+- Ubuntu 22.04, R 4.3.3, Spark 3.1 (GH Actions)
+- Ubuntu 22.04, R 4.3.3, Spark 2.4 (GH Actions)
+
 ## R CMD check environments
 
-- Local Mac OS M1 (aarch64-apple-darwin20), R 4.2.3
-- Mac OS x86_64-apple-darwin17.0 (64-bit), R 4.2.3
-- Windows  x86_64-w64-mingw32 (64-bit), R 4.2.3
-- Linux x86_64-pc-linux-gnu (64-bit), R 4.2.3
+- Local Mac OS M1 (aarch64-apple-darwin20), R 4.3.3
+- Mac OS x86_64-apple-darwin20.0 (64-bit), R 4.3.3
+- Windows  x86_64-w64-mingw32 (64-bit), R 4.3.3
+- Linux x86_64-pc-linux-gnu (64-bit), R 4.3.3
 
 
 ## R CMD check results
@@ -25,74 +42,27 @@
 Notes:
 
 ```
-❯ checking package dependencies ... NOTE
-  Imports includes 28 non-default packages.
-  Importing from so many packages makes the package vulnerable to any of
-  them becoming unavailable.  Move as many as possible to Suggests and
-  use conditionally.
-
 ❯ checking installed package size ... NOTE
-    installed size is  6.7Mb
+    installed size is  5.1Mb
     sub-directories of 1Mb or more:
-      R      2.0Mb
-      java   3.4Mb
+      R      2.1Mb
+      java   1.8Mb
+
+0 errors ✔ | 0 warnings ✔ | 1 note ✖
 ```
 
-## Reverse dependencies
+## revdepcheck results
 
-1 Warning in sparkwarc, not related sparklyr
+We checked 28 reverse dependencies (27 from CRAN + 1 from Bioconductor), 
+comparing R CMD check results across CRAN and dev versions of this package.
 
-|Package|Version|Error|Warning|Note|OK|
-|:---|:---|:---|:---|:---|:---|
-|[apache.sedona](#apache.sedona)|1.4.0|0|0|0|40|
-|[catalog](#catalog)|0.1.1|0|0|0|42|
-|[geospark](#geospark)|0.3.1|0|0|2|41|
-|[graphframes](#graphframes)|0.1.2|0|0|1|41|
-|[apache.sedona](#apache.sedona)|1.3.0|0|0|1|39|
-|[catalog](#catalog)|0.1.1|0|0|0|42|
-|[geospark](#geospark)|0.3.1|0|0|2|41|
-|[graphframes](#graphframes)|0.1.2|0|0|1|41|
-|[rsparkling](#rsparkling)|0.2.19|0|0|2|33|
-|[s3.resourcer](#s3.resourcer)|1.1.0|0|0|0|41|
-|[shinyML](#shinyML)|1.0.1|0|0|1|40|
-|[spark.sas7bdat](#spark.sas7bdat)|1.4|0|0|0|46|
-|[sparkavro](#sparkavro)|0.3.0|0|0|1|42|
-|[sparkbq](#sparkbq)|0.1.1|0|0|1|40|
-|[sparkhail](#sparkhail)|0.1.1|0|0|1|42|
-|[sparklyr.flint](#sparklyr.flint)|0.2.2|0|0|0|46|
-|[sparklyr.nested](#sparklyr.nested)|0.0.3|0|0|1|41|
-|[sparktf](#sparktf)|0.1.0|0|0|1|42|
-|[sparkwarc](#sparkwarc)|0.1.6|0|1|0|46|
-|[sparkxgb](#sparkxgb)|0.1.1|0|0|1|41|
-|[variantspark](#variantspark)|0.1.1|0|0|1|42|
-|[rsparkling](#rsparkling)|0.2.19|0|0|2|33|
-|[s3.resourcer](#s3.resourcer)|1.1.0|0|0|0|41|
-|[shinyML](#shinyML)|1.0.1|0|0|1|40|
-|[spark.sas7bdat](#spark.sas7bdat)|1.4|0|0|0|46|
-|[sparkavro](#sparkavro)|0.3.0|0|0|1|42|
-|[sparkbq](#sparkbq)|0.1.1|0|0|1|40|
-|[sparkhail](#sparkhail)|0.1.1|0|0|1|42|
-|[sparklyr.flint](#sparklyr.flint)|0.2.2|1|0|0|45|
-|[sparklyr.nested](#sparklyr.nested)|0.0.4|0|0|0|41|
-|[sparktf](#sparktf)|0.1.0|0|0|1|42|
-|[sparkwarc](#sparkwarc)|0.1.6|0|0|0|47|
-|[sparkxgb](#sparkxgb)|0.1.1|0|0|1|41|
-|[variantspark](#variantspark)|0.1.1|0|0|1|42|
+ * We saw 0 new problems
+ * We failed to check 1 packages
 
-###  sparkwarc
-```
-* using log directory ‘/Users/edgar/r_projects/sparklyr/revdep/sparkwarc.Rcheck’
-* using R version 4.2.1 (2022-06-23)
-* using platform: aarch64-apple-darwin20 (64-bit)
-* using session charset: UTF-8
-* checking extension type ... Package
-* this is package ‘sparkwarc’ version ‘0.1.6’
-* package encoding: UTF-8
-* checking whether package ‘sparkwarc’ can be installed ... WARNING
-Found the following significant warnings:
-  /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/Rcpp/include/Rcpp/internal/r_coerce.h:255:7: warning: 'sprintf' is deprecated: This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead. [-Wdeprecated-declarations]
-See ‘/Users/edgar/r_projects/sparklyr/revdep/sparkwarc.Rcheck/00install.out’ for details.
-* DONE
-Status: 1 WARNING
-```
+Issues with CRAN packages are summarised below.
+
+### Failed to check
+
+* pathling (NA)
+
 

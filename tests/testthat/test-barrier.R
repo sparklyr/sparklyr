@@ -1,3 +1,4 @@
+skip_connection("barrier")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -17,3 +18,5 @@ test_that("barrier-spark_apply works", {
     perl = TRUE
   ))
 })
+
+test_clear_cache()

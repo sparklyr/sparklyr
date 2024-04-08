@@ -1,3 +1,4 @@
+skip_connection("ml-fpm-fpgrowth")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -49,3 +50,6 @@ test_that("ml_fpgrowth() works properly", {
     list(list(), list(), list("5"))
   )
 })
+
+test_clear_cache()
+

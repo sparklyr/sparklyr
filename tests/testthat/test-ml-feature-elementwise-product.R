@@ -1,3 +1,4 @@
+skip_connection("ml-feature-elementwise-product")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -24,7 +25,7 @@ test_that("ft_elementwise_product() works", {
       ft_vector_assembler(list("a", "b", "c"), output_col = "features") %>%
       ft_elementwise_product("features", "multiplied", c(2, 4, 6)) %>%
       pull(multiplied) %>%
-      rlang::flatten_dbl()
+      purrr::list_c(ptype = numeric())
   )
 
   expect_identical(
@@ -48,3 +49,6 @@ test_that("ft_elementwise_product() works", {
     )
   )
 })
+
+test_clear_cache()
+

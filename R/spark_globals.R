@@ -9,8 +9,18 @@
 .gls_env$ml_package_mapping <- NULL
 .gls_env$avail_package_cache <- NULL
 .gls_env$do_spark <- NULL
+.gls_env$last_error <- NULL
 
 # ---------- Manage session level variables ----------
+genv_get_last_error <- function() {
+  .gls_env$last_error
+}
+
+genv_set_last_error <- function(x) {
+  .gls_env$last_error <- x
+  invisible()
+}
+
 genv_get_extension_packages <- function() {
   .gls_env$extension_packages
 }

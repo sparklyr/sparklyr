@@ -1,3 +1,158 @@
+# Sparklyr 1.8.5
+
+### Fixes
+
+- Fixes quoting issue with `dbplyr` 2.5.0 (#3429)
+
+- Fixes Windows OS identification (#3426)
+
+### Package improvements
+
+- Removes dependency on `tibble`, all calls are now redirected to `dplyr` (#3399)
+
+- Removes dependency on `rapddirs` (#3401): 
+  - Backwards compatibility with `sparklyr` 0.5 is no longer needed
+  - Replicates selection of cache directory 
+
+- Converts `spark_apply()` to a method (#3418)
+
+### Spark improvements
+
+- Spark 2.3 is no longer considered maintained as of September 2019
+  - Removes Java folder for versions 2.3 and below
+  - Merges Scala file sets into Spark version 2.4
+  - Re-compiles JARs for version 2.4 and above
+
+- Updates Delta-to-Spark version matching when using `delta` as one of the
+`packages` when connecting (#3414)
+
+# Sparklyr 1.8.4
+
+### Compatability with new `dbplyr` version
+
+- Fixes `db_connection_describe()` S3 consistency error (@t-kalinowski)
+
+- Addresses new error from `dbplyr` that fails when you try to access 
+components from a remote `tbl` using `$`
+ 
+- Bumps the version of `dbplyr` to switch between the two methods to create
+temporary tables 
+
+- Addresses new `translate_sql()` hard requirement to pass a `con` object. Done
+by passing the current connection or `simulate_hive()` 
+
+### Fixes
+
+- Small fix to spark_connect_method() arguments. Removes 'hadoop_version'
+
+- Improvements to handling `pysparklyr` load (@t-kalinowski)
+
+- Fixes 'subscript out of bounds' issue found by `pysparklyr` (@t-kalinowski)
+
+- Updates available Spark download links
+
+### Improvements
+
+- Removes dependency on the following packages:
+  - `digest`
+  - `base64enc`
+  - `ellipsis`
+  
+- Converts `ml_fit()` into a S3 method for `pysparklyr` compatibility
+
+### Test improvements
+
+- Improvements and fixes to tests (@t-kalinowski)
+
+- Fixes test jobs that include should have included Arrow but did not
+
+- Updates to the Spark versions to be tested 
+
+- Re-adds tests for development `dbplyr`
+
+# Sparklyr 1.8.3
+
+### Improvements
+
+- Spark error message relays are now cached instead of the entire content
+displayed as an R error. This used to overwhelm the interactive session's 
+console or Notebook, because of the amount of lines returned by the
+Spark message.  Now, by default, it will return the top of the Spark 
+error message, which is typically the most relevant part. The full error can
+still be accessed using a new function called `spark_last_error()`
+
+- Reduces redundancy on several tests
+
+- Handles SQL quoting when the table reference contains multiple levels. The 
+common time someone would encounter an issue is when a table name is passed
+using `in_catalog()`, or `in_schema()`. 
+
+### Java
+
+- Adds Scala scripts to handle changes in the upcoming version of Spark (3.5)
+- Adds new JAR file to handle Spark 3.0 to 3.4
+- Adds new JAR file to handle Spark 3.5 and above
+
+### Fixes
+
+- It prevents an error when `na.rm = TRUE` is explicitly set within `pmax()` and
+`pmin()`. It will now also purposely fail if `na.rm` is set to `FALSE`. The
+default of these functions in base R is for `na.rm` to be `FALSE`, but ever
+since these functions were released, there has been no warning or error. For now,
+we will keep that behavior until a better approach can be figured out. (#3353)
+
+- `spark_install()` will now properly match when a partial version is passed 
+to the function. The issue was that passing '2.3' would match to '3.2.3', instead
+of '2.3.x' (#3370)
+
+### Package integration
+
+- Adds functionality to allow other packages to provide `sparklyr` additional 
+back-ends. This effort is mainly focused on adding the ability to integrate 
+with Spark Connect and Databricks Connect through a new package. 
+
+- New exported functions to integrate with the RStudio IDE. They all have the
+same `spark_ide_` prefix
+
+- Modifies several read functions to become exported methods, such as 
+`sdf_read_column()`. 
+
+- Adds `spark_integ_test_skip()` function. This is to allow other packages 
+to use `sparklyr`'s test suite. It enables a way to the external package to 
+indicate if a given test should run or be skipped.
+
+- If installed, `sparklyr` will load the `pysparklyr` package
+
+# Sparklyr 1.8.2
+
+### New Features
+
+- Adds Azure Synapse Analytics connectivity (@Bob-Chou , #3336)
+
+- Adds support for "parameterized" queries now available in Spark 3.4 (@gregleleu #3335)
+
+- Adds new DBI methods: `dbValid` and `dbDisconnect` (@alibell, #3296)
+
+- Adds `overwrite` parameter to `dbWriteTable()` (@alibell, #3296)
+
+- Adds `database` parameter to `dbListTables()` (@alibell, #3296)
+
+- Adds ability to turn off predicate support (where(), across()) using 
+  options("sparklyr.support.predicates" = FALSE). Defaults to TRUE. This should
+  accelerate `dplyr` commands because it won't need to process column types
+  for every single piped command
+
+### Fixes
+
+- Fixes Spark download locations (#3331)
+
+- Fix various rlang deprecation warnings (@mgirlich, #3333).
+
+### Misc
+
+- Switches upper version of Spark to 3.4, and updates JARS (#3334)
+
+
 # Sparklyr 1.8.1
 
 ### Bug Fixes

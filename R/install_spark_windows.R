@@ -164,7 +164,7 @@ winutils_source_path <- function() {
 
 stop_with_winutils_error <- function(hadoopBinPath) {
   if (is_win64()) {
-    winutilsDownload <- "https://github.com/steveloughran/winutils/raw/master/hadoop-2.6.0/bin/"
+    winutilsDownload <- "https://github.com/steveloughran/winutils/raw/master/hadoop-3.0.0/bin/"
   } else {
     winutilsDownload <- "https://code.google.com/archive/p/rrd-hadoop-win32/source/default/source"
   }

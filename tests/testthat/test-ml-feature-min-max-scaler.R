@@ -1,3 +1,4 @@
+skip_connection("ml-feature-min-max-scaler")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -44,3 +45,6 @@ test_that("ft_min_max_scaler() works properly", {
     )
   )
 })
+
+test_clear_cache()
+

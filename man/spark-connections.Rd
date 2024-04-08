@@ -12,7 +12,7 @@
 spark_connect(
   master,
   spark_home = Sys.getenv("SPARK_HOME"),
-  method = c("shell", "livy", "databricks", "test", "qubole"),
+  method = c("shell", "livy", "databricks", "test", "qubole", "synapse"),
   app_name = "sparklyr",
   version = NULL,
   config = spark_config(),

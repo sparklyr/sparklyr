@@ -105,6 +105,11 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
     rlang::set_names(stage_uids[stage_indices])
 }
 
+cross_compat <- function(x) {
+  out <- vctrs::vec_expand_grid(!!!x, .vary = "fastest")
+  purrr::transpose(out)
+}
+
 ml_spark_param_map <- function(param_map, sc, stage_jobjs) {
   purrr::imap(param_map, function(param_set, stage_uid) {
     purrr::imap(param_set, function(value, param_name) {
@@ -118,7 +123,7 @@ ml_spark_param_map <- function(param_map, sc, stage_jobjs) {
       purrr::discard(~ is.null(.x[["value"]]))
   }) %>%
     unname() %>%
-    rlang::flatten() %>%
+    purrr::list_flatten() %>%
     purrr::reduce(
       function(x, pair) invoke(x, "put", pair$param_jobj, pair$value),
       .init = invoke_new(sc, "org.apache.spark.ml.param.ParamMap")
@@ -151,9 +156,9 @@ ml_new_validator <- function(sc, class, uid, estimator, evaluator,
       purrr::map(~ invoke_static(sc, "sparklyr.MLUtils", "paramMapToList", .x))
 
     estimator_param_maps %>%
-      purrr::map(purrr::cross) %>%
+      purrr::map(cross_compat) %>%
       ml_validate_params(stage_jobjs, current_param_list) %>%
-      purrr::cross() %>%
+      cross_compat() %>%
       purrr::map(ml_spark_param_map, sc, stage_jobjs)
   }
 

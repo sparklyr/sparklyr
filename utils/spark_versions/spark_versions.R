@@ -70,6 +70,13 @@ parse_file <- function(x, main, folder) {
 # ---------------------- Read / create versions.rds file ----------------
 
 versions_rds <- path("utils", "spark_versions", "versions.rds")
+if(file_exists(versions_rds)) {
+  rds_info <- file_info(versions_rds)
+  rds_days <- as.integer(Sys.Date() - as.Date(rds_info$modification_time))
+  if(rds_days > 8) {
+    file_delete(versions_rds)
+  }
+}
 
 if(!file_exists(versions_rds)) {
   c("https://dlcdn.apache.org/spark/",

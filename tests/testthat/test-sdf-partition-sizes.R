@@ -1,3 +1,4 @@
+skip_connection("sdf-partition-sizes")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -13,3 +14,6 @@ test_that("sdf_partition_sizes works as expected", {
   expect_equal(length(rs$partition_size), num_partitions)
   expect_equal(sum(rs$partition_size), num_rows)
 })
+
+test_clear_cache()
+

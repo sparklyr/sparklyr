@@ -17,13 +17,3 @@ from the result (e.g., `["col1"]`, `[c("col1", "col2")]`, `[1:10]`, `[-1]`,
 Susetting operator for Spark dataframe allowing a subset of column(s) to be
 selected using syntaxes similar to those supported by R dataframes
 }
-\examples{
-
-\dontrun{
-library(sparklyr)
-sc <- spark_connect(master = "spark://HOST:PORT")
-example_sdf <- copy_to(sc, tibble::tibble(a = 1, b = 2))
-example_sdf["a"] \%>\% print()
-}
-
-}

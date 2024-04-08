@@ -167,7 +167,7 @@ new_ml_quantile_discretizer <- function(jobj) {
 }
 
 validator_ml_quantile_discretizer <- function(.args) {
-  .args[["uid"]] <- cast_scalar_character(.args[["uid"]])
+  .args[["uid"]] <- cast_string(.args[["uid"]])
 
   if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]])) {
     stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
@@ -175,9 +175,9 @@ validator_ml_quantile_discretizer <- function(.args) {
   .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
   .args[["num_buckets"]] <- cast_scalar_integer(.args[["num_buckets"]])
-  .args[["input_cols"]] <- cast_nullable_string_list(.args[["input_cols"]])
-  .args[["output_cols"]] <- cast_nullable_string_list(.args[["output_cols"]])
-  .args[["num_buckets_array"]] <- cast_nullable_integer_list(.args[["num_buckets_array"]])
+  .args[["input_cols"]] <- cast_string_list(.args[["input_cols"]], allow_null = TRUE)
+  .args[["output_cols"]] <- cast_string_list(.args[["output_cols"]], allow_null = TRUE)
+  .args[["num_buckets_array"]] <- cast_integer_list(.args[["num_buckets_array"]], allow_null = TRUE)
   .args[["handle_invalid"]] <- cast_choice(
     .args[["handle_invalid"]],
     c("error", "skip", "keep")

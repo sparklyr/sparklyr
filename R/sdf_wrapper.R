@@ -6,11 +6,11 @@ get_sdf_storage_level <- function(sdf_jobj) {
 #' @importFrom dbplyr sql_render
 #' @importFrom dbplyr sql_build
 spark_dataframe.tbl_spark <- function(x, ...) {
-  x$spark_dataframe(
+  x[["spark_dataframe"]](
     x,
     function(tbl_spark) {
       sc <- spark_connection(tbl_spark)
-      sql <- as.character(sql_render(sql_build(tbl_spark, con = sc), con = sc))
+      sql <- as.character(dbplyr::remote_query(tbl_spark))
       hive <- hive_context(sc)
 
       invoke(hive, "sql", sql)
@@ -54,7 +54,7 @@ sdf_schema <- function(x,
 sdf_schema.tbl_spark <- function(x,
                                  expand_nested_cols = FALSE,
                                  expand_struct_cols = FALSE) {
-  x$schema(
+  x[["schema"]](
     x,
     sdf_schema_impl,
     expand_nested_cols = expand_nested_cols,
@@ -138,14 +138,20 @@ sdf_deserialize_column <- function(column, sc) {
 #' @param column The name of a column within \code{x}.
 #' @export
 sdf_read_column <- function(x, column) {
-  sc <- spark_connection(x)
+  UseMethod("sdf_read_column")
+}
+
+#' @export
+sdf_read_column.spark_jobj <- function(x, column) {
   sdf <- spark_dataframe(x)
-
-  col_df <- sdf %>%
-    invoke("select", column, list()) %>%
-    collect()
-
+  col_df <- invoke(sdf, "select", column, list())
+  col_df <- collect(col_df)
   col_df[[column]]
+}
+
+#' @export
+sdf_read_column.tbl_spark <- function(x, column) {
+  dplyr::pull(x, column)
 }
 
 #' Collect a Spark DataFrame into R.
@@ -198,7 +204,7 @@ collect_from_rds <- function(path) {
   struct_col_idxes <- data[[4]]
   col_data <- data[[5]]
   names(col_data) <- col_names
-  df <- tibble::as_tibble(col_data)
+  df <- dplyr::as_tibble(col_data)
 
   apply_conversion <- function(df, idx, fn) {
     if ("list" %in% class(df[[idx]])) {
@@ -519,7 +525,7 @@ sdf_separate_column <- function(x,
     indices <- x %>%
       head(1) %>%
       dplyr::pull(!!rlang::sym(column)) %>%
-      rlang::flatten() %>%
+      purrr::list_flatten() %>%
       length() %>%
       seq_len(.)
 

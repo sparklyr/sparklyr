@@ -1,3 +1,4 @@
+skip_connection("broom-isotonic_regression")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -42,3 +43,6 @@ test_that("isotonic_regression.tidy() works", {
     exp.names = c("isotonic", "num_boundaries")
   )
 })
+
+test_clear_cache()
+

@@ -26,7 +26,8 @@ spark_connection.src_spark <- function(x, ...) {
 
 #' @importFrom dbplyr db_connection_describe
 #' @export
-db_connection_describe.src_spark <- function(con) {
+db_connection_describe.src_spark <- function(con, ...) {
+  check_dots_empty()
   spark_db_desc(con)
 }
 
@@ -69,7 +70,13 @@ tbl.src_spark <- function(src, from, ...) {
 #' @importFrom dbplyr tbl_sql
 #' @export
 tbl.spark_connection <- function(src, from, ...) {
-  spark_tbl_sql(src = src_sql("spark", src), from)
+  subclass <- "spark"
+  subclass <- paste0("src_", subclass)
+  src <- structure(
+    list(con = src, ...),
+    class = c(subclass, "src_sql", "src")
+    )
+  spark_tbl_sql(src = src, from)
 }
 
 spark_tbl_sql <- function(src, from, ...) {
@@ -79,45 +86,45 @@ spark_tbl_sql <- function(src, from, ...) {
     from = process_tbl_name(from),
     ...)
 
-  tbl_spark$sdf_cache_state <- new.env(parent = emptyenv())
-  tbl_spark$sdf_cache_state$ops <- NULL
-  tbl_spark$sdf_cache_state$lazy_query <- NULL
-  tbl_spark$sdf_cache_state$spark_dataframe <- NULL
-  tbl_spark$spark_dataframe <- function(self, spark_dataframe_impl) {
-    cached <- identical(self$sdf_cache_state$lazy_query, self$lazy_query)
+  tbl_spark[["sdf_cache_state"]] <- new.env(parent = emptyenv())
+  tbl_spark[["sdf_cache_state"]][["ops"]] <- NULL
+  tbl_spark[["sdf_cache_state"]][["lazy_query"]] <- NULL
+  tbl_spark[["sdf_cache_state"]][["spark_dataframe"]] <- NULL
+  tbl_spark[["spark_dataframe"]] <- function(self, spark_dataframe_impl) {
+    cached <- identical(self[["sdf_cache_state"]][["lazy_query"]], self[["lazy_query"]])
 
     if (!cached) {
-      self$sdf_cache_state$lazy_query <- self$lazy_query
-      self$sdf_cache_state$spark_dataframe <- spark_dataframe_impl(self)
+      self[["sdf_cache_state"]][["lazy_query"]] <- self[["lazy_query"]]
+      self[["sdf_cache_state"]][["spark_dataframe"]] <- spark_dataframe_impl(self)
     }
 
-    self$sdf_cache_state$spark_dataframe
+    self[["sdf_cache_state"]][["spark_dataframe"]]
   }
 
-  tbl_spark$schema_cache_state <- new.env(parent = emptyenv())
-  tbl_spark$schema_cache_state$ops <- NULL
-  tbl_spark$schema_cache_state$lazy_query <- NULL
-  tbl_spark$schema_cache_state$schema <- as.list(rep(NA, 4L))
-  tbl_spark$schema <- function(self, schema_impl, expand_nested_cols, expand_struct_cols) {
+  tbl_spark[["schema_cache_state"]] <- new.env(parent = emptyenv())
+  tbl_spark[["schema_cache_state"]][["ops"]] <- NULL
+  tbl_spark[["schema_cache_state"]][["lazy_query"]] <- NULL
+  tbl_spark[["schema_cache_state"]][["schema"]] <- as.list(rep(NA, 4L))
+  tbl_spark[["schema"]] <- function(self, schema_impl, expand_nested_cols, expand_struct_cols) {
     cache_index <- (
       as.integer(expand_nested_cols) * 2L + as.integer(expand_struct_cols) + 1L
     )
 
-    cached <- identical(self$schema_cache_state$lazy_query, self$lazy_query)
+    cached <- identical(self[["schema_cache_state"]][["lazy_query"]], self[["lazy_query"]])
 
 
-    if (!cached || is.na(self$schema_cache_state$schema[[cache_index]])[[1]]) {
+    if (!cached || is.na(self[["schema_cache_state"]][["schema"]][[cache_index]])[[1]]) {
 
-      self$schema_cache_state$lazy_query <- self$lazy_query
+      self[["schema_cache_state"]][["lazy_query"]] <- self[["lazy_query"]]
 
-      self$schema_cache_state$schema[[cache_index]] <- schema_impl(
+      self[["schema_cache_state"]][["schema"]][[cache_index]] <- schema_impl(
         self,
         expand_nested_cols = expand_nested_cols,
         expand_struct_cols = expand_struct_cols
       )
     }
 
-    self$schema_cache_state$schema[[cache_index]]
+    self[["schema_cache_state"]][["schema"]][[cache_index]]
   }
 
   tbl_spark

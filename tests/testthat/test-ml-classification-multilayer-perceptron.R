@@ -1,3 +1,6 @@
+test_requires_version(min_version = "2.4", max_version = "3.3")
+
+skip_connection("ml-classification-multilayer-perceptron")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -36,3 +39,5 @@ test_that("ml_multilayer_perceptron returns correct number of weights", {
   )
   expect_equal(length(mlp$model$weights), 4 * 10 + 10 + 10 * 3 + 3)
 })
+
+test_clear_cache()

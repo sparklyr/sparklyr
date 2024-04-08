@@ -1,3 +1,4 @@
+skip_connection("sdf-weighted-sampling-ext")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -68,3 +69,6 @@ test_that("sdf_weighted_sample without replacement works as expected", {
 test_that("sdf_weighted_sample with replacement works as expected", {
   verify_distribution(replacement = TRUE)
 })
+
+test_clear_cache()
+

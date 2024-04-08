@@ -11,7 +11,7 @@ NULL
 #'    `SparkContext.defaultParallelism()` which by default is the number
 #'    of cores available to the `sparklyr` application)
 #' @param ... additional options for sparklyr parallel backend
-#'   (currently only the only valid option is nocompile = {T, F})
+#'   (currently only the only valid option is `nocompile`)
 #'
 #' @return None
 #'
@@ -24,11 +24,6 @@ NULL
 #'
 #' @export
 registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
-
-  if (packageVersion("dbplyr") < "2") {
-    stop("This feature is only supported by dbplyr 2.0 or above")
-  }
-
   do_spark_parallelism <- as.integer(
     parallelism %||%
       tryCatch(
@@ -145,7 +140,7 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
 
     it <- iterators::iter(obj)
     accumulator <- foreach::makeAccum(it)
-    items <- tibble::tibble(
+    items <- dplyr::tibble(
       encoded = it %>% as.list() %>% lapply(serializer)
     )
     spark_items <- sdf_copy_to(

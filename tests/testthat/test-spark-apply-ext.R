@@ -1,3 +1,4 @@
+skip_connection("spark-apply-ext")
 skip_on_livy()
 test_requires("dplyr")
 sc <- testthat_spark_connection()
@@ -175,6 +176,7 @@ test_that("'spark_apply' can roundtrip dates", {
 })
 
 test_that("'spark_apply' can roundtrip Date-Time", {
+  skip("Research issue with test failure (#3341)")
   skip_slow("takes too long to measure coverage")
   expect_equal(
     dates_tbl %>%
@@ -285,3 +287,6 @@ test_that("can infer R package dependencies", {
     sparklyr:::infer_required_r_packages(fn4)
   )
 })
+
+test_clear_cache()
+

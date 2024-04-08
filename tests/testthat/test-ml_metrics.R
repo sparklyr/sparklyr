@@ -1,3 +1,4 @@
+skip_connection("ml_metrics")
 skip_on_livy()
 
 test_that("Multiclass metrics return expected results", {
@@ -54,3 +55,6 @@ test_that("Regression metrics return expected results", {
   expect_equal(pull(metrics, .estimate), c(0.310, 0.859, 0.252), tolerance = 0.001)
 
 })
+
+test_clear_cache()
+

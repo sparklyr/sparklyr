@@ -1,3 +1,4 @@
+skip_connection("sdf-stat")
 skip_on_livy()
 skip_on_arrow_devel()
 test_requires_version("3.0.0")
@@ -73,7 +74,7 @@ test_that("sdf_quantile() approximates weighted quantiles correctly", {
 
   range <- seq(-4, 4, 8e-6)
 
-  weighted_table <- tibble::tibble(
+  weighted_table <- dplyr::tibble(
     v = range,
     w = sapply(range, dnorm)
   )[sample(length(range)), ]
@@ -163,3 +164,5 @@ test_that("Can generate i.i.d samples from distributions correctly", {
     )
   }
 })
+
+test_clear_cache()

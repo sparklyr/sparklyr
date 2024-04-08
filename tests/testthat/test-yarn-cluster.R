@@ -1,3 +1,4 @@
+skip_connection("yarn-cluster")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -59,3 +60,6 @@ test_that("'spark_yarn_cluster_get_conf_property' does variable expansion for co
 
   Sys.unsetenv("YARN_CONF_DIR")
 })
+
+test_clear_cache()
+

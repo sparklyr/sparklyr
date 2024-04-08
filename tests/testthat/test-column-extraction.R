@@ -1,3 +1,4 @@
+skip_connection("column-extraction")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -131,3 +132,5 @@ test_that("we can separate struct columns (#690)", {
     as.Date("2013-01-15 UTC")
   )
 })
+
+test_clear_cache()

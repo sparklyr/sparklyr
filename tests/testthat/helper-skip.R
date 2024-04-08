@@ -15,6 +15,13 @@ skip_databricks_connect <- function() {
     skip("Test is skipped on Databricks Connect")
   }
 }
+
+skip_unless_synapse_connect <- function() {
+  if (testthat_spark_connection_type() != "synapse") {
+    skip("Test only runs on Synapse connection")
+  }
+}
+
 skip_on_arrow_devel <- function(message = "Test is skipped on Arrow development version") {
   if (using_arrow_version() == "devel") skip(message)
 }
@@ -97,5 +104,19 @@ test_requires <- function(...) {
 test_requires_package_version <- function(pkg, min_version) {
   if (packageVersion(pkg) < min_version) {
     skip(paste0("Test requires ", pkg," ", min_version," or above"))
+  }
+}
+
+skip_connection <- function(x) {
+  sc <- testthat_spark_connection()
+  out <- spark_integ_test_skip(sc, x)
+  if(out) {
+    skip(paste0("Test '", x, "' not supported by backend"))
+  }
+}
+
+skip_if_dbplyr_dev <- function() {
+  if(Sys.getenv("DBPLYR_VERSION") == "dev") {
+    skip("Skipping on dev version of `dbplyr`")
   }
 }

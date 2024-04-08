@@ -1,3 +1,4 @@
+skip_connection("sdf-collect")
 skip_on_livy()
 
 sc <- testthat_spark_connection()
@@ -36,7 +37,7 @@ test_that("sdf_collect() works with nested lists", {
     skip("serializing nested list into Spark StructType is only supported in Spark 2.4+")
   }
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     a = list(c(1, 2, 3), c(4, 5), c(6)),
     b = list(c("foo"), c("bar", "foobar"), c("a", "b", "c"))
   )
@@ -52,7 +53,7 @@ test_that("sdf_collect() works with nested named lists", {
     skip("serializing nested named list into Spark StructType is only supported in Spark 2.4+")
   }
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     x = list(c(a = 1, b = 2), c(a = 3, b = 4), c(a = 5, b = 6)),
     y = list(c(a = "foo", b = "bar"), c(a = "a", b = "b"), c(a = "", b = "")),
     z = list(list(a = list(c = "foo", d = "bar", e = list("e")), b = "b"))
@@ -86,7 +87,7 @@ test_that("sdf_collect() works with boolean array column", {
   )
   expect_equivalent(
     sdf %>% sdf_collect(),
-    tibble::tibble(arr = list(FALSE, c(TRUE, FALSE), NA, c(TRUE, NA, FALSE)))
+    dplyr::tibble(arr = list(FALSE, c(TRUE, FALSE), NA, c(TRUE, NA, FALSE)))
   )
 })
 
@@ -144,7 +145,7 @@ test_that("sdf_collect() works with integral array column", {
 
     expect_equivalent(
       sdf %>% sdf_collect(),
-      tibble::tibble(arr = list(1L, c(2L, 3L), NA, c(4L, NA, 5L)))
+      dplyr::tibble(arr = list(1L, c(2L, 3L), NA, c(4L, NA, 5L)))
     )
   }
 })
@@ -174,7 +175,7 @@ test_that("sdf_collect() works with numeric array column", {
 
     expect_equivalent(
       sdf %>% sdf_collect(),
-      tibble::tibble(arr = list(1, c(2, 3), NA, c(4, NA, NaN, 5)))
+      dplyr::tibble(arr = list(1, c(2, 3), NA, c(4, NA, NaN, 5)))
     )
   }
 })
@@ -194,7 +195,7 @@ test_that("sdf_collect() works with string array column", {
   )
   expect_equivalent(
     sdf %>% sdf_collect(),
-    tibble::tibble(arr = list("ab", c("bcd", "e"), NA, c("fghi", NA, "jk")))
+    dplyr::tibble(arr = list("ab", c("bcd", "e"), NA, c("fghi", NA, "jk")))
   )
 })
 
@@ -395,8 +396,11 @@ test_that("sdf_collect() supports callback expression", {
 })
 
 test_that("sdf_collect() preserves NA_real_", {
-  df <- tibble::tibble(x = c(NA_real_, 3.14, 0.142857))
+  df <- dplyr::tibble(x = c(NA_real_, 3.14, 0.142857))
   sdf <- sdf_copy_to(sc, df, overwrite = TRUE)
 
   expect_equal(sdf %>% collect(), df)
 })
+
+test_clear_cache()
+

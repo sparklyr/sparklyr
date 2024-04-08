@@ -44,7 +44,7 @@ repair_names <- function(col_names, names_repair) {
   names(args) <- col_names
   args <- append(args, list(.name_repair = names_repair))
 
-  do.call(tibble::tibble, args) %>%
+  do.call(dplyr::tibble, args) %>%
     names() %>%
     lapply(function(x) gsub("\\.", "_", x)) %>%
     unlist()
@@ -160,7 +160,7 @@ str_split_fixed_to_sql <- function(substr_arr_col, column, sep, n, extra, fill, 
   extra <- rlang::arg_match(extra, c("warn", "merge", "drop"))
   fill <- rlang::arg_match(fill, c("warn", "left", "right"))
 
-  sep <- dbplyr::translate_sql_(list(sep), con = dbplyr::simulate_dbi())
+  sep <- dbplyr::translate_sql_(list(sep), con = dbplyr::simulate_hive())
   limit <- if (identical(extra, "merge")) n else -1L
   sql <- list(dplyr::sql(sprintf("%s(%s, %s, %d)", impl, column, sep, limit)))
   names(sql) <- substr_arr_col

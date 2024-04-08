@@ -4,6 +4,7 @@ sc <- testthat_spark_connection()
 iris_table_name <- random_table_name("iris")
 
 test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
+  skip_connection("format-csv")
   if (.Platform$OS.type == "windows") {
     skip("CSV encoding is slightly different in windows")
   }
@@ -24,6 +25,7 @@ test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
 })
 
 test_that("spark_write_delta() and spark_read_delta() work as expected", {
+  skip_connection("format-delta")
   test_requires_version("2.4.2")
   test_requires("nycflights13")
 
@@ -45,6 +47,7 @@ test_that("spark_write_delta() and spark_read_delta() work as expected", {
 })
 
 test_that("spark_read_json() can load data using column names", {
+  skip_connection("format-json")
   jsonPath <- get_test_data_path(
     "spark-read-json-can-load-data-using-column-names.json"
   )
@@ -59,6 +62,7 @@ test_that("spark_read_json() can load data using column names", {
 })
 
 test_that("spark_read_json() can load data using column types", {
+  skip_connection("format-json")
   test_requires("dplyr")
 
   jsonPath <- get_test_data_path(
@@ -81,6 +85,7 @@ test_that("spark_read_json() can load data using column types", {
 })
 
 test_that("spark_read_json() can load nested structs using column types", {
+  skip_connection("format-json")
   jsonPath <- get_test_data_path(
     "spark-read-json-can-load-nested-structs-using-column-types.json"
   )
@@ -128,6 +133,7 @@ test_that("spark_read_json() can load nested structs using column types", {
 })
 
 test_that("spark_read_csv() can read long decimals", {
+  skip_connection("format-csv")
   csvPath <- get_test_data_path(
     "spark-read-csv-can-read-long-decimals.csv"
   )
@@ -141,20 +147,23 @@ test_that("spark_read_csv() can read long decimals", {
 })
 
 test_that("spark_read_text() and spark_write_text() read and write basic files", {
+  skip_connection("format-text")
   skip_databricks_connect()
   test_requires("dplyr")
 
-  text_file <- file("test.txt", "w+")
+  test_file_path <- tempfile()
+
+  text_file <- file(test_file_path, "w+")
   cat("1\n2\n3", file = text_file)
   close(text_file)
 
   sdf <- spark_read_text(
     sc,
     name = "test_spark_read",
-    path = "test.txt"
+    path = test_file_path
   )
 
-  output_file <- "test_roundtrip.txt"
+  output_file <- tempfile()
   spark_write_text(
     sdf,
     path = output_file
@@ -163,16 +172,14 @@ test_that("spark_read_text() and spark_write_text() read and write basic files",
   sdf_roundtrip <- spark_read_text(
     sc,
     name = "test_spark_roundtrip",
-    path = "test_roundtrip.txt"
+    path = output_file
   )
 
   expect_equal(sdf %>% collect(), sdf_roundtrip %>% collect())
-
-  file.remove("test.txt")
-  unlink(output_file, recursive = TRUE)
 })
 
 test_that("spark_write_table() can append data", {
+  skip_connection("format-table")
   skip_databricks_connect()
   if (spark_version(sc) < "2.0.0") skip("tables not supported before 2.0.0")
   test_requires("dplyr")
@@ -193,6 +200,7 @@ test_that("spark_write_table() can append data", {
 })
 
 test_that("spark_write_table() can write data", {
+  skip_connection("format-table")
   skip_databricks_connect()
   if (spark_version(sc) < "2.0.0") skip("tables not supported before 2.0.0")
   test_requires("dplyr")
@@ -208,6 +216,7 @@ test_that("spark_write_table() can write data", {
 })
 
 test_that("spark_write_table() overwrites existing table definition when overwriting", {
+  skip_connection("format-table")
   skip_databricks_connect()
   test_requires("dplyr")
 
@@ -229,8 +238,8 @@ test_that("spark_write_table() overwrites existing table definition when overwri
   desc <- DBI::dbGetQuery(sc, glue::glue("DESCRIBE TABLE {tbl}"))
 
   expect_equal(
-    tibble::as_tibble(desc),
-    tibble::tribble(
+    dplyr::as_tibble(desc),
+    dplyr::tribble(
       ~col_name, ~data_type, ~comment,
       "foo", "int", NA_character_,
       "bar", "int", NA_character_,
@@ -240,8 +249,8 @@ test_that("spark_write_table() overwrites existing table definition when overwri
   new_table <- tbl(sc, tbl)
 
   expect_equal(
-    tibble::as_tibble(new_table),
-    tibble::tribble(
+    dplyr::as_tibble(new_table),
+    dplyr::tribble(
       ~foo, ~bar,
       1L, 2L
     )
@@ -249,6 +258,7 @@ test_that("spark_write_table() overwrites existing table definition when overwri
 })
 
 test_that("spark_insert_table() inserts into existing table definition, even when overwriting", {
+  skip_connection("format-insert-table")
   skip_databricks_connect()
   test_requires("dplyr")
 
@@ -268,8 +278,8 @@ test_that("spark_insert_table() inserts into existing table definition, even whe
   desc <- DBI::dbGetQuery(sc, glue::glue("DESCRIBE TABLE {tbl}"))
 
   expect_equal(
-    tibble::as_tibble(desc),
-    tibble::tribble(
+    dplyr::as_tibble(desc),
+    dplyr::tribble(
       ~col_name, ~data_type, ~comment,
       "foo", "int", NA_character_,
       "bar", "bigint", NA_character_,
@@ -280,8 +290,8 @@ test_that("spark_insert_table() inserts into existing table definition, even whe
 
   # bar is returned as a double when the table definition is bigint
   expect_equal(
-    tibble::as_tibble(new_table),
-    tibble::tribble(
+    dplyr::as_tibble(new_table),
+    dplyr::tribble(
       ~foo, ~bar,
       1L, 2
     )
@@ -289,6 +299,7 @@ test_that("spark_insert_table() inserts into existing table definition, even whe
 })
 
 test_that("spark_read_csv() can rename columns", {
+  skip_connection("format-csv")
   csvPath <- get_test_data_path(
     "spark-read-csv-can-rename-columns.csv"
   )
@@ -303,6 +314,7 @@ test_that("spark_read_csv() can rename columns", {
 })
 
 test_that("spark_read_text() can read a whole file", {
+  skip_connection("format-csv")
   skip_databricks_connect()
   test_requires("dplyr")
 
@@ -321,6 +333,7 @@ test_that("spark_read_text() can read a whole file", {
 })
 
 test_that("spark_read_csv() can read with no name", {
+  skip_connection("format-csv")
   test_requires("dplyr")
 
   csvPath <- get_test_data_path(
@@ -332,6 +345,7 @@ test_that("spark_read_csv() can read with no name", {
 })
 
 test_that("spark_read_csv() can read with named character name", {
+  skip_connection("format-csv")
   test_requires("dplyr")
 
   csvPath <- get_test_data_path(
@@ -344,6 +358,7 @@ test_that("spark_read_csv() can read with named character name", {
 
 
 test_that("spark_read_csv() can read column types", {
+  skip_connection("format-csv")
   csvPath <- get_test_data_path(
     "spark-read-csv-can-read-column-types.txt"
   )
@@ -366,6 +381,7 @@ test_that("spark_read_csv() can read column types", {
 })
 
 test_that("spark_read_csv() can read verbatim column types", {
+  skip_connection("format-csv")
   csvPath <- get_test_data_path(
     "spark-read-csv-can-read-verbatim-column-types.csv"
   )
@@ -388,6 +404,7 @@ test_that("spark_read_csv() can read verbatim column types", {
 })
 
 test_that("spark_read_csv() can read if embedded nuls present", {
+  skip_connection("format-csv")
   skip_on_arrow() # ARROW-6582
 
   fpath <- get_test_data_path("with_embedded_nul.csv")
@@ -403,6 +420,7 @@ test_that("spark_read_csv() can read if embedded nuls present", {
 })
 
 test_that("spark_read() works as expected", {
+  skip_connection("format-generalized")
   paths <- c(
     "hdfs://localhost:9000/1/a/b",
     "hdfs://localhost:9000/2",
@@ -411,12 +429,13 @@ test_that("spark_read() works as expected", {
     "hdfs://localhost:9000/3/4/5"
   )
   reader <- function(path) {
-    data.frame(md5 = digest::digest(path, algo = "md5"), length = nchar(path))
+    data.frame(md5 = openssl::multihash(path, algos = "md5"), length = nchar(path))
   }
 
   expected_md5s <- sapply(
-    paths, function(x) digest::digest(x, algo = "md5")
-  )
+    paths, function(x) openssl::multihash(x, algos = "md5")
+  ) %>%
+    unlist()
   names(expected_md5s) <- NULL
 
   expected_lengths <- sapply(paths, function(x) nchar(x))
@@ -431,7 +450,7 @@ test_that("spark_read() works as expected", {
       sc,
       paths,
       reader,
-      packages = c("digest"),
+      packages = c("openssl"),
       columns = c("md5", "length")
     )
     expect_equivalent(
@@ -446,6 +465,7 @@ test_that("spark_read() works as expected", {
 })
 
 test_that("spark_write() works as expected", {
+  skip_connection("format-generalized")
   test_requires_version("2.4.0")
 
   iris_tbl <- testthat_tbl("iris")
@@ -502,10 +522,11 @@ test_avro_schema <- list(
   as.character()
 
 test_that("spark_read_avro() works as expected", {
+  skip_connection("format-avro")
   test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
   skip_databricks_connect()
 
-  expected <- tibble::tibble(
+  expected <- dplyr::tibble(
     a = c(1, NaN, 3, 4, NaN),
     b = c(-2L, 0L, 1L, 3L, 6L),
     c = c("ab", "cde", "zzzz", "", "fghi")
@@ -528,10 +549,11 @@ test_that("spark_read_avro() works as expected", {
 })
 
 test_that("spark_write_avro() works as expected", {
+  skip_connection("format-avro")
   test_requires_version("2.4.0", "spark_write_avro() requires Spark 2.4+")
   skip_databricks_connect()
 
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     a = c(1, NaN, 3, 4, NaN),
     b = c(-2L, 0L, 1L, 3L, 6L),
     c = c("ab", "cde", "zzzz", "", "fghi")
@@ -552,10 +574,11 @@ test_that("spark_write_avro() works as expected", {
 })
 
 test_that("spark read/write methods avoid name collision on identical file names", {
+  skip_connection("format-avro")
   test_requires_version("2.4.0")
 
-  tbl_1 <- tibble::tibble(name = c("foo_1", "bar_1"))
-  tbl_2 <- tibble::tibble(name = c("foo_2", "bar_2"))
+  tbl_1 <- dplyr::tibble(name = c("foo_1", "bar_1"))
+  tbl_2 <- dplyr::tibble(name = c("foo_2", "bar_2"))
   sdf_1 <- copy_to(sc, tbl_1)
   sdf_2 <- copy_to(sc, tbl_2)
 
@@ -587,6 +610,7 @@ test_that("spark read/write methods avoid name collision on identical file names
 })
 
 test_that("spark_read_binary can process input directory without partition specs", {
+  skip_connection("format-binary")
   test_requires_version("3.0.0")
 
   dir <- get_test_data_path("test_spark_read_binary")
@@ -597,7 +621,7 @@ test_that("spark_read_binary can process input directory without partition specs
   expect_equal(colnames(df), c("path", "modificationTime", "length", "content"))
   expect_equivalent(
     df %>% dplyr::select(path, length, content),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                         ~length,          ~content,
       paste0("file:", file.path(dir, "file0.dat")),        4, charToRaw("1234"),
       paste0("file:", file.path(dir, "file1.dat")),        4, charToRaw("5678"),
@@ -608,6 +632,7 @@ test_that("spark_read_binary can process input directory without partition specs
 })
 
 test_that("spark_read_binary can process input directory with flat partition specs", {
+  skip_connection("format-binary")
   test_requires_version("3.0.0")
 
   dir <- get_test_data_path("test_spark_read_binary_with_flat_partition_specs")
@@ -621,7 +646,7 @@ test_that("spark_read_binary can process input directory with flat partition spe
   )
   expect_equivalent(
     df %>% dplyr::select(path, length, content, partition),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                                       ~length,          ~content, ~partition,
       paste0("file:", file.path(dir, "partition=0", "file0.dat")),       4, charToRaw("1234"),         0L,
       paste0("file:", file.path(dir, "partition=1", "file1.dat")),       4, charToRaw("5678"),         1L,
@@ -632,6 +657,7 @@ test_that("spark_read_binary can process input directory with flat partition spe
 })
 
 test_that("spark_read_binary can process input directory with nested partition specs", {
+  skip_connection("format-binary")
   test_requires_version("3.0.0")
 
   dir <- get_test_data_path(
@@ -647,7 +673,7 @@ test_that("spark_read_binary can process input directory with nested partition s
   )
   expect_equivalent(
     df %>% dplyr::select(path, length, content, a, b),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                                       ~length,          ~content, ~a, ~b,
       paste0("file:", file.path(dir, "a=0", "b=0", "file0.dat")),       4, charToRaw("1234"), 0L, 0L,
       paste0("file:", file.path(dir, "a=0", "b=1", "file2.dat")),       4, charToRaw("abcd"), 0L, 1L,
@@ -658,6 +684,7 @@ test_that("spark_read_binary can process input directory with nested partition s
 })
 
 test_that("spark_read_binary can support 'pathGlobFilter' option correctly", {
+  skip_connection("format-binary")
   test_requires_version("3.0.0")
 
   dir <- get_test_data_path("test_spark_read_binary")
@@ -674,7 +701,7 @@ test_that("spark_read_binary can support 'pathGlobFilter' option correctly", {
   )
   expect_equivalent(
     df %>% dplyr::select(path, length, content),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                        ~length,          ~content,
       paste0("file:", file.path(dir, "file0.dat")),       4, charToRaw("1234"),
       paste0("file:", file.path(dir, "file1.dat")),       4, charToRaw("5678"),
@@ -684,6 +711,7 @@ test_that("spark_read_binary can support 'pathGlobFilter' option correctly", {
 })
 
 test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
+  skip_connection("format-binary")
   test_requires_version("3.0.0")
 
   dir <- get_test_data_path("test_spark_read_binary_recursive_file_lookup")
@@ -697,7 +725,7 @@ test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
   expect_equal(colnames(df), c("path", "modificationTime", "length", "content"))
   expect_equivalent(
     df %>% dplyr::select(path, length, content),
-    tibble::tribble(
+    dplyr::tribble(
       ~path,                                                      ~length,          ~content,
       paste0("file:", file.path(dir, "a=0", "b=0", "file0.dat")),       4, charToRaw("1234"),
       paste0("file:", file.path(dir, "a=1", "b=0", "file1.dat")),       4, charToRaw("5678"),
@@ -708,6 +736,7 @@ test_that("spark_read_binary supports 'recursiveFileLookup' option correctly", {
 })
 
 test_that("spark_read_image works as expected", {
+  skip_connection("format-image")
   test_requires_version("2.4.0")
 
   dir <- get_test_data_path("images")
@@ -739,7 +768,7 @@ test_that("spark_read_image works as expected", {
       dplyr::transmute(origin = image[["origin"]]) %>%
       dplyr::arrange(origin) %>%
       dplyr::collect(),
-    tibble::tibble(
+    dplyr::tibble(
       origin = lapply(
         c("edit-sql", "help", "livy-ui", "livy", "spark-log", "spark-ui", "spark", "yarn-ui"),
         function(x) paste0("file://", file.path(dir, x), ".png")
@@ -748,3 +777,7 @@ test_that("spark_read_image works as expected", {
     )
   )
 })
+
+
+test_clear_cache()
+

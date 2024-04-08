@@ -72,7 +72,9 @@ rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
 #' @rdname sdf_bind
 sdf_bind_rows <- function(..., id = NULL) {
   id <- cast_nullable_string(id)
-  dots <- Filter(length, rlang::dots_splice(...))
+  dots <- Filter(length, rlang::dots_list(...))
+  dots <- purrr::list_flatten(dots)
+  dots <- purrr::compact(dots)
   if (!all(sapply(dots, is.tbl_spark))) {
     stop("all inputs must be tbl_spark")
   }
@@ -191,7 +193,9 @@ cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparkl
 #' @rdname sdf_bind
 #' @export
 sdf_bind_cols <- function(...) {
-  dots <- Filter(length, rlang::dots_splice(...))
+  dots <- Filter(length, rlang::dots_list(...))
+  dots <- purrr::list_flatten(dots)
+  dots <- purrr::compact(dots)
   if (!all(sapply(dots, is.tbl_spark))) {
     stop("all inputs must be tbl_spark")
   }

@@ -1,3 +1,4 @@
+skip_connection("ml-classification-logistic-regression")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -314,3 +315,6 @@ test_that("logistic regression bounds on coefficients", {
   expect_equal(max(coef(lr)), 1)
   expect_equal(min(coef(lr)), -1)
 })
+
+test_clear_cache()
+

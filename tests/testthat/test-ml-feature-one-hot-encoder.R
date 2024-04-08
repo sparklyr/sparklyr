@@ -1,3 +1,4 @@
+skip_connection("ml-feature-one-hot-encoder")
 skip_on_livy()
 skip_on_arrow_devel()
 
@@ -99,3 +100,6 @@ test_that("ft_one_hot_encoder() works with ml pipeline", {
     list(c(0, 0), c(1, 0), c(0, 1))
   )
 })
+
+test_clear_cache()
+
