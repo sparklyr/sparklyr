@@ -427,6 +427,46 @@ stream_read_cloudfiles <- function(
   )
 }
 
+#' @rdname stream_read_csv
+#' @export
+stream_read_table <- function(
+    sc,
+    path,
+    name = NULL,
+    options = list(),
+    ...) {
+  stream_read_generic(
+    sc,
+    path = path,
+    type = "table",
+    name = name,
+    columns = FALSE,
+    stream_options = options,
+    load = FALSE
+  )
+}
+
+#' @rdname stream_write_csv
+#' @export
+stream_write_table <- function(
+    x,
+    path,
+    mode = c("append", "complete", "update"),
+    checkpoint = file.path("checkpoints", random_string("")),
+    options = list(),
+    partition_by = NULL,
+    ...) {
+  stream_write_generic(x,
+                       path = path,
+                       type = "table",
+                       mode = mode,
+                       trigger = FALSE,
+                       checkpoint = checkpoint,
+                       partition_by = partition_by,
+                       stream_options = options
+  )
+}
+
 stream_read_generic_type <- function(
     sc,
     path,

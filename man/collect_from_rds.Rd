@@ -19,6 +19,7 @@ dataframe.
 Other Spark serialization routines: 
 \code{\link{spark_insert_table}()},
 \code{\link{spark_load_table}()},
+\code{\link{spark_read}()},
 \code{\link{spark_read_avro}()},
 \code{\link{spark_read_binary}()},
 \code{\link{spark_read_csv}()},
@@ -32,7 +33,6 @@ Other Spark serialization routines:
 \code{\link{spark_read_source}()},
 \code{\link{spark_read_table}()},
 \code{\link{spark_read_text}()},
-\code{\link{spark_read}()},
 \code{\link{spark_save_table}()},
 \code{\link{spark_write_avro}()},
 \code{\link{spark_write_csv}()},
