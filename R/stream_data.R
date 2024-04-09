@@ -446,11 +446,21 @@ stream_read_table <- function(
   )
 }
 
-#' @rdname stream_write_csv
+
+#' Write Stream to Table
+#'
+#' Writes a Spark dataframe stream into a table.
+#'
+#' @inheritParams stream_write_csv
+#' @param format Specifies format of data written to table E.g.
+#' \code{"delta"}, \code{"parquet"}. Defaults to \code{NULL} which will use
+#' system default format.
+#' @family Spark stream serialization
 #' @export
 stream_write_table <- function(
     x,
     path,
+    format = NULL,
     mode = c("append", "complete", "update"),
     checkpoint = file.path("checkpoints", random_string("")),
     options = list(),
@@ -458,12 +468,13 @@ stream_write_table <- function(
     ...) {
   stream_write_generic(x,
                        path = path,
-                       type = "toTable",
+                       type = format,
                        mode = mode,
                        trigger = FALSE,
                        checkpoint = checkpoint,
                        partition_by = partition_by,
-                       stream_options = options
+                       stream_options = options,
+                       to_table = TRUE
   )
 }
 
@@ -551,7 +562,7 @@ stream_read_generic <- function(
 }
 
 stream_write_generic <- function(
-    x, path, type, mode, trigger, checkpoint, partition_by, stream_options) {
+    x, path, type, mode, trigger, checkpoint, partition_by, stream_options, to_table = FALSE) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
   sdf <- spark_dataframe(x)
@@ -564,14 +575,19 @@ stream_write_generic <- function(
     )
   }
 
-  streamOptions <- invoke(sdf, "writeStream") %>%
-    invoke("format", type)
+  streamOptions <- invoke(sdf, "writeStream")
+
+  if (!is.null(type)) {
+    streamOptions <- streamOptions %>% invoke("format", type)
+  }
 
   if (!is.null(partition_by)) {
     streamOptions <- streamOptions %>% invoke("partitionBy", as.list(partition_by))
   }
 
-  stream_options$path <- path
+  if (!to_table) {
+    stream_options$path <- path
+  }
 
   stream_options$checkpointLocation <- checkpoint
 
@@ -603,6 +619,10 @@ stream_write_generic <- function(
 
   if (!identical(trigger, FALSE)) {
     streamOptions <- streamOptions %>% invoke("trigger", trigger)
+  }
+
+  if (to_table) {
+    streamOptions <- streamOptions %>% invoke("toTable", path)
   }
 
   streamOptions %>%

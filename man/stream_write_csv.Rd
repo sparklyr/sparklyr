@@ -9,7 +9,6 @@
 \alias{stream_write_kafka}
 \alias{stream_write_console}
 \alias{stream_write_delta}
-\alias{stream_write_table}
 \title{Write files to the stream}
 \usage{
 stream_write_csv(
@@ -101,16 +100,6 @@ stream_write_delta(
   partition_by = NULL,
   ...
 )
-
-stream_write_table(
-  x,
-  path,
-  mode = c("append", "complete", "update"),
-  checkpoint = file.path("checkpoints", random_string("")),
-  options = list(),
-  partition_by = NULL,
-  ...
-)
 }
 \arguments{
 \item{x}{A Spark DataFrame or dplyr operation}
@@ -167,6 +156,7 @@ stream_stop(stream)
 }
 \seealso{
 Other Spark stream serialization: 
-\code{\link{stream_write_memory}()}
+\code{\link{stream_write_memory}()},
+\code{\link{stream_write_table}()}
 }
 \concept{Spark stream serialization}
