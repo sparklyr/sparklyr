@@ -627,7 +627,7 @@ stream_write_generic <- function(
     streamOptions <- streamOptions %>% invoke("start")
   }
 
-  streamOptions
+  streamOptions %>%
     stream_class() %>%
     stream_validate() %>%
     stream_register()
