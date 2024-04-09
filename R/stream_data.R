@@ -623,10 +623,11 @@ stream_write_generic <- function(
 
   if (to_table) {
     streamOptions <- streamOptions %>% invoke("toTable", path)
+  } else {
+    streamOptions <- streamOptions %>% invoke("start")
   }
 
-  streamOptions %>%
-    invoke("start") %>%
+  streamOptions
     stream_class() %>%
     stream_validate() %>%
     stream_register()
