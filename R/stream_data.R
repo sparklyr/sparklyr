@@ -585,6 +585,8 @@ stream_write_generic <- function(
     streamOptions <- streamOptions %>% invoke("partitionBy", as.list(partition_by))
   }
 
+  # TODO: review if path should be permitted when sinking to table
+  # if so, check for missing-ness or default path to null?
   if (!to_table) {
     stream_options$path <- path
   }
