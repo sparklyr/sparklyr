@@ -115,7 +115,7 @@ Suggests:
     testthat,
     rprojroot
 Encoding: UTF-8
-RoxygenNote: 7.3.0
+RoxygenNote: 7.3.1
 SystemRequirements: Spark: 2.x, or 3.x
 Collate:
     'spark_data_build_types.R'
