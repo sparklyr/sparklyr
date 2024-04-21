@@ -9,6 +9,8 @@
 \alias{stream_read_kafka}
 \alias{stream_read_socket}
 \alias{stream_read_delta}
+\alias{stream_read_cloudfiles}
+\alias{stream_read_table}
 \title{Read files created by the stream}
 \usage{
 stream_read_csv(
@@ -46,6 +48,10 @@ stream_read_kafka(sc, name = NULL, options = list(), ...)
 stream_read_socket(sc, name = NULL, columns = NULL, options = list(), ...)
 
 stream_read_delta(sc, path, name = NULL, options = list(), ...)
+
+stream_read_cloudfiles(sc, path, name = NULL, options = list(), ...)
+
+stream_read_table(sc, path, name = NULL, options = list(), ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
