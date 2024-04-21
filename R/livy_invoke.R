@@ -52,6 +52,7 @@ livy_invoke_deserialize <- function(sc, base64) {
   attach_connection(object, sc)
 }
 
+#' @export
 jobj_subclass.livy_backend <- function(con) {
   "livy_jobj"
 }

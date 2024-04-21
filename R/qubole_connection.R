@@ -1,3 +1,4 @@
+#' @export
 initialize_method.qubole <- function(method, scon) {
   scon$config$sparklyr.web.spark <- invoke(
     scon$state$spark_context,

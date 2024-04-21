@@ -151,11 +151,13 @@ is_required_spark <- function(x, required_version) {
   UseMethod("is_required_spark")
 }
 
+#' @export
 is_required_spark.spark_connection <- function(x, required_version) {
   version <- spark_version(x)
   version >= required_version
 }
 
+#' @export
 is_required_spark.spark_jobj <- function(x, required_version) {
   sc <- spark_connection(x)
   is_required_spark(sc, required_version)

@@ -581,6 +581,7 @@ initialize_method <- function(method, scon) {
   UseMethod("initialize_method")
 }
 
+#' @export
 initialize_method.default <- function(method, scon) {
   scon
 }
