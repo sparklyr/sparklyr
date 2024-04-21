@@ -37,7 +37,12 @@ reproducible across repeated calls.}
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
-\item{...}{Optional arguments, see Details.}
+\item{...}{Optional arguments, see Details.
+#' @return The object returned depends on the class of \code{x}. If it is a
+\code{spark_connection}, the function returns a \code{ml_estimator} object. If
+it is a \code{ml_pipeline}, it will return a pipeline with the predictor
+appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
+the predictions added to it.}
 }
 \description{
 A bisecting k-means algorithm based on the paper "A comparison of document clustering techniques" by Steinbach, Karypis, and Kumar, with modification to fit Spark. The algorithm starts from a single cluster that contains all points. Iteratively it finds divisible clusters on the bottom level and bisects each of them using k-means, until there are k leaf clusters in total or no leaf clusters are divisible. The bisecting steps of clusters on the same level are grouped together to increase parallelism. If bisecting all divisible clusters on the bottom level would result more than k leaf clusters, larger clusters get higher priority.
@@ -55,20 +60,3 @@ iris_tbl \%>\%
 }
 
 }
-\seealso{
-Other ml clustering algorithms
-#' @return The object returned depends on the class of \code{x}. If it is a
-\code{spark_connection}, the function returns a \code{ml_estimator} object. If
-it is a \code{ml_pipeline}, it will return a pipeline with the predictor
-appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
-the predictions added to it.: 
-\code{\link{ml_gaussian_mixture}()},
-\code{\link{ml_kmeans}()},
-\code{\link{ml_lda}()}
-}
-\concept{ml clustering algorithms
-#' @return The object returned depends on the class of \code{x}. If it is a
-\code{spark_connection}, the function returns a \code{ml_estimator} object. If
-it is a \code{ml_pipeline}, it will return a pipeline with the predictor
-appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
-the predictions added to it.}

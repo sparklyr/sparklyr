@@ -69,7 +69,7 @@ Description: R interface to Apache Spark, a fast and general
     provides a 'dplyr' compatible back-end, and provides an interface to
     Spark's built-in machine learning algorithms.
 License: Apache License 2.0 | file LICENSE
-URL: https://spark.rstudio.com/
+URL: https://spark.posit.co/
 BugReports: https://github.com/sparklyr/sparklyr/issues
 Depends:
     R (>= 3.2)

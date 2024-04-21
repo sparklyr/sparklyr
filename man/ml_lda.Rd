@@ -98,7 +98,12 @@ mixture distribution for each document (often called "theta" in the
 
 \item{uid}{A character string used to uniquely identify the ML estimator.}
 
-\item{...}{Optional arguments, see Details.}
+\item{...}{Optional arguments, see Details.
+#' @return The object returned depends on the class of \code{x}. If it is a
+\code{spark_connection}, the function returns a \code{ml_estimator} object. If
+it is a \code{ml_pipeline}, it will return a pipeline with the predictor
+appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
+the predictions added to it.}
 
 \item{model}{A fitted LDA model returned by \code{ml_lda()}.}
 
@@ -245,20 +250,3 @@ tidy(lda_model)
 }
 
 }
-\seealso{
-Other ml clustering algorithms
-#' @return The object returned depends on the class of \code{x}. If it is a
-\code{spark_connection}, the function returns a \code{ml_estimator} object. If
-it is a \code{ml_pipeline}, it will return a pipeline with the predictor
-appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
-the predictions added to it.: 
-\code{\link{ml_bisecting_kmeans}()},
-\code{\link{ml_gaussian_mixture}()},
-\code{\link{ml_kmeans}()}
-}
-\concept{ml clustering algorithms
-#' @return The object returned depends on the class of \code{x}. If it is a
-\code{spark_connection}, the function returns a \code{ml_estimator} object. If
-it is a \code{ml_pipeline}, it will return a pipeline with the predictor
-appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
-the predictions added to it.}
