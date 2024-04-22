@@ -1,3 +1,17 @@
+# Sparklyr (dev)
+
+
+- Adding support for Databricks "[autoloader](https://docs.databricks.com/en/ingestion/auto-loader/options.html)" (format: `cloudFiles`) for streaming ingestion of files(`stream_read_cloudfiles`)(@zacdav-db #3432):
+  - `stream_write_table()`
+  - `stream_read_table()`
+
+- Made changes to `stream_write_generic` (@zacdav-db #3432):
+  - `toTable` method doesn't allow calling `start`, added `to_table` param that adjusts logic
+  - `path` option not propagated when `to_table` is `TRUE`
+
+- Upgrades to Roxygen version 7.3.1 
+
+
 # Sparklyr 1.8.5
 
 ### Fixes
