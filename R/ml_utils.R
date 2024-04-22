@@ -182,16 +182,19 @@ post_ml_obj <- function(x, nm, ml_function, formula, response,
   UseMethod("post_ml_obj")
 }
 
+#' @export
 post_ml_obj.spark_connection <- function(x, nm, ml_function, formula, response,
                                          features, features_col, label_col) {
   nm
 }
 
+#' @export
 post_ml_obj.ml_pipeline <- function(x, nm, ml_function, formula, response,
                                     features, features_col, label_col) {
   ml_add_stage(x, nm)
 }
 
+#' @export
 post_ml_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
                                   features, features_col, label_col) {
   formula <- ml_standardize_formula(formula, response, features)

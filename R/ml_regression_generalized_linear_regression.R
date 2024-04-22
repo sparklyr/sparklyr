@@ -122,6 +122,7 @@ ml_generalized_linear_regression_impl <- function(x, formula = NULL, family = "g
   )
 }
 
+#' @export
 params_validator.ml_generalized_linear_regression <- function(x) {
   x <- params_base_validator(x)
   x$solver <- function(x) cast_choice(x, "irls")

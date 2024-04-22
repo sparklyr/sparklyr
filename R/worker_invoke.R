@@ -8,6 +8,7 @@ worker_invoke <- function(jobj, method, ...) {
   UseMethod("worker_invoke")
 }
 
+#' @export
 worker_invoke.shell_jobj <- function(jobj, method, ...) {
   worker_invoke_method(worker_connection(jobj), FALSE, jobj, method, ...)
 }

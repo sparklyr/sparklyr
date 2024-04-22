@@ -110,10 +110,12 @@ stream_trigger_create <- function(trigger, sc) {
   UseMethod("stream_trigger_create")
 }
 
+#' @export
 stream_trigger_create.stream_trigger_interval <- function(trigger, sc) {
   invoke_static(sc, "org.apache.spark.sql.streaming.Trigger", "ProcessingTime", as.integer(trigger$interval))
 }
 
+#' @export
 stream_trigger_create.stream_trigger_continuous <- function(trigger, sc) {
   invoke_static(sc, "org.apache.spark.sql.streaming.Trigger", "Continuous", as.integer(trigger$interval))
 }

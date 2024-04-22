@@ -206,6 +206,7 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, return_
   attach_connection(result_object, sc)
 }
 
+#' @export
 jobj_subclass.shell_backend <- function(con) {
   "shell_jobj"
 }
@@ -214,6 +215,7 @@ jobj_subclass.spark_connection <- function(con) {
   "shell_jobj"
 }
 
+#' @export
 jobj_subclass.spark_worker_connection <- function(con) {
   "shell_jobj"
 }

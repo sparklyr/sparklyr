@@ -2,10 +2,12 @@ params_validator <- function(x) {
   UseMethod("params_validator")
 }
 
+#' @export
 params_validator.ml_estimator <- function(x) {
   params_base_validator(x)
 }
 
+#' @export
 params_validator.pre_ml_estimator <- function(x) {
   params_base_validator(x)
 }

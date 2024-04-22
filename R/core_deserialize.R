@@ -2,6 +2,7 @@ read_bin <- function(con, what, n, endian = NULL) {
   UseMethod("read_bin")
 }
 
+#' @export
 read_bin.default <- function(con, what, n, endian = NULL) {
   if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 }
@@ -51,10 +52,12 @@ read_bin.spark_connection <- function(con, what, n, endian = NULL) {
   read_bin_wait(con, what, n, endian)
 }
 
+#' @export
 read_bin.spark_worker_connection <- function(con, what, n, endian = NULL) {
   read_bin_wait(con, what, n, endian)
 }
 
+#' @export
 read_bin.livy_backend <- function(con, what, n, endian = NULL) {
   read_bin.default(con$rc, what, n, endian)
 }
