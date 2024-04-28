@@ -140,7 +140,7 @@ ml_metrics_impl <- function(x, truth, estimate, metrics,
                             evaluator, pred_col, estimator_name,
                             beta = NULL) {
 
-  if(spark_version(spark_connection(x)) >= 3) {
+  if(spark_version(spark_connection(x)) >= "3") {
     if(is.null(beta) && evaluator == "MulticlassClassificationEvaluator") beta <- 1
   }
 
