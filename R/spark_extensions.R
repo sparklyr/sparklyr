@@ -143,7 +143,7 @@ spark_dependencies_from_extension <- function(spark_version, scala_version, exte
   )
 
   # reduce the spark_version to just major and minor versions
-  spark_version <- package_version(spark_version)
+  spark_version <- package_version2(spark_version)
   spark_version <- paste(spark_version$major, spark_version$minor, sep = ".")
   spark_version <- numeric_version(spark_version)
 
@@ -173,7 +173,7 @@ spark_dependencies_from_extension <- function(spark_version, scala_version, exte
 #'
 #' @export
 spark_dependency_fallback <- function(spark_version, supported_versions) {
-  supported <- supported_versions[package_version(supported_versions) <= spark_version]
+  supported <- supported_versions[package_version2(supported_versions) <= spark_version]
   sort(supported, decreasing = TRUE)[[1]]
 }
 

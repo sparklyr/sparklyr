@@ -102,7 +102,7 @@ test_requires <- function(...) {
 }
 
 test_requires_package_version <- function(pkg, min_version) {
-  if (packageVersion(pkg) < min_version) {
+  if (packageVersion(pkg) < as.character(min_version)) {
     skip(paste0("Test requires ", pkg," ", min_version," or above"))
   }
 }
