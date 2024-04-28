@@ -394,8 +394,8 @@ sdf_quantile <- function(x,
 
   if (is.null(weight.column)) {
     if (length(column) > 1) {
-      if (package_version(sdf$connection$home_version) <
-        package_version("2.0.0")) {
+      if (package_version2(sdf$connection$home_version) <
+        package_version2("2.0.0")) {
         stop("Spark 2.0+ is required when length(column) > 1")
       }
     }

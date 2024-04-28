@@ -97,7 +97,7 @@ livy_install <- function(version = "0.6.0",
       version
     )
   } else {
-    apache_prefix <- if (package_version(version) >= package_version("0.6.0")) "apache-" else ""
+    apache_prefix <- if (package_version2(version) >= package_version2("0.6.0")) "apache-" else ""
     url <- sprintf(
       "https://archive.apache.org/dist/incubator/livy/%s-incubating/%slivy-%s-incubating-bin.zip",
       version,
