@@ -1,5 +1,12 @@
 # Sparklyr (dev)
 
+- Addresses issues with R 4.4.0. The root cause was that version checking functions
+changed how the work. 
+  - `package_version()` no longer accepts `numeric_version()` output. Wrapped
+  the `package_version()` function to coerce the argument if it's a
+  `numeric_version` class
+  - Comparison operators (`<`, `>=`, etc.) for `packageVersion()` do no longer accept numeric values.
+  The changes were to pass the version as a character
 
 - Adding support for Databricks "[autoloader](https://docs.databricks.com/en/ingestion/auto-loader/options.html)" (format: `cloudFiles`) for streaming ingestion of files(`stream_read_cloudfiles`)(@zacdav-db #3432):
   - `stream_write_table()`
