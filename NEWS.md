@@ -1,4 +1,4 @@
-# Sparklyr (dev)
+# Sparklyr 1.8.6
 
 - Addresses issues with R 4.4.0. The root cause was that version checking functions
 changed how the work. 
