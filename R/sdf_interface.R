@@ -160,6 +160,14 @@ sdf_register.list <- function(x, name = NULL) {
 #' @export
 #' @importFrom dplyr tbl
 sdf_register.spark_jobj <- function(x, name = NULL) {
+  # Avoids further operations if the jobj is an
+  # empty dataset
+  if("Dataset" %in% jobj_class(x)) {
+    if(length(invoke(x, "columns")) == 0) {
+      return(invisible())
+    }
+  }
+
   name <- name %||% paste0("sparklyr_tmp_", gsub("-", "_", uuid::UUIDgenerate()))
   sc <- spark_connection(x)
 
