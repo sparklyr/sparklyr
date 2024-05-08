@@ -162,3 +162,11 @@ check_frac <- function(size, replace = FALSE) {
   )
 }
 
+#' @export
+head.tbl_spark <- function(x, n = 6L, ...) {
+  if (ncol(x) == 0) {
+    return(x)
+  } else {
+    NextMethod()
+  }
+}
