@@ -4,10 +4,13 @@
 \alias{src_databases}
 \title{Show database list}
 \usage{
-src_databases(sc, ...)
+src_databases(sc, col = "databaseName", ...)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
+
+\item{col}{The column name of the table that lists all databases
+may be referred to as \code{namespace} in some versions of the system.}
 
 \item{...}{Optional arguments; currently unused.}
 }
