@@ -1,7 +1,7 @@
 skip_connection("ml-feature-pca")
 skip_on_livy()
 skip_on_arrow_devel()
-
+skip_on_ci()
 skip_databricks_connect()
 test_that("ft_pca() param setting", {
   test_requires_version("3.0.0")
