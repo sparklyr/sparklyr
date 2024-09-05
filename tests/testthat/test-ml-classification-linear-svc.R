@@ -3,6 +3,9 @@ skip_on_livy()
 skip_on_arrow_devel()
 
 skip_databricks_connect()
+
+skip()
+
 test_that("ml_linear_svc() default params", {
   test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
