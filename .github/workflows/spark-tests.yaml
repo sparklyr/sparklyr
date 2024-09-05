@@ -26,7 +26,7 @@ jobs:
       SPARK_VERSION:  ${{ matrix.config.spark }}
       HADOOP_VERSION: ${{ matrix.config.hadoop }}
       LIVY_VERSION:   ${{ matrix.config.livy }}
-      ARROW_VERSION : ${{ matrix.config.arrow }}
+      ARROW_VERSION: ${{ matrix.config.arrow }}
       DBPLYR_VERSION: ${{ matrix.config.dbplyr }}
       R_SPARKINSTALL_INSTALL_INFO_PATH: "/home/runner/work/sparklyr/sparklyr/inst/extdata/versions.json"
 
@@ -139,5 +139,5 @@ jobs:
           spark_major <- as.numeric(substr(Sys.getenv("SPARK_VERSION"), 1, 1))
           if(spark_major < 3) Sys.setenv("JAVA_HOME" = Sys.getenv("JAVA_HOME_8_X64"))
           Sys.getenv("JAVA_HOME")
-          devtools::test(filter = "ml-", reporter = sparklyr_reporter())
+          devtools::test(reporter = sparklyr_reporter())
         shell: Rscript {0}
