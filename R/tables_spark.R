@@ -100,12 +100,14 @@ tbl_change_db <- function(sc, name) {
 #' Show database list
 #'
 #' @param sc A \code{spark_connection}.
+#' @param col The column name of the table that lists all databases
+#' may be referred to as \code{namespace} in some versions of the system.
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export
-src_databases <- function(sc, ...) {
+src_databases <- function(sc, col = "databaseName", ...) {
   sql <- hive_context(sc)
   dbs <- invoke(sql, "sql", "SHOW DATABASES")
-  databaseNames <- sdf_read_column(dbs, "databaseName")
+  databaseNames <- sdf_read_column(dbs, col)
   sort(databaseNames)
 }
