@@ -1,413 +1,5 @@
 [
   {
-    "spark": "1.5.2",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-1.5.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.5.2",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-1.5.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.5.2",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-1.5.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.5.2",
-    "hadoop": "cdh4",
-    "base": "https://d3kbcqa49mib13.cloudfront.net/",
-    "pattern": "spark-%s-bin-%s.tgz"
-  },
-  {
-    "spark": "1.6.0",
-    "hadoop": "1",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.0",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.0",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.0",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.0",
-    "hadoop": "cdh4",
-    "base": "https://d3kbcqa49mib13.cloudfront.net/",
-    "pattern": "spark-%s-bin-%s.tgz"
-  },
-  {
-    "spark": "1.6.1",
-    "hadoop": "1",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.1",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.1",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.1",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.1",
-    "hadoop": "cdh4",
-    "base": "https://d3kbcqa49mib13.cloudfront.net/",
-    "pattern": "spark-%s-bin-%s.tgz"
-  },
-  {
-    "spark": "1.6.2",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.2",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.2",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.2",
-    "hadoop": "cdh4",
-    "base": "https://d3kbcqa49mib13.cloudfront.net/",
-    "pattern": "spark-%s-bin-%s.tgz"
-  },
-  {
-    "spark": "1.6.3",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.3",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.3",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-1.6.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "1.6.3",
-    "hadoop": "cdh4",
-    "base": "https://d3kbcqa49mib13.cloudfront.net/",
-    "pattern": "spark-%s-bin-%s.tgz"
-  },
-  {
-    "spark": "2.0.0",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.0",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.0",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.0",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.1",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.1",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.1",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.1",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.2",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.2",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.2",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.0.2",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.0.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.0",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.0",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.0",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.0",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.1",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.1",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.1",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.1",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.2",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.2",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.2",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.2",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.3",
-    "hadoop": "2.3",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.3",
-    "hadoop": "2.4",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.3",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.1.3",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.1.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.2.0",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.2.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.2.0",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.2.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.2.1",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.2.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.2.1",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.2.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.2.2",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.2.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.2.2",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.2.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.2.3",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.2.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.2.3",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.2.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.3.0",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.3.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.3.0",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.3.0/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.3.1",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.3.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.3.1",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.3.1/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.3.2",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.3.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.3.2",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.3.2/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.3.3",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.3.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.3.3",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.3.3/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.3.4",
-    "hadoop": "2.6",
-    "base": "https://archive.apache.org/dist/spark/spark-2.3.4/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "2.3.4",
-    "hadoop": "2.7",
-    "base": "https://archive.apache.org/dist/spark/spark-2.3.4/",
-    "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
     "spark": "2.4.0",
     "hadoop": "2.6",
     "base": "https://archive.apache.org/dist/spark/spark-2.4.0/",
@@ -518,6 +110,24 @@
   {
     "spark": "3.0.0",
     "hadoop": "2.7",
+    "base": "https://archive.apache.org/dist/spark/spark-3.0.0-preview/",
+    "pattern": "spark-%s-preview-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "3.0.0",
+    "hadoop": "2.7",
+    "base": "https://archive.apache.org/dist/spark/spark-3.0.0-preview2/",
+    "pattern": "spark-%s-preview2-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "3.0.0",
+    "hadoop": "2.7",
+    "base": "https://archive.apache.org/dist/spark/spark-3.0.0-preview2/",
+    "pattern": "spark-%s-preview2-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "3.0.0",
+    "hadoop": "2.7",
     "base": "https://archive.apache.org/dist/spark/spark-3.0.0/",
     "pattern": "spark-%s-bin-hadoop%s.tgz"
   },
@@ -526,6 +136,18 @@
     "hadoop": "2.7",
     "base": "https://archive.apache.org/dist/spark/spark-3.0.0/",
     "pattern": "spark-%s-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "3.0.0",
+    "hadoop": "3.2",
+    "base": "https://archive.apache.org/dist/spark/spark-3.0.0-preview/",
+    "pattern": "spark-%s-preview-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "3.0.0",
+    "hadoop": "3.2",
+    "base": "https://archive.apache.org/dist/spark/spark-3.0.0-preview2/",
+    "pattern": "spark-%s-preview2-bin-hadoop%s.tgz"
   },
   {
     "spark": "3.0.0",
@@ -770,7 +392,25 @@
   {
     "spark": "3.5.2",
     "hadoop": "3",
-    "base": "https://dlcdn.apache.org/spark/spark-3.5.2/",
+    "base": "https://archive.apache.org/dist/spark/spark-3.5.2/",
     "pattern": "spark-%s-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "3.5.3",
+    "hadoop": "3",
+    "base": "https://dlcdn.apache.org/spark/spark-3.5.3/",
+    "pattern": "spark-%s-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "4.0.0",
+    "hadoop": "3",
+    "base": "https://dlcdn.apache.org/spark/spark-4.0.0-preview1/",
+    "pattern": "spark-%s-preview1-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "4.0.0",
+    "hadoop": "3",
+    "base": "https://dlcdn.apache.org/spark/spark-4.0.0-preview2/",
+    "pattern": "spark-%s-preview2-bin-hadoop%s.tgz"
   }
 ]
