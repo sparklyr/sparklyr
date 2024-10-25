@@ -128,6 +128,14 @@ final_tbl <- apache_entries %>%
   select(-priority) %>%
   ungroup()
 
+previews <- final_tbl %>%
+  filter(str_detect(base, "preview")) %>%
+  filter(base != max(base)) %>%
+  pull(base)
+
+final_tbl <- final_tbl %>%
+  filter(!base %in% previews)
+
 final_tbl %>%
   mutate(base = str_sub(base, 1, 25)) %>%
   count(base)

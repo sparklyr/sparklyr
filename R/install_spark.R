@@ -49,19 +49,15 @@ spark_install_find <- function(version = NULL,
     version <- spark_install_version_expand(version, installed_only)
   }
 
-  sparkVersion <- version
-  hadoopVersion <- hadoop_version
-  installedOnly <- installed_only
-
   versions <- spark_versions(latest = latest)
-  if (!is.null(sparkVersion) && sparkVersion == "master") {
+  if (!is.null(version) && version == "master") {
     versions <- versions[versions$installed, ]
   } else {
-    if (installedOnly) {
+    if (installed_only) {
       versions <- versions[versions$installed, ]
     }
-    versions <- if (is.null(sparkVersion)) versions else versions[versions$spark == sparkVersion, ]
-    versions <- if (is.null(hadoopVersion)) versions else versions[versions$hadoop == hadoopVersion, ]
+    versions <- if (is.null(version)) versions else versions[versions$spark == version, ]
+    versions <- if (is.null(hadoop_version)) versions else versions[versions$hadoop == hadoop_version, ]
   }
 
   if (NROW(versions) == 0) {
@@ -71,7 +67,7 @@ spark_install_find <- function(version = NULL,
       "available Spark versions."
     )
     component_name <- sprintf(
-      "spark-%s-bin-hadoop%s", sparkVersion, hadoopVersion %||% "2.7"
+      "spark-%s-bin-hadoop%s", version, hadoop_version %||% "2.7"
     )
     package_name <- paste0(component_name, ".tgz")
     spark_dir <- spark_install_dir()
@@ -81,7 +77,7 @@ spark_install_find <- function(version = NULL,
       packageName = package_name,
       packageRemotePath = sprintf(
         "https://archive.apache.org/dist/spark/spark-%s/%s",
-        sparkVersion, package_name
+        version, package_name
       ),
       packageLocalPath = file.path(spark_dir, package_name),
       sparkDir = spark_dir,
