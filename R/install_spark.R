@@ -44,9 +44,7 @@ spark_install_find <- function(version = NULL,
                                installed_only = TRUE,
                                latest = FALSE,
                                hint = FALSE) {
-
   version <- spark_install_version_expand(version, FALSE)
-
   versions <- spark_versions(latest = latest)
   if (!is.null(version) && version == "master") {
     versions <- versions[versions$installed, ]
@@ -54,18 +52,13 @@ spark_install_find <- function(version = NULL,
     if (installed_only) {
       versions <- versions[versions$installed, ]
     }
-    versions <- ifelse(
-      is.null(version),
-      versions,
-      versions[versions$spark == version, ]
-    )
-    versions <- ifelse(
-      is.null(hadoop_version),
-      versions,
-      versions[versions$hadoop == hadoop_version, ]
-    )
+    if(!is.null(version)) {
+      versions <- versions[versions$spark == version, ]
+    }
+    if(!is.null(hadoop_version)) {
+      versions <- versions[versions$hadoop == hadoop_version, ]
+    }
   }
-
   if (NROW(versions) == 0) {
     warning(
       "The Spark version specified may not be available.\n",
@@ -90,7 +83,7 @@ spark_install_find <- function(version = NULL,
       sparkVersionDir = file.path(spark_install_dir(), component_name)
     )
   } else {
-    #versions <- versions[with(versions, order(default, spark, hadoop_default, decreasing = TRUE)), ]
+    versions <- versions[with(versions, order(default, spark, hadoop_default, decreasing = TRUE)), ]
     spark_install_info(
       as.character(versions[1, ]$spark),
       as.character(versions[1, ]$hadoop),
@@ -184,7 +177,12 @@ spark_install <- function(version = NULL,
                           reset = TRUE,
                           logging = "INFO",
                           verbose = interactive()) {
-  installInfo <- spark_install_find(version, hadoop_version, installed_only = FALSE, latest = TRUE)
+  installInfo <- spark_install_find(
+    version = version,
+    hadoop_version = hadoop_version,
+    installed_only = FALSE,
+    latest = TRUE
+    )
 
   if (!dir.exists(installInfo$sparkDir)) {
     dir.create(installInfo$sparkDir, recursive = TRUE)
