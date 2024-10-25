@@ -19,7 +19,10 @@ read_spark_versions_json <- function(latest = TRUE, future = FALSE) {
       package = packageName()
       )
     dev_file <- "inst/extdata/versions.json"
-    dev_path <- ifelse(file.exists(dev_file), dev_file, NULL)
+    dev_path <- NULL
+    if(file.exists(dev_file)) {
+      dev_path <- dev_file
+    }
     package_path <- dev_path %||% package_path_env %||% installed_path
     versions_json <- NULL
     if (is.null(versions_json)) {
