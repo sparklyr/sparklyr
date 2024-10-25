@@ -44,7 +44,9 @@ spark_install_find <- function(version = NULL,
                                installed_only = TRUE,
                                latest = FALSE,
                                hint = FALSE) {
-  version <- spark_install_version_expand(version, FALSE)
+  if(!is.null(version)) {
+    version <- spark_install_version_expand(version, FALSE)
+  }
   versions <- spark_versions(latest = latest)
   if (!is.null(version) && version == "master") {
     versions <- versions[versions$installed, ]
