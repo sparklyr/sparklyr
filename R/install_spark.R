@@ -11,8 +11,7 @@ spark_can_install <- function() {
 spark_install_version_expand <- function(version, installed_only) {
   if (installed_only) {
     versions <- spark_installed_versions()$spark
-  }
-  else {
+  } else {
     versions <- spark_available_versions(show_minor = TRUE)$spark
   }
 
@@ -45,9 +44,8 @@ spark_install_find <- function(version = NULL,
                                installed_only = TRUE,
                                latest = FALSE,
                                hint = FALSE) {
-  if (identical(grepl("^[0-9]+\\.[0-9]+$", version), TRUE)) {
-    version <- spark_install_version_expand(version, installed_only)
-  }
+
+  version <- spark_install_version_expand(version, FALSE)
 
   versions <- spark_versions(latest = latest)
   if (!is.null(version) && version == "master") {
@@ -56,8 +54,16 @@ spark_install_find <- function(version = NULL,
     if (installed_only) {
       versions <- versions[versions$installed, ]
     }
-    versions <- if (is.null(version)) versions else versions[versions$spark == version, ]
-    versions <- if (is.null(hadoop_version)) versions else versions[versions$hadoop == hadoop_version, ]
+    versions <- ifelse(
+      is.null(version),
+      versions,
+      versions[versions$spark == version, ]
+    )
+    versions <- ifelse(
+      is.null(hadoop_version),
+      versions,
+      versions[versions$hadoop == hadoop_version, ]
+    )
   }
 
   if (NROW(versions) == 0) {
@@ -84,12 +90,12 @@ spark_install_find <- function(version = NULL,
       sparkVersionDir = file.path(spark_install_dir(), component_name)
     )
   } else {
-    versions <- versions[with(versions, order(default, spark, hadoop_default, decreasing = TRUE)), ]
+    #versions <- versions[with(versions, order(default, spark, hadoop_default, decreasing = TRUE)), ]
     spark_install_info(
       as.character(versions[1, ]$spark),
       as.character(versions[1, ]$hadoop),
       latest = latest
-      )
+    )
   }
 }
 
@@ -264,7 +270,7 @@ spark_install <- function(version = NULL,
             file.path(installInfo$sparkVersionDir, "tmp", "hive"),
             mustWork = FALSE,
             winslash = "/"
-            )
+          )
 
           hiveProperties <- c(hiveProperties, list(
             "hive.exec.scratchdir" = hivePath,
@@ -287,7 +293,7 @@ spark_install <- function(version = NULL,
       file.path(installInfo$sparkVersionDir, "tmp", "local"),
       mustWork = FALSE,
       winslash = "/"
-      )
+    )
   }
 
   if (!is.null(hivePath)) {
@@ -338,8 +344,7 @@ spark_resolve_envpath <- function(path_with_end) {
     first <- gsub("%", "", parts[[1]])
     if (nchar(Sys.getenv(first)) > 0) parts[[1]] <- Sys.getenv(first)
     do.call("file.path", as.list(parts))
-  }
-  else {
+  } else {
     normalizePath(path_with_end, mustWork = FALSE)
   }
 }
@@ -382,7 +387,6 @@ spark_install_tar <- function(tarfile) {
 
 spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
                                        reset = TRUE, logging = "INFO") {
-
   log_template <- NULL
   log_properties <- NULL
   log_template_v1 <- "log4j.properties.template"
@@ -392,7 +396,7 @@ spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
 
   dir_contents <- list.files(spark_conf_dir)
 
-  if(any(dir_contents == log_template_v2)) {
+  if (any(dir_contents == log_template_v2)) {
     log_template <- log_template_v2
     log_properties <- list(
       "rootLogger.level" = paste0("rootLogger.level = ", tolower(logging)),
@@ -401,18 +405,18 @@ spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
       "appender.file.name" = "appender.file.name = File",
       "appender.file.append" = "appender.file.append = true",
       "appender.file.layout.type" = "appender.file.layout.type = PatternLayout",
-      "appender.file.layout.pattern" =  "appender.file.layout.pattern = %d{yy/MM/dd HH:mm:ss.SSS} %t %p %c{1}: %m%n%ex",
+      "appender.file.layout.pattern" = "appender.file.layout.pattern = %d{yy/MM/dd HH:mm:ss.SSS} %t %p %c{1}: %m%n%ex",
       "logger.jetty.name" = "logger.jetty.name = org.eclipse.jetty",
       "logger.jetty.level" = "logger.jetty.level = warn"
     )
-    if(os_is_windows()){
+    if (os_is_windows()) {
       log_properties <- c(
         log_properties,
         "appender.file.fileName" = "appender.file.fileName = logs/log4j.spark.log"
-        )
-      }
+      )
+    }
   } else {
-    if(any(dir_contents == log_template_v1)) {
+    if (any(dir_contents == log_template_v1)) {
       log_template <- log_template_v1
       log_properties <- list(
         "log4j.rootCategory" = paste0("log4j.rootCategory=", logging, ",console,localfile"),
@@ -420,7 +424,7 @@ spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
         "log4j.appender.localfile.layout" = "log4j.appender.localfile.layout=org.apache.log4j.PatternLayout",
         "log4j.appender.localfile.layout.ConversionPattern" = "log4j.appender.localfile.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n"
       )
-      if(os_is_windows()){
+      if (os_is_windows()) {
         log_properties <- c(
           log_properties,
           "log4j.appender.localfile.file" = "log4j.appender.localfile.file=logs/log4j.spark.log"
@@ -429,9 +433,9 @@ spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
     }
   }
 
-  if(is.null(log_template)) stop("No log4j template file found")
+  if (is.null(log_template)) stop("No log4j template file found")
 
-  if(!is.null(properties)) log_properties <- properties
+  if (!is.null(properties)) log_properties <- properties
 
   log_file <- substr(log_template, 1, nchar(log_template) - 9)
 
@@ -443,7 +447,7 @@ spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
       from = log_path_template,
       to = log_path,
       overwrite = TRUE
-      )
+    )
   }
 
   file_log <- file(log_path)
@@ -457,8 +461,7 @@ spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
 
     if (length(grep(pattern, lines)) > 0) {
       lines <<- gsub(pattern, value, lines, perl = TRUE)
-    }
-    else {
+    } else {
       lines[[length(lines) + 1]] <<- value
     }
   })
@@ -505,8 +508,7 @@ spark_conf_file_set_value <- function(installInfo, properties, reset) {
 
     if (length(grep(pattern, lines)) > 0) {
       lines <<- gsub(pattern, value, lines, perl = TRUE)
-    }
-    else {
+    } else {
       lines[[length(lines) + 1]] <<- value
     }
   })
