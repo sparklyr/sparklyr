@@ -6,29 +6,34 @@ spark_versions_file_pattern <- function() {
 read_spark_versions_json <- function(latest = TRUE, future = FALSE) {
   # see if we have a cached version
   if (is.null(genv_get_spark_versions_json())) {
-    # This function might be called during a custom configuration and the package
-    # will not be available at that time; allow overriding with environment variable
-    package_path_env <- Sys.getenv("R_SPARKINSTALL_INSTALL_INFO_PATH", unset = NA)
-    package_path <- if (!is.na(package_path_env)) {
-      package_path_env
-    } else {
-      system.file(file.path("extdata", "versions.json"), package = packageName())
+    # This function might be called during a custom configuration and the
+    # package will not be available at that time; allow overriding with
+    # environment variable
+    env_path <- Sys.getenv("R_SPARKINSTALL_INSTALL_INFO_PATH", unset = NA)
+    package_path_env <- NULL
+    if(!is.na(env_path)) {
+      package_path_env <- env_path
     }
-
+    installed_path <-  system.file(
+      file.path("extdata", "versions.json"),
+      package = packageName()
+      )
+    dev_file <- "inst/extdata/versions.json"
+    dev_path <- ifelse(file.exists(dev_file), dev_file, NULL)
+    package_path <- dev_path %||% package_path_env %||% installed_path
     versions_json <- NULL
-
     if (is.null(versions_json)) {
       versions_json <- fromJSON(package_path, simplifyDataFrame = TRUE)
     }
-
     genv_set_spark_versions_json(versions_json)
   }
 
   if (identical(future, TRUE)) {
     # add future versions
-    future_versions_path <- system.file(file.path("extdata", "versions-next.json"),
-                                        package = packageName()
-                                        )
+    future_versions_path <- system.file(
+      file.path("extdata", "versions-next.json"),
+      package = packageName()
+      )
     future_versions_json <- fromJSON(future_versions_path, simplifyDataFrame = TRUE)
     rbind(genv_get_spark_versions_json(), future_versions_json)
   }
