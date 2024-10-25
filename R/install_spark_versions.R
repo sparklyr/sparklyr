@@ -1,5 +1,19 @@
-spark_versions_file_pattern <- function() {
-  "spark-(.*)-bin-(?:hadoop)?(.*)"
+spark_versions_file_pattern <- function(x = NULL) {
+  pattern <- "spark-(.*)-bin-(?:hadoop)?(.*)"
+  if (!is.null(x)) {
+    versions <- read_spark_versions_json()
+    versions <- versions[versions$base != "", ]
+    tgz_files <- sprintf(versions$pattern, versions$spark, versions$hadoop)
+    prospect_folders <- tools::file_path_sans_ext(tgz_files)
+    split_pattern <- strsplit(versions$pattern, "%s")
+    regex_pattern <- lapply(split_pattern, function(x) paste0(x, collapse = "(.*)"))
+    patterns <- tools::file_path_sans_ext(as.character(regex_pattern))
+    matched <- patterns[x == prospect_folders]
+    if (length(matched) > 0) {
+      pattern <- matched
+    }
+  }
+  pattern
 }
 
 #' @importFrom jsonlite fromJSON
@@ -31,7 +45,7 @@ read_spark_versions_json <- function(latest = TRUE, future = FALSE) {
     genv_set_spark_versions_json(versions_json)
   }
 
-  if (identical(future, TRUE)) {
+  if (future) {
     # add future versions
     future_versions_path <- system.file(
       file.path("extdata", "versions-next.json"),
@@ -56,7 +70,7 @@ spark_installed_versions <- function() {
   lapply(dir(c(spark_install_old_dir(), spark_install_dir()), full.names = TRUE), function(maybeDir) {
     if (dir.exists(maybeDir)) {
       fileName <- basename(maybeDir)
-      m <- regmatches(fileName, regexec(spark_versions_file_pattern(), fileName))[[1]]
+      m <- regmatches(fileName, regexec(spark_versions_file_pattern(fileName), fileName))[[1]]
       if (length(m) > 2) {
         spark <<- c(spark, m[[2]])
         hadoop <<- c(hadoop, m[[3]])
@@ -119,7 +133,7 @@ spark_versions <- function(latest = TRUE) {
   json_data$hadoop_default <- FALSE
 
   # apply spark and hadoop versions
-  json_data[json_data$spark == "2.4.3" & json_data$hadoop == "2.7", ]$default <- TRUE
+    json_data[json_data$spark == "2.4.3" & json_data$hadoop == "2.7", ]$default <- TRUE
 
   json_data$hadoop_default <- json_data$spark %>%
     unique() %>%
@@ -138,13 +152,16 @@ spark_versions <- function(latest = TRUE) {
   lapply(
     Filter(
       function(e) !is.null(e),
-      lapply(dir(c(spark_install_old_dir(), spark_install_dir()), full.names = TRUE), function(maybeDir) {
-        if (dir.exists(maybeDir)) {
-          fileName <- basename(maybeDir)
-          m <- regmatches(fileName, regexec(spark_versions_file_pattern(), fileName))[[1]]
-          if (length(m) > 2) list(spark = m[[2]], hadoop = m[[3]], pattern = fileName) else NULL
-        }
-      })
+      lapply(
+        dir(c(spark_install_old_dir(), spark_install_dir()), full.names = TRUE),
+        function(maybeDir) {
+          if (dir.exists(maybeDir)) {
+            fileName <- basename(maybeDir)
+            pattern <- spark_versions_file_pattern(fileName)
+            m <- regmatches(fileName, regexec(pattern, fileName))[[1]]
+            if (length(m) > 2) list(spark = m[[2]], hadoop = m[[3]], pattern = fileName) else NULL
+          }}
+        )
     ),
     function(row) {
       currentRow <- json_data[json_data$spark == row$spark & json_data$hadoop == row$hadoop, ]
@@ -193,7 +210,7 @@ spark_versions_info <- function(version, hadoop_version, latest = TRUE) {
   version <- versions[1, ]
 
   if (nchar(versions$pattern) > 0) {
-    componentName <- sub("\\.tgz", "", sprintf(versions$pattern, version$spark, version$hadoop))
+    componentName <- sub("\\.tgz", "", sprintf(version$pattern, version$spark, version$hadoop))
   }
   else {
     componentName <- sprintf("spark-%s-bin-hadoop%s", version$spark, version$hadoop)
