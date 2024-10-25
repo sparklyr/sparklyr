@@ -95,7 +95,7 @@ spark_available_versions <- function(show_hadoop = FALSE, show_minor = FALSE, sh
   versions
 }
 
-#' Retrieves a dataframe available Spark versions that van be installed.
+#' Returns a data frame of available Spark versions that can be installed.
 #'
 #' @param latest Check for latest version?
 #'
