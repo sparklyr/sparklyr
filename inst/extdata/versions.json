@@ -370,11 +370,5 @@
     "hadoop": "3",
     "base": "https://dlcdn.apache.org/spark/spark-3.5.3/",
     "pattern": "spark-%s-bin-hadoop%s.tgz"
-  },
-  {
-    "spark": "4.0.0",
-    "hadoop": "3",
-    "base": "https://dlcdn.apache.org/spark/spark-4.0.0-preview2/",
-    "pattern": "spark-%s-preview2-bin-hadoop%s.tgz"
   }
 ]

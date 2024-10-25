@@ -109,6 +109,7 @@ apache_entries <- all_files %>%
   map(~ parse_file(.x$file, .x$main, .x$folder))
 
 versions_json <- path("inst/extdata/versions.json")
+future_json <- path("inst/extdata/versions-next.json")
 
 # -------------------- Create new list -------------
 
@@ -133,8 +134,12 @@ previews <- final_tbl %>%
   filter(base != max(base)) %>%
   pull(base)
 
-final_tbl <- final_tbl %>%
+future_tbl <- final_tbl %>%
+  filter(str_detect(base, "preview")) %>%
   filter(!base %in% previews)
+
+final_tbl <- final_tbl %>%
+  filter(!str_detect(base, "preview"))
 
 final_tbl %>%
   mutate(base = str_sub(base, 1, 25)) %>%
@@ -145,3 +150,7 @@ final_tbl %>%
 final_tbl %>%
   transpose() %>%
   write_json(versions_json, pretty = TRUE, auto_unbox = TRUE)
+
+future_tbl %>%
+  transpose() %>%
+  write_json(future_json, pretty = TRUE, auto_unbox = TRUE)
