@@ -67,18 +67,19 @@ object Utils {
   }
 
   private[this] def toArray(columns: Iterable[Collectors.ColumnCtx[_]], numRows: Int, separator: String): Array[_] = {
-    // merge any string column into a single string delimited by `separator`
-    val StringCollectors = Array[(Row, Int) => String](Collectors.collectString, Collectors.collectForceString)
-    val res: Array[Any] = columns.map(x => {
+    val StringCollectors: Array[(Row, Int) => String] = Array(
+      Collectors.collectString,
+      Collectors.collectForceString
+    )
+    val res: Array[Any] = columns.map { x =>
       val column = x.column.take(numRows)
-      if (StringCollectors contains x.collector) {
+      if (StringCollectors.exists(c => c == x.collector)) {
         val str = column.mkString(separator)
         if (str.isEmpty) str else str + separator
       } else {
         column
       }
-    }).toArray
-
+    }.toArray
     res
   }
 
