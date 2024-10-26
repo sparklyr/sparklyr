@@ -67,18 +67,19 @@ object Utils {
   }
 
   private[this] def toArray(columns: Iterable[Collectors.ColumnCtx[_]], numRows: Int, separator: String): Array[_] = {
-    // merge any string column into a single string delimited by `separator`
-    val StringCollectors = Array[(Row, Int) => String](Collectors.collectString, Collectors.collectForceString)
-    val res: Array[Any] = columns.map(x => {
+    val StringCollectors: Array[(Row, Int) => String] = Array(
+      Collectors.collectString,
+      Collectors.collectForceString
+    )
+    val res: Array[Any] = columns.map { x =>
       val column = x.column.take(numRows)
-      if (StringCollectors contains x.collector) {
+      if (StringCollectors.exists(c => c == x.collector)) {
         val str = column.mkString(separator)
         if (str.isEmpty) str else str + separator
       } else {
         column
       }
-    }).toArray
-
+    }.toArray
     res
   }
 
@@ -222,7 +223,7 @@ object Utils {
         x => UTF8String.fromString(x.asInstanceOf[String])
       ).toArray
     }
-    val rows = (0 until num_rows).par.map(r => {
+    val rows = (0 until num_rows).map {r => {
       val variableLengthBytes = (0 until num_cols).map(c =>
         cols(c)(r) match {
           case x: UTF8String => x.numBytes
@@ -265,7 +266,7 @@ object Utils {
       )
 
       row
-    }).toArray
+    }}.toArray
 
     val x: RDD[InternalRow] = sc.parallelize(rows, partitions)
 
