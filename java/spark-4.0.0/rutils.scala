@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets
 import scala.collection.Iterator
 
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuffer
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.Row
@@ -217,9 +218,9 @@ object RUtils {
 
     writeStringValues(dos, dtypes.map(x => x._1))
 
-    val timestampColIdxes = Int()
-    val dateColIdxes = Int()
-    val structColIdxes = Int()
+    val timestampColIdxes = ArrayBuffer[Int]()
+    val dateColIdxes = ArrayBuffer[Int]()
+    val structColIdxes = ArrayBuffer[Int]()
     (1 to dtypes.length).map(
       idx => {
         val colType = dtypes(idx - 1)._2
@@ -234,9 +235,9 @@ object RUtils {
         }
       }
     )
-    writeIntValues(dos, timestampColIdxes)
-    writeIntValues(dos, dateColIdxes)
-    writeIntValues(dos, structColIdxes)
+    writeIntValues(dos, timestampColIdxes.toSeq)
+    writeIntValues(dos, dateColIdxes.toSeq)
+    writeIntValues(dos, structColIdxes.toSeq)
 
     writeFlags(dos, dtype = VECSXP)
     writeLength(dos, dtypes.length)
@@ -364,7 +365,12 @@ object RUtils {
     } else {
       val buf = v.asInstanceOf[scala.collection.mutable.WrappedArray[java.lang.Byte]].array
       writeLength(dos, buf.length)
-      dos.write(buf.map(Byte.unbox))
+      val byteArray = new Array[Byte](buf.length)
+      for (i <- buf.indices) {
+        byteArray(i) = buf(i).asInstanceOf[Byte]
+      }
+      dos.write(byteArray)
+
     }
   }
 
