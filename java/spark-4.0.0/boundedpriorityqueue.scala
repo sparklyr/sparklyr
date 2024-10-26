@@ -20,20 +20,16 @@ package sparklyr
 import java.io.Serializable
 import java.util.{PriorityQueue => JPriorityQueue}
 
-import scala.collection.JavaConverters._
-import scala.collection.generic.Growable
+import scala.collection.mutable.Growable
+import scala.jdk.CollectionConverters._
 
 /**
  * Bounded priority queue. This class wraps the original PriorityQueue
  * class and modifies it such that only the top K elements are retained.
  * The top K elements are defined by an implicit Ordering[A].
- *
- * NOTE: this class is identical to org.apache.spark.util.BoundedPriorityQueue
  */
 class BoundedPriorityQueue[A](maxSize: Int)(implicit ord: Ordering[A])
   extends Iterable[A] with Growable[A] with Serializable {
-
-  //  Note: this class supports Scala 2.12. A parallel source tree has a 2.13 implementation.
 
   private val underlying = new JPriorityQueue[A](maxSize, ord)
 
@@ -41,12 +37,14 @@ class BoundedPriorityQueue[A](maxSize: Int)(implicit ord: Ordering[A])
 
   override def size: Int = underlying.size
 
-  override def ++=(xs: TraversableOnce[A]): this.type = {
-    xs.foreach { this += _ }
+  override def knownSize: Int = size
+
+  override def addAll(xs: IterableOnce[A]): this.type = {
+    xs.iterator.foreach { this += _ }
     this
   }
 
-  override def +=(elem: A): this.type = {
+  override def addOne(elem: A): this.type = {
     if (size < maxSize) {
       underlying.offer(elem)
     } else {
@@ -57,10 +55,6 @@ class BoundedPriorityQueue[A](maxSize: Int)(implicit ord: Ordering[A])
 
   def poll(): A = {
     underlying.poll()
-  }
-
-  override def +=(elem1: A, elem2: A, elems: A*): this.type = {
-    this += elem1 += elem2 ++= elems
   }
 
   override def clear(): Unit = { underlying.clear() }
