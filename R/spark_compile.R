@@ -3,7 +3,8 @@ sparklyr_jar_spec_list <- function() {
     list(spark = "2.4.0", scala = "2.11"),
     list(spark = "2.4.0", scala = "2.12"),
     list(spark = "3.0.0", scala = "2.12"),
-    list(spark = "3.5.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
+    list(spark = "3.5.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar"),
+    list(spark = "4.0.0", scala = "2.13")
   )
 }
 
@@ -370,8 +371,9 @@ download_scalac <- function(dest_path = NULL) {
 
   download_urls <-  paste0(
     c(
-      "https://downloads.lightbend.com/scala/2.12.10/scala-2.12.10",
-      "https://downloads.lightbend.com/scala/2.11.8/scala-2.11.8",
+      "https://downloads.lightbend.com/scala/2.13.15/scala-2.13.15",
+      "https://downloads.lightbend.com/scala/2.12.20/scala-2.12.20",
+      "https://downloads.lightbend.com/scala/2.11.12/scala-2.11.12",
       "https://downloads.lightbend.com/scala/2.10.6/scala-2.10.6"
     ),
     ".",
