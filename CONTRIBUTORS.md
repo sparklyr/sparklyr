@@ -13,6 +13,7 @@
 | Jozef Hajnala     |        jozef.io        |        jozef.hajnala@gmail.com          |    jozefhajnala     |
 | Maciej Szymkiewicz|       zero323.net      |         mszymkiewicz@gmail.com          |      zero323        |
 | Wil Davis         | Worthington Industries | william.davis@worthingtonindustries.com |      wkdavis        |
+| Martin Studer     |    Mirai Solutions     |    martin.studer@mirai-solutions.com    |    martinstuder     |
 
 ## Committer
 

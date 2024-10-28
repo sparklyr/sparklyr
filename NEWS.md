@@ -5,6 +5,8 @@
 - `sdf_sql()` now returns nothing, including an error, when the query outputs an
 empty dataset (#3439)
 
+- `spark_read_source()` now allows setting no path using `path = NA` (#3469)
+
 # Sparklyr 1.8.6
 
 - Addresses issues with R 4.4.0. The root cause was that version checking functions
