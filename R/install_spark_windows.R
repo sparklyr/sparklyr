@@ -137,7 +137,7 @@ prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
     stdout = TRUE
   )
 
-  if (!is.null(output) && grepl("error", output)) {
+  if (!is.null(output) && any(grepl("error", output))) {
     stop(output)
   }
 
