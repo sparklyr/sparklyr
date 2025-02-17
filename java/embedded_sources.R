@@ -84,6 +84,7 @@ read_bin <- function(con, what, n, endian = NULL) {
   UseMethod("read_bin")
 }
 
+#' @export
 read_bin.default <- function(con, what, n, endian = NULL) {
   if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 }
@@ -133,10 +134,12 @@ read_bin.spark_connection <- function(con, what, n, endian = NULL) {
   read_bin_wait(con, what, n, endian)
 }
 
+#' @export
 read_bin.spark_worker_connection <- function(con, what, n, endian = NULL) {
   read_bin_wait(con, what, n, endian)
 }
 
+#' @export
 read_bin.livy_backend <- function(con, what, n, endian = NULL) {
   read_bin.default(con$rc, what, n, endian)
 }
@@ -739,6 +742,7 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, return_
   attach_connection(result_object, sc)
 }
 
+#' @export
 jobj_subclass.shell_backend <- function(con) {
   "shell_jobj"
 }
@@ -747,6 +751,7 @@ jobj_subclass.spark_connection <- function(con) {
   "shell_jobj"
 }
 
+#' @export
 jobj_subclass.spark_worker_connection <- function(con) {
   "shell_jobj"
 }
@@ -1942,6 +1947,7 @@ worker_invoke <- function(jobj, method, ...) {
   UseMethod("worker_invoke")
 }
 
+#' @export
 worker_invoke.shell_jobj <- function(jobj, method, ...) {
   worker_invoke_method(worker_connection(jobj), FALSE, jobj, method, ...)
 }

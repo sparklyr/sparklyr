@@ -44,7 +44,7 @@ spark_serialize_rds <- function(sc, df, columns, repartition) {
 
   invoke_static(
     sc,
-    "sparklyr.SQLUtils2",
+    "sparklyr.SQLUtils3",
     "createDataFrame",
     hive_context(sc),
     rdd,
