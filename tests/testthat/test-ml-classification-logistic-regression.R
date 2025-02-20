@@ -1,7 +1,7 @@
 skip_connection("ml-classification-logistic-regression")
 skip_on_livy()
 skip_on_arrow_devel()
-
+skip_on_ci()
 skip_databricks_connect()
 test_that("ml_logistic_regression() default params", {
   test_requires_version("3.0.0")

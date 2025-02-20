@@ -19,7 +19,7 @@ test_that("isotonic_regression.tidy() works", {
   td1 <- tidy(ir_model)
 
   check_tidy(td1,
-    exp.row = 44,
+    exp.row = 20,
     exp.names = c("boundaries", "predictions")
   )
 

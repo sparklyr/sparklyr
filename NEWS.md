@@ -1,5 +1,7 @@
 # Sparklyr (dev)
 
+- Updates the Spark versions to use for CI
+
 - `sdf_sql()` now returns nothing, including an error, when the query outputs an
 empty dataset (#3439)
 

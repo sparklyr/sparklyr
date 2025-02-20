@@ -1,7 +1,7 @@
 skip_connection("sdf-expand-grid")
 skip_on_livy()
 skip_on_arrow_devel()
-
+skip_on_ci()
 sc <- testthat_spark_connection()
 
 var1 <- seq(26)

@@ -66,7 +66,6 @@ tbl.src_spark <- function(src, from, ...) {
   spark_tbl_sql(src, from)
 }
 
-#' @importFrom dbplyr src_sql
 #' @importFrom dbplyr tbl_sql
 #' @export
 tbl.spark_connection <- function(src, from, ...) {

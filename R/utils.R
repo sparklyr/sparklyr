@@ -484,7 +484,7 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
     lapply(
       function(x) {
         fn <- tryCatch(
-          get(paste0("as.", x), envir = parent.frame()),
+          get(paste0(x), envir = parent.frame()),
           error = function(e) {
             NULL
           }
@@ -493,7 +493,7 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
         if (is.null(fn)) {
           list()
         } else {
-          fn(NA)
+          fn(0)
         }
       }
     ) %>%
