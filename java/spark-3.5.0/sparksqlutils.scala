@@ -1,38 +1,17 @@
-package sparklyr
+package org.apache.spark.sql
 
-import org.apache.spark.sql.{SparkSession, DataFrame, Row}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.types.{StructType, DataType}
+import org.apache.spark.sql.types.StructType
 
-object SQLUtils3 {
+object SQLUtils {
   def createDataFrame(
-    spark: SparkSession,
+    sc: org.apache.spark.sql.SparkSession,
     catalystRows: RDD[InternalRow],
-    schema: Any // Accept both StructType and String
+    schema: StructType
   ): DataFrame = {
+    val sdf = sc.internalCreateDataFrame(catalystRows, schema)
 
-    // Convert schema if it's a string
-    val structSchema: StructType = schema match {
-      case s: StructType => s
-      case s: String =>
-        try {
-          DataType.fromJson(s).asInstanceOf[StructType] // JSON schema
-        } catch {
-          case _: Exception => StructType.fromDDL(s) // DDL schema
-        }
-      case _ => throw new IllegalArgumentException("Invalid schema format")
-    }
-
-    // Convert InternalRow to Row
-    val rowRDD: RDD[Row] = catalystRows.map { internalRow =>
-      val values = structSchema.fields.indices.map { i =>
-        internalRow.get(i, structSchema.fields(i).dataType)
-      }
-      Row(values: _*)
-    }
-
-    // Create DataFrame
-    spark.createDataFrame(rowRDD, structSchema)
+    sdf
   }
 }

@@ -11,7 +11,7 @@ import scala.jdk.CollectionConverters._
 import scala.collection.mutable.WrappedArray
 import scala.Option
 
-
+import org.apache.spark.sql.types.{StructType, DataType}
 
 object Serializer {
   private[this] val kMsPerDay: Long = 24 * 60 * 60 * 1000
@@ -377,6 +377,8 @@ class Serializer(tracker: JVMObjectTracker) {
       val value = (
         if (obj.isInstanceOf[WrappedArray[_]]) {
           obj.asInstanceOf[WrappedArray[_]].toArray
+        } else if (obj.isInstanceOf[StructType]) {
+          obj
         } else if (obj.isInstanceOf[Seq[_]]) {
           obj.asInstanceOf[Seq[_]].mkString(",")
         } else {
