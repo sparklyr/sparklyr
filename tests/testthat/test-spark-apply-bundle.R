@@ -26,7 +26,7 @@ available_packages_mock <- function() {
 }
 
 test_that("'spark_apply_packages' uses different names for different packages", {
-  with_mock(
+  with_mocked_bindings(
     `available.packages` = available_packages_mock,
     expect_true(
       length(spark_apply_packages("purrr")) > 0
