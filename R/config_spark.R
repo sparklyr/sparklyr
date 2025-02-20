@@ -154,11 +154,15 @@ spark_config_value_retries <- function(config, name, default, retries) {
 spark_config_packages <- function(config, packages, version, scala_version = NULL, ...) {
   version <- spark_version_latest(version)
 
-  if (version >= "2.4.1") {
-    scala_version <- "2.12"
+  scala_version <- scala_version %||% (
+    if (version >= "4.0.0") {
+      "2.13"
+    } else if (version >= "3.0.0") {
+      "2.12"
     } else {
-      scala_version <- scala_version %||% "2.11"
+      "2.11"
     }
+  )
 
   if ("kafka" %in% packages) {
     packages <- packages[-which(packages == "kafka")]
