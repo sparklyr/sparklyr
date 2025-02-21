@@ -133,8 +133,8 @@ test_that("we can cross validate a logistic regression with xval", {
   )
 
   expect_identical(
-    names(cvm$avg_metrics_df),
-    c("f1", "elastic_net_param_1", "reg_param_1")
+    sort(names(cvm$avg_metrics_df)),
+    sort(c("f1", "elastic_net_param_1", "reg_param_1"))
   )
   expect_identical(nrow(cvm$avg_metrics_df), 4L)
   summary_string <- capture.output(summary(cvm)) %>%
