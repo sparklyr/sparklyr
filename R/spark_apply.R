@@ -462,6 +462,13 @@ spark_apply.default <- function(
 
     transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
   } else {
+# ----------------------- Post Spark 2.0 a.k.a non-RDD -------------------------
+
+    if(spark_version(sc) >= "4" && !grouped) {
+      sdf <- invoke_static(sc, "sparklyr.LatestUtils", "convertToArray", sdf)
+      sdf_limit <- invoke_static(sc, "sparklyr.LatestUtils", "convertToArray", sdf_limit)
+    }
+
     json_cols <- c()
     if (identical(columns, NULL) || is.character(columns)) {
       columns_schema <- spark_data_build_types(
