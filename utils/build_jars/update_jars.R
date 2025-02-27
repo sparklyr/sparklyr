@@ -10,8 +10,11 @@ sparklyr_jar_verify_spark()
 # Updates jar's
 compile_package_jars()
 
-# Updates embeddes sources
-spark_update_embedded_sources(
-  jars_to_skip = "sparklyr-1.5-2.10.jar"
-)
+# Embedded sources are the R functions that will be copied into the JARs.
+# They are all placed inside the java/embedded_sources.R file. The source
+# are all the R scripts in /R with a name containing "worker" or "core".
+# Embedded sources are the key to how spark_apply() works.
+spark_update_embedded_sources()
+
+
 
