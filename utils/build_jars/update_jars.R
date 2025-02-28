@@ -1,4 +1,3 @@
-
 devtools::load_all(".")
 
 # Downloads Scala compilers
