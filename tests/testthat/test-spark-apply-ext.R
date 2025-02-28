@@ -58,6 +58,7 @@ test_that("'spark_apply' works with 'group_by' over multiple columns", {
   iris_tbl_ints <- iris_tbl %>%
     mutate(Petal_Width_Int = as.integer(Petal_Width))
 
+
   grouped_lm <- spark_apply(
     iris_tbl_ints,
     function(e, species, petal_width) {

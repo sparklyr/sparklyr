@@ -394,7 +394,7 @@ spark_worker_apply <- function(sc, config) {
   for (group_entry in groups) {
     # serialized groups are wrapped over single lists
     data <- group_entry[[1]]
-    if(config$spark_version >= "4") {
+    if(config$spark_version >= "4" && !grouped) {
       data <- lapply(data, unlist, recursive = FALSE)
     }
     df <- (
