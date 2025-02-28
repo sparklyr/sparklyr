@@ -551,7 +551,6 @@ test_that("spark_read_avro() works as expected", {
 test_that("spark_write_avro() works as expected", {
   skip_connection("format-avro")
   test_requires_version("2.4.0", max_version = "4")
-  test_requires_version(max_version = "3.5")
   skip_databricks_connect()
 
   df <- dplyr::tibble(
