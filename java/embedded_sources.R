@@ -1708,9 +1708,17 @@ spark_worker_apply <- function(sc, config) {
   for (group_entry in groups) {
     # serialized groups are wrapped over single lists
     data <- group_entry[[1]]
-    if(spark_version(sc) >= "4") {
-      data <- purrr::map(data, purrr::flatten)
-    }
+    worker_log("*************************************************")
+    worker_log(as.character(data))
+    worker_log("*************************************************")
+
+    #if(config$spark_version(sc) >= "4") {
+      data <- lapply(data, unlist, recursive = FALSE)
+    #}
+    worker_log("*************************************************")
+    worker_log(as.character(data))
+    worker_log("*************************************************")
+
     df <- (
       if (config$single_binary_column) {
         dplyr::tibble(encoded = lapply(data, function(x) x[[1]]))
