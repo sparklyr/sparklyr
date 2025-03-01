@@ -379,6 +379,8 @@ class Serializer(tracker: JVMObjectTracker) {
           obj.asInstanceOf[WrappedArray[_]].toArray
         } else if (obj.isInstanceOf[StructType]) {
           obj
+        } else if (obj.isInstanceOf[Array[_]]) {
+          obj
         } else if (obj.isInstanceOf[Seq[_]]) {
           obj.asInstanceOf[Seq[_]].mkString(",")
         } else {

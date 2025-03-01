@@ -807,9 +807,7 @@ spark_error <- function(message) {
     stop(message, call. = FALSE)
   }
 
-  split_message <- message %>%
-    strsplit("\n\t") %>%
-    unlist()
+  split_message <- unlist(strsplit(message, "\n\t"))
 
   msg_l <- "\u001B]8;;"
   msg_r <- "\u001B\\"
@@ -849,7 +847,7 @@ spark_error <- function(message) {
 
   msg <- c(split_message[[1]], "", last_err, option_msg)
 
-  genv_set_last_error(message)
+  #genv_set_last_error(message)
 
   rlang::abort(
     message = msg,
