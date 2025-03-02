@@ -358,44 +358,41 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name(),
 #'
 #' @export
 download_scalac <- function(dest_path = NULL) {
+  cat("------------------ Scala setup ------------------\n")
   if (is.null(dest_path)) {
     dest_path <- scalac_default_locations()[[1]]
   }
-
   if (!dir.exists(dest_path)) {
     dir.create(dest_path, recursive = TRUE)
   }
-
   ext <- ifelse(os_is_windows(), "zip", "tgz")
-
   download_urls <-  paste0(
     c(
       "https://downloads.lightbend.com/scala/2.13.15/scala-2.13.15",
       "https://downloads.lightbend.com/scala/2.12.20/scala-2.12.20",
-      "https://downloads.lightbend.com/scala/2.11.12/scala-2.11.12",
-      "https://downloads.lightbend.com/scala/2.10.6/scala-2.10.6"
+      "https://downloads.lightbend.com/scala/2.11.12/scala-2.11.12"
     ),
     ".",
     ext
   )
 
-  lapply(download_urls, function(download_url) {
+  for(download_url in download_urls) {
     dest_file <- file.path(dest_path, basename(download_url))
-
     if (!dir.exists(dirname(dest_file))) {
       dir.create(dirname(dest_file), recursive = TRUE)
     }
-
     if(!file.exists(dest_file)) {
+      cat("- ", "Downloading and expanding:", download_url, "\n")
       download_file(download_url, destfile = dest_file)
-    }
-
-    if (ext == "zip") {
-      unzip(dest_file, exdir = dest_path)
+      if (ext == "zip") {
+        unzip(dest_file, exdir = dest_path)
+      } else {
+        untar(dest_file, exdir = dest_path)
+      }
     } else {
-      untar(dest_file, exdir = dest_path)
+      cat("- ", dest_file, "found\n")
     }
-  })
+  }
 }
 
 #' Discover the Scala Compiler
