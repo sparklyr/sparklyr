@@ -84,6 +84,7 @@ read_bin <- function(con, what, n, endian = NULL) {
   UseMethod("read_bin")
 }
 
+#' @export
 read_bin.default <- function(con, what, n, endian = NULL) {
   if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
 }
@@ -133,10 +134,12 @@ read_bin.spark_connection <- function(con, what, n, endian = NULL) {
   read_bin_wait(con, what, n, endian)
 }
 
+#' @export
 read_bin.spark_worker_connection <- function(con, what, n, endian = NULL) {
   read_bin_wait(con, what, n, endian)
 }
 
+#' @export
 read_bin.livy_backend <- function(con, what, n, endian = NULL) {
   read_bin.default(con$rc, what, n, endian)
 }
@@ -739,6 +742,7 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, return_
   attach_connection(result_object, sc)
 }
 
+#' @export
 jobj_subclass.shell_backend <- function(con) {
   "shell_jobj"
 }
@@ -747,6 +751,7 @@ jobj_subclass.spark_connection <- function(con) {
   "shell_jobj"
 }
 
+#' @export
 jobj_subclass.spark_worker_connection <- function(con) {
   "shell_jobj"
 }
@@ -802,9 +807,7 @@ spark_error <- function(message) {
     stop(message, call. = FALSE)
   }
 
-  split_message <- message %>%
-    strsplit("\n\t") %>%
-    unlist()
+  split_message <- unlist(strsplit(message, "\n\t"))
 
   msg_l <- "\u001B]8;;"
   msg_r <- "\u001B\\"
@@ -844,7 +847,7 @@ spark_error <- function(message) {
 
   msg <- c(split_message[[1]], "", last_err, option_msg)
 
-  genv_set_last_error(message)
+  #genv_set_last_error(message)
 
   rlang::abort(
     message = msg,
@@ -1320,9 +1323,7 @@ spark_worker_context <- function(sc) {
       connection = sc
     )
   )
-
   worker_log("retrieved worker context")
-
   context
 }
 
@@ -1672,7 +1673,6 @@ spark_worker_apply <- function(sc, config) {
 
   groups <- worker_invoke(context, if (grouped) "getSourceArrayGroupedSeq" else "getSourceArraySeq")
   worker_log("retrieved ", length(groups), " rows")
-
   deserialize_impl <- spark_worker_get_deserializer(sc)
 
   closureRaw <- worker_invoke(context, "getClosure")
@@ -1706,7 +1706,9 @@ spark_worker_apply <- function(sc, config) {
   for (group_entry in groups) {
     # serialized groups are wrapped over single lists
     data <- group_entry[[1]]
-
+    if(config$spark_version >= "4" && !grouped) {
+      data <- lapply(data, unlist, recursive = FALSE)
+    }
     df <- (
       if (config$single_binary_column) {
         dplyr::tibble(encoded = lapply(data, function(x) x[[1]]))
@@ -1942,6 +1944,7 @@ worker_invoke <- function(jobj, method, ...) {
   UseMethod("worker_invoke")
 }
 
+#' @export
 worker_invoke.shell_jobj <- function(jobj, method, ...) {
   worker_invoke_method(worker_connection(jobj), FALSE, jobj, method, ...)
 }
@@ -2016,7 +2019,6 @@ spark_worker_main <- function(
                               backendPort = 8880,
                               configRaw = NULL) {
   spark_worker_hooks()
-
   tryCatch(
     {
       worker_log_session(sessionId)

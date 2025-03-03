@@ -259,7 +259,7 @@ test_stream("Adds watermark step", {
 })
 
 test_stream("stream can read and write from Delta", {
-  test_requires_version("3.0.0", "Spark streaming requires Spark 3.0 or above")
+  test_requires_version("3.0.0", max_version = "4")
 
   delta_in <- file.path(base_dir, "delta-in")
 

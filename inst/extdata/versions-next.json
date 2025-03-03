@@ -1,2 +1,8 @@
 [
+  {
+    "spark": "4.0.0",
+    "hadoop": "3",
+    "base": "https://dlcdn.apache.org/spark/spark-4.0.0-preview2/",
+    "pattern": "spark-%s-preview2-bin-hadoop%s.tgz"
+  }
 ]

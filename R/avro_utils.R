@@ -9,10 +9,21 @@ spark_avro_package_name <- function(spark_version, scala_version = NULL) {
     )
   }
 
-  if (spark_version < "2.4.0") stop("Avro requires Spark 2.4.0 or newer")
+  no_version <- spark_version
+  if(grepl("-preview", spark_version)) {
+    no_version <- unlist(strsplit(spark_version, "-"))[[1]]
+  }
+
+  if (no_version < "2.4.0") stop("Avro requires Spark 2.4.0 or newer")
 
   scala_version <- scala_version %||% (
-    if (spark_version >= "3.0.0") "2.12" else "2.11"
+    if (no_version >= "4.0.0") {
+      "2.13"
+    } else if (no_version >= "3.0.0") {
+      "2.12"
+    } else {
+      "2.11"
+    }
   )
   paste0(
     "org.apache.spark:spark-avro_",
