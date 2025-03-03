@@ -358,7 +358,6 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name(),
 #'
 #' @export
 download_scalac <- function(dest_path = NULL) {
-  cat("------------------ Scala setup ------------------\n")
   if (is.null(dest_path)) {
     dest_path <- scalac_default_locations()[[1]]
   }
@@ -369,8 +368,7 @@ download_scalac <- function(dest_path = NULL) {
   download_urls <-  paste0(
     c(
       "https://downloads.lightbend.com/scala/2.13.15/scala-2.13.15",
-      "https://downloads.lightbend.com/scala/2.12.20/scala-2.12.20",
-      "https://downloads.lightbend.com/scala/2.11.12/scala-2.11.12"
+      "https://downloads.lightbend.com/scala/2.12.20/scala-2.12.20"
     ),
     ".",
     ext
