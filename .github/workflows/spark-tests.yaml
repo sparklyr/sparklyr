@@ -72,7 +72,7 @@ jobs:
       - name: Cache Livy
         if: ${{ matrix.config.livy }} != ''
         id: cache-livy
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /home/runner/.cache/livy/livy-${{ matrix.config.livy }}
           key: livy-${{ matrix.config.livy }}
@@ -89,7 +89,7 @@ jobs:
 
       - name: Cache Scala
         id: cache-scala
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /home/runner/scala/
           key: scala-2

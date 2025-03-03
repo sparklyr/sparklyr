@@ -52,7 +52,7 @@ jobs:
 
       - name: Cache Scala
         id: cache-scala
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /home/runner/scala/
           key: scala-2
