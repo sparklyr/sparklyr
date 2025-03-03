@@ -9,7 +9,8 @@ import scala.util.Try
 
 import org.apache.spark.sql.Row
 import org.apache.spark.ml.linalg.{Vector, DenseVector}
-
+import org.apache.spark.ml.linalg.{Vector => NewVector}
+import org.apache.spark.mllib.linalg.{Vector => OldVector}
 
 object Collectors {
   val ReDecimalType = "(^DecimalType(\\(.*\\)?)$)".r
@@ -194,10 +195,11 @@ object Collectors {
     val el = row(idx)
     el match {
       case null => Array.empty
-      case seq: Seq[_] => seq.toArray(ClassTag.Any)
-      case arrSeq: scala.collection.mutable.ArraySeq[_] => arrSeq.toArray(ClassTag.Any)
-      case vec: Vector => vec.toArray
-      case array: Array[_] => array
+      case seq: Seq[_] => seq.toArray(ClassTag.Any) // Scala Collections
+      case arrSeq: scala.collection.mutable.ArraySeq[_] => arrSeq.toArray(ClassTag.Any) // ArraySeq
+      case vec: NewVector => vec.toArray // Spark 3.x+ ML Vectors
+      case vec: OldVector => vec.toArray // Legacy MLlib Vectors
+      case array: Array[_] => array // Arrays
       case _ =>
         throw new UnsupportedOperationException(s"Cannot convert ${el.getClass} to array")
     }
