@@ -18,8 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {spark: '3.5.2', hadoop: '3',   arrow: '', livy: '',      dbplyr: '',      name: 'Spark 3.5'}
-          - {spark: '4.0.0', hadoop: '3',   arrow: 'release',        livy: '',      dbplyr: '',      name: 'Spark 4.0 w Arrow'}
+          - {spark: '3.5.2', hadoop: '3',   arrow: '',         livy: '',      dbplyr: '',      name: 'Spark 3.5'}
+          - {spark: '4.0.0', hadoop: '3',   arrow: 'release',  livy: '',      dbplyr: '',      name: 'Spark 4.0 w Arrow'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
@@ -54,7 +54,7 @@ jobs:
 
       - name: Cache Spark
         id: cache-spark
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /home/runner/spark/spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
           key: sparklyr-spark-${{ matrix.config.spark }}-bin-hadoop${{ matrix.config.hadoop }}
