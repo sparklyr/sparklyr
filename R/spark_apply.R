@@ -464,7 +464,7 @@ spark_apply.default <- function(
   } else {
 # ----------------------- Post Spark 2.0 a.k.a non-RDD -------------------------
 
-    if(spark_version(sc) >= "4" && !grouped) {
+    if(spark_version(sc) >= "4" && !grouped && !arrow) {
       sdf <- invoke_static(sc, "sparklyr.LatestUtils", "convertToArray", sdf)
       sdf_limit <- invoke_static(sc, "sparklyr.LatestUtils", "convertToArray", sdf_limit)
     }
