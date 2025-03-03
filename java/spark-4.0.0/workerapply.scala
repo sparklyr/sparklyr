@@ -133,8 +133,9 @@ class WorkerApply(
     }
     logger.log("RScript completed")
 
-    if (exception.isDefined) {
-      throw exception.get
+    exception match {
+      case Some(x) => throw x
+      case _    => println("")
     }
 
     logger.log(s"returning RDD iterator with ${workerContext.getResultArray.length} rows")
