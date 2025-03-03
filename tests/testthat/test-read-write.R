@@ -18,14 +18,8 @@ test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
     delimiter = ";", memory = FALSE
   )
 
-  if(spark_version(sc) >= "4") {
-    mun <- "Municpio"
-  } else {
-    mun <- "Municipio"
-  }
-
   expect_true(
-    all(dplyr::tbl_vars(df) == c(mun, "var", "var_1_0")),
+    all(dplyr::tbl_vars(df) == c("Municpio", "var", "var_1_0")),
     info = "success reading non-ascii similar columns from csv"
   )
 })
@@ -459,7 +453,6 @@ test_that("spark_read() works as expected", {
       packages = c("openssl"),
       columns = c("md5", "length")
     )
-    print(sdf_collect(sdf))
     expect_equivalent(
       sdf_collect(sdf),
       data.frame(
