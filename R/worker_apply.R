@@ -359,7 +359,17 @@ spark_worker_apply <- function(sc, config) {
   length <- worker_invoke(context, "getSourceArrayLength")
   worker_log("found ", length, " rows")
 
-  groups <- worker_invoke(context, if (grouped) "getSourceArrayGroupedSeq" else "getSourceArraySeq")
+  is_read <- config$spark_read %||% FALSE
+
+  groups_func <- if(grouped) {
+    "getSourceArrayGroupedSeq"
+  } else if (is_read && config$spark_version >= "4") {
+    "getSourceArraySeq2"
+  } else {
+    "getSourceArraySeq"
+  }
+  groups <- worker_invoke(context, groups_func)
+
   worker_log("retrieved ", length(groups), " rows")
   deserialize_impl <- spark_worker_get_deserializer(sc)
 
@@ -394,7 +404,7 @@ spark_worker_apply <- function(sc, config) {
   for (group_entry in groups) {
     # serialized groups are wrapped over single lists
     data <- group_entry[[1]]
-    if(config$spark_version >= "4" && !grouped) {
+    if(config$spark_version >= "4" && !grouped && !is_read) {
       data <- lapply(data, unlist, recursive = FALSE)
     }
     df <- (
