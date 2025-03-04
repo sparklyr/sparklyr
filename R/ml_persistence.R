@@ -93,10 +93,21 @@ ml_load <- function(sc, path) {
       spark_normalize_path()
   }
 
+  metadata_folder <- file.path(path, "metadata")
+  metadata_files <- list.files(metadata_folder)
+  part_find <- startsWith(metadata_files, "part-00000")
+
+  if(any(part_find)) {
+    part_file <- metadata_files[part_find][[1]]
+    part_path <- file.path(metadata_folder, part_file)
+  } else {
+    stop("ML Pipeline metadata file not found (part-00000*)")
+  }
   metadata_table_name <- random_string("ml_load_metadata")
   class <- spark_read_json(
-    sc, metadata_table_name,
-    paste0(path, "/metadata/part-00000")
+    sc = sc,
+    name = metadata_table_name,
+    path = part_path
   ) %>%
     dplyr::pull(!!rlang::sym("class"))
 

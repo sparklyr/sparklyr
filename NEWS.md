@@ -1,5 +1,16 @@
 # Sparklyr (dev)
 
+- Adds support for Spark 4 and Scala 2.13 (#3479):
+
+  - Adds new Java folder for Spark 4.0.0 with updated code
+  
+  - Adds new JAR file to handle Spark 4
+  
+  - Updates to different spots in the R code to start handling version 4, 
+  as well as releases marked as "preview" by the Spark project
+  
+  - Removes JARs supporting Scala 2.11
+
 - Updates the Spark versions to use for CI
 
 - `sdf_sql()` now returns nothing, including an error, when the query outputs an

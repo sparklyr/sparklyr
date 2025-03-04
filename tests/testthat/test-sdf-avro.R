@@ -5,7 +5,7 @@ skip_on_arrow_devel()
 sc <- testthat_spark_connection()
 
 test_that("to_avro and from_avro work properly", {
-  test_requires_version("2.4.0")
+  test_requires_version("2.4.0", max_version = "4")
   skip_databricks_connect()
 
   df <- dplyr::tibble(
