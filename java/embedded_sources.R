@@ -1676,7 +1676,7 @@ spark_worker_apply <- function(sc, config) {
 
   groups_func <- if(grouped) {
     "getSourceArrayGroupedSeq"
-  } else if (is_read) {
+  } else if (is_read && config$spark_version >= "4") {
     "getSourceArraySeq2"
   } else {
     "getSourceArraySeq"
