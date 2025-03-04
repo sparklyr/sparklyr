@@ -441,27 +441,22 @@ test_that("spark_read() works as expected", {
   expected_lengths <- sapply(paths, function(x) nchar(x))
   names(expected_lengths) <- NULL
 
-  for (columns in list(
-    c("md5", "length"),
-    list("md5", "length"),
-    list(md5 = "character", length = "integer")
-  )) {
-    sdf <- spark_read(
-      sc,
-      paths,
-      reader,
-      packages = c("openssl"),
-      columns = c("md5", "length")
+  sdf <- spark_read(
+    sc,
+    paths,
+    reader,
+    packages = c("openssl"),
+    columns = list(md5 = "character", length = "integer")
+  )
+  expect_equivalent(
+    sdf_collect(sdf),
+    data.frame(
+      md5 = expected_md5s,
+      length = expected_lengths,
+      stringsAsFactors = FALSE
     )
-    expect_equivalent(
-      sdf_collect(sdf),
-      data.frame(
-        md5 = expected_md5s,
-        length = expected_lengths,
-        stringsAsFactors = FALSE
-      )
-    )
-  }
+  )
+
 })
 
 test_that("spark_write() works as expected", {

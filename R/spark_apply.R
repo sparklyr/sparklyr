@@ -9,7 +9,8 @@ spark_apply_worker_config <- function(sc,
                                       schema = FALSE,
                                       arrow = FALSE,
                                       fetch_result_as_sdf = TRUE,
-                                      single_binary_column = FALSE) {
+                                      single_binary_column = FALSE,
+                                      spark_read = FALSE) {
   worker_config_serialize(
     c(
       list(
@@ -19,7 +20,8 @@ spark_apply_worker_config <- function(sc,
         arrow = isTRUE(arrow),
         fetch_result_as_sdf = isTRUE(fetch_result_as_sdf),
         spark_version = spark_version(sc),
-        single_binary_column = single_binary_column
+        single_binary_column = single_binary_column,
+        spark_read = spark_read
       ),
       sc$config
     )
