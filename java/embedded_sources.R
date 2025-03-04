@@ -1308,7 +1308,7 @@ worker_config_deserialize <- function(raw) {
     fetch_result_as_sdf = as.logical(parts[[7]]),
     single_binary_column = as.logical(parts[[8]]),
     spark_read = as.logical(parts[[9]]),
-    spark_version = parts[[9]]
+    spark_version = parts[[10]]
   )
 }
 # nocov start
