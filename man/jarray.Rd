@@ -21,9 +21,11 @@ containing the same list of references, where \code{T} is a non-primitive
 type that is more specific than \code{java.lang.Object}.
 }
 \examples{
+\donttest{
 sc <- spark_connect(master = "spark://HOST:PORT")
 
 string_arr <- jarray(sc, letters, element_type = "java.lang.String")
 # string_arr is now a reference to an array of type String[]
+}
 
 }

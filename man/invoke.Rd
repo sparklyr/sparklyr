@@ -36,10 +36,3 @@ Use each of these functions in the following scenarios:
 \code{invoke_new} \tab Invoke a constructor associated with a Java class. \cr
 }
 }
-\examples{
-
-sc <- spark_connect(master = "spark://HOST:PORT")
-spark_context(sc) \%>\%
-  invoke("textFile", "file.csv", 1L) \%>\%
-  invoke("count")
-}
