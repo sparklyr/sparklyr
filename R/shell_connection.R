@@ -282,8 +282,8 @@ start_shell <- function(master,
     # in Spark 3.5 and earlier versions, these characters will be replaced with
     # mojibakes. To restore the previous behavior, set
     # spark.sql.legacy.codingErrorAction to true. For example, if you try to
-    #decode a string value tést / [116, -23, 115, 116] (encoded in latin1) with
-    #'UTF-8', you get t�st.
+    # decode a string value tést / [116, -23, 115, 116] (encoded in latin1) with
+    # 'UTF-8', you get t�st.
     if(spark_version >= "4") {
       config$mergedConfigspark.sql.legacy.codingErrorAction <- TRUE
     }

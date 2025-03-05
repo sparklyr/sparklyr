@@ -61,10 +61,12 @@ random_string <- function(prefix = "table") {
 #'   must refer to a Java object that is assignable to \code{element_type}.
 #'
 #' @examples
+#' \donttest{
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #'
 #' string_arr <- jarray(sc, letters, element_type = "java.lang.String")
 #' # string_arr is now a reference to an array of type String[]
+#' }
 #'
 #' @export
 jarray <- function(sc, x, element_type) {
@@ -87,10 +89,12 @@ jarray <- function(sc, x, element_type) {
 #' @param x A numeric value in R.
 #'
 #' @examples
+#' \donttest{
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #'
 #' jflt <- jfloat(sc, 1.23e-8)
 #' # jflt is now a reference to a java.lang.Float object
+#' }
 #'
 #' @export
 jfloat <- function(sc, x) {
@@ -107,10 +111,12 @@ jfloat <- function(sc, x) {
 #' @param x A numeric vector in R.
 #'
 #' @examples
+#' \donttest{
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #'
 #' jflt_arr <- jfloat_array(sc, c(-1.23e-8, 0, -1.23e-8))
 #' # jflt_arr is now a reference an array of java.lang.Float
+#' }
 #'
 #' @export
 jfloat_array <- function(sc, x) {
