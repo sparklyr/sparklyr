@@ -596,7 +596,7 @@ livy_connection_jars <- function(config, version, scala_version) {
     if (length(target_jar) > 1) {
       target_jar <- sort(target_jar)[[1]]
     } else if (length(target_jar) == 0) {
-      target_jar <- "sparklyr-master-2.12.jar"
+      target_jar <- "sparklyr-master-2.13.jar"
     }
 
     livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "feature/sparklyr-1.7.0")
