@@ -17,9 +17,11 @@ NOTE: this method is useful when one has to invoke a Java/Scala method
 requiring an \code{Array[Float]} as one of its parameters.
 }
 \examples{
+\donttest{
 sc <- spark_connect(master = "spark://HOST:PORT")
 
 jflt_arr <- jfloat_array(sc, c(-1.23e-8, 0, -1.23e-8))
 # jflt_arr is now a reference an array of java.lang.Float
+}
 
 }

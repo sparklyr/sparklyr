@@ -18,6 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
+          - {spark: '3.4.4', hadoop: '3', arrow: '',        livy: '', dbplyr: '', name: 'Spark 3.4'}
           - {spark: '3.5.5', hadoop: '3', arrow: 'release', livy: '', dbplyr: '', name: 'Spark 3.5 w Arrow'}
           - {spark: '4.0.0', hadoop: '3', arrow: '',        livy: '', dbplyr: '', name: 'Spark 4.0'}
           - {spark: '4.0.0', hadoop: '3', arrow: 'release', livy: '', dbplyr: '', name: 'Spark 4.0 w Arrow'}
