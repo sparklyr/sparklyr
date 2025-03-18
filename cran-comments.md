@@ -1,4 +1,8 @@
-# Submission
+# Resubmission
+
+- Removes invalid links
+
+## Original Submission
 
 - Adds support for Spark 4 and Scala 2.13 (#3479):
 
