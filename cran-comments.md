@@ -35,18 +35,19 @@ empty dataset (#3439)
 
 ## revdepcheck results
 
-We checked 28 reverse dependencies (27 from CRAN + 1 from Bioconductor), 
+We checked 30 reverse dependencies (29 from CRAN + 1 from Bioconductor), 
 comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 1 new problems
+ * We saw 1 problem
  * We failed to check 0 packages
 
 Issues with CRAN packages are summarised below.
 
-### New problems
+### Problems
 (This reports the first line of each new failure)
 
 * sparklyr.flint
   checking examples ... ERROR
+
 
 
