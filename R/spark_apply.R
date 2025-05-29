@@ -9,7 +9,8 @@ spark_apply_worker_config <- function(sc,
                                       schema = FALSE,
                                       arrow = FALSE,
                                       fetch_result_as_sdf = TRUE,
-                                      single_binary_column = FALSE) {
+                                      single_binary_column = FALSE,
+                                      spark_read = FALSE) {
   worker_config_serialize(
     c(
       list(
@@ -19,7 +20,8 @@ spark_apply_worker_config <- function(sc,
         arrow = isTRUE(arrow),
         fetch_result_as_sdf = isTRUE(fetch_result_as_sdf),
         spark_version = spark_version(sc),
-        single_binary_column = single_binary_column
+        single_binary_column = single_binary_column,
+        spark_read = spark_read
       ),
       sc$config
     )
@@ -167,7 +169,8 @@ spark_apply.default <- function(
   memory <- force(memory)
   args <- list(...)
   if (identical(fetch_result_as_sdf, FALSE)) {
-    # If we are fetching R objects returned from the transformation function in their serialized form,
+    # If we are fetching R objects returned from the
+    # transformation function in their serialized form,
     # then the result will contain a single binary column
     columns <- list(spark_apply_binary_result = "spark_apply_binary_result")
   } else {
@@ -190,20 +193,21 @@ spark_apply.default <- function(
   if (identical(barrier, TRUE)) {
     # barrier works in rdd
     args$rdd <- TRUE
-
-    if (spark_version(sc) < "2.4.0") {
-      stop("Barrier execution is only available for spark 2.4.0 or greater.")
-    }
-
     if (is.null(columns)) {
       stop("Barrier execution requires explicit columns names.")
     }
   }
 
-  if (spark_version(sc) < "2.0.0") args$rdd <- TRUE
   if (identical(args$rdd, TRUE)) {
     rdd_base <- invoke(sdf, "rdd")
-    if (identical(columns, NULL)) columns <- colnames(x)
+    if (identical(columns, NULL)) {
+      columns <- colnames(x)
+    }
+  }
+
+  # backward compatible support for names argument from 0.6
+  if (!is.null(args$names)) {
+    columns <- args$names
   }
 
   grouped <- !is.null(group_by)
@@ -218,7 +222,10 @@ spark_apply.default <- function(
   arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
   if (identical(fetch_result_as_sdf, FALSE) &&
     identical(arrow, TRUE)) {
-    warning("Disabling arrow due to its potential incompatibility with fetch_result_as_sdf = FALSE")
+    warning(
+      "Disabling arrow due to its potential",
+      " incompatibility with fetch_result_as_sdf = FALSE"
+    )
     arrow <- FALSE
   }
   if (arrow) {
@@ -246,11 +253,6 @@ spark_apply.default <- function(
     )
   }
 
-  # backward compatible support for names argument from 0.6
-  if (!is.null(args$names)) {
-    columns <- args$names
-  }
-
   if (!is.null(group_by) && sdf_is_streaming(sdf)) {
     stop("'group_by' is unsupported with streams.")
   }
@@ -269,10 +271,14 @@ spark_apply.default <- function(
   if (rlang) warning("The `rlang` parameter is under active development.")
 
   # disable package distribution for local connections
-  if (spark_master_is_local(sc$master)) packages <- FALSE
+  if (spark_master_is_local(sc$master)) {
+    packages <- FALSE
+  }
 
   # disable package distribution for livy connections and no package spec
-  if (identical(tolower(sc$method), "livy") && identical(packages, TRUE)) packages <- FALSE
+  if (identical(tolower(sc$method), "livy") && identical(packages, TRUE)) {
+    packages <- FALSE
+  }
 
   # inject column types and partition_index_param to context
   context <- list(
@@ -328,13 +334,47 @@ spark_apply.default <- function(
     }
 
     if (identical(args$rdd, TRUE)) {
-      rdd_base <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", rdd_base, group_by_list)
+      rdd_base <- invoke_static(
+        sc,
+        "sparklyr.ApplyUtils",
+        "groupBy",
+        rdd_base,
+        group_by_list
+      )
     } else if (arrow) {
-      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf, group_by_list, time_zone, records_per_batch)
-      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupByArrow", sdf_limit, group_by_list, time_zone, records_per_batch)
+      sdf <- invoke_static(
+        sc,
+        "sparklyr.ApplyUtils",
+        "groupByArrow",
+        sdf,
+        group_by_list,
+        time_zone,
+        records_per_batch
+      )
+      sdf_limit <- invoke_static(
+        sc,
+        "sparklyr.ApplyUtils",
+        "groupByArrow",
+        sdf_limit,
+        group_by_list,
+        time_zone,
+        records_per_batch
+      )
     } else {
-      sdf <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf, group_by_list)
-      sdf_limit <- invoke_static(sc, "sparklyr.ApplyUtils", "groupBy", sdf_limit, group_by_list)
+      sdf <- invoke_static(
+        sc,
+        "sparklyr.ApplyUtils",
+        "groupBy",
+        sdf,
+        group_by_list
+      )
+      sdf_limit <- invoke_static(
+        sc,
+        "sparklyr.ApplyUtils",
+        "groupBy",
+        sdf_limit,
+        group_by_list
+      )
     }
   }
 
@@ -356,7 +396,9 @@ spark_apply.default <- function(
     connection_config(sc, "sparklyr.apply.options."),
     as.character
   )
-  if (!is.null(records_per_batch)) spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
+  if (!is.null(records_per_batch)) {
+    spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
+  }
 
   if (identical(args$rdd, TRUE)) {
     if (identical(barrier, TRUE)) {
@@ -422,6 +464,13 @@ spark_apply.default <- function(
 
     transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
   } else {
+# ----------------------- Post Spark 2.0 a.k.a non-RDD -------------------------
+
+    if(spark_version(sc) >= "4" && !grouped && !arrow) {
+      sdf <- invoke_static(sc, "sparklyr.LatestUtils", "convertToArray", sdf)
+      sdf_limit <- invoke_static(sc, "sparklyr.LatestUtils", "convertToArray", sdf_limit)
+    }
+
     json_cols <- c()
     if (identical(columns, NULL) || is.character(columns)) {
       columns_schema <- spark_data_build_types(
@@ -529,8 +578,9 @@ spark_apply.default <- function(
   } else {
     name <- name %||% random_string("sparklyr_tmp_")
     registered <- sdf_register(transformed, name = name)
-
-    if (memory && !identical(args$rdd, TRUE) && !sdf_is_streaming(sdf)) tbl_cache(sc, name, force = FALSE)
+    if (memory && !identical(args$rdd, TRUE) && !sdf_is_streaming(sdf)) {
+      tbl_cache(sc, name, force = FALSE)
+    }
   }
 
   if (identical(fetch_result_as_sdf, FALSE)) {

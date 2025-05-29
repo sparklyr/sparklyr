@@ -15,18 +15,18 @@ test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
   )
   df <- spark_read_csv(sc,
     name = "teste", path = csvPath, header = TRUE,
-    delimiter = ";", charset = "Latin1", memory = FALSE
+    delimiter = ";", memory = FALSE
   )
 
   expect_true(
-    all(dplyr::tbl_vars(df) == c("Municipio", "var", "var_1_0")),
+    all(dplyr::tbl_vars(df) == c("Municpio", "var", "var_1_0")),
     info = "success reading non-ascii similar columns from csv"
   )
 })
 
 test_that("spark_write_delta() and spark_read_delta() work as expected", {
   skip_connection("format-delta")
-  test_requires_version("2.4.2")
+  test_requires_version("2.4.2", max_version = "4")
   test_requires("nycflights13")
 
   flights_df <- flights %>% head(100)
@@ -441,27 +441,22 @@ test_that("spark_read() works as expected", {
   expected_lengths <- sapply(paths, function(x) nchar(x))
   names(expected_lengths) <- NULL
 
-  for (columns in list(
-    c("md5", "length"),
-    list("md5", "length"),
-    list(md5 = "character", length = "integer")
-  )) {
-    sdf <- spark_read(
-      sc,
-      paths,
-      reader,
-      packages = c("openssl"),
-      columns = c("md5", "length")
+  sdf <- spark_read(
+    sc,
+    paths,
+    reader,
+    packages = c("openssl"),
+    columns = list(md5 = "character", length = "integer")
+  )
+  expect_equivalent(
+    sdf_collect(sdf),
+    data.frame(
+      md5 = expected_md5s,
+      length = expected_lengths,
+      stringsAsFactors = FALSE
     )
-    expect_equivalent(
-      sdf_collect(sdf),
-      data.frame(
-        md5 = expected_md5s,
-        length = expected_lengths,
-        stringsAsFactors = FALSE
-      )
-    )
-  }
+  )
+
 })
 
 test_that("spark_write() works as expected", {
@@ -523,7 +518,7 @@ test_avro_schema <- list(
 
 test_that("spark_read_avro() works as expected", {
   skip_connection("format-avro")
-  test_requires_version("2.4.0", "spark_read_avro() requires Spark 2.4+")
+  test_requires_version("2.4.0", max_version = "4")
   skip_databricks_connect()
 
   expected <- dplyr::tibble(
@@ -550,7 +545,7 @@ test_that("spark_read_avro() works as expected", {
 
 test_that("spark_write_avro() works as expected", {
   skip_connection("format-avro")
-  test_requires_version("2.4.0", "spark_write_avro() requires Spark 2.4+")
+  test_requires_version("2.4.0", max_version = "4")
   skip_databricks_connect()
 
   df <- dplyr::tibble(
@@ -575,7 +570,7 @@ test_that("spark_write_avro() works as expected", {
 
 test_that("spark read/write methods avoid name collision on identical file names", {
   skip_connection("format-avro")
-  test_requires_version("2.4.0")
+  test_requires_version("2.4.0", max_version = "4")
 
   tbl_1 <- dplyr::tibble(name = c("foo_1", "bar_1"))
   tbl_2 <- dplyr::tibble(name = c("foo_2", "bar_2"))

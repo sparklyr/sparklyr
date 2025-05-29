@@ -27,15 +27,20 @@ Run `revdepcheck::revdep_details(, "sparklyr.flint")` for more info
     > 
     > 
     ...
-      5.     │ └─base::structure(list(.jobj = jobj), class = "ts_rdd")
-      6.     ├─sparklyr::invoke(builder, "fromDF", spark_dataframe(sdf))
-      7.     └─sparklyr:::invoke.shell_jobj(builder, "fromDF", spark_dataframe(sdf))
-      8.       ├─sparklyr::invoke_method(...)
-      9.       └─sparklyr:::invoke_method.spark_shell_connection(...)
-     10.         └─sparklyr:::core_invoke_method(...)
-     11.           └─sparklyr:::core_invoke_method_impl(...)
-     12.             └─sparklyr:::spark_error(msg)
-     13.               └─rlang::abort(message = msg, use_cli_format = TRUE, call = NULL)
+      5.     └─sparklyr.flint:::new_ts_rdd_builder(...)
+      6.       ├─sparklyr::invoke_new(...)
+      7.       └─sparklyr:::invoke_new.spark_shell_connection(...)
+      8.         ├─sparklyr::invoke_method(sc, TRUE, class, "<init>", ...)
+      9.         └─sparklyr:::invoke_method.spark_shell_connection(...)
+     10.           └─sparklyr:::core_invoke_method(...)
+     11.             └─sparklyr:::core_invoke_method_impl(...)
+     12.               └─sparklyr:::spark_error(msg)
+     13.                 └─rlang::abort(message = msg, use_cli_format = TRUE, call = NULL)
     Execution halted
     ```
+
+## Newly fixed
+
+*   R CMD check timed out
+    
 

@@ -18,9 +18,11 @@ requiring a float (instead of double) type for at least one of its
 parameters.
 }
 \examples{
+\donttest{
 sc <- spark_connect(master = "spark://HOST:PORT")
 
 jflt <- jfloat(sc, 1.23e-8)
 # jflt is now a reference to a java.lang.Float object
+}
 
 }

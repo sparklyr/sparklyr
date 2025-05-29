@@ -179,24 +179,23 @@ spark_dependency_fallback <- function(spark_version, supported_versions) {
 
 sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
   scala_version <- scala_version %||% (
-    if (spark_version < "2.0") {
-      "2.10"
-    } else if (spark_version < "3.0") {
-      "2.11"
-    } else {
+    if (spark_version < "3.0") {
       "2.12"
+    }  else {
+      "2.13"
     })
 
   spark_major_minor <- spark_version[1, 1:2]
 
   exact_jar <- sprintf("sparklyr-%s-%s.jar", spark_major_minor, scala_version)
 
-  if (grepl("sparklyr-3\\.[5-9]-[0-9]+\\.[0-9]+\\.jar", exact_jar)) {
+  if (grepl("sparklyr-4\\.[0-9]-[0-9]+\\.[0-9]+\\.jar", exact_jar)) {
     # At the moment we ship sparklyr-3.0-2.12.jar as sparklyr-master-2.12.jar
     # for Databricks-related reasons, and do not duplicate the same jar file
     # twice under different names to avoid inflating the size of the R package,
-    # and sparklyr-3.5-2.12.jar should be considered compatible with Spark 3.5+
-    exact_jar <- "sparklyr-master-2.12.jar"
+    # and sparklyr-3.5-2.12.jar should be considered compatible with Spark 3+
+    # 2/6/25 - As of Spark 4+, the Scala version to use is 2.13
+    exact_jar <- "sparklyr-master-2.13.jar"
   }
 
   java_path <- system.file("java", package = "sparklyr")
@@ -212,7 +211,7 @@ sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
 
   # Overrides when there is a environment variable set
   if (exists(".test_on_spark_master", envir = .GlobalEnv) && out == "") {
-    out <- file.path(java_path, "sparklyr-master-2.12.jar")
+    out <- file.path(java_path, "sparklyr-master-2.13.jar")
   }
 
   # If no exact match, it looks for the Jar with the closes version

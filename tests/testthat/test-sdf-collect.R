@@ -162,10 +162,10 @@ test_that("sdf_collect() works with numeric array column", {
           SELECT
             *
           FROM
-            VALUES ARRAY(CAST(1 AS {type})),
-                   ARRAY(CAST(2 AS {type}), CAST(3 AS {type})),
+            VALUES ARRAY(TRY_CAST(1 AS {type})),
+                   ARRAY(TRY_CAST(2 AS {type}), TRY_CAST(3 AS {type})),
                    NULL,
-                   ARRAY(CAST(4 AS {type}), NULL, CAST('NaN' AS {type}), CAST(5 AS {type}))
+                   ARRAY(TRY_CAST(4 AS {type}), NULL, TRY_CAST('NaN' AS {type}), TRY_CAST(5 AS {type}))
           AS TAB(`arr`)
           ",
           type = type

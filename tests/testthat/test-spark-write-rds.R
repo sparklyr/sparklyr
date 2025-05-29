@@ -92,9 +92,9 @@ test_that("spark_write_rds() works as expected with non-array columns", {
     dplyr::mutate(
       float_vals = float(float_vals),
       decimal_vals = decimal(int_vals),
-      byte_vals = dplyr::sql("CAST(MOD(`int_vals`, 256) * 77 + 20 AS BYTE)"),
-      short_vals = dplyr::sql("CAST(MOD(`int_vals`, 256) * 77 + 20 AS SHORT)"),
-      long_vals = dplyr::sql("CAST(`int_vals` AS LONG) * 1073741824L")
+      byte_vals = dplyr::sql("TRY_CAST(MOD(`int_vals`, 256) * 77 + 20 AS BYTE)"),
+      short_vals = dplyr::sql("TRY_CAST(MOD(`int_vals`, 256) * 77 + 20 AS SHORT)"),
+      long_vals = dplyr::sql("TRY_CAST(`int_vals` AS LONG) * 1073741824L")
     )
 
   spark_write_rds(sdf, paste0("file://", test_rds_output))
@@ -206,22 +206,22 @@ test_that("spark_write_rds() works as expected with array columns", {
     ) %>%
     dplyr::mutate(
       byte_arr = dplyr::sql(
-        "TRANSFORM(`long_arr`, x -> CAST(`x` AS BYTE))"
+        "TRANSFORM(`long_arr`, x -> TRY_CAST(`x` AS BYTE))"
       )
     ) %>%
     dplyr::mutate(
       short_arr = dplyr::sql(
-        "TRANSFORM(`long_arr`, x -> CAST(`x` AS SHORT))"
+        "TRANSFORM(`long_arr`, x -> TRY_CAST(`x` AS SHORT))"
       )
     ) %>%
     dplyr::mutate(
       float_arr = dplyr::sql(
-        "TRANSFORM(`double_arr`, x -> CAST(`x` AS FLOAT))"
+        "TRANSFORM(`double_arr`, x -> TRY_CAST(`x` AS FLOAT))"
       )
     ) %>%
     dplyr::mutate(
       decimal_arr = dplyr::sql(
-        "TRANSFORM(`long_arr`, x -> CAST(`x` AS DECIMAL))"
+        "TRANSFORM(`long_arr`, x -> TRY_CAST(`x` AS DECIMAL))"
       )
     )
 

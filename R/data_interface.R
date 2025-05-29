@@ -1372,6 +1372,12 @@ spark_read <- function(sc,
     # Otherwise if it is of the form c(col_name1 = "col_type1", ...)
     # or list(col_name1 = "col_type1", ...), etc, then make sure it gets coerced
     columns <- as.list(columns)
+  } else {
+    if(spark_version(sc) >= "4") {
+      stop("Only a named list with the name of the column and",
+           " type of column is valid on Spark 4+"
+           )
+    }
   }
 
   rdd_base <- invoke_static(
@@ -1421,7 +1427,8 @@ spark_read <- function(sc,
     spark_apply_worker_config(
       sc,
       args$debug,
-      args$profile
+      args$profile,
+      spark_read = TRUE
     ),
     as.integer(worker_port),
     list("path"),

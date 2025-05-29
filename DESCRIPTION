@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.8.6.9001
+Version: 1.9.0
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -115,8 +115,8 @@ Suggests:
     testthat,
     rprojroot
 Encoding: UTF-8
-RoxygenNote: 7.3.1
-SystemRequirements: Spark: 2.x, or 3.x
+RoxygenNote: 7.3.2
+SystemRequirements: Spark: 2.x, or 3.x, or 4.x
 Collate:
     'spark_data_build_types.R'
     'arrow_data.R'

@@ -61,10 +61,12 @@ random_string <- function(prefix = "table") {
 #'   must refer to a Java object that is assignable to \code{element_type}.
 #'
 #' @examples
+#' \donttest{
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #'
 #' string_arr <- jarray(sc, letters, element_type = "java.lang.String")
 #' # string_arr is now a reference to an array of type String[]
+#' }
 #'
 #' @export
 jarray <- function(sc, x, element_type) {
@@ -87,10 +89,12 @@ jarray <- function(sc, x, element_type) {
 #' @param x A numeric value in R.
 #'
 #' @examples
+#' \donttest{
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #'
 #' jflt <- jfloat(sc, 1.23e-8)
 #' # jflt is now a reference to a java.lang.Float object
+#' }
 #'
 #' @export
 jfloat <- function(sc, x) {
@@ -107,10 +111,12 @@ jfloat <- function(sc, x) {
 #' @param x A numeric vector in R.
 #'
 #' @examples
+#' \donttest{
 #' sc <- spark_connect(master = "spark://HOST:PORT")
 #'
 #' jflt_arr <- jfloat_array(sc, c(-1.23e-8, 0, -1.23e-8))
 #' # jflt_arr is now a reference an array of java.lang.Float
+#' }
 #'
 #' @export
 jfloat_array <- function(sc, x) {
@@ -693,4 +699,23 @@ package_version2 <- function(x) {
     x <- as.character(x)
   }
   package_version(x)
+}
+
+update_jars <- function() {
+
+  # Downloads Scala compilers
+  download_scalac()
+
+  # Verifies, and installs, needed Spark versions
+  sparklyr_jar_verify_spark()
+
+  # Updates jar's
+  compile_package_jars()
+
+  # Embedded sources are the R functions that will be copied into the JARs.
+  # They are all placed inside the java/embedded_sources.R file. The source
+  # are all the R scripts in /R with a name containing "worker" or "core".
+  # Embedded sources are the key to how spark_apply() works.
+  spark_update_embedded_sources()
+
 }

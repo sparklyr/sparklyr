@@ -1,9 +1,9 @@
 sparklyr_jar_spec_list <- function() {
   list(
-    list(spark = "2.4.0", scala = "2.11"),
-    list(spark = "2.4.0", scala = "2.12"),
-    list(spark = "3.0.0", scala = "2.12"),
-    list(spark = "3.5.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
+    list(spark = "2.4.8", scala = "2.12"),
+    list(spark = "3.0.3", scala = "2.12"),
+    list(spark = "3.5.4", scala = "2.12"),
+    list(spark = "4.0.0", scala = "2.13", jar_name = "sparklyr-master-2.13.jar")
   )
 }
 
@@ -361,40 +361,36 @@ download_scalac <- function(dest_path = NULL) {
   if (is.null(dest_path)) {
     dest_path <- scalac_default_locations()[[1]]
   }
-
   if (!dir.exists(dest_path)) {
     dir.create(dest_path, recursive = TRUE)
   }
-
   ext <- ifelse(os_is_windows(), "zip", "tgz")
-
   download_urls <-  paste0(
     c(
-      "https://downloads.lightbend.com/scala/2.12.10/scala-2.12.10",
-      "https://downloads.lightbend.com/scala/2.11.8/scala-2.11.8",
-      "https://downloads.lightbend.com/scala/2.10.6/scala-2.10.6"
+      "https://downloads.lightbend.com/scala/2.13.15/scala-2.13.15",
+      "https://downloads.lightbend.com/scala/2.12.20/scala-2.12.20"
     ),
     ".",
     ext
   )
 
-  lapply(download_urls, function(download_url) {
+  for(download_url in download_urls) {
     dest_file <- file.path(dest_path, basename(download_url))
-
     if (!dir.exists(dirname(dest_file))) {
       dir.create(dirname(dest_file), recursive = TRUE)
     }
-
     if(!file.exists(dest_file)) {
+      cat("- ", "Downloading and expanding:", download_url, "\n")
       download_file(download_url, destfile = dest_file)
-    }
-
-    if (ext == "zip") {
-      unzip(dest_file, exdir = dest_path)
+      if (ext == "zip") {
+        unzip(dest_file, exdir = dest_path)
+      } else {
+        untar(dest_file, exdir = dest_path)
+      }
     } else {
-      untar(dest_file, exdir = dest_path)
+      cat("- ", dest_file, "found\n")
     }
-  })
+  }
 }
 
 #' Discover the Scala Compiler
