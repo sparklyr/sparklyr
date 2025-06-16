@@ -95,7 +95,7 @@ ml_load <- function(sc, path) {
 
   metadata <- try(
     spark_context(sc) %>%
-      invoke("textFile", file.path(model_dir, "metadata", "part-*.txt"), 1L) %>%
+      invoke("textFile", file.path(path, "metadata", "part-*.txt"), 1L) %>%
       invoke("collect") %>%
       unlist() %>%
       jsonlite::fromJSON(),
