@@ -106,6 +106,8 @@ apache_entries <- all_files %>%
   discard(~str_detect(.x$file, "incubating")) %>%
   discard(~str_detect(.x$file, "without")) %>%
   discard(~str_detect(.x$file, "scala")) %>%
+  discard(~str_detect(.x$file, "connect")) %>%
+  discard(~str_detect(.x$file, "hive")) %>%
   map(~ parse_file(.x$file, .x$main, .x$folder))
 
 versions_json <- path("inst/extdata/versions.json")
