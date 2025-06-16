@@ -123,6 +123,7 @@ final_tbl <- apache_entries %>%
     if(str_detect(x$base, "archive.apache.org")) x$priority <- 2
     x
   }) %>%
+  discard(~str_detect(.x$base, "archive.apache.org") && str_detect(.x$base, "preview")) %>%
   map_dfr(~.x) %>%
   arrange(spark, hadoop, priority) %>%
   filter(spark >= "2.4.0") %>% # Matching minimum version to the original file
@@ -131,14 +132,18 @@ final_tbl <- apache_entries %>%
   select(-priority) %>%
   ungroup()
 
-previews <- final_tbl %>%
-  filter(str_detect(base, "preview")) %>%
-  filter(base != max(base)) %>%
-  pull(base)
+if(any(str_detect(final_tbl$base, "preview"))) {
+  previews <- final_tbl %>%
+    filter(str_detect(base, "preview")) %>%
+    filter(base != max(base)) %>%
+    pull(base)
 
-future_tbl <- final_tbl %>%
-  filter(str_detect(base, "preview")) %>%
-  filter(!base %in% previews)
+  future_tbl <- final_tbl %>%
+    filter(str_detect(base, "preview")) %>%
+    filter(!base %in% previews)
+} else {
+  future_tbl <- data.frame()
+}
 
 final_tbl <- final_tbl %>%
   filter(!str_detect(base, "preview"))
