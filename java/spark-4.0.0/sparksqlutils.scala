@@ -15,7 +15,7 @@ import org.apache.spark.sql._
 import scala.util.matching.Regex
 
 object SQLUtils {
-  def createDataFrameFromRows(
+  def createDataFrame(
     sc: SparkSession,
     rows: RDD[Row],
     schema: StructType
