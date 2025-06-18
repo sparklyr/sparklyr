@@ -187,7 +187,8 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
       list(spark = "3.2", delta = "2.0.2"),
       list(spark = "3.3", delta = "2.3.0"),
       list(spark = "3.4", delta = "2.4.0"),
-      list(spark = "3.5", delta = "3.0.0")
+      list(spark = "3.5", delta = "3.0.0"),
+      list(spark = "4.0", delta = "4.0.0")
     ) %>%
       purrr::keep(~ .x$spark >= substr(version, 1, 3)) %>%
       head(1) %>%

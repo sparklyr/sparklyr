@@ -73,14 +73,11 @@ test_that("ml_cross_validator() works correctly", {
     SIMPLIFY = FALSE
   )
 
-  empty_named_list <- list()
-  names(empty_named_list) <- character()
-
   expect_identical(
     c(diff),
     rep(list(list(
-      hashing_tf_1 = empty_named_list,
-      logistic_1 = empty_named_list
+      hashing_tf_1 = list(),
+      logistic_1 = list()
     )), 8)
   )
 
