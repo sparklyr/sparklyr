@@ -31,7 +31,7 @@ class WorkerApply(
 
   def workerSourceFile(rscript: Rscript, sessionId: Int): String = {
     val source = Sources.sources
-    val tempFile = new File(s"${rscript.getScratchDir}${File.separator}sparkworker_$sessionId.R")
+    val tempFile = new File(s"${rscript.getScratchDir()}${File.separator}sparkworker_$sessionId.R")
     val outStream = new FileWriter(tempFile)
     outStream.write(source)
     outStream.flush()
@@ -79,7 +79,7 @@ class WorkerApply(
     )
     backend.setHostContext(contextId)
     backend.init(port, sessionId, connectionTimeout)
-    backendPort = backend.getPort
+    backendPort = backend.getPort()
 
     val backendThread = new Thread("backend thread") {
       override def run(): Unit = {
@@ -138,7 +138,7 @@ class WorkerApply(
       case _    => println("")
     }
 
-    logger.log(s"returning RDD iterator with ${workerContext.getResultArray.length} rows")
-    workerContext.getResultArray.iterator
+    logger.log(s"returning RDD iterator with ${workerContext.getResultArray().length} rows")
+    workerContext.getResultArray().iterator
   }
 }
