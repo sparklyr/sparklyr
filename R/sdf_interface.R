@@ -323,7 +323,7 @@ sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
   id <- cast_string(id)
   from <- cast_scalar_integer(from)
 
-  transformed <- invoke_static(
+  args <- list(
     sc,
     "sparklyr.Utils",
     "addSequentialIndex",
@@ -331,6 +331,12 @@ sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
     from,
     id
   )
+
+  if(spark_version(sc) >= "4.0") {
+    args <- c(args, spark_session(sc))
+  }
+
+  transformed <- rlang::exec(invoke_static, !!!args)
 
   sdf_register(transformed)
 }
