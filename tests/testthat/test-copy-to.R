@@ -83,6 +83,7 @@ test_that("sdf_copy_to can preserve list columns", {
 })
 
 test_that("sdf_copy_to supports binary columns", {
+  test_requires_version(max_version = "3.6")
   expected <- list(
     list(3L, 5.5, NULL, "foo", NaN, "", foo = "foo", NA, bar = "bar"),
     list(a = 3L, "", NA, list(b = 4L, NaN, list(c = 5L))),
