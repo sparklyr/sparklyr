@@ -3,7 +3,6 @@ skip_on_livy()
 skip_on_arrow_devel()
 test_requires("foreach")
 test_requires("iterators")
-test_requires_version("2.4", max_version = "3.6")
 
 register_test_spark_connection <- function() {
   sc <- testthat_spark_connection()

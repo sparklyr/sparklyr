@@ -197,7 +197,8 @@ object Utils {
     serialized_cols: Array[Array[Byte]],
     timestamp_col_idxes: Seq[Int],
     string_col_idxes: Seq[Int],
-    partitions: Int
+    partitions: Int,
+    schema: StructType
   ): RDD[InternalRow] = {
     if (serialized_cols.isEmpty) {
       throw new IllegalArgumentException("Serialized columns byte array is empty.")

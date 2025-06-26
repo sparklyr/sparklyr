@@ -1505,7 +1505,8 @@ spark_write_rds <- function(x, dest_uri) {
     "sparklyr.RDSCollector",
     "collect",
     spark_dataframe(x),
-    as.list(dest_uri)
+    as.list(dest_uri)#,
+    #spark_session(spark_connection(x))
   )
 
   dplyr::tibble(
