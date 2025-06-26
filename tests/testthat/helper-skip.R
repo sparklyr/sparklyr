@@ -80,7 +80,7 @@ test_requires_version <- function(min_version, comment = NULL, max_version = NUL
     skip(msg)
   } else if (!is.null(max_version)) {
     if (spark_version(sc) >= max_version) {
-      msg <- paste0("test is not needed with Spark version ", max_version)
+      msg <- paste0("test is not needed with Spark version ", max_version, "+")
       if (!is.null(comment)) {
         msg <- paste0(msg, ": ", comment)
       }
