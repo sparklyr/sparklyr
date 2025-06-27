@@ -238,6 +238,11 @@ object Utils {
         else {
           field.dataType match {
             case StringType => value.asInstanceOf[UTF8String].toString
+            case BinaryType => value match {
+              case raw: RawSXP => raw.buf
+              case arr: Array[Byte] => arr
+              case _ => throw new IllegalArgumentException(s"Invalid binary value at col $c: $value")
+            }
             case _ => value
           }
         }
