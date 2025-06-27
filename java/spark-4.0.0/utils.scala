@@ -22,8 +22,8 @@ import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.apache.spark.sql.Row
 import java.io.{ByteArrayInputStream, DataInputStream}
 import org.apache.spark.sql.{Row, SparkSession}
-
-
+import java.sql.{Timestamp, Date}
+import java.time.LocalDate
 
 object Utils {
   def collect(df: DataFrame, separator: String, impl: String): Array[_] = {
@@ -212,22 +212,39 @@ object Utils {
     if (serialized_cols.isEmpty) {
       throw new IllegalArgumentException("Serialized columns byte array is empty.")
     }
+
     val cols = serialized_cols.map { serialized_col =>
       val bis = new ByteArrayInputStream(serialized_col)
       val dis = new DataInputStream(bis)
       RUtils.validateSerializationFormat(dis)
       RUtils.unserializeColumn(dis)
     }
+
     for (c <- timestamp_col_idxes) {
       cols(c) = cols(c).asInstanceOf[Array[_]].map {
-        case d: Double => d.toLong * 1000000L
         case null => null
+        case d: Double => new Timestamp((d * 1000).toLong)   // seconds → millis
+        case l: Long   => new Timestamp(l / 1000)            // micros → millis
+        case ts: Timestamp => ts
+        case other => throw new IllegalArgumentException(s"Unsupported timestamp value: $other")
       }
     }
+
     for (c <- string_col_idxes) {
       cols(c) = cols(c).asInstanceOf[Array[_]].map {
-        case s: String => UTF8String.fromString(s)
         case null => null
+        case s: String => UTF8String.fromString(s)
+        case other => throw new IllegalArgumentException(s"Unsupported string value: $other")
+      }
+    }
+
+    for ((field, idx) <- schema.fields.zipWithIndex if field.dataType == DateType) {
+      cols(idx) = cols(idx).asInstanceOf[Array[_]].map {
+        case null => null
+        case i: Int => Date.valueOf(LocalDate.ofEpochDay(i.toLong))
+        case l: Long => Date.valueOf(LocalDate.ofEpochDay(l))
+        case d: Date => d
+        case other => throw new IllegalArgumentException(s"Unsupported date value in column ${field.name}: $other")
       }
     }
 
@@ -238,20 +255,27 @@ object Utils {
         else {
           field.dataType match {
             case StringType => value.asInstanceOf[UTF8String].toString
+
             case BinaryType => value match {
               case raw: RawSXP => raw.buf
               case arr: Array[Byte] => arr
-              case _ => throw new IllegalArgumentException(s"Invalid binary value at col $c: $value")
+              case _ => throw new IllegalArgumentException(s"Invalid binary value at column ${field.name}: $value")
             }
+
+            case TimestampType => value
+            case DateType => value
+
             case _ => value
           }
         }
       }.toArray
+
       Row.fromSeq(values)
     }
 
     sc.parallelize(rowsAsRow, partitions)
   }
+
 
   private[this] def writeVariableLengthField(
     variableLengthOffset: Int,
