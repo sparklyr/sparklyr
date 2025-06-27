@@ -1,5 +1,7 @@
 # Sparklyr (dev)
 
+- Addresses changes done to Spark 4.0 from when it was in preview to now.
+
 - Switches from R file read, to Spark file read to obtain the metadata for the
 ML object to be loaded in `ml_load()`. This approach accounts for when the
 Spark Context is reading different mounted file protocols and mounted paths 
