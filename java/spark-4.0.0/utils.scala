@@ -17,6 +17,13 @@ import org.apache.spark.unsafe.types.UTF8String
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 import scala.util.Try
+// For Spark 4.0
+import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
+import org.apache.spark.sql.Row
+import java.io.{ByteArrayInputStream, DataInputStream}
+import org.apache.spark.sql.{Row, SparkSession}
+import java.sql.{Timestamp, Date}
+import java.time.LocalDate
 
 object Utils {
   def collect(df: DataFrame, separator: String, impl: String): Array[_] = {
@@ -198,80 +205,77 @@ object Utils {
     serialized_cols: Array[Array[Byte]],
     timestamp_col_idxes: Seq[Int],
     string_col_idxes: Seq[Int],
-    partitions: Int
-  ): RDD[InternalRow] = {
+    partitions: Int,
+    schema: StructType
+  ): RDD[Row] = {
+
     if (serialized_cols.isEmpty) {
       throw new IllegalArgumentException("Serialized columns byte array is empty.")
     }
-    val cols = serialized_cols.map(
-      serialized_col => {
-        val bis = new ByteArrayInputStream(serialized_col)
-        val dis = new DataInputStream(bis)
 
-        RUtils.validateSerializationFormat(dis)
-        RUtils.unserializeColumn(dis)
-      }
-    ).toArray
-    val num_cols = cols.length
+    val cols = serialized_cols.map { serialized_col =>
+      val bis = new ByteArrayInputStream(serialized_col)
+      val dis = new DataInputStream(bis)
+      RUtils.validateSerializationFormat(dis)
+      RUtils.unserializeColumn(dis)
+    }
+
     for (c <- timestamp_col_idxes) {
-      cols(c) = cols(c).asInstanceOf[Array[_]].map(
-        x => x.asInstanceOf[Double].longValue * 1000000
-      ).toArray
+      cols(c) = cols(c).asInstanceOf[Array[_]].map {
+        case null => null
+        case d: Double => new Timestamp((d * 1000).toLong)   // seconds → millis
+        case l: Long   => new Timestamp(l / 1000)            // micros → millis
+        case ts: Timestamp => ts
+        case other => throw new IllegalArgumentException(s"Unsupported timestamp value: $other")
+      }
     }
+
     for (c <- string_col_idxes) {
-      cols(c) = cols(c).asInstanceOf[Array[_]].map(
-        x => UTF8String.fromString(x.asInstanceOf[String])
-      ).toArray
+      cols(c) = cols(c).asInstanceOf[Array[_]].map {
+        case null => null
+        case s: String => UTF8String.fromString(s)
+        case other => throw new IllegalArgumentException(s"Unsupported string value: $other")
+      }
     }
-    val rows = (0 until num_rows).map {r => {
-      val variableLengthBytes = (0 until num_cols).map(c =>
-        cols(c)(r) match {
-          case x: UTF8String => x.numBytes
-          case x: RawSXP => x.buf.length
-          case _ => 0
-        }
-      ).sum
-      var variableLengthOffset = UnsafeRow.calculateBitSetWidthInBytes(cols.length) + 8 * num_cols
-      val row = UnsafeRow.createFromByteArray(variableLengthOffset + variableLengthBytes, num_cols)
-      (0 until num_cols).map(
-        c => {
-          if (cols(c)(r) == null) {
-            row.setNullAt(c)
-          } else {
-            cols(c)(r) match {
-              case x: Boolean => row.setBoolean(c, x)
-              case x: Integer => row.setInt(c, x)
-              case x: Double => row.setDouble(c, x)
-              case x: Long => row.setLong(c, x)
-              case x: UTF8String => {
-                variableLengthOffset = writeVariableLengthField(
-                  variableLengthOffset,
-                  row,
-                  c,
-                  x.getBytes
-                )
-              }
-              case x: RawSXP => {
-                variableLengthOffset = writeVariableLengthField(
-                  variableLengthOffset,
-                  row,
-                  c,
-                  x.buf
-                )
-              }
-              case _ => throw new IllegalArgumentException("Unsupported column type")
+
+    for ((field, idx) <- schema.fields.zipWithIndex if field.dataType == DateType) {
+      cols(idx) = cols(idx).asInstanceOf[Array[_]].map {
+        case null => null
+        case i: Int => Date.valueOf(LocalDate.ofEpochDay(i.toLong))
+        case l: Long => Date.valueOf(LocalDate.ofEpochDay(l))
+        case d: Date => d
+        case other => throw new IllegalArgumentException(s"Unsupported date value in column ${field.name}: $other")
+      }
+    }
+
+    val rowsAsRow = (0 until num_rows).map { r =>
+      val values: Array[Any] = schema.fields.zipWithIndex.map { case (field, c) =>
+        val value = cols(c)(r)
+        if (value == null) null
+        else {
+          field.dataType match {
+            case StringType => value.asInstanceOf[UTF8String].toString
+
+            case BinaryType => value match {
+              case raw: RawSXP => raw.buf
+              case arr: Array[Byte] => arr
+              case _ => throw new IllegalArgumentException(s"Invalid binary value at column ${field.name}: $value")
             }
+
+            case TimestampType => value
+            case DateType => value
+
+            case _ => value
           }
         }
-      )
+      }.toArray
 
-      row
-    }}.toArray
+      Row.fromSeq(values)
+    }
 
-    val x: RDD[InternalRow] = sc.parallelize(rows, partitions)
-
-    x
+    sc.parallelize(rowsAsRow, partitions)
   }
+
 
   private[this] def writeVariableLengthField(
     variableLengthOffset: Int,

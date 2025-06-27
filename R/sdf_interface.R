@@ -329,7 +329,8 @@ sdf_with_sequential_id <- function(x, id = "id", from = 1L) {
     "addSequentialIndex",
     sdf,
     from,
-    id
+    id,
+    spark_session(sc)
   )
 
   sdf_register(transformed)

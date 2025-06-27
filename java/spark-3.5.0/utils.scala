@@ -197,7 +197,8 @@ object Utils {
     serialized_cols: Array[Array[Byte]],
     timestamp_col_idxes: Seq[Int],
     string_col_idxes: Seq[Int],
-    partitions: Int
+    partitions: Int,
+    schema: StructType
   ): RDD[InternalRow] = {
     if (serialized_cols.isEmpty) {
       throw new IllegalArgumentException("Serialized columns byte array is empty.")
@@ -314,7 +315,8 @@ object Utils {
   def addSequentialIndex(
     df: DataFrame,
     from: Int,
-    id: String) : DataFrame = {
+    id: String,
+    spark: SparkSession) : DataFrame = {
       val sqlContext = df.sqlContext
       sqlContext.createDataFrame(
         df.rdd.zipWithIndex.map {

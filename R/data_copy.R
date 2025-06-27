@@ -23,30 +23,36 @@ spark_serialize_rds <- function(sc, df, columns, repartition) {
       }
     )
   })
+
+  serialized_cols <- cols %>%
+    unname() %>%
+    lapply(
+      function(x) {
+        serialize(x, connection = NULL, version = 2L, xdr = TRUE)
+      }
+    )
+
+  schema <- spark_data_build_types(sc, columns)
+
   rdd <- invoke_static(
     sc,
     "sparklyr.Utils",
     "parallelize",
     spark_context(sc),
     num_rows,
-    cols %>%
-      unname() %>%
-      lapply(
-        function(x) {
-          serialize(x, connection = NULL, version = 2L, xdr = TRUE)
-        }
-      ),
+    serialized_cols,
     as.list(timestamp_col_idxes),
     as.list(string_col_idxes),
-    if (repartition > 0) as.integer(repartition) else 1L
+    if (repartition > 0) as.integer(repartition) else 1L,
+    schema
   )
-  schema <- spark_data_build_types(sc, columns)
+
 
   invoke_static(
     sc,
     "org.apache.spark.sql.SQLUtils",
     "createDataFrame",
-    hive_context(sc),
+    spark_session(sc),
     rdd,
     schema
   )

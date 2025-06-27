@@ -56,19 +56,19 @@ class WorkerContext(
   }
 
   def getSourceArrayLength(): Int = {
-    getSourceArray.length
+    getSourceArray().length
   }
 
   def getSourceArraySeq(): Array[Row] = {
-    getSourceArray
+    getSourceArray()
   }
 
   def getSourceArraySeq2(): Array[Seq[Any]] = {
-    getSourceArray.map(x => x.toSeq)
+    getSourceArray().map(x => x.toSeq)
   }
 
-  def getSourceArrayGroupedSeq(): Array[Array[Array[Any]]] = {
-    getSourceArray.map(x => x.toSeq.map(g => g.asInstanceOf[Seq[Any]].toArray).toArray)
+  def getSourceArrayGroupedSeq: Array[Array[Array[Any]]] = {
+    getSourceArray().map(x => x.toSeq.map(g => g.asInstanceOf[Seq[Any]].toArray).toArray)
   }
 
   def setResultArraySeq(resultParam: Array[Any]) = {
