@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: main
+    branches: paused
   pull_request:
-    branches: main
+    branches: paused
 
 name: Spark-Tests
 
@@ -19,10 +19,10 @@ jobs:
       matrix:
         config:
           - {spark: '2.4.8', hadoop: '2.7', arrow: '',        livy: '', dbplyr: '', name: 'Spark 2.4'}
-          #- {spark: '3.4.4', hadoop: '3',   arrow: '',        livy: '', dbplyr: '', name: 'Spark 3.4'}
-          #- {spark: '3.5.6', hadoop: '3',   arrow: '',        livy: '', dbplyr: '', name: 'Spark 3.6'}
-          #- {spark: '4.0.0', hadoop: '3',   arrow: '',        livy: '', dbplyr: '', name: 'Spark 4.0'}
-          #- {spark: '4.0.0', hadoop: '3',   arrow: 'release', livy: '', dbplyr: '', name: 'Spark 4.0 w Arrow'}
+          - {spark: '3.4.4', hadoop: '3',   arrow: '',        livy: '', dbplyr: '', name: 'Spark 3.4'}
+          - {spark: '3.5.6', hadoop: '3',   arrow: '',        livy: '', dbplyr: '', name: 'Spark 3.6'}
+          - {spark: '4.0.0', hadoop: '3',   arrow: '',        livy: '', dbplyr: '', name: 'Spark 4.0'}
+          - {spark: '4.0.0', hadoop: '3',   arrow: 'release', livy: '', dbplyr: '', name: 'Spark 4.0 w Arrow'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
