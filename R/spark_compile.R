@@ -1,8 +1,8 @@
 sparklyr_jar_spec_list <- function() {
   list(
-    #list(spark = "2.4.8", scala = "2.11"),
-    #list(spark = "3.0.3", scala = "2.12"),
-    #list(spark = "3.5.4", scala = "2.12"),
+    list(spark = "2.4.8", scala = "2.11"),
+    list(spark = "3.0.3", scala = "2.12"),
+    list(spark = "3.5.4", scala = "2.12"),
     list(spark = "4.0.0", scala = "2.13", jar_name = "sparklyr-master-2.13.jar")
   )
 }
@@ -15,10 +15,10 @@ sparklyr_jar_verify_spark <- function(install = TRUE) {
       spec_list,
       function(x){
         if(!(x$spark %in% installed_vers$spark)) {
-          rlang::inform(c("i" = paste0("- Spark version ", x$spark, " - Not found")))
+          rlang::inform(c("i" = paste0("Spark version ", x$spark, " - Not found")))
           if(install) spark_install(x$spark)
         } else {
-          rlang::inform(c("*" = paste0("- Spark version ", x$spark, " - Ok")))
+          rlang::inform(c("*" = paste0("Spark version ", x$spark, " - Ok")))
         }
       }
     )
@@ -139,12 +139,15 @@ spark_compile <- function(jar_name,
   optflag <- ifelse(grepl("2.12", scalac_version), "-opt:l:default", "-optimise")
   withr::with_envvar(
     list(CLASSPATH = classpath),
-    status <- system2(
-      command = scalac,
-      args = c(optflag, "-deprecation", "-feature", scala_files),
-      stdout = NULL,
-      stderr = temp_out
+    withr::with_dir(
+      temp_dir,
+      status <- system2(
+        command = scalac,
+        args = c(optflag, "-deprecation", "-feature", scala_files),
+        stdout = NULL,
+        stderr = temp_out
       )
+    )
   )
 
   rlang::inform(c("*" = paste("Ouput:", temp_out)))
@@ -154,7 +157,10 @@ spark_compile <- function(jar_name,
   }
 
   # call 'jar' to create our jar
-  status <- system(shQuote(jar), "cf", shQuote(jar_path), ".", .message = "Creating JAR")
+  withr::with_dir(
+    temp_dir,
+    status <- system(paste(shQuote(jar), "cf", shQuote(jar_path), "."))
+  )
 
   if (status) {
     rlang::abort("Failed to build Java Archive")
