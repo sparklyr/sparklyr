@@ -21,7 +21,7 @@ spark_update_embedded_sources <- function(jars_to_skip = c()) {
 
   for (sparklyr_jar in sparklyr_jars) {
     if (!basename(sparklyr_jar) %in% jars_to_skip) {
-      message("updating embedded sources in '", sparklyr_jar, "'")
+      rlang::inform(c("*" = "Updating embedded sources in '", sparklyr_jar, "'"))
       system2(
         "jar",
         args = c("uf", sparklyr_jar, file.path("sparklyr", "embedded_sources.R"))

@@ -152,7 +152,7 @@ test_that("sdf_collect() works with integral array column", {
 
 test_that("sdf_collect() works with numeric array column", {
   skip_on_arrow()
-
+  test_requires_version("3.0")
   for (type in c("FLOAT", "LONG", "DOUBLE")) {
     sdf <- dplyr::tbl(
       sc,

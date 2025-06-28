@@ -1,6 +1,6 @@
 skip_connection("connect-shell")
 skip_on_livy()
-
+test_requires_version("3.0")
 skip_databricks_connect()
 sc <- testthat_spark_connection()
 

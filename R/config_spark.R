@@ -181,7 +181,7 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
     if (version < "2.4.2") stop("Delta Lake requires Spark 2.4.2 or newer")
 
     delta <- list(
-      list(spark = "2.4", delta = "0.7.0"),
+      list(spark = "2.4", delta = "0.6.0"),
       list(spark = "3.0", delta = "0.8.0"),
       list(spark = "3.1", delta = "1.0.1"),
       list(spark = "3.2", delta = "2.0.2"),

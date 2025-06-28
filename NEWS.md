@@ -1,5 +1,7 @@
 # Sparklyr (dev)
 
+- Restores support for Spark 2.4 with Scala 2.11 (#3485)
+
 - Addresses changes done to Spark 4.0 from when it was in preview to now.
 
 - Switches from R file read, to Spark file read to obtain the metadata for the
