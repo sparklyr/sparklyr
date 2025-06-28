@@ -1,9 +1,9 @@
 sparklyr_jar_spec_list <- function() {
   list(
-    list(spark = "2.4.8", scala = "2.11")#,
+    #list(spark = "2.4.8", scala = "2.11"),
     #list(spark = "3.0.3", scala = "2.12"),
     #list(spark = "3.5.4", scala = "2.12"),
-    #list(spark = "4.0.0", scala = "2.13", jar_name = "sparklyr-master-2.13.jar")
+    list(spark = "4.0.0", scala = "2.13", jar_name = "sparklyr-master-2.13.jar")
   )
 }
 
@@ -96,19 +96,17 @@ spark_compile <- function(jar_name,
     "*" = paste("Building:", jar_name)
     ))
 
+  # work in temporary directory
+  temp_dir <- tempfile(sprintf("scalac-%s-", sub("-.*", "", jar_name)))
+  ensure_directory(temp_dir)
+
   execute <- function(..., .message = NULL) {
-    message <- .message %||% "System command"
     cmd <- paste(...)
+    message <- .message %||% "System command"
     rlang::inform(c("*" = paste0(message, ": ", cmd)))
-    #system(cmd)
-    FALSE
+    withr::with_dir(temp_dir, system(cmd))
   }
 
-  # work in temporary directory
-  dir <- tempfile(sprintf("scalac-%s-", sub("-.*", "", jar_name)))
-  ensure_directory(dir)
-  owd <- setwd(dir)
-  on.exit(setwd(owd), add = TRUE)
 
   # list jars in the installation folder
   candidates <- c("jars", "lib")
@@ -140,9 +138,10 @@ spark_compile <- function(jar_name,
 
   # copy embedded sources to current working directory
   rlang::inform(c("*" = paste("Embedded source(s):", paste(embedded_srcs, collapse = ", "))))
-  ensure_directory("sparklyr")
+  temp_sparklyr <- file.path(temp_dir, "sparklyr")
+  ensure_directory(temp_sparklyr)
   for (src in embedded_srcs) {
-    file.copy(file.path(scala_path, src), "sparklyr")
+    file.copy(file.path(scala_path, src), temp_sparklyr)
   }
 
   # call 'scalac' with CLASSPATH set
@@ -159,6 +158,7 @@ spark_compile <- function(jar_name,
 
   # call 'jar' to create our jar
   status <- execute(shQuote(jar), "cf", shQuote(jar_path), ".", .message = "Creating JAR")
+
   if (status) {
     rlang::abort("Failed to build Java Archive")
   }
