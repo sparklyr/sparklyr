@@ -90,22 +90,23 @@ spark_compile <- function(jar_name,
     scala_files <- filter(scala_files)
   }
 
+  # work in temporary directory
+  temp_name <- sprintf("scalac-%s-", sub("-.*", "", jar_name))
+  temp_dir <- tempfile(temp_name)
+  ensure_directory(temp_dir)
+
+  temp_sparklyr <- file.path(temp_dir, "sparklyr")
+  ensure_directory(temp_sparklyr)
+  for (src in embedded_srcs) {
+    file.copy(file.path(scala_path, src), temp_sparklyr)
+  }
+
   rlang::inform(c(
     "*" = paste("Using scalac:", scalac_version),
     "*" = paste("Building against Spark:", spark_version),
+    "*" = paste("Embedded source(s):", paste(embedded_srcs, collapse = ", ")),
     "*" = paste("Building:", jar_name)
     ))
-
-  # work in temporary directory
-  temp_dir <- tempfile(sprintf("scalac-%s-", sub("-.*", "", jar_name)))
-  ensure_directory(temp_dir)
-
-  execute <- function(..., .message = NULL) {
-    cmd <- paste(...)
-    message <- .message %||% "System command"
-    rlang::inform(c("*" = paste0(message, ": ", cmd)))
-    withr::with_dir(temp_dir, system(cmd))
-  }
 
   # list jars in the installation folder
   candidates <- c("jars", "lib")
@@ -132,28 +133,28 @@ spark_compile <- function(jar_name,
   inst_java_path <- file.path(root, "inst/java")
   ensure_directory(inst_java_path)
 
-  # copy embedded sources to current working directory
-  rlang::inform(c("*" = paste("Embedded source(s):", paste(embedded_srcs, collapse = ", "))))
-  temp_sparklyr <- file.path(temp_dir, "sparklyr")
-  ensure_directory(temp_sparklyr)
-  for (src in embedded_srcs) {
-    file.copy(file.path(scala_path, src), temp_sparklyr)
-  }
-
+  temp_out <- tempfile(fileext = ".txt")
   classpath <- paste(jars, collapse = .Platform$path.sep)
   scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
   optflag <- ifelse(grepl("2.12", scalac_version), "-opt:l:default", "-optimise")
   withr::with_envvar(
     list(CLASSPATH = classpath),
-    status <- execute(shQuote(scalac), optflag, "-deprecation", "-feature", scala_files_quoted, .message = "Scalac call")
+    status <- system2(
+      command = scalac,
+      args = c(optflag, "-deprecation", "-feature", scala_files),
+      stdout = NULL,
+      stderr = temp_out
+      )
   )
+
+  rlang::inform(c("*" = paste("Ouput:", temp_out)))
 
   if (status) {
     rlang::abort("Failed to compile Scala source files")
   }
 
   # call 'jar' to create our jar
-  status <- execute(shQuote(jar), "cf", shQuote(jar_path), ".", .message = "Creating JAR")
+  status <- system(shQuote(jar), "cf", shQuote(jar_path), ".", .message = "Creating JAR")
 
   if (status) {
     rlang::abort("Failed to build Java Archive")
