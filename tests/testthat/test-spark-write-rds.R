@@ -1,4 +1,5 @@
 skip_connection("spark-write-rds")
+test_requires("3.0")
 skip_on_livy()
 skip_on_arrow_devel()
 
