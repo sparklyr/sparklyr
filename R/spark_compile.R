@@ -1,9 +1,9 @@
 sparklyr_jar_spec_list <- function() {
   list(
-    list(spark = "2.4.8", scala = "2.12"),
-    list(spark = "3.0.3", scala = "2.12"),
-    list(spark = "3.5.4", scala = "2.12"),
-    list(spark = "4.0.0", scala = "2.13", jar_name = "sparklyr-master-2.13.jar")
+    list(spark = "2.4.8", scala = "2.11")#,
+    #list(spark = "3.0.3", scala = "2.12"),
+    #list(spark = "3.5.4", scala = "2.12"),
+    #list(spark = "4.0.0", scala = "2.13", jar_name = "sparklyr-master-2.13.jar")
   )
 }
 
@@ -15,10 +15,10 @@ sparklyr_jar_verify_spark <- function(install = TRUE) {
       spec_list,
       function(x){
         if(!(x$spark %in% installed_vers$spark)) {
-          message("- Spark version ", x$spark, " - Not found")
+          rlang::inform(c("i" = paste0("- Spark version ", x$spark, " - Not found")))
           if(install) spark_install(x$spark)
         } else {
-          message("- Spark version ", x$spark, " - Ok")
+          rlang::inform(c("*" = paste0("- Spark version ", x$spark, " - Ok")))
         }
       }
     )
@@ -90,14 +90,18 @@ spark_compile <- function(jar_name,
     scala_files <- filter(scala_files)
   }
 
-  message("==> Using scalac: ", scalac_version)
-  message("==> Building against Spark: ", spark_version)
-  message("==> Building: '", jar_name, "\n")
+  rlang::inform(c(
+    "*" = paste("Using scalac:", scalac_version),
+    "*" = paste("Building against Spark:", spark_version),
+    "*" = paste("Building:", jar_name)
+    ))
 
-  execute <- function(...) {
+  execute <- function(..., .message = NULL) {
+    message <- .message %||% "System command"
     cmd <- paste(...)
-    message("==> System command: ", cmd, "\n")
-    system(cmd)
+    rlang::inform(c("*" = paste0(message, ": ", cmd)))
+    #system(cmd)
+    FALSE
   }
 
   # work in temporary directory
@@ -124,7 +128,7 @@ spark_compile <- function(jar_name,
   jars <- c(jars, jar_dep)
 
   if (!length(jars)) {
-    stop("failed to discover Spark jars")
+    rlang::abort("Failed to discover Spark jars")
   }
 
   # construct classpath
@@ -135,7 +139,7 @@ spark_compile <- function(jar_name,
   ensure_directory(inst_java_path)
 
   # copy embedded sources to current working directory
-  message("==> Embedded source(s): ", paste(embedded_srcs, collapse = ", "), "\n")
+  rlang::inform(c("*" = paste("Embedded source(s):", paste(embedded_srcs, collapse = ", "))))
   ensure_directory("sparklyr")
   for (src in embedded_srcs) {
     file.copy(file.path(scala_path, src), "sparklyr")
@@ -147,24 +151,24 @@ spark_compile <- function(jar_name,
   on.exit(Sys.setenv(CLASSPATH = classpath), add = TRUE)
   scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
   optflag <- ifelse(grepl("2.12", scalac_version), "-opt:l:default", "-optimise")
-  status <- execute(shQuote(scalac), optflag, "-deprecation", "-feature", scala_files_quoted)
+  status <- execute(shQuote(scalac), optflag, "-deprecation", "-feature", scala_files_quoted, .message = "Scalac call")
 
   if (status) {
-    stop("==> Failed to compile Scala source files")
+    rlang::abort("Failed to compile Scala source files")
   }
 
   # call 'jar' to create our jar
-  status <- execute(shQuote(jar), "cf", shQuote(jar_path), ".")
+  status <- execute(shQuote(jar), "cf", shQuote(jar_path), ".", .message = "Creating JAR")
   if (status) {
-    stop("==> Failed to build Java Archive")
+    rlang::abort("Failed to build Java Archive")
   }
 
   # double-check existence of jar
   if (!file.exists(jar_path)) {
-    stop("==> failed to create ", jar_name)
+    rlang::abort(paste("Failed to create:", jar_name))
   }
 
-  message("==> ", basename(jar_path), " successfully created\n")
+  rlang::inform(c("i" =  paste0("'", basename(jar_path), "' successfully created")))
   TRUE
 }
 
@@ -217,7 +221,7 @@ compile_package_jars <- function(..., spec = NULL) {
         spark_version <- installInfo$sparkVersion
         spark_home <- installInfo$sparkVersionDir
       } else {
-        message("==> downloading Spark ", spark_version)
+        rlang::inform("*" = paste("Downloading Spark", spark_version))
         spark_install(spark_version, verbose = TRUE)
         spark_home <- spark_home_dir(spark_version)
       }
@@ -368,7 +372,8 @@ download_scalac <- function(dest_path = NULL) {
   download_urls <-  paste0(
     c(
       "https://downloads.lightbend.com/scala/2.13.15/scala-2.13.15",
-      "https://downloads.lightbend.com/scala/2.12.20/scala-2.12.20"
+      "https://downloads.lightbend.com/scala/2.12.20/scala-2.12.20",
+      "https://downloads.lightbend.com/scala/2.11.12/scala-2.11.12"
     ),
     ".",
     ext
