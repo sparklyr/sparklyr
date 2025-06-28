@@ -107,7 +107,6 @@ spark_compile <- function(jar_name,
     withr::with_dir(temp_dir, system(cmd))
   }
 
-
   # list jars in the installation folder
   candidates <- c("jars", "lib")
   jars <- NULL
@@ -129,9 +128,6 @@ spark_compile <- function(jar_name,
     rlang::abort("Failed to discover Spark jars")
   }
 
-  # construct classpath
-  CLASSPATH <- paste(jars, collapse = .Platform$path.sep)
-
   # ensure 'inst/java' exists
   inst_java_path <- file.path(root, "inst/java")
   ensure_directory(inst_java_path)
@@ -144,13 +140,13 @@ spark_compile <- function(jar_name,
     file.copy(file.path(scala_path, src), temp_sparklyr)
   }
 
-  # call 'scalac' with CLASSPATH set
-  classpath <- Sys.getenv("CLASSPATH")
-  Sys.setenv(CLASSPATH = CLASSPATH)
-  on.exit(Sys.setenv(CLASSPATH = classpath), add = TRUE)
+  classpath <- paste(jars, collapse = .Platform$path.sep)
   scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
   optflag <- ifelse(grepl("2.12", scalac_version), "-opt:l:default", "-optimise")
-  status <- execute(shQuote(scalac), optflag, "-deprecation", "-feature", scala_files_quoted, .message = "Scalac call")
+  withr::with_envvar(
+    list(CLASSPATH = classpath),
+    status <- execute(shQuote(scalac), optflag, "-deprecation", "-feature", scala_files_quoted, .message = "Scalac call")
+  )
 
   if (status) {
     rlang::abort("Failed to compile Scala source files")
