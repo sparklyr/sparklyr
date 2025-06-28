@@ -26,7 +26,7 @@ test_that("spark_read_csv() succeeds when column contains similar non-ascii", {
 
 test_that("spark_write_delta() and spark_read_delta() work as expected", {
   skip_connection("format-delta")
-  test_requires_version("2.4.2", max_version = "4")
+  test_requires_version("3", max_version = "4")
   test_requires("nycflights13")
 
   flights_df <- flights %>% head(100)
