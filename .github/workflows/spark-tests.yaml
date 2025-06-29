@@ -10,7 +10,7 @@ name: Spark-Tests
 
 jobs:
   Spark-Tests:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     name: ${{ matrix.config.name }}
 
