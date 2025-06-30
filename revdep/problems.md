@@ -6,7 +6,7 @@
 * GitHub: https://github.com/r-spark/sparklyr.flint
 * Source code: https://github.com/cran/sparklyr.flint
 * Date/Publication: 2022-01-11 08:50:13 UTC
-* Number of recursive dependencies: 57
+* Number of recursive dependencies: 56
 
 Run `revdepcheck::revdep_details(, "sparklyr.flint")` for more info
 
@@ -38,9 +38,4 @@ Run `revdepcheck::revdep_details(, "sparklyr.flint")` for more info
      13.                 └─rlang::abort(message = msg, use_cli_format = TRUE, call = NULL)
     Execution halted
     ```
-
-## Newly fixed
-
-*   R CMD check timed out
-    
 
