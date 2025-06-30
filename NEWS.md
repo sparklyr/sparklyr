@@ -1,11 +1,13 @@
 # Sparklyr (dev)
 
+- Removes use of `%||%` in worker's R scripts to avoid reference error (#3487)
+
 - Restores support for Spark 2.4 with Scala 2.11 (#3485)
 
-- Addresses changes done to Spark 4.0 from when it was in preview to now.
+- Addresses changes in Spark 4.0 from when it was in preview to now.
 
-- Switches from R file read, to Spark file read to obtain the metadata for the
-ML object to be loaded in `ml_load()`. This approach accounts for when the
+- `ml_load()` now uses Spark's file read to obtain the metadata for the
+models instead of R's file read. This approach accounts for when the
 Spark Context is reading different mounted file protocols and mounted paths 
 (#3478).
 

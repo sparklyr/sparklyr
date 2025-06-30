@@ -1672,7 +1672,7 @@ spark_worker_apply <- function(sc, config) {
   length <- worker_invoke(context, "getSourceArrayLength")
   worker_log("found ", length, " rows")
 
-  is_read <- config$spark_read %||% FALSE
+  is_read <- ifelse(!is.null(config$spark_read), config$spark_read, FALSE)
 
   groups_func <- if(grouped) {
     "getSourceArrayGroupedSeq"
