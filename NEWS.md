@@ -1,4 +1,4 @@
-# Sparklyr (dev)
+# Sparklyr 1.9.1
 
 - Removes use of `%||%` in worker's R scripts to avoid reference error (#3487)
 
