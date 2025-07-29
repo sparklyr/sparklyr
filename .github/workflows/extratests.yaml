@@ -66,10 +66,11 @@ jobs:
           path: /home/runner/spark/spark-3.5.6-bin-hadoop3.2
           key: sparklyr-spark-3.5.6-bin-hadoop3.2
 
-      - name: Install Spark (via sparklyr)
+      - name: Install Spark
         if: steps.cache-spark.outputs.cache-hit != 'true'
         run: |
-          sparklyr::spark_install()
+          try(sparklyr::spark_install(verbose = TRUE), silent = TRUE)
+        shell: Rscript {0}
 
       - name: Install devel versions
         run: |
