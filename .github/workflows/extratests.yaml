@@ -30,7 +30,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_COMPILE_AND_INSTALL_PACKAGES: 'always'
       R_KEEP_PKG_SOURCE: yes
-      SPARK_VERSION: '3.5.6'
+      SPARK_VERSION: '3.4.0'
 
     steps:
       - uses: actions/checkout@v3
@@ -63,14 +63,14 @@ jobs:
         id: cache-spark
         uses: actions/cache@v3
         with:
-          path: /home/runner/spark/spark-3.5.6-bin-hadoop3.2
-          key: sparklyr-spark-3.5.6-bin-hadoop3.2
+          path: /home/runner/spark/spark-3.4.0-bin-hadoop3
+          key: sparklyr-spark-3.4.0-bin-hadoop3
 
       - name: Install Spark (via sparklyr)
         if: steps.cache-spark.outputs.cache-hit != 'true'
         run: |
           devtools::load_all()
-          spark_install(version = "3.5.6")
+          spark_install(version = "3.4.0")
         shell: Rscript {0}
 
       - name: Install devel versions
