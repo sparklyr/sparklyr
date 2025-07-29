@@ -44,7 +44,7 @@ test_that('spark execution', {
   )
 
   # check for reproducibility and passing extra arguments
-  expect_error(
+  expect_silent(
     spark_reg_fit_dup <-
       fit(
         boost_tree(trees = 5, mode = "regression") %>%
@@ -52,8 +52,7 @@ test_that('spark execution', {
         control = ctrl,
         compounds ~ .,
         data = hpc_bt_tr
-      ),
-    regexp = NA
+      )
   )
 
   expect_error(
