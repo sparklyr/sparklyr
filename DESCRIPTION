@@ -113,7 +113,8 @@ Suggests:
     shiny (>= 1.0.1),
     parsnip,
     testthat,
-    rprojroot
+    rprojroot,
+    modeldata
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 SystemRequirements: Spark: 2.x, or 3.x, or 4.x

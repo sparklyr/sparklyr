@@ -1,5 +1,0 @@
-VectorAssembler (Transformer)
-<va> 
- (Parameters -- Column Names)
-  input_cols: foo, bar
-  output_col: features

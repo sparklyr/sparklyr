@@ -1,0 +1,84 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+#
+# NOTE: This workflow is overkill for most R packages and
+# check-standard.yaml is likely a better choice.
+# usethis::use_github_action("check-standard") will install it.
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # runs tests every day at 1am EST
+    - cron:  '0 5 * * *'
+  workflow_dispatch:
+
+name: spark-R-CMD-check
+
+jobs:
+  spark-R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: ubuntu-latest, r: 'release'}
+
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_COMPILE_AND_INSTALL_PACKAGES: 'always'
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '8' # The JDK version to make available on the path.
+          java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
+          architecture: x64 # (x64 or x86) - defaults to x64
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - name: Update to get updated PPA
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - name: Install Spark
+        run: |
+          try(sparklyr::spark_install(verbose = TRUE), silent = TRUE)
+        shell: Rscript {0}
+
+      - name: Install devel versions
+        run: |
+          try(pak::pkg_install("tidymodels/parsnip"))
+        shell: Rscript {0}
+
+      - uses: r-lib/actions/check-r-package@v2
+
+      - name: Notify slack fail
+        if: failure() && github.event_name == 'schedule'
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        uses: voxmedia/github-action-slack-notify-build@v2
+        with:
+          channel_id: C03D2NLG47N
+          status: FAILED
+          color: danger
