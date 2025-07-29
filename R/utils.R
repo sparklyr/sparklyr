@@ -489,13 +489,16 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
   col_types %>%
     lapply(
       function(x) {
-        fn <- tryCatch(
-          get(paste0(x), envir = parent.frame()),
-          error = function(e) {
-            NULL
-          }
-        )
-
+        if(x == "unknown") {
+          fn <- NULL
+        } else {
+          fn <- tryCatch(
+            get(paste0(x), envir = parent.frame()),
+            error = function(e) {
+              NULL
+            }
+          )
+        }
         if (is.null(fn)) {
           list()
         } else {
