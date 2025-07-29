@@ -30,6 +30,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_COMPILE_AND_INSTALL_PACKAGES: 'always'
       R_KEEP_PKG_SOURCE: yes
+      SPARK_VERSION: '3.5.6'
 
     steps:
       - uses: actions/checkout@v3
@@ -68,7 +69,7 @@ jobs:
       - name: Install Spark (via sparklyr)
         if: steps.cache-spark.outputs.cache-hit != 'true'
         run: |
-          sparklyr::spark_install(version = "3.5.6")
+          sparklyr::spark_install()
 
       - name: Install devel versions
         run: |
