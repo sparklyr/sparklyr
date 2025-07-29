@@ -78,10 +78,7 @@ jobs:
           try(pak::pkg_install("tidymodels/parsnip"))
         shell: Rscript {0}
 
-      - name: R Tests
-        run: |
-          devtools::test()
-        shell: Rscript {0}
+      - uses: r-lib/actions/check-r-package@v2
 
       - name: Notify slack fail
         if: failure() && github.event_name == 'schedule'
