@@ -22,7 +22,7 @@ test_that('spark execution', {
   skip_if_not_installed("sparklyr")
   suppressPackageStartupMessages(library(sparklyr))
 
-  sc <- testthat_spark_connection()
+  sc <- spark_connect(master = "local", version = "3.4.0")
 
   skip_if(inherits(sc, "try-error"))
 
