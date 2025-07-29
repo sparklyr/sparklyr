@@ -1,8 +1,0 @@
-StandardScalerModel (Transformer)
-<standard_scalaer_999> 
- (Parameters -- Column Names)
-  input_col: features
-  output_col: scaledFeatures
- (Transformer Info)
-  mean:  num [1:692] 0 0 0 0 0 0 0 0 0 0 ... 
-  std:  num [1:692] 0 0 0 0 0 0 0 0 0 0 ... 

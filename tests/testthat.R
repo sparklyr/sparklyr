@@ -32,8 +32,7 @@
 
 ## For Coverage us: Sys.setenv("CODE_COVERAGE" = "true")
 
-if(identical(Sys.getenv("CODE_COVERAGE"), "true")) {
-  library(testthat)
-  library(sparklyr)
-  test_check("sparklyr")
-}
+
+library(testthat)
+library(sparklyr)
+test_check("sparklyr")
