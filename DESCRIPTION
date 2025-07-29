@@ -106,6 +106,7 @@ Suggests:
     mlbench,
     nnet,
     nycflights13,
+    pillar (>= 1.6.5.9001),
     R6,
     r2d3,
     RCurl,
@@ -115,6 +116,8 @@ Suggests:
     testthat,
     rprojroot,
     modeldata
+Remotes:
+    r-lib/pillar    
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 SystemRequirements: Spark: 2.x, or 3.x, or 4.x
