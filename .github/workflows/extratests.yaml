@@ -68,8 +68,7 @@ jobs:
       - name: Install Spark (via sparklyr)
         if: steps.cache-spark.outputs.cache-hit != 'true'
         run: |
-          devtools::load_all()
-          spark_install(version = "3.5.6")
+          sparklyr::spark_install(version = "3.5.6")
 
       - name: Install devel versions
         run: |
