@@ -144,7 +144,11 @@ sdf_read_column <- function(x, column) {
 #' @export
 sdf_read_column.spark_jobj <- function(x, column) {
   sdf <- spark_dataframe(x)
-  col_df <- invoke(sdf, "select", column, list())
+  if (inherits(sdf, "spark_pyobj")) {
+    col_df <- invoke(sdf, "select", list(column))
+  } else {
+    col_df <- invoke(sdf, "select", column, list())
+  }
   col_df <- collect(col_df)
   col_df[[column]]
 }
