@@ -1,5 +1,7 @@
 # Sparklyr (dev)
 
+- Converts spark_write_delta() to method 
+
 - In simulate_vars_spark(), it avoids calling a function named 'unknown' in
 case a package has added such a function name in its environment (#3497)
 
