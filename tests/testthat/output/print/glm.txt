@@ -1,7 +1,0 @@
-Coefficients:
-(Intercept) Petal_Width 
-   1.083558    2.229940 
-
-Degress of Freedom:  149 Total (i.e. Null);  148 Residual
-Null Deviance:       464.3
-Residual Deviance:   33.84	AIC: 208.4
