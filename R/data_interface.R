@@ -1078,6 +1078,25 @@ spark_write_delta <- function(x,
                               options = list(),
                               partition_by = NULL,
                               ...) {
+  UseMethod("spark_write_delta")
+}
+#' @export
+spark_write_delta.tbl_spark <- function(x,
+                                        path,
+                                        mode = NULL,
+                                        options = list(),
+                                        partition_by = NULL,
+                                        ...) {
+  options$path <- path
+  spark_write_source(x, "delta", mode = mode, options = options, partition_by = partition_by)
+}
+#' @export
+spark_write_delta.spark_jobj <- function(x,
+                                         path,
+                                         mode = NULL,
+                                         options = list(),
+                                         partition_by = NULL,
+                                         ...) {
   options$path <- path
   spark_write_source(x, "delta", mode = mode, options = options, partition_by = partition_by)
 }
@@ -1373,10 +1392,11 @@ spark_read <- function(sc,
     # or list(col_name1 = "col_type1", ...), etc, then make sure it gets coerced
     columns <- as.list(columns)
   } else {
-    if(spark_version(sc) >= "4") {
-      stop("Only a named list with the name of the column and",
-           " type of column is valid on Spark 4+"
-           )
+    if (spark_version(sc) >= "4") {
+      stop(
+        "Only a named list with the name of the column and",
+        " type of column is valid on Spark 4+"
+      )
     }
   }
 

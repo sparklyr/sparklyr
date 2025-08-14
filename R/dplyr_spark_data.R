@@ -43,7 +43,10 @@ spark_source_from_ops <- function(x) {
     stop("This operation does not support multiple remote sources")
   }
 
-  Filter(function(e) "src_spark" %in% attr(e, "class"), x)[[1]]
+  src_spark <- which(
+    as.logical(lapply(x, function(e) "src_spark" %in% attr(e, "class")))
+    )
+  x[[src_spark]]
 }
 
 #' @importFrom dbplyr sql_render
