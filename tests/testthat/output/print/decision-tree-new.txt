@@ -1,3 +1,0 @@
-Formula: Species ~ Petal_Length + Sepal_Width
-
-DecisionTreeClassificationModel (uid=dt1) of depth 5 with 15 nodes
