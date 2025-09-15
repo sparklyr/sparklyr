@@ -85,15 +85,45 @@ ml_save.ml_model <- function(x, path, overwrite = FALSE,
 #' @rdname ml-persistence
 #' @export
 ml_load <- function(sc, path) {
-  is_local <- spark_context(sc) %>%
-    invoke("isLocal")
-
+  is_local <- spark_context(sc) %>% invoke("isLocal")
+  path <- cast_string(path)
   if (is_local) {
-    path <- cast_string(path) %>%
-      spark_normalize_path()
+    path <- spark_normalize_path(path)
   }
 
-  metadata <- try(
+  metadata_glob <- file.path(path, "metadata", "part-*")
+  metadata_view <- random_string("ml_load_metadata")
+
+  df_try <- try(
+    spark_read_json(
+      sc   = sc,
+      name = metadata_view,
+      path = metadata_glob
+    ),
+    silent = TRUE
+  )
+
+  if (!inherits(df_try, "try-error")) {
+    class_val <- NULL
+
+    cls1 <- try(dplyr::pull(df_try, "class"), silent = TRUE)
+    if (!inherits(cls1, "try-error") && length(cls1) > 0 &&
+        !is.na(cls1[[1]]) && nzchar(cls1[[1]])) {
+      class_val <- cls1[[1]]
+    } else {
+      cls2 <- try(dplyr::pull(df_try, "className"), silent = TRUE)
+      if (!inherits(cls2, "try-error") && length(cls2) > 0 &&
+          !is.na(cls2[[1]]) && nzchar(cls2[[1]])) {
+        class_val <- cls2[[1]]
+      }
+    }
+
+    if (!is.null(class_val)) {
+      return(invoke_static(sc, class_val, "load", path) %>% ml_call_constructor())
+    }
+  }
+
+  metadata_try <- try(
     spark_context(sc) %>%
       invoke("textFile", file.path(path, "metadata", "part-00*"), 1L) %>%
       invoke("collect") %>%
@@ -102,11 +132,19 @@ ml_load <- function(sc, path) {
     silent = TRUE
   )
 
-  if (!inherits(metadata, "try-error")) {
-    class <- metadata$class
-    invoke_static(sc, class, "load", path) %>%
-      ml_call_constructor()
-  } else {
-    stop("ML could not be loaded:\n  ", metadata)
+  if (!inherits(metadata_try, "try-error")) {
+    class_val <- metadata_try$class
+    if (is.null(class_val) || length(class_val) == 0 || is.na(class_val) || !nzchar(class_val)) {
+      class_val <- metadata_try$className
+    }
+    if (!is.null(class_val) && length(class_val) > 0 && !is.na(class_val) && nzchar(class_val)) {
+      return(invoke_static(sc, class_val, "load", path) %>% ml_call_constructor())
+    }
   }
+
+  stop(
+    "ML could not be loaded: failed to read metadata from '", path, "'.\n",
+    "Tried Spark JSON glob at '", metadata_glob, "' and legacy RDD textFile path.",
+    call. = FALSE
+  )
 }
