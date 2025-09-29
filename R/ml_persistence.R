@@ -107,7 +107,7 @@ ml_load <- function(sc, path) {
   if ("class" %in% colnames(df_try)) {
     class <- df_try %>%
       dplyr::select("class") %>%
-      dplyr::slice_head(n = 1) %>%
+      sparklyr::sdf_limit(1) %>%
       dplyr::pull(1)
 
     return(invoke_static(sc, class, "load", path) %>% ml_call_constructor())
