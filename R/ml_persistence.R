@@ -103,27 +103,18 @@ ml_load <- function(sc, path) {
     silent = TRUE
   )
 
-  if (!inherits(df_try, "try-error")) {
-    class_val <- NULL
+ if (!inherits(df_try, "try-error")) {
+  if ("class" %in% colnames(df_try)) {
+    class <- df_try %>%
+      dplyr::select("class") %>%
+      dplyr::slice_head(n = 1) %>%
+      dplyr::pull(1)
 
-    cls1 <- try(dplyr::pull(df_try, "class"), silent = TRUE)
-    if (!inherits(cls1, "try-error") && length(cls1) > 0 &&
-        !is.na(cls1[[1]]) && nzchar(cls1[[1]])) {
-      class_val <- cls1[[1]]
-    } else {
-      cls2 <- try(dplyr::pull(df_try, "className"), silent = TRUE)
-      if (!inherits(cls2, "try-error") && length(cls2) > 0 &&
-          !is.na(cls2[[1]]) && nzchar(cls2[[1]])) {
-        class_val <- cls2[[1]]
-      }
-    }
-
-    if (!is.null(class_val)) {
-      return(invoke_static(sc, class_val, "load", path) %>% ml_call_constructor())
-    }
+    return(invoke_static(sc, class, "load", path) %>% ml_call_constructor())
   }
+}
 
-  metadata_try <- try(
+  metadata <- try(
     spark_context(sc) %>%
       invoke("textFile", file.path(path, "metadata", "part-00*"), 1L) %>%
       invoke("collect") %>%
@@ -132,19 +123,14 @@ ml_load <- function(sc, path) {
     silent = TRUE
   )
 
-  if (!inherits(metadata_try, "try-error")) {
-    class_val <- metadata_try$class
-    if (is.null(class_val) || length(class_val) == 0 || is.na(class_val) || !nzchar(class_val)) {
-      class_val <- metadata_try$className
-    }
-    if (!is.null(class_val) && length(class_val) > 0 && !is.na(class_val) && nzchar(class_val)) {
-      return(invoke_static(sc, class_val, "load", path) %>% ml_call_constructor())
-    }
-  }
-
+  if (!inherits(metadata, "try-error")) {
+    class <- metadata$class
+    invoke_static(sc, class, "load", path) %>%
+      ml_call_constructor()
+    } else {
   stop(
     "ML could not be loaded: failed to read metadata from '", path, "'.\n",
-    "Tried Spark JSON glob at '", metadata_glob, "' and legacy RDD textFile path.",
-    call. = FALSE
+    "Tried Spark JSON glob at '", metadata_glob, "' and the RDD textFile path."
   )
+}
 }
