@@ -1,29 +1,25 @@
 ## Submission
 
-- Restores support for Spark 2.4 with Scala 2.11 (#3485)
+- Avoids the cross-wire when pulling an object from a lazy table instead of pulling
+a field (#3494)
 
-- Addresses changes in Spark 4.0 from when it was in preview to now.
+- Converts spark_write_delta() to method 
 
-- `ml_load()` now uses Spark's file read to obtain the metadata for the
-models instead of R's file read. This approach accounts for when the
-Spark Context is reading different mounted file protocols and mounted paths 
-(#3478).
-
-- Removes use of `%||%` in worker's R scripts to avoid reference error (#3487)
+- In simulate_vars_spark(), it avoids calling a function named 'unknown' in
+case a package has added such a function name in its environment (#3497)
 
 ## Test environments
 
-- Ubuntu 24.04, R 4.5.1, Spark 2.4 (GH Actions)
-- Ubuntu 24.04, R 4.5.1, Spark 3.4 (GH Actions)
-- Ubuntu 24.04, R 4.5.1, Spark 3.5 (GH Actions)
-- Ubuntu 24.04, R 4.5.1, Spark 4.0 (GH Actions)
+- Spark 4.0: Ubuntu 24.04.3 LTS (x86_64, linux-gnu), R version 4.5.1 (2025-06-13)
+- Spark 4.0 w Arrow: Ubuntu 24.04.3 LTS (x86_64, linux-gnu), R version 4.5.1 (2025-06-13)
+- Spark 3.5: Ubuntu 24.04.3 LTS (x86_64, linux-gnu), R version 4.5.1 (2025-06-13)
 
 ## R CMD check environments
 
-- Mac OS aarch64-apple-darwin20, R 4.5.1
-- Windows x86_64-w64-mingw32 (64-bit), R 4.5.1
-- Linux x86_64-pc-linux-gnu, R 4.5.1
-- Linux x86_64-pc-linux-gnu, R devel
+- Ubuntu 24.04.3 LTS (x86_64, linux-gnu), R version 4.5.1 (2025-06-13)
+- Windows Server 2022 x64 (build 26100) (x86_64, mingw32), R version 4.5.1 (2025-06-13 ucrt)
+- Ubuntu 24.04.3 LTS (x86_64, linux-gnu), R Under development (unstable) (2025-10-02 r88897)
+- macOS Sequoia 15.6.1 (aarch64, darwin20), R version 4.5.1 (2025-06-13)
 
 ## R CMD check results
 
@@ -44,8 +40,3 @@ Issues with CRAN packages are summarised below.
 
 * sparklyr.flint
   checking examples ... ERROR
-
-
-
-
-

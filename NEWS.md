@@ -1,4 +1,4 @@
-# Sparklyr (dev)
+# Sparklyr 1.9.2
 
 - Avoids the cross-wire when pulling an object from a lazy table instead of pulling
 a field (#3494)
