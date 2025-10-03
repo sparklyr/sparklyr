@@ -378,9 +378,21 @@
     "pattern": "spark-%s-bin-hadoop%s.tgz"
   },
   {
+    "spark": "3.5.7",
+    "hadoop": "3",
+    "base": "https://dlcdn.apache.org/spark/spark-3.5.7/",
+    "pattern": "spark-%s-bin-hadoop%s.tgz"
+  },
+  {
     "spark": "4.0.0",
     "hadoop": "3",
-    "base": "https://dlcdn.apache.org/spark/spark-4.0.0/",
+    "base": "https://archive.apache.org/dist/spark/spark-4.0.0/",
+    "pattern": "spark-%s-bin-hadoop%s.tgz"
+  },
+  {
+    "spark": "4.0.1",
+    "hadoop": "3",
+    "base": "https://dlcdn.apache.org/spark/spark-4.0.1/",
     "pattern": "spark-%s-bin-hadoop%s.tgz"
   }
 ]
