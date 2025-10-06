@@ -773,6 +773,23 @@ test_that("spark_read_image works as expected", {
   )
 })
 
+test_that("spark_read_source allows setting no path", {
+  skip_connection("format-csv")
+
+  csvPath <- get_test_data_path(
+    "spark-read-source-allows-setting-no-path.csv"
+  )
+  df <- spark_read_source(
+    sc,
+    name = "test_no_path",
+    path = NA,
+    source = "csv",
+    options = list(path = csvPath, header="true")
+  )
+
+  expect_equal(sdf_nrow(df), 1)
+})
+
 
 test_clear_cache()
 
