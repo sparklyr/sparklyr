@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.9.3
+Version: 1.9.3.9000
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -346,6 +346,7 @@ Collate:
     'tidyr_separate.R'
     'tidyr_unite.R'
     'tidyr_unnest.R'
+    'tune-grid-spark.R'
     'worker_apply.R'
     'worker_connect.R'
     'worker_connection.R'
