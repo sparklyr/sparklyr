@@ -1,4 +1,11 @@
-#' Model tuning via grid search inside Spark
+#' Perform Tidymodels grid search tuning inside Spark
+#' @details
+#' The parsnip model, or the unfitted `workflow()`, the pre-processor and the
+#' re-samples are uploaded to the Spark cluster as R objects. The Spark cluster
+#' runs each tuning combinations in parallel using R, Tidymodels and any other
+#' modeling packages used for the given workflow. The results are then
+#' downloaded back to the local R session.
+#'
 #' @param sc A Spark Connection
 #' @param object A parsnip model specification or an unfitted `workflow()`. No
 #' tuning parameters are allowed; if arguments have been marked with `tune()`,
@@ -24,7 +31,7 @@
 #' @param control	An object used to modify the tuning process, likely created
 #' by `control_grid()`.
 #' @param no_tasks Number of parallel tasks (jobs) to request Spark
-#'
+#' @returns tune_results object
 #' @export
 tune_grid_spark <- function(
     sc,
