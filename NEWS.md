@@ -1,3 +1,8 @@
+# Sparklyr (dev)
+
+- Adds `tune_grid_spark()` method in order for `pysparklyr` to provide the 
+functionality
+
 # Sparklyr 1.9.3
 
 - Ensures current pre-release of Spark 4.1 works with `sparklyr`
