@@ -34,17 +34,17 @@
 #' @returns tune_results object
 #' @export
 tune_grid_spark <- function(
-    sc,
-    object,
-    preprocessor,
-    resamples,
-    ...,
-    param_info = NULL,
-    grid = 10,
-    metrics = NULL,
-    eval_time = NULL,
-    control = tune::control_grid(),
-    no_tasks = NULL
+  sc,
+  object,
+  preprocessor,
+  resamples,
+  ...,
+  param_info = NULL,
+  grid = 10,
+  metrics = NULL,
+  eval_time = NULL,
+  control = NULL,
+  no_tasks = NULL
 ) {
   UseMethod("tune_grid_spark")
 }

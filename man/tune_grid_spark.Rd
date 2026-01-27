@@ -14,7 +14,7 @@ tune_grid_spark(
   grid = 10,
   metrics = NULL,
   eval_time = NULL,
-  control = tune::control_grid(),
+  control = NULL,
   no_tasks = NULL
 )
 }
