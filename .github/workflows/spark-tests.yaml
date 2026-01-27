@@ -44,7 +44,6 @@ jobs:
         with:
           extra-packages: |
             any::devtools
-            any::qs
             any::e1071
             any::mlbench
             any::glmnet
