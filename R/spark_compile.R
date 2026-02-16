@@ -1,9 +1,9 @@
 sparklyr_jar_spec_list <- function() {
   list(
-    list(spark = "2.4.0", scala = "2.11"),
-    list(spark = "2.4.0", scala = "2.12"),
-    list(spark = "3.0.0", scala = "2.12"),
-    list(spark = "3.5.0", scala = "2.12", jar_name = "sparklyr-master-2.12.jar")
+    list(spark = "2.4.8", scala = "2.11"),
+    list(spark = "3.0.3", scala = "2.12"),
+    list(spark = "3.5.4", scala = "2.12"),
+    list(spark = "4.0.0", scala = "2.13", jar_name = "sparklyr-master-2.13.jar")
   )
 }
 
@@ -15,10 +15,10 @@ sparklyr_jar_verify_spark <- function(install = TRUE) {
       spec_list,
       function(x){
         if(!(x$spark %in% installed_vers$spark)) {
-          message("- Spark version ", x$spark, " - Not found")
+          rlang::inform(c("i" = paste0("Spark version ", x$spark, " - Not found")))
           if(install) spark_install(x$spark)
         } else {
-          message("- Spark version ", x$spark, " - Ok")
+          rlang::inform(c("*" = paste0("Spark version ", x$spark, " - Ok")))
         }
       }
     )
@@ -90,21 +90,23 @@ spark_compile <- function(jar_name,
     scala_files <- filter(scala_files)
   }
 
-  message("==> Using scalac: ", scalac_version)
-  message("==> Building against Spark: ", spark_version)
-  message("==> Building: '", jar_name, "\n")
+  # work in temporary directory
+  temp_name <- sprintf("scalac-%s-", sub("-.*", "", jar_name))
+  temp_dir <- tempfile(temp_name)
+  ensure_directory(temp_dir)
 
-  execute <- function(...) {
-    cmd <- paste(...)
-    message("==> System command: ", cmd, "\n")
-    system(cmd)
+  temp_sparklyr <- file.path(temp_dir, "sparklyr")
+  ensure_directory(temp_sparklyr)
+  for (src in embedded_srcs) {
+    file.copy(file.path(scala_path, src), temp_sparklyr)
   }
 
-  # work in temporary directory
-  dir <- tempfile(sprintf("scalac-%s-", sub("-.*", "", jar_name)))
-  ensure_directory(dir)
-  owd <- setwd(dir)
-  on.exit(setwd(owd), add = TRUE)
+  rlang::inform(c(
+    "*" = paste("Using scalac:", scalac_version),
+    "*" = paste("Building against Spark:", spark_version),
+    "*" = paste("Embedded source(s):", paste(embedded_srcs, collapse = ", ")),
+    "*" = paste("Building:", jar_name)
+    ))
 
   # list jars in the installation folder
   candidates <- c("jars", "lib")
@@ -124,47 +126,52 @@ spark_compile <- function(jar_name,
   jars <- c(jars, jar_dep)
 
   if (!length(jars)) {
-    stop("failed to discover Spark jars")
+    rlang::abort("Failed to discover Spark jars")
   }
-
-  # construct classpath
-  CLASSPATH <- paste(jars, collapse = .Platform$path.sep)
 
   # ensure 'inst/java' exists
   inst_java_path <- file.path(root, "inst/java")
   ensure_directory(inst_java_path)
 
-  # copy embedded sources to current working directory
-  message("==> Embedded source(s): ", paste(embedded_srcs, collapse = ", "), "\n")
-  ensure_directory("sparklyr")
-  for (src in embedded_srcs) {
-    file.copy(file.path(scala_path, src), "sparklyr")
-  }
-
-  # call 'scalac' with CLASSPATH set
-  classpath <- Sys.getenv("CLASSPATH")
-  Sys.setenv(CLASSPATH = CLASSPATH)
-  on.exit(Sys.setenv(CLASSPATH = classpath), add = TRUE)
+  temp_out <- tempfile(fileext = ".txt")
+  classpath <- paste(jars, collapse = .Platform$path.sep)
   scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
   optflag <- ifelse(grepl("2.12", scalac_version), "-opt:l:default", "-optimise")
-  status <- execute(shQuote(scalac), optflag, "-deprecation", "-feature", scala_files_quoted)
+  withr::with_envvar(
+    list(CLASSPATH = classpath),
+    withr::with_dir(
+      temp_dir,
+      status <- system2(
+        command = scalac,
+        args = c(optflag, "-deprecation", "-feature", scala_files),
+        stdout = NULL,
+        stderr = temp_out
+      )
+    )
+  )
+
+  rlang::inform(c("*" = paste("Ouput:", temp_out)))
 
   if (status) {
-    stop("==> Failed to compile Scala source files")
+    rlang::abort("Failed to compile Scala source files")
   }
 
   # call 'jar' to create our jar
-  status <- execute(shQuote(jar), "cf", shQuote(jar_path), ".")
+  withr::with_dir(
+    temp_dir,
+    status <- system(paste(shQuote(jar), "cf", shQuote(jar_path), "."))
+  )
+
   if (status) {
-    stop("==> Failed to build Java Archive")
+    rlang::abort("Failed to build Java Archive")
   }
 
   # double-check existence of jar
   if (!file.exists(jar_path)) {
-    stop("==> failed to create ", jar_name)
+    rlang::abort(paste("Failed to create:", jar_name))
   }
 
-  message("==> ", basename(jar_path), " successfully created\n")
+  rlang::inform(c("i" =  paste0("'", basename(jar_path), "' successfully created")))
   TRUE
 }
 
@@ -217,7 +224,7 @@ compile_package_jars <- function(..., spec = NULL) {
         spark_version <- installInfo$sparkVersion
         spark_home <- installInfo$sparkVersionDir
       } else {
-        message("==> downloading Spark ", spark_version)
+        rlang::inform("*" = paste("Downloading Spark", spark_version))
         spark_install(spark_version, verbose = TRUE)
         spark_home <- spark_home_dir(spark_version)
       }
@@ -361,40 +368,37 @@ download_scalac <- function(dest_path = NULL) {
   if (is.null(dest_path)) {
     dest_path <- scalac_default_locations()[[1]]
   }
-
   if (!dir.exists(dest_path)) {
     dir.create(dest_path, recursive = TRUE)
   }
-
   ext <- ifelse(os_is_windows(), "zip", "tgz")
-
   download_urls <-  paste0(
     c(
-      "https://downloads.lightbend.com/scala/2.12.10/scala-2.12.10",
-      "https://downloads.lightbend.com/scala/2.11.8/scala-2.11.8",
-      "https://downloads.lightbend.com/scala/2.10.6/scala-2.10.6"
+      "https://downloads.lightbend.com/scala/2.13.15/scala-2.13.15",
+      "https://downloads.lightbend.com/scala/2.12.20/scala-2.12.20",
+      "https://downloads.lightbend.com/scala/2.11.12/scala-2.11.12"
     ),
     ".",
     ext
   )
 
-  lapply(download_urls, function(download_url) {
+  for(download_url in download_urls) {
     dest_file <- file.path(dest_path, basename(download_url))
-
     if (!dir.exists(dirname(dest_file))) {
       dir.create(dirname(dest_file), recursive = TRUE)
     }
-
     if(!file.exists(dest_file)) {
+      cat("- ", "Downloading and expanding:", download_url, "\n")
       download_file(download_url, destfile = dest_file)
-    }
-
-    if (ext == "zip") {
-      unzip(dest_file, exdir = dest_path)
+      if (ext == "zip") {
+        unzip(dest_file, exdir = dest_path)
+      } else {
+        untar(dest_file, exdir = dest_path)
+      }
     } else {
-      untar(dest_file, exdir = dest_path)
+      cat("- ", dest_file, "found\n")
     }
-  })
+  }
 }
 
 #' Discover the Scala Compiler

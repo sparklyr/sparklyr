@@ -154,11 +154,15 @@ spark_config_value_retries <- function(config, name, default, retries) {
 spark_config_packages <- function(config, packages, version, scala_version = NULL, ...) {
   version <- spark_version_latest(version)
 
-  if (version >= "2.4.1") {
-    scala_version <- "2.12"
+  scala_version <- scala_version %||% (
+    if (version >= "4.0.0") {
+      "2.13"
+    } else if (version >= "3.0.0") {
+      "2.12"
     } else {
-      scala_version <- scala_version %||% "2.11"
+      "2.11"
     }
+  )
 
   if ("kafka" %in% packages) {
     packages <- packages[-which(packages == "kafka")]
@@ -177,13 +181,14 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
     if (version < "2.4.2") stop("Delta Lake requires Spark 2.4.2 or newer")
 
     delta <- list(
-      list(spark = "2.4", delta = "0.7.0"),
+      list(spark = "2.4", delta = "0.6.0"),
       list(spark = "3.0", delta = "0.8.0"),
       list(spark = "3.1", delta = "1.0.1"),
       list(spark = "3.2", delta = "2.0.2"),
       list(spark = "3.3", delta = "2.3.0"),
       list(spark = "3.4", delta = "2.4.0"),
-      list(spark = "3.5", delta = "3.0.0")
+      list(spark = "3.5", delta = "3.0.0"),
+      list(spark = "4.0", delta = "4.0.0")
     ) %>%
       purrr::keep(~ .x$spark >= substr(version, 1, 3)) %>%
       head(1) %>%

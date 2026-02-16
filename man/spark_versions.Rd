@@ -2,7 +2,7 @@
 % Please edit documentation in R/install_spark_versions.R
 \name{spark_versions}
 \alias{spark_versions}
-\title{Retrieves a dataframe available Spark versions that van be installed.}
+\title{Returns a data frame of available Spark versions that can be installed.}
 \usage{
 spark_versions(latest = TRUE)
 }
@@ -10,6 +10,6 @@ spark_versions(latest = TRUE)
 \item{latest}{Check for latest version?}
 }
 \description{
-Retrieves a dataframe available Spark versions that van be installed.
+Returns a data frame of available Spark versions that can be installed.
 }
 \keyword{internal}

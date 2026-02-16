@@ -18,9 +18,10 @@ import org.apache.spark.SparkContext
 import org.apache.spark.TaskContext
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Row
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object RDSCollector {
-  def collect(df: DataFrame, outputFiles: Seq[String]): Unit = {
+  def collect(df: DataFrame, outputFiles: Seq[String], spark: SparkSession): Unit = {
     // create a binary file(s) on HDFS if we are connected to a Spark cluster,
     // or on local file system if Spark is running in local mode
     val numPartitions = df.rdd.getNumPartitions

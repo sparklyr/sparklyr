@@ -7,7 +7,6 @@ spark_worker_main <- function(
                               backendPort = 8880,
                               configRaw = NULL) {
   spark_worker_hooks()
-
   tryCatch(
     {
       worker_log_session(sessionId)

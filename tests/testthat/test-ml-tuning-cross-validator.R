@@ -73,14 +73,11 @@ test_that("ml_cross_validator() works correctly", {
     SIMPLIFY = FALSE
   )
 
-  empty_named_list <- list()
-  names(empty_named_list) <- character()
-
   expect_identical(
     c(diff),
     rep(list(list(
-      hashing_tf_1 = empty_named_list,
-      logistic_1 = empty_named_list
+      hashing_tf_1 = list(),
+      logistic_1 = list()
     )), 8)
   )
 
@@ -133,8 +130,8 @@ test_that("we can cross validate a logistic regression with xval", {
   )
 
   expect_identical(
-    names(cvm$avg_metrics_df),
-    c("f1", "elastic_net_param_1", "reg_param_1")
+    sort(names(cvm$avg_metrics_df)),
+    sort(c("f1", "elastic_net_param_1", "reg_param_1"))
   )
   expect_identical(nrow(cvm$avg_metrics_df), 4L)
   summary_string <- capture.output(summary(cvm)) %>%

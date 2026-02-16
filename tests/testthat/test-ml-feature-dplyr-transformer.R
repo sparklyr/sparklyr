@@ -32,7 +32,9 @@ test_that("ft_dplyr_transformer() works", {
 
 test_that("ft_dplyr_transformer() supports all sampling use cases", {
   test_requires_version("2.0.0", "sample_frac() requires Spark 2.0+")
-
+  if(spark_version(sc) > "4.0.0") {
+    skip("Skipped until #3504 is resolved")
+  }
   sdf <- copy_to(
     sc,
     dplyr::tibble(

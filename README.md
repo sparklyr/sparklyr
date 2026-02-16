@@ -2,6 +2,7 @@ sparklyr: R interface for Apache Spark
 ================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/sparklyr/sparklyr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sparklyr/sparklyr/actions/workflows/R-CMD-check.yaml)
@@ -19,14 +20,8 @@ coverage](https://codecov.io/gh/sparklyr/sparklyr/branch/main/graph/badge.svg)](
 - Use [dplyr](#using-dplyr) to filter and aggregate Spark datasets and
   [streams](https://spark.posit.co/guides/streaming/) then bring them
   into R for analysis and visualization.
-- Use [MLlib](#machine-learning), [H2O](#using-h2o),
-  [XGBoost](https://spark.posit.co/packages/sparkxgb/latest/) and
-  [GraphFrames](https://spark.posit.co/packages/graphframes/latest/)
-  to train models at scale in Spark.
 - Create interoperable machine learning
-  [pipelines](https://spark.posit.co/guides/pipelines.html) and
-  productionize them with
-  [MLeap](https://spark.posit.co/packages/mleap/latest/).
+  [pipelines](https://spark.posit.co/guides/pipelines.html)
 - Create [extensions](#extensions) that call the full Spark API or run
   [distributed R](#distributed-r) code to support new functionality.
 
@@ -120,7 +115,8 @@ To start with here’s a simple filtering example:
 ``` r
 # filter by departure delay and print the first few records
 flights_tbl %>% filter(dep_delay == 2)
-#> # Source: spark<?> [?? x 19]
+#> # Source:   SQL [?? x 19]
+#> # Database: spark_connection
 #>     year month   day dep_time sched_dep_time dep_delay
 #>    <int> <int> <int>    <int>          <int>     <dbl>
 #>  1  2013     1     1      517            515         2
@@ -167,8 +163,8 @@ ggplot(delay, aes(dist, delay)) +
 ### Window Functions
 
 dplyr [window
-functions](https://spark.posit.co/guides/dplyr.html#grouping) are
-also supported, for example:
+functions](https://spark.posit.co/guides/dplyr.html#grouping) are also
+supported, for example:
 
 ``` r
 batting_tbl %>%
@@ -176,7 +172,8 @@ batting_tbl %>%
   arrange(playerID, yearID, teamID) %>%
   group_by(playerID) %>%
   filter(min_rank(desc(H)) <= 2 & H > 0)
-#> # Source:     spark<?> [?? x 7]
+#> # Source:     SQL [?? x 7]
+#> # Database:   spark_connection
 #> # Groups:     playerID
 #> # Ordered by: playerID, yearID, teamID
 #>    playerID  yearID teamID     G    AB     R     H
@@ -329,19 +326,20 @@ follows:
 spark_apply(iris_tbl, function(data) {
   data[1:4] + rgamma(1,2)
 })
-#> # Source: spark<?> [?? x 4]
+#> # Source:   table<`sparklyr_tmp__752f1c17_51c6_45bc_a22e_fa06e1ebac58`> [?? x 4]
+#> # Database: spark_connection
 #>    Sepal_Length Sepal_Width Petal_Length Petal_Width
 #>           <dbl>       <dbl>        <dbl>       <dbl>
-#>  1         5.75        4.15         2.05       0.846
-#>  2         5.55        3.65         2.05       0.846
-#>  3         5.35        3.85         1.95       0.846
-#>  4         5.25        3.75         2.15       0.846
-#>  5         5.65        4.25         2.05       0.846
-#>  6         6.05        4.55         2.35       1.05 
-#>  7         5.25        4.05         2.05       0.946
-#>  8         5.65        4.05         2.15       0.846
-#>  9         5.05        3.55         2.05       0.846
-#> 10         5.55        3.75         2.15       0.746
+#>  1        10.1         8.48         6.38        5.18
+#>  2         9.88        7.98         6.38        5.18
+#>  3         9.68        8.18         6.28        5.18
+#>  4         9.58        8.08         6.48        5.18
+#>  5         9.98        8.58         6.38        5.18
+#>  6        10.4         8.88         6.68        5.38
+#>  7         9.58        8.38         6.38        5.28
+#>  8         9.98        8.38         6.48        5.18
+#>  9         9.38        7.88         6.38        5.18
+#> 10         9.88        8.08         6.48        5.08
 #> # ℹ more rows
 ```
 
@@ -355,7 +353,8 @@ spark_apply(
   columns = c("term", "estimate", "std.error", "statistic", "p.value"),
   group_by = "Species"
 )
-#> # Source: spark<?> [?? x 6]
+#> # Source:   table<`sparklyr_tmp__11d902f5_6218_41db_85dd_72c5ebe98eab`> [?? x 6]
+#> # Database: spark_connection
 #>   Species    term      estimate std.error statistic  p.value
 #>   <chr>      <chr>        <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 versicolor (Interce…  -0.0843    0.161     -0.525 6.02e- 1
@@ -395,8 +394,8 @@ count_lines(sc, tempfile)
 ```
 
 To learn more about creating extensions see the
-[Extensions](https://spark.posit.co/guides/extensions.html) section
-of the sparklyr website.
+[Extensions](https://spark.posit.co/guides/extensions.html) section of
+the sparklyr website.
 
 ## Table Utilities
 
@@ -424,16 +423,16 @@ You can show the log using the `spark_log()` function:
 
 ``` r
 spark_log(sc, n = 10)
-#> 24/01/08 15:49:41 INFO Executor: Running task 0.0 in stage 87.0 (TID 115)
-#> 24/01/08 15:49:41 INFO HadoopRDD: Input split: file:/var/folders/l8/v1ym1mc10_b0dftql5wrrm8w0000gn/T/Rtmpl48w30/file213f56a22695.csv:0+33313106
-#> 24/01/08 15:49:41 INFO BlockManagerInfo: Removed broadcast_94_piece0 on localhost:56103 in memory (size: 20.0 KiB, free: 1048.6 MiB)
-#> 24/01/08 15:49:41 INFO Executor: Finished task 0.0 in stage 87.0 (TID 115). 969 bytes result sent to driver
-#> 24/01/08 15:49:41 INFO TaskSetManager: Finished task 0.0 in stage 87.0 (TID 115) in 102 ms on localhost (executor driver) (1/1)
-#> 24/01/08 15:49:41 INFO TaskSchedulerImpl: Removed TaskSet 87.0, whose tasks have all completed, from pool 
-#> 24/01/08 15:49:41 INFO DAGScheduler: ResultStage 87 (count at DirectMethodHandleAccessor.java:104) finished in 0.105 s
-#> 24/01/08 15:49:41 INFO DAGScheduler: Job 70 is finished. Cancelling potential speculative or zombie tasks for this job
-#> 24/01/08 15:49:41 INFO TaskSchedulerImpl: Killing all running tasks in stage 87: Stage finished
-#> 24/01/08 15:49:41 INFO DAGScheduler: Job 70 finished: count at DirectMethodHandleAccessor.java:104, took 0.106307 s
+#> {"ts":"2025-03-18T05:33:03.487Z","level":"INFO","msg":"Running task 0.0 in stage 90.0 (TID 127)","context":{"task_name":"task 0.0 in stage 90.0 (TID 127)"},"logger":"Executor"}
+#> {"ts":"2025-03-18T05:33:03.491Z","level":"INFO","msg":"Task (TID 127) input split: file:/var/folders/y_/f_0cx_291nl0s8h26t4jg6ch0000gp/T/RtmpTDeQSI/fileaff16a4bc7cf.csv:0+33313106","context":{"input_split":"file:/var/folders/y_/f_0cx_291nl0s8h26t4jg6ch0000gp/T/RtmpTDeQSI/fileaff16a4bc7cf.csv:0+33313106","task_id":"127","task_name":"task 0.0 in stage 90.0 (TID 127)"},"logger":"HadoopRDD"}
+#> {"ts":"2025-03-18T05:33:03.597Z","level":"INFO","msg":"Finished task 0.0 in stage 90.0 (TID 127). 1078 bytes result sent to driver","context":{"num_bytes":"1078","task_name":"task 0.0 in stage 90.0 (TID 127)"},"logger":"Executor"}
+#> {"ts":"2025-03-18T05:33:03.598Z","level":"INFO","msg":"Finished task 0.0 in stage 90.0 (TID 127) in 116 ms on localhost (executor driver) (1/1)","context":{"duration":"116","executor_id":"driver","host":"localhost","num_successful_tasks":"1","num_tasks":"1","task_name":"task 0.0 in stage 90.0 (TID 127)"},"logger":"TaskSetManager"}
+#> {"ts":"2025-03-18T05:33:03.598Z","level":"INFO","msg":"Removed TaskSet 90.0 whose tasks have all completed, from pool ","context":{"pool_name":"","stage_attempt":"0","stage_id":"90"},"logger":"TaskSchedulerImpl"}
+#> {"ts":"2025-03-18T05:33:03.598Z","level":"INFO","msg":"ResultStage 90 (count at NativeMethodAccessorImpl.java:0) finished in 118 ms","context":{"stage":"ResultStage 90","stage_name":"count at NativeMethodAccessorImpl.java:0","time_units":"118"},"logger":"DAGScheduler"}
+#> {"ts":"2025-03-18T05:33:03.598Z","level":"INFO","msg":"Job 74 is finished. Cancelling potential speculative or zombie tasks for this job","context":{"job_id":"74"},"logger":"DAGScheduler"}
+#> {"ts":"2025-03-18T05:33:03.598Z","level":"INFO","msg":"Canceling stage 90","context":{"stage_id":"90"},"logger":"TaskSchedulerImpl"}
+#> {"ts":"2025-03-18T05:33:03.598Z","level":"INFO","msg":"Killing all running tasks in stage 90: Stage finished","context":{"reason":"Stage finished","stage_id":"90"},"logger":"TaskSchedulerImpl"}
+#> {"ts":"2025-03-18T05:33:03.598Z","level":"INFO","msg":"Job 74 finished: count at NativeMethodAccessorImpl.java:0, took 118.374959 ms","context":{"call_site_short_form":"count at NativeMethodAccessorImpl.java:0","job_id":"74","time":"118.374959"},"logger":"DAGScheduler"}
 ```
 
 Finally, we disconnect from Spark:

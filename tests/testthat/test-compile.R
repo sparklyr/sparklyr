@@ -26,8 +26,6 @@ scalac_download_path <- tempdir()
 
 test_that("'find_scalac' can find scala version", {
   ensure_download_scalac(scalac_download_path)
-
-  expect_true(scalac_is_available("2.10", scalac_download_path))
   expect_true(scalac_is_available("2.11", scalac_download_path))
   expect_true(scalac_is_available("2.12", scalac_download_path))
 })

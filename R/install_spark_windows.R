@@ -137,7 +137,7 @@ prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
     stdout = TRUE
   )
 
-  if (!is.null(output) && grepl("error", output)) {
+  if (!is.null(output) && any(grepl("error", output))) {
     stop(output)
   }
 
@@ -178,10 +178,6 @@ stop_with_winutils_error <- function(hadoopBinPath) {
     paste("  ", winutilsDownload),
     "\n\n",
     paste("2. Copy winutils.exe to", hadoopBinPath),
-    "\n\n",
-    "Alternatively, if you are using RStudio you can install the RStudio Preview Release,\n",
-    "which includes an embedded copy of Hadoop winutils.exe:\n\n",
-    "  https://www.posit.co/products/rstudio/download/preview/",
     "\n\n",
     call. = FALSE
   )

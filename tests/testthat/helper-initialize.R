@@ -65,11 +65,11 @@ testthat_shell_connection <- function(method = "shell") {
       config[["spark.sql.session.timeZone"]] <- "UTC"
     }
     config$`sparklyr.sdf_collect.persistence_level` <- "NONE"
-
     packages <- NULL
-    if (spark_version >= "2.4.0") packages <- "avro"
-    if (spark_version >= "2.4.2") packages <- c(packages, "delta")
-
+    if(spark_version < "4.1.0") {
+      if (spark_version >= "2.4.0") packages <- "avro"
+      if (spark_version >= "2.4.2") packages <- c(packages, "delta")
+    }
     sc <- spark_connect(
       master = "local",
       method = method,

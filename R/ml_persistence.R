@@ -85,28 +85,52 @@ ml_save.ml_model <- function(x, path, overwrite = FALSE,
 #' @rdname ml-persistence
 #' @export
 ml_load <- function(sc, path) {
-  is_local <- spark_context(sc) %>%
-    invoke("isLocal")
-
+  is_local <- spark_context(sc) %>% invoke("isLocal")
+  path <- cast_string(path)
   if (is_local) {
-    path <- cast_string(path) %>%
-      spark_normalize_path()
+    path <- spark_normalize_path(path)
   }
 
-  metadata_table_name <- random_string("ml_load_metadata")
-  class <- spark_read_json(
-    sc, metadata_table_name,
-    paste0(path, "/metadata/part-00000")
-  ) %>%
-    dplyr::pull(!!rlang::sym("class"))
+  metadata_glob <- file.path(path, "metadata", "part-*")
+  metadata_view <- random_string("ml_load_metadata")
 
-  # Drop temp view
-  if (spark_version(sc) > "2.0.0") {
-    spark_session(sc) %>%
-      invoke("catalog") %>%
-      invoke("dropTempView", metadata_table_name)
+  df_try <- try(
+    spark_read_json(
+      sc   = sc,
+      name = metadata_view,
+      path = metadata_glob
+    ),
+    silent = TRUE
+  )
+
+ if (!inherits(df_try, "try-error")) {
+  if ("class" %in% colnames(df_try)) {
+    class <- df_try %>%
+      dplyr::select("class") %>%
+      head(1) %>%
+      dplyr::pull(1)
+
+    return(invoke_static(sc, class, "load", path) %>% ml_call_constructor())
   }
+}
 
-  invoke_static(sc, class, "load", path) %>%
-    ml_call_constructor()
+  metadata <- try(
+    spark_context(sc) %>%
+      invoke("textFile", file.path(path, "metadata", "part-00*"), 1L) %>%
+      invoke("collect") %>%
+      unlist() %>%
+      jsonlite::fromJSON(),
+    silent = TRUE
+  )
+
+  if (!inherits(metadata, "try-error")) {
+    class <- metadata$class
+    invoke_static(sc, class, "load", path) %>%
+      ml_call_constructor()
+    } else {
+  stop(
+    "ML could not be loaded: failed to read metadata from '", path, "'.\n",
+    "Tried Spark JSON glob at '", metadata_glob, "' and the RDD textFile path."
+  )
+}
 }

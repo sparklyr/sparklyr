@@ -19,6 +19,8 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 
+Sys.setenv("SPARK_VERSION" = "3.5")
+
 options(width = 60)
 
 library(sparklyr)
@@ -41,13 +43,8 @@ Livy or Kubernetes.
 - Use [dplyr](#using-dplyr) to filter and aggregate Spark datasets and 
 [streams](https://spark.posit.co/guides/streaming/) then bring them into R 
 for analysis and visualization.
-- Use [MLlib](#machine-learning), [H2O](#using-h2o), 
-[XGBoost](https://spark.posit.co/packages/sparkxgb/latest/) and
-[GraphFrames](https://spark.posit.co/packages/graphframes/latest/) to train
-models at scale in Spark.
 - Create interoperable machine learning 
-[pipelines](https://spark.posit.co/guides/pipelines.html) and productionize
-them with [MLeap](https://spark.posit.co/packages/mleap/latest/).
+[pipelines](https://spark.posit.co/guides/pipelines.html) 
 - Create [extensions](#extensions) that call the full Spark API or run
 [distributed R](#distributed-r) code to support new functionality.
 

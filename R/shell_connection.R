@@ -275,6 +275,19 @@ start_shell <- function(master,
         gsub("[-_a-zA-Z]", "", spark_version)
       )
     )
+
+    # From SQL Migration Guide
+    # Since Spark 4.0, the encode() and decode() functions raise
+    # MALFORMED_CHARACTER_CODING error when handling unmappable characters, while
+    # in Spark 3.5 and earlier versions, these characters will be replaced with
+    # mojibakes. To restore the previous behavior, set
+    # spark.sql.legacy.codingErrorAction to true. For example, if you try to
+    # decode a string value tést / [116, -23, 115, 116] (encoded in latin1) with
+    # 'UTF-8', you get t�st.
+    if(spark_version >= "4") {
+      config$mergedConfigspark.sql.legacy.codingErrorAction <- TRUE
+    }
+
     extensions <- spark_dependencies_from_extensions(spark_version, scala_version, extensions, config)
 
     # combine passed jars and packages with extensions

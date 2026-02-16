@@ -1,6 +1,54 @@
 # Sparklyr (dev)
 
+- Adds `tune_grid_spark()` method in order for `pysparklyr` to provide the 
+functionality
+
+# Sparklyr 1.9.3
+
+- Ensures current pre-release of Spark 4.1 works with `sparklyr`
+
+# Sparklyr 1.9.2
+
+- Avoids the cross-wire when pulling an object from a lazy table instead of pulling
+a field (#3494)
+
+- Converts spark_write_delta() to method 
+
+- In simulate_vars_spark(), it avoids calling a function named 'unknown' in
+case a package has added such a function name in its environment (#3497)
+
+# Sparklyr 1.9.1
+
+- Removes use of `%||%` in worker's R scripts to avoid reference error (#3487)
+
+- Restores support for Spark 2.4 with Scala 2.11 (#3485)
+
+- Addresses changes in Spark 4.0 from when it was in preview to now.
+
+- `ml_load()` now uses Spark's file read to obtain the metadata for the
+models instead of R's file read. This approach accounts for when the
+Spark Context is reading different mounted file protocols and mounted paths 
+(#3478).
+
+
+# Sparklyr 1.9.0
+
+### Improvements
+
+- Adds support for Spark 4 and Scala 2.13 (#3479):
+
+  - Adds new Java folder for Spark 4.0.0 with updated code
+  
+  - Adds new JAR file to handle Spark 4+
+  
+  - Updates to different spots in the R code to start handling version 4, 
+  as well as releases marked as "preview" by the Spark project
+  
+  - Removes JARs using Scala 2.11
+
 - Updates the Spark versions to use for CI
+
+### Fixes
 
 - `sdf_sql()` now returns nothing, including an error, when the query outputs an
 empty dataset (#3439)

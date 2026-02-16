@@ -1,7 +1,7 @@
 Type: Package
 Package: sparklyr
 Title: R Interface to Apache Spark
-Version: 1.8.6.9001
+Version: 1.9.3.9000
 Authors@R:
     c(person(given = "Javier",
              family = "Luraschi",
@@ -119,8 +119,8 @@ Suggests:
     testthat,
     rprojroot
 Encoding: UTF-8
-RoxygenNote: 7.3.1
-SystemRequirements: Spark: 2.x, or 3.x
+RoxygenNote: 7.3.3
+SystemRequirements: Spark: 2.x, or 3.x, or 4.x
 Collate:
     'spark_data_build_types.R'
     'arrow_data.R'
@@ -350,6 +350,7 @@ Collate:
     'tidyr_separate.R'
     'tidyr_unite.R'
     'tidyr_unnest.R'
+    'tune-grid-spark.R'
     'worker_apply.R'
     'worker_connect.R'
     'worker_connection.R'
