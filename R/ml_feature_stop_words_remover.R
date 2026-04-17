@@ -8,7 +8,7 @@
 #'
 #' @details Supported languages: danish, dutch, english, finnish, french,
 #'   german, hungarian, italian, norwegian, portuguese, russian, spanish,
-#'   swedish, turkish. Defaults to English. See \url{https://anoncvs.postgresql.org/cvsweb.cgi/pgsql/src/backend/snowball/stopwords/}
+#'   swedish, turkish. Defaults to English. See \url{https://snowballstem.org/projects.html}
 #'   for more details
 #'
 #' @return A list of stop words.
