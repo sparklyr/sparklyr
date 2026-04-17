@@ -5,7 +5,11 @@ test_requires("dplyr")
 sc <- testthat_spark_connection()
 
 df1a <- data.frame(a = 1:3, b = letters[1:3], stringsAsFactors = FALSE)
-df2a <- data.frame(c = letters[1:3], d = letters[24:26], stringsAsFactors = FALSE)
+df2a <- data.frame(
+  c = letters[1:3],
+  d = letters[24:26],
+  stringsAsFactors = FALSE
+)
 df3a <- data.frame(e = 1:2, f = letters[1:2], stringsAsFactors = FALSE)
 df4a <- data.frame(b = letters[4:6], a = 4:6, stringsAsFactors = FALSE)
 
@@ -133,7 +137,9 @@ test_that("'sdf_bind_cols' supports programming", {
 })
 
 test_that("'sdf_bind_cols' works with overlapping columns'", {
-  if (spark_version(sc) < "2.0.0") skip("sdf_bind_cols() workaround not available in 1.6")
+  if (spark_version(sc) < "2.0.0") {
+    skip("sdf_bind_cols() workaround not available in 1.6")
+  }
 
   df1a_tbl <- testthat_tbl("df1a")
   df4a_tbl <- testthat_tbl("df4a")
