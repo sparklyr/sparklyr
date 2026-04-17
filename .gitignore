@@ -61,3 +61,4 @@ tests/testthat/iris-out/
 .Rproj.user
 \.*\.swp
 .Renviron
+.claude

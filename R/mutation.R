@@ -141,9 +141,8 @@ sdf_bind_rows <- function(..., id = NULL) {
     lapply(sdf_register)
 
   if (!is.null(id)) {
-    if (!all(rlang::have_name(dots))) {
-      names(dots) <- as.character(seq_along(dots))
-    }
+    unnamed_idx <- which(!rlang::have_name(dots))
+    names(dots)[unnamed_idx] <- as.character(unnamed_idx)
     augmented_dots <- Map(
       function(x, label) {
         dplyr::mutate(x, !!sym(id) := label) %>%
