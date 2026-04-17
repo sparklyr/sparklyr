@@ -48,3 +48,4 @@
 ^\.github$
 ^CRAN-SUBMISSION$
 ^\.claude$
+^CLAUDE\.md$
