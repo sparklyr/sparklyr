@@ -72,7 +72,9 @@ as_sampled_tbl <- function(tbl, frac, args) {
   tbl
 }
 
+#' Slice (not supported)
 #' @export
+#' @keywords internal
 #' @importFrom dplyr slice_
 slice_.tbl_spark <- function(.data, ..., .dots) {
   stop("Slice is not supported in this version of sparklyr")
