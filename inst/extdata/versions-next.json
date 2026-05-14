@@ -2,7 +2,7 @@
   {
     "spark": "4.2.0",
     "hadoop": "3",
-    "base": "https://dlcdn.apache.org/spark/spark-4.2.0-preview1/",
-    "pattern": "spark-%s-preview1-bin-hadoop%s.tgz"
+    "base": "https://dlcdn.apache.org/spark/spark-4.2.0-preview5/",
+    "pattern": "spark-%s-preview5-bin-hadoop%s.tgz"
   }
 ]
