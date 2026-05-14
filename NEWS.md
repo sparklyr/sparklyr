@@ -1,3 +1,8 @@
+# Sparklyr (dev)
+
+- `spark_install()` adds a second attempt at downloading from the Spark
+archive if the link from the primary download location fails.
+
 # Sparklyr 1.9.4
 
 - Adds `tune_grid_spark()` method in order for `pysparklyr` to provide the
