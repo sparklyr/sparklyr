@@ -39,12 +39,14 @@ spark_install_version_expand <- function(version, installed_only) {
 #'
 #' @keywords internal
 #' @export
-spark_install_find <- function(version = NULL,
-                               hadoop_version = NULL,
-                               installed_only = TRUE,
-                               latest = FALSE,
-                               hint = FALSE) {
-  if(!is.null(version)) {
+spark_install_find <- function(
+  version = NULL,
+  hadoop_version = NULL,
+  installed_only = TRUE,
+  latest = FALSE,
+  hint = FALSE
+) {
+  if (!is.null(version)) {
     version <- spark_install_version_expand(version, FALSE)
   }
   versions <- spark_versions(latest = latest)
@@ -54,10 +56,10 @@ spark_install_find <- function(version = NULL,
     if (installed_only) {
       versions <- versions[versions$installed, ]
     }
-    if(!is.null(version)) {
+    if (!is.null(version)) {
       versions <- versions[versions$spark == version, ]
     }
-    if(!is.null(hadoop_version)) {
+    if (!is.null(hadoop_version)) {
       versions <- versions[versions$hadoop == hadoop_version, ]
     }
   }
@@ -68,7 +70,9 @@ spark_install_find <- function(version = NULL,
       "available Spark versions."
     )
     component_name <- sprintf(
-      "spark-%s-bin-hadoop%s", version, hadoop_version %||% "2.7"
+      "spark-%s-bin-hadoop%s",
+      version,
+      hadoop_version %||% "2.7"
     )
     package_name <- paste0(component_name, ".tgz")
     spark_dir <- spark_install_dir()
@@ -78,14 +82,17 @@ spark_install_find <- function(version = NULL,
       packageName = package_name,
       packageRemotePath = sprintf(
         "https://archive.apache.org/dist/spark/spark-%s/%s",
-        version, package_name
+        version,
+        package_name
       ),
       packageLocalPath = file.path(spark_dir, package_name),
       sparkDir = spark_dir,
       sparkVersionDir = file.path(spark_install_dir(), component_name)
     )
   } else {
-    versions <- versions[with(versions, order(default, spark, hadoop_default, decreasing = TRUE)), ]
+    versions <- versions[
+      with(versions, order(default, spark, hadoop_default, decreasing = TRUE)),
+    ]
     spark_install_info(
       as.character(versions[1, ]$spark),
       as.character(versions[1, ]$hadoop),
@@ -103,13 +110,21 @@ spark_default_version <- function() {
   # if we have versions installed then use the same logic as spark_connect to figure out
   # which version we will bind to when we pass version = NULL and hadoop_version = NULL
   if (nrow(spark_installed_versions()) > 0) {
-    version <- spark_install_find(version = NULL, hadoop_version = NULL, installed_only = TRUE, latest = FALSE)
+    version <- spark_install_find(
+      version = NULL,
+      hadoop_version = NULL,
+      installed_only = TRUE,
+      latest = FALSE
+    )
     spark <- version$sparkVersion
     hadoop <- version$hadoopVersion
     # otherwise check available versions and take the default
   } else {
     versions <- spark_versions()
-    versions <- subset(versions, versions$default == TRUE & versions$hadoop_default == TRUE)
+    versions <- subset(
+      versions,
+      versions$default == TRUE & versions$hadoop_default == TRUE
+    )
     version <- versions[1, ]
     spark <- version$spark
     hadoop <- version$hadoop
@@ -121,8 +136,16 @@ spark_default_version <- function() {
   )
 }
 
-spark_install_info <- function(sparkVersion = NULL, hadoopVersion = NULL, latest = TRUE) {
-  versionInfo <- spark_versions_info(sparkVersion, hadoopVersion, latest = latest)
+spark_install_info <- function(
+  sparkVersion = NULL,
+  hadoopVersion = NULL,
+  latest = TRUE
+) {
+  versionInfo <- spark_versions_info(
+    sparkVersion,
+    hadoopVersion,
+    latest = latest
+  )
 
   componentName <- versionInfo$componentName
   packageName <- versionInfo$packageName
@@ -174,17 +197,19 @@ spark_home <- function() {
 #'
 #' @import utils
 #' @export
-spark_install <- function(version = NULL,
-                          hadoop_version = NULL,
-                          reset = TRUE,
-                          logging = "INFO",
-                          verbose = interactive()) {
+spark_install <- function(
+  version = NULL,
+  hadoop_version = NULL,
+  reset = TRUE,
+  logging = "INFO",
+  verbose = interactive()
+) {
   installInfo <- spark_install_find(
     version = version,
     hadoop_version = hadoop_version,
     installed_only = FALSE,
     latest = TRUE
-    )
+  )
 
   if (!dir.exists(installInfo$sparkDir)) {
     dir.create(installInfo$sparkDir, recursive = TRUE)
@@ -192,11 +217,14 @@ spark_install <- function(version = NULL,
 
   if (!dir.exists(installInfo$sparkVersionDir)) {
     if (verbose) {
-      fmt <- paste(c(
-        "Installing Spark %s for Hadoop %s or later.",
-        "Downloading from:\n- '%s'",
-        "Installing to:\n- '%s'"
-      ), collapse = "\n")
+      fmt <- paste(
+        c(
+          "Installing Spark %s for Hadoop %s or later.",
+          "Downloading from:\n- '%s'",
+          "Installing to:\n- '%s'"
+        ),
+        collapse = "\n"
+      )
 
       msg <- sprintf(
         fmt,
@@ -209,14 +237,46 @@ spark_install <- function(version = NULL,
       message(msg)
     }
 
-    status <- suppressWarnings(download_file(
-      installInfo$packageRemotePath,
-      destfile = installInfo$packageLocalPath,
-      quiet = !verbose
-    ))
+    download_locations <- list(
+      current = "https://dlcdn.apache.org/spark/",
+      archive = "https://archive.apache.org/dist/spark/"
+    )
 
-    if (status) {
-      stopf("Failed to download Spark: download exited with status %s", status)
+    download_result <- tryCatch(
+      download_file(
+        installInfo$packageRemotePath,
+        destfile = installInfo$packageLocalPath,
+        quiet = !verbose
+      ),
+      error = function(e) e
+    )
+
+    if (inherits(download_result, "error") || isTRUE(download_result != 0)) {
+      if (grepl(download_locations$current, installInfo$packageRemotePath, fixed = TRUE)) {
+        archive_url <- sub(
+          download_locations$current,
+          download_locations$archive,
+          installInfo$packageRemotePath,
+          fixed = TRUE
+        )
+        if (verbose) {
+          message(sprintf("Download failed, retrying from archive:\n- '%s'", archive_url))
+        }
+        download_result <- tryCatch(
+          download_file(
+            archive_url,
+            destfile = installInfo$packageLocalPath,
+            quiet = !verbose
+          ),
+          error = function(e) e
+        )
+      }
+    }
+
+    if (inherits(download_result, "error")) {
+      stop(download_result$message)
+    } else if (isTRUE(download_result != 0)) {
+      stopf("Failed to download Spark: download exited with status %s", download_result)
     }
 
     untar(
@@ -272,11 +332,14 @@ spark_install <- function(version = NULL,
             winslash = "/"
           )
 
-          hiveProperties <- c(hiveProperties, list(
-            "hive.exec.scratchdir" = hivePath,
-            "hive.exec.local.scratchdir" = hivePath,
-            "hive.metastore.warehouse.dir" = hivePath
-          ))
+          hiveProperties <- c(
+            hiveProperties,
+            list(
+              "hive.exec.scratchdir" = hivePath,
+              "hive.exec.local.scratchdir" = hivePath,
+              "hive.metastore.warehouse.dir" = hivePath
+            )
+          )
         }
 
         spark_hive_file_set_value(hiveSitePath, hiveProperties)
@@ -321,7 +384,10 @@ spark_install <- function(version = NULL,
 #' @export
 spark_uninstall <- function(version, hadoop_version) {
   info <- spark_versions_info(version, hadoop_version)
-  sparkDir <- file.path(c(spark_install_old_dir(), spark_install_dir()), info$componentName)
+  sparkDir <- file.path(
+    c(spark_install_old_dir(), spark_install_dir()),
+    info$componentName
+  )
   if (any(dir.exists(sparkDir))) {
     unlink(sparkDir, recursive = TRUE)
 
@@ -342,7 +408,9 @@ spark_resolve_envpath <- function(path_with_end) {
   if (os_is_windows()) {
     parts <- strsplit(path_with_end, "/")[[1]]
     first <- gsub("%", "", parts[[1]])
-    if (nchar(Sys.getenv(first)) > 0) parts[[1]] <- Sys.getenv(first)
+    if (nchar(Sys.getenv(first)) > 0) {
+      parts[[1]] <- Sys.getenv(first)
+    }
     do.call("file.path", as.list(parts))
   } else {
     normalizePath(path_with_end, mustWork = FALSE)
@@ -355,7 +423,10 @@ spark_resolve_envpath <- function(path_with_end) {
 spark_install_dir <- function() {
   json_pkg <- system.file("extdata/config.json", package = packageName())
   config <- fromJSON(json_pkg)
-  getOption("spark.install.dir", spark_resolve_envpath(config$dirs[[.Platform$OS.type]]))
+  getOption(
+    "spark.install.dir",
+    spark_resolve_envpath(config$dirs[[.Platform$OS.type]])
+  )
 }
 
 # Used for backwards compatibility with sparklyr 0.5 installation path
@@ -374,7 +445,8 @@ spark_install_tar <- function(tarfile) {
   fileName <- basename(tarfile)
   if (length(grep(filePattern, fileName)) == 0) {
     stop(
-      "The given file does not conform with the following pattern: ", filePattern
+      "The given file does not conform with the following pattern: ",
+      filePattern
     )
   }
 
@@ -385,8 +457,12 @@ spark_install_tar <- function(tarfile) {
   )
 }
 
-spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
-                                       reset = TRUE, logging = "INFO") {
+spark_conf_log4j_set_value <- function(
+  installInfo,
+  properties = NULL,
+  reset = TRUE,
+  logging = "INFO"
+) {
   log_template <- NULL
   log_properties <- NULL
   log_template_v1 <- "log4j.properties.template"
@@ -419,7 +495,11 @@ spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
     if (any(dir_contents == log_template_v1)) {
       log_template <- log_template_v1
       log_properties <- list(
-        "log4j.rootCategory" = paste0("log4j.rootCategory=", logging, ",console,localfile"),
+        "log4j.rootCategory" = paste0(
+          "log4j.rootCategory=",
+          logging,
+          ",console,localfile"
+        ),
         "log4j.appender.localfile" = "log4j.appender.localfile=org.apache.log4j.DailyRollingFileAppender",
         "log4j.appender.localfile.layout" = "log4j.appender.localfile.layout=org.apache.log4j.PatternLayout",
         "log4j.appender.localfile.layout.ConversionPattern" = "log4j.appender.localfile.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n"
@@ -433,9 +513,13 @@ spark_conf_log4j_set_value <- function(installInfo, properties = NULL,
     }
   }
 
-  if (is.null(log_template)) stop("No log4j template file found")
+  if (is.null(log_template)) {
+    stop("No log4j template file found")
+  }
 
-  if (!is.null(properties)) log_properties <- properties
+  if (!is.null(properties)) {
+    log_properties <- properties
+  }
 
   log_file <- substr(log_template, 1, nchar(log_template) - 9)
 
@@ -491,9 +575,15 @@ spark_hive_file_set_value <- function(hivePath, properties) {
 }
 
 spark_conf_file_set_value <- function(installInfo, properties, reset) {
-  confPropertiesPath <- file.path(installInfo$sparkConfDir, "spark-defaults.conf")
+  confPropertiesPath <- file.path(
+    installInfo$sparkConfDir,
+    "spark-defaults.conf"
+  )
   if (!file.exists(confPropertiesPath) || reset) {
-    confTemplatePath <- file.path(installInfo$sparkConfDir, "spark-defaults.conf.template")
+    confTemplatePath <- file.path(
+      installInfo$sparkConfDir,
+      "spark-defaults.conf.template"
+    )
     file.copy(confTemplatePath, confPropertiesPath, overwrite = TRUE)
   }
 
