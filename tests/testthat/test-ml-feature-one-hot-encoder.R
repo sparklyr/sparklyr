@@ -28,7 +28,8 @@ test_that("ft_one_hot_encoder() works", {
       iris_tbl %>%
         ft_string_indexer("Species", "indexed") %>%
         ft_one_hot_encoder("indexed", "encoded") %>%
-        pull(encoded) %>% unique(),
+        pull(encoded) %>%
+        unique(),
       list(c(0, 0), c(1, 0), c(0, 1))
     )
   } else {
@@ -38,14 +39,23 @@ test_that("ft_one_hot_encoder() works", {
 
     encoded_tbl <- iris_tbl %>%
       mutate(Species1 = Species, Species2 = Species) %>%
-      ft_string_indexer("Species1", "indexed1", string_order_type = "alphabetDesc") %>%
-      ft_string_indexer("Species2", "indexed2", string_order_type = "alphabetDesc") %>%
+      ft_string_indexer(
+        "Species1",
+        "indexed1",
+        string_order_type = "alphabetDesc"
+      ) %>%
+      ft_string_indexer(
+        "Species2",
+        "indexed2",
+        string_order_type = "alphabetDesc"
+      ) %>%
       ft_one_hot_encoder(indexed_cols, encoded_cols) %>%
       compute()
     for (x in encoded_cols) {
       expect_warning_on_arrow(
         expect_setequal(
-          encoded_tbl %>% pull(!!x) %>% unique(), list(c(0, 0), c(0, 1), c(1, 0))
+          encoded_tbl %>% pull(!!x) %>% unique(),
+          list(c(0, 0), c(0, 1), c(1, 0))
         )
       )
     }
@@ -62,10 +72,11 @@ test_that("ft_one_hot_encoder() with multiple columns", {
   df_tbl <- copy_to(sc, df, overwrite = TRUE)
 
   if (spark_version(sc) < "3.0.0") {
-    expect_error(df_tbl %>%
-      ft_one_hot_encoder(c("input1", "input2"), c("output1", "output2")))
-  }
-  else {
+    expect_error(
+      df_tbl %>%
+        ft_one_hot_encoder(c("input1", "input2"), c("output1", "output2"))
+    )
+  } else {
     expect_identical(
       df_tbl %>%
         ft_one_hot_encoder(c("input1", "input2"), c("output1", "output2")) %>%
@@ -84,7 +95,11 @@ test_that("ft_one_hot_encoder() works with ml pipeline", {
       ft_one_hot_encoder("indexed", "encoded")
   } else {
     pipeline <- ml_pipeline(sc) %>%
-      ft_string_indexer("Species", "indexed", string_order_type = "alphabetDesc") %>%
+      ft_string_indexer(
+        "Species",
+        "indexed",
+        string_order_type = "alphabetDesc"
+      ) %>%
       ft_one_hot_encoder("indexed", "encoded")
   }
 
@@ -102,4 +117,3 @@ test_that("ft_one_hot_encoder() works with ml pipeline", {
 })
 
 test_clear_cache()
-

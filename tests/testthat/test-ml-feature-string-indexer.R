@@ -59,7 +59,12 @@ test_that("ft_index_to_string() works", {
 
   expect_identical(s2, c("wow", "cool", "wow", "wow"))
 
-  its <- ft_index_to_string(sc, "indexed", "string", labels = list("foo", "bar"))
+  its <- ft_index_to_string(
+    sc,
+    "indexed",
+    "string",
+    labels = list("foo", "bar")
+  )
 
   expect_equal(
     ml_params(its, list("input_col", "output_col", "labels")),
@@ -77,7 +82,11 @@ test_that("ft_string_indexer respects `string_order_type`", {
   df_tbl <- testthat_tbl("df")
   expect_identical(
     df_tbl %>%
-      ft_string_indexer("string", "indexed", string_order_type = "alphabetAsc") %>%
+      ft_string_indexer(
+        "string",
+        "indexed",
+        string_order_type = "alphabetAsc"
+      ) %>%
       dplyr::pull(indexed),
     c(1, 0, 1, 1)
   )
@@ -87,7 +96,12 @@ test_that("ft_string_indexer_model works", {
   sc <- testthat_spark_connection()
   df_tbl <- testthat_tbl("df")
   expect_identical(
-    ft_string_indexer_model(sc, "string", "indexed", labels = c("foo", "bar")) %>%
+    ft_string_indexer_model(
+      sc,
+      "string",
+      "indexed",
+      labels = c("foo", "bar")
+    ) %>%
       ml_transform(df_tbl) %>%
       dplyr::pull(indexed),
     c(0, 1, 0, 0)
@@ -102,4 +116,3 @@ test_that("ft_string_indexer_model works", {
 })
 
 test_clear_cache()
-

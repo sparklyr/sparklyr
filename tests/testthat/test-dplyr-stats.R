@@ -8,12 +8,13 @@ test_that("cor, cov, sd and var works as expected", {
   stats <- data.frame(x = 1:10, y = 10:1)
   stats_tbl <- copy_to(sc, stats, overwrite = TRUE)
 
-  s1 <- stats %>% mutate(
-    cor = cor(x, y),
-    cov = cov(x, y),
-    sd = sd(x),
-    var = var(x)
-  )
+  s1 <- stats %>%
+    mutate(
+      cor = cor(x, y),
+      cov = cov(x, y),
+      sd = sd(x),
+      var = var(x)
+    )
 
   s2 <- stats_tbl %>%
     mutate(

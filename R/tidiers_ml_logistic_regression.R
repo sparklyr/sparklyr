@@ -36,17 +36,14 @@ tidy.ml_model_logistic_regression <- function(x, ...) {
 #' @param newdata a tbl_spark of new data to use for prediction.
 #'
 #' @export
-augment.ml_model_logistic_regression <- function(x, newdata = NULL,
-                                                 ...) {
+augment.ml_model_logistic_regression <- function(x, newdata = NULL, ...) {
   broom_augment_supervised(x, newdata = newdata)
 }
 
 #' @rdname ml_logistic_regression_tidiers
 #' @param new_data a tbl_spark of new data to use for prediction.
 #' @export
-augment._ml_model_logistic_regression <- function(x, new_data = NULL,
-                                                  ...) {
-
+augment._ml_model_logistic_regression <- function(x, new_data = NULL, ...) {
   check_newdata(... = ...)
   augment(x = x$fit, newdata = new_data, ... = ...)
 }

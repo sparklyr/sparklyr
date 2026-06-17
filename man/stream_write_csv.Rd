@@ -155,8 +155,8 @@ stream_stop(stream)
 
 }
 \seealso{
-Other Spark stream serialization: 
-\code{\link{stream_write_memory}()},
-\code{\link{stream_write_table}()}
+Other Spark stream serialization:
+\code{\link[=stream_write_memory]{stream_write_memory()}},
+\code{\link[=stream_write_table]{stream_write_table()}}
 }
 \concept{Spark stream serialization}

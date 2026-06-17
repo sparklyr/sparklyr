@@ -81,18 +81,31 @@ NULL
 #' }
 #'
 #' @export
-ml_power_iteration <- function(x, k = 4, max_iter = 20, init_mode = "random",
-                               src_col = "src", dst_col = "dst", weight_col = "weight",
-                               ...) {
+ml_power_iteration <- function(
+  x,
+  k = 4,
+  max_iter = 20,
+  init_mode = "random",
+  src_col = "src",
+  dst_col = "dst",
+  weight_col = "weight",
+  ...
+) {
   check_dots_used()
   UseMethod("ml_power_iteration")
 }
 
 #' @export
-ml_power_iteration.spark_connection <- function(x, k = 4, max_iter = 20,
-                                                init_mode = "random",
-                                                src_col = "src", dst_col = "dst", weight_col = "weight",
-                                                ...) {
+ml_power_iteration.spark_connection <- function(
+  x,
+  k = 4,
+  max_iter = 20,
+  init_mode = "random",
+  src_col = "src",
+  dst_col = "dst",
+  weight_col = "weight",
+  ...
+) {
   if (spark_version(x) < "2.4") {
     stop("`ml_power_iteration()` is only supported in Spark 2.4 or above.")
   }
@@ -109,9 +122,11 @@ ml_power_iteration.spark_connection <- function(x, k = 4, max_iter = 20,
     validator_ml_power_iteration()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.clustering.PowerIterationClustering",
+    x,
+    "org.apache.spark.ml.clustering.PowerIterationClustering",
     uid = NULL,
-    k = .args[["k"]], max_iter = .args[["max_iter"]]
+    k = .args[["k"]],
+    max_iter = .args[["max_iter"]]
   ) %>%
     invoke("setInitMode", .args[["init_mode"]]) %>%
     invoke("setSrcCol", .args[["src_col"]]) %>%
@@ -122,10 +137,16 @@ ml_power_iteration.spark_connection <- function(x, k = 4, max_iter = 20,
 }
 
 #' @export
-ml_power_iteration.tbl_spark <- function(x, k = 4, max_iter = 20,
-                                         init_mode = "random",
-                                         src_col = "src", dst_col = "dst", weight_col = "weight",
-                                         ...) {
+ml_power_iteration.tbl_spark <- function(
+  x,
+  k = 4,
+  max_iter = 20,
+  init_mode = "random",
+  src_col = "src",
+  dst_col = "dst",
+  weight_col = "weight",
+  ...
+) {
   sc <- spark_connection(x)
   stage <- ml_power_iteration.spark_connection(
     x = sc,

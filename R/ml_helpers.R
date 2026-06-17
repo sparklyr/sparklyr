@@ -16,18 +16,18 @@ ml_feature_importances.ml_prediction_model <- function(model, ...) {
   if (grepl("ml_gbt|ml_decision_tree", model_class)) {
     spark_require_version(spark_connection(spark_jobj(model)), "2.0.0")
   }
-  if (!model_class %in% c(
-    "ml_decision_tree_regression_model",
-    "ml_decision_tree_classifcation_model",
-    "ml_gbt_regression_model",
-    "ml_gbt_classification_model",
-    "ml_random_forest_regression_model",
-    "ml_random_forest_classification_model"
-  )
+  if (
+    !model_class %in%
+      c(
+        "ml_decision_tree_regression_model",
+        "ml_decision_tree_classifcation_model",
+        "ml_gbt_regression_model",
+        "ml_gbt_classification_model",
+        "ml_random_forest_regression_model",
+        "ml_random_forest_classification_model"
+      )
   ) {
-    stop("Cannot extract feature importances from ", model_class,
-      call. = FALSE
-    )
+    stop("Cannot extract feature importances from ", model_class, call. = FALSE)
   }
   model$feature_importances()
 }
@@ -36,13 +36,13 @@ ml_feature_importances.ml_prediction_model <- function(model, ...) {
 ml_feature_importances.ml_model <- function(model, ...) {
   # backwards compat, old signature was function(sc, model)
   if (inherits(model, "spark_connection")) {
-    warning("The signature function(sc, model) for ml_feature_importances() is deprecated",
+    warning(
+      "The signature function(sc, model) for ml_feature_importances() is deprecated",
       " and will be removed in a future version.",
       call. = FALSE
     )
     model <- rlang::dots_list(...) %>% unlist()
   }
-
 
   supported <- grepl(
     "ml_model_decision_tree|ml_model_gbt|ml_model_random_forest",

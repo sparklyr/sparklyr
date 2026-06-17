@@ -31,28 +31,48 @@
 #' ml_regression_evaluator(pred, label_col = "mpg")
 #' }
 #' @export
-ml_linear_regression <- function(x, formula = NULL, fit_intercept = TRUE,
-                                 elastic_net_param = 0, reg_param = 0,
-                                 max_iter = 100, weight_col = NULL,
-                                 loss = "squaredError", solver = "auto",
-                                 standardization = TRUE, tol = 1e-6,
-                                 features_col = "features", label_col = "label",
-                                 prediction_col = "prediction",
-                                 uid = random_string("linear_regression_"), ...) {
+ml_linear_regression <- function(
+  x,
+  formula = NULL,
+  fit_intercept = TRUE,
+  elastic_net_param = 0,
+  reg_param = 0,
+  max_iter = 100,
+  weight_col = NULL,
+  loss = "squaredError",
+  solver = "auto",
+  standardization = TRUE,
+  tol = 1e-6,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("linear_regression_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_linear_regression")
 }
 
-ml_linear_regression_impl <- function(x, formula = NULL, fit_intercept = TRUE,
-                                           elastic_net_param = 0, reg_param = 0,
-                                           max_iter = 100, weight_col = NULL,
-                                           loss = "squaredError", solver = "auto",
-                                           standardization = TRUE, tol = 1e-6,
-                                           features_col = "features", label_col = "label",
-                                           prediction_col = "prediction",
-                                           uid = random_string("linear_regression_"),
-                                           response = NULL, features = NULL, ...) {
-
+ml_linear_regression_impl <- function(
+  x,
+  formula = NULL,
+  fit_intercept = TRUE,
+  elastic_net_param = 0,
+  reg_param = 0,
+  max_iter = 100,
+  weight_col = NULL,
+  loss = "squaredError",
+  solver = "auto",
+  standardization = TRUE,
+  tol = 1e-6,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("linear_regression_"),
+  response = NULL,
+  features = NULL,
+  ...
+) {
   loss <- param_min_version(x, loss, "2.3.0", "squaredError")
 
   ml_process_model(
@@ -92,7 +112,10 @@ ml_linear_regression.tbl_spark <- ml_linear_regression_impl
 new_ml_linear_regression_model <- function(jobj) {
   summary <- if (invoke(jobj, "hasSummary")) {
     fit_intercept <- ml_get_param_map(jobj)$fit_intercept
-    new_ml_linear_regression_training_summary(invoke(jobj, "summary"), fit_intercept)
+    new_ml_linear_regression_training_summary(
+      invoke(jobj, "summary"),
+      fit_intercept
+    )
   } else {
     NULL
   }
@@ -101,14 +124,21 @@ new_ml_linear_regression_model <- function(jobj) {
     jobj,
     coefficients = read_spark_vector(jobj, "coefficients"),
     intercept = invoke(jobj, "intercept"),
-    scale = if (spark_version(spark_connection(jobj)) >= "2.3.0") invoke(jobj, "scale"),
+    scale = if (spark_version(spark_connection(jobj)) >= "2.3.0") {
+      invoke(jobj, "scale")
+    },
     summary = summary,
     class = "ml_linear_regression_model"
   )
 }
 
 # -------------------------- Summary functions ---------------------------------
-new_ml_linear_regression_summary <- function(jobj, fit_intercept, ..., class = character()) {
+new_ml_linear_regression_summary <- function(
+  jobj,
+  fit_intercept,
+  ...,
+  class = character()
+) {
   arrange_stats <- make_stats_arranger(fit_intercept)
 
   s <- new_ml_summary(
@@ -121,7 +151,11 @@ new_ml_linear_regression_summary <- function(jobj, fit_intercept, ..., class = c
     # `lazy val devianceResiduals`
     deviance_residuals = function() invoke(jobj, "devianceResiduals"),
     explained_variance = invoke(jobj, "explainedVariance"),
-    features_col = if (spark_version(spark_connection(jobj)) >= "2.0.0") invoke(jobj, "featuresCol") else NULL,
+    features_col = if (spark_version(spark_connection(jobj)) >= "2.0.0") {
+      invoke(jobj, "featuresCol")
+    } else {
+      NULL
+    },
     label_col = invoke(jobj, "labelCol"),
     mean_absolute_error = invoke(jobj, "meanAbsoluteError"),
     mean_squared_error = invoke(jobj, "meanSquaredError"),
@@ -160,7 +194,8 @@ new_ml_linear_regression_summary <- function(jobj, fit_intercept, ..., class = c
 
 new_ml_linear_regression_training_summary <- function(jobj, fit_intercept) {
   s <- new_ml_linear_regression_summary(
-    jobj, fit_intercept,
+    jobj,
+    fit_intercept,
     objective_history = invoke(jobj, "objectiveHistory"),
     total_iterations = invoke(jobj, "totalIterations"),
     class = "ml_linear_regression_training_summary"

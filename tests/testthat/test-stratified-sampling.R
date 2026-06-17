@@ -42,12 +42,11 @@ sdf <- testthat_tbl(
 ## ---------------------- Sampling testing function ----------------------------
 
 verify_sample_results <- function(weighted, replacement, sampling) {
-
   expected_dist <- rep(0L, sample_space_sz + num_zeroes)
 
   actual_dist <- rep(0L, sample_space_sz + num_zeroes)
 
-  if(weighted) {
+  if (weighted) {
     weight <- expr(weight)
   } else {
     weight <- NULL
@@ -56,39 +55,39 @@ verify_sample_results <- function(weighted, replacement, sampling) {
   for (x in seq(num_sampling_iters)) {
     set.seed(142857L + x)
 
-    if(sampling == "fraction") {
+    if (sampling == "fraction") {
       r_sample <- sampling_test_data %>%
         group_by(group) %>%
         sample_frac(
-          weight = !! weight,
-          replace = !! replacement,
+          weight = !!weight,
+          replace = !!replacement,
           size = sample_frac
-          )
+        )
 
       spark_sample <- sdf %>%
         group_by(group) %>%
         sample_frac(
-          weight = !! weight,
-          replace = !! replacement,
+          weight = !!weight,
+          replace = !!replacement,
           size = sample_frac
         ) %>%
         collect()
     }
 
-    if(sampling == "number") {
+    if (sampling == "number") {
       r_sample <- sampling_test_data %>%
         group_by(group) %>%
         sample_n(
-          weight = !! weight,
-          replace = !! replacement,
+          weight = !!weight,
+          replace = !!replacement,
           size = sample_sz
         )
 
       spark_sample <- sdf %>%
         group_by(group) %>%
         sample_n(
-          weight = !! weight,
-          replace = !! replacement,
+          weight = !!weight,
+          replace = !!replacement,
           size = sample_sz
         ) %>%
         collect()
@@ -98,17 +97,19 @@ verify_sample_results <- function(weighted, replacement, sampling) {
       count(group) %>%
       pull(n)
 
-    if(sampling == "fraction") {
+    if (sampling == "fraction") {
       expect_equal(
         spark_count,
         rep(ceiling((sample_space_sz + num_zeroes) * sample_frac), num_groups)
-      )}
+      )
+    }
 
-    if(sampling == "number") {
+    if (sampling == "number") {
       expect_equal(
         spark_count,
         rep(sample_sz, num_groups)
-      )}
+      )
+    }
 
     for (id in r_sample$id) {
       expected_dist[[id]] <- expected_dist[[id]] + 1L
@@ -124,36 +125,66 @@ verify_sample_results <- function(weighted, replacement, sampling) {
   )
 
   expect_gte(res$p.value, alpha)
-
-
 }
 
 test_that("stratified sampling without replacement works as expected", {
   test_requires_version("3.0.0")
 
-  verify_sample_results(weighted = FALSE, replacement = FALSE, sampling = "number")
-  verify_sample_results(weighted = FALSE, replacement = FALSE, sampling = "fraction")
+  verify_sample_results(
+    weighted = FALSE,
+    replacement = FALSE,
+    sampling = "number"
+  )
+  verify_sample_results(
+    weighted = FALSE,
+    replacement = FALSE,
+    sampling = "fraction"
+  )
 })
 
 test_that("stratified sampling with replacement works as expected", {
   test_requires_version("3.0.0")
 
-  verify_sample_results(weighted = FALSE, replacement = TRUE, sampling = "number")
-  verify_sample_results(weighted = FALSE, replacement = TRUE, sampling = "fraction")
+  verify_sample_results(
+    weighted = FALSE,
+    replacement = TRUE,
+    sampling = "number"
+  )
+  verify_sample_results(
+    weighted = FALSE,
+    replacement = TRUE,
+    sampling = "fraction"
+  )
 })
 
 test_that("stratified weighted sampling without replacement works as expected", {
   test_requires_version("3.0.0")
 
-  verify_sample_results(weighted = TRUE, replacement = FALSE, sampling = "number")
-  verify_sample_results(weighted = TRUE, replacement = FALSE, sampling = "fraction")
+  verify_sample_results(
+    weighted = TRUE,
+    replacement = FALSE,
+    sampling = "number"
+  )
+  verify_sample_results(
+    weighted = TRUE,
+    replacement = FALSE,
+    sampling = "fraction"
+  )
 })
 
 test_that("stratified weighted sampling with replacement works as expected", {
   test_requires_version("3.0.0")
 
-  verify_sample_results(weighted = TRUE, replacement = TRUE, sampling = "number")
-  verify_sample_results(weighted = TRUE, replacement = TRUE, sampling = "fraction")
+  verify_sample_results(
+    weighted = TRUE,
+    replacement = TRUE,
+    sampling = "number"
+  )
+  verify_sample_results(
+    weighted = TRUE,
+    replacement = TRUE,
+    sampling = "fraction"
+  )
 })
 
 test_that("stratified sampling returns repeatable results from a fixed PRNG seed", {
@@ -172,7 +203,8 @@ test_that("stratified sampling returns repeatable results from a fixed PRNG seed
           set.seed(142857L)
           sdf %>%
             dplyr::group_by(group) %>>%
-            dplyr::sample_n %@% args %>%
+            dplyr::sample_n %@%
+            args %>%
             collect()
         }
       )
@@ -193,7 +225,8 @@ test_that("stratified sampling returns repeatable results from a fixed PRNG seed
           set.seed(142857L)
           sdf %>%
             dplyr::group_by(group) %>>%
-            dplyr::sample_frac %@% args %>%
+            dplyr::sample_frac %@%
+            args %>%
             collect()
         }
       )
@@ -207,4 +240,3 @@ test_that("stratified sampling returns repeatable results from a fixed PRNG seed
 })
 
 test_clear_cache()
-

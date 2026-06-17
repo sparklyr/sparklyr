@@ -26,7 +26,12 @@ ml_evaluate <- function(x, dataset) {
 
 #' @export
 ml_evaluate.default <- function(x, dataset) {
-  stop("`ml_evaluate()` is not supported for `", class(x)[[1]], "`.", call. = FALSE)
+  stop(
+    "`ml_evaluate()` is not supported for `",
+    class(x)[[1]],
+    "`.",
+    call. = FALSE
+  )
 }
 
 #' @rdname ml_evaluate
@@ -109,7 +114,9 @@ ml_evaluate.ml_model_classification <- function(x, dataset) {
     invoke("transform", spark_dataframe(dataset))
 
   accuracy <- sc %>%
-    invoke_new("org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator") %>%
+    invoke_new(
+      "org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator"
+    ) %>%
     invoke("evaluate", prediction)
 
   dplyr::tibble(Accuracy = accuracy)

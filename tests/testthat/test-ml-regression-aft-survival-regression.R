@@ -41,7 +41,8 @@ training_tbl <- sdf_copy_to(sc, training, overwrite = TRUE)
 test_that("ml_aft_survival_regression() works properly", {
   training_va <- ft_vector_assembler(
     training_tbl,
-    c("V1", "V2"), "features"
+    c("V1", "V2"),
+    "features"
   )
 
   aft <- ml_aft_survival_regression(
@@ -50,7 +51,12 @@ test_that("ml_aft_survival_regression() works properly", {
     quantiles_col = "quantiles"
   )
 
-  expect_equal(aft$coefficients, c(-0.49631114666506776, 0.19844437699934067), tolerance = 1e-4, scale = 1)
+  expect_equal(
+    aft$coefficients,
+    c(-0.49631114666506776, 0.19844437699934067),
+    tolerance = 1e-4,
+    scale = 1
+  )
   expect_equal(aft$intercept, 2.6380946151040043, tolerance = 1e-4, scale = 1)
   expect_equal(aft$scale, 1.5472345574364683, tolerance = 1e-4, scale = 1)
 
@@ -62,22 +68,35 @@ test_that("ml_aft_survival_regression() works properly", {
       dplyr::first()
   )
 
-  expect_equal(p_q,
+  expect_equal(
+    p_q,
     c(1.1603238947151593, 4.995456010274735),
-    tolerance = 1e-4, scale = 1
+    tolerance = 1e-4,
+    scale = 1
   )
-  expect_equal(predicted_tbl %>%
-    dplyr::pull(prediction) %>%
-    dplyr::first(),
-  5.718979487634966,
-  tolerance = 1e-4, scale = 1
+  expect_equal(
+    predicted_tbl %>%
+      dplyr::pull(prediction) %>%
+      dplyr::first(),
+    5.718979487634966,
+    tolerance = 1e-4,
+    scale = 1
   )
 
-  aft_model <- ml_aft_survival_regression(training_va, label ~ V1 + V2, features_col = "feat")
+  aft_model <- ml_aft_survival_regression(
+    training_va,
+    label ~ V1 + V2,
+    features_col = "feat"
+  )
 
-  expect_equal(coef(aft_model),
-    structure(c(2.63808989630564, -0.496304411053117, 0.198452172529228), .Names = c("(Intercept)", "V1", "V2")),
-    tolerance = 1e-05, scale = 1
+  expect_equal(
+    coef(aft_model),
+    structure(
+      c(2.63808989630564, -0.496304411053117, 0.198452172529228),
+      .Names = c("(Intercept)", "V1", "V2")
+    ),
+    tolerance = 1e-05,
+    scale = 1
   )
 })
 
@@ -101,7 +120,7 @@ test_that("Deprecated function fails", {
   expect_warning(
     ml_survival_regression(sc),
     "'ml_survival_regression' is deprecated."
-    )
+  )
 })
 
 test_that("Tuning works with AFT", {
@@ -114,7 +133,7 @@ test_that("Tuning works with AFT", {
     survival::ovarian,
     name = "ovarian_tbl",
     overwrite = TRUE
-    )
+  )
 
   pipeline <- ml_pipeline(sc) %>%
     ft_r_formula(futime ~ ecog_ps + rx + age + resid_ds) %>%
@@ -142,6 +161,4 @@ test_that("Tuning works with AFT", {
 })
 
 
-
 test_clear_cache()
-

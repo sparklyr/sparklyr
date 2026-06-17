@@ -57,4 +57,3 @@ test_that("'spark_config_settings()' returns a data.frame", {
 })
 
 test_clear_cache()
-

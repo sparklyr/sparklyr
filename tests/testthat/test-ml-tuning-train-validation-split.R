@@ -38,7 +38,8 @@ test_that("we can train a regression with train-validation-split", {
   )
   tvsm <- ml_train_validation_split(
     iris_tbl,
-    estimator = pipeline, estimator_param_maps = grid,
+    estimator = pipeline,
+    estimator_param_maps = grid,
     evaluator = ml_multiclass_classification_evaluator(sc),
     collect_sub_models = TRUE,
     seed = 1

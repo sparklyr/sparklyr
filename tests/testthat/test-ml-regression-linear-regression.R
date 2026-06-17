@@ -78,10 +78,13 @@ test_that("weights column works for lm", {
     )
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
-  r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
-    weights = weights, data = iris_weighted
+  r <- lm(
+    Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+    weights = weights,
+    data = iris_weighted
   )
-  s <- ml_linear_regression(iris_weighted_tbl,
+  s <- ml_linear_regression(
+    iris_weighted_tbl,
     response = "Sepal_Length",
     features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
     reg_param = 0L,
@@ -89,10 +92,12 @@ test_that("weights column works for lm", {
   )
   expect_equal(unname(coef(r)), unname(coef(s)))
 
-  r <- lm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+  r <- lm(
+    Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
     data = iris_weighted
   )
-  s <- ml_linear_regression(iris_weighted_tbl,
+  s <- ml_linear_regression(
+    iris_weighted_tbl,
     response = "Sepal_Length",
     features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
     reg_param = 0L,
@@ -102,12 +107,12 @@ test_that("weights column works for lm", {
 })
 
 test_that("ml_linear_regression print methods work", {
-
   sc <- testthat_spark_connection()
 
   iris_tbl <- testthat_tbl("iris")
   linear_model <- ml_linear_regression(
-    iris_tbl, Petal_Length ~ Petal_Width
+    iris_tbl,
+    Petal_Length ~ Petal_Width
   )
 
   expect_known_output(
@@ -164,6 +169,4 @@ test_that("Tuning works with Linear Regression", {
 })
 
 
-
 test_clear_cache()
-

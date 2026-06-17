@@ -68,26 +68,31 @@ test_readwrite <- function(sc, writer, reader, name = "testtable", ...) {
 test_that(
   "spark_read_parquet() reads multiple parquet files",
   expect_equal(
-    test_readwrite(sc = sc, writer = spark_write_parquet, reader = spark_read_parquet),
+    test_readwrite(
+      sc = sc,
+      writer = spark_write_parquet,
+      reader = spark_read_parquet
+    ),
     list(TRUE, TRUE, TRUE, TRUE)
   )
 )
 
-test_that(
-  "spark_read_orc() reads multiple orc files",
-  {
-    test_requires_version("2.0.0")
-    expect_equal(
-      test_readwrite(sc = sc, writer = spark_write_orc, reader = spark_read_orc),
-      list(TRUE, TRUE, TRUE, TRUE)
-    )
-  }
-)
+test_that("spark_read_orc() reads multiple orc files", {
+  test_requires_version("2.0.0")
+  expect_equal(
+    test_readwrite(sc = sc, writer = spark_write_orc, reader = spark_read_orc),
+    list(TRUE, TRUE, TRUE, TRUE)
+  )
+})
 
 test_that(
   "spark_read_json() reads multiple json files",
   expect_equal(
-    test_readwrite(sc = sc, writer = spark_write_json, reader = spark_read_json),
+    test_readwrite(
+      sc = sc,
+      writer = spark_write_json,
+      reader = spark_read_json
+    ),
     list(TRUE, TRUE, TRUE, TRUE)
   )
 )
@@ -95,7 +100,11 @@ test_that(
 test_that(
   "spark_read_text() reads multiple text files",
   expect_equal(
-    test_readwrite(sc = sc, writer = spark_write_text, reader = spark_read_text),
+    test_readwrite(
+      sc = sc,
+      writer = spark_write_text,
+      reader = spark_read_text
+    ),
     list(TRUE, TRUE, TRUE, TRUE)
   )
 )
@@ -103,10 +112,14 @@ test_that(
 test_that(
   "spark_read_text() throws a useful error for multiple files with whole=TRUE",
   expect_error(
-    test_readwrite(sc = sc, writer = spark_write_text, reader = spark_read_text, whole = TRUE),
+    test_readwrite(
+      sc = sc,
+      writer = spark_write_text,
+      reader = spark_read_text,
+      whole = TRUE
+    ),
     "spark_read_text is only suppored with path of length 1 if whole=TRUE"
   )
 )
 
 test_clear_cache()
-

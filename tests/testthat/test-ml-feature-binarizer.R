@@ -37,4 +37,3 @@ test_that("ft_binarizer() input checking", {
 })
 
 test_clear_cache()
-

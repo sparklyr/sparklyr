@@ -24,7 +24,13 @@ test_that("sdf_expand_grid works with R vectors", {
 
   expect_equivalent(
     sdf_expand_grid(sc, x = var1, y = var2, z = var3, w = var4) %>% collect(),
-    expand.grid(x = var1, y = var2, z = var3, w = var4, stringsAsFactors = FALSE)
+    expand.grid(
+      x = var1,
+      y = var2,
+      z = var3,
+      w = var4,
+      stringsAsFactors = FALSE
+    )
   )
 })
 
@@ -101,4 +107,3 @@ test_that("sdf_expand_grid works with broadcast joins", {
 })
 
 test_clear_cache()
-

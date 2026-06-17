@@ -42,4 +42,3 @@ test_that("ft_max_abs_scaler() works properly", {
 })
 
 test_clear_cache()
-

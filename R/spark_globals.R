@@ -1,7 +1,7 @@
 # ------------ Init session level variables ----------
 .gls_env <- new.env(parent = emptyenv())
 
-.gls_env$extension_packages <-  character()
+.gls_env$extension_packages <- character()
 .gls_env$spark_versions_json <- NULL
 .gls_env$param_mapping_s_to_r <- NULL
 .gls_env$param_mapping_r_to_s <- NULL
@@ -85,7 +85,7 @@ genv_set_avail_package_cache <- function(x) {
 }
 
 genv_get_do_spark <- function(element = NULL) {
-  if(!is.null(element)) {
+  if (!is.null(element)) {
     .gls_env$do_spark[[element]]
   } else {
     .gls_env$do_spark

@@ -18,7 +18,6 @@ test_that("sdf_crosstab() works", {
 })
 
 test_that("sdf_quantile() works for a single column", {
-
   mtcars_tbl <- testthat_tbl("mtcars")
 
   quantiles <- mtcars_tbl %>%
@@ -37,7 +36,6 @@ test_that("sdf_quantile() works for a single column", {
 })
 
 test_that("sdf_quantile() works for multiple column", {
-
   mtcars_tbl <- testthat_tbl("mtcars")
 
   quantiles <- mtcars_tbl %>%
@@ -69,7 +67,6 @@ test_that("sdf_quantile() works for multiple column", {
 })
 
 test_that("sdf_quantile() approximates weighted quantiles correctly", {
-
   set.seed(31415926L)
 
   range <- seq(-4, 4, 8e-6)
@@ -84,7 +81,6 @@ test_that("sdf_quantile() approximates weighted quantiles correctly", {
   pct <- seq(0, 1, 0.001)
 
   for (max_error in c(0.1, 0.05, 0.01, 0.001)) {
-
     pct_values <- sdf_quantile(sdf, "v", pct, max_error, "w")
 
     approx_pct <- purrr::map_dbl(pct_values, pnorm)
@@ -146,7 +142,7 @@ test_that("Can generate i.i.d samples from distributions correctly", {
       summarise(m = mean(x, na.rm = TRUE)) %>%
       pull()
 
-    r_probs <- tibble(x = do.call(stats_fn, stats_fn_args))  %>%
+    r_probs <- tibble(x = do.call(stats_fn, stats_fn_args)) %>%
       mutate(nt = ntile(x, n = 10)) %>%
       filter(nt > 1, nt < 10) %>%
       group_by(nt) %>%

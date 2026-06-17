@@ -52,7 +52,10 @@ on_connection_opened <- function(scon, env, connectCall) {
           host = host,
 
           # icon for connection
-          icon = system.file(file.path("icons", "spark.png"), package = "sparklyr"),
+          icon = system.file(
+            file.path("icons", "spark.png"),
+            package = "sparklyr"
+          ),
 
           # connection code
           connectCode = connectCall,
@@ -63,16 +66,18 @@ on_connection_opened <- function(scon, env, connectCall) {
           },
           listObjectTypes = function() {
             return(
-              list(catalog = list(
-                contains =
-                  list(schema = list(
-                    contains =
-                      list(
+              list(
+                catalog = list(
+                  contains = list(
+                    schema = list(
+                      contains = list(
                         table = list(contains = "data"),
                         view = list(contains = "data")
                       )
-                  ))
-              ))
+                    )
+                  )
+                )
+              )
             )
           },
 
@@ -120,9 +125,11 @@ on_connection_opened <- function(scon, env, connectCall) {
         objs <- ls(env)
         for (name in objs) {
           x <- base::get(name, envir = env)
-          if (inherits(x, "spark_connection") &&
-            identical(to_host(x), host) &&
-            sparklyr::connection_is_open(x)) {
+          if (
+            inherits(x, "spark_connection") &&
+              identical(to_host(x), host) &&
+              sparklyr::connection_is_open(x)
+          ) {
             return(name)
           }
         }
@@ -279,8 +286,10 @@ spark_ide_actions <- function(scon) {
           icon = file.path(icons, "edit-sql.png"),
           callback = function() {
             varname <- "sc"
-            if (!exists("sc", envir = .GlobalEnv) ||
-              !identical(get("sc", envir = .GlobalEnv), scon)) {
+            if (
+              !exists("sc", envir = .GlobalEnv) ||
+                !identical(get("sc", envir = .GlobalEnv), scon)
+            ) {
               varname <- Filter(
                 function(e) identical(get(e, envir = .GlobalEnv), scon),
                 ls(envir = .GlobalEnv)
@@ -337,7 +346,13 @@ spark_ide_objects <- function(con, catalog, schema, name, type) {
 }
 
 #' @export
-spark_ide_objects.spark_connection <- function(con, catalog, schema, name, type) {
+spark_ide_objects.spark_connection <- function(
+  con,
+  catalog,
+  schema,
+  name,
+  type
+) {
   connection_list_tables(con, includeType = TRUE)
 }
 
@@ -364,20 +379,24 @@ connection_list_tables <- function(con, includeType = FALSE) {
 # ----------------------------- DB Columns -------------------------------------
 #' @rdname spark_ide_connection_open
 #' @export
-spark_ide_columns <- function(con,
-                              table = NULL,
-                              view = NULL,
-                              catalog = NULL,
-                              schema = NULL) {
+spark_ide_columns <- function(
+  con,
+  table = NULL,
+  view = NULL,
+  catalog = NULL,
+  schema = NULL
+) {
   UseMethod("spark_ide_columns")
 }
 
 #' @export
-spark_ide_columns.spark_connection <- function(con,
-                                               table = NULL,
-                                               view = NULL,
-                                               catalog = NULL,
-                                               schema = NULL) {
+spark_ide_columns.spark_connection <- function(
+  con,
+  table = NULL,
+  view = NULL,
+  catalog = NULL,
+  schema = NULL
+) {
   connection_list_columns(con, table = table)
 }
 
@@ -388,7 +407,8 @@ connection_list_columns <- function(con, table) {
     data.frame(
       name = names(df),
       type = as.character(lapply(names(df), function(f) {
-        capture.output(str(df[[f]],
+        capture.output(str(
+          df[[f]],
           give.length = FALSE,
           width = 30,
           strict.width = "cut"
@@ -405,23 +425,25 @@ connection_list_columns <- function(con, table) {
 #' @rdname spark_ide_connection_open
 #' @export
 spark_ide_preview <- function(
-    con,
-    rowLimit,
-    table = NULL,
-    view = NULL,
-    catalog = NULL,
-    schema = NULL) {
+  con,
+  rowLimit,
+  table = NULL,
+  view = NULL,
+  catalog = NULL,
+  schema = NULL
+) {
   UseMethod("spark_ide_preview")
 }
 
 #' @export
 spark_ide_preview.spark_connection <- function(
-    con,
-    rowLimit,
-    table = NULL,
-    view = NULL,
-    catalog = NULL,
-    schema = NULL) {
+  con,
+  rowLimit,
+  table = NULL,
+  view = NULL,
+  catalog = NULL,
+  schema = NULL
+) {
   connection_preview_table(con, table, rowLimit)
 }
 

@@ -21,7 +21,10 @@ test_that("ft_idf() param setting", {
 })
 
 test_that("ft_idf() works properly", {
-  test_requires_version("2.0.0", "hashing implementation changed in 2.0 -- https://issues.apache.org/jira/browse/SPARK-10574")
+  test_requires_version(
+    "2.0.0",
+    "hashing implementation changed in 2.0 -- https://issues.apache.org/jira/browse/SPARK-10574"
+  )
   sc <- testthat_spark_connection()
   sentence_df <- data.frame(
     sentence = c(
@@ -49,8 +52,18 @@ test_that("ft_idf() works properly", {
   )
   expected_res <- ifelse(
     spark_version(sc) >= "3.0.0",
-    list(c(0.287682072451781, 0.693147180559945, 0.287682072451781, 0.575364144903562)),
-    list(c(0.693147180559945, 0.693147180559945, 0.287682072451781, 1.38629436111989))
+    list(c(
+      0.287682072451781,
+      0.693147180559945,
+      0.287682072451781,
+      0.575364144903562
+    )),
+    list(c(
+      0.693147180559945,
+      0.693147180559945,
+      0.287682072451781,
+      1.38629436111989
+    ))
   )
 
   expect_equal(which(idf_1 != 0), expected_non_zero_idxes[[1]])
@@ -58,4 +71,3 @@ test_that("ft_idf() works properly", {
 })
 
 test_clear_cache()
-

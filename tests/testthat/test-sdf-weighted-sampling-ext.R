@@ -71,4 +71,3 @@ test_that("sdf_weighted_sample with replacement works as expected", {
 })
 
 test_clear_cache()
-

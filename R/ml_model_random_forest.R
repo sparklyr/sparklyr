@@ -39,14 +39,33 @@ NULL
 #' ml_multiclass_classification_evaluator(pred)
 #' }
 #' @export
-ml_random_forest <- function(x, formula = NULL, type = c("auto", "regression", "classification"),
-                             features_col = "features", label_col = "label", prediction_col = "prediction",
-                             probability_col = "probability", raw_prediction_col = "rawPrediction",
-                             feature_subset_strategy = "auto", impurity = "auto", checkpoint_interval = 10,
-                             max_bins = 32, max_depth = 5, num_trees = 20, min_info_gain = 0,
-                             min_instances_per_node = 1, subsampling_rate = 1, seed = NULL,
-                             thresholds = NULL, cache_node_ids = FALSE, max_memory_in_mb = 256,
-                             uid = random_string("random_forest_"), response = NULL, features = NULL, ...) {
+ml_random_forest <- function(
+  x,
+  formula = NULL,
+  type = c("auto", "regression", "classification"),
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  feature_subset_strategy = "auto",
+  impurity = "auto",
+  checkpoint_interval = 10,
+  max_bins = 32,
+  max_depth = 5,
+  num_trees = 20,
+  min_info_gain = 0,
+  min_instances_per_node = 1,
+  subsampling_rate = 1,
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256,
+  uid = random_string("random_forest_"),
+  response = NULL,
+  features = NULL,
+  ...
+) {
   formula <- ml_standardize_formula(formula, response, features)
   response_col <- gsub("~.+$", "", formula) %>% trimws()
 
@@ -134,23 +153,38 @@ ml_random_forest <- function(x, formula = NULL, type = c("auto", "regression", "
   )
 }
 
-new_ml_model_random_forest_classification <- function(pipeline_model, formula, dataset, label_col,
-                                                      features_col, predicted_label_col) {
+new_ml_model_random_forest_classification <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col,
+  predicted_label_col
+) {
   new_ml_model_classification(
-    pipeline_model, formula,
+    pipeline_model,
+    formula,
     dataset = dataset,
-    label_col = label_col, features_col = features_col,
+    label_col = label_col,
+    features_col = features_col,
     predicted_label_col = predicted_label_col,
     class = "ml_model_random_forest_classification"
   )
 }
 
-new_ml_model_random_forest_regression <- function(pipeline_model, formula, dataset, label_col,
-                                                  features_col) {
+new_ml_model_random_forest_regression <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col
+) {
   new_ml_model_regression(
-    pipeline_model, formula,
+    pipeline_model,
+    formula,
     dataset = dataset,
-    label_col = label_col, features_col = features_col,
+    label_col = label_col,
+    features_col = features_col,
     class = "ml_model_random_forest_regression"
   )
 }

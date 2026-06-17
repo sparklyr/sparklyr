@@ -13,8 +13,8 @@ test_that("distinct equivalent to local unique when keeping all columns", {
 
   expect_equivalent(
     sdf %>% dplyr::distinct() %>% arrange(x, y, z) %>% collect(),
-     df %>% dplyr::distinct() %>% arrange(x, y, z)
-    )
+    df %>% dplyr::distinct() %>% arrange(x, y, z)
+  )
 })
 
 test_that("distinct for single column works as expected", {
@@ -25,10 +25,12 @@ test_that("distinct for single column works as expected", {
   )
   sdf <- copy_to(sc, df, name = random_string("tmp"))
   expect_equivalent(
-    sdf %>% dplyr::distinct(x, .keep_all = FALSE) %>% arrange(x) %>% collect(), unique(df[order(df$x),"x"])
+    sdf %>% dplyr::distinct(x, .keep_all = FALSE) %>% arrange(x) %>% collect(),
+    unique(df[order(df$x), "x"])
   )
   expect_equivalent(
-    sdf %>% dplyr::distinct(y, .keep_all = FALSE) %>% arrange(y) %>% collect(), unique(df[order(df$y), "y"])
+    sdf %>% dplyr::distinct(y, .keep_all = FALSE) %>% arrange(y) %>% collect(),
+    unique(df[order(df$y), "y"])
   )
 })
 
@@ -42,19 +44,18 @@ test_that("distinct keeps only specified cols", {
 })
 
 test_that("unless .keep_all = TRUE", {
-
   df <- dplyr::tibble(x = c(1, 1, 1), y = 3:1)
 
   sdf <- copy_to(sc, df, name = random_string("tmp"))
 
   expect_equivalent(
     sdf %>% dplyr::distinct(x) %>% collect(),
-     df %>% dplyr::distinct(x)
+    df %>% dplyr::distinct(x)
   )
 
   expect_equivalent(
     sdf %>% dplyr::distinct(x, .keep_all = TRUE) %>% collect(),
-     df %>% dplyr::distinct(x, .keep_all = TRUE),
+    df %>% dplyr::distinct(x, .keep_all = TRUE),
   )
 })
 
@@ -63,12 +64,16 @@ test_that("distinct doesn't duplicate columns", {
   sdf <- copy_to(sc, df, overwrite = TRUE)
 
   expect_equivalent(
-    sdf %>% dplyr::distinct(a, a) %>% arrange(a) %>%  collect(),
-     df %>% dplyr::distinct(a, a) %>% arrange(a)
+    sdf %>% dplyr::distinct(a, a) %>% arrange(a) %>% collect(),
+    df %>% dplyr::distinct(a, a) %>% arrange(a)
   )
   expect_equivalent(
-    sdf %>% dplyr::group_by(a) %>% dplyr::distinct(a) %>% arrange(a) %>% collect(),
-     df %>% dplyr::group_by(a) %>% dplyr::distinct(a) %>% arrange(a)
+    sdf %>%
+      dplyr::group_by(a) %>%
+      dplyr::distinct(a) %>%
+      arrange(a) %>%
+      collect(),
+    df %>% dplyr::group_by(a) %>% dplyr::distinct(a) %>% arrange(a)
   )
 })
 
@@ -78,7 +83,10 @@ test_that("grouped distinct always includes group cols", {
     group_by(g) %>%
     distinct(x)
 
-  expect_equivalent(out %>% arrange(g) %>% collect(), dplyr::tibble(g = c(1, 2), x = c(1, 2)))
+  expect_equivalent(
+    out %>% arrange(g) %>% collect(),
+    dplyr::tibble(g = c(1, 2), x = c(1, 2))
+  )
   expect_equal(dplyr::group_vars(out), "g")
 })
 
@@ -111,7 +119,8 @@ test_that("distinct on a new, copied variable is equivalent to mutate followed b
   sdf <- copy_to(sc, dplyr::tibble(g = c(1, 2), x = c(1, 2)))
 
   expect_equivalent(
-    sdf %>% dplyr::distinct(aa = g) %>% arrange(aa) %>% collect(), dplyr::tibble(aa = c(1, 2))
+    sdf %>% dplyr::distinct(aa = g) %>% arrange(aa) %>% collect(),
+    dplyr::tibble(aa = c(1, 2))
   )
 })
 
@@ -124,8 +133,8 @@ test_that("distinct preserves grouping", {
 
   expect_equivalent(
     sdf %>% dplyr::distinct(x) %>% arrange(x) %>% collect(),
-     df %>% dplyr::distinct(x) %>% arrange(x)
-    )
+    df %>% dplyr::distinct(x) %>% arrange(x)
+  )
 
   expect_equivalent(
     sdf %>% dplyr::distinct(x) %>% dplyr::group_vars(),
@@ -134,17 +143,15 @@ test_that("distinct preserves grouping", {
 
   out <- sdf %>% dplyr::distinct(x = x + 2)
 
-
   expect_equivalent(
     sdf %>% dplyr::distinct(x = x + 2) %>% arrange(x) %>% collect(),
-     df %>% dplyr::distinct(x = x + 2) %>% arrange(x)
+    df %>% dplyr::distinct(x = x + 2) %>% arrange(x)
   )
 
   expect_equivalent(
     sdf %>% dplyr::distinct(x = x + 2) %>% dplyr::group_vars(),
-     df %>% dplyr::distinct(x = x + 2) %>% dplyr::group_vars()
+    df %>% dplyr::distinct(x = x + 2) %>% dplyr::group_vars()
   )
-
 })
 
 test_that("distinct followed by another lazy op works as expected", {

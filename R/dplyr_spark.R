@@ -11,10 +11,12 @@ spark_connection.tbl_spark <- function(x, ...) {
 
 #' @export
 spark_connection.src_spark <- function(x, ...) {
-
   # for development version of dplyr (>= 0.5.0.9000)
-  if ("dplyr" %in% loadedNamespaces() &&
-    exists("con_acquire", envir = asNamespace("dplyr"))) {
+  if (
+    "dplyr" %in%
+      loadedNamespaces() &&
+      exists("con_acquire", envir = asNamespace("dplyr"))
+  ) {
     acquire <- get("con_acquire", envir = asNamespace("dplyr"))
     return(acquire(x))
   }
@@ -74,7 +76,7 @@ tbl.spark_connection <- function(src, from, ...) {
   src <- structure(
     list(con = src, ...),
     class = c(subclass, "src_sql", "src")
-    )
+  )
   spark_tbl_sql(src = src, from)
 }
 
@@ -83,18 +85,24 @@ spark_tbl_sql <- function(src, from, ...) {
     subclass = "spark",
     src = src,
     from = process_tbl_name(from),
-    ...)
+    ...
+  )
 
   tbl_spark[["sdf_cache_state"]] <- new.env(parent = emptyenv())
   tbl_spark[["sdf_cache_state"]][["ops"]] <- NULL
   tbl_spark[["sdf_cache_state"]][["lazy_query"]] <- NULL
   tbl_spark[["sdf_cache_state"]][["spark_dataframe"]] <- NULL
   tbl_spark[["spark_dataframe"]] <- function(self, spark_dataframe_impl) {
-    cached <- identical(self[["sdf_cache_state"]][["lazy_query"]], self[["lazy_query"]])
+    cached <- identical(
+      self[["sdf_cache_state"]][["lazy_query"]],
+      self[["lazy_query"]]
+    )
 
     if (!cached) {
       self[["sdf_cache_state"]][["lazy_query"]] <- self[["lazy_query"]]
-      self[["sdf_cache_state"]][["spark_dataframe"]] <- spark_dataframe_impl(self)
+      self[["sdf_cache_state"]][["spark_dataframe"]] <- spark_dataframe_impl(
+        self
+      )
     }
 
     self[["sdf_cache_state"]][["spark_dataframe"]]
@@ -104,16 +112,26 @@ spark_tbl_sql <- function(src, from, ...) {
   tbl_spark[["schema_cache_state"]][["ops"]] <- NULL
   tbl_spark[["schema_cache_state"]][["lazy_query"]] <- NULL
   tbl_spark[["schema_cache_state"]][["schema"]] <- as.list(rep(NA, 4L))
-  tbl_spark[["schema"]] <- function(self, schema_impl, expand_nested_cols, expand_struct_cols) {
-    cache_index <- (
-      as.integer(expand_nested_cols) * 2L + as.integer(expand_struct_cols) + 1L
+  tbl_spark[["schema"]] <- function(
+    self,
+    schema_impl,
+    expand_nested_cols,
+    expand_struct_cols
+  ) {
+    cache_index <- (as.integer(expand_nested_cols) *
+      2L +
+      as.integer(expand_struct_cols) +
+      1L)
+
+    cached <- identical(
+      self[["schema_cache_state"]][["lazy_query"]],
+      self[["lazy_query"]]
     )
 
-    cached <- identical(self[["schema_cache_state"]][["lazy_query"]], self[["lazy_query"]])
-
-
-    if (!cached || is.na(self[["schema_cache_state"]][["schema"]][[cache_index]])[[1]]) {
-
+    if (
+      !cached ||
+        is.na(self[["schema_cache_state"]][["schema"]][[cache_index]])[[1]]
+    ) {
       self[["schema_cache_state"]][["lazy_query"]] <- self[["lazy_query"]]
 
       self[["schema_cache_state"]][["schema"]][[cache_index]] <- schema_impl(
@@ -147,7 +165,9 @@ process_tbl_name <- function(x) {
       } else if (identical(num_components, 3L)) {
         dbplyr::in_catalog(components[[1]], components[[2]], components[[3]])
       } else {
-        stop("expected input to be <table name>, <schema name>.<table name>, or <catalog name>.<schema name>.<table name>")
+        stop(
+          "expected input to be <table name>, <schema name>.<table name>, or <catalog name>.<schema name>.<table name>"
+        )
       }
     }
   }
@@ -159,13 +179,15 @@ src_tbls.spark_connection <- function(x, ...) {
   dots <- rlang::dots_list(...)
   db <- dots$database
   sql <- hive_context(x)
-  query <- (
-    if (is.null(db)) {
-      "SHOW TABLES"
-    } else {
-      as.character(dbplyr::build_sql("SHOW TABLES IN ", dbplyr::ident(db), con = x))
-    }
-  )
+  query <- (if (is.null(db)) {
+    "SHOW TABLES"
+  } else {
+    as.character(dbplyr::build_sql(
+      "SHOW TABLES IN ",
+      dbplyr::ident(db),
+      con = x
+    ))
+  })
   tbls <- invoke(sql, "sql", query)
   tableNames <- sdf_read_column(tbls, "tableName")
 
@@ -175,8 +197,7 @@ src_tbls.spark_connection <- function(x, ...) {
 
 #' @export
 #' @importFrom dplyr db_data_type
-db_data_type.spark_connection <- function(...) {
-}
+db_data_type.spark_connection <- function(...) {}
 
 
 #' Copy an R Data Frame to Spark
@@ -201,13 +222,15 @@ db_data_type.spark_connection <- function(...) {
 #'
 #' @export
 #' @importFrom dplyr copy_to
-copy_to.spark_connection <- function(dest,
-                                     df,
-                                     name = spark_table_name(substitute(df)),
-                                     overwrite = FALSE,
-                                     memory = TRUE,
-                                     repartition = 0L,
-                                     ...) {
+copy_to.spark_connection <- function(
+  dest,
+  df,
+  name = spark_table_name(substitute(df)),
+  overwrite = FALSE,
+  memory = TRUE,
+  repartition = 0L,
+  ...
+) {
   sdf_copy_to(dest, df, name, memory, repartition, overwrite, ...)
 }
 
@@ -247,7 +270,13 @@ compute.tbl_spark <- function(x, ...) {
 
 #' @importFrom dbplyr sql_query_save
 #' @export
-sql_query_save.spark_connection <- function(con, sql, name, temporary = TRUE, ...) {
+sql_query_save.spark_connection <- function(
+  con,
+  sql,
+  name,
+  temporary = TRUE,
+  ...
+) {
   spark_sql_query_save(con, sql, name, temporary, ...)
 }
 

@@ -58,12 +58,12 @@ sdf_copy_to(sc, iris)
 
 }
 \seealso{
-Other Spark data frames: 
-\code{\link{sdf_distinct}()},
-\code{\link{sdf_random_split}()},
-\code{\link{sdf_register}()},
-\code{\link{sdf_sample}()},
-\code{\link{sdf_sort}()},
-\code{\link{sdf_weighted_sample}()}
+Other Spark data frames:
+\code{\link[=sdf_distinct]{sdf_distinct()}},
+\code{\link[=sdf_random_split]{sdf_random_split()}},
+\code{\link[=sdf_register]{sdf_register()}},
+\code{\link[=sdf_sample]{sdf_sample()}},
+\code{\link[=sdf_sort]{sdf_sort()}},
+\code{\link[=sdf_weighted_sample]{sdf_weighted_sample()}}
 }
 \concept{Spark data frames}

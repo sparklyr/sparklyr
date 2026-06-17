@@ -22,18 +22,19 @@ NULL
 #'
 #' @export
 stream_read_csv <- function(
-    sc,
-    path,
-    name = NULL,
-    header = TRUE,
-    columns = NULL,
-    delimiter = ",",
-    quote = "\"",
-    escape = "\\",
-    charset = "UTF-8",
-    null_value = NULL,
-    options = list(),
-    ...) {
+  sc,
+  path,
+  name = NULL,
+  header = TRUE,
+  columns = NULL,
+  delimiter = ",",
+  quote = "\"",
+  escape = "\\",
+  charset = "UTF-8",
+  null_value = NULL,
+  options = list(),
+  ...
+) {
   infer_schema <- identical(columns, NULL) || is.character(columns)
 
   streamOptions <- spark_csv_options(
@@ -88,20 +89,21 @@ stream_read_csv <- function(
 #'
 #' @export
 stream_write_csv <- function(
-    x,
-    path,
-    mode = c("append", "complete", "update"),
-    trigger = stream_trigger_interval(),
-    checkpoint = file.path(path, "checkpoint"),
-    header = TRUE,
-    delimiter = ",",
-    quote = "\"",
-    escape = "\\",
-    charset = "UTF-8",
-    null_value = NULL,
-    options = list(),
-    partition_by = NULL,
-    ...) {
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path(path, "checkpoint"),
+  header = TRUE,
+  delimiter = ",",
+  quote = "\"",
+  escape = "\\",
+  charset = "UTF-8",
+  null_value = NULL,
+  options = list(),
+  partition_by = NULL,
+  ...
+) {
   streamOptions <- spark_csv_options(
     header = header,
     inferSchema = NULL,
@@ -113,7 +115,8 @@ stream_write_csv <- function(
     options = options
   )
 
-  stream_write_generic(x,
+  stream_write_generic(
+    x,
     path = path,
     type = "csv",
     mode = mode,
@@ -127,11 +130,12 @@ stream_write_csv <- function(
 #' @rdname stream_read_csv
 #' @export
 stream_read_text <- function(
-    sc,
-    path,
-    name = NULL,
-    options = list(),
-    ...) {
+  sc,
+  path,
+  name = NULL,
+  options = list(),
+  ...
+) {
   stream_read_generic(
     sc,
     path = path,
@@ -145,14 +149,15 @@ stream_read_text <- function(
 #' @rdname stream_write_csv
 #' @export
 stream_write_text <- function(
-    x,
-    path,
-    mode = c("append", "complete", "update"),
-    trigger = stream_trigger_interval(),
-    checkpoint = file.path(path, "checkpoints", random_string("")),
-    options = list(),
-    partition_by = NULL,
-    ...) {
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path(path, "checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+) {
   stream_write_generic(
     x,
     path = path,
@@ -168,12 +173,13 @@ stream_write_text <- function(
 #' @rdname stream_read_csv
 #' @export
 stream_read_json <- function(
-    sc,
-    path,
-    name = NULL,
-    columns = NULL,
-    options = list(),
-    ...) {
+  sc,
+  path,
+  name = NULL,
+  columns = NULL,
+  options = list(),
+  ...
+) {
   stream_read_generic(
     sc,
     path = path,
@@ -187,14 +193,15 @@ stream_read_json <- function(
 #' @rdname stream_write_csv
 #' @export
 stream_write_json <- function(
-    x,
-    path,
-    mode = c("append", "complete", "update"),
-    trigger = stream_trigger_interval(),
-    checkpoint = file.path(path, "checkpoints", random_string("")),
-    options = list(),
-    partition_by = NULL,
-    ...) {
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path(path, "checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+) {
   stream_write_generic(
     x,
     path = path,
@@ -210,12 +217,13 @@ stream_write_json <- function(
 #' @rdname stream_read_csv
 #' @export
 stream_read_parquet <- function(
-    sc,
-    path,
-    name = NULL,
-    columns = NULL,
-    options = list(),
-    ...) {
+  sc,
+  path,
+  name = NULL,
+  columns = NULL,
+  options = list(),
+  ...
+) {
   stream_read_generic(
     sc,
     path = path,
@@ -229,14 +237,15 @@ stream_read_parquet <- function(
 #' @rdname stream_write_csv
 #' @export
 stream_write_parquet <- function(
-    x,
-    path,
-    mode = c("append", "complete", "update"),
-    trigger = stream_trigger_interval(),
-    checkpoint = file.path(path, "checkpoints", random_string("")),
-    options = list(),
-    partition_by = NULL,
-    ...) {
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path(path, "checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+) {
   stream_write_generic(
     x,
     path = path,
@@ -252,12 +261,13 @@ stream_write_parquet <- function(
 #' @rdname stream_read_csv
 #' @export
 stream_read_orc <- function(
-    sc,
-    path,
-    name = NULL,
-    columns = NULL,
-    options = list(),
-    ...) {
+  sc,
+  path,
+  name = NULL,
+  columns = NULL,
+  options = list(),
+  ...
+) {
   stream_read_generic(
     sc,
     path = path,
@@ -271,14 +281,15 @@ stream_read_orc <- function(
 #' @rdname stream_write_csv
 #' @export
 stream_write_orc <- function(
-    x,
-    path,
-    mode = c("append", "complete", "update"),
-    trigger = stream_trigger_interval(),
-    checkpoint = file.path(path, "checkpoints", random_string("")),
-    options = list(),
-    partition_by = NULL,
-    ...) {
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path(path, "checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+) {
   stream_write_generic(
     x,
     path = path,
@@ -294,10 +305,11 @@ stream_write_orc <- function(
 #' @rdname stream_read_csv
 #' @export
 stream_read_kafka <- function(
-    sc,
-    name = NULL,
-    options = list(),
-    ...) {
+  sc,
+  name = NULL,
+  options = list(),
+  ...
+) {
   stream_read_generic(
     sc,
     path = NULL,
@@ -311,13 +323,14 @@ stream_read_kafka <- function(
 #' @rdname stream_write_csv
 #' @export
 stream_write_kafka <- function(
-    x,
-    mode = c("append", "complete", "update"),
-    trigger = stream_trigger_interval(),
-    checkpoint = file.path("checkpoints", random_string("")),
-    options = list(),
-    partition_by = NULL,
-    ...) {
+  x,
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path("checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+) {
   stream_write_generic(
     x,
     path = NULL,
@@ -333,11 +346,12 @@ stream_write_kafka <- function(
 #' @rdname stream_read_csv
 #' @export
 stream_read_socket <- function(
-    sc,
-    name = NULL,
-    columns = NULL,
-    options = list(),
-    ...) {
+  sc,
+  name = NULL,
+  columns = NULL,
+  options = list(),
+  ...
+) {
   stream_read_generic(
     sc,
     path = NULL,
@@ -351,13 +365,15 @@ stream_read_socket <- function(
 #' @rdname stream_write_csv
 #' @export
 stream_write_console <- function(
+  x,
+  mode = c("append", "complete", "update"),
+  options = list(),
+  trigger = stream_trigger_interval(),
+  partition_by = NULL,
+  ...
+) {
+  stream_write_generic(
     x,
-    mode = c("append", "complete", "update"),
-    options = list(),
-    trigger = stream_trigger_interval(),
-    partition_by = NULL,
-    ...) {
-  stream_write_generic(x,
     path = NULL,
     type = "console",
     mode = mode,
@@ -371,11 +387,12 @@ stream_write_console <- function(
 #' @rdname stream_read_csv
 #' @export
 stream_read_delta <- function(
-    sc,
-    path,
-    name = NULL,
-    options = list(),
-    ...) {
+  sc,
+  path,
+  name = NULL,
+  options = list(),
+  ...
+) {
   stream_read_generic(
     sc,
     path = path,
@@ -390,14 +407,16 @@ stream_read_delta <- function(
 #' @rdname stream_write_csv
 #' @export
 stream_write_delta <- function(
+  x,
+  path,
+  mode = c("append", "complete", "update"),
+  checkpoint = file.path("checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+) {
+  stream_write_generic(
     x,
-    path,
-    mode = c("append", "complete", "update"),
-    checkpoint = file.path("checkpoints", random_string("")),
-    options = list(),
-    partition_by = NULL,
-    ...) {
-  stream_write_generic(x,
     path = path,
     type = "delta",
     mode = mode,
@@ -411,11 +430,12 @@ stream_write_delta <- function(
 #' @rdname stream_read_csv
 #' @export
 stream_read_cloudfiles <- function(
-    sc,
-    path,
-    name = NULL,
-    options = list(),
-    ...) {
+  sc,
+  path,
+  name = NULL,
+  options = list(),
+  ...
+) {
   stream_read_generic(
     sc,
     path = path,
@@ -430,11 +450,12 @@ stream_read_cloudfiles <- function(
 #' @rdname stream_read_csv
 #' @export
 stream_read_table <- function(
-    sc,
-    path,
-    name = NULL,
-    options = list(),
-    ...) {
+  sc,
+  path,
+  name = NULL,
+  options = list(),
+  ...
+) {
   stream_read_generic(
     sc,
     path = path,
@@ -458,34 +479,38 @@ stream_read_table <- function(
 #' @family Spark stream serialization
 #' @export
 stream_write_table <- function(
+  x,
+  path,
+  format = NULL,
+  mode = c("append", "complete", "update"),
+  checkpoint = file.path("checkpoints", random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+) {
+  stream_write_generic(
     x,
-    path,
-    format = NULL,
-    mode = c("append", "complete", "update"),
-    checkpoint = file.path("checkpoints", random_string("")),
-    options = list(),
-    partition_by = NULL,
-    ...) {
-  stream_write_generic(x,
-                       path = path,
-                       type = format,
-                       mode = mode,
-                       trigger = FALSE,
-                       checkpoint = checkpoint,
-                       partition_by = partition_by,
-                       stream_options = options,
-                       to_table = TRUE
+    path = path,
+    type = format,
+    mode = mode,
+    trigger = FALSE,
+    checkpoint = checkpoint,
+    partition_by = partition_by,
+    stream_options = options,
+    to_table = TRUE
   )
 }
 
 stream_read_generic_type <- function(
-    sc,
-    path,
+  sc,
+  path,
+  type,
+  name,
+  columns = NULL,
+  stream_options = list()
+) {
+  switch(
     type,
-    name,
-    columns = NULL,
-    stream_options = list()) {
-  switch(type,
     csv = {
       spark_csv_read(
         sc,
@@ -503,13 +528,14 @@ stream_read_generic_type <- function(
 }
 
 stream_read_generic <- function(
-    sc,
-    path,
-    type,
-    name,
-    columns,
-    stream_options,
-    load = FALSE) {
+  sc,
+  path,
+  type,
+  name,
+  columns,
+  stream_options,
+  load = FALSE
+) {
   spark_require_version(sc, "2.0.0", "Spark streaming")
   name <- name %||% random_string("sparklyr_tmp_")
   schema <- NULL
@@ -517,7 +543,8 @@ stream_read_generic <- function(
     invoke("readStream")
 
   if (identical(columns, NULL)) {
-    reader <- stream_read_generic_type(sc,
+    reader <- stream_read_generic_type(
+      sc,
       path,
       type,
       name,
@@ -534,7 +561,12 @@ stream_read_generic <- function(
   }
 
   for (optionName in names(stream_options)) {
-    streamOptions <- invoke(streamOptions, "option", optionName, stream_options[[optionName]])
+    streamOptions <- invoke(
+      streamOptions,
+      "option",
+      optionName,
+      stream_options[[optionName]]
+    )
   }
 
   if (identical(schema, NULL)) {
@@ -562,12 +594,24 @@ stream_read_generic <- function(
 }
 
 stream_write_generic <- function(
-    x, path, type, mode, trigger, checkpoint, partition_by, stream_options, to_table = FALSE) {
+  x,
+  path,
+  type,
+  mode,
+  trigger,
+  checkpoint,
+  partition_by,
+  stream_options,
+  to_table = FALSE
+) {
   spark_require_version(spark_connection(x), "2.0.0", "Spark streaming")
 
   sdf <- spark_dataframe(x)
   sc <- spark_connection(x)
-  mode <- match.arg(as.character(mode), choices = c("append", "complete", "update"))
+  mode <- match.arg(
+    as.character(mode),
+    choices = c("append", "complete", "update")
+  )
 
   if (!sdf_is_streaming(sdf)) {
     stop(
@@ -582,7 +626,8 @@ stream_write_generic <- function(
   }
 
   if (!is.null(partition_by)) {
-    streamOptions <- streamOptions %>% invoke("partitionBy", as.list(partition_by))
+    streamOptions <- streamOptions %>%
+      invoke("partitionBy", as.list(partition_by))
   }
 
   # TODO: review if path should be permitted when sinking to table
@@ -645,14 +690,15 @@ stream_write_generic <- function(
 #' @family Spark stream serialization
 #' @export
 stream_write_memory <- function(
-    x,
-    name = random_string("sparklyr_tmp_"),
-    mode = c("append", "complete", "update"),
-    trigger = stream_trigger_interval(),
-    checkpoint = file.path("checkpoints", name, random_string("")),
-    options = list(),
-    partition_by = NULL,
-    ...) {
+  x,
+  name = random_string("sparklyr_tmp_"),
+  mode = c("append", "complete", "update"),
+  trigger = stream_trigger_interval(),
+  checkpoint = file.path("checkpoints", name, random_string("")),
+  options = list(),
+  partition_by = NULL,
+  ...
+) {
   sc <- spark_connection(x)
   spark_require_version(sc, "2.0.0", "Spark streaming")
 
@@ -663,7 +709,11 @@ stream_write_memory <- function(
         queryPlan <- spark_dataframe(x) %>%
           invoke("queryExecution") %>%
           invoke("analyzed")
-        tryMode <- invoke_static(sc, "org.apache.spark.sql.streaming.OutputMode", "Complete")
+        tryMode <- invoke_static(
+          sc,
+          "org.apache.spark.sql.streaming.OutputMode",
+          "Complete"
+        )
         invoke_static(
           sc,
           "org.apache.spark.sql.catalyst.analysis.UnsupportedOperationChecker",
@@ -674,13 +724,12 @@ stream_write_memory <- function(
 
         mode <- "complete"
       },
-      error = function(e) {
-
-      }
+      error = function(e) {}
     )
   }
 
-  stream_write_generic(x,
+  stream_write_generic(
+    x,
     path = name,
     type = "memory",
     mode = mode,

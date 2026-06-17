@@ -4,7 +4,6 @@ skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("random_forest.tidy() works", {
-
   ## ---------------- Connection and data upload to Spark ----------------------
 
   sc <- testthat_spark_connection()
@@ -26,7 +25,6 @@ test_that("random_forest.tidy() works", {
 
   expect_equal(td1$importance, c(0.941, 0.0586), tolerance = 0.1, scale = 1)
 
-
   # for regression
   td2 <- tidy(rf_regression)
 
@@ -41,7 +39,8 @@ test_that("random_forest.tidy() works", {
   # for classification without newdata
   au1 <- collect(augment(rf_classification))
 
-  check_tidy(au1,
+  check_tidy(
+    au1,
     exp.row = nrow(iris),
     exp.name = c(iris_vars, ".predicted_label")
   )
@@ -51,17 +50,16 @@ test_that("random_forest.tidy() works", {
 
   au2 <- collect(augment(rf_regression, top_25))
 
-  check_tidy(au2,
-    exp.row = 25,
-    exp.name = c(iris_vars, ".prediction")
-  )
-
+  check_tidy(au2, exp.row = 25, exp.name = c(iris_vars, ".prediction"))
 
   ## ---------------------------- glance() -------------------------------------
 
   gl_names <- c(
-    "num_trees", "total_num_nodes", "max_depth",
-    "impurity", "subsampling_rate"
+    "num_trees",
+    "total_num_nodes",
+    "max_depth",
+    "impurity",
+    "subsampling_rate"
   )
 
   # for classification
@@ -72,10 +70,7 @@ test_that("random_forest.tidy() works", {
   # for regression
   gl2 <- glance(rf_regression)
 
-  check_tidy(gl2,
-    exp.row = 1,
-    exp.names = gl_names
-  )
+  check_tidy(gl2, exp.row = 1, exp.names = gl_names)
 
   rf_classification_parsnip <- parsnip::rand_forest(engine = "spark") %>%
     parsnip::set_mode("classification") %>%
@@ -88,13 +83,15 @@ test_that("random_forest.tidy() works", {
   expect_equal(
     tidy(rf_classification_parsnip)$importance,
     td1$importance,
-    tolerance = 0.1, scale = 1
+    tolerance = 0.1,
+    scale = 1
   )
 
   expect_equal(
     tidy(rf_regression_parsnip)$importance,
     td2$importance,
-    tolerance = 0.2, scale = 1
+    tolerance = 0.2,
+    scale = 1
   )
 
   expect_equal(
@@ -105,7 +102,8 @@ test_that("random_forest.tidy() works", {
   expect_equal(
     collect(augment(rf_regression_parsnip, top_25))$.prediction,
     au2$.prediction,
-    tolerance = 0.1, scale = 1
+    tolerance = 0.1,
+    scale = 1
   )
 
   expect_equal(
@@ -120,4 +118,3 @@ test_that("random_forest.tidy() works", {
 })
 
 test_clear_cache()
-

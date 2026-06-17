@@ -23,16 +23,20 @@ test_that("ft_dplyr_transformer() works", {
   expect_equal(
     ml_param_map(dplyr_transformer),
     if (packageVersion("dbplyr") > "2.3.4") {
-      list(statement = "SELECT `__THIS__`.*, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
+      list(
+        statement = "SELECT `__THIS__`.*, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`"
+      )
     } else {
-      list(statement = "SELECT *, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`")
+      list(
+        statement = "SELECT *, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`"
+      )
     }
   )
 })
 
 test_that("ft_dplyr_transformer() supports all sampling use cases", {
   test_requires_version("2.0.0", "sample_frac() requires Spark 2.0+")
-  if(spark_version(sc) > "4.0.0") {
+  if (spark_version(sc) > "4.0.0") {
     skip("Skipped until #3504 is resolved")
   }
   sdf <- copy_to(
@@ -65,42 +69,60 @@ test_that("ft_dplyr_transformer() supports all sampling use cases", {
   }
 
   for (repeatable in c(FALSE, TRUE)) {
-    for (transformed in
-      list(
-        sdf %>% sample_n_impl(
+    for (transformed in list(
+      sdf %>%
+        sample_n_impl(
           100,
-          replace = FALSE, repeatable = repeatable
+          replace = FALSE,
+          repeatable = repeatable
         ),
-        sdf %>% sample_n_impl(
+      sdf %>%
+        sample_n_impl(
           100,
-          replace = TRUE, repeatable = repeatable
+          replace = TRUE,
+          repeatable = repeatable
         ),
-        sdf %>% sample_frac_impl(
+      sdf %>%
+        sample_frac_impl(
           0.1,
-          replace = FALSE, repeatable = repeatable
+          replace = FALSE,
+          repeatable = repeatable
         ),
-        sdf %>% sample_frac_impl(
+      sdf %>%
+        sample_frac_impl(
           0.1,
-          replace = TRUE, repeatable = repeatable
+          replace = TRUE,
+          repeatable = repeatable
         ),
-        sdf %>% sample_n_impl(
+      sdf %>%
+        sample_n_impl(
           100,
-          weight = weight, replace = FALSE, repeatable = repeatable
+          weight = weight,
+          replace = FALSE,
+          repeatable = repeatable
         ),
-        sdf %>% sample_n_impl(
+      sdf %>%
+        sample_n_impl(
           100,
-          weight = weight, replace = TRUE, repeatable = repeatable
+          weight = weight,
+          replace = TRUE,
+          repeatable = repeatable
         ),
-        sdf %>% sample_frac_impl(
+      sdf %>%
+        sample_frac_impl(
           0.1,
-          weight = weight, replace = FALSE, repeatable = repeatable
+          weight = weight,
+          replace = FALSE,
+          repeatable = repeatable
         ),
-        sdf %>% sample_frac_impl(
+      sdf %>%
+        sample_frac_impl(
           0.1,
-          weight = weight, replace = TRUE, repeatable = repeatable
+          weight = weight,
+          replace = TRUE,
+          repeatable = repeatable
         )
-      )
-    ) {
+    )) {
       if (repeatable) {
         reset_prng_state()
       }
@@ -150,4 +172,3 @@ test_that("ft_dplyr_transformer() handles cases where table name isn't quoted (#
 })
 
 test_clear_cache()
-

@@ -45,19 +45,29 @@
 #' }
 #'
 #' @export
-ml_prefixspan <- function(x, seq_col = "sequence", min_support = 0.1,
-                          max_pattern_length = 10,
-                          max_local_proj_db_size = 32000000,
-                          uid = random_string("prefixspan_"), ...) {
+ml_prefixspan <- function(
+  x,
+  seq_col = "sequence",
+  min_support = 0.1,
+  max_pattern_length = 10,
+  max_local_proj_db_size = 32000000,
+  uid = random_string("prefixspan_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_prefixspan")
 }
 
 #' @export
-ml_prefixspan.spark_connection <- function(x, seq_col = "sequence", min_support = 0.1,
-                                           max_pattern_length = 10,
-                                           max_local_proj_db_size = 32000000,
-                                           uid = random_string("prefixspan_"), ...) {
+ml_prefixspan.spark_connection <- function(
+  x,
+  seq_col = "sequence",
+  min_support = 0.1,
+  max_pattern_length = 10,
+  max_local_proj_db_size = 32000000,
+  uid = random_string("prefixspan_"),
+  ...
+) {
   .args <- list(
     seq_col = seq_col,
     min_support = min_support,
@@ -85,7 +95,9 @@ validator_ml_prefixspan <- function(.args) {
   .args[["seq_col"]] <- cast_string(.args[["seq_col"]])
   .args[["min_support"]] <- cast_scalar_double(.args[["min_support"]])
   .args[["max_pattern_length"]] <- cast_integer(.args[["max_pattern_length"]])
-  .args[["max_local_proj_db_size"]] <- cast_integer(.args[["max_local_proj_db_size"]])
+  .args[["max_local_proj_db_size"]] <- cast_integer(.args[[
+    "max_local_proj_db_size"
+  ]])
   .args
 }
 

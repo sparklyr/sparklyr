@@ -46,9 +46,15 @@
 #'   Default: \code{FALSE}.
 #'
 #' @export
-ft_r_formula <- function(x, formula = NULL, features_col = "features", label_col = "label",
-                         force_index_label = FALSE,
-                         uid = random_string("r_formula_"), ...) {
+ft_r_formula <- function(
+  x,
+  formula = NULL,
+  features_col = "features",
+  label_col = "label",
+  force_index_label = FALSE,
+  uid = random_string("r_formula_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_r_formula")
 }
@@ -56,9 +62,15 @@ ft_r_formula <- function(x, formula = NULL, features_col = "features", label_col
 ml_r_formula <- ft_r_formula
 
 #' @export
-ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "features", label_col = "label",
-                                          force_index_label = FALSE,
-                                          uid = random_string("r_formula_"), ...) {
+ft_r_formula.spark_connection <- function(
+  x,
+  formula = NULL,
+  features_col = "features",
+  label_col = "label",
+  force_index_label = FALSE,
+  uid = random_string("r_formula_"),
+  ...
+) {
   .args <- list(
     formula = formula,
     features_col = features_col,
@@ -69,20 +81,35 @@ ft_r_formula.spark_connection <- function(x, formula = NULL, features_col = "fea
     c(rlang::dots_list(...)) %>%
     validator_ml_r_formula()
 
-  estimator <- invoke_new(x, "org.apache.spark.ml.feature.RFormula", .args[["uid"]]) %>%
+  estimator <- invoke_new(
+    x,
+    "org.apache.spark.ml.feature.RFormula",
+    .args[["uid"]]
+  ) %>%
     invoke("setFeaturesCol", .args[["features_col"]]) %>%
     jobj_set_param("setFormula", .args[["formula"]]) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
-    jobj_set_param("setForceIndexLabel", .args[["force_index_label"]], "2.1.0", FALSE) %>%
+    jobj_set_param(
+      "setForceIndexLabel",
+      .args[["force_index_label"]],
+      "2.1.0",
+      FALSE
+    ) %>%
     new_ml_r_formula()
 
   estimator
 }
 
 #' @export
-ft_r_formula.ml_pipeline <- function(x, formula = NULL, features_col = "features", label_col = "label",
-                                     force_index_label = FALSE,
-                                     uid = random_string("r_formula_"), ...) {
+ft_r_formula.ml_pipeline <- function(
+  x,
+  formula = NULL,
+  features_col = "features",
+  label_col = "label",
+  force_index_label = FALSE,
+  uid = random_string("r_formula_"),
+  ...
+) {
   stage <- ft_r_formula.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -96,9 +123,15 @@ ft_r_formula.ml_pipeline <- function(x, formula = NULL, features_col = "features
 }
 
 #' @export
-ft_r_formula.tbl_spark <- function(x, formula = NULL, features_col = "features", label_col = "label",
-                                   force_index_label = FALSE,
-                                   uid = random_string("r_formula_"), ...) {
+ft_r_formula.tbl_spark <- function(
+  x,
+  formula = NULL,
+  features_col = "features",
+  label_col = "label",
+  force_index_label = FALSE,
+  uid = random_string("r_formula_"),
+  ...
+) {
   stage <- ft_r_formula.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -121,7 +154,8 @@ new_ml_r_formula <- function(jobj) {
 }
 
 new_ml_r_formula_model <- function(jobj) {
-  new_ml_transformer(jobj,
+  new_ml_transformer(
+    jobj,
     formula = possibly_null(
       ~ jobj %>%
         invoke("parent") %>%
@@ -140,6 +174,8 @@ validator_ml_r_formula <- function(.args) {
   .args[["formula"]] <- cast_nullable_string(.args[["formula"]])
   .args[["features_col"]] <- cast_string(.args[["features_col"]])
   .args[["label_col"]] <- cast_string(.args[["label_col"]])
-  .args[["force_index_label"]] <- cast_scalar_logical(.args[["force_index_label"]])
+  .args[["force_index_label"]] <- cast_scalar_logical(.args[[
+    "force_index_label"
+  ]])
   .args
 }

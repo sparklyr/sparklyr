@@ -252,7 +252,13 @@ spark_install <- function(
     )
 
     if (inherits(download_result, "error") || isTRUE(download_result != 0)) {
-      if (grepl(download_locations$current, installInfo$packageRemotePath, fixed = TRUE)) {
+      if (
+        grepl(
+          download_locations$current,
+          installInfo$packageRemotePath,
+          fixed = TRUE
+        )
+      ) {
         archive_url <- sub(
           download_locations$current,
           download_locations$archive,
@@ -260,7 +266,10 @@ spark_install <- function(
           fixed = TRUE
         )
         if (verbose) {
-          message(sprintf("Download failed, retrying from archive:\n- '%s'", archive_url))
+          message(sprintf(
+            "Download failed, retrying from archive:\n- '%s'",
+            archive_url
+          ))
         }
         download_result <- tryCatch(
           download_file(
@@ -276,7 +285,10 @@ spark_install <- function(
     if (inherits(download_result, "error")) {
       stop(download_result$message)
     } else if (isTRUE(download_result != 0)) {
-      stopf("Failed to download Spark: download exited with status %s", download_result)
+      stopf(
+        "Failed to download Spark: download exited with status %s",
+        download_result
+      )
     }
 
     untar(

@@ -22,7 +22,8 @@ spark_jobj_id <- function(x) {
 
 #' @export
 spark_jobj.default <- function(x, ...) {
-  stop("Unable to retrieve a spark_jobj from object of class ",
+  stop(
+    "Unable to retrieve a spark_jobj from object of class ",
     paste(class(x), collapse = " "),
     call. = FALSE
   )
@@ -66,7 +67,8 @@ get_to_remove_jobjs <- function(con) {
 
 # Check if jobj points to a valid external JVM object
 isValidJobj <- function(jobj) {
-  exists("connection", jobj) && exists(jobj$id, get_valid_jobjs(jobj$connection))
+  exists("connection", jobj) &&
+    exists(jobj$id, get_valid_jobjs(jobj$connection))
 }
 
 getJobj <- function(con, objId) {
@@ -88,7 +90,10 @@ jobj_create <- function(con, objId) {
   }
   # NOTE: We need a new env for a jobj as we can only register
   # finalizers for environments or external references pointers.
-  obj <- structure(new.env(parent = emptyenv()), class = c("spark_jobj", jobj_subclass(con)))
+  obj <- structure(
+    new.env(parent = emptyenv()),
+    class = c("spark_jobj", jobj_subclass(con))
+  )
   obj$id <- objId
 
   # Register a finalizer to remove the Java object when this reference
@@ -112,15 +117,13 @@ jobj_info <- function(jobj) {
         class <- invoke(class, "getName")
       }
     },
-    error = function(e) {
-    }
+    error = function(e) {}
   )
   tryCatch(
     {
       repr <- invoke(jobj, "toString")
     },
-    error = function(e) {
-    }
+    error = function(e) {}
   )
   list(
     class = class,
@@ -184,13 +187,11 @@ clear_jobjs <- function() {
 attach_connection <- function(jobj, connection) {
   if (inherits(jobj, "spark_jobj")) {
     jobj$connection <- connection
-  }
-  else if (is.list(jobj) || inherits(jobj, "struct")) {
+  } else if (is.list(jobj) || inherits(jobj, "struct")) {
     jobj <- lapply(jobj, function(e) {
       attach_connection(e, connection)
     })
-  }
-  else if (is.environment(jobj)) {
+  } else if (is.environment(jobj)) {
     jobj <- eapply(jobj, function(e) {
       attach_connection(e, connection)
     })

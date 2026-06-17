@@ -31,9 +31,18 @@
 #' }
 #'
 #' @export
-ft_bucketizer <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
-                          input_cols = NULL, output_cols = NULL, splits_array = NULL,
-                          handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
+ft_bucketizer <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  splits = NULL,
+  input_cols = NULL,
+  output_cols = NULL,
+  splits_array = NULL,
+  handle_invalid = "error",
+  uid = random_string("bucketizer_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_bucketizer")
 }
@@ -41,9 +50,18 @@ ft_bucketizer <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
 ml_bucketizer <- ft_bucketizer
 
 #' @export
-ft_bucketizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
-                                           input_cols = NULL, output_cols = NULL, splits_array = NULL,
-                                           handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
+ft_bucketizer.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  splits = NULL,
+  input_cols = NULL,
+  output_cols = NULL,
+  splits_array = NULL,
+  handle_invalid = "error",
+  uid = random_string("bucketizer_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -58,17 +76,28 @@ ft_bucketizer.spark_connection <- function(x, input_col = NULL, output_col = NUL
     validator_ml_bucketizer()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.Bucketizer", .args[["uid"]],
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]]
+    x,
+    "org.apache.spark.ml.feature.Bucketizer",
+    .args[["uid"]],
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]]
   ) %>%
     jobj_set_param("setSplits", .args[["splits"]]) %>%
     jobj_set_param("setInputCols", .args[["input_cols"]], "2.3.0") %>%
     jobj_set_param("setOutputCols", .args[["output_cols"]], "2.3.0") %>%
-    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error")
+    jobj_set_param(
+      "setHandleInvalid",
+      .args[["handle_invalid"]],
+      "2.1.0",
+      "error"
+    )
   if (!is.null(.args[["splits_array"]])) {
     jobj <- invoke_static(
-      x, "sparklyr.BucketizerUtils", "setSplitsArrayParam",
-      jobj, .args[["splits_array"]]
+      x,
+      "sparklyr.BucketizerUtils",
+      "setSplitsArrayParam",
+      jobj,
+      .args[["splits_array"]]
     )
   }
 
@@ -76,9 +105,18 @@ ft_bucketizer.spark_connection <- function(x, input_col = NULL, output_col = NUL
 }
 
 #' @export
-ft_bucketizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
-                                      input_cols = NULL, output_cols = NULL, splits_array = NULL,
-                                      handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
+ft_bucketizer.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  splits = NULL,
+  input_cols = NULL,
+  output_cols = NULL,
+  splits_array = NULL,
+  handle_invalid = "error",
+  uid = random_string("bucketizer_"),
+  ...
+) {
   stage <- ft_bucketizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -95,9 +133,18 @@ ft_bucketizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, sp
 }
 
 #' @export
-ft_bucketizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, splits = NULL,
-                                    input_cols = NULL, output_cols = NULL, splits_array = NULL,
-                                    handle_invalid = "error", uid = random_string("bucketizer_"), ...) {
+ft_bucketizer.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  splits = NULL,
+  input_cols = NULL,
+  output_cols = NULL,
+  splits_array = NULL,
+  handle_invalid = "error",
+  uid = random_string("bucketizer_"),
+  ...
+) {
   stage <- ft_bucketizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -122,7 +169,10 @@ validator_ml_bucketizer <- function(.args) {
   .args[["uid"]] <- cast_string(.args[["uid"]])
 
   if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]])) {
-    stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
+    stop(
+      "Only one of `input_col` or `input_cols` may be specified.",
+      call. = FALSE
+    )
   }
   .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
@@ -130,8 +180,14 @@ validator_ml_bucketizer <- function(.args) {
     stop("`splits` must be at least length 3.", call. = FALSE)
   }
   .args[["splits"]] <- cast_double_list(.args[["splits"]], allow_null = TRUE)
-  .args[["input_cols"]] <- cast_string_list(.args[["input_cols"]], allow_null = TRUE)
-  .args[["output_cols"]] <- cast_string_list(.args[["output_cols"]], allow_null = TRUE)
+  .args[["input_cols"]] <- cast_string_list(
+    .args[["input_cols"]],
+    allow_null = TRUE
+  )
+  .args[["output_cols"]] <- cast_string_list(
+    .args[["output_cols"]],
+    allow_null = TRUE
+  )
   if (!is.null(.args[["splits_array"]])) {
     .args[["splits_array"]] <- purrr::map(
       .args[["splits_array"]],
@@ -139,7 +195,8 @@ validator_ml_bucketizer <- function(.args) {
     )
   }
   .args[["handle_invalid"]] <- cast_choice(
-    .args[["handle_invalid"]], c("error", "skip", "keep")
+    .args[["handle_invalid"]],
+    c("error", "skip", "keep")
   )
   .args
 }

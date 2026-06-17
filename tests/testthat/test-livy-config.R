@@ -34,4 +34,3 @@ test_that("'livy_config()' works with additional_curl_opts", {
 })
 
 test_clear_cache()
-

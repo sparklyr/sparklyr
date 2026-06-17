@@ -21,7 +21,6 @@ spark_version <- function(sc) {
 
 #' @export
 spark_version.default <- function(sc) {
-
   # use cached value if available
   if (!is.null(sc$state$spark_version)) {
     return(sc$state$spark_version)
@@ -75,12 +74,24 @@ spark_version_from_home <- function(spark_home, default = NULL) {
     },
     useAssemblies = function() {
       candidateVersions <- list(
-        list(path = "lib", pattern = "spark-assembly-([0-9\\.]*)-hadoop.[0-9\\.]*\\.jar"),
-        list(path = "yarn", pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"),
+        list(
+          path = "lib",
+          pattern = "spark-assembly-([0-9\\.]*)-hadoop.[0-9\\.]*\\.jar"
+        ),
+        list(
+          path = "yarn",
+          pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"
+        ),
         list(path = "yarn", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar"),
-        list(path = "lib", pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"),
+        list(
+          path = "lib",
+          pattern = "spark-([0-9\\.]*)-preview-yarn-shuffle\\.jar"
+        ),
         list(path = "lib", pattern = "spark-([0-9\\.]*)-yarn-shuffle\\.jar"),
-        list(path = "lib", pattern = "spark-assembly-([0-9\\.]*)-cdh[0-9\\.]*-hadoop.[0-9\\.]*\\.jar")
+        list(
+          path = "lib",
+          pattern = "spark-assembly-([0-9\\.]*)-cdh[0-9\\.]*-hadoop.[0-9\\.]*\\.jar"
+        )
       )
 
       candidateFiles <- lapply(candidateVersions, function(e) {
@@ -96,7 +107,10 @@ spark_version_from_home <- function(spark_home, default = NULL) {
         )
       })
 
-      filteredCandidates <- Filter(function(f) length(f$files) > 0, candidateFiles)
+      filteredCandidates <- Filter(
+        function(f) length(f$files) > 0,
+        candidateFiles
+      )
       if (length(filteredCandidates) > 0) {
         valid <- filteredCandidates[[1]]
         e <- regexec(valid$pattern, valid$files[[1]])
@@ -110,10 +124,14 @@ spark_version_from_home <- function(spark_home, default = NULL) {
       version_output <- system2(
         file.path(spark_home, "bin", "spark-submit"),
         "--version",
-        stderr = TRUE, stdout = TRUE
+        stderr = TRUE,
+        stdout = TRUE
       )
 
-      version_matches <- regmatches(version_output, regexec("   version (.*)$", version_output))
+      version_matches <- regmatches(
+        version_output,
+        regexec("   version (.*)$", version_output)
+      )
       if (any(sapply(version_matches, length) > 0)) {
         version_row <- which(sapply(version_matches, length) > 0)
         return(version_matches[[version_row]][2])
@@ -136,13 +154,14 @@ spark_version_from_home <- function(spark_home, default = NULL) {
 
 spark_version_latest <- function(version = NULL) {
   versions_full <- spark_available_versions(
-    show_minor = TRUE, show_future = TRUE
-    )
+    show_minor = TRUE,
+    show_future = TRUE
+  )
   versions <- sort(versions_full$spark, decreasing = TRUE)
   ret <- head(versions, 1)
-  if(!is.null(version)) {
+  if (!is.null(version)) {
     match_versions <- versions[substr(versions, 1, nchar(version)) == version]
-    if(length(match_versions) > 0) {
+    if (length(match_versions) > 0) {
       ret <- head(match_versions, 1)
     }
   }

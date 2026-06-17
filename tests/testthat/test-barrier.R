@@ -10,10 +10,15 @@ test_that("barrier-spark_apply works", {
   sc <- testthat_spark_connection()
 
   address <- sdf_len(sc, 1, repartition = 1) %>%
-    spark_apply(~ .y$address, barrier = TRUE, columns = c(address = "character")) %>%
+    spark_apply(
+      ~ .y$address,
+      barrier = TRUE,
+      columns = c(address = "character")
+    ) %>%
     collect()
 
-  expect_true(grepl("[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}|localhost",
+  expect_true(grepl(
+    "[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}|localhost",
     address$address[1],
     perl = TRUE
   ))

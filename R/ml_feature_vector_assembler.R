@@ -10,8 +10,13 @@
 #' @template roxlate-ml-feature-transformer
 #'
 #' @export
-ft_vector_assembler <- function(x, input_cols = NULL, output_col = NULL,
-                                uid = random_string("vector_assembler_"), ...) {
+ft_vector_assembler <- function(
+  x,
+  input_cols = NULL,
+  output_col = NULL,
+  uid = random_string("vector_assembler_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_vector_assembler")
 }
@@ -19,8 +24,13 @@ ft_vector_assembler <- function(x, input_cols = NULL, output_col = NULL,
 ml_vector_assembler <- ft_vector_assembler
 
 #' @export
-ft_vector_assembler.spark_connection <- function(x, input_cols = NULL, output_col = NULL,
-                                                 uid = random_string("vector_assembler_"), ...) {
+ft_vector_assembler.spark_connection <- function(
+  x,
+  input_cols = NULL,
+  output_col = NULL,
+  uid = random_string("vector_assembler_"),
+  ...
+) {
   .args <- list(
     input_cols = input_cols,
     output_col = output_col,
@@ -30,16 +40,24 @@ ft_vector_assembler.spark_connection <- function(x, input_cols = NULL, output_co
     validator_ml_vector_assembler()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.VectorAssembler",
-    input_cols = .args[["input_cols"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.VectorAssembler",
+    input_cols = .args[["input_cols"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   )
 
   new_ml_vector_assembler(jobj)
 }
 
 #' @export
-ft_vector_assembler.ml_pipeline <- function(x, input_cols = NULL, output_col = NULL,
-                                            uid = random_string("vector_assembler_"), ...) {
+ft_vector_assembler.ml_pipeline <- function(
+  x,
+  input_cols = NULL,
+  output_col = NULL,
+  uid = random_string("vector_assembler_"),
+  ...
+) {
   stage <- ft_vector_assembler.spark_connection(
     x = spark_connection(x),
     input_cols = input_cols,
@@ -51,8 +69,13 @@ ft_vector_assembler.ml_pipeline <- function(x, input_cols = NULL, output_col = N
 }
 
 #' @export
-ft_vector_assembler.tbl_spark <- function(x, input_cols = NULL, output_col = NULL,
-                                          uid = random_string("vector_assembler_"), ...) {
+ft_vector_assembler.tbl_spark <- function(
+  x,
+  input_cols = NULL,
+  output_col = NULL,
+  uid = random_string("vector_assembler_"),
+  ...
+) {
   stage <- ft_vector_assembler.spark_connection(
     x = spark_connection(x),
     input_cols = input_cols,

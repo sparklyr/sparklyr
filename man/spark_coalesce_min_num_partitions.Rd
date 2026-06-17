@@ -16,12 +16,12 @@ Defaults to \code{NULL} to retrieve configuration entries.}
 Retrieves or sets the minimum number of shuffle partitions after coalescing
 }
 \seealso{
-Other Spark runtime configuration: 
-\code{\link{spark_adaptive_query_execution}()},
-\code{\link{spark_advisory_shuffle_partition_size}()},
-\code{\link{spark_auto_broadcast_join_threshold}()},
-\code{\link{spark_coalesce_initial_num_partitions}()},
-\code{\link{spark_coalesce_shuffle_partitions}()},
-\code{\link{spark_session_config}()}
+Other Spark runtime configuration:
+\code{\link[=spark_adaptive_query_execution]{spark_adaptive_query_execution()}},
+\code{\link[=spark_advisory_shuffle_partition_size]{spark_advisory_shuffle_partition_size()}},
+\code{\link[=spark_auto_broadcast_join_threshold]{spark_auto_broadcast_join_threshold()}},
+\code{\link[=spark_coalesce_initial_num_partitions]{spark_coalesce_initial_num_partitions()}},
+\code{\link[=spark_coalesce_shuffle_partitions]{spark_coalesce_shuffle_partitions()}},
+\code{\link[=spark_session_config]{spark_session_config()}}
 }
 \concept{Spark runtime configuration}

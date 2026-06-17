@@ -16,4 +16,3 @@ test_that("sdf_partition_sizes works as expected", {
 })
 
 test_clear_cache()
-

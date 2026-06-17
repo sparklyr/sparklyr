@@ -36,12 +36,15 @@ livy_invoke_deserialize <- function(sc, base64) {
   }
   if (returnStatus != 0) {
     msg <- readString(rc)
-    withr::with_options(list(
-      warning.length = 8000
-    ), {
-      close(rc)
-      stop(msg, call. = FALSE)
-    })
+    withr::with_options(
+      list(
+        warning.length = 8000
+      ),
+      {
+        close(rc)
+        stop(msg, call. = FALSE)
+      }
+    )
   }
 
   conn <- structure(list(rc = rc, state = sc$state), class = c("livy_backend"))

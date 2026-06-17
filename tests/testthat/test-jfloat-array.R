@@ -20,4 +20,3 @@ test_that("jfloat_array() works as expected", {
 })
 
 test_clear_cache()
-

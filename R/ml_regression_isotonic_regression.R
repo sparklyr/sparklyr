@@ -29,19 +29,36 @@
 #' }
 #'
 #' @export
-ml_isotonic_regression <- function(x, formula = NULL, feature_index = 0, isotonic = TRUE,
-                                   weight_col = NULL, features_col = "features",
-                                   label_col = "label", prediction_col = "prediction",
-                                   uid = random_string("isotonic_regression_"), ...) {
+ml_isotonic_regression <- function(
+  x,
+  formula = NULL,
+  feature_index = 0,
+  isotonic = TRUE,
+  weight_col = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("isotonic_regression_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_isotonic_regression")
 }
 
-ml_isotonic_regression_impl <- function(x, formula = NULL, feature_index = 0, isotonic = TRUE,
-                                           weight_col = NULL, features_col = "features",
-                                           label_col = "label", prediction_col = "prediction",
-                                           uid = random_string("isotonic_regression_"),
-                                           response = NULL, features = NULL, ...) {
+ml_isotonic_regression_impl <- function(
+  x,
+  formula = NULL,
+  feature_index = 0,
+  isotonic = TRUE,
+  weight_col = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("isotonic_regression_"),
+  response = NULL,
+  features = NULL,
+  ...
+) {
   ml_process_model(
     x = x,
     r_class = "ml_isotonic_regression",
@@ -59,7 +76,6 @@ ml_isotonic_regression_impl <- function(x, formula = NULL, feature_index = 0, is
       weight_col = weight_col
     )
   )
-
 }
 
 # ------------------------------- Methods --------------------------------------

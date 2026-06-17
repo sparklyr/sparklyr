@@ -10,15 +10,21 @@ ml_model_data <- function(object) {
 possibly_null <- function(.f) purrr::possibly(.f, otherwise = NULL)
 
 #' @export
-predict.ml_model_classification <- function(object,
-                                            newdata = ml_model_data(object),
-                                            ...) {
+predict.ml_model_classification <- function(
+  object,
+  newdata = ml_model_data(object),
+  ...
+) {
   ml_predict(object, newdata) %>%
     sdf_read_column("predicted_label")
 }
 
 #' @export
-predict.ml_model_regression <- function(object, newdata = ml_model_data(object), ...) {
+predict.ml_model_regression <- function(
+  object,
+  newdata = ml_model_data(object),
+  ...
+) {
   prediction_col <- ml_param(object$model, "prediction_col")
 
   ml_predict(object, newdata) %>%
@@ -76,7 +82,10 @@ spark_dense_matrix <- function(sc, mat) {
     return(mat)
   }
   invoke_new(
-    sc, "org.apache.spark.ml.linalg.DenseMatrix", dim(mat)[1L], dim(mat)[2L],
+    sc,
+    "org.apache.spark.ml.linalg.DenseMatrix",
+    dim(mat)[1L],
+    dim(mat)[2L],
     as.list(mat)
   )
 }
@@ -86,7 +95,9 @@ spark_dense_vector <- function(sc, vec) {
     return(vec)
   }
   invoke_static(
-    sc, "org.apache.spark.ml.linalg.Vectors", "dense",
+    sc,
+    "org.apache.spark.ml.linalg.Vectors",
+    "dense",
     as.list(vec)
   )
 }
@@ -112,8 +123,16 @@ make_stats_arranger <- function(fit_intercept) {
 
 # ----------------------------- ML helpers -------------------------------------
 
-ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
-                             formula = NULL, response = NULL, features = NULL) {
+ml_process_model <- function(
+  x,
+  uid,
+  r_class,
+  invoke_steps,
+  ml_function,
+  formula = NULL,
+  response = NULL,
+  features = NULL
+) {
   sc <- spark_connection(x)
 
   # Mapping R class to Spark model using /inst/sparkml/class_mapping.json
@@ -132,8 +151,8 @@ ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
 
   l_steps <- purrr::imap(pe, ~ list(.y, .x))
 
-  for(i in seq_along(l_steps)) {
-    if(!is.null(l_steps[[i]][[2]])) {
+  for (i in seq_along(l_steps)) {
+    if (!is.null(l_steps[[i]][[2]])) {
       jobj <- do.call(invoke, c(jobj, l_steps[[i]]))
     }
   }
@@ -150,7 +169,6 @@ ml_process_model <- function(x, uid, r_class, invoke_steps, ml_function,
     features_col = invoke_steps$features_col,
     label_col = invoke_steps$label_col
   )
-
 }
 
 param_min_version <- function(x, value, min_version = NULL, default = NULL) {
@@ -160,10 +178,13 @@ param_min_version <- function(x, value, min_version = NULL, default = NULL) {
       sc <- spark_connection(x)
       ver <- spark_version(sc)
       if (ver < min_version) {
-        if(value != default) {
+        if (value != default) {
           stop(paste0(
-            "Parameter `", deparse(substitute(value)),
-            "` is only available for Spark ", min_version, " and later.",
+            "Parameter `",
+            deparse(substitute(value)),
+            "` is only available for Spark ",
+            min_version,
+            " and later.",
             "To avoid passing this variable, change the argument value to NULL."
           ))
         } else {
@@ -177,26 +198,58 @@ param_min_version <- function(x, value, min_version = NULL, default = NULL) {
 
 # --------------------- Post conversion functions ------------------------------
 
-post_ml_obj <- function(x, nm, ml_function, formula, response,
-                        features, features_col, label_col) {
+post_ml_obj <- function(
+  x,
+  nm,
+  ml_function,
+  formula,
+  response,
+  features,
+  features_col,
+  label_col
+) {
   UseMethod("post_ml_obj")
 }
 
 #' @export
-post_ml_obj.spark_connection <- function(x, nm, ml_function, formula, response,
-                                         features, features_col, label_col) {
+post_ml_obj.spark_connection <- function(
+  x,
+  nm,
+  ml_function,
+  formula,
+  response,
+  features,
+  features_col,
+  label_col
+) {
   nm
 }
 
 #' @export
-post_ml_obj.ml_pipeline <- function(x, nm, ml_function, formula, response,
-                                    features, features_col, label_col) {
+post_ml_obj.ml_pipeline <- function(
+  x,
+  nm,
+  ml_function,
+  formula,
+  response,
+  features,
+  features_col,
+  label_col
+) {
   ml_add_stage(x, nm)
 }
 
 #' @export
-post_ml_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
-                                  features, features_col, label_col) {
+post_ml_obj.tbl_spark <- function(
+  x,
+  nm,
+  ml_function,
+  formula,
+  response,
+  features,
+  features_col,
+  label_col
+) {
   formula <- ml_standardize_formula(formula, response, features)
 
   if (is.null(formula)) {
@@ -212,4 +265,3 @@ post_ml_obj.tbl_spark <- function(x, nm, ml_function, formula, response,
     )
   }
 }
-

@@ -10,21 +10,22 @@ spark_avro_package_name <- function(spark_version, scala_version = NULL) {
   }
 
   no_version <- spark_version
-  if(grepl("-preview", spark_version)) {
+  if (grepl("-preview", spark_version)) {
     no_version <- unlist(strsplit(spark_version, "-"))[[1]]
   }
 
-  if (no_version < "2.4.0") stop("Avro requires Spark 2.4.0 or newer")
+  if (no_version < "2.4.0") {
+    stop("Avro requires Spark 2.4.0 or newer")
+  }
 
-  scala_version <- scala_version %||% (
-    if (no_version >= "4.0.0") {
+  scala_version <- scala_version %||%
+    (if (no_version >= "4.0.0") {
       "2.13"
     } else if (no_version >= "3.0.0") {
       "2.12"
     } else {
       "2.11"
-    }
-  )
+    })
   paste0(
     "org.apache.spark:spark-avro_",
     scala_version,
@@ -41,8 +42,11 @@ validate_spark_avro_pkg_version <- function(sc) {
     stop(
       "Avro support must be enabled with ",
       "`spark_connect(..., version = <version>, packages = c(\"avro\", <other package(s)>), ...)` ",
-      " or by explicitly including '", spark_avro_pkg, "' for Spark version ",
-      full_spark_version, " in list of packages"
+      " or by explicitly including '",
+      spark_avro_pkg,
+      "' for Spark version ",
+      full_spark_version,
+      " in list of packages"
     )
   }
 }

@@ -19,10 +19,18 @@
 #' @param relative_error The target relative error for quantile computation.
 #'
 #' @export
-ft_robust_scaler <- function(x, input_col = NULL, output_col = NULL,
-                             lower = 0.25, upper = 0.75, with_centering = TRUE,
-                             with_scaling = TRUE, relative_error = 0.001,
-                             uid = random_string("ft_robust_scaler_"), ...) {
+ft_robust_scaler <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  lower = 0.25,
+  upper = 0.75,
+  with_centering = TRUE,
+  with_scaling = TRUE,
+  relative_error = 0.001,
+  uid = random_string("ft_robust_scaler_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_robust_scaler")
 }
@@ -30,10 +38,18 @@ ft_robust_scaler <- function(x, input_col = NULL, output_col = NULL,
 ml_robust_scaler <- ft_robust_scaler
 
 #' @export
-ft_robust_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                              lower = 0.25, upper = 0.75, with_centering = TRUE,
-                                              with_scaling = TRUE, relative_error = 0.001,
-                                              uid = random_string("ft_robust_scaler_"), ...) {
+ft_robust_scaler.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  lower = 0.25,
+  upper = 0.75,
+  with_centering = TRUE,
+  with_scaling = TRUE,
+  relative_error = 0.001,
+  uid = random_string("ft_robust_scaler_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -48,8 +64,11 @@ ft_robust_scaler.spark_connection <- function(x, input_col = NULL, output_col = 
     validator_ml_robust_scaler()
 
   estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.RobustScaler",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.RobustScaler",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
     invoke("setLower", .args[["lower"]]) %>%
     invoke("setUpper", .args[["upper"]]) %>%
@@ -62,10 +81,18 @@ ft_robust_scaler.spark_connection <- function(x, input_col = NULL, output_col = 
 }
 
 #' @export
-ft_robust_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                         lower = 0.25, upper = 0.75, with_centering = TRUE,
-                                         with_scaling = TRUE, relative_error = 0.001,
-                                         uid = random_string("ft_robust_scaler_"), ...) {
+ft_robust_scaler.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  lower = 0.25,
+  upper = 0.75,
+  with_centering = TRUE,
+  with_scaling = TRUE,
+  relative_error = 0.001,
+  uid = random_string("ft_robust_scaler_"),
+  ...
+) {
   stage <- ft_robust_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -83,10 +110,18 @@ ft_robust_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
 }
 
 #' @export
-ft_robust_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                       lower = 0.25, upper = 0.75, with_centering = TRUE,
-                                       with_scaling = TRUE, relative_error = 0.001,
-                                       uid = random_string("ft_robust_scaler_"), ...) {
+ft_robust_scaler.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  lower = 0.25,
+  upper = 0.75,
+  with_centering = TRUE,
+  with_scaling = TRUE,
+  relative_error = 0.001,
+  uid = random_string("ft_robust_scaler_"),
+  ...
+) {
   stage <- ft_robust_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

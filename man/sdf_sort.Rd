@@ -16,12 +16,12 @@ Sort a Spark DataFrame by one or more columns, with each column
 sorted in ascending order.
 }
 \seealso{
-Other Spark data frames: 
-\code{\link{sdf_copy_to}()},
-\code{\link{sdf_distinct}()},
-\code{\link{sdf_random_split}()},
-\code{\link{sdf_register}()},
-\code{\link{sdf_sample}()},
-\code{\link{sdf_weighted_sample}()}
+Other Spark data frames:
+\code{\link[=sdf_copy_to]{sdf_copy_to()}},
+\code{\link[=sdf_distinct]{sdf_distinct()}},
+\code{\link[=sdf_random_split]{sdf_random_split()}},
+\code{\link[=sdf_register]{sdf_register()}},
+\code{\link[=sdf_sample]{sdf_sample()}},
+\code{\link[=sdf_weighted_sample]{sdf_weighted_sample()}}
 }
 \concept{Spark data frames}

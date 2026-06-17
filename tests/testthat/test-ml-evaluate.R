@@ -180,7 +180,12 @@ test_that("ml_evaluate() works for bisecting kmeans", {
     ml_evaluate(iris_tbl)
 
   expect_equal(names(bi_kmeans_silhouette), "Silhouette")
-  expect_equal(bi_kmeans_silhouette$Silhouette, 0.517, tolerance = 0.001, scale = 1)
+  expect_equal(
+    bi_kmeans_silhouette$Silhouette,
+    0.517,
+    tolerance = 0.001,
+    scale = 1
+  )
 })
 
 test_that("ml_evaluate() works for gaussian mixtures model", {
@@ -223,7 +228,11 @@ test_that("ml_evaluate() works for decision tree model", {
 
 test_that("ml_evaluate() works for mlp model", {
   iris_tbl <- testthat_tbl("iris")
-  mlp_acc <- ml_multilayer_perceptron_classifier(iris_tbl, Species ~ ., layers = c(4, 3, 3)) %>%
+  mlp_acc <- ml_multilayer_perceptron_classifier(
+    iris_tbl,
+    Species ~ .,
+    layers = c(4, 3, 3)
+  ) %>%
     ml_evaluate(iris_tbl)
 
   expect_equal(names(mlp_acc), "Accuracy")
@@ -259,4 +268,3 @@ test_that("ml_evaluate() works for svc model", {
 })
 
 test_clear_cache()
-

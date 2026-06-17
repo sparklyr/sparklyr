@@ -38,4 +38,3 @@ test_that("ft_tokenizer.tbl_spark() works as expected", {
 })
 
 test_clear_cache()
-

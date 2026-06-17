@@ -4,7 +4,6 @@ skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("isotonic_regression.tidy() works", {
-
   ## ---------------- Connection and data upload to Spark ----------------------
 
   sc <- testthat_spark_connection()
@@ -18,7 +17,8 @@ test_that("isotonic_regression.tidy() works", {
 
   td1 <- tidy(ir_model)
 
-  check_tidy(td1,
+  check_tidy(
+    td1,
     exp.row = length(ir_model$model$boundaries()),
     exp.names = c("boundaries", "predictions")
   )
@@ -29,7 +29,8 @@ test_that("isotonic_regression.tidy() works", {
     augment() %>%
     dplyr::collect()
 
-  check_tidy(au1,
+  check_tidy(
+    au1,
     exp.row = 150,
     exp.name = c(dplyr::tbl_vars(iris_tbl), ".prediction")
   )
@@ -38,11 +39,7 @@ test_that("isotonic_regression.tidy() works", {
 
   gl1 <- glance(ir_model)
 
-  check_tidy(gl1,
-    exp.row = 1,
-    exp.names = c("isotonic", "num_boundaries")
-  )
+  check_tidy(gl1, exp.row = 1, exp.names = c("isotonic", "num_boundaries"))
 })
 
 test_clear_cache()
-

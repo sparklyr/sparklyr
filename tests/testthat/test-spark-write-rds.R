@@ -18,10 +18,46 @@ test_that("spark_write_rds() works as expected with non-array columns", {
   skip_databricks_connect()
 
   test_lgl_vals <- c(TRUE, NA, FALSE, NA, TRUE, NA, FALSE, NA)
-  test_int_vals <- c(NA_integer_, -2147483647L, -2L, -1L, 0L, 1L, 2L, 2147483647L)
-  test_double_vals <- c(NA_real_, jdouble.min, jdouble.max, 0, 1.234, -jdouble.min, -jdouble.max, NaN)
-  test_float_vals <- c(NA_real_, jfloat.min, jfloat.max, 0, 1.234, -jfloat.min, -jfloat.max, NaN)
-  test_string_vals <- c("abcDEF", "a", "A", "", NA, "Hello, world!", "\001\002\003", NA)
+  test_int_vals <- c(
+    NA_integer_,
+    -2147483647L,
+    -2L,
+    -1L,
+    0L,
+    1L,
+    2L,
+    2147483647L
+  )
+  test_double_vals <- c(
+    NA_real_,
+    jdouble.min,
+    jdouble.max,
+    0,
+    1.234,
+    -jdouble.min,
+    -jdouble.max,
+    NaN
+  )
+  test_float_vals <- c(
+    NA_real_,
+    jfloat.min,
+    jfloat.max,
+    0,
+    1.234,
+    -jfloat.min,
+    -jfloat.max,
+    NaN
+  )
+  test_string_vals <- c(
+    "abcDEF",
+    "a",
+    "A",
+    "",
+    NA,
+    "Hello, world!",
+    "\001\002\003",
+    NA
+  )
   test_date_vals <- c(
     as.Date(2500 * seq(4), origin = "1970-01-01", tz = "UTC"),
     as.Date(NA_integer_, origin = "1970-01-01", tz = "UTC"),
@@ -93,8 +129,12 @@ test_that("spark_write_rds() works as expected with non-array columns", {
     dplyr::mutate(
       float_vals = float(float_vals),
       decimal_vals = decimal(int_vals),
-      byte_vals = dplyr::sql("TRY_CAST(MOD(`int_vals`, 256) * 77 + 20 AS BYTE)"),
-      short_vals = dplyr::sql("TRY_CAST(MOD(`int_vals`, 256) * 77 + 20 AS SHORT)"),
+      byte_vals = dplyr::sql(
+        "TRY_CAST(MOD(`int_vals`, 256) * 77 + 20 AS BYTE)"
+      ),
+      short_vals = dplyr::sql(
+        "TRY_CAST(MOD(`int_vals`, 256) * 77 + 20 AS SHORT)"
+      ),
       long_vals = dplyr::sql("TRY_CAST(`int_vals` AS LONG) * 1073741824L")
     )
 
@@ -106,21 +146,26 @@ test_that("spark_write_rds() works as expected with non-array columns", {
   expect_equal(actual %>% dplyr::pull(int_vals), test_int_vals)
   expect_equal(actual %>% dplyr::pull(double_vals), test_double_vals)
   expect_equal(
-    actual %>% dplyr::pull(float_vals), sdf %>% dplyr::pull(float_vals)
+    actual %>% dplyr::pull(float_vals),
+    sdf %>% dplyr::pull(float_vals)
   )
   expect_equal(actual %>% dplyr::pull(string_vals), test_string_vals)
   expect_equal(actual %>% dplyr::pull(date_vals), test_date_vals)
   expect_equal(
-    actual %>% dplyr::pull(decimal_vals), sdf %>% dplyr::pull(decimal_vals)
+    actual %>% dplyr::pull(decimal_vals),
+    sdf %>% dplyr::pull(decimal_vals)
   )
   expect_equal(
-    actual %>% dplyr::pull(byte_vals), sdf %>% dplyr::pull(byte_vals)
+    actual %>% dplyr::pull(byte_vals),
+    sdf %>% dplyr::pull(byte_vals)
   )
   expect_equal(
-    actual %>% dplyr::pull(short_vals), sdf %>% dplyr::pull(short_vals)
+    actual %>% dplyr::pull(short_vals),
+    sdf %>% dplyr::pull(short_vals)
   )
   expect_equal(
-    actual %>% dplyr::pull(long_vals), sdf %>% dplyr::pull(long_vals)
+    actual %>% dplyr::pull(long_vals),
+    sdf %>% dplyr::pull(long_vals)
   )
   expect_equal(actual %>% dplyr::pull(struct_vals), test_struct_vals)
 })
@@ -146,7 +191,17 @@ test_that("spark_write_rds() works as expected with array columns", {
     -1234L,
     NA_integer_,
     c(142L, 85L, NA_integer_, 714L, NA_integer_, 2857L, NA_integer_),
-    c(NA_integer_, -2147483647L, -2L, -1L, 0L, 1L, 2L, 2147483647L, NA_integer_),
+    c(
+      NA_integer_,
+      -2147483647L,
+      -2L,
+      -1L,
+      0L,
+      1L,
+      2L,
+      2147483647L,
+      NA_integer_
+    ),
     rep(NA_integer_, 7)
   )
 
@@ -176,7 +231,17 @@ test_that("spark_write_rds() works as expected with array columns", {
     -1234L,
     NA_integer_,
     c(142L, 85L, NA_integer_, 714L, NA_integer_, 2857L, NA_integer_),
-    c(NA_integer_, -2147483647L, -2L, -1L, 0L, 1L, 2L, 2147483647L, NA_integer_),
+    c(
+      NA_integer_,
+      -2147483647L,
+      -2L,
+      -1L,
+      0L,
+      1L,
+      2L,
+      2147483647L,
+      NA_integer_
+    ),
     rep(NA_integer_, 7)
   )
 
@@ -236,16 +301,20 @@ test_that("spark_write_rds() works as expected with array columns", {
   expect_equal(actual %>% dplyr::pull(string_arr), test_string_arr)
   expect_equal(actual %>% dplyr::pull(date_arr), test_date_arr)
   expect_equal(
-    actual %>% dplyr::pull(byte_arr), arr_sdf %>% dplyr::pull(byte_arr)
+    actual %>% dplyr::pull(byte_arr),
+    arr_sdf %>% dplyr::pull(byte_arr)
   )
   expect_equal(
-    actual %>% dplyr::pull(short_arr), arr_sdf %>% dplyr::pull(short_arr)
+    actual %>% dplyr::pull(short_arr),
+    arr_sdf %>% dplyr::pull(short_arr)
   )
   expect_equal(
-    actual %>% dplyr::pull(float_arr), arr_sdf %>% dplyr::pull(float_arr)
+    actual %>% dplyr::pull(float_arr),
+    arr_sdf %>% dplyr::pull(float_arr)
   )
   expect_equal(
-    actual %>% dplyr::pull(decimal_arr), arr_sdf %>% dplyr::pull(decimal_arr)
+    actual %>% dplyr::pull(decimal_arr),
+    arr_sdf %>% dplyr::pull(decimal_arr)
   )
 })
 
@@ -259,7 +328,10 @@ test_that("spark_write_rds() works as expected with multiple Spark dataframe par
   num_partitions <- 10L
   flights_sdf <- copy_to(sc, flights, repartition = num_partitions)
 
-  dest_uri <- paste0("file://", tempfile(pattern = "flights-part-{partitionId}-"))
+  dest_uri <- paste0(
+    "file://",
+    tempfile(pattern = "flights-part-{partitionId}-")
+  )
   outputs <- spark_write_rds(flights_sdf, dest_uri = dest_uri)
 
   partitions <- outputs %>%
@@ -281,4 +353,3 @@ test_that("spark_write_rds() works as expected with multiple Spark dataframe par
 })
 
 test_clear_cache()
-

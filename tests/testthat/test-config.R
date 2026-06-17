@@ -12,15 +12,27 @@ test_that("spark_config_exists function works as expected", {
   )
 
   expect_false(
-    spark_config_exists(list("sparklyr.log.console"), "sparklyr.log.console", FALSE)
+    spark_config_exists(
+      list("sparklyr.log.console"),
+      "sparklyr.log.console",
+      FALSE
+    )
   )
 
   expect_true(
-    spark_config_exists(list(sparklyr.log.console = TRUE), "sparklyr.log.console", FALSE)
+    spark_config_exists(
+      list(sparklyr.log.console = TRUE),
+      "sparklyr.log.console",
+      FALSE
+    )
   )
 
   expect_false(
-    spark_config_exists(list(sparklyr.log.console = FALSE), "sparklyr.log.console", TRUE)
+    spark_config_exists(
+      list(sparklyr.log.console = FALSE),
+      "sparklyr.log.console",
+      TRUE
+    )
   )
 })
 
@@ -35,7 +47,11 @@ test_that("spark_config_value function works as expected", {
 
       expect_equal(
         2,
-        spark_config_value(list(sparklyr.something = 2), "sparklyr.something", "1")
+        spark_config_value(
+          list(sparklyr.something = 2),
+          "sparklyr.something",
+          "1"
+        )
       )
 
       expect_equal(
@@ -45,7 +61,11 @@ test_that("spark_config_value function works as expected", {
 
       expect_equal(
         2,
-        spark_config_value(list(sparklyr.something = 2), "sparklyr.something", 1)
+        spark_config_value(
+          list(sparklyr.something = 2),
+          "sparklyr.something",
+          1
+        )
       )
     }
   )
@@ -79,10 +99,14 @@ test_that("spark_config_shell_args() works as expected", {
     expect_equal(
       spark_config_shell_args(config = config, master = "local"),
       c(
-        "--conf", "key1=value1",
-        "--conf", "key2=value2",
-        "--key3", "value3",
-        "--packages", "pkg1,pkg2,pkg3"
+        "--conf",
+        "key1=value1",
+        "--conf",
+        "key2=value2",
+        "--key3",
+        "value3",
+        "--packages",
+        "pkg1,pkg2,pkg3"
       )
     )
   }
@@ -117,4 +141,3 @@ test_that("spark_config warns() if non-existent file is passed", {
 })
 
 test_clear_cache()
-

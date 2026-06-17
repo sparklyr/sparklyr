@@ -74,7 +74,12 @@ jarray <- function(sc, x, element_type) {
   arr_cls <- invoke_static(sc, "java.lang.Class", "forName", cls)
 
   j_invoke_static(
-    sc, "java.util.Arrays", "copyOf", as.list(x), length(x), arr_cls
+    sc,
+    "java.util.Arrays",
+    "copyOf",
+    as.list(x),
+    length(x),
+    arr_cls
   )
 }
 
@@ -128,8 +133,12 @@ printf <- function(fmt, ...) {
   cat(sprintf(fmt, ...))
 }
 
-spark_require_version <- function(sc, required, module = NULL, required_max = NULL) {
-
+spark_require_version <- function(
+  sc,
+  required,
+  module = NULL,
+  required_max = NULL
+) {
   # guess module based on calling function
   if (is.null(module)) {
     call <- sys.call(sys.parent())
@@ -193,7 +202,9 @@ spark_sanitize_names <- function(names, config) {
   # the Spark API.
 
   # sanitize names by default, but opt out with global option
-  if (!isTRUE(spark_config_value(config, "sparklyr.sanitize.column.names", TRUE))) {
+  if (
+    !isTRUE(spark_config_value(config, "sparklyr.sanitize.column.names", TRUE))
+  ) {
     return(names)
   }
 
@@ -202,7 +213,6 @@ spark_sanitize_names <- function(names, config) {
 
   # use 'iconv' to translate names to ASCII if possible
   newNames <- unlist(lapply(newNames, function(name) {
-
     # attempt to translate to ASCII
     transformed <- tryCatch(
       iconv(name, to = "ASCII//TRANSLIT"),
@@ -221,9 +231,9 @@ spark_sanitize_names <- function(names, config) {
   newNames <- regex_replace(
     newNames,
     "^\\s*|\\s*$" = "",
-    "[\\s.]+"        = "_",
-    "[^\\w_]"     = "",
-    "^(\\W)"      = "V\\1"
+    "[\\s.]+" = "_",
+    "[^\\w_]" = "",
+    "^(\\W)" = "V\\1"
   )
 
   # ensure new names are unique
@@ -232,7 +242,11 @@ spark_sanitize_names <- function(names, config) {
   # report translations
   verbose <- spark_config_value(
     config,
-    c("sparklyr.verbose.sanitize", "sparklyr.sanitize.column.names.verbose", "sparklyr.verbose"),
+    c(
+      "sparklyr.verbose.sanitize",
+      "sparklyr.sanitize.column.names.verbose",
+      "sparklyr.verbose"
+    ),
     FALSE
   )
 
@@ -245,8 +259,14 @@ spark_sanitize_names <- function(names, config) {
       nLhs <- max(nchar(changedOldNames))
       nRhs <- max(nchar(changedNewNames))
 
-      lhs <- sprintf(paste("%-", nLhs + 2, "s", sep = ""), shQuote(changedOldNames))
-      rhs <- sprintf(paste("%-", nRhs + 2, "s", sep = ""), shQuote(changedNewNames))
+      lhs <- sprintf(
+        paste("%-", nLhs + 2, "s", sep = ""),
+        shQuote(changedOldNames)
+      )
+      rhs <- sprintf(
+        paste("%-", nRhs + 2, "s", sep = ""),
+        shQuote(changedNewNames)
+      )
 
       n <- floor(log10(max(changedIdx)))
       index <- sprintf(paste("(#%-", n, "s)", sep = ""), changedIdx)
@@ -319,7 +339,6 @@ infer_active_package_name <- function() {
 }
 
 split_chunks <- function(x, chunk_size) {
-
   # return early when chunk_size > length of vector
   n <- length(x)
   if (n <= chunk_size) {
@@ -331,9 +350,15 @@ split_chunks <- function(x, chunk_size) {
   ends <- c(seq(chunk_size, n - 1, by = chunk_size), n)
 
   # apply our subsetter
-  mapply(function(start, end) {
-    x[start:end]
-  }, starts, ends, SIMPLIFY = FALSE, USE.NAMES = FALSE)
+  mapply(
+    function(start, end) {
+      x[start:end]
+    },
+    starts,
+    ends,
+    SIMPLIFY = FALSE,
+    USE.NAMES = FALSE
+  )
 }
 
 remove_class <- function(object, class) {
@@ -366,7 +391,9 @@ is.tbl_spark <- function(x) {
 
 `%<-%` <- function(x, value) {
   dest <- as.character(as.list(substitute(x))[-1])
-  if (length(dest) != length(value)) stop("Assignment must contain same number of elements")
+  if (length(dest) != length(value)) {
+    stop("Assignment must contain same number of elements")
+  }
 
   for (i in seq_along(dest)) {
     assign(dest[[i]], value[[i]], envir = sys.frame(which = sys.parent(n = 1)))
@@ -403,28 +430,58 @@ pcre_to_java <- function(regex) {
     gsub("\\[:alpha:\\]", "A-Za-z", .) %>%
     gsub("\\[:ascii:\\]", paste0("\\\\", "x00", "-", "\\\\", "x7F"), .) %>%
     gsub("\\[:blank:\\]", " \\\\t", .) %>%
-    gsub("\\[:cntrl:\\]", paste0("\\\\", "x00", "-", "\\\\", "x1F", "\\\\", "x7F"), .) %>%
+    gsub(
+      "\\[:cntrl:\\]",
+      paste0("\\\\", "x00", "-", "\\\\", "x1F", "\\\\", "x7F"),
+      .
+    ) %>%
     gsub("\\[:digit:\\]", "0-9", .) %>%
     gsub("\\[:graph:\\]", paste0("\\\\", "x21", "-", "\\\\", "x7E"), .) %>%
     gsub("\\[:lower:\\]", "a-z", .) %>%
     gsub("\\[:print:\\]", paste0("\\\\", "x20", "-", "\\\\", "x7E"), .) %>%
-    gsub("\\[:punct:\\]",
-         paste0("\\\\", "x21", "-", "\\\\", "x2F",
-                "\\\\", "x3A", "-", "\\\\", "x40",
-                "\\\\", "x5B", "-", "\\\\", "x60",
-                "\\\\", "x7B", "-", "\\\\", "x7E"),
-         .
-        ) %>%
-    gsub("\\[:space:\\]",
-         paste0(" ",
-                "\\\\", "t",
-                "\\\\", "r",
-                "\\\\", "n",
-                "\\\\", "v",
-                "\\\\", "f"
-         ),
-         .
-        ) %>%
+    gsub(
+      "\\[:punct:\\]",
+      paste0(
+        "\\\\",
+        "x21",
+        "-",
+        "\\\\",
+        "x2F",
+        "\\\\",
+        "x3A",
+        "-",
+        "\\\\",
+        "x40",
+        "\\\\",
+        "x5B",
+        "-",
+        "\\\\",
+        "x60",
+        "\\\\",
+        "x7B",
+        "-",
+        "\\\\",
+        "x7E"
+      ),
+      .
+    ) %>%
+    gsub(
+      "\\[:space:\\]",
+      paste0(
+        " ",
+        "\\\\",
+        "t",
+        "\\\\",
+        "r",
+        "\\\\",
+        "n",
+        "\\\\",
+        "v",
+        "\\\\",
+        "f"
+      ),
+      .
+    ) %>%
     gsub("\\[:upper:\\]", "A-Z", .) %>%
     gsub("\\[:word:\\]", "A-Za-z0-9_", .) %>%
     gsub("\\[:xdigit:\\]", "0-9a-fA-F", .)
@@ -489,7 +546,7 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
   col_types %>%
     lapply(
       function(x) {
-        if(x == "unknown") {
+        if (x == "unknown") {
           fn <- NULL
         } else {
           fn <- tryCatch(
@@ -512,7 +569,7 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
 #' @importFrom tidyselect tidyselect_data_proxy tidyselect_data_has_predicates
 #' @export
 tidyselect_data_proxy.tbl_spark <- function(x) {
-  if(tidyselect_data_has_predicates(x)) {
+  if (tidyselect_data_has_predicates(x)) {
     simulate_vars_spark(x, FALSE)
   } else {
     NextMethod()
@@ -523,7 +580,7 @@ tidyselect_data_proxy.tbl_spark <- function(x) {
 tidyselect_data_has_predicates.tbl_spark <- function(x) {
   supported <- unlist(options("sparklyr.support.predicates"))
   out <- TRUE
-  if(!is.null(supported)) {
+  if (!is.null(supported)) {
     out <- supported
   }
   out
@@ -555,7 +612,10 @@ infer_required_r_packages <- function(fn) {
 
     if (!identical(deps[[pkg]], TRUE)) {
       imm_deps <- pkg %>%
-        tools::package_dependencies(db = installed.packages(), recursive = FALSE)
+        tools::package_dependencies(
+          db = installed.packages(),
+          recursive = FALSE
+        )
       purrr::map(imm_deps[[1]], ~ populate_deps(.x))
       deps[[pkg]] <- TRUE
     }
@@ -566,10 +626,12 @@ infer_required_r_packages <- function(fn) {
       call = function(x) {
         cfn <- rlang::eval_bare(x[[1]])
 
-        for (mfn in list(base::library,
-                         base::require,
-                         base::requireNamespace,
-                         base::loadNamespace)) {
+        for (mfn in list(
+          base::library,
+          base::require,
+          base::requireNamespace,
+          base::loadNamespace
+        )) {
           if (identical(cfn, mfn)) {
             populate_deps(rlang::call_args(match.call(mfn, x))$package)
             return(x)
@@ -577,7 +639,9 @@ infer_required_r_packages <- function(fn) {
         }
 
         if (identical(cfn, base::attachNamespace)) {
-          populate_deps(rlang::call_args(match.call(base::attachNamespace, x))$ns)
+          populate_deps(
+            rlang::call_args(match.call(base::attachNamespace, x))$ns
+          )
           return(x)
         }
 
@@ -613,22 +677,42 @@ os_is_windows <- function() {
 }
 
 cast_string <- function(x) {
-  vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
+  vctrs::vec_check_size(
+    x,
+    1,
+    arg = rlang::caller_arg(x),
+    call = rlang::caller_env()
+  )
   vctrs::vec_cast(x, character())
 }
 
 cast_scalar_logical <- function(x) {
-  vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
+  vctrs::vec_check_size(
+    x,
+    1,
+    arg = rlang::caller_arg(x),
+    call = rlang::caller_env()
+  )
   vctrs::vec_cast(x, logical())
 }
 
 cast_scalar_double <- function(x) {
-  vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
+  vctrs::vec_check_size(
+    x,
+    1,
+    arg = rlang::caller_arg(x),
+    call = rlang::caller_env()
+  )
   vctrs::vec_cast(x, numeric())
 }
 
 cast_scalar_integer <- function(x) {
-  vctrs::vec_check_size(x, 1, arg = rlang::caller_arg(x), call = rlang::caller_env())
+  vctrs::vec_check_size(
+    x,
+    1,
+    arg = rlang::caller_arg(x),
+    call = rlang::caller_env()
+  )
   vctrs::vec_cast(x, integer())
 }
 
@@ -693,19 +777,23 @@ cast_double_list <- function(x, allow_null = FALSE) {
   cast_list(x, numeric(), allow_null = allow_null)
 }
 
-cast_choice <- function(x, choices, error_arg = rlang::caller_arg(x), error_call = rlang::caller_env()) {
+cast_choice <- function(
+  x,
+  choices,
+  error_arg = rlang::caller_arg(x),
+  error_call = rlang::caller_env()
+) {
   rlang::arg_match(x, choices, error_arg = error_arg, error_call = error_call)
 }
 
 package_version2 <- function(x) {
-  if(inherits(x, "numeric_version")) {
+  if (inherits(x, "numeric_version")) {
     x <- as.character(x)
   }
   package_version(x)
 }
 
 update_jars <- function() {
-
   # Downloads Scala compilers
   download_scalac()
 
@@ -720,5 +808,4 @@ update_jars <- function() {
   # are all the R scripts in /R with a name containing "worker" or "core".
   # Embedded sources are the key to how spark_apply() works.
   spark_update_embedded_sources()
-
 }

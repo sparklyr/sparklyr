@@ -65,23 +65,53 @@
 #' }
 #'
 #' @export
-ml_als <- function(x, formula = NULL, rating_col = "rating", user_col = "user", item_col = "item",
-                   rank = 10, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
-                   nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
-                   num_item_blocks = 10, checkpoint_interval = 10,
-                   cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
-                   final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
+ml_als <- function(
+  x,
+  formula = NULL,
+  rating_col = "rating",
+  user_col = "user",
+  item_col = "item",
+  rank = 10,
+  reg_param = 0.1,
+  implicit_prefs = FALSE,
+  alpha = 1,
+  nonnegative = FALSE,
+  max_iter = 10,
+  num_user_blocks = 10,
+  num_item_blocks = 10,
+  checkpoint_interval = 10,
+  cold_start_strategy = "nan",
+  intermediate_storage_level = "MEMORY_AND_DISK",
+  final_storage_level = "MEMORY_AND_DISK",
+  uid = random_string("als_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_als")
 }
 
 #' @export
-ml_als.spark_connection <- function(x, formula = NULL, rating_col = "rating", user_col = "user", item_col = "item",
-                                    rank = 10, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
-                                    nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
-                                    num_item_blocks = 10, checkpoint_interval = 10,
-                                    cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
-                                    final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
+ml_als.spark_connection <- function(
+  x,
+  formula = NULL,
+  rating_col = "rating",
+  user_col = "user",
+  item_col = "item",
+  rank = 10,
+  reg_param = 0.1,
+  implicit_prefs = FALSE,
+  alpha = 1,
+  nonnegative = FALSE,
+  max_iter = 10,
+  num_user_blocks = 10,
+  num_item_blocks = 10,
+  checkpoint_interval = 10,
+  cold_start_strategy = "nan",
+  intermediate_storage_level = "MEMORY_AND_DISK",
+  final_storage_level = "MEMORY_AND_DISK",
+  uid = random_string("als_"),
+  ...
+) {
   .args <- list(
     rating_col = rating_col,
     user_col = user_col,
@@ -102,11 +132,13 @@ ml_als.spark_connection <- function(x, formula = NULL, rating_col = "rating", us
     validator_ml_als()
 
   jobj <- invoke_new(x, "org.apache.spark.ml.recommendation.ALS", uid) %>%
-    (
-      function(obj) {
-        do.call(
-          invoke,
-          c(obj, "%>%", Filter(
+    (function(obj) {
+      do.call(
+        invoke,
+        c(
+          obj,
+          "%>%",
+          Filter(
             function(x) !is.null(x),
             list(
               list("setRatingCol", .args[["rating_col"]]),
@@ -122,32 +154,57 @@ ml_als.spark_connection <- function(x, formula = NULL, rating_col = "rating", us
               list("setNumItemBlocks", .args[["num_item_blocks"]]),
               list("setCheckpointInterval", .args[["checkpoint_interval"]]),
               jobj_set_param_helper(
-                obj, "setIntermediateStorageLevel", .args[["intermediate_storage_level"]],
-                "2.0.0", "MEMORY_AND_DISK"
+                obj,
+                "setIntermediateStorageLevel",
+                .args[["intermediate_storage_level"]],
+                "2.0.0",
+                "MEMORY_AND_DISK"
               ),
               jobj_set_param_helper(
-                obj, "setFinalStorageLevel", .args[["final_storage_level"]],
-                "2.0.0", "MEMORY_AND_DISK"
+                obj,
+                "setFinalStorageLevel",
+                .args[["final_storage_level"]],
+                "2.0.0",
+                "MEMORY_AND_DISK"
               ),
               jobj_set_param_helper(
-                obj, "setColdStartStrategy", .args[["cold_start_strategy"]],
-                "2.2.0", "nan"
+                obj,
+                "setColdStartStrategy",
+                .args[["cold_start_strategy"]],
+                "2.2.0",
+                "nan"
               )
             )
-          ))
+          )
         )
-      })
+      )
+    })
 
   new_ml_als(jobj)
 }
 
 #' @export
-ml_als.ml_pipeline <- function(x, formula = NULL, rating_col = "rating", user_col = "user", item_col = "item",
-                               rank = 10, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
-                               nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
-                               num_item_blocks = 10, checkpoint_interval = 10,
-                               cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
-                               final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
+ml_als.ml_pipeline <- function(
+  x,
+  formula = NULL,
+  rating_col = "rating",
+  user_col = "user",
+  item_col = "item",
+  rank = 10,
+  reg_param = 0.1,
+  implicit_prefs = FALSE,
+  alpha = 1,
+  nonnegative = FALSE,
+  max_iter = 10,
+  num_user_blocks = 10,
+  num_item_blocks = 10,
+  checkpoint_interval = 10,
+  cold_start_strategy = "nan",
+  intermediate_storage_level = "MEMORY_AND_DISK",
+  final_storage_level = "MEMORY_AND_DISK",
+  uid = random_string("als_"),
+  ...
+) {
   stage <- ml_als.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -173,12 +230,27 @@ ml_als.ml_pipeline <- function(x, formula = NULL, rating_col = "rating", user_co
 }
 
 #' @export
-ml_als.tbl_spark <- function(x, formula = NULL, rating_col = "rating", user_col = "user", item_col = "item",
-                             rank = 10, reg_param = 0.1, implicit_prefs = FALSE, alpha = 1,
-                             nonnegative = FALSE, max_iter = 10, num_user_blocks = 10,
-                             num_item_blocks = 10, checkpoint_interval = 10,
-                             cold_start_strategy = "nan", intermediate_storage_level = "MEMORY_AND_DISK",
-                             final_storage_level = "MEMORY_AND_DISK", uid = random_string("als_"), ...) {
+ml_als.tbl_spark <- function(
+  x,
+  formula = NULL,
+  rating_col = "rating",
+  user_col = "user",
+  item_col = "item",
+  rank = 10,
+  reg_param = 0.1,
+  implicit_prefs = FALSE,
+  alpha = 1,
+  nonnegative = FALSE,
+  max_iter = 10,
+  num_user_blocks = 10,
+  num_item_blocks = 10,
+  checkpoint_interval = 10,
+  cold_start_strategy = "nan",
+  intermediate_storage_level = "MEMORY_AND_DISK",
+  final_storage_level = "MEMORY_AND_DISK",
+  uid = random_string("als_"),
+  ...
+) {
   formula <- ml_standardize_formula(formula)
 
   stage <- ml_als.spark_connection(
@@ -229,9 +301,16 @@ validator_ml_als <- function(.args) {
   .args[["max_iter"]] <- cast_scalar_integer(.args[["max_iter"]])
   .args[["num_user_blocks"]] <- cast_scalar_integer(.args[["num_user_blocks"]])
   .args[["num_item_blocks"]] <- cast_scalar_integer(.args[["num_item_blocks"]])
-  .args[["checkpoint_interval"]] <- cast_scalar_integer(.args[["checkpoint_interval"]])
-  .args[["cold_start_strategy"]] <- cast_choice(.args[["cold_start_strategy"]], c("nan", "drop"))
-  .args[["intermediate_storage_level"]] <- cast_string(.args[["intermediate_storage_level"]])
+  .args[["checkpoint_interval"]] <- cast_scalar_integer(.args[[
+    "checkpoint_interval"
+  ]])
+  .args[["cold_start_strategy"]] <- cast_choice(
+    .args[["cold_start_strategy"]],
+    c("nan", "drop")
+  )
+  .args[["intermediate_storage_level"]] <- cast_string(.args[[
+    "intermediate_storage_level"
+  ]])
   .args[["final_storage_level"]] <- cast_string(.args[["final_storage_level"]])
   .args
 }
@@ -285,13 +364,16 @@ ml_recommend <- function(model, type = c("items", "users"), n = 1) {
     spark_connection() %>%
     spark_version()
 
-  if (version < "2.2.0") stop("`ml_recommend()`` is only supported for Spark 2.2+.", call. = FALSE)
+  if (version < "2.2.0") {
+    stop("`ml_recommend()`` is only supported for Spark 2.2+.", call. = FALSE)
+  }
 
   model <- if (inherits(model, "ml_model_als")) model$model else model
 
   type <- match.arg(type)
   n <- cast_scalar_integer(n)
-  (switch(type,
+  (switch(
+    type,
     items = model$recommend_for_all_users,
     users = model$recommend_for_all_items
   ))(n) %>%

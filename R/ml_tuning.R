@@ -32,13 +32,16 @@
 #' @name ml-tuning
 NULL
 
-ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list) {
+ml_validate_params <- function(
+  expanded_params,
+  stage_jobjs,
+  current_param_list
+) {
   stage_uids <- names(stage_jobjs)
   stage_indices <- integer(0)
 
   expanded_params %>%
     purrr::imap(function(param_sets, user_input_name) {
-
       # Determine the pipeline stage based on the user specified name.
       matched <- paste0("^", user_input_name) %>%
         grepl(stage_uids) %>%
@@ -46,12 +49,18 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
 
       # Error if we find more than one or no stage in the pipeline with the name.
       if (length(matched) > 1) {
-        stop("The name ", user_input_name, " matches more than one stage in the pipeline.",
+        stop(
+          "The name ",
+          user_input_name,
+          " matches more than one stage in the pipeline.",
           call. = FALSE
         )
       }
       if (length(matched) == 0) {
-        stop("The name ", user_input_name, " matches no stages in the pipeline.",
+        stop(
+          "The name ",
+          user_input_name,
+          " matches no stages in the pipeline.",
           call. = FALSE
         )
       }
@@ -86,20 +95,21 @@ ml_validate_params <- function(expanded_params, stage_jobjs, current_param_list)
         default_params_keep <- setdiff(default_param_names, current_params_keep)
 
         args_to_validate <- c(
-          params, current_params[current_params_keep], default_params[default_params_keep]
+          params,
+          current_params[current_params_keep],
+          default_params[default_params_keep]
         )
 
         # Call the validator associated with the stage, and return the (validated)
         #   parameters the user specified.
         validation_function <- ml_get_stage_validator(stage_jobj)
-        if(!is.null(validation_function)) {
+        if (!is.null(validation_function)) {
           do.call(validation_function, list(args_to_validate)) %>%
             `[`(input_param_names)
         } else {
           params_validate_estimator(stage_jobj, args_to_validate) %>%
             `[`(input_param_names)
         }
-
       })
     }) %>%
     rlang::set_names(stage_uids[stage_indices])
@@ -134,19 +144,33 @@ ml_get_estimator_param_maps <- function(jobj) {
   sc <- spark_connection(jobj)
   jobj %>%
     invoke("getEstimatorParamMaps") %>%
-    purrr::map(~ invoke_static(sc, "sparklyr.MLUtils", "paramMapToNestedList", .x)) %>%
+    purrr::map(
+      ~ invoke_static(sc, "sparklyr.MLUtils", "paramMapToNestedList", .x)
+    ) %>%
     purrr::map(~ lapply(.x, ml_map_param_list_names))
 }
 
-ml_new_validator <- function(sc, class, uid, estimator, evaluator,
-                             estimator_param_maps, seed) {
+ml_new_validator <- function(
+  sc,
+  class,
+  uid,
+  estimator,
+  evaluator,
+  estimator_param_maps,
+  seed
+) {
   uid <- cast_string(uid)
 
   possibly_spark_jobj <- possibly_null(spark_jobj)
 
   param_maps <- if (!is.null(estimator) && !is.null(estimator_param_maps)) {
     stage_jobjs <- if (inherits(estimator, "ml_pipeline")) {
-      invoke_static(sc, "sparklyr.MLUtils", "uidStagesMapping", spark_jobj(estimator))
+      invoke_static(
+        sc,
+        "sparklyr.MLUtils",
+        "uidStagesMapping",
+        spark_jobj(estimator)
+      )
     } else {
       rlang::set_names(list(spark_jobj(estimator)), ml_uid(estimator))
     }
@@ -169,8 +193,11 @@ ml_new_validator <- function(sc, class, uid, estimator, evaluator,
 
   if (!is.null(param_maps)) {
     invoke_static(
-      sc, "sparklyr.MLUtils", "setParamMaps",
-      jobj, param_maps
+      sc,
+      "sparklyr.MLUtils",
+      "setParamMaps",
+      jobj,
+      param_maps
     )
   } else {
     jobj
@@ -233,14 +260,15 @@ print_tuning_info <- function(x, type = c("cv", "tvs")) {
     cat("    with metric", ml_param(x$evaluator, "metric_name"), "\n")
   }
 
-
   if (identical(type, "cv")) {
     cat("  num_folds:", x$num_folds, "\n")
   } else {
     cat("  train_ratio:", x$train_ratio, "\n")
   }
   cat(
-    "  [Tuned over", num_sets, "hyperparameter",
+    "  [Tuned over",
+    num_sets,
+    "hyperparameter",
     if (num_sets == 1) "set]" else "sets]"
   )
 }
@@ -262,15 +290,23 @@ print_tuning_summary <- function(x, type = c("cv", "tvs")) {
 
   cat(paste0("Tuned ", ml_short_type(x$estimator), "\n"))
   cat(paste0("  with metric ", ml_param(x$evaluator, "metric_name"), "\n"))
-  cat(paste0(
-    "  over ", num_sets, " hyperparameter ",
-    if (num_sets == 1) "set" else "sets"
-  ), "\n")
+  cat(
+    paste0(
+      "  over ",
+      num_sets,
+      " hyperparameter ",
+      if (num_sets == 1) "set" else "sets"
+    ),
+    "\n"
+  )
 
   if (identical(type, "cv")) {
     cat("  via", paste0(x$num_folds, "-fold cross validation"))
   } else {
-    cat("  via", paste0(x$train_ratio, "/", 1 - x$train_ratio, " train-validation split"))
+    cat(
+      "  via",
+      paste0(x$train_ratio, "/", 1 - x$train_ratio, " train-validation split")
+    )
   }
   cat("\n\n")
 
@@ -299,10 +335,11 @@ print_tuning_summary <- function(x, type = c("cv", "tvs")) {
 #'   order of the estimator param maps.
 #' @export
 ml_sub_models <- function(model) {
-  fn <- model$sub_models %||% stop(
-    "Cannot extract sub models. `collect_sub_models` must be set to TRUE in ",
-    "ml_cross_validator() or ml_train_split_validation()."
-  )
+  fn <- model$sub_models %||%
+    stop(
+      "Cannot extract sub models. `collect_sub_models` must be set to TRUE in ",
+      "ml_cross_validator() or ml_train_split_validation()."
+    )
   fn()
 }
 
@@ -351,7 +388,8 @@ ml_validation_metrics <- function(model) {
   } else if (inherits(model, "ml_train_validation_split_model")) {
     model$validation_metrics_df
   } else {
-    stop("ml_validation_metrics() must be called on `ml_cross_validator_model` ",
+    stop(
+      "ml_validation_metrics() must be called on `ml_cross_validator_model` ",
       "or `ml_train_validation_split_model`.",
       call. = FALSE
     )
@@ -375,16 +413,27 @@ param_maps_to_df <- function(param_maps) {
 }
 
 validate_args_tuning <- function(.args) {
-  .args[["collect_sub_models"]] <- cast_scalar_logical(.args[["collect_sub_models"]])
+  .args[["collect_sub_models"]] <- cast_scalar_logical(.args[[
+    "collect_sub_models"
+  ]])
   .args[["parallelism"]] <- cast_scalar_integer(.args[["parallelism"]])
   .args[["seed"]] <- cast_nullable_scalar_integer(.args[["seed"]])
-  if (!is.null(.args[["estimator"]]) && !inherits(.args[["estimator"]], "ml_estimator")) {
+  if (
+    !is.null(.args[["estimator"]]) &&
+      !inherits(.args[["estimator"]], "ml_estimator")
+  ) {
     stop("`estimator` must be an `ml_estimator`.")
   }
-  if (!is.null(.args[["estimator_param_maps"]]) && !rlang::is_bare_list(.args[["estimator_param_maps"]])) {
+  if (
+    !is.null(.args[["estimator_param_maps"]]) &&
+      !rlang::is_bare_list(.args[["estimator_param_maps"]])
+  ) {
     stop("`estimator_param_maps` must be a list.")
   }
-  if (!is.null(.args[["evaluator"]]) && !inherits(.args[["evaluator"]], "ml_evaluator")) {
+  if (
+    !is.null(.args[["evaluator"]]) &&
+      !inherits(.args[["evaluator"]], "ml_evaluator")
+  ) {
     stop("`evaluator` must be an `ml_evaluator`.")
   }
   .args

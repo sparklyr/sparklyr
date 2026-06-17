@@ -1,17 +1,27 @@
 # nocov start
 
 spark_worker_connect <- function(
-                                 sessionId,
-                                 backendPort = 8880,
-                                 config = list()) {
-  gatewayPort <- spark_config_value(config, "sparklyr.worker.gateway.port", backendPort)
+  sessionId,
+  backendPort = 8880,
+  config = list()
+) {
+  gatewayPort <- spark_config_value(
+    config,
+    "sparklyr.worker.gateway.port",
+    backendPort
+  )
 
-  gatewayAddress <- spark_config_value(config, "sparklyr.worker.gateway.address", "localhost")
+  gatewayAddress <- spark_config_value(
+    config,
+    "sparklyr.worker.gateway.address",
+    "localhost"
+  )
   config <- list()
 
   worker_log("is connecting to backend using port ", gatewayPort)
 
-  gatewayInfo <- spark_connect_gateway(gatewayAddress,
+  gatewayInfo <- spark_connect_gateway(
+    gatewayAddress,
     gatewayPort,
     sessionId,
     config = config,
@@ -40,26 +50,30 @@ spark_worker_connect <- function(
       close(gatewayInfo$gateway)
 
       stop(
-        "Failed to open connection to backend:", err$message
+        "Failed to open connection to backend:",
+        err$message
       )
     }
   )
 
   worker_log("is connected to backend session")
 
-  sc <- structure(class = c("spark_worker_connection"), list(
-    # spark_connection
-    master = "",
-    method = "shell",
-    app_name = NULL,
-    config = NULL,
-    state = new.env(),
-    # spark_shell_connection
-    spark_home = NULL,
-    backend = backend,
-    gateway = gatewayInfo$gateway,
-    output_file = NULL
-  ))
+  sc <- structure(
+    class = c("spark_worker_connection"),
+    list(
+      # spark_connection
+      master = "",
+      method = "shell",
+      app_name = NULL,
+      config = NULL,
+      state = new.env(),
+      # spark_shell_connection
+      spark_home = NULL,
+      backend = backend,
+      gateway = gatewayInfo$gateway,
+      output_file = NULL
+    )
+  )
 
   worker_log("created connection")
 

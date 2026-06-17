@@ -17,9 +17,7 @@ tidy.ml_model_pca <- function(x, ...) {
 #' @param newdata a tbl_spark of new data to use for prediction.
 #'
 #' @export
-augment.ml_model_pca <- function(x, newdata = NULL,
-                                 ...) {
-
+augment.ml_model_pca <- function(x, newdata = NULL, ...) {
   # if the user doesn't provide a new data, this funcion will
   # use the training set
   if (is.null(newdata)) {

@@ -27,7 +27,8 @@ sdf_fast_bind_cols <- function(...) {
       "sparklyr.DFUtils",
       "zipDataFrames",
       spark_context(sc),
-      df1, df2
+      df1,
+      df2
     )
   }
 

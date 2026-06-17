@@ -70,14 +70,19 @@ test_that("too many pieces dealt with as requested", {
   )
 
   expect_equivalent(
-    tidyr::separate(len_mismatch_sdf, x, c("x", "y"), extra = "merge") %>% collect(),
+    tidyr::separate(len_mismatch_sdf, x, c("x", "y"), extra = "merge") %>%
+      collect(),
     dplyr::tibble(id = 1:2, x = c("a", "a"), y = c("b", "b c"))
   )
   expect_equivalent(
-    tidyr::separate(len_mismatch_sdf, x, c("x", "y"), extra = "drop") %>% collect(),
+    tidyr::separate(len_mismatch_sdf, x, c("x", "y"), extra = "drop") %>%
+      collect(),
     dplyr::tibble(id = 1:2, x = c("a", "a"), y = c("b", "b"))
   )
-  suppressWarnings(expect_warning(tidyr::separate(len_mismatch_sdf, x, c("x", "y"), extra = "error"), "deprecated"))
+  suppressWarnings(expect_warning(
+    tidyr::separate(len_mismatch_sdf, x, c("x", "y"), extra = "error"),
+    "deprecated"
+  ))
 })
 
 test_that("too few pieces dealt with as requested", {
@@ -91,11 +96,13 @@ test_that("too few pieces dealt with as requested", {
   )
 
   expect_equivalent(
-    tidyr::separate(len_mismatch_sdf, x, c("x", "y", "z"), fill = "left") %>% collect(),
+    tidyr::separate(len_mismatch_sdf, x, c("x", "y", "z"), fill = "left") %>%
+      collect(),
     dplyr::tibble(id = 1:2, x = c(NA, "a"), y = c("a", "b"), z = c("b", "c"))
   )
   expect_equivalent(
-    tidyr::separate(len_mismatch_sdf, x, c("x", "y", "z"), fill = "right") %>% collect(),
+    tidyr::separate(len_mismatch_sdf, x, c("x", "y", "z"), fill = "right") %>%
+      collect(),
     dplyr::tibble(id = 1:2, x = c("a", "a"), y = c("b", "b"), z = c(NA, "c"))
   )
 })
@@ -143,4 +150,3 @@ test_that("checks type of `into` and `sep`", {
 })
 
 test_clear_cache()
-

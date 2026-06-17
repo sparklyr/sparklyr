@@ -4,27 +4,53 @@ NULL
 #' @rdname ml_decision_tree
 #' @template roxlate-ml-probabilistic-classifier-params
 #' @export
-ml_decision_tree_classifier <- function(x, formula = NULL, max_depth = 5, max_bins = 32,
-                                        min_instances_per_node = 1, min_info_gain = 0,
-                                        impurity = "gini", seed = NULL, thresholds = NULL,
-                                        cache_node_ids = FALSE, checkpoint_interval = 10,
-                                        max_memory_in_mb = 256, features_col = "features",
-                                        label_col = "label", prediction_col = "prediction",
-                                        probability_col = "probability", raw_prediction_col = "rawPrediction",
-                                        uid = random_string("decision_tree_classifier_"), ...) {
+ml_decision_tree_classifier <- function(
+  x,
+  formula = NULL,
+  max_depth = 5,
+  max_bins = 32,
+  min_instances_per_node = 1,
+  min_info_gain = 0,
+  impurity = "gini",
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10,
+  max_memory_in_mb = 256,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("decision_tree_classifier_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_decision_tree_classifier")
 }
 
 #' @export
-ml_decision_tree_classifier.spark_connection <- function(x, formula = NULL, max_depth = 5, max_bins = 32,
-                                                         min_instances_per_node = 1, min_info_gain = 0,
-                                                         impurity = "gini", seed = NULL, thresholds = NULL,
-                                                         cache_node_ids = FALSE, checkpoint_interval = 10,
-                                                         max_memory_in_mb = 256, features_col = "features",
-                                                         label_col = "label", prediction_col = "prediction",
-                                                         probability_col = "probability", raw_prediction_col = "rawPrediction",
-                                                         uid = random_string("decision_tree_classifier_"), ...) {
+ml_decision_tree_classifier.spark_connection <- function(
+  x,
+  formula = NULL,
+  max_depth = 5,
+  max_bins = 32,
+  min_instances_per_node = 1,
+  min_info_gain = 0,
+  impurity = "gini",
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10,
+  max_memory_in_mb = 256,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("decision_tree_classifier_"),
+  ...
+) {
   .args <- list(
     max_depth = max_depth,
     max_bins = max_bins,
@@ -46,8 +72,11 @@ ml_decision_tree_classifier.spark_connection <- function(x, formula = NULL, max_
     validator_ml_decision_tree_classifier()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.classification.DecisionTreeClassifier", uid,
-    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    x,
+    "org.apache.spark.ml.classification.DecisionTreeClassifier",
+    uid,
+    features_col = .args[["features_col"]],
+    label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]],
     probability_col = .args[["probability_col"]],
     raw_prediction_col = .args[["raw_prediction_col"]]
@@ -67,14 +96,27 @@ ml_decision_tree_classifier.spark_connection <- function(x, formula = NULL, max_
 }
 
 #' @export
-ml_decision_tree_classifier.ml_pipeline <- function(x, formula = NULL, max_depth = 5, max_bins = 32,
-                                                    min_instances_per_node = 1, min_info_gain = 0,
-                                                    impurity = "gini", seed = NULL, thresholds = NULL,
-                                                    cache_node_ids = FALSE, checkpoint_interval = 10,
-                                                    max_memory_in_mb = 256, features_col = "features",
-                                                    label_col = "label", prediction_col = "prediction",
-                                                    probability_col = "probability", raw_prediction_col = "rawPrediction",
-                                                    uid = random_string("decision_tree_classifier_"), ...) {
+ml_decision_tree_classifier.ml_pipeline <- function(
+  x,
+  formula = NULL,
+  max_depth = 5,
+  max_bins = 32,
+  min_instances_per_node = 1,
+  min_info_gain = 0,
+  impurity = "gini",
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10,
+  max_memory_in_mb = 256,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("decision_tree_classifier_"),
+  ...
+) {
   stage <- ml_decision_tree_classifier.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -101,16 +143,30 @@ ml_decision_tree_classifier.ml_pipeline <- function(x, formula = NULL, max_depth
 }
 
 #' @export
-ml_decision_tree_classifier.tbl_spark <- function(x, formula = NULL, max_depth = 5, max_bins = 32,
-                                                  min_instances_per_node = 1, min_info_gain = 0,
-                                                  impurity = "gini", seed = NULL, thresholds = NULL,
-                                                  cache_node_ids = FALSE, checkpoint_interval = 10,
-                                                  max_memory_in_mb = 256, features_col = "features",
-                                                  label_col = "label", prediction_col = "prediction",
-                                                  probability_col = "probability", raw_prediction_col = "rawPrediction",
-                                                  uid = random_string("decision_tree_classifier_"),
-                                                  response = NULL, features = NULL,
-                                                  predicted_label_col = "predicted_label", ...) {
+ml_decision_tree_classifier.tbl_spark <- function(
+  x,
+  formula = NULL,
+  max_depth = 5,
+  max_bins = 32,
+  min_instances_per_node = 1,
+  min_info_gain = 0,
+  impurity = "gini",
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  checkpoint_interval = 10,
+  max_memory_in_mb = 256,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("decision_tree_classifier_"),
+  response = NULL,
+  features = NULL,
+  predicted_label_col = "predicted_label",
+  ...
+) {
   formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_decision_tree_classifier.spark_connection(
@@ -153,7 +209,10 @@ ml_decision_tree_classifier.tbl_spark <- function(x, formula = NULL, max_depth =
 
 validator_ml_decision_tree_classifier <- function(.args) {
   .args <- ml_validate_decision_tree_args(.args)
-  .args[["thresholds"]] <- cast_double_list(.args[["thresholds"]], allow_null = TRUE)
+  .args[["thresholds"]] <- cast_double_list(
+    .args[["thresholds"]],
+    allow_null = TRUE
+  )
   .args[["impurity"]] <- cast_choice(.args[["impurity"]], c("gini", "entropy"))
   .args
 }
@@ -167,7 +226,9 @@ new_ml_decision_tree_classification_model <- function(jobj) {
     jobj,
     # `depth` and `featureImportances` are lazy vals in Spark.
     depth = function() invoke(jobj, "depth"),
-    feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
+    feature_importances = possibly_null(
+      ~ read_spark_vector(jobj, "featureImportances")
+    ),
     # `numNodes` is a def in Spark.
     num_nodes = function() invoke(jobj, "numNodes"),
     class = "ml_decision_tree_classification_model"

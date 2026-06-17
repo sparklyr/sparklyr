@@ -4,7 +4,6 @@ skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("aft_survival_regression.tidy() works", {
-
   ## ---------------- Connection and data upload to Spark ----------------------
 
   sc <- testthat_spark_connection()
@@ -26,20 +25,26 @@ test_that("aft_survival_regression.tidy() works", {
 
   td1 <- tidy(aft_model)
 
-  check_tidy(td1,
-    exp.row = 3, exp.col = 2,
+  check_tidy(
+    td1,
+    exp.row = 3,
+    exp.col = 2,
     exp.names = c("features", "coefficients")
   )
-  expect_equal(td1$coefficients, c(2.64, -0.496, 0.198),
-    tolerance = 0.001, scale = 1
+  expect_equal(
+    td1$coefficients,
+    c(2.64, -0.496, 0.198),
+    tolerance = 0.001,
+    scale = 1
   )
 
   ## --------------------------- augment() -------------------------------------
 
-  au1 <-  augment(aft_model) %>%
+  au1 <- augment(aft_model) %>%
     collect()
 
-  check_tidy(au1,
+  check_tidy(
+    au1,
     exp.row = 5,
     exp.name = c(
       dplyr::tbl_vars(df_tbl),
@@ -51,11 +56,7 @@ test_that("aft_survival_regression.tidy() works", {
 
   gl1 <- glance(aft_model)
 
-  check_tidy(gl1,
-    exp.row = 1,
-    exp.names = c("scale", "aggregation_depth")
-  )
+  check_tidy(gl1, exp.row = 1, exp.names = c("scale", "aggregation_depth"))
 })
 
 test_clear_cache()
-

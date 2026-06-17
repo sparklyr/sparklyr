@@ -34,9 +34,13 @@ test_that("ml_linear_svc() runs", {
   test_requires_version("2.2.0")
   sc <- testthat_spark_connection()
   iris_tbl2 <- testthat_tbl("iris") %>%
-    mutate(is_versicolor = ifelse(
-      Species == "versicolor", "versicolor", "other"
-    )) %>%
+    mutate(
+      is_versicolor = ifelse(
+        Species == "versicolor",
+        "versicolor",
+        "other"
+      )
+    ) %>%
     select(-Species)
 
   expect_error(
@@ -48,4 +52,3 @@ test_that("ml_linear_svc() runs", {
 })
 
 test_clear_cache()
-

@@ -10,7 +10,6 @@ mtcars_tbl <- testthat_tbl("mtcars")
 has_predicates <- tidyselect_data_has_predicates(mtcars_tbl)
 
 
-
 df1 <- tibble(a = 1:3, b = letters[1:3])
 df2 <- tibble(b = letters[1:3], c = letters[24:26])
 
@@ -56,7 +55,6 @@ arrays_df <- dplyr::tibble(
 arrays_sdf <- copy_to(sc, arrays_df, overwrite = TRUE)
 
 test_that("'select' works with where(...) predicate", {
-
   skip_if(!has_predicates)
 
   expect_equal(
@@ -70,9 +68,9 @@ test_that("'n_distinct' summarizer works as expected", {
   summarize_n_distinct <- function(input) {
     input %>%
       summarize(
-        n_distinct_default = n_distinct(x ^ 2),
-        n_distinct_na_rm_true = n_distinct(x ^ 2, na.rm = TRUE),
-        n_distinct_na_rm_false = n_distinct(x ^ 2, na.rm = FALSE)
+        n_distinct_default = n_distinct(x^2),
+        n_distinct_na_rm_true = n_distinct(x^2, na.rm = TRUE),
+        n_distinct_na_rm_false = n_distinct(x^2, na.rm = FALSE)
       )
   }
 
@@ -91,17 +89,23 @@ test_that("'summarize' works with where(...) predicate", {
 
   expect_equivalent(
     iris %>% summarize(across(where(is.numeric), mean)),
-    iris_tbl %>% summarize(across(where(is.numeric), ~mean(.x, na.rm = TRUE))) %>% collect()
+    iris_tbl %>%
+      summarize(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
+      collect()
   )
 
   expect_equivalent(
     iris %>% summarize(across(starts_with("Petal"), mean)),
-    iris_tbl %>% summarize(across(starts_with("Petal"), ~mean(.x, na.rm = TRUE))) %>%  collect()
+    iris_tbl %>%
+      summarize(across(starts_with("Petal"), ~ mean(.x, na.rm = TRUE))) %>%
+      collect()
   )
 
   expect_equivalent(
     iris %>% summarize(across(where(is.factor), n_distinct)),
-    iris_tbl %>% summarize(across(where(is.character), n_distinct)) %>% collect()
+    iris_tbl %>%
+      summarize(across(where(is.character), n_distinct)) %>%
+      collect()
   )
 })
 
@@ -158,7 +162,8 @@ test_that("if_else works as expected", {
     c("bad", NA, "good")
   )
   expect_equal(
-    sdf %>% dplyr::mutate(x = ifelse(x > 1, "good", "bad", "unknown")) %>%
+    sdf %>%
+      dplyr::mutate(x = ifelse(x > 1, "good", "bad", "unknown")) %>%
       dplyr::pull(x),
     c("bad", "unknown", "good")
   )
@@ -262,7 +267,19 @@ test_that("if_all and if_any work as expected with boolean predicates", {
 
 test_that("grepl works as expected", {
   regexes <- c(
-    "a|c", ".", "b", "x|z", "", "y", "e", "^", "$", "^$", "[0-9]", "[a-z]", "[b-z]"
+    "a|c",
+    ".",
+    "b",
+    "x|z",
+    "",
+    "y",
+    "e",
+    "^",
+    "$",
+    "^$",
+    "[0-9]",
+    "[a-z]",
+    "[b-z]"
   )
   verify_equivalent <- function(actual, expected) {
     # handle an edge case for arrow-enabled Spark connection
@@ -286,7 +303,6 @@ test_that("grepl works as expected", {
 })
 
 test_that("'head' uses 'limit' clause", {
-
   test_requires("dbplyr")
 
   expect_true(
@@ -354,7 +370,8 @@ test_that("compute() works as expected", {
   temp_view <- sdf_congruent_to_2_mod_3 %>% dplyr::compute("temp_view")
 
   test_remote_name(
-    temp_view, "temp_view"
+    temp_view,
+    "temp_view"
   )
 
   expect_equivalent(
@@ -398,7 +415,8 @@ test_that("overwriting a temp view", {
 
   expect_equivalent(sdf %>% collect(), dplyr::tibble(id = seq(5)))
   expect_equivalent(
-    dplyr::tbl(sc, temp_view_name) %>% collect(), dplyr::tibble(id = seq(5))
+    dplyr::tbl(sc, temp_view_name) %>% collect(),
+    dplyr::tibble(id = seq(5))
   )
 })
 
@@ -431,25 +449,29 @@ test_that("process_tbl_name works as expected", {
   expect_equal(sparklyr:::process_tbl_name("a"), "a")
   expect_equal(sparklyr:::process_tbl_name("xyz"), "xyz")
   expect_equal(sparklyr:::process_tbl_name("x.y"), dbplyr::in_schema("x", "y"))
-  expect_equal(sparklyr:::process_tbl_name("x.y.z"), dbplyr::in_catalog("x", "y", "z"))
+  expect_equal(
+    sparklyr:::process_tbl_name("x.y.z"),
+    dbplyr::in_catalog("x", "y", "z")
+  )
 
   df1 <- dplyr::tibble(a = 1, g = 2) %>%
     copy_to(sc, ., "df1", overwrite = TRUE)
   df2 <- dplyr::tibble(b = 1, g = 2) %>%
     copy_to(sc, ., "df2", overwrite = TRUE)
 
-  query <- sql("SELECT df1.a, df2.b, df1.g FROM df1 LEFT JOIN df2 ON df1.g = df2.g")
+  query <- sql(
+    "SELECT df1.a, df2.b, df1.g FROM df1 LEFT JOIN df2 ON df1.g = df2.g"
+  )
   expect_equivalent(
     tbl(sc, query) %>% collect(),
     dplyr::tibble(a = 1, b = 1, g = 2)
   )
-
 })
 
 test_that("in_schema() works as expected", {
   skip_on_arrow()
   skip_on_livy()
-  if(spark_version(sc) < "3.4.0") {
+  if (spark_version(sc) < "3.4.0") {
     db_name <- random_string("test_db_")
 
     queries <- c(
@@ -497,7 +519,7 @@ test_that("sdf_remote_name works with arrange followed by compute", {
   tbl <- copy_to(sc, dplyr::tibble(lts = letters[26:24], nums = seq(3)))
   ordered_tbl <- tbl %>% arrange(lts) %>% compute(name = "ordered_tbl")
 
-test_remote_name(
+  test_remote_name(
     ordered_tbl,
     "ordered_tbl"
   )
@@ -518,7 +540,10 @@ test_that("tbl_ptype.tbl_spark works as expected", {
   expect_equal(df1_tbl %>% dplyr::select_if(is.integer) %>% colnames(), "a")
   expect_equal(df1_tbl %>% dplyr::select_if(is.numeric) %>% colnames(), "a")
   expect_equal(df1_tbl %>% dplyr::select_if(is.character) %>% colnames(), "b")
-  expect_equal(df1_tbl %>% dplyr::select_if(is.list) %>% colnames(), character())
+  expect_equal(
+    df1_tbl %>% dplyr::select_if(is.list) %>% colnames(),
+    character()
+  )
 })
 
 test_that("summarise(.groups=)", {
@@ -527,8 +552,14 @@ test_that("summarise(.groups=)", {
 
   expect_equal(sdf %>% summarise() %>% group_vars(), "x")
   expect_equal(sdf %>% summarise(.groups = "drop_last") %>% group_vars(), "x")
-  expect_equal(sdf %>% summarise(.groups = "drop") %>% group_vars(), character())
-  expect_equal(sdf %>% summarise(.groups = "keep") %>% group_vars(), c("x", "y"))
+  expect_equal(
+    sdf %>% summarise(.groups = "drop") %>% group_vars(),
+    character()
+  )
+  expect_equal(
+    sdf %>% summarise(.groups = "keep") %>% group_vars(),
+    c("x", "y")
+  )
 
   df <- dplyr::tibble(val1 = c(1, 2, 1, 2), val2 = c(10, 20, 30, 40))
   sdf <- copy_to(sc, df, name = random_string())
@@ -543,7 +574,6 @@ test_that("summarise(.groups=)", {
         group_by(val1) %>%
         summarize(result = sum(val2, na.rm = TRUE), .groups = groups) %>%
         arrange(val1)
-
     )
   }
 })
@@ -579,13 +609,19 @@ test_that("pmin and pmax work", {
     all(remote_p == local_p)
   )
 
-  expect_error({
-    collect(mutate(tbl_pmin_df, x = pmin(x, y, na.rm = FALSE)))
-  }, regexp = "na.rm = TRUE")
+  expect_error(
+    {
+      collect(mutate(tbl_pmin_df, x = pmin(x, y, na.rm = FALSE)))
+    },
+    regexp = "na.rm = TRUE"
+  )
 
-  expect_error({
-    collect(mutate(tbl_pmin_df, x = pmax(x, y, na.rm = FALSE)))
-  }, regexp = "na.rm = TRUE")
+  expect_error(
+    {
+      collect(mutate(tbl_pmin_df, x = pmax(x, y, na.rm = FALSE)))
+    },
+    regexp = "na.rm = TRUE"
+  )
 })
 
 test_clear_cache()

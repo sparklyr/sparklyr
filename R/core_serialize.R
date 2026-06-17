@@ -28,7 +28,6 @@ getSerdeType <- function(object) {
       getSerdeType(elem)
     }))
     if (length(elemType) <= 1) {
-
       # Check that there are no NAs in arrays since they are unsupported in scala
       hasNAs <- any(is.na(object))
 
@@ -46,7 +45,19 @@ getSerdeType <- function(object) {
 writeObject <- function(con, object, writeType = TRUE) {
   type <- class(object)[[1]]
 
-  if (type %in% c("integer", "character", "logical", "double", "numeric", "factor", "Date", "POSIXct")) {
+  if (
+    type %in%
+      c(
+        "integer",
+        "character",
+        "logical",
+        "double",
+        "numeric",
+        "factor",
+        "Date",
+        "POSIXct"
+      )
+  ) {
     if (is.na(object) && !is.nan(object)) {
       object <- NULL
       type <- "NULL"
@@ -57,7 +68,8 @@ writeObject <- function(con, object, writeType = TRUE) {
   if (writeType) {
     writeType(con, serdeType)
   }
-  switch(serdeType,
+  switch(
+    serdeType,
     NULL = writeVoid(con),
     integer = writeInt(con, object),
     character = writeString(con, object),
@@ -116,7 +128,8 @@ writeRaw <- function(con, batch) {
 }
 
 writeType <- function(con, class) {
-  type <- switch(class,
+  type <- switch(
+    class,
     NULL = "n",
     integer = "i",
     character = "c",

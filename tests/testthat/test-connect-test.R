@@ -10,4 +10,3 @@ test_that("test connection does not fail", {
 })
 
 test_clear_cache()
-

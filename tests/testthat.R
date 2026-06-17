@@ -25,14 +25,13 @@
 ## Sys.setenv("TEST_SPARKLYR_MASTER" = Sys.getenv("DATABRICKS_HOST"))
 ## Sys.setenv("TEST_SPARKLYR_LIBRARIES" = "dbplyr; dplyr; pysparklyr;")
 
-
 ## For testing new versions of Spark, and need to prioritize the
 ## local versions.json file over the one in the GH repo use:
 ## Sys.setenv("R_SPARKINSTALL_INSTALL_INFO_PATH" = here::here("inst/extdata/versions.json"))
 
 ## For Coverage us: Sys.setenv("CODE_COVERAGE" = "true")
 
-if(identical(Sys.getenv("CODE_COVERAGE"), "true")) {
+if (identical(Sys.getenv("CODE_COVERAGE"), "true")) {
   library(testthat)
   library(sparklyr)
   test_check("sparklyr")

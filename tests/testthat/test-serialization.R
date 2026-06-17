@@ -145,11 +145,19 @@ test_that("collect() can retrieve all data types correctly", {
   epoch_utime <- 0
   epoch_sdate <- "from_unixtime(unix_timestamp('01-01-1970' , 'dd-MM-yyyy'))"
   epoch_rdate <- as.Date("01-01-1970", "%d-%m-%Y") %>% as.character()
-  epoch_stime <- paste0("to_utc_timestamp(from_unixtime(", epoch_utime, "), 'UTC')")
+  epoch_stime <- paste0(
+    "to_utc_timestamp(from_unixtime(",
+    epoch_utime,
+    "), 'UTC')"
+  )
   epoch_rtime <- "1970-01-01"
   epoch_atime <- as.character(as.POSIXct(epoch_utime, origin = "1970-01-01"))
 
-  utime <- as.numeric(as.POSIXct("2010-01-01 01:01:10", origin = "1970-01-01", tz = "UTC"))
+  utime <- as.numeric(as.POSIXct(
+    "2010-01-01 01:01:10",
+    origin = "1970-01-01",
+    tz = "UTC"
+  ))
   sdate <- "from_unixtime(unix_timestamp('01-01-2010' , 'dd-MM-yyyy'))"
   rdate <- as.Date("01-01-2010", "%d-%m-%Y") %>% as.character()
   stime <- paste0("to_utc_timestamp(from_unixtime(", utime, "), 'UTC')")
@@ -157,22 +165,22 @@ test_that("collect() can retrieve all data types correctly", {
   atime <- as.character(as.POSIXct(utime, origin = "1970-01-01"))
 
   hive_type <- dplyr::tribble(
-    ~stype,            ~svalue,      ~rtype,     ~rvalue,      ~atype,     ~avalue,
-    "tinyint",             "1",   "integer",         "1",   "integer",         "1",
-    "smallint",            "1",   "integer",         "1",   "integer",         "1",
-    "integer",             "1",   "integer",         "1",   "integer",         "1",
-    "bigint",              "1",   "numeric",         "1", arrowbigint,         "1",
-    "float",               "1",   "numeric",         "1",   "numeric",         "1",
-    "double",              "1",   "numeric",         "1",   "numeric",         "1",
-    "decimal",             "1",   "numeric",         "1",   "numeric",         "1",
-    "timestamp",   epoch_stime,   "POSIXct", epoch_rtime,   "POSIXct", epoch_atime,
-    "date",        epoch_sdate,      "Date", epoch_rdate,      "Date", epoch_rdate,
-    "timestamp",         stime,   "POSIXct",       rtime,   "POSIXct",       atime,
-    "date",              sdate,      "Date",       rdate,      "Date",       rdate,
-    "string",              "1", "character",         "1", "character",         "1",
-    "varchar(10)",         "1", "character",         "1", "character",         "1",
-    "char(10)",            "1", "character",         "1", "character",         "1",
-    "boolean",          "true",   "logical",      "TRUE",   "logical",      "TRUE",
+    ~stype        , ~svalue     , ~rtype      , ~rvalue     , ~atype      , ~avalue     ,
+    "tinyint"     , "1"         , "integer"   , "1"         , "integer"   , "1"         ,
+    "smallint"    , "1"         , "integer"   , "1"         , "integer"   , "1"         ,
+    "integer"     , "1"         , "integer"   , "1"         , "integer"   , "1"         ,
+    "bigint"      , "1"         , "numeric"   , "1"         , arrowbigint , "1"         ,
+    "float"       , "1"         , "numeric"   , "1"         , "numeric"   , "1"         ,
+    "double"      , "1"         , "numeric"   , "1"         , "numeric"   , "1"         ,
+    "decimal"     , "1"         , "numeric"   , "1"         , "numeric"   , "1"         ,
+    "timestamp"   , epoch_stime , "POSIXct"   , epoch_rtime , "POSIXct"   , epoch_atime ,
+    "date"        , epoch_sdate , "Date"      , epoch_rdate , "Date"      , epoch_rdate ,
+    "timestamp"   , stime       , "POSIXct"   , rtime       , "POSIXct"   , atime       ,
+    "date"        , sdate       , "Date"      , rdate       , "Date"      , rdate       ,
+    "string"      , "1"         , "character" , "1"         , "character" , "1"         ,
+    "varchar(10)" , "1"         , "character" , "1"         , "character" , "1"         ,
+    "char(10)"    , "1"         , "character" , "1"         , "character" , "1"         ,
+    "boolean"     , "true"      , "logical"   , "TRUE"      , "logical"   , "TRUE"      ,
   )
 
   if (spark_version(sc) < "2.2.0") {
@@ -186,7 +194,16 @@ test_that("collect() can retrieve all data types correctly", {
 
   spark_query <- hive_type %>%
     mutate(
-      query = paste0("cast(", svalue, " as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col", row_number())
+      query = paste0(
+        "cast(",
+        svalue,
+        " as ",
+        stype,
+        ") as ",
+        gsub("\\(|\\)", "", stype),
+        "_col",
+        row_number()
+      )
     ) %>%
     pull(query) %>%
     paste(collapse = ", ") %>%
@@ -216,19 +233,19 @@ test_that("collect() can retrieve NULL data types as NAs", {
   library(dplyr)
 
   hive_type <- dplyr::tribble(
-    ~stype, ~rtype, ~atype,
-    "tinyint", "integer", "integer",
-    "smallint", "integer", "integer",
-    "integer", "integer", "integer",
-    "bigint", "numeric", arrowbigint,
-    "float", "numeric", "numeric",
-    "double", "numeric", "numeric",
-    "decimal", "numeric", "numeric",
-    "timestamp", "POSIXct", "POSIXct",
-    "date", "Date", "Date",
-    "string", "character", "character",
-    "varchar(10)", "character", "character",
-    "char(10)", "character", "character",
+    ~stype        , ~rtype      , ~atype      ,
+    "tinyint"     , "integer"   , "integer"   ,
+    "smallint"    , "integer"   , "integer"   ,
+    "integer"     , "integer"   , "integer"   ,
+    "bigint"      , "numeric"   , arrowbigint ,
+    "float"       , "numeric"   , "numeric"   ,
+    "double"      , "numeric"   , "numeric"   ,
+    "decimal"     , "numeric"   , "numeric"   ,
+    "timestamp"   , "POSIXct"   , "POSIXct"   ,
+    "date"        , "Date"      , "Date"      ,
+    "string"      , "character" , "character" ,
+    "varchar(10)" , "character" , "character" ,
+    "char(10)"    , "character" , "character" ,
   )
 
   if (spark_version(sc) < "2.2.0") {
@@ -237,7 +254,13 @@ test_that("collect() can retrieve NULL data types as NAs", {
 
   spark_query <- hive_type %>%
     mutate(
-      query = paste0("cast(NULL as ", stype, ") as ", gsub("\\(|\\)", "", stype), "_col")
+      query = paste0(
+        "cast(NULL as ",
+        stype,
+        ") as ",
+        gsub("\\(|\\)", "", stype),
+        "_col"
+      )
     ) %>%
     pull(query) %>%
     paste(collapse = ", ") %>%
@@ -334,7 +357,12 @@ test_that("collect() can retrieve specific dates without timezones", {
     as.double(
       as.Date(
         data_tbl %>%
-          mutate(date_alt = as.character(to_date(from_utc_timestamp(timestamp(t), "UTC")))) %>%
+          mutate(
+            date_alt = as.character(to_date(from_utc_timestamp(
+              timestamp(t),
+              "UTC"
+            )))
+          ) %>%
           pull(date_alt)
       )
     ),
@@ -352,17 +380,32 @@ test_that("collect() can retrieve logical columns with NAs", {
 
 test_that("environments are sent to Scala Maps (#1058)", {
   expect_identical(
-    invoke_static(sc, "sparklyr.Test", "readMap", as.environment(list(foo = 5))),
+    invoke_static(
+      sc,
+      "sparklyr.Test",
+      "readMap",
+      as.environment(list(foo = 5))
+    ),
     list(foo = 5)
   )
 
   expect_identical(
-    invoke_static(sc, "sparklyr.Test", "readMap", as.environment(list(foo = 2L))),
+    invoke_static(
+      sc,
+      "sparklyr.Test",
+      "readMap",
+      as.environment(list(foo = 2L))
+    ),
     list(foo = 2L)
   )
 
   expect_identical(
-    invoke_static(sc, "sparklyr.Test", "readMap", as.environment(list(foo = "bar"))),
+    invoke_static(
+      sc,
+      "sparklyr.Test",
+      "readMap",
+      as.environment(list(foo = "bar"))
+    ),
     list(foo = "bar")
   )
 })
@@ -371,7 +414,9 @@ test_that("collect() can retrieve nested list efficiently", {
   skip_databricks_connect()
   skip_on_windows()
 
-  if (spark_version(sc) < "2.0.0") skip("performance improvement not available")
+  if (spark_version(sc) < "2.0.0") {
+    skip("performance improvement not available")
+  }
 
   temp_json <- tempfile(fileext = ".json")
 
@@ -407,4 +452,3 @@ test_that("array of temporal values are preserved with Spark 3.0+", {
 })
 
 test_clear_cache()
-

@@ -9,8 +9,7 @@ NULL
 
 #' @rdname ml_survival_regression_tidiers
 #' @export
-tidy.ml_model_aft_survival_regression <- function(x,
-                                                  ...) {
+tidy.ml_model_aft_survival_regression <- function(x, ...) {
   as.data.frame(x$coefficients) %>%
     dplyr::as_tibble(rownames = "features") %>%
     dplyr::rename(coefficients = !!"x$coefficients")
@@ -20,8 +19,7 @@ tidy.ml_model_aft_survival_regression <- function(x,
 #' @param newdata a tbl_spark of new data to use for prediction.
 #'
 #' @export
-augment.ml_model_aft_survival_regression <- function(x, newdata = NULL,
-                                                     ...) {
+augment.ml_model_aft_survival_regression <- function(x, newdata = NULL, ...) {
   broom_augment_supervised(x, newdata = newdata)
 }
 

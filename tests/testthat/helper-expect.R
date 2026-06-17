@@ -1,5 +1,5 @@
 expect_warning_on_arrow <- function(x) {
-  if(using_arrow()) {
+  if (using_arrow()) {
     expect_warning(x)
   } else {
     x
@@ -76,7 +76,7 @@ test_default_args <- function(sc, fn) {
 }
 
 expect_same_remote_result <- function(.data, pipeline, sc = NULL) {
-  if(is.null(sc)) {
+  if (is.null(sc)) {
     sc <- testthat_spark_connection()
   }
   temp_name <- random_table_name("test_")
@@ -84,14 +84,13 @@ expect_same_remote_result <- function(.data, pipeline, sc = NULL) {
 
   local <- pipeline(.data)
 
-
   remote <- try(
     spark_data %>%
       pipeline() %>%
       collect()
   )
 
-  if(inherits(remote, "try-error")) {
+  if (inherits(remote, "try-error")) {
     expect_equal(remote[[1]], "")
   } else {
     expect_equivalent(local, remote)

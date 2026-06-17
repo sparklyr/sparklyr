@@ -1,4 +1,3 @@
-
 #' @importFrom dbplyr escape
 #' @importFrom dbplyr ident
 #' @importFrom dplyr tbl
@@ -39,13 +38,18 @@ spark_source_from_ops <- function(x) {
     attr(e, "class")
   })
 
-  if (!all(lapply(classList, function(e) !("src" %in% e) || ("src_spark" %in% e)) == TRUE)) {
+  if (
+    !all(
+      lapply(classList, function(e) !("src" %in% e) || ("src_spark" %in% e)) ==
+        TRUE
+    )
+  ) {
     stop("This operation does not support multiple remote sources")
   }
 
   src_spark <- which(
     as.logical(lapply(x, function(e) "src_spark" %in% attr(e, "class")))
-    )
+  )
   x[[src_spark]]
 }
 

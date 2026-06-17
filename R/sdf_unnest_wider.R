@@ -45,12 +45,13 @@ NULL
 #'
 #' @export
 sdf_unnest_wider <- function(
-                             data,
-                             col,
-                             names_sep = NULL,
-                             names_repair = "check_unique",
-                             ptype = list(),
-                             transform = list()) {
+  data,
+  col,
+  names_sep = NULL,
+  names_repair = "check_unique",
+  ptype = list(),
+  transform = list()
+) {
   if (data %>% spark_connection() %>% spark_version() < "2.0.0") {
     stop("`sdf_unnest_wider()` requires Spark 2.0.0 or above!")
   }
@@ -97,8 +98,10 @@ sdf_unnest_wider <- function(
   names(srcs) <- dsts
 
   data %>>%
-    dplyr::mutate %@% srcs %>>%
-    dplyr::select %@% lapply(dsts, as.symbol) %>%
+    dplyr::mutate %@%
+    srcs %>>%
+    dplyr::select %@%
+    lapply(dsts, as.symbol) %>%
     apply_ptype(ptype) %>%
     apply_transform(transform)
 }

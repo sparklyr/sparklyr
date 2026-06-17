@@ -127,9 +127,12 @@ connection_config <- function(sc, prefix, not_prefix = list()) {
     function(idx) {
       config_name <- names(config)[[idx]]
 
-      (is.null(prefix) || identical(substring(config_name, 1, nchar(prefix)), prefix)) &&
+      (is.null(prefix) ||
+        identical(substring(config_name, 1, nchar(prefix)), prefix)) &&
         all(unlist(
-          lapply(not_prefix, function(x) !identical(substring(config_name, 1, nchar(x)), x))
+          lapply(not_prefix, function(x) {
+            !identical(substring(config_name, 1, nchar(x)), x)
+          })
         )) &&
         !(grepl("\\.local$", config_name) && !isLocal) &&
         !(grepl("\\.remote$", config_name) && isLocal) &&
@@ -187,7 +190,8 @@ spark_web <- function(sc, ...) {
     sc$state$spark_web
   } else {
     sparkui_url <- spark_config_value(
-      sc$config, c("sparklyr.web.spark", "sparklyr.sparkui.url")
+      sc$config,
+      c("sparklyr.web.spark", "sparklyr.sparkui.url")
     )
     if (!is.null(sparkui_url)) {
       structure(sprintf("%s/jobs/", sparkui_url), class = "spark_web_url")

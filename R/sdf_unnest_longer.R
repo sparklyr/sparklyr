@@ -57,14 +57,15 @@ NULL
 #'
 #' @export
 sdf_unnest_longer <- function(
-                              data,
-                              col,
-                              values_to = NULL,
-                              indices_to = NULL,
-                              include_indices = NULL,
-                              names_repair = "check_unique",
-                              ptype = list(),
-                              transform = list()) {
+  data,
+  col,
+  values_to = NULL,
+  indices_to = NULL,
+  include_indices = NULL,
+  names_repair = "check_unique",
+  ptype = list(),
+  transform = list()
+) {
   sc <- spark_connection(data)
   if (spark_version(sc) < "2.2.0") {
     stop("`sdf_unnest_longer()` requires Spark 2.2.0 or above!")
@@ -220,7 +221,10 @@ sdf_unnest_longer <- function(
   if (has_numeric_indices) {
     # make numeric indices 1-based
     indices_col <- dsts[[indices_col_idx]]
-    increment_indices_sql <- list(dplyr::sql(sprintf("%s + 1", quote_sql_name(indices_col))))
+    increment_indices_sql <- list(dplyr::sql(sprintf(
+      "%s + 1",
+      quote_sql_name(indices_col)
+    )))
     names(increment_indices_sql) <- indices_col
     out <- out %>>% dplyr::mutate %@% increment_indices_sql
   }

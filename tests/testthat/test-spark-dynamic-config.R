@@ -9,14 +9,20 @@ test_that("configuration getter works", {
     spark_session_config(sc, "spark.sql.shuffle.partitions.local", 1L)
     expect_equal(
       "1",
-      unname(unlist(spark_session_config(sc, "spark.sql.shuffle.partitions.local")))
+      unname(unlist(spark_session_config(
+        sc,
+        "spark.sql.shuffle.partitions.local"
+      )))
     )
 
     # make sure we didn't just get lucky
     spark_session_config(sc, "spark.sql.shuffle.partitions.local", 2L)
     expect_equal(
       "2",
-      unname(unlist(spark_session_config(sc, "spark.sql.shuffle.partitions.local")))
+      unname(unlist(spark_session_config(
+        sc,
+        "spark.sql.shuffle.partitions.local"
+      )))
     )
   }
 })
@@ -32,16 +38,18 @@ test_that("spark_adaptive_query_execution() works", {
     "true"
   )
   expect_equal(
-    spark_adaptive_query_execution(sc) %>% unname() %>% unlist(), "true"
+    spark_adaptive_query_execution(sc) %>% unname() %>% unlist(),
+    "true"
   )
 })
 
 test_that("spark_coalesce_shuffle_partitions() works", {
-
   test_requires_version("3.0.0")
 
   spark_session_config(
-    sc, "spark.sql.adaptive.coalescePartitions.enabled", FALSE
+    sc,
+    "spark.sql.adaptive.coalescePartitions.enabled",
+    FALSE
   )
   spark_coalesce_shuffle_partitions(sc, TRUE)
 
@@ -53,14 +61,16 @@ test_that("spark_coalesce_shuffle_partitions() works", {
   )
   expect_equal(
     spark_session_config(
-      sc, "spark.sql.adaptive.coalescePartitions.enabled"
+      sc,
+      "spark.sql.adaptive.coalescePartitions.enabled"
     ) %>%
       unname() %>%
       unlist(),
     "true"
   )
   expect_equal(
-    spark_coalesce_shuffle_partitions(sc) %>% unname() %>% unlist(), "true"
+    spark_coalesce_shuffle_partitions(sc) %>% unname() %>% unlist(),
+    "true"
   )
 })
 
@@ -68,7 +78,11 @@ test_that("spark_advisory_shuffle_partition_size() works", {
   test_requires_version("3.0.0")
 
   spark_session_config(sc, "spark.sql.adaptive.enabled", FALSE)
-  spark_session_config(sc, "spark.sql.adaptive.coalescePartitions.enabled", FALSE)
+  spark_session_config(
+    sc,
+    "spark.sql.adaptive.coalescePartitions.enabled",
+    FALSE
+  )
 
   advisory_shuffle_partition_size <- 64 * 1024 * 1024
   spark_advisory_shuffle_partition_size(sc, advisory_shuffle_partition_size)
@@ -80,13 +94,19 @@ test_that("spark_advisory_shuffle_partition_size() works", {
     "true"
   )
   expect_equal(
-    spark_session_config(sc, "spark.sql.adaptive.coalescePartitions.enabled") %>%
+    spark_session_config(
+      sc,
+      "spark.sql.adaptive.coalescePartitions.enabled"
+    ) %>%
       unname() %>%
       unlist(),
     "true"
   )
   expect_equal(
-    spark_session_config(sc, "spark.sql.adaptive.advisoryPartitionSizeInBytes") %>%
+    spark_session_config(
+      sc,
+      "spark.sql.adaptive.advisoryPartitionSizeInBytes"
+    ) %>%
       unname() %>%
       unlist(),
     as.character(advisory_shuffle_partition_size)
@@ -101,7 +121,11 @@ test_that("spark_coalesce_initial_num_partitions() works", {
   test_requires_version("3.0.0")
 
   spark_session_config(sc, "spark.sql.adaptive.enabled", FALSE)
-  spark_session_config(sc, "spark.sql.adaptive.coalescePartitions.enabled", FALSE)
+  spark_session_config(
+    sc,
+    "spark.sql.adaptive.coalescePartitions.enabled",
+    FALSE
+  )
 
   num_partitions <- 64
   spark_coalesce_initial_num_partitions(sc, num_partitions)
@@ -113,14 +137,18 @@ test_that("spark_coalesce_initial_num_partitions() works", {
     "true"
   )
   expect_equal(
-    spark_session_config(sc, "spark.sql.adaptive.coalescePartitions.enabled") %>%
+    spark_session_config(
+      sc,
+      "spark.sql.adaptive.coalescePartitions.enabled"
+    ) %>%
       unname() %>%
       unlist(),
     "true"
   )
   expect_equal(
     spark_session_config(
-      sc, "spark.sql.adaptive.coalescePartitions.initialPartitionNum"
+      sc,
+      "spark.sql.adaptive.coalescePartitions.initialPartitionNum"
     ) %>%
       unname() %>%
       unlist(),
@@ -146,4 +174,3 @@ test_that("spark_auto_broadcast_join_threshold() works", {
 })
 
 test_clear_cache()
-

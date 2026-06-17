@@ -17,7 +17,8 @@ test_that("spark connection method is configured correctly", {
 test_that("spark local property is set", {
   sc <- testthat_spark_connection()
 
-  client_type <- spark_context(sc) %>% invoke("getLocalProperty", "spark.databricks.service.client.type")
+  client_type <- spark_context(sc) %>%
+    invoke("getLocalProperty", "spark.databricks.service.client.type")
   expect_equal(client_type, "sparklyr")
 })
 
@@ -28,4 +29,3 @@ test_that("spark libpaths config is set", {
 })
 
 test_clear_cache()
-

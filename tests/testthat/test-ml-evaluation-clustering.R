@@ -7,7 +7,9 @@ test_that("ml_clustering_evaluator() works", {
   test_requires_version("2.3.0", "ml clustering evaluator requires spark 2.3+")
   sc <- testthat_spark_connection()
   sample_data_path <- get_test_data_path("sample_kmeans_data.txt")
-  sample_data <- spark_read_libsvm(sc, "sample_data",
+  sample_data <- spark_read_libsvm(
+    sc,
+    "sample_data",
     sample_data_path,
     overwrite = TRUE
   )
@@ -27,7 +29,12 @@ test_that("ml_clustering_evalator() can be used in a CV pipeline", {
   iris_tbl <- testthat_tbl("iris")
   pipeline_cv <- ml_pipeline(sc) %>%
     ft_vector_assembler(
-      input_cols = c("Sepal_Width", "Sepal_Length", "Petal_Width", "Petal_Length"),
+      input_cols = c(
+        "Sepal_Width",
+        "Sepal_Length",
+        "Petal_Width",
+        "Petal_Length"
+      ),
       output_col = "features"
     ) %>%
     ml_kmeans(uid = "kmeans")
@@ -57,4 +64,3 @@ test_that("ml_clustering_evalator() can be used in a CV pipeline", {
 })
 
 test_clear_cache()
-

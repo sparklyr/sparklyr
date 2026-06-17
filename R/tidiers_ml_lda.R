@@ -10,8 +10,7 @@ NULL
 #' @rdname ml_lda_tidiers
 #' @importFrom rlang !!
 #' @export
-tidy.ml_model_lda <- function(x,
-                              ...) {
+tidy.ml_model_lda <- function(x, ...) {
   term <- ml_vocabulary(x)
   topics_matrix <- x$model$topics_matrix() %>%
     dplyr::as_tibble(.name_repair = "unique")
@@ -28,9 +27,7 @@ tidy.ml_model_lda <- function(x,
 #' @param newdata a tbl_spark of new data to use for prediction.
 #' @importFrom rlang syms
 #' @export
-augment.ml_model_lda <- function(x, newdata = NULL,
-                                 ...) {
-
+augment.ml_model_lda <- function(x, newdata = NULL, ...) {
   # if the user doesn't provide a new data, this funcion will
   # use the training set
   if (is.null(newdata)) {
@@ -46,8 +43,7 @@ augment.ml_model_lda <- function(x, newdata = NULL,
 
 #' @rdname ml_lda_tidiers
 #' @export
-glance.ml_model_lda <- function(x,
-                                ...) {
+glance.ml_model_lda <- function(x, ...) {
   k <- x$model$param_map$k
   vocab_size <- x$model$vocab_size
   learning_decay <- x$model$param_map$learning_decay

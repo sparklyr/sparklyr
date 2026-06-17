@@ -26,11 +26,17 @@ spark_sql_translation <- function(con) {
   }
   sql_if_else <- function(cond, if_true, if_false, if_missing = NULL) {
     dbplyr::build_sql(
-      "IF(ISNULL(", cond, "), ",
+      "IF(ISNULL(",
+      cond,
+      "), ",
       if_missing %||% dbplyr::sql("NULL"),
-      ", IF(", cond %||% dbplyr::sql("NULL"),
-      ", ", if_true %||% dbplyr::sql("NULL"), ", ",
-      if_false %||% dbplyr::sql("NULL"), "))"
+      ", IF(",
+      cond %||% dbplyr::sql("NULL"),
+      ", ",
+      if_true %||% dbplyr::sql("NULL"),
+      ", ",
+      if_false %||% dbplyr::sql("NULL"),
+      "))"
     )
   }
 
@@ -39,9 +45,23 @@ spark_sql_translation <- function(con) {
     w <- dbplyr::build_sql(w)
     dbplyr::sql(
       paste(
-        "CAST(SUM(IF(ISNULL(", w, "), 0, ", w, ") * IF(ISNULL(", x, "), 0, ", x, ")) AS DOUBLE)",
+        "CAST(SUM(IF(ISNULL(",
+        w,
+        "), 0, ",
+        w,
+        ") * IF(ISNULL(",
+        x,
+        "), 0, ",
+        x,
+        ")) AS DOUBLE)",
         "/",
-        "CAST(SUM(IF(ISNULL(", w, "), 0, ", w, ") * IF(ISNULL(", x, "), 0, 1)) AS DOUBLE)"
+        "CAST(SUM(IF(ISNULL(",
+        w,
+        "), 0, ",
+        w,
+        ") * IF(ISNULL(",
+        x,
+        "), 0, 1)) AS DOUBLE)"
       )
     )
   }
@@ -56,7 +76,9 @@ spark_sql_translation <- function(con) {
       as.character = function(x) dbplyr::build_sql("CAST(", x, " AS STRING)"),
       as.date = function(x) dbplyr::build_sql("CAST(", x, " AS DATE)"),
       as.Date = function(x) dbplyr::build_sql("CAST(", x, " AS DATE)"),
-      paste = function(..., sep = " ") dbplyr::build_sql("CONCAT_WS", list(sep, ...)),
+      paste = function(..., sep = " ") {
+        dbplyr::build_sql("CONCAT_WS", list(sep, ...))
+      },
       paste0 = function(...) dbplyr::build_sql("CONCAT", list(...)),
       xor = function(x, y) dbplyr::build_sql(x, " ^ ", y),
       or = function(x, y) dbplyr::build_sql(x, " OR ", y),
@@ -119,13 +141,17 @@ spark_sql_translation <- function(con) {
       },
       transform = function(expr, func) {
         sprintf(
-          "TRANSFORM(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+          "TRANSFORM(%s, %s)",
+          dbplyr::build_sql(expr),
+          build_sql_fn(func)
         ) %>%
           dbplyr::sql()
       },
       filter = function(expr, func) {
         sprintf(
-          "FILTER(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+          "FILTER(%s, %s)",
+          dbplyr::build_sql(expr),
+          build_sql_fn(func)
         ) %>%
           dbplyr::sql()
       },
@@ -141,7 +167,9 @@ spark_sql_translation <- function(con) {
       },
       exists = function(expr, pred) {
         sprintf(
-          "EXISTS(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(pred)
+          "EXISTS(%s, %s)",
+          dbplyr::build_sql(expr),
+          build_sql_fn(pred)
         ) %>%
           dbplyr::sql()
       },
@@ -156,31 +184,41 @@ spark_sql_translation <- function(con) {
       },
       array_sort = function(expr, func = ~ as.integer(sign(.x - .y))) {
         sprintf(
-          "ARRAY_SORT(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+          "ARRAY_SORT(%s, %s)",
+          dbplyr::build_sql(expr),
+          build_sql_fn(func)
         ) %>%
           dbplyr::sql()
       },
       map_filter = function(expr, func) {
         sprintf(
-          "MAP_FILTER(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+          "MAP_FILTER(%s, %s)",
+          dbplyr::build_sql(expr),
+          build_sql_fn(func)
         ) %>%
           dbplyr::sql()
       },
       forall = function(expr, pred) {
         sprintf(
-          "FORALL(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(pred)
+          "FORALL(%s, %s)",
+          dbplyr::build_sql(expr),
+          build_sql_fn(pred)
         ) %>%
           dbplyr::sql()
       },
       transform_keys = function(expr, func) {
         sprintf(
-          "TRANSFORM_KEYS(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+          "TRANSFORM_KEYS(%s, %s)",
+          dbplyr::build_sql(expr),
+          build_sql_fn(func)
         ) %>%
           dbplyr::sql()
       },
       transform_values = function(expr, func) {
         sprintf(
-          "TRANSFORM_VALUES(%s, %s)", dbplyr::build_sql(expr), build_sql_fn(func)
+          "TRANSFORM_VALUES(%s, %s)",
+          dbplyr::build_sql(expr),
+          build_sql_fn(func)
         ) %>%
           dbplyr::sql()
       },
@@ -335,7 +373,14 @@ build_sql_fn <- function(fn) {
 #' @importFrom dbplyr sql_query_set_op
 #' @keywords internal
 #' @export
-sql_query_set_op.spark_connection <- function(con, x, y, method, ..., all = FALSE) {
+sql_query_set_op.spark_connection <- function(
+  con,
+  x,
+  y,
+  method,
+  ...,
+  all = FALSE
+) {
   sql <- spark_sql_set_op(con, x, y, method)
 
   if (!is.null(sql)) {
@@ -358,8 +403,8 @@ build_sql_if_compare <- function(..., con, compare, fn_name) {
   args <- list(...)
 
   na_rm <- unlist(args["na.rm"])
-  if(!is.null(na_rm)) {
-    if(na_rm) {
+  if (!is.null(na_rm)) {
+    if (na_rm) {
       args <- args[names(args) != "na.rm"]
     } else {
       rlang::abort(

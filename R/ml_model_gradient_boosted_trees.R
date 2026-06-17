@@ -39,18 +39,34 @@ NULL
 #' }
 #'
 #' @export
-ml_gradient_boosted_trees <- function(x, formula = NULL,
-                                      type = c("auto", "regression", "classification"),
-                                      features_col = "features", label_col = "label",
-                                      prediction_col = "prediction", probability_col = "probability",
-                                      raw_prediction_col = "rawPrediction", checkpoint_interval = 10,
-                                      loss_type = c("auto", "logistic", "squared", "absolute"),
-                                      max_bins = 32, max_depth = 5, max_iter = 20L,
-                                      min_info_gain = 0, min_instances_per_node = 1,
-                                      step_size = 0.1, subsampling_rate = 1, feature_subset_strategy = "auto",
-                                      seed = NULL, thresholds = NULL, cache_node_ids = FALSE,
-                                      max_memory_in_mb = 256, uid = random_string("gradient_boosted_trees_"),
-                                      response = NULL, features = NULL, ...) {
+ml_gradient_boosted_trees <- function(
+  x,
+  formula = NULL,
+  type = c("auto", "regression", "classification"),
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  checkpoint_interval = 10,
+  loss_type = c("auto", "logistic", "squared", "absolute"),
+  max_bins = 32,
+  max_depth = 5,
+  max_iter = 20L,
+  min_info_gain = 0,
+  min_instances_per_node = 1,
+  step_size = 0.1,
+  subsampling_rate = 1,
+  feature_subset_strategy = "auto",
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256,
+  uid = random_string("gradient_boosted_trees_"),
+  response = NULL,
+  features = NULL,
+  ...
+) {
   formula <- ml_standardize_formula(formula, response, features)
   response_col <- gsub("~.+$", "", formula) %>% trimws()
 
@@ -141,23 +157,38 @@ ml_gradient_boosted_trees <- function(x, formula = NULL,
   )
 }
 
-new_ml_model_gbt_classification <- function(pipeline_model, formula, dataset, label_col,
-                                            features_col, predicted_label_col) {
+new_ml_model_gbt_classification <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col,
+  predicted_label_col
+) {
   new_ml_model_classification(
-    pipeline_model, formula,
+    pipeline_model,
+    formula,
     dataset = dataset,
-    label_col = label_col, features_col = features_col,
+    label_col = label_col,
+    features_col = features_col,
     predicted_label_col = predicted_label_col,
     class = "ml_model_gbt_classification"
   )
 }
 
-new_ml_model_gbt_regression <- function(pipeline_model, formula, dataset, label_col,
-                                        features_col) {
+new_ml_model_gbt_regression <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col
+) {
   new_ml_model_regression(
-    pipeline_model, formula,
+    pipeline_model,
+    formula,
     dataset = dataset,
-    label_col = label_col, features_col = features_col,
+    label_col = label_col,
+    features_col = features_col,
     class = "ml_model_gbt_regression"
   )
 }

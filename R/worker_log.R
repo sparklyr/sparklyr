@@ -6,7 +6,12 @@ worker_log_session <- function(sessionId) {
   assign("sessionId", sessionId, envir = worker_log_env)
 }
 
-worker_log_format <- function(message, session, level = "INFO", component = "RScript") {
+worker_log_format <- function(
+  message,
+  session,
+  level = "INFO",
+  component = "RScript"
+) {
   paste(
     format(Sys.time(), "%y/%m/%d %H:%M:%S"),
     " ",
@@ -31,8 +36,11 @@ worker_log_level <- function(..., level, component = "RScript") {
 
   args <- list(...)
   message <- paste(args, sep = "", collapse = "")
-  formatted <- worker_log_format(message, worker_log_env$sessionId,
-    level = level, component = component
+  formatted <- worker_log_format(
+    message,
+    worker_log_env$sessionId,
+    level = level,
+    component = component
   )
   cat(formatted, "\n")
 }

@@ -8,15 +8,18 @@ sc <- testthat_spark_connection()
 iris_tbl <- testthat_tbl("iris")
 
 test_that("'sample_n' works as expected", {
-
-  s_replace <- spark_integ_test_skip(sc,  "sample-n-replace")
+  s_replace <- spark_integ_test_skip(sc, "sample-n-replace")
   s_weights <- spark_integ_test_skip(sc, "sample-n-weights")
   for (weight in list(NULL, rlang::sym("Petal_Length"))) {
     for (replace in list(FALSE, TRUE)) {
       skip_test <- FALSE
-      if(replace && s_replace) skip_test <- TRUE
-      if(!is.null(weight) && s_weights) skip_test <- TRUE
-      if(!skip_test) {
+      if (replace && s_replace) {
+        skip_test <- TRUE
+      }
+      if (!is.null(weight) && s_weights) {
+        skip_test <- TRUE
+      }
+      if (!skip_test) {
         sample_sdf <- iris_tbl %>%
           sample_n(10, weight = !!weight, replace = replace)
         expect_equal(colnames(sample_sdf), colnames(iris_tbl))
@@ -49,4 +52,3 @@ test_that("weighted sampling works as expected with integer weight columns", {
 })
 
 test_clear_cache()
-

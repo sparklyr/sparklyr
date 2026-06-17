@@ -1,7 +1,16 @@
-
 setMethod(
-  "dbWriteTable", "spark_connection",
-  function(conn, name, value, temporary = getOption("sparklyr.dbwritetable.temp", FALSE), overwrite = FALSE, append = FALSE, repartition = 0, serializer = NULL) {
+  "dbWriteTable",
+  "spark_connection",
+  function(
+    conn,
+    name,
+    value,
+    temporary = getOption("sparklyr.dbwritetable.temp", FALSE),
+    overwrite = FALSE,
+    append = FALSE,
+    repartition = 0,
+    serializer = NULL
+  ) {
     found <- dbExistsTable(conn, name) && !overwrite
     if (found) {
       stop("Table ", name, " already exists")
@@ -11,17 +20,27 @@ setMethod(
       stop("append and overwrite parameters cannot both be setted to TRUE.")
     }
 
-    temp_name <- if (identical(temporary, FALSE)) random_string("sparklyr_tmp_") else name
-
-    if (identical(append, TRUE)) {
-        mode <- "append"
-    } else if (identical(overwrite, TRUE)) {
-        mode <- "overwrite"
+    temp_name <- if (identical(temporary, FALSE)) {
+      random_string("sparklyr_tmp_")
     } else {
-        mode <- NULL
+      name
     }
 
-    spark_data_copy(conn, value, temp_name, repartition, serializer = serializer)
+    if (identical(append, TRUE)) {
+      mode <- "append"
+    } else if (identical(overwrite, TRUE)) {
+      mode <- "overwrite"
+    } else {
+      mode <- NULL
+    }
+
+    spark_data_copy(
+      conn,
+      value,
+      temp_name,
+      repartition,
+      serializer = serializer
+    )
 
     if (identical(temporary, FALSE)) {
       spark_write_table(
@@ -36,7 +55,8 @@ setMethod(
 )
 
 setMethod(
-  "dbReadTable", c("spark_connection", "character"),
+  "dbReadTable",
+  c("spark_connection", "character"),
   function(conn, name) {
     name <- dbQuoteIdentifier(conn, name)
     dbGetQuery(conn, paste("SELECT * FROM ", name))
@@ -53,8 +73,7 @@ setMethod("dbListTables", "spark_connection", function(conn, database = NULL) {
 
   if (nrow(df) <= 0) {
     character(0)
-  }
-  else {
+  } else {
     tableNames <- df$tableName
     filtered <- grep("^sparklyr_tmp_", tableNames, invert = TRUE, value = TRUE)
     sort(filtered)
@@ -62,13 +81,18 @@ setMethod("dbListTables", "spark_connection", function(conn, database = NULL) {
 })
 
 
-setMethod("dbExistsTable", c("spark_connection", "character"), function(conn, name) {
-  tolower(name) %in% tolower(dbListTables(conn))
-})
+setMethod(
+  "dbExistsTable",
+  c("spark_connection", "character"),
+  function(conn, name) {
+    tolower(name) %in% tolower(dbListTables(conn))
+  }
+)
 
 
 setMethod(
-  "dbRemoveTable", c("spark_connection", "character"),
+  "dbRemoveTable",
+  c("spark_connection", "character"),
   function(conn, name) {
     dbi_ensure_no_backtick(name)
 

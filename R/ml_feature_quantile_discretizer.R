@@ -47,11 +47,20 @@
 #'
 #' @seealso \code{\link{ft_bucketizer}}
 #' @export
-ft_quantile_discretizer <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
-                                    input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
-                                    handle_invalid = "error", relative_error = 0.001,
-                                    uid = random_string("quantile_discretizer_"),
-                                    weight_column = NULL, ...) {
+ft_quantile_discretizer <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  num_buckets = 2,
+  input_cols = NULL,
+  output_cols = NULL,
+  num_buckets_array = NULL,
+  handle_invalid = "error",
+  relative_error = 0.001,
+  uid = random_string("quantile_discretizer_"),
+  weight_column = NULL,
+  ...
+) {
   check_dots_used()
   UseMethod("ft_quantile_discretizer")
 }
@@ -59,13 +68,24 @@ ft_quantile_discretizer <- function(x, input_col = NULL, output_col = NULL, num_
 ml_quantile_discretizer <- ft_quantile_discretizer
 
 #' @export
-ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
-                                                     input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
-                                                     handle_invalid = "error", relative_error = 0.001,
-                                                     uid = random_string("quantile_discretizer_"),
-                                                     weight_column = NULL, ...) {
+ft_quantile_discretizer.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  num_buckets = 2,
+  input_cols = NULL,
+  output_cols = NULL,
+  num_buckets_array = NULL,
+  handle_invalid = "error",
+  relative_error = 0.001,
+  uid = random_string("quantile_discretizer_"),
+  weight_column = NULL,
+  ...
+) {
   if (!is.null(weight_column) && spark_version(x) < "3.0.0") {
-    stop("Weighted quantile discretizer is only supported in Spark 3.0 or above.")
+    stop(
+      "Weighted quantile discretizer is only supported in Spark 3.0 or above."
+    )
   }
 
   .args <- list(
@@ -90,12 +110,24 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
     } else {
       "org.apache.spark.ml.feature.WeightedQuantileDiscretizer"
     },
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]],
-    input_cols = .args[["input_cols"]], output_cols = .args[["output_cols"]],
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    input_cols = .args[["input_cols"]],
+    output_cols = .args[["output_cols"]],
     uid = .args[["uid"]]
   ) %>%
-    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
-    jobj_set_param("setRelativeError", .args[["relative_error"]], "2.0.0", 0.001)
+    jobj_set_param(
+      "setHandleInvalid",
+      .args[["handle_invalid"]],
+      "2.1.0",
+      "error"
+    ) %>%
+    jobj_set_param(
+      "setRelativeError",
+      .args[["relative_error"]],
+      "2.0.0",
+      0.001
+    )
   if (!is.null(weight_column)) {
     jobj <- jobj %>%
       jobj_set_param("setWeightCol", .args[["weight_column"]], "2.3.0", NULL)
@@ -106,7 +138,11 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
       jobj_set_param("setNumBuckets", .args[["num_buckets"]])
   } else if (!is.null(input_cols) && !is.null(output_cols)) {
     jobj <- jobj %>%
-      jobj_set_param("setNumBucketsArray", .args[["num_buckets_array"]], "2.3.0")
+      jobj_set_param(
+        "setNumBucketsArray",
+        .args[["num_buckets_array"]],
+        "2.3.0"
+      )
   }
 
   estimator <- jobj %>%
@@ -116,10 +152,19 @@ ft_quantile_discretizer.spark_connection <- function(x, input_col = NULL, output
 }
 
 #' @export
-ft_quantile_discretizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
-                                                input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
-                                                handle_invalid = "error", relative_error = 0.001,
-                                                uid = random_string("quantile_discretizer_"), ...) {
+ft_quantile_discretizer.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  num_buckets = 2,
+  input_cols = NULL,
+  output_cols = NULL,
+  num_buckets_array = NULL,
+  handle_invalid = "error",
+  relative_error = 0.001,
+  uid = random_string("quantile_discretizer_"),
+  ...
+) {
   stage <- ft_quantile_discretizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -137,10 +182,19 @@ ft_quantile_discretizer.ml_pipeline <- function(x, input_col = NULL, output_col 
 }
 
 #' @export
-ft_quantile_discretizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, num_buckets = 2,
-                                              input_cols = NULL, output_cols = NULL, num_buckets_array = NULL,
-                                              handle_invalid = "error", relative_error = 0.001,
-                                              uid = random_string("quantile_discretizer_"), ...) {
+ft_quantile_discretizer.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  num_buckets = 2,
+  input_cols = NULL,
+  output_cols = NULL,
+  num_buckets_array = NULL,
+  handle_invalid = "error",
+  relative_error = 0.001,
+  uid = random_string("quantile_discretizer_"),
+  ...
+) {
   stage <- ft_quantile_discretizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -170,14 +224,26 @@ validator_ml_quantile_discretizer <- function(.args) {
   .args[["uid"]] <- cast_string(.args[["uid"]])
 
   if (!is.null(.args[["input_col"]]) && !is.null(.args[["input_cols"]])) {
-    stop("Only one of `input_col` or `input_cols` may be specified.", call. = FALSE)
+    stop(
+      "Only one of `input_col` or `input_cols` may be specified.",
+      call. = FALSE
+    )
   }
   .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
   .args[["num_buckets"]] <- cast_scalar_integer(.args[["num_buckets"]])
-  .args[["input_cols"]] <- cast_string_list(.args[["input_cols"]], allow_null = TRUE)
-  .args[["output_cols"]] <- cast_string_list(.args[["output_cols"]], allow_null = TRUE)
-  .args[["num_buckets_array"]] <- cast_integer_list(.args[["num_buckets_array"]], allow_null = TRUE)
+  .args[["input_cols"]] <- cast_string_list(
+    .args[["input_cols"]],
+    allow_null = TRUE
+  )
+  .args[["output_cols"]] <- cast_string_list(
+    .args[["output_cols"]],
+    allow_null = TRUE
+  )
+  .args[["num_buckets_array"]] <- cast_integer_list(
+    .args[["num_buckets_array"]],
+    allow_null = TRUE
+  )
   .args[["handle_invalid"]] <- cast_choice(
     .args[["handle_invalid"]],
     c("error", "skip", "keep")

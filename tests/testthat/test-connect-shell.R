@@ -37,7 +37,11 @@ test_that("'spark_connect' fails with bad configuration'", {
   config$sparklyr.connect.timeout <- 3
 
   expect_error({
-    spark_connect(master = "local", app_name = "bad_connection", config = config)
+    spark_connect(
+      master = "local",
+      app_name = "bad_connection",
+      config = config
+    )
   })
 })
 
@@ -56,13 +60,16 @@ test_that("'spark_session_id' generates same ids for same apps", {
 })
 
 test_that("'spark_session_random' generates different ids even with seeds", {
-  expect_true({
-    set.seed(10)
-    spark_session_random()
-  } != {
-    set.seed(10)
-    spark_session_random()
-  })
+  expect_true(
+    {
+      set.seed(10)
+      spark_session_random()
+    } !=
+      {
+        set.seed(10)
+        spark_session_random()
+      }
+  )
 })
 
 test_that("'spark_inspect' can enumerate information from the context", {
@@ -137,7 +144,7 @@ test_that("Abort shell returns expected output", {
       message = "test",
       spark_submit_path = "",
       shell_args = ""
-      )
+    )
   )
 })
 
@@ -153,8 +160,7 @@ test_that("Misc tests", {
 
   expect_silent(
     spark_log_file(testthat_spark_connection())
-    )
+  )
 })
 
 test_clear_cache()
-

@@ -4,17 +4,23 @@ skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("ml_tree_feature_importance() works properly", {
-  test_requires_version("2.0.0", "feature importances not available prior to spark 2.0")
+  test_requires_version(
+    "2.0.0",
+    "feature importances not available prior to spark 2.0"
+  )
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   rf <- iris_tbl %>%
-    ml_random_forest(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
+    ml_random_forest(
+      Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
       type = "regression",
-      subsampling_rate = 1, feature_subset_strategy = "all",
+      subsampling_rate = 1,
+      feature_subset_strategy = "all",
       num_trees = 1
     )
   dt <- iris_tbl %>%
-    ml_decision_tree(Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
+    ml_decision_tree(
+      Petal_Length ~ Sepal_Width + Sepal_Length + Petal_Width,
       type = "regression"
     )
 
@@ -83,4 +89,3 @@ test_that("ml_feature_importances work properly (#1436)", {
 })
 
 test_clear_cache()
-

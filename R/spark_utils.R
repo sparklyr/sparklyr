@@ -5,12 +5,14 @@
 #' @param dir checkpoint directory, must be HDFS path of running on cluster
 #' @export
 spark_set_checkpoint_dir <- function(sc, dir) {
-  invisible(sc %>%
-    spark_context() %>%
-    invoke(
-      "setCheckpointDir",
-      spark_normalize_path(dir)
-    ))
+  invisible(
+    sc %>%
+      spark_context() %>%
+      invoke(
+        "setCheckpointDir",
+        spark_normalize_path(dir)
+      )
+  )
 }
 
 #' @rdname checkpoint_directory
@@ -38,8 +40,9 @@ spark_get_checkpoint_dir <- function(sc) {
 #' @export
 spark_table_name <- function(expr) {
   table_name <- deparse(expr)
-  if (identical(length(table_name), 1L) &&
-    grepl("^[a-zA-Z][a-zA-Z0-9_]*$", table_name[[1]])
+  if (
+    identical(length(table_name), 1L) &&
+      grepl("^[a-zA-Z][a-zA-Z0-9_]*$", table_name[[1]])
   ) {
     table_name
   } else {

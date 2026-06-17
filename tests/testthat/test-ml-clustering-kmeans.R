@@ -9,4 +9,3 @@ test_that("ml_kmeans() default params", {
 })
 
 test_clear_cache()
-

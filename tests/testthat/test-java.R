@@ -86,4 +86,3 @@ test_that("'validate_java_version_line' works when date is present and version h
 })
 
 test_clear_cache()
-

@@ -82,7 +82,9 @@ test_that("regardless of the type of the NA", {
 
   vec_unite <- function(vars) {
     rs <- tidyr::unite(
-      na_sdf, "out", tidyselect::any_of(vars),
+      na_sdf,
+      "out",
+      tidyselect::any_of(vars),
       na.rm = TRUE
     ) %>%
       collect()
@@ -96,4 +98,3 @@ test_that("regardless of the type of the NA", {
 })
 
 test_clear_cache()
-

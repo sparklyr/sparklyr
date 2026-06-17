@@ -53,12 +53,21 @@ test_that("ml_find_synonyms works properly", {
   # https://github.com/apache/spark/blob/87b93d32a6bfb0f2127019b97b3fc1d13e16a10b/mllib/src/test/scala/org/apache/spark/mllib/feature/Word2VecSuite.scala#L37
   test_requires_version("2.0.0", "spark computation different in 1.6.x")
   sc <- testthat_spark_connection()
-  sentence <- data.frame(sentence = do.call(paste, as.list(c(rep("a b", 100), rep("a c", 10)))))
+  sentence <- data.frame(
+    sentence = do.call(paste, as.list(c(rep("a b", 100), rep("a c", 10))))
+  )
   doc <- rbind(sentence, sentence)
   sdf <- sdf_copy_to(sc, doc, overwrite = TRUE)
   tokenized_tbl <- ft_tokenizer(sdf, "sentence", "words")
 
-  model <- ft_word2vec(sc, "words", "result", vector_size = 10, seed = 42L, min_count = 0) %>%
+  model <- ft_word2vec(
+    sc,
+    "words",
+    "result",
+    vector_size = 10,
+    seed = 42L,
+    min_count = 0
+  ) %>%
     ml_fit(tokenized_tbl)
 
   synonyms <- ml_find_synonyms(model, "a", 2) %>% pull(word)

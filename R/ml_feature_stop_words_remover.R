@@ -15,16 +15,32 @@
 #'
 #' @seealso \code{\link{ft_stop_words_remover}}
 #' @export
-ml_default_stop_words <- function(sc, language = c(
-                                    "english", "danish", "dutch", "finnish",
-                                    "french", "german", "hungarian", "italian",
-                                    "norwegian", "portuguese", "russian", "spanish",
-                                    "swedish", "turkish"
-                                  ), ...) {
+ml_default_stop_words <- function(
+  sc,
+  language = c(
+    "english",
+    "danish",
+    "dutch",
+    "finnish",
+    "french",
+    "german",
+    "hungarian",
+    "italian",
+    "norwegian",
+    "portuguese",
+    "russian",
+    "spanish",
+    "swedish",
+    "turkish"
+  ),
+  ...
+) {
   language <- rlang::arg_match(language)
   invoke_static(
-    sc, "org.apache.spark.ml.feature.StopWordsRemover",
-    "loadDefaultStopWords", language
+    sc,
+    "org.apache.spark.ml.feature.StopWordsRemover",
+    "loadDefaultStopWords",
+    language
   )
 }
 
@@ -41,9 +57,15 @@ ml_default_stop_words <- function(sc, language = c(
 #' @seealso \code{\link{ml_default_stop_words}}
 #'
 #' @export
-ft_stop_words_remover <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
-                                  stop_words = ml_default_stop_words(spark_connection(x), "english"),
-                                  uid = random_string("stop_words_remover_"), ...) {
+ft_stop_words_remover <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  case_sensitive = FALSE,
+  stop_words = ml_default_stop_words(spark_connection(x), "english"),
+  uid = random_string("stop_words_remover_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_stop_words_remover")
 }
@@ -51,9 +73,15 @@ ft_stop_words_remover <- function(x, input_col = NULL, output_col = NULL, case_s
 ml_stop_words_remover <- ft_stop_words_remover
 
 #' @export
-ft_stop_words_remover.spark_connection <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
-                                                   stop_words = ml_default_stop_words(spark_connection(x), "english"),
-                                                   uid = random_string("stop_words_remover_"), ...) {
+ft_stop_words_remover.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  case_sensitive = FALSE,
+  stop_words = ml_default_stop_words(spark_connection(x), "english"),
+  uid = random_string("stop_words_remover_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -65,8 +93,11 @@ ft_stop_words_remover.spark_connection <- function(x, input_col = NULL, output_c
     validator_ml_stop_words_remover()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.StopWordsRemover",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.StopWordsRemover",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
     invoke("setCaseSensitive", .args[["case_sensitive"]]) %>%
     invoke("setStopWords", .args[["stop_words"]])
@@ -75,9 +106,15 @@ ft_stop_words_remover.spark_connection <- function(x, input_col = NULL, output_c
 }
 
 #' @export
-ft_stop_words_remover.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
-                                              stop_words = ml_default_stop_words(spark_connection(x), "english"),
-                                              uid = random_string("stop_words_remover_"), ...) {
+ft_stop_words_remover.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  case_sensitive = FALSE,
+  stop_words = ml_default_stop_words(spark_connection(x), "english"),
+  uid = random_string("stop_words_remover_"),
+  ...
+) {
   stage <- ft_stop_words_remover.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -91,9 +128,15 @@ ft_stop_words_remover.ml_pipeline <- function(x, input_col = NULL, output_col = 
 }
 
 #' @export
-ft_stop_words_remover.tbl_spark <- function(x, input_col = NULL, output_col = NULL, case_sensitive = FALSE,
-                                            stop_words = ml_default_stop_words(spark_connection(x), "english"),
-                                            uid = random_string("stop_words_remover_"), ...) {
+ft_stop_words_remover.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  case_sensitive = FALSE,
+  stop_words = ml_default_stop_words(spark_connection(x), "english"),
+  uid = random_string("stop_words_remover_"),
+  ...
+) {
   stage <- ft_stop_words_remover.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

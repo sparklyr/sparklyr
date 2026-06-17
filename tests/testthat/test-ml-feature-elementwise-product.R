@@ -34,14 +34,21 @@ test_that("ft_elementwise_product() works", {
   )
 
   ewp <- ft_elementwise_product(
-    sc, "features", "multiplied",
+    sc,
+    "features",
+    "multiplied",
     scaling_vec = c(1, 3, 5)
   )
 
   expect_equal(
-    ml_params(ewp, list(
-      "input_col", "output_col", "scaling_vec"
-    )),
+    ml_params(
+      ewp,
+      list(
+        "input_col",
+        "output_col",
+        "scaling_vec"
+      )
+    ),
     list(
       input_col = "features",
       output_col = "multiplied",
@@ -51,4 +58,3 @@ test_that("ft_elementwise_product() works", {
 })
 
 test_clear_cache()
-

@@ -12,4 +12,3 @@ test_that("input_cols print correctly", {
 })
 
 test_clear_cache()
-

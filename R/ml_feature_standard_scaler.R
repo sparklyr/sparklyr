@@ -32,9 +32,15 @@
 #' }
 #'
 #' @export
-ft_standard_scaler <- function(x, input_col = NULL, output_col = NULL,
-                               with_mean = FALSE, with_std = TRUE,
-                               uid = random_string("standard_scaler_"), ...) {
+ft_standard_scaler <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  with_mean = FALSE,
+  with_std = TRUE,
+  uid = random_string("standard_scaler_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_standard_scaler")
 }
@@ -42,9 +48,15 @@ ft_standard_scaler <- function(x, input_col = NULL, output_col = NULL,
 ml_standard_scaler <- ft_standard_scaler
 
 #' @export
-ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                                with_mean = FALSE, with_std = TRUE,
-                                                uid = random_string("standard_scaler_"), ...) {
+ft_standard_scaler.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  with_mean = FALSE,
+  with_std = TRUE,
+  uid = random_string("standard_scaler_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -56,8 +68,11 @@ ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col 
     validator_ml_standard_scaler()
 
   estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.StandardScaler",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.StandardScaler",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
     invoke(
       "%>%",
@@ -70,9 +85,15 @@ ft_standard_scaler.spark_connection <- function(x, input_col = NULL, output_col 
 }
 
 #' @export
-ft_standard_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                           with_mean = FALSE, with_std = TRUE,
-                                           uid = random_string("standard_scaler_"), ...) {
+ft_standard_scaler.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  with_mean = FALSE,
+  with_std = TRUE,
+  uid = random_string("standard_scaler_"),
+  ...
+) {
   stage <- ft_standard_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -86,9 +107,15 @@ ft_standard_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NUL
 }
 
 #' @export
-ft_standard_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                         with_mean = FALSE, with_std = TRUE,
-                                         uid = random_string("standard_scaler_"), ...) {
+ft_standard_scaler.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  with_mean = FALSE,
+  with_std = TRUE,
+  uid = random_string("standard_scaler_"),
+  ...
+) {
   stage <- ft_standard_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

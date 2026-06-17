@@ -42,10 +42,12 @@
 #' weights <- c(training = 0.6, test = 0.4)
 #' diamonds_tbl %>% sdf_random_split(weights = weights)
 #' }
-sdf_random_split <- function(x,
-                             ...,
-                             weights = NULL,
-                             seed = sample(.Machine$integer.max, 1)) {
+sdf_random_split <- function(
+  x,
+  ...,
+  weights = NULL,
+  seed = sample(.Machine$integer.max, 1)
+) {
   sdf <- spark_dataframe(x)
   weights <- weights %||% list(...)
   nm <- names(weights)
@@ -60,10 +62,12 @@ sdf_random_split <- function(x,
 
 #' @rdname sdf_random_split
 #' @export
-sdf_partition <- function(x,
-                          ...,
-                          weights = NULL,
-                          seed = sample(.Machine$integer.max, 1)) {
+sdf_partition <- function(
+  x,
+  ...,
+  weights = NULL,
+  seed = sample(.Machine$integer.max, 1)
+) {
   .Deprecated("sdf_random_split")
   sdf_random_split(x = x, ..., weights = weights, seed = seed)
 }
@@ -77,14 +81,17 @@ sdf_partition <- function(x,
 #' @param ... Optional arguments; currently unused.
 #'
 #' @export
-sdf_project <- function(object, newdata,
-                        features = dimnames(object$pc)[[1]],
-                        feature_prefix = NULL, ...) {
+sdf_project <- function(
+  object,
+  newdata,
+  features = dimnames(object$pc)[[1]],
+  feature_prefix = NULL,
+  ...
+) {
   dots <- list(...)
   if (!rlang::is_null(dots$feature.prefix)) {
     assign("feature_prefix", dots$feature.prefix)
   }
-
 
   feature_prefix <- cast_nullable_string(feature_prefix)
 

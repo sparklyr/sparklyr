@@ -26,7 +26,6 @@ do.tbl_spark <- function(.data, ...) {
   nm <- names(combos)
 
   lapply(seq_len(nrow(combos)), function(i) {
-
     # generate filters for each combination
     filters <- lapply(seq_along(nm), function(j) {
       sdf %>%
@@ -42,10 +41,8 @@ do.tbl_spark <- function(.data, ...) {
         sdf_register()
     }
 
-
     # apply functions with this data
     fits <- enumerate(quosures, function(name, quosure) {
-
       # override '.' in envir
       assign(".", filtered, envir = environment(quosure))
 

@@ -9,8 +9,14 @@
 #' @param n Minimum n-gram length, greater than or equal to 1. Default: 2, bigram features
 #'
 #' @export
-ft_ngram <- function(x, input_col = NULL, output_col = NULL, n = 2,
-                     uid = random_string("ngram_"), ...) {
+ft_ngram <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  n = 2,
+  uid = random_string("ngram_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_ngram")
 }
@@ -18,8 +24,14 @@ ft_ngram <- function(x, input_col = NULL, output_col = NULL, n = 2,
 ml_ngram <- ft_ngram
 
 #' @export
-ft_ngram.spark_connection <- function(x, input_col = NULL, output_col = NULL, n = 2,
-                                      uid = random_string("ngram_"), ...) {
+ft_ngram.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  n = 2,
+  uid = random_string("ngram_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -30,8 +42,11 @@ ft_ngram.spark_connection <- function(x, input_col = NULL, output_col = NULL, n 
     validator_ml_ngram()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.NGram",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.NGram",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
     invoke("setN", .args[["n"]])
 
@@ -39,8 +54,14 @@ ft_ngram.spark_connection <- function(x, input_col = NULL, output_col = NULL, n 
 }
 
 #' @export
-ft_ngram.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, n = 2,
-                                 uid = random_string("ngram_"), ...) {
+ft_ngram.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  n = 2,
+  uid = random_string("ngram_"),
+  ...
+) {
   stage <- ft_ngram.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -53,8 +74,14 @@ ft_ngram.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, n = 2,
 }
 
 #' @export
-ft_ngram.tbl_spark <- function(x, input_col = NULL, output_col = NULL, n = 2,
-                               uid = random_string("ngram_"), ...) {
+ft_ngram.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  n = 2,
+  uid = random_string("ngram_"),
+  ...
+) {
   stage <- ft_ngram.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

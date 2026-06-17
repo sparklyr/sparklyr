@@ -11,14 +11,19 @@
 #'   none. If non-null, the reader will automatically stop when the session ends.
 #'
 #' @export
-reactiveSpark <- function(x,
-                          intervalMillis = 1000,
-                          session = NULL) {
-  if (!"shiny" %in% installed.packages()) stop("The 'shiny' package is required for this operation.")
+reactiveSpark <- function(x, intervalMillis = 1000, session = NULL) {
+  if (!"shiny" %in% installed.packages()) {
+    stop("The 'shiny' package is required for this operation.")
+  }
 
-  getDefaultReactiveDomain <- get("getDefaultReactiveDomain", envir = asNamespace("shiny"))
+  getDefaultReactiveDomain <- get(
+    "getDefaultReactiveDomain",
+    envir = asNamespace("shiny")
+  )
   reactivePoll <- get("reactivePoll", envir = asNamespace("shiny"))
-  if (identical(session, NULL)) session <- getDefaultReactiveDomain()
+  if (identical(session, NULL)) {
+    session <- getDefaultReactiveDomain()
+  }
 
   sc <- spark_connection(x)
 
@@ -27,7 +32,12 @@ reactiveSpark <- function(x,
     sdf,
     "withColumn",
     "reactive_timestamp",
-    invoke_static(sc, "org.apache.spark.sql.functions", "expr", "current_timestamp()")
+    invoke_static(
+      sc,
+      "org.apache.spark.sql.functions",
+      "expr",
+      "current_timestamp()"
+    )
   )
 
   name <- random_string("sparklyr_tmp_")
@@ -35,9 +45,12 @@ reactiveSpark <- function(x,
   stream <- traceable %>% stream_write_memory(name)
 
   onStop <- get("onStop", envir = asNamespace("shiny"))
-  onStop(function() {
-    stream_stop(stream)
-  }, session = session)
+  onStop(
+    function() {
+      stream_stop(stream)
+    },
+    session = session
+  )
 
   reactivePoll(
     intervalMillis = intervalMillis,

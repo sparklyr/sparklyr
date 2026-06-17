@@ -36,4 +36,3 @@ test_that("ml_gbt_classifier() param setting", {
 })
 
 test_clear_cache()
-

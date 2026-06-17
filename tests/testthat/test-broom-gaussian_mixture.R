@@ -4,7 +4,6 @@ skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("gaussian_mixture.tidy() works", {
-
   ## ---------------- Connection and data upload to Spark ----------------------
 
   sc <- testthat_spark_connection()
@@ -20,9 +19,10 @@ test_that("gaussian_mixture.tidy() works", {
     td1 <- tidy(model)
   )
 
-  check_tidy(td1,
-             exp.row = 4,
-             exp.names = c("mpg", "cyl", "weight", "size", "cluster")
+  check_tidy(
+    td1,
+    exp.row = 4,
+    exp.names = c("mpg", "cyl", "weight", "size", "cluster")
   )
 
   expect_equal(td1$size, model$summary$cluster_sizes())
@@ -33,7 +33,8 @@ test_that("gaussian_mixture.tidy() works", {
     augment() %>%
     collect()
 
-  check_tidy(au1,
+  check_tidy(
+    au1,
     exp.row = nrow(mtcars),
     exp.name = c(names(mtcars), ".cluster")
   )
@@ -42,27 +43,17 @@ test_that("gaussian_mixture.tidy() works", {
     augment(newdata = head(mtcars_tbl, 25)) %>%
     collect()
 
-  check_tidy(au2,
-    exp.row = 25,
-    exp.name = c(names(mtcars), ".cluster")
-  )
+  check_tidy(au2, exp.row = 25, exp.name = c(names(mtcars), ".cluster"))
 
   ## ---------------------------- glance() -------------------------------------
 
   gl1 <- glance(model)
 
   if (spark_version(sc) >= "2.3.0") {
-    check_tidy(gl1,
-      exp.row = 1,
-      exp.names = c("k", "silhouette")
-    )
+    check_tidy(gl1, exp.row = 1, exp.names = c("k", "silhouette"))
   } else {
-    check_tidy(gl1,
-      exp.row = 1,
-      exp.names = "k"
-    )
+    check_tidy(gl1, exp.row = 1, exp.names = "k")
   }
 })
 
 test_clear_cache()
-

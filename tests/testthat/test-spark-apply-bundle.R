@@ -35,11 +35,16 @@ test_that("'spark_apply_packages' uses different names for different packages", 
 })
 
 test_that("'spark_apply_bundle_file' uses different names for different packages", {
-  purrr_file <- spark_apply_bundle_file(spark_apply_packages("purrr"), tempdir())
-  tidyr_file <- spark_apply_bundle_file(spark_apply_packages("tidyr"), tempdir())
+  purrr_file <- spark_apply_bundle_file(
+    spark_apply_packages("purrr"),
+    tempdir()
+  )
+  tidyr_file <- spark_apply_bundle_file(
+    spark_apply_packages("tidyr"),
+    tempdir()
+  )
 
   expect_true(purrr_file != tidyr_file)
 })
 
 test_clear_cache()
-

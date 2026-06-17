@@ -28,8 +28,10 @@ connection_progress_base <- function(sc, terminated = FALSE) {
     env$jobs <- list()
   }
 
-  if ((!terminated || length(env$jobs) > 0) &&
-    !is.null(spark_context(sc))) {
+  if (
+    (!terminated || length(env$jobs) > 0) &&
+      !is.null(spark_context(sc))
+  ) {
     connection_progress_context(sc, function() {
       if (is.null(env$web_url)) {
         env$web_url <- tryCatch(
@@ -58,7 +60,12 @@ connection_progress_base <- function(sc, terminated = FALSE) {
           }
 
           jobName <- paste("Spark Job", jobIdText)
-          jobUrl <- file.path(env$web_url, "jobs", "job", paste0("?id=", jobSparkId))
+          jobUrl <- file.path(
+            env$web_url,
+            "jobs",
+            "job",
+            paste0("?id=", jobSparkId)
+          )
           jobUrlParam <- if (nchar(jobUrl) > 0) jobUrl else ""
           env$jobs[[jobId]] <- list(
             ref = connection_progress_update(jobName, 101L, jobUrlParam),
@@ -107,9 +114,11 @@ connection_progress_context <- function(sc, f) {
 }
 
 connection_progress <- function(sc, terminated = FALSE) {
-  if (!spark_config_logical(sc$config, "sparklyr.progress", TRUE) ||
-    !rstudio_jobs_api_available() ||
-    identical(sc$state$use_monitoring, TRUE)) {
+  if (
+    !spark_config_logical(sc$config, "sparklyr.progress", TRUE) ||
+      !rstudio_jobs_api_available() ||
+      identical(sc$state$use_monitoring, TRUE)
+  ) {
     return()
   }
 

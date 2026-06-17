@@ -64,7 +64,11 @@ new_ml_classification_model <- function(jobj, ..., class = character()) {
 #' @rdname ml-constructors
 #' @export
 #' @keywords internal
-new_ml_probabilistic_classification_model <- function(jobj, ..., class = character()) {
+new_ml_probabilistic_classification_model <- function(
+  jobj,
+  ...,
+  class = character()
+) {
   new_ml_classification_model(
     jobj,
     probabilitiy_col = invoke(jobj, "getProbabilityCol"),

@@ -9,10 +9,15 @@
 #' @param max_categories Threshold for the number of values a categorical feature can take. If a feature is found to have > \code{max_categories} values, then it is declared continuous. Must be greater than or equal to 2. Defaults to 20.
 #'
 #' @export
-ft_vector_indexer <- function(x, input_col = NULL, output_col = NULL,
-                              handle_invalid = "error",
-                              max_categories = 20,
-                              uid = random_string("vector_indexer_"), ...) {
+ft_vector_indexer <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  handle_invalid = "error",
+  max_categories = 20,
+  uid = random_string("vector_indexer_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_vector_indexer")
 }
@@ -20,10 +25,15 @@ ft_vector_indexer <- function(x, input_col = NULL, output_col = NULL,
 ml_vector_indexer <- ft_vector_indexer
 
 #' @export
-ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                               handle_invalid = "error",
-                                               max_categories = 20,
-                                               uid = random_string("vector_indexer_"), ...) {
+ft_vector_indexer.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  handle_invalid = "error",
+  max_categories = 20,
+  uid = random_string("vector_indexer_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -35,10 +45,18 @@ ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col =
     validator_ml_vector_indexer()
 
   estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.VectorIndexer",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.VectorIndexer",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
-    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.3.0", "error") %>%
+    jobj_set_param(
+      "setHandleInvalid",
+      .args[["handle_invalid"]],
+      "2.3.0",
+      "error"
+    ) %>%
     invoke("setMaxCategories", .args[["max_categories"]]) %>%
     new_ml_vector_indexer()
 
@@ -46,10 +64,15 @@ ft_vector_indexer.spark_connection <- function(x, input_col = NULL, output_col =
 }
 
 #' @export
-ft_vector_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                          handle_invalid = "error",
-                                          max_categories = 20,
-                                          uid = random_string("vector_indexer_"), ...) {
+ft_vector_indexer.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  handle_invalid = "error",
+  max_categories = 20,
+  uid = random_string("vector_indexer_"),
+  ...
+) {
   stage <- ft_vector_indexer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -62,10 +85,15 @@ ft_vector_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
 }
 
 #' @export
-ft_vector_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                        handle_invalid = "error",
-                                        max_categories = 20,
-                                        uid = random_string("vector_indexer_"), ...) {
+ft_vector_indexer.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  handle_invalid = "error",
+  max_categories = 20,
+  uid = random_string("vector_indexer_"),
+  ...
+) {
   stage <- ft_vector_indexer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

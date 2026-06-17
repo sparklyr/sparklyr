@@ -8,7 +8,9 @@ sdf_stratified_sample_n <- function(x, grps, k, weight, replace, seed) {
   }
 
   method <- ifelse(
-    replace, "sampleWithReplacement", "sampleWithoutReplacement"
+    replace,
+    "sampleWithReplacement",
+    "sampleWithoutReplacement"
   )
   schema <- x %>%
     spark_dataframe() %>%
@@ -35,7 +37,9 @@ sdf_stratified_sample_frac <- function(x, grps, frac, weight, replace, seed) {
   }
 
   method <- ifelse(
-    replace, "sampleFracWithReplacement", "sampleFracWithoutReplacement"
+    replace,
+    "sampleFracWithReplacement",
+    "sampleFracWithoutReplacement"
   )
   schema <- x %>%
     spark_dataframe() %>%

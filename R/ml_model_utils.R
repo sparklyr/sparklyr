@@ -15,7 +15,8 @@ ml_feature_names_metadata <- function(pipeline_model, dataset, features_col) {
   transformed_tbl <- ml_transform(preprocessor, dataset)
   features_col <- if (inherits(preprocessor, "ml_r_formula_model")) {
     ml_param(preprocessor, "features_col")
-  } else { # vector assembler
+  } else {
+    # vector assembler
     ml_param(preprocessor, "output_col")
   }
 

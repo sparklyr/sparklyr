@@ -46,10 +46,12 @@ test_that("sdf_distinct works properly", {
       gear = c(3, 4, 5, 3, 4, 4, 5),
       am = c(0, 1, 1, 0, 0, 1, 1)
     ),
-    sdf %>% sdf_distinct(vs, c("gear", "am")) %>%
-      arrange_all() %>% collect() %>% as.data.frame()
+    sdf %>%
+      sdf_distinct(vs, c("gear", "am")) %>%
+      arrange_all() %>%
+      collect() %>%
+      as.data.frame()
   )
 })
 
 test_clear_cache()
-

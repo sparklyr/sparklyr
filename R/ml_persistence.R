@@ -46,8 +46,13 @@ ml_save.default <- function(x, path, overwrite = FALSE, ...) {
 #' @rdname ml-persistence
 #' @param type Whether to save the pipeline model or the pipeline.
 #' @export
-ml_save.ml_model <- function(x, path, overwrite = FALSE,
-                             type = c("pipeline_model", "pipeline"), ...) {
+ml_save.ml_model <- function(
+  x,
+  path,
+  overwrite = FALSE,
+  type = c("pipeline_model", "pipeline"),
+  ...
+) {
   version <- x %>%
     spark_jobj() %>%
     spark_connection() %>%
@@ -63,9 +68,11 @@ ml_save.ml_model <- function(x, path, overwrite = FALSE,
   overwrite <- cast_scalar_logical(overwrite)
   type <- match.arg(type)
 
-  ml_writer <- (
-    if (identical(type, "pipeline_model")) x$pipeline_model else x$pipeline
-  ) %>%
+  ml_writer <- (if (identical(type, "pipeline_model")) {
+    x$pipeline_model
+  } else {
+    x$pipeline
+  }) %>%
     spark_jobj() %>%
     invoke("write")
 
@@ -96,23 +103,23 @@ ml_load <- function(sc, path) {
 
   df_try <- try(
     spark_read_json(
-      sc   = sc,
+      sc = sc,
       name = metadata_view,
       path = metadata_glob
     ),
     silent = TRUE
   )
 
- if (!inherits(df_try, "try-error")) {
-  if ("class" %in% colnames(df_try)) {
-    class <- df_try %>%
-      dplyr::select("class") %>%
-      head(1) %>%
-      dplyr::pull(1)
+  if (!inherits(df_try, "try-error")) {
+    if ("class" %in% colnames(df_try)) {
+      class <- df_try %>%
+        dplyr::select("class") %>%
+        head(1) %>%
+        dplyr::pull(1)
 
-    return(invoke_static(sc, class, "load", path) %>% ml_call_constructor())
+      return(invoke_static(sc, class, "load", path) %>% ml_call_constructor())
+    }
   }
-}
 
   metadata <- try(
     spark_context(sc) %>%
@@ -127,10 +134,14 @@ ml_load <- function(sc, path) {
     class <- metadata$class
     invoke_static(sc, class, "load", path) %>%
       ml_call_constructor()
-    } else {
-  stop(
-    "ML could not be loaded: failed to read metadata from '", path, "'.\n",
-    "Tried Spark JSON glob at '", metadata_glob, "' and the RDD textFile path."
-  )
-}
+  } else {
+    stop(
+      "ML could not be loaded: failed to read metadata from '",
+      path,
+      "'.\n",
+      "Tried Spark JSON glob at '",
+      metadata_glob,
+      "' and the RDD textFile path."
+    )
+  }
 }

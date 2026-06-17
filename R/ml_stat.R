@@ -32,8 +32,10 @@ ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
   col_in_df <- columns %in% colnames(x)
   if (!all(col_in_df)) {
     bad_cols <- paste0(columns[!col_in_df], collapse = ", ")
-    stop("All columns specified must be in x. Failed to find ",
-      bad_cols, ".",
+    stop(
+      "All columns specified must be in x. Failed to find ",
+      bad_cols,
+      ".",
       call. = FALSE
     )
   }
@@ -42,7 +44,8 @@ ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
     # check to see that the column is a VectorUDT
 
     if (!grepl("VectorUDT", sdf_schema(x)[[columns]][["type"]])) {
-      stop("When only one column is specified, it must be a column of Vectors. For example, the output of `ft_vector_assembler()`.",
+      stop(
+        "When only one column is specified, it must be a column of Vectors. For example, the output of `ft_vector_assembler()`.",
         call. = FALSE
       )
     }
@@ -69,16 +72,20 @@ ml_corr <- function(x, columns = NULL, method = c("pearson", "spearman")) {
   invoke_static(
     spark_connection(sdf),
     "org.apache.spark.ml.stat.Correlation",
-    "corr", sdf, features_col
+    "corr",
+    sdf,
+    features_col
   ) %>%
     invoke("first") %>%
     sapply(invoke, "toArray") %>%
     matrix(nrow = num_features) %>%
     dplyr::as_tibble(.name_repair = "unique") %>%
-    dplyr::rename(!!!rlang::set_names(
-      paste0("...", seq_len(num_features)),
-      feature_names
-    ))
+    dplyr::rename(
+      !!!rlang::set_names(
+        paste0("...", seq_len(num_features)),
+        feature_names
+      )
+    )
 }
 
 #' Chi-square hypothesis testing for categorical data.
@@ -114,8 +121,10 @@ ml_chisquare_test <- function(x, features, label) {
   col_in_df <- columns %in% colnames(x)
   if (!all(col_in_df)) {
     bad_cols <- paste(columns[!col_in_df], collapse = ", ")
-    stop("All columns specified must be in x. Failed to find ",
-      bad_cols, ".",
+    stop(
+      "All columns specified must be in x. Failed to find ",
+      bad_cols,
+      ".",
       call. = FALSE
     )
   }
@@ -144,17 +153,23 @@ ml_chisquare_test <- function(x, features, label) {
     features_col <- random_string("features")
     if (label_is_double) {
       label_col <- label
-      df <- ft_r_formula(x, paste0("~ ", paste0(features, collapse = " + ")),
+      df <- ft_r_formula(
+        x,
+        paste0("~ ", paste0(features, collapse = " + ")),
         features_col = features_col
       )
     } else {
       label_col <- random_string("label")
-      df <- ft_r_formula(x, paste0(
-        label, " ~ ",
-        paste0(features, collapse = " + ")
-      ),
-      features_col = features_col,
-      label_col = label_col, force_index_label = TRUE
+      df <- ft_r_formula(
+        x,
+        paste0(
+          label,
+          " ~ ",
+          paste0(features, collapse = " + ")
+        ),
+        features_col = features_col,
+        label_col = label_col,
+        force_index_label = TRUE
       )
     }
   }
@@ -163,8 +178,12 @@ ml_chisquare_test <- function(x, features, label) {
   sc <- spark_connection(sdf)
 
   invoke_static(
-    sc, "org.apache.spark.ml.stat.ChiSquareTest", "test",
-    sdf, features_col, label_col
+    sc,
+    "org.apache.spark.ml.stat.ChiSquareTest",
+    "test",
+    sdf,
+    features_col,
+    label_col
   ) %>%
     sdf_register() %>%
     dplyr::collect() %>%
@@ -174,8 +193,11 @@ ml_chisquare_test <- function(x, features, label) {
       degrees_of_freedom = unlist(!!rlang::sym("degreesOfFreedom")),
       statistic = !!rlang::sym("statistics")
     ) %>%
-    dplyr::bind_cols(data.frame(
-      feature = feature_names,
-      label = label
-    ), .)
+    dplyr::bind_cols(
+      data.frame(
+        feature = feature_names,
+        label = label
+      ),
+      .
+    )
 }

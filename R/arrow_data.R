@@ -50,7 +50,12 @@ arrow_enabled_object.spark_jobj <- function(object) {
     sdf_schema() %>%
     Filter(function(x) grepl(unsupported_expr, x$type), .)
   enabled <- length(unsupported) == 0
-  if (!enabled) warning("Arrow disabled due to columns: ", paste(names(unsupported), collapse = ", "))
+  if (!enabled) {
+    warning(
+      "Arrow disabled due to columns: ",
+      paste(names(unsupported), collapse = ", ")
+    )
+  }
 
   enabled
 }
@@ -60,15 +65,19 @@ arrow_enabled_object.data.frame <- function(object) {
   unsupported <- NULL
   enabled <- TRUE
   for (column in colnames(object)) {
-    if ("list" %in% class(object[[column]]) &&
-      "raw" %in% lapply(object[[column]], class)) {
+    if (
+      "list" %in%
+        class(object[[column]]) &&
+        "raw" %in% lapply(object[[column]], class)
+    ) {
       unsupported <- c(unsupported, column)
       enabled <- FALSE
     }
   }
   if (!enabled) {
     warning(
-      "Arrow disabled due to columns: ", paste(unsupported, collapse = ", ")
+      "Arrow disabled due to columns: ",
+      paste(unsupported, collapse = ", ")
     )
   }
 
@@ -94,7 +103,9 @@ arrow_read_stream <- function(stream) {
 arrow_copy_to <- function(sc, df, parallelism) {
   # replace factors with characters
   if (any(sapply(df, is.factor))) {
-    df <- dplyr::as_tibble(lapply(df, function(x) if (is.factor(x)) as.character(x) else x))
+    df <- dplyr::as_tibble(lapply(df, function(x) {
+      if (is.factor(x)) as.character(x) else x
+    }))
   }
 
   # serialize to arrow
@@ -107,8 +118,22 @@ arrow_copy_to <- function(sc, df, parallelism) {
   schema <- spark_data_build_types(sc, lapply(df, class))
 
   # load arrow file in scala
-  rdd <- invoke_static(sc, "sparklyr.ArrowHelper", "javaRddFromBinaryBatches", spark_context(sc), batches, parallelism)
-  sdf <- invoke_static(sc, "sparklyr.ArrowConverters", "toDataFrame", rdd, schema, spark_session(sc))
+  rdd <- invoke_static(
+    sc,
+    "sparklyr.ArrowHelper",
+    "javaRddFromBinaryBatches",
+    spark_context(sc),
+    batches,
+    parallelism
+  )
+  sdf <- invoke_static(
+    sc,
+    "sparklyr.ArrowConverters",
+    "toDataFrame",
+    rdd,
+    schema,
+    spark_session(sc)
+  )
 
   sdf
 }
@@ -135,24 +160,50 @@ arrow_collect <- function(tbl, ...) {
 
   if (!identical(args$callback, NULL)) {
     cb <- args$callback
-    if (is.language(cb)) cb <- rlang::as_closure(cb)
+    if (is.language(cb)) {
+      cb <- rlang::as_closure(cb)
+    }
 
-    arrow_df <- invoke_static(sc, "sparklyr.ArrowConverters", "toArrowDataset", sdf, session, time_zone)
+    arrow_df <- invoke_static(
+      sc,
+      "sparklyr.ArrowConverters",
+      "toArrowDataset",
+      sdf,
+      session,
+      time_zone
+    )
     arrow_iter <- invoke(arrow_df, "toLocalIterator")
 
     iter <- 1
     while (invoke(arrow_iter, "hasNext")) {
-      batches <- invoke_static(sc, "sparklyr.ArrowConverters", "toArrowStream", sdf, time_zone, invoke(arrow_iter, "underlying")) %>%
+      batches <- invoke_static(
+        sc,
+        "sparklyr.ArrowConverters",
+        "toArrowStream",
+        sdf,
+        time_zone,
+        invoke(arrow_iter, "underlying")
+      ) %>%
         arrow_read_stream()
 
       for (batch in batches) {
-        if (length(formals(cb)) >= 2) cb(batch, iter) else cb(batch)
+        if (length(formals(cb)) >= 2) {
+          cb(batch, iter)
+        } else {
+          cb(batch)
+        }
         iter <- iter + 1
       }
     }
-  }
-  else {
-    invoke_static(sc, "sparklyr.ArrowConverters", "toArrowBatchRdd", sdf, session, time_zone) %>%
+  } else {
+    invoke_static(
+      sc,
+      "sparklyr.ArrowConverters",
+      "toArrowBatchRdd",
+      sdf,
+      session,
+      time_zone
+    ) %>%
       arrow_read_stream() %>%
       dplyr::bind_rows()
   }

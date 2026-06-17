@@ -20,8 +20,11 @@ get_stats <- function(stats, model) {
 #' @importFrom rlang sym syms quo
 #' @importFrom tidyselect vars_select
 #' @export
-tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
-                                                        ...) {
+tidy.ml_model_generalized_linear_regression <- function(
+  x,
+  exponentiate = FALSE,
+  ...
+) {
   model <- x$model
   exponentiate <- cast_scalar_logical(exponentiate)
 
@@ -50,7 +53,6 @@ tidy.ml_model_generalized_linear_regression <- function(x, exponentiate = FALSE,
     trans <- identity
     vars <- vars_select(c("term", new_names), everything())
   }
-
 
   coefficients <- list(x$coefficients)
   statistics <- stats %>%
@@ -90,9 +92,12 @@ tidy.ml_model_linear_regression <- function(x, ...) {
 #' @importFrom rlang := sym
 #' @importFrom dplyr rename mutate
 #' @export
-augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
-                                                           type.residuals = c("working", "deviance", "pearson", "response"),
-                                                           ...) {
+augment.ml_model_generalized_linear_regression <- function(
+  x,
+  newdata = NULL,
+  type.residuals = c("working", "deviance", "pearson", "response"),
+  ...
+) {
   type.residuals <- rlang::arg_match(type.residuals) %>%
     cast_string()
 
@@ -107,8 +112,10 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
   if (type.residuals == "working") {
     predictions <- ml_predict(x, newdata) %>%
       dplyr::rename(fitted = !!rlang::sym("prediction"))
-    return(predictions %>%
-      dplyr::mutate(resid = `-`(!!sym(x$response), !!sym("fitted"))))
+    return(
+      predictions %>%
+        dplyr::mutate(resid = `-`(!!sym(x$response), !!sym("fitted")))
+    )
   }
 
   # If the code reaches here, user didn't supply 'newdata' so we're dealing with
@@ -124,13 +131,16 @@ augment.ml_model_generalized_linear_regression <- function(x, newdata = NULL,
 #' @rdname ml_glm_tidiers
 #' @param new_data a tbl_spark of new data to use for prediction.
 #' @export
-augment._ml_model_linear_regression <- function(x, new_data = NULL,
-                                                type.residuals = c("working", "deviance", "pearson", "response"),
-                                                ...) {
-
+augment._ml_model_linear_regression <- function(
+  x,
+  new_data = NULL,
+  type.residuals = c("working", "deviance", "pearson", "response"),
+  ...
+) {
   check_newdata(... = ...)
   augment(
-    x = x$fit, newdata = new_data,
+    x = x$fit,
+    newdata = new_data,
     type.residuals = type.residuals,
     ... = ...
   )
@@ -144,7 +154,10 @@ augment.ml_model_linear_regression <- augment.ml_model_generalized_linear_regres
 #' @export
 glance.ml_model_generalized_linear_regression <- function(x, ...) {
   metric_names <- c(
-    "null_deviance", "residual_degree_of_freedom_null", "aic", "deviance",
+    "null_deviance",
+    "residual_degree_of_freedom_null",
+    "aic",
+    "deviance",
     "residual_degree_of_freedom"
   )
   new_names <- c("null.deviance", "df.null", "AIC", "deviance", "df.residual")
@@ -155,13 +168,18 @@ glance.ml_model_generalized_linear_regression <- function(x, ...) {
 #' @export
 glance.ml_model_linear_regression <- function(x, ...) {
   metric_names <- c(
-    "explained_variance", "mean_absolute_error",
+    "explained_variance",
+    "mean_absolute_error",
     "mean_squared_error",
-    "r2", "root_mean_squared_error"
+    "r2",
+    "root_mean_squared_error"
   )
   new_names <- c(
-    "explained.variance", "mean.absolute.error",
-    "mean.squared.error", "r.squared", "root.mean.squared.error"
+    "explained.variance",
+    "mean.absolute.error",
+    "mean.squared.error",
+    "r.squared",
+    "root.mean.squared.error"
   )
   extract_model_metrics(x, metric_names, new_names)
 }

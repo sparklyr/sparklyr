@@ -9,15 +9,13 @@ NULL
 
 #' @rdname ml_tree_tidiers
 #' @export
-tidy.ml_model_decision_tree_classification <- function(x,
-                                                       ...) {
+tidy.ml_model_decision_tree_classification <- function(x, ...) {
   dplyr::as_tibble(ml_feature_importances(x))
 }
 
 #' @rdname ml_tree_tidiers
 #' @export
-tidy.ml_model_decision_tree_regression <- function(x,
-                                                   ...) {
+tidy.ml_model_decision_tree_regression <- function(x, ...) {
   dplyr::as_tibble(ml_feature_importances(x))
 }
 
@@ -26,14 +24,22 @@ tidy.ml_model_decision_tree_regression <- function(x,
 #' @importFrom rlang syms
 #'
 #' @export
-augment.ml_model_decision_tree_classification <- function(x, newdata = NULL, ...) {
+augment.ml_model_decision_tree_classification <- function(
+  x,
+  newdata = NULL,
+  ...
+) {
   broom_augment_supervised(x, newdata = newdata)
 }
 
 #' @rdname ml_tree_tidiers
 #' @param new_data a tbl_spark of new data to use for prediction.
 #' @export
-augment._ml_model_decision_tree_classification <- function(x, new_data = NULL, ...) {
+augment._ml_model_decision_tree_classification <- function(
+  x,
+  new_data = NULL,
+  ...
+) {
   check_newdata(... = ...)
   augment(x = x$fit, newdata = new_data, ... = ...)
 }
@@ -49,22 +55,24 @@ augment.ml_model_decision_tree_regression <- function(x, newdata = NULL, ...) {
 #' @rdname ml_tree_tidiers
 #' @param new_data a tbl_spark of new data to use for prediction.
 #' @export
-augment._ml_model_decision_tree_regression <- function(x, new_data = NULL, ...) {
+augment._ml_model_decision_tree_regression <- function(
+  x,
+  new_data = NULL,
+  ...
+) {
   check_newdata(... = ...)
   augment(x = x$fit, newdata = new_data, ... = ...)
 }
 
 #' @rdname ml_tree_tidiers
 #' @export
-glance.ml_model_decision_tree_classification <- function(x,
-                                                         ...) {
+glance.ml_model_decision_tree_classification <- function(x, ...) {
   glance_decision_tree(x)
 }
 
 #' @rdname ml_tree_tidiers
 #' @export
-glance.ml_model_decision_tree_regression <- function(x,
-                                                     ...) {
+glance.ml_model_decision_tree_regression <- function(x, ...) {
   glance_decision_tree(x)
 }
 
@@ -85,15 +93,13 @@ glance_decision_tree <- function(x) {
 
 #' @rdname ml_tree_tidiers
 #' @export
-tidy.ml_model_random_forest_classification <- function(x,
-                                                       ...) {
+tidy.ml_model_random_forest_classification <- function(x, ...) {
   dplyr::as_tibble(ml_feature_importances(x))
 }
 
 #' @rdname ml_tree_tidiers
 #' @export
-tidy.ml_model_random_forest_regression <- function(x,
-                                                   ...) {
+tidy.ml_model_random_forest_regression <- function(x, ...) {
   dplyr::as_tibble(ml_feature_importances(x))
 }
 
@@ -101,14 +107,22 @@ tidy.ml_model_random_forest_regression <- function(x,
 #' @importFrom rlang syms
 #'
 #' @export
-augment.ml_model_random_forest_classification <- function(x, newdata = NULL, ...) {
+augment.ml_model_random_forest_classification <- function(
+  x,
+  newdata = NULL,
+  ...
+) {
   broom_augment_supervised(x, newdata = newdata)
 }
 
 #' @rdname ml_tree_tidiers
 #' @param new_data a tbl_spark of new data to use for prediction.
 #' @export
-augment._ml_model_random_forest_classification <- function(x, new_data = NULL, ...) {
+augment._ml_model_random_forest_classification <- function(
+  x,
+  new_data = NULL,
+  ...
+) {
   check_newdata(... = ...)
   augment(x = x$fit, newdata = new_data, ... = ...)
 }
@@ -124,7 +138,11 @@ augment.ml_model_random_forest_regression <- function(x, newdata = NULL, ...) {
 #' @rdname ml_tree_tidiers
 #' @param new_data a tbl_spark of new data to use for prediction.
 #' @export
-augment._ml_model_random_forest_regression <- function(x, new_data = NULL, ...) {
+augment._ml_model_random_forest_regression <- function(
+  x,
+  new_data = NULL,
+  ...
+) {
   check_newdata(... = ...)
   augment(x = x$fit, newdata = new_data, ... = ...)
 }
@@ -162,15 +180,13 @@ glance_random_forest <- function(x) {
 
 #' @rdname ml_tree_tidiers
 #' @export
-tidy.ml_model_gbt_classification <- function(x,
-                                             ...) {
+tidy.ml_model_gbt_classification <- function(x, ...) {
   dplyr::as_tibble(ml_feature_importances(x))
 }
 
 #' @rdname ml_tree_tidiers
 #' @export
-tidy.ml_model_gbt_regression <- function(x,
-                                         ...) {
+tidy.ml_model_gbt_regression <- function(x, ...) {
   dplyr::as_tibble(ml_feature_importances(x))
 }
 
@@ -208,22 +224,19 @@ augment._ml_model_gbt_regression <- function(x, new_data = NULL, ...) {
 
 #' @rdname ml_tree_tidiers
 #' @export
-glance.ml_model_gbt_classification <- function(x,
-                                               ...) {
+glance.ml_model_gbt_classification <- function(x, ...) {
   glance_gbt(x)
 }
 
 #' @rdname ml_tree_tidiers
 #' @export
-glance.ml_model_gbt_regression <- function(x,
-                                           ...) {
+glance.ml_model_gbt_regression <- function(x, ...) {
   glance_gbt(x)
 }
 
 # glance() code for gradient boosted trees is almost
 #  the same for regression and classification
 glance_gbt <- function(x) {
-
   # in gbt models, the total number of nodes is
   # model$total_num_nodes() in classification and
   # model$total_num_nodes in regression

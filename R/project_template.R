@@ -29,7 +29,12 @@ project_template <- function(path, ...) {
     "#' @import sparklyr",
     "#' @export",
     paste(project_name, "_hello <- function(sc) {", sep = ""),
-    paste("  sparklyr::invoke_static(sc, \"", project_name, ".Main\", \"hello\")", sep = ""),
+    paste(
+      "  sparklyr::invoke_static(sc, \"",
+      project_name,
+      ".Main\", \"hello\")",
+      sep = ""
+    ),
     "}"
   )
 
@@ -38,7 +43,12 @@ project_template <- function(path, ...) {
     "  sparklyr::spark_dependency(",
     "    jars = c(",
     "      system.file(",
-    paste("        sprintf(\"java/", project_name, "-%s-%s.jar\", spark_version, scala_version),", sep = ""),
+    paste(
+      "        sprintf(\"java/",
+      project_name,
+      "-%s-%s.jar\", spark_version, scala_version),",
+      sep = ""
+    ),
     paste("        package = \"", project_name, "\"", sep = ""),
     "      )",
     "    ),",

@@ -13,10 +13,12 @@ sparklyr_jar_verify_spark <- function(install = TRUE) {
   invisible(
     lapply(
       spec_list,
-      function(x){
-        if(!(x$spark %in% installed_vers$spark)) {
-          rlang::inform(c("i" = paste0("Spark version ", x$spark, " - Not found")))
-          if(install) spark_install(x$spark)
+      function(x) {
+        if (!(x$spark %in% installed_vers$spark)) {
+          rlang::inform(c(
+            "i" = paste0("Spark version ", x$spark, " - Not found")
+          ))
+          if (install) spark_install(x$spark)
         } else {
           rlang::inform(c("*" = paste0("Spark version ", x$spark, " - Ok")))
         }
@@ -46,13 +48,15 @@ sparklyr_jar_verify_spark <- function(install = TRUE) {
 #'
 #' @keywords internal
 #' @export
-spark_compile <- function(jar_name,
-                          spark_home = NULL,
-                          filter = NULL,
-                          scalac = NULL,
-                          jar = NULL,
-                          jar_dep = NULL,
-                          embedded_srcs = "embedded_sources.R") {
+spark_compile <- function(
+  jar_name,
+  spark_home = NULL,
+  filter = NULL,
+  scalac = NULL,
+  jar = NULL,
+  jar_dep = NULL,
+  embedded_srcs = "embedded_sources.R"
+) {
   default_install <- spark_install_find()
   spark_home <- if (is.null(spark_home) && !is.null(default_install)) {
     spark_install_find()$sparkVersionDir
@@ -69,17 +73,20 @@ spark_compile <- function(jar_name,
   root <- package_root()
 
   env_jar_path <- Sys.getenv("R_SPARKINSTALL_COMPILE_JAR_PATH", unset = NA)
-  if(is.na(env_jar_path)) {
+  if (is.na(env_jar_path)) {
     java_path <- file.path(root, "inst/java")
   } else {
-    if(!dir.exists(env_jar_path)) dir.create(env_jar_path)
+    if (!dir.exists(env_jar_path)) {
+      dir.create(env_jar_path)
+    }
     java_path <- env_jar_path
   }
 
   jar_path <- file.path(java_path, jar_name)
 
   scala_path <- file.path(root, "java")
-  scala_files <- list.files(scala_path,
+  scala_files <- list.files(
+    scala_path,
     pattern = "scala$",
     full.names = TRUE,
     recursive = TRUE
@@ -106,7 +113,7 @@ spark_compile <- function(jar_name,
     "*" = paste("Building against Spark:", spark_version),
     "*" = paste("Embedded source(s):", paste(embedded_srcs, collapse = ", ")),
     "*" = paste("Building:", jar_name)
-    ))
+  ))
 
   # list jars in the installation folder
   candidates <- c("jars", "lib")
@@ -136,7 +143,11 @@ spark_compile <- function(jar_name,
   temp_out <- tempfile(fileext = ".txt")
   classpath <- paste(jars, collapse = .Platform$path.sep)
   scala_files_quoted <- paste(shQuote(scala_files), collapse = " ")
-  optflag <- ifelse(grepl("2.12", scalac_version), "-opt:l:default", "-optimise")
+  optflag <- ifelse(
+    grepl("2.12", scalac_version),
+    "-opt:l:default",
+    "-optimise"
+  )
   withr::with_envvar(
     list(CLASSPATH = classpath),
     withr::with_dir(
@@ -171,7 +182,9 @@ spark_compile <- function(jar_name,
     rlang::abort(paste("Failed to create:", jar_name))
   }
 
-  rlang::inform(c("i" =  paste0("'", basename(jar_path), "' successfully created")))
+  rlang::inform(c(
+    "i" = paste0("'", basename(jar_path), "' successfully created")
+  ))
   TRUE
 }
 
@@ -190,7 +203,6 @@ spark_compile <- function(jar_name,
 #'
 #' @export
 compile_package_jars <- function(..., spec = NULL) {
-
   # unpack compilation specification
   spec <- spec %||% list(...)
   if (!length(spec)) {
@@ -220,7 +232,7 @@ compile_package_jars <- function(..., spec = NULL) {
           hadoop_version = NULL,
           installed_only = TRUE,
           latest = FALSE
-          )
+        )
         spark_version <- installInfo$sparkVersion
         spark_home <- installInfo$sparkVersionDir
       } else {
@@ -274,14 +286,16 @@ compile_package_jars <- function(..., spec = NULL) {
 #'   be included in the root of the resulting jar file as resources
 #'
 #' @export
-spark_compilation_spec <- function(spark_version = NULL,
-                                   spark_home = NULL,
-                                   scalac_path = NULL,
-                                   scala_filter = NULL,
-                                   jar_name = NULL,
-                                   jar_path = NULL,
-                                   jar_dep = NULL,
-                                   embedded_srcs = "embedded_sources.R") {
+spark_compilation_spec <- function(
+  spark_version = NULL,
+  spark_home = NULL,
+  scalac_path = NULL,
+  scala_filter = NULL,
+  jar_name = NULL,
+  jar_path = NULL,
+  jar_dep = NULL,
+  embedded_srcs = "embedded_sources.R"
+) {
   spark_home <- spark_home %||% spark_home_dir(spark_version)
   spark_version <- spark_version %||% spark_version_from_home(spark_home)
 
@@ -303,10 +317,14 @@ find_jar <- function() {
     p_jar <- normalizePath(
       file.path(env_java_jome, "bin", "jar"),
       mustWork = FALSE
-      )
+    )
     p_res <- NULL
-    if(file.exists(p_jar)) p_res <- p_jar
-    if(is.null(p_res)) p_res <- system2("which", "jar", stdout = TRUE)
+    if (file.exists(p_jar)) {
+      p_res <- p_jar
+    }
+    if (is.null(p_res)) {
+      p_res <- system2("which", "jar", stdout = TRUE)
+    }
     p_res
   } else {
     NULL
@@ -324,9 +342,10 @@ find_jar <- function() {
 #'   be scanned.
 #'
 #' @export
-spark_default_compilation_spec <- function(pkg = infer_active_package_name(),
-                                           locations = NULL) {
-
+spark_default_compilation_spec <- function(
+  pkg = infer_active_package_name(),
+  locations = NULL
+) {
   spec_list <- sparklyr_jar_spec_list()
 
   jar_location <- find_jar()
@@ -342,9 +361,15 @@ spark_default_compilation_spec <- function(pkg = infer_active_package_name(),
         scala_filter = make_version_filter(x$spark)
       )
 
-      if(!is.null(x$jar_name)) args$jar_name <- x$jar_name
-      if(!is.null(x$scala_filter)) args$scala_filter <- make_version_filter(x$scala_filter)
-      if(!is.null(x$remove_srcs)) args <- c(args, list(embedded_srcs = c()))
+      if (!is.null(x$jar_name)) {
+        args$jar_name <- x$jar_name
+      }
+      if (!is.null(x$scala_filter)) {
+        args$scala_filter <- make_version_filter(x$scala_filter)
+      }
+      if (!is.null(x$remove_srcs)) {
+        args <- c(args, list(embedded_srcs = c()))
+      }
       do.call(spark_compilation_spec, args)
     }
   )
@@ -372,7 +397,7 @@ download_scalac <- function(dest_path = NULL) {
     dir.create(dest_path, recursive = TRUE)
   }
   ext <- ifelse(os_is_windows(), "zip", "tgz")
-  download_urls <-  paste0(
+  download_urls <- paste0(
     c(
       "https://downloads.lightbend.com/scala/2.13.15/scala-2.13.15",
       "https://downloads.lightbend.com/scala/2.12.20/scala-2.12.20",
@@ -382,12 +407,12 @@ download_scalac <- function(dest_path = NULL) {
     ext
   )
 
-  for(download_url in download_urls) {
+  for (download_url in download_urls) {
     dest_file <- file.path(dest_path, basename(download_url))
     if (!dir.exists(dirname(dest_file))) {
       dir.create(dirname(dest_file), recursive = TRUE)
     }
-    if(!file.exists(dest_file)) {
+    if (!file.exists(dest_file)) {
       cat("- ", "Downloading and expanding:", download_url, "\n")
       download_file(download_url, destfile = dest_file)
       if (ext == "zip") {
@@ -440,7 +465,8 @@ find_scalac <- function(version, locations = NULL) {
     return(scalac_path)
   }
 
-  stopf("failed to discover scala-%s compiler -- search paths were:\n%s",
+  stopf(
+    "failed to discover scala-%s compiler -- search paths were:\n%s",
     version,
     paste("-", shQuote(locations), collapse = "\n"),
     call. = FALSE
@@ -449,7 +475,7 @@ find_scalac <- function(version, locations = NULL) {
 
 scalac_default_locations <- function() {
   if (os_is_windows()) {
-      path.expand("~/scala")
+    path.expand("~/scala")
   } else {
     c(
       path.expand("~/scala"),
@@ -475,52 +501,65 @@ make_version_filter <- function(version_upper) {
   force(version_upper)
 
   function(files) {
-    Filter(function(file) {
-      maybe_version <- file %>%
-        dirname() %>%
-        basename() %>%
-        strsplit("-") %>%
-        unlist() %>%
-        dplyr::last()
+    Filter(
+      function(file) {
+        maybe_version <- file %>%
+          dirname() %>%
+          basename() %>%
+          strsplit("-") %>%
+          unlist() %>%
+          dplyr::last()
 
-      if (grepl("([0-9]+\\.){2}[0-9]+", maybe_version)) {
-        if (version_upper == "master") {
-          use_file <- TRUE
+        if (grepl("([0-9]+\\.){2}[0-9]+", maybe_version)) {
+          if (version_upper == "master") {
+            use_file <- TRUE
+          } else {
+            use_file <- numeric_version(maybe_version) <=
+              numeric_version(version_upper)
+          }
+          file_name <- basename(file)
+
+          # is there is more than one file with the same name
+          if (sum(file_name == basename(files)) > 1) {
+            repeated_names <- Filter(function(e) grepl(file_name, e), files)
+            other_versions <- repeated_names %>%
+              dirname() %>%
+              basename() %>%
+              strsplit("-") %>%
+              sapply(function(e) e[-1]) %>%
+              numeric_version() %>%
+              Filter(
+                function(e) {
+                  if (version_upper == "master") {
+                    TRUE
+                  } else {
+                    e <= numeric_version(version_upper)
+                  }
+                },
+                .
+              )
+
+            # only use the file with the biggest version
+            numeric_version(maybe_version) == max(other_versions)
+          } else {
+            use_file
+          }
         } else {
-          use_file <- numeric_version(maybe_version) <= numeric_version(version_upper)
+          TRUE
         }
-        file_name <- basename(file)
-
-        # is there is more than one file with the same name
-        if (sum(file_name == basename(files)) > 1) {
-          repeated_names <- Filter(function(e) grepl(file_name, e), files)
-          other_versions <- repeated_names %>%
-            dirname() %>%
-            basename() %>%
-            strsplit("-") %>%
-            sapply(function(e) e[-1]) %>%
-            numeric_version() %>%
-            Filter(function(e) if (version_upper == "master") TRUE else e <= numeric_version(version_upper), .)
-
-          # only use the file with the biggest version
-          numeric_version(maybe_version) == max(other_versions)
-        }
-        else {
-          use_file
-        }
-      } else {
-        TRUE
-      }
-    }, files)
+      },
+      files
+    )
   }
 }
 
 #' list all sparklyr-*.jar files that have been built
 list_sparklyr_jars <- function() {
   normalizePath(dir(
-      file.path(package_root(), "inst", "java"),
-      full.names = TRUE, pattern = "sparklyr-.+\\.jar"
-    ))
+    file.path(package_root(), "inst", "java"),
+    full.names = TRUE,
+    pattern = "sparklyr-.+\\.jar"
+  ))
 }
 
 package_root <- function() {

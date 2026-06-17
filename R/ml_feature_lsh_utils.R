@@ -8,7 +8,10 @@ make_approx_nearest_neighbors <- function(jobj) {
     jobj %>%
       invoke(
         "approxNearestNeighbors",
-        dataset, key, num_nearest_neighbors, dist_col
+        dataset,
+        key,
+        num_nearest_neighbors,
+        dist_col
       ) %>%
       sdf_register()
   }
@@ -24,13 +27,19 @@ make_approx_similarity_join <- function(jobj) {
     jobj %>%
       invoke(
         "approxSimilarityJoin",
-        dataset_a, dataset_b, threshold, dist_col
+        dataset_a,
+        dataset_b,
+        threshold,
+        dist_col
       ) %>%
-      invoke("select", list(
-        spark_sql_column(sc, "datasetA.id", "id_a"),
-        spark_sql_column(sc, "datasetB.id", "id_b"),
-        spark_sql_column(sc, dist_col)
-      )) %>%
+      invoke(
+        "select",
+        list(
+          spark_sql_column(sc, "datasetA.id", "id_a"),
+          spark_sql_column(sc, "datasetB.id", "id_b"),
+          spark_sql_column(sc, dist_col)
+        )
+      ) %>%
       sdf_register()
   }
 }
@@ -46,7 +55,12 @@ make_approx_similarity_join <- function(jobj) {
 #' @param dist_col Output column for storing the distance between each result row and the key.
 #' @export
 ml_approx_nearest_neighbors <- function(
-                                        model, dataset, key, num_nearest_neighbors, dist_col = "distCol") {
+  model,
+  dataset,
+  key,
+  num_nearest_neighbors,
+  dist_col = "distCol"
+) {
   model$approx_nearest_neighbors(dataset, key, num_nearest_neighbors, dist_col)
 }
 
@@ -56,6 +70,11 @@ ml_approx_nearest_neighbors <- function(
 #' @param threshold The threshold for the distance of row pairs.
 #' @export
 ml_approx_similarity_join <- function(
-                                      model, dataset_a, dataset_b, threshold, dist_col = "distCol") {
+  model,
+  dataset_a,
+  dataset_b,
+  threshold,
+  dist_col = "distCol"
+) {
   model$approx_similarity_join(dataset_a, dataset_b, threshold, dist_col)
 }

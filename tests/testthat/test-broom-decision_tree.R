@@ -4,7 +4,6 @@ skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("decision_tree.tidy() works", {
-
   ## ---------------- Connection and data upload to Spark ----------------------
 
   sc <- testthat_spark_connection()
@@ -26,8 +25,6 @@ test_that("decision_tree.tidy() works", {
 
   expect_equal(td1$importance, c(0.94, 0.0603), tolerance = 0.001, scale = 1)
 
-
-
   # for regression
   td2 <- tidy(dt_regression)
 
@@ -35,32 +32,27 @@ test_that("decision_tree.tidy() works", {
 
   expect_equal(td2$importance, c(0.954, 0.0456), tolerance = 0.001, scale = 1)
 
-
-
   ## --------------------------- augment() -------------------------------------
 
   iris_vars <- dplyr::tbl_vars(iris_tbl)
 
   # for classification without newdata
-  au1 <-  collect(augment(dt_classification))
+  au1 <- collect(augment(dt_classification))
 
-  check_tidy(au1,
-             exp.row = nrow(iris),
-             exp.name = c(iris_vars, ".predicted_label")
-             )
+  check_tidy(
+    au1,
+    exp.row = nrow(iris),
+    exp.name = c(iris_vars, ".predicted_label")
+  )
 
   # for regression with newdata
 
   top_25 <- iris_tbl %>%
     head(25)
 
-  au2 <-collect(augment(dt_regression, top_25))
+  au2 <- collect(augment(dt_regression, top_25))
 
-  check_tidy(au2,
-             exp.row = 25,
-             exp.name = c(iris_vars, ".prediction")
-             )
-
+  check_tidy(au2, exp.row = 25, exp.name = c(iris_vars, ".prediction"))
 
   ## ---------------------------- glance() -------------------------------------
 
@@ -71,15 +63,10 @@ test_that("decision_tree.tidy() works", {
 
   check_tidy(gl1, exp.row = 1, exp.names = gl_names)
 
-
-
   # for regression
   gl2 <- glance(dt_regression)
 
-  check_tidy(gl2,
-    exp.row = 1,
-    exp.names = gl_names
-  )
+  check_tidy(gl2, exp.row = 1, exp.names = gl_names)
 
   dt_classification_parsnip <- parsnip::decision_tree(engine = "spark") %>%
     parsnip::set_mode("classification") %>%
@@ -112,11 +99,7 @@ test_that("decision_tree.tidy() works", {
   expect_true(
     all(tidy(dt_regression_parsnip) == td2)
   )
-
-
-
 })
 
 
 test_clear_cache()
-

@@ -18,4 +18,3 @@ test_that("jarray() works as expected", {
 })
 
 test_clear_cache()
-

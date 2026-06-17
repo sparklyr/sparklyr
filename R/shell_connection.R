@@ -1,6 +1,8 @@
 shell_connection_validate_config <- function(config) {
   if ("spark.jars.default" %in% names(config)) {
-    warning("The spark.jars.default config parameter is deprecated, please use sparklyr.jars.default")
+    warning(
+      "The spark.jars.default config parameter is deprecated, please use sparklyr.jars.default"
+    )
     config[["sparklyr.jars.default"]] <- config[["spark.jars.default"]]
   }
 
@@ -8,19 +10,21 @@ shell_connection_validate_config <- function(config) {
 }
 
 # create a shell connection
-shell_connection <- function(master,
-                             spark_home,
-                             method = "",
-                             app_name,
-                             version,
-                             hadoop_version,
-                             shell_args,
-                             config,
-                             service,
-                             remote,
-                             extensions,
-                             batch,
-                             scala_version = NULL) {
+shell_connection <- function(
+  master,
+  spark_home,
+  method = "",
+  app_name,
+  version,
+  hadoop_version,
+  shell_args,
+  config,
+  service,
+  remote,
+  extensions,
+  batch,
+  scala_version = NULL
+) {
   # trigger deprecated warnings
   config <- shell_connection_validate_config(config)
 
@@ -66,7 +70,10 @@ shell_connection <- function(master,
   }
 
   # apply environment variables
-  sparkEnvironmentVars <- connection_config(list(config = config, master = master), "spark.env.")
+  sparkEnvironmentVars <- connection_config(
+    list(config = config, master = master),
+    "spark.env."
+  )
   lapply(names(sparkEnvironmentVars), function(varName) {
     environment[[varName]] <<- sparkEnvironmentVars[[varName]]
   })
@@ -78,8 +85,15 @@ shell_connection <- function(master,
     spark_version = version,
     app_name = app_name,
     config = config,
-    jars = spark_config_value(config, c("sparklyr.connect.jars", "sparklyr.jars.default"), list()),
-    packages = spark_config_value(config, c("sparklyr.connect.packages", "sparklyr.defaultPackages")),
+    jars = spark_config_value(
+      config,
+      c("sparklyr.connect.jars", "sparklyr.jars.default"),
+      list()
+    ),
+    packages = spark_config_value(
+      config,
+      c("sparklyr.connect.packages", "sparklyr.defaultPackages")
+    ),
     extensions = extensions,
     environment = environment,
     shell_args = shell_args,
@@ -105,81 +119,106 @@ spark_session_random <- function() {
   floor(rand_num(1) * 100000)
 }
 
-abort_shell <- function(message, spark_submit_path, shell_args, output_file, error_file) {
-  withr::with_options(list(
-    warning.length = 8000
-  ), {
-    maxRows <- 100
+abort_shell <- function(
+  message,
+  spark_submit_path,
+  shell_args,
+  output_file,
+  error_file
+) {
+  withr::with_options(
+    list(
+      warning.length = 8000
+    ),
+    {
+      maxRows <- 100
 
-    # sleep for one second to allow spark process to dump data into the log file
-    Sys.sleep(1)
+      # sleep for one second to allow spark process to dump data into the log file
+      Sys.sleep(1)
 
-    logLines <- if (!is.null(output_file) && file.exists(output_file)) {
-      outputContent <- readLines(output_file)
-      paste(tail(outputContent, n = maxRows), collapse = "\n")
-    } else {
-      ""
-    }
+      logLines <- if (!is.null(output_file) && file.exists(output_file)) {
+        outputContent <- readLines(output_file)
+        paste(tail(outputContent, n = maxRows), collapse = "\n")
+      } else {
+        ""
+      }
 
-    errorLines <- if (!is.null(error_file) && file.exists(error_file)) {
-      paste(tail(readLines(error_file), n = maxRows), collapse = "\n")
-    } else {
-      ""
-    }
+      errorLines <- if (!is.null(error_file) && file.exists(error_file)) {
+        paste(tail(readLines(error_file), n = maxRows), collapse = "\n")
+      } else {
+        ""
+      }
 
-    stop(
-      paste(
-        message, "\n",
-        if (!is.null(spark_submit_path)) {
-          paste("    Path: ", spark_submit_path, "\n", sep = "")
-        } else {
-          ""
-        },
-        if (!is.null(shell_args)) {
-          paste("    Parameters: ", paste(shell_args, collapse = ", "), "\n", sep = "")
-        } else {
-          ""
-        },
-        if (!is.null(output_file)) {
-          paste("    Log: ", output_file, "\n", sep = "")
-        } else {
-          ""
-        },
-        "\n\n",
-        if (!is.null(output_file)) "---- Output Log ----\n" else "",
-        logLines,
-        "\n\n",
-        if (!is.null(error_file)) "---- Error Log ----\n" else "",
-        errorLines,
-        sep = ""
+      stop(
+        paste(
+          message,
+          "\n",
+          if (!is.null(spark_submit_path)) {
+            paste("    Path: ", spark_submit_path, "\n", sep = "")
+          } else {
+            ""
+          },
+          if (!is.null(shell_args)) {
+            paste(
+              "    Parameters: ",
+              paste(shell_args, collapse = ", "),
+              "\n",
+              sep = ""
+            )
+          } else {
+            ""
+          },
+          if (!is.null(output_file)) {
+            paste("    Log: ", output_file, "\n", sep = "")
+          } else {
+            ""
+          },
+          "\n\n",
+          if (!is.null(output_file)) "---- Output Log ----\n" else "",
+          logLines,
+          "\n\n",
+          if (!is.null(error_file)) "---- Error Log ----\n" else "",
+          errorLines,
+          sep = ""
+        )
       )
-    )
-  })
+    }
+  )
 
   print("\nLocal stack trace:\n")
   print(sys.calls())
 }
 
 # Start the Spark R Shell
-start_shell <- function(master,
-                        spark_home = Sys.getenv("SPARK_HOME"),
-                        spark_version = NULL,
-                        app_name = "sparklyr",
-                        config = list(),
-                        extensions,
-                        jars = NULL,
-                        packages = NULL,
-                        environment = NULL,
-                        shell_args = NULL,
-                        service = FALSE,
-                        remote = FALSE,
-                        batch = NULL,
-                        scala_version = NULL,
-                        gateway_connect_attempts = 5,
-                        gateway_connect_retry_interval_s = 0.25,
-                        gateway_connect_retry_interval_multiplier = 2) {
-  gatewayPort <- as.integer(spark_config_value(config, "sparklyr.gateway.port", "8880"))
-  gatewayAddress <- spark_config_value(config, "sparklyr.gateway.address", "localhost")
+start_shell <- function(
+  master,
+  spark_home = Sys.getenv("SPARK_HOME"),
+  spark_version = NULL,
+  app_name = "sparklyr",
+  config = list(),
+  extensions,
+  jars = NULL,
+  packages = NULL,
+  environment = NULL,
+  shell_args = NULL,
+  service = FALSE,
+  remote = FALSE,
+  batch = NULL,
+  scala_version = NULL,
+  gateway_connect_attempts = 5,
+  gateway_connect_retry_interval_s = 0.25,
+  gateway_connect_retry_interval_multiplier = 2
+) {
+  gatewayPort <- as.integer(spark_config_value(
+    config,
+    "sparklyr.gateway.port",
+    "8880"
+  ))
+  gatewayAddress <- spark_config_value(
+    config,
+    "sparklyr.gateway.address",
+    "localhost"
+  )
   isService <- service
   isRemote <- remote
   isBatch <- !is.null(batch)
@@ -208,12 +247,22 @@ start_shell <- function(master,
   shQuoteType <- if (.Platform$OS.type == "windows") "cmd" else NULL
 
   if (is.null(gatewayInfo) || gatewayInfo$backendPort == 0) {
-    versionSparkHome <- spark_version_from_home(spark_home, default = spark_version)
+    versionSparkHome <- spark_version_from_home(
+      spark_home,
+      default = spark_version
+    )
 
     # read app jar through config, this allows "sparkr-shell" to test sparkr backend
-    app_jar <- spark_config_value(config, c("sparklyr.connect.app.jar", "sparklyr.app.jar"), NULL)
+    app_jar <- spark_config_value(
+      config,
+      c("sparklyr.connect.app.jar", "sparklyr.app.jar"),
+      NULL
+    )
     if (is.null(app_jar)) {
-      app_jar <- spark_default_app_jar(versionSparkHome, scala_version = scala_version)
+      app_jar <- spark_default_app_jar(
+        versionSparkHome,
+        scala_version = scala_version
+      )
       if (typeof(app_jar) != "character" || nchar(app_jar) == 0) {
         stop("sparklyr does not support Spark version: ", versionSparkHome)
       }
@@ -222,13 +271,18 @@ start_shell <- function(master,
         warning("sparklyr does not support Spark version: ", versionSparkHome)
       }
 
-      app_jar <- shQuote(normalizePath(app_jar, mustWork = FALSE), type = shQuoteType)
+      app_jar <- shQuote(
+        normalizePath(app_jar, mustWork = FALSE),
+        type = shQuoteType
+      )
       shell_args <- c(shell_args, "--class", "sparklyr.Shell")
     }
 
     # validate and normalize spark_home
     if (!nzchar(spark_home)) {
-      stop("No spark_home specified (defaults to SPARK_HOME environment varirable).")
+      stop(
+        "No spark_home specified (defaults to SPARK_HOME environment varirable)."
+      )
     }
     if (!dir.exists(spark_home)) {
       stop("SPARK_HOME directory '", spark_home, "' not found")
@@ -247,30 +301,47 @@ start_shell <- function(master,
     }
 
     # determine path to spark_submit
-    spark_submit <- switch(.Platform$OS.type,
+    spark_submit <- switch(
+      .Platform$OS.type,
       unix = c("spark2-submit", "spark-submit"),
       windows = "spark-submit2.cmd"
     )
 
     # allow users to override spark-submit if needed
-    spark_submit <- spark_config_value(config, c("sparklyr.connect.sparksubmit", "sparklyr.spark-submit"), spark_submit)
+    spark_submit <- spark_config_value(
+      config,
+      c("sparklyr.connect.sparksubmit", "sparklyr.spark-submit"),
+      spark_submit
+    )
 
     spark_submit_paths <- unlist(lapply(
       spark_submit,
       function(submit_path) {
-        normalizePath(file.path(spark_home, "bin", submit_path), mustWork = FALSE)
+        normalizePath(
+          file.path(spark_home, "bin", submit_path),
+          mustWork = FALSE
+        )
       }
     ))
 
     if (!any(file.exists(spark_submit_paths))) {
-      stop("Failed to find '", paste(spark_submit, collapse = "' or '"), "' under '", spark_home, "', please verify SPARK_HOME.")
+      stop(
+        "Failed to find '",
+        paste(spark_submit, collapse = "' or '"),
+        "' under '",
+        spark_home,
+        "', please verify SPARK_HOME."
+      )
     }
 
-    spark_submit_path <- spark_submit_paths[[which(file.exists(spark_submit_paths))[[1]]]]
+    spark_submit_path <- spark_submit_paths[[which(file.exists(
+      spark_submit_paths
+    ))[[1]]]]
 
     # resolve extensions
     spark_version <- numeric_version(
-      ifelse(is.null(spark_version),
+      ifelse(
+        is.null(spark_version),
         spark_version_from_home(spark_home),
         gsub("[-_a-zA-Z]", "", spark_version)
       )
@@ -284,31 +355,46 @@ start_shell <- function(master,
     # spark.sql.legacy.codingErrorAction to true. For example, if you try to
     # decode a string value tést / [116, -23, 115, 116] (encoded in latin1) with
     # 'UTF-8', you get t�st.
-    if(spark_version >= "4") {
+    if (spark_version >= "4") {
       config$mergedConfigspark.sql.legacy.codingErrorAction <- TRUE
     }
 
-    extensions <- spark_dependencies_from_extensions(spark_version, scala_version, extensions, config)
+    extensions <- spark_dependencies_from_extensions(
+      spark_version,
+      scala_version,
+      extensions,
+      config
+    )
 
     # combine passed jars and packages with extensions
     all_jars <- c(jars, extensions$jars)
-    jars <- if (length(all_jars) > 0) normalizePath(unlist(unique(all_jars))) else list()
+    jars <- if (length(all_jars) > 0) {
+      normalizePath(unlist(unique(all_jars)))
+    } else {
+      list()
+    }
     packages <- unique(c(packages, extensions$packages))
     repositories <- extensions$repositories
 
     # include embedded jars, if needed
-    csv_config_value <- spark_config_value(config, c("sparklyr.connect.csv.embedded", "sparklyr.csv.embedded"))
-    if (!is.null(csv_config_value) &&
-      length(grep(csv_config_value, spark_version)) > 0) {
+    csv_config_value <- spark_config_value(
+      config,
+      c("sparklyr.connect.csv.embedded", "sparklyr.csv.embedded")
+    )
+    if (
+      !is.null(csv_config_value) &&
+        length(grep(csv_config_value, spark_version)) > 0
+    ) {
       packages <- c(packages, "com.univocity:univocity-parsers:1.5.1")
-      if (spark_config_value(config, c("sparklyr.connect.csv.scala11"), FALSE)) {
+      if (
+        spark_config_value(config, c("sparklyr.connect.csv.scala11"), FALSE)
+      ) {
         packages <- c(
           packages,
           "com.databricks:spark-csv_2.11:1.5.0",
           "org.apache.commons:commons-csv:1.5"
         )
-      }
-      else {
+      } else {
         packages <- c(
           packages,
           "com.databricks:spark-csv_2.10:1.5.0",
@@ -319,17 +405,29 @@ start_shell <- function(master,
 
     # add jars to arguments
     if (length(jars) > 0) {
-      shell_args <- c(shell_args, "--jars", paste(shQuote(jars, type = shQuoteType), collapse = ","))
+      shell_args <- c(
+        shell_args,
+        "--jars",
+        paste(shQuote(jars, type = shQuoteType), collapse = ",")
+      )
     }
 
     # add packages to arguments
     if (length(packages) > 0) {
-      shell_args <- c(shell_args, "--packages", paste(shQuote(packages, type = shQuoteType), collapse = ","))
+      shell_args <- c(
+        shell_args,
+        "--packages",
+        paste(shQuote(packages, type = shQuoteType), collapse = ",")
+      )
     }
 
     # add repositories to arguments
     if (length(repositories) > 0) {
-      shell_args <- c(shell_args, "--repositories", paste(repositories, collapse = ","))
+      shell_args <- c(
+        shell_args,
+        "--repositories",
+        paste(repositories, collapse = ",")
+      )
     }
 
     # add environment parameters to arguments
@@ -360,8 +458,14 @@ start_shell <- function(master,
     }
 
     # create temp file for stdout and stderr
-    output_file <- Sys.getenv("SPARKLYR_LOG_FILE", tempfile(fileext = "_spark.log"))
-    error_file <- Sys.getenv("SPARKLYR_LOG_FILE", tempfile(fileext = "_spark.err"))
+    output_file <- Sys.getenv(
+      "SPARKLYR_LOG_FILE",
+      tempfile(fileext = "_spark.log")
+    )
+    error_file <- Sys.getenv(
+      "SPARKLYR_LOG_FILE",
+      tempfile(fileext = "_spark.err")
+    )
 
     console_log <- spark_config_exists(config, "sparklyr.log.console", FALSE)
 
@@ -377,7 +481,8 @@ start_shell <- function(master,
     # start the shell (w/ specified additional environment variables)
     env <- unlist(as.list(environment))
     withr::with_envvar(env, {
-      system2(spark_submit_path,
+      system2(
+        spark_submit_path,
         args = shell_args,
         stdout = stdout_param,
         stderr = stderr_param,
@@ -386,7 +491,10 @@ start_shell <- function(master,
     })
 
     # support custom operations after spark-submit useful to enable port forwarding
-    spark_config_value(config, c("sparklyr.connect.aftersubmit", "sparklyr.events.aftersubmit"))
+    spark_config_value(
+      config,
+      c("sparklyr.connect.aftersubmit", "sparklyr.events.aftersubmit")
+    )
 
     # batch connections only use the shell to submit an application, not to connect.
     if (identical(batch, TRUE)) {
@@ -394,21 +502,41 @@ start_shell <- function(master,
     }
 
     # for yarn-cluster
-    if (spark_master_is_yarn_cluster(master, config) && is.null(config[["sparklyr.gateway.address"]])) {
-      gatewayAddress <- config[["sparklyr.gateway.address"]] <- spark_yarn_cluster_get_gateway(config, start_time)
+    if (
+      spark_master_is_yarn_cluster(master, config) &&
+        is.null(config[["sparklyr.gateway.address"]])
+    ) {
+      gatewayAddress <- config[[
+        "sparklyr.gateway.address"
+      ]] <- spark_yarn_cluster_get_gateway(config, start_time)
     }
 
     # reload port and address to let kubernetes hooks find the right container
-    gatewayConfigRetries <- spark_config_value(config, "sparklyr.gateway.config.retries", 10)
-    gatewayPort <- as.integer(spark_config_value_retries(config, "sparklyr.gateway.port", "8880", gatewayConfigRetries))
-    gatewayAddress <- spark_config_value_retries(config, "sparklyr.gateway.address", "localhost", gatewayConfigRetries)
+    gatewayConfigRetries <- spark_config_value(
+      config,
+      "sparklyr.gateway.config.retries",
+      10
+    )
+    gatewayPort <- as.integer(spark_config_value_retries(
+      config,
+      "sparklyr.gateway.port",
+      "8880",
+      gatewayConfigRetries
+    ))
+    gatewayAddress <- spark_config_value_retries(
+      config,
+      "sparklyr.gateway.address",
+      "localhost",
+      gatewayConfigRetries
+    )
 
     while (gateway_connect_attempts > 0) {
       gateway_connect_attempts <- gateway_connect_attempts - 1
       withCallingHandlers(
         {
           # connect and wait for the service to start
-          gatewayInfo <- spark_connect_gateway(gatewayAddress,
+          gatewayInfo <- spark_connect_gateway(
+            gatewayAddress,
             gatewayPort,
             sessionId,
             config = config,
@@ -420,7 +548,8 @@ start_shell <- function(master,
           if (gateway_connect_attempts > 0) {
             Sys.sleep(gateway_connect_retry_interval_s)
             gateway_connect_retry_interval_s <-
-              gateway_connect_retry_interval_s * gateway_connect_retry_interval_multiplier
+              gateway_connect_retry_interval_s *
+              gateway_connect_retry_interval_multiplier
           } else {
             abort_shell(
               paste(
@@ -431,8 +560,7 @@ start_shell <- function(master,
                     ") and address (",
                     gatewayAddress
                   )
-                }
-                else {
+                } else {
                   ""
                 },
                 ") for sessionid (",
@@ -514,11 +642,15 @@ start_shell <- function(master,
   ))
 
   # stop shell on R exit
-  reg.finalizer(baseenv(), function(x) {
-    if (connection_is_open(sc)) {
-      stop_shell(sc)
-    }
-  }, onexit = TRUE)
+  reg.finalizer(
+    baseenv(),
+    function(x) {
+      if (connection_is_open(sc)) {
+        stop_shell(sc)
+      }
+    },
+    onexit = TRUE
+  )
 
   sc
 }
@@ -532,7 +664,11 @@ spark_disconnect.spark_shell_connection <- function(sc, ...) {
 
 # Stop the Spark R Shell
 stop_shell <- function(sc, terminate = FALSE) {
-  terminationMode <- if (terminate == TRUE) "terminateBackend" else "stopBackend"
+  terminationMode <- if (terminate == TRUE) {
+    "terminateBackend"
+  } else {
+    "stopBackend"
+  }
 
   # use monitoring connection to terminate
   sc$state$use_monitoring <- TRUE
@@ -557,8 +693,7 @@ connection_is_open.spark_shell_connection <- function(sc) {
       {
         bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
       },
-      error = function(e) {
-      }
+      error = function(e) {}
     )
   }
   bothOpen
@@ -593,12 +728,24 @@ spark_log.spark_shell_connection <- function(sc, n = 100, filter = NULL, ...) {
 }
 
 #' @export
-invoke_method.spark_shell_connection <- function(sc, static, object, method, ...) {
+invoke_method.spark_shell_connection <- function(
+  sc,
+  static,
+  object,
+  method,
+  ...
+) {
   core_invoke_method(sc, static, object, method, FALSE, ...)
 }
 
 #' @export
-j_invoke_method.spark_shell_connection <- function(sc, static, object, method, ...) {
+j_invoke_method.spark_shell_connection <- function(
+  sc,
+  static,
+  object,
+  method,
+  ...
+) {
   core_invoke_method(sc, static, object, method, TRUE, ...)
 }
 
@@ -637,23 +784,27 @@ initialize_connection.spark_shell_connection <- function(sc) {
     # create the spark config
     settings <- list(list("setAppName", sc$app_name))
 
-    if (!spark_master_is_yarn_cluster(sc$master, sc$config) &&
-      !spark_master_is_gateway(sc$master)) {
+    if (
+      !spark_master_is_yarn_cluster(sc$master, sc$config) &&
+        !spark_master_is_gateway(sc$master)
+    ) {
       settings <- c(settings, list(list("setMaster", sc$master)))
 
       if (!is.null(sc$spark_home)) {
         settings <- c(settings, list(list("setSparkHome", sc$spark_home)))
       }
     }
-    conf <- invoke_new(sc, "org.apache.spark.SparkConf") %>% (
-      function(obj) do.call(invoke, c(obj, "%>%", settings))
-    )
+    conf <- invoke_new(sc, "org.apache.spark.SparkConf") %>%
+      (function(obj) do.call(invoke, c(obj, "%>%", settings)))
 
     context_config <- connection_config(sc, "spark.", c("spark.sql."))
     apply_config(conf, context_config, "set", "spark.")
 
     default_config <- shell_connection_config_defaults()
-    default_config_remove <- Filter(function(e) e %in% names(context_config), names(default_config))
+    default_config_remove <- Filter(
+      function(e) e %in% names(context_config),
+      names(default_config)
+    )
     default_config[default_config_remove] <- NULL
     apply_config(conf, default_config, "set", "spark.")
 
@@ -677,7 +828,11 @@ initialize_connection.spark_shell_connection <- function(sc) {
           "builder"
         ) %>%
           invoke("config", conf) %>%
-          apply_config(connection_config(sc, "spark.sql."), "config", "spark.sql.")
+          apply_config(
+            connection_config(sc, "spark.sql."),
+            "config",
+            "spark.sql."
+          )
 
         if (identical(sc$state$hive_support_enabled, TRUE)) {
           invoke(session_builder, "enableHiveSupport")
@@ -689,15 +844,18 @@ initialize_connection.spark_shell_connection <- function(sc) {
         sc$state$hive_context <- session
 
         # Set the `SparkContext`.
-        sc$state$spark_context <- sc$state$spark_context %||% invoke(session, "sparkContext")
+        sc$state$spark_context <- sc$state$spark_context %||%
+          invoke(session, "sparkContext")
       }
 
       if (is.null(spark_context(sc))) {
         # create the spark context and assign the connection to it
         # use spark home version since spark context is not yet initialized in shell connection
         # but spark_home might not be initialized in submit_batch while spark context is available
-        if ((!identical(sc$home_version, NULL) && sc$home_version >= "2.0") ||
-          (!identical(spark_context(sc), NULL) && spark_version(sc) >= "2.0")) {
+        if (
+          (!identical(sc$home_version, NULL) && sc$home_version >= "2.0") ||
+            (!identical(spark_context(sc), NULL) && spark_version(sc) >= "2.0")
+        ) {
           init_hive_ctx_for_spark_2_plus()
         } else {
           sc$state$spark_context <- invoke_static(
@@ -717,7 +875,10 @@ initialize_connection.spark_shell_connection <- function(sc) {
               NULL
             }
           )
-          if (!identical(actual_spark_version, NULL) && actual_spark_version >= "2.0") {
+          if (
+            !identical(actual_spark_version, NULL) &&
+              actual_spark_version >= "2.0"
+          ) {
             init_hive_ctx_for_spark_2_plus()
           }
         }
@@ -729,44 +890,45 @@ initialize_connection.spark_shell_connection <- function(sc) {
 
       # If Spark version is 2.0.0 or above, hive_context should be initialized by now.
       # So if that's not the case, then attempt to initialize it assuming Spark version is below 2.0.0
-      sc$state$hive_context <- sc$state$hive_context %||% tryCatch(
-        invoke_new(
-          sc,
-          if (identical(sc$state$hive_support_enabled, TRUE)) {
-            "org.apache.spark.sql.hive.HiveContext"
-          } else {
-            "org.apache.spark.sql.SQLContext"
-          },
-          sc$state$spark_context
-        ),
-        error = function(e) {
-          warning(e$message)
-          warning(
-            "Failed to create Hive context, falling back to SQL. Some operations, ",
-            "like window-functions, will not work"
-          )
-
-          jsc <- invoke_static(
+      sc$state$hive_context <- sc$state$hive_context %||%
+        tryCatch(
+          invoke_new(
             sc,
-            "org.apache.spark.api.java.JavaSparkContext",
-            "fromSparkContext",
+            if (identical(sc$state$hive_support_enabled, TRUE)) {
+              "org.apache.spark.sql.hive.HiveContext"
+            } else {
+              "org.apache.spark.sql.SQLContext"
+            },
             sc$state$spark_context
-          )
+          ),
+          error = function(e) {
+            warning(e$message)
+            warning(
+              "Failed to create Hive context, falling back to SQL. Some operations, ",
+              "like window-functions, will not work"
+            )
 
-          hive_context <- invoke_static(
-            sc,
-            "org.apache.spark.sql.api.r.SQLUtils",
-            "createSQLContext",
-            jsc
-          )
+            jsc <- invoke_static(
+              sc,
+              "org.apache.spark.api.java.JavaSparkContext",
+              "fromSparkContext",
+              sc$state$spark_context
+            )
 
-          params <- connection_config(sc, "spark.sql.")
-          apply_config(hive_context, params, "setConf", "spark.sql.")
+            hive_context <- invoke_static(
+              sc,
+              "org.apache.spark.sql.api.r.SQLUtils",
+              "createSQLContext",
+              jsc
+            )
 
-          # return hive_context
-          hive_context
-        }
-      )
+            params <- connection_config(sc, "spark.sql.")
+            apply_config(hive_context, params, "setConf", "spark.sql.")
+
+            # return hive_context
+            hive_context
+          }
+        )
 
       # create the java spark context and assign the connection to it
       sc$state$java_context <- invoke_static(

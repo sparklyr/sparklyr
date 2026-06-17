@@ -75,4 +75,3 @@ test_that("Tuning works Isotonic", {
 })
 
 test_clear_cache()
-

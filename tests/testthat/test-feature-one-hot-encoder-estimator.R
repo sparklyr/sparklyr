@@ -28,10 +28,10 @@ test_that("ft_one_hot_encoder_estimator() works", {
     iris_tbl %>%
       ft_string_indexer("Species", "indexed") %>%
       ft_one_hot_encoder_estimator("indexed", "encoded") %>%
-      pull(encoded) %>% unique(),
+      pull(encoded) %>%
+      unique(),
     list(c(0, 0), c(1, 0), c(0, 1))
   )
 })
 
 test_clear_cache()
-

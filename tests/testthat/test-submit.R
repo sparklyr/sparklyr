@@ -12,9 +12,16 @@ test_that("spark_submit() can submit batch jobs", {
     skip("spark_submit() not yet implemented for windows")
   }
 
-  batch_file <- dir(getwd(), recursive = TRUE, pattern = "batch.R", full.names = TRUE)
+  batch_file <- dir(
+    getwd(),
+    recursive = TRUE,
+    pattern = "batch.R",
+    full.names = TRUE
+  )
 
-  if (dir.exists("batch.csv")) unlink("batch.csv", recursive = TRUE)
+  if (dir.exists("batch.csv")) {
+    unlink("batch.csv", recursive = TRUE)
+  }
 
   sc <- testthat_spark_connection()
 
@@ -24,10 +31,11 @@ test_that("spark_submit() can submit batch jobs", {
       sparklyr.verbose = FALSE
     ),
     {
-      spark_submit(master = "local",
-                   file = batch_file,
-                   version = spark_version(sc)
-                   )
+      spark_submit(
+        master = "local",
+        file = batch_file,
+        version = spark_version(sc)
+      )
     }
   )
 
@@ -41,4 +49,3 @@ test_that("spark_submit() can submit batch jobs", {
 })
 
 test_clear_cache()
-

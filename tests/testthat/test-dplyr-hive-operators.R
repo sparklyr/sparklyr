@@ -7,11 +7,13 @@ test_that("regex relational operators work", {
   skip_databricks_connect()
   test_requires("dplyr")
 
-  hello <- tibble(hello = c(
-    "hello my friend",
-    "hello my dog",
-    "hello my cat"
-  ))
+  hello <- tibble(
+    hello = c(
+      "hello my friend",
+      "hello my dog",
+      "hello my cat"
+    )
+  )
   hello_tbl <- testthat_tbl("hello")
 
   expect_equal(
@@ -31,26 +33,42 @@ test_that("regex relational operators work", {
 
   expect_equal(
     products_tbl %>%
-      mutate(category = ifelse(product_description %rlike% "F|fruit",
-        "produce", "dairy"
-      )) %>%
+      mutate(
+        category = ifelse(
+          product_description %rlike% "F|fruit",
+          "produce",
+          "dairy"
+        )
+      ) %>%
       collect(),
     products %>%
-      mutate(category = ifelse(grepl("F|fruit", product_description),
-        "produce", "dairy"
-      ))
+      mutate(
+        category = ifelse(
+          grepl("F|fruit", product_description),
+          "produce",
+          "dairy"
+        )
+      )
   )
 
   expect_equal(
     products_tbl %>%
-      mutate(category = ifelse(product_description %regexp% "F|fruit",
-        "produce", "dairy"
-      )) %>%
+      mutate(
+        category = ifelse(
+          product_description %regexp% "F|fruit",
+          "produce",
+          "dairy"
+        )
+      ) %>%
       collect(),
     products %>%
-      mutate(category = ifelse(grepl("F|fruit", product_description),
-        "produce", "dairy"
-      ))
+      mutate(
+        category = ifelse(
+          grepl("F|fruit", product_description),
+          "produce",
+          "dairy"
+        )
+      )
   )
 })
 

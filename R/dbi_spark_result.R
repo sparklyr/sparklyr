@@ -1,6 +1,5 @@
 # DBISparkResult results.
 
-
 #' DBI Spark Result.
 #'
 #' @slot sql character.
@@ -11,7 +10,8 @@
 #' @keywords internal
 #'
 #' @export
-setClass("DBISparkResult",
+setClass(
+  "DBISparkResult",
   contains = "DBIResult",
   slots = list(
     sql = "character",
@@ -42,16 +42,18 @@ setMethod("dbColumnInfo", "DBISparkResult", function(res, ...) {
   tinyres <- dbSendQuery(res@conn, res@sql)
   tinyres@sdf <- tinyres@sdf %>% invoke("limit", as.integer(1))
   sdf_columns <- tinyres@sdf %>% invoke("dtypes")
-  df <- dbFetch(tinyres, n=0)
+  df <- dbFetch(tinyres, n = 0)
 
   columns <- colnames(df)
-  columns_types <- sapply(df, function (x) class(x)[1])
-  columns_sql_types <- sapply(sdf_columns, function(x) { x %>% invoke("_2") })
+  columns_types <- sapply(df, function(x) class(x)[1])
+  columns_sql_types <- sapply(sdf_columns, function(x) {
+    x %>% invoke("_2")
+  })
 
   columns_info <- data.frame(
-    name=columns,
-    type=columns_types,
-    sql.type=columns_sql_types
+    name = columns,
+    type = columns_types,
+    sql.type = columns_sql_types
   )
   rownames(columns_info) <- NULL
 
@@ -68,13 +70,14 @@ setMethod(
       stop("Native paramtereized queries require Spark 3.4.0 or newer")
     }
 
-    if(length(params) == 0) {
+    if (length(params) == 0) {
       sdf <- invoke(hive_context(conn), "sql", sql)
     } else {
       sdf <- invoke(hive_context(conn), "sql", sql, as.environment(params))
     }
 
-    rs <- new("DBISparkResult",
+    rs <- new(
+      "DBISparkResult",
       sql = sql,
       conn = conn,
       sdf = sdf,
@@ -111,39 +114,43 @@ setMethod(
   }
 )
 
-setMethod("dbFetch", "DBISparkResult", function(res, n = -1, ..., row.names = NA) {
-  start <- 1
-  end <- n
-  lastFetch <- res@state$lastFetch
+setMethod(
+  "dbFetch",
+  "DBISparkResult",
+  function(res, n = -1, ..., row.names = NA) {
+    start <- 1
+    end <- n
+    lastFetch <- res@state$lastFetch
 
-  if (length(lastFetch) > 0) {
-    start <- lastFetch + 1
-    end <- lastFetch + end
-  }
-
-  res@state$lastFetch <- end
-  df <- df_from_sdf(res@conn, res@sdf, end)
-
-  if (n > 0) {
-    range <- 0
-    if (nrow(df) > 0) {
-      end <- min(nrow(df), end)
-      range <- start:end
+    if (length(lastFetch) > 0) {
+      start <- lastFetch + 1
+      end <- lastFetch + end
     }
-    df <- df[range, ]
-  } else if (n == 0) {
-    df <- df[0,]
+
+    res@state$lastFetch <- end
+    df <- df_from_sdf(res@conn, res@sdf, end)
+
+    if (n > 0) {
+      range <- 0
+      if (nrow(df) > 0) {
+        end <- min(nrow(df), end)
+        range <- start:end
+      }
+      df <- df[range, ]
+    } else if (n == 0) {
+      df <- df[0, ]
+    }
+
+    if (nrow(df) == 0) {
+      df <- df[]
+    }
+
+    dfFetch <- as.data.frame(df, drop = FALSE, optional = TRUE)
+    colnames(dfFetch) <- colnames(df)
+
+    dfFetch
   }
-
-  if (nrow(df) == 0) {
-    df <- df[]
-  }
-
-  dfFetch <- as.data.frame(df, drop = FALSE, optional = TRUE)
-  colnames(dfFetch) <- colnames(df)
-
-  dfFetch
-})
+)
 
 setMethod("dbBind", "DBISparkResult", function(res, params, ...) {
   TRUE
@@ -157,9 +164,13 @@ setMethod("dbClearResult", "DBISparkResult", function(res, ...) {
   TRUE
 })
 
-setMethod("dbSendStatement", "spark_connection", function(conn, statement, ...) {
-  dbSendQuery(conn, statement, ...)
-})
+setMethod(
+  "dbSendStatement",
+  "spark_connection",
+  function(conn, statement, ...) {
+    dbSendQuery(conn, statement, ...)
+  }
+)
 
 setMethod("dbExecute", "spark_connection", function(conn, statement, ...) {
   rs <- dbSendStatement(conn, statement, ...)

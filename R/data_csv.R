@@ -37,35 +37,44 @@ spark_csv_save_name <- function(sc) {
   if (spark_csv_is_embedded(sc)) "save" else "csv"
 }
 
-spark_csv_read <- function(sc,
-                           path,
-                           csvOptions = list(),
-                           columns = NULL) {
+spark_csv_read <- function(sc, path, csvOptions = list(), columns = NULL) {
   read <- invoke(hive_context(sc), "read")
 
   options <- spark_csv_format_if_needed(read, sc)
 
-  if (spark_config_value(sc$config, "sparklyr.verbose", FALSE) && !identical(columns, NULL)) {
+  if (
+    spark_config_value(sc$config, "sparklyr.verbose", FALSE) &&
+      !identical(columns, NULL)
+  ) {
     ncol_ds <- options %>%
       invoke(spark_csv_load_name(sc), path) %>%
       invoke("schema") %>%
       invoke("length")
 
     if (ncol_ds != length(columns)) {
-      warning("Dataset has ", ncol_ds, " columns but 'columns' has length ", length(columns))
+      warning(
+        "Dataset has ",
+        ncol_ds,
+        " columns but 'columns' has length ",
+        length(columns)
+      )
     }
   }
 
   for (csvOptionName in names(csvOptions)) {
-    options <- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
+    options <- invoke(
+      options,
+      "option",
+      csvOptionName,
+      csvOptions[[csvOptionName]]
+    )
   }
 
   columnsHaveTypes <- !identical(columns, NULL) && length(names(columns)) > 0
 
   if (identical(columns, NULL) || !columnsHaveTypes) {
     optionSchema <- options
-  }
-  else {
+  } else {
     columnDefs <- spark_data_build_types(sc, columns)
     optionSchema <- invoke(options, "schema", columnDefs)
   }
@@ -76,12 +85,13 @@ spark_csv_read <- function(sc,
     path
   )
 
-  if ((identical(columns, NULL) && identical(csvOptions$header, "false")) ||
-    (!identical(columns, NULL) && !columnsHaveTypes)) {
+  if (
+    (identical(columns, NULL) && identical(csvOptions$header, "false")) ||
+      (!identical(columns, NULL) && !columnsHaveTypes)
+  ) {
     if (!identical(columns, NULL)) {
       newNames <- columns
-    }
-    else {
+    } else {
       # create normalized column names when header = FALSE and a columns specification is not supplied
       columns <- invoke(df, "columns")
       n <- length(columns)
@@ -107,7 +117,12 @@ spark_csv_write <- function(df, path, csvOptions, mode, partition_by) {
   options <- spark_csv_format_if_needed(write, sc)
 
   for (csvOptionName in names(csvOptions)) {
-    options <- invoke(options, "option", csvOptionName, csvOptions[[csvOptionName]])
+    options <- invoke(
+      options,
+      "option",
+      csvOptionName,
+      csvOptions[[csvOptionName]]
+    )
   }
 
   if (!is.null(partition_by)) {

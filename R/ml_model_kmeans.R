@@ -1,5 +1,9 @@
-new_ml_model_kmeans <- function(pipeline_model, formula, dataset,
-                                features_col) {
+new_ml_model_kmeans <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  features_col
+) {
   m <- new_ml_model_clustering(
     pipeline_model = pipeline_model,
     formula = formula,
@@ -83,9 +87,11 @@ ml_compute_cost <- function(model, dataset) {
 #' @return \code{ml_compute_silhouette_measure()} returns the Silhouette measure
 #'   of the clustering on the given data.
 #' @export
-ml_compute_silhouette_measure <- function(model,
-                                          dataset,
-                                          distance_measure = c("squaredEuclidean", "cosine")) {
+ml_compute_silhouette_measure <- function(
+  model,
+  dataset,
+  distance_measure = c("squaredEuclidean", "cosine")
+) {
   if (!is_required_spark(spark_connection(dataset), "3.0.0")) {
     stop("Silhouette measure is only supported in Spark 3.0 or above.")
   }

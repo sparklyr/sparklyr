@@ -20,12 +20,21 @@ iris_in <- paste0("file://", iris_in_dir)
 iris_out_dir <- file.path(base_dir, "iris-out")
 iris_out <- paste0("file://", iris_out_dir)
 
-if (!dir.exists(iris_in_dir)) dir.create(iris_in_dir)
+if (!dir.exists(iris_in_dir)) {
+  dir.create(iris_in_dir)
+}
 
 test_stream <- function(description, test) {
-  if (dir.exists(iris_out_dir)) unlink(iris_out_dir, recursive = TRUE)
+  if (dir.exists(iris_out_dir)) {
+    unlink(iris_out_dir, recursive = TRUE)
+  }
 
-  write.table(iris, file.path(iris_in_dir, "iris.csv"), row.names = FALSE, sep = ";")
+  write.table(
+    iris,
+    file.path(iris_in_dir, "iris.csv"),
+    row.names = FALSE,
+    sep = ";"
+  )
 
   on.exit(unlink(iris_out_dir, recursive = TRUE))
 
@@ -45,10 +54,9 @@ test_stream("Stream lag works", {
   sf <- stream_find(sc, id)
 
   succeed()
+})
 
-  })
-
-  stream <- stream_read_csv(sc, iris_in, delimiter = ";")
+stream <- stream_read_csv(sc, iris_in, delimiter = ";")
 
 test_stream("Stream lag works", {
   test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
@@ -185,14 +193,14 @@ test_stream("stream_lag() works as expected", {
   expect_true(weekdays_sdf %>% sdf_is_streaming())
 
   expected <- dplyr::tribble(
-    ~day,         ~x,   ~yesterday, ~two_days_ago,
-    "Monday",     1L,           NA,            NA,
-    "Tuesday",    1L,     "Monday",            NA,
-    "Wednesday",  2L,    "Tuesday",      "Monday",
-    "Thursday",   3L,  "Wednesday",     "Tuesday",
-    "Friday",     3L,   "Thursday",   "Wednesday",
-    "Saturday",   3L,     "Friday",    "Thursday",
-    "Sunday",     6L,   "Saturday",      "Friday",
+    ~day        , ~x , ~yesterday  , ~two_days_ago ,
+    "Monday"    , 1L , NA          , NA            ,
+    "Tuesday"   , 1L , "Monday"    , NA            ,
+    "Wednesday" , 2L , "Tuesday"   , "Monday"      ,
+    "Thursday"  , 3L , "Wednesday" , "Tuesday"     ,
+    "Friday"    , 3L , "Thursday"  , "Wednesday"   ,
+    "Saturday"  , 3L , "Friday"    , "Thursday"    ,
+    "Sunday"    , 6L , "Saturday"  , "Friday"      ,
   )
   output_sdf <- weekdays_sdf %>%
     stream_lag(cols = c(yesterday = day ~ 1, two_days_ago = day ~ 2))
@@ -200,14 +208,14 @@ test_stream("stream_lag() works as expected", {
   expect_equivalent(output_sdf %>% collect(), expected)
 
   expected <- dplyr::tribble(
-    ~day,         ~x,   ~yesterday, ~two_days_ago,
-    "Monday",     1L,           NA,            NA,
-    "Tuesday",    1L,     "Monday",            NA,
-    "Wednesday",  2L,    "Tuesday",      "Monday",
-    "Thursday",   3L,  "Wednesday",            NA,
-    "Friday",     3L,   "Thursday",   "Wednesday",
-    "Saturday",   3L,     "Friday",    "Thursday",
-    "Sunday",     6L,           NA,            NA,
+    ~day        , ~x , ~yesterday  , ~two_days_ago ,
+    "Monday"    , 1L , NA          , NA            ,
+    "Tuesday"   , 1L , "Monday"    , NA            ,
+    "Wednesday" , 2L , "Tuesday"   , "Monday"      ,
+    "Thursday"  , 3L , "Wednesday" , NA            ,
+    "Friday"    , 3L , "Thursday"  , "Wednesday"   ,
+    "Saturday"  , 3L , "Friday"    , "Thursday"    ,
+    "Sunday"    , 6L , NA          , NA            ,
   )
   output_sdf <- weekdays_sdf %>%
     stream_lag(
@@ -241,7 +249,11 @@ test_stream("stream write handles partitioning columns correctly", {
 
   sub_dirs <- dir(iris_out_dir)
 
-  for (partition in c("Species=setosa", "Species=versicolor", "Species=virginica")) {
+  for (partition in c(
+    "Species=setosa",
+    "Species=versicolor",
+    "Species=virginica"
+  )) {
     expect_true(partition %in% sub_dirs)
   }
 })
@@ -279,4 +291,3 @@ test_that("to_milliseconds() responds as expected", {
 })
 
 test_clear_cache()
-

@@ -24,19 +24,39 @@ NULL
 #' }
 #'
 #' @export
-ml_kmeans <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-4,
-                      init_steps = 2, init_mode = "k-means||", seed = NULL,
-                      features_col = "features", prediction_col = "prediction",
-                      uid = random_string("kmeans_"), ...) {
+ml_kmeans <- function(
+  x,
+  formula = NULL,
+  k = 2,
+  max_iter = 20,
+  tol = 1e-4,
+  init_steps = 2,
+  init_mode = "k-means||",
+  seed = NULL,
+  features_col = "features",
+  prediction_col = "prediction",
+  uid = random_string("kmeans_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_kmeans")
 }
 
 #' @export
-ml_kmeans.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-4,
-                                       init_steps = 2, init_mode = "k-means||", seed = NULL,
-                                       features_col = "features", prediction_col = "prediction",
-                                       uid = random_string("kmeans_"), ...) {
+ml_kmeans.spark_connection <- function(
+  x,
+  formula = NULL,
+  k = 2,
+  max_iter = 20,
+  tol = 1e-4,
+  init_steps = 2,
+  init_mode = "k-means||",
+  seed = NULL,
+  features_col = "features",
+  prediction_col = "prediction",
+  uid = random_string("kmeans_"),
+  ...
+) {
   .args <- list(
     k = k,
     max_iter = max_iter,
@@ -51,9 +71,13 @@ ml_kmeans.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 20, 
     validator_ml_kmeans()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.clustering.KMeans", uid,
-    features_col = .args[["features_col"]], k = .args[["k"]],
-    max_iter = .args[["max_iter"]], seed = .args[["seed"]]
+    x,
+    "org.apache.spark.ml.clustering.KMeans",
+    uid,
+    features_col = .args[["features_col"]],
+    k = .args[["k"]],
+    max_iter = .args[["max_iter"]],
+    seed = .args[["seed"]]
   ) %>%
     invoke("setTol", .args[["tol"]]) %>%
     invoke("setInitSteps", .args[["init_steps"]]) %>%
@@ -64,10 +88,20 @@ ml_kmeans.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 20, 
 }
 
 #' @export
-ml_kmeans.ml_pipeline <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-4,
-                                  init_steps = 2, init_mode = "k-means||", seed = NULL,
-                                  features_col = "features", prediction_col = "prediction",
-                                  uid = random_string("kmeans_"), ...) {
+ml_kmeans.ml_pipeline <- function(
+  x,
+  formula = NULL,
+  k = 2,
+  max_iter = 20,
+  tol = 1e-4,
+  init_steps = 2,
+  init_mode = "k-means||",
+  seed = NULL,
+  features_col = "features",
+  prediction_col = "prediction",
+  uid = random_string("kmeans_"),
+  ...
+) {
   stage <- ml_kmeans.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -86,10 +120,21 @@ ml_kmeans.ml_pipeline <- function(x, formula = NULL, k = 2, max_iter = 20, tol =
 }
 
 #' @export
-ml_kmeans.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 20, tol = 1e-4,
-                                init_steps = 2, init_mode = "k-means||", seed = NULL,
-                                features_col = "features", prediction_col = "prediction",
-                                uid = random_string("kmeans_"), features = NULL, ...) {
+ml_kmeans.tbl_spark <- function(
+  x,
+  formula = NULL,
+  k = 2,
+  max_iter = 20,
+  tol = 1e-4,
+  init_steps = 2,
+  init_mode = "k-means||",
+  seed = NULL,
+  features_col = "features",
+  prediction_col = "prediction",
+  uid = random_string("kmeans_"),
+  features = NULL,
+  ...
+) {
   formula <- ml_standardize_formula(formula, features = features)
 
   stage <- ml_kmeans.spark_connection(
@@ -126,7 +171,10 @@ validator_ml_kmeans <- function(.args) {
   .args <- validate_args_clustering(.args)
   .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
   .args[["init_steps"]] <- cast_scalar_integer(.args[["init_steps"]])
-  .args[["init_mode"]] <- cast_choice(.args[["init_mode"]], c("random", "k-means||"))
+  .args[["init_mode"]] <- cast_choice(
+    .args[["init_mode"]],
+    c("random", "k-means||")
+  )
   .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
   .args
 }
@@ -155,21 +203,29 @@ new_ml_kmeans_model <- function(jobj) {
   } else {
     sc <- spark_connection(jobj)
     clustering_evaluator_jobj <- invoke_new(
-      sc, "org.apache.spark.ml.evaluation.ClusteringEvaluator"
+      sc,
+      "org.apache.spark.ml.evaluation.ClusteringEvaluator"
     )
-    clustering_evaluator_jobj %>% invoke(
-      "%>%",
-      list("setFeaturesCol", jobj %>% invoke("getFeaturesCol")),
-      list("setPredictionCol", jobj %>% invoke("getPredictionCol"))
-    )
+    clustering_evaluator_jobj %>%
+      invoke(
+        "%>%",
+        list("setFeaturesCol", jobj %>% invoke("getFeaturesCol")),
+        list("setPredictionCol", jobj %>% invoke("getPredictionCol"))
+      )
     weight_col_param <- jobj %>% invoke("weightCol")
     if (jobj %>% invoke("isSet", weight_col_param)) {
-      clustering_evaluator_jobj %>% invoke(
-        "setWeightCol", jobj %>% invoke("getWeightCol")
-      )
+      clustering_evaluator_jobj %>%
+        invoke(
+          "setWeightCol",
+          jobj %>% invoke("getWeightCol")
+        )
     }
-    kmeans_model[["compute_silhouette_measure"]] <- function(dataset, distance_measure) {
-      clustering_evaluator_jobj %>% invoke("setDistanceMeasure", distance_measure)
+    kmeans_model[["compute_silhouette_measure"]] <- function(
+      dataset,
+      distance_measure
+    ) {
+      clustering_evaluator_jobj %>%
+        invoke("setDistanceMeasure", distance_measure)
       dataset <- jobj %>% invoke("transform", spark_dataframe(dataset))
       invoke(clustering_evaluator_jobj, "evaluate", dataset)
     }

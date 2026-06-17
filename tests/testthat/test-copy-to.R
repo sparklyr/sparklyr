@@ -4,7 +4,8 @@ skip_on_livy()
 sc <- testthat_spark_connection()
 
 test_that("sdf_copy_to works for default serializer", {
-  df <- matrix(0, ncol = 5, nrow = 2) %>% dplyr::as_tibble(.name_repair = "unique")
+  df <- matrix(0, ncol = 5, nrow = 2) %>%
+    dplyr::as_tibble(.name_repair = "unique")
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE)
 
   expect_equal(
@@ -25,7 +26,8 @@ test_that("spark_table_name() doesn't warn for multiline expression (#1386)", {
 })
 
 test_that("sdf_copy_to supports list of callbacks", {
-  df <- matrix(0, ncol = 5, nrow = 2) %>% dplyr::as_tibble(.name_repair = "unique")
+  df <- matrix(0, ncol = 5, nrow = 2) %>%
+    dplyr::as_tibble(.name_repair = "unique")
   df_tbl <- sdf_copy_to(sc, list(~df, ~df), overwrite = TRUE)
 
   expect_equal(

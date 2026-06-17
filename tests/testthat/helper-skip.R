@@ -1,5 +1,5 @@
 skip_unless_local <- function() {
-  if(testthat_spark_connection_type() != "local") {
+  if (testthat_spark_connection_type() != "local") {
     skip("Test only run on local Spark connection")
   }
 }
@@ -22,7 +22,9 @@ skip_unless_synapse_connect <- function() {
   }
 }
 
-skip_on_arrow_devel <- function(message = "Test is skipped on Arrow development version") {
+skip_on_arrow_devel <- function(
+  message = "Test is skipped on Arrow development version"
+) {
   if (using_arrow_version() == "devel") skip(message)
 }
 
@@ -39,7 +41,9 @@ skip_on_spark_master <- function() {
 skip_unless_verbose <- function(message = NULL) {
   message <- message %||% "Verbose test skipped"
   verbose <- Sys.getenv("SPARKLYR_TESTS_VERBOSE", unset = NA)
-  if (is.na(verbose)) skip(message)
+  if (is.na(verbose)) {
+    skip(message)
+  }
   invisible(TRUE)
 }
 
@@ -59,18 +63,22 @@ skip_covr <- function(message) {
 }
 
 skip_on_livy <- function() {
-  if(using_livy()) {
+  if (using_livy()) {
     skip("Test unsupported under Livy.")
   }
 }
 
 skip_unless_livy <- function() {
-  if(!using_livy()) {
+  if (!using_livy()) {
     skip("Test only runs on Livy")
   }
 }
 
-test_requires_version <- function(min_version, comment = NULL, max_version = NULL) {
+test_requires_version <- function(
+  min_version,
+  comment = NULL,
+  max_version = NULL
+) {
   sc <- testthat_spark_connection()
   if (spark_version(sc) < min_version) {
     msg <- paste0("test requires Spark version ", min_version)
@@ -103,20 +111,20 @@ test_requires <- function(...) {
 
 test_requires_package_version <- function(pkg, min_version) {
   if (packageVersion(pkg) < as.character(min_version)) {
-    skip(paste0("Test requires ", pkg," ", min_version," or above"))
+    skip(paste0("Test requires ", pkg, " ", min_version, " or above"))
   }
 }
 
 skip_connection <- function(x) {
   sc <- testthat_spark_connection()
   out <- spark_integ_test_skip(sc, x)
-  if(out) {
+  if (out) {
     skip(paste0("Test '", x, "' not supported by backend"))
   }
 }
 
 skip_if_dbplyr_dev <- function() {
-  if(Sys.getenv("DBPLYR_VERSION") == "dev") {
+  if (Sys.getenv("DBPLYR_VERSION") == "dev") {
     skip("Skipping on dev version of `dbplyr`")
   }
 }

@@ -17,9 +17,16 @@
 #' @name ft_lsh
 #' @seealso ft_lsh_utils
 #' @export
-ft_bucketed_random_projection_lsh <- function(x, input_col = NULL, output_col = NULL,
-                                              bucket_length = NULL, num_hash_tables = 1, seed = NULL,
-                                              uid = random_string("bucketed_random_projection_lsh_"), ...) {
+ft_bucketed_random_projection_lsh <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  bucket_length = NULL,
+  num_hash_tables = 1,
+  seed = NULL,
+  uid = random_string("bucketed_random_projection_lsh_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_bucketed_random_projection_lsh")
 }
@@ -27,9 +34,16 @@ ft_bucketed_random_projection_lsh <- function(x, input_col = NULL, output_col = 
 ml_bucketed_random_projection_lsh <- ft_bucketed_random_projection_lsh
 
 #' @export
-ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                                               bucket_length = NULL, num_hash_tables = 1, seed = NULL,
-                                                               uid = random_string("bucketed_random_projection_lsh_"), ...) {
+ft_bucketed_random_projection_lsh.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  bucket_length = NULL,
+  num_hash_tables = 1,
+  seed = NULL,
+  uid = random_string("bucketed_random_projection_lsh_"),
+  ...
+) {
   spark_require_version(x, "2.1.0", "LSH")
 
   .args <- list(
@@ -44,8 +58,11 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NU
     validator_ml_bucketed_random_projection_lsh()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.BucketedRandomProjectionLSH",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
     jobj_set_param("setBucketLength", .args[["bucket_length"]]) %>%
     invoke("setNumHashTables", .args[["num_hash_tables"]]) %>%
@@ -57,9 +74,16 @@ ft_bucketed_random_projection_lsh.spark_connection <- function(x, input_col = NU
 }
 
 #' @export
-ft_bucketed_random_projection_lsh.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                                          bucket_length = NULL, num_hash_tables = 1, seed = NULL,
-                                                          uid = random_string("bucketed_random_projection_lsh_"), ...) {
+ft_bucketed_random_projection_lsh.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  bucket_length = NULL,
+  num_hash_tables = 1,
+  seed = NULL,
+  uid = random_string("bucketed_random_projection_lsh_"),
+  ...
+) {
   stage <- ft_bucketed_random_projection_lsh.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -74,9 +98,16 @@ ft_bucketed_random_projection_lsh.ml_pipeline <- function(x, input_col = NULL, o
 }
 
 #' @export
-ft_bucketed_random_projection_lsh.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                                        bucket_length = NULL, num_hash_tables = 1, seed = NULL,
-                                                        uid = random_string("bucketed_random_projection_lsh_"), ...) {
+ft_bucketed_random_projection_lsh.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  bucket_length = NULL,
+  num_hash_tables = 1,
+  seed = NULL,
+  uid = random_string("bucketed_random_projection_lsh_"),
+  ...
+) {
   stage <- ft_bucketed_random_projection_lsh.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -110,7 +141,9 @@ new_ml_bucketed_random_projection_lsh_model <- function(jobj) {
 
 validator_ml_bucketed_random_projection_lsh <- function(.args) {
   .args <- validate_args_transformer(.args)
-  .args[["bucket_length"]] <- cast_nullable_scalar_double(.args[["bucket_length"]])
+  .args[["bucket_length"]] <- cast_nullable_scalar_double(.args[[
+    "bucket_length"
+  ]])
   .args[["num_hash_tables"]] <- cast_scalar_integer(.args[["num_hash_tables"]])
   .args[["seed"]] <- cast_nullable_scalar_integer(.args[["seed"]])
   .args

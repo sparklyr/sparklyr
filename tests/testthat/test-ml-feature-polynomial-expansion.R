@@ -38,4 +38,3 @@ test_that("ft_polynomial_expansion() works properly", {
 })
 
 test_clear_cache()
-

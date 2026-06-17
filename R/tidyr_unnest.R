@@ -3,19 +3,22 @@ NULL
 
 #' @importFrom tidyr unnest
 #' @export
-unnest.tbl_spark <- function(data,
-                             cols,
-                             ...,
-                             keep_empty = FALSE,
-                             ptype = NULL,
-                             names_sep = NULL,
-                             names_repair = "check_unique",
-                             .drop = "DEPRECATED",
-                             .id = "DEPRECATED",
-                             .sep = "DEPRECATED",
-                             .preserve = "DEPRECATED") {
+unnest.tbl_spark <- function(
+  data,
+  cols,
+  ...,
+  keep_empty = FALSE,
+  ptype = NULL,
+  names_sep = NULL,
+  names_repair = "check_unique",
+  .drop = "DEPRECATED",
+  .id = "DEPRECATED",
+  .sep = "DEPRECATED",
+  .preserve = "DEPRECATED"
+) {
   cols <- tidyselect::eval_select(
-    rlang::enquo(cols), replicate_colnames(data)
+    rlang::enquo(cols),
+    replicate_colnames(data)
   ) %>%
     names()
   if (length(cols) == 0) {
@@ -37,7 +40,9 @@ unnest.tbl_spark <- function(data,
       paste0(
         "`unnest.tbl_spark` is only supported for columns of type ",
         "`array<struct<.*>>` (i.e., a column produced by a previous ",
-        "`nest.tbl_spark` operation. Column '", col, "' is of type ",
+        "`nest.tbl_spark` operation. Column '",
+        col,
+        "' is of type ",
         schema[[col]]$type
       ) %>%
         rlang::abort()
@@ -54,12 +59,11 @@ unnest.tbl_spark <- function(data,
   for (col in colnames(data)) {
     if (col %in% cols) {
       for (nested_col in struct_fields[[col]]) {
-        dest_col <- (
-          if (is.null(names_sep)) {
-            nested_col
-          } else {
-            paste0(col, names_sep, nested_col)
-          })
+        dest_col <- (if (is.null(names_sep)) {
+          nested_col
+        } else {
+          paste0(col, names_sep, nested_col)
+        })
         output_cols <- append(output_cols, dest_col)
       }
     } else {
@@ -139,8 +143,10 @@ unnest.tbl_spark <- function(data,
   group_vars <- intersect(setdiff(group_vars, cols), output_cols)
 
   out <- do.call(sdf_fast_bind_cols, unnested_cols) %>>%
-    dplyr::select %@% lapply(output_cols, as.symbol) %>>%
-    dplyr::group_by %@% lapply(group_vars, as.symbol)
+    dplyr::select %@%
+    lapply(output_cols, as.symbol) %>>%
+    dplyr::group_by %@%
+    lapply(group_vars, as.symbol)
 
   apply_ptype(out, ptype)
 }

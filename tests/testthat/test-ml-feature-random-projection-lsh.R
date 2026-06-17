@@ -45,8 +45,11 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
 
   lsh <- ft_bucketed_random_projection_lsh(
     sc,
-    input_col = "features", output_col = "hashes",
-    bucket_length = 2, num_hash_tables = 3, seed = 666
+    input_col = "features",
+    output_col = "hashes",
+    bucket_length = 2,
+    num_hash_tables = 3,
+    seed = 666
   ) %>%
     ml_fit(dfA_tbl)
 
@@ -65,7 +68,12 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
     4
   )
   expect_equal(
-    ml_approx_nearest_neighbors(lsh, dfA_tbl, c(1, 0), num_nearest_neighbors = 2) %>%
+    ml_approx_nearest_neighbors(
+      lsh,
+      dfA_tbl,
+      c(1, 0),
+      num_nearest_neighbors = 2
+    ) %>%
       dplyr::pull(id),
     c(0, 1)
   )
@@ -84,4 +92,3 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
 })
 
 test_clear_cache()
-

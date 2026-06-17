@@ -26,12 +26,12 @@ adding a row to the sample set is equal to its weight divided by summation of
 weights of all rows that are not in the sample set yet in that step.
 }
 \seealso{
-Other Spark data frames: 
-\code{\link{sdf_copy_to}()},
-\code{\link{sdf_distinct}()},
-\code{\link{sdf_random_split}()},
-\code{\link{sdf_register}()},
-\code{\link{sdf_sample}()},
-\code{\link{sdf_sort}()}
+Other Spark data frames:
+\code{\link[=sdf_copy_to]{sdf_copy_to()}},
+\code{\link[=sdf_distinct]{sdf_distinct()}},
+\code{\link[=sdf_random_split]{sdf_random_split()}},
+\code{\link[=sdf_register]{sdf_register()}},
+\code{\link[=sdf_sample]{sdf_sample()}},
+\code{\link[=sdf_sort]{sdf_sort()}}
 }
 \concept{Spark data frames}

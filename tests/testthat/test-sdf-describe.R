@@ -25,4 +25,3 @@ test_that("sdf_describe() checks column name", {
 })
 
 test_clear_cache()
-

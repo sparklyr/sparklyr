@@ -28,7 +28,9 @@ params_base_validator <- function(x) {
     loss = function(x) cast_choice(x, c("squaredError", "huber")),
     weight_col = function(x) cast_nullable_string(x),
     # GLM
-    family = function(x) cast_choice(x, c("gaussian", "binomial", "poisson", "gamma", "tweedie")),
+    family = function(x) {
+      cast_choice(x, c("gaussian", "binomial", "poisson", "gamma", "tweedie"))
+    },
     link = function(x) cast_nullable_string(x),
     link_power = function(x) cast_nullable_scalar_double(x),
     variance_power = function(x) cast_nullable_scalar_double(x),
@@ -81,14 +83,14 @@ params_validate_estimator_and_set <- function(jobj, params = list()) {
     names(validated),
     param_name_r_to_spark,
     as.list(genv_get_param_mapping_r_to_s())
-    )
+  )
   names_set <- paste0("set", new_names)
   set_names(validated, names_set)
 }
 
 param_name_r_to_spark <- function(x, initial_catalog = NULL) {
   match_catalog <- initial_catalog[names(initial_catalog) == x]
-  if(length(match_catalog) == 0) {
+  if (length(match_catalog) == 0) {
     sw <- strsplit(x, "_")[[1]]
   } else {
     sw <- match_catalog[[1]]
@@ -105,8 +107,8 @@ params_validate <- function(x, params, unmatched_fail = FALSE) {
   matched_list <- imap(params, ~ any(names(pm) == .y))
   matched_names <- as.logical(matched_list)
 
-  if(unmatched_fail) {
-    if(!all(matched_names)) {
+  if (unmatched_fail) {
+    if (!all(matched_names)) {
       unmatched_list <- names(params)[!matched_names]
       stop(
         "Could not find the following parameter(s): ",
@@ -116,13 +118,15 @@ params_validate <- function(x, params, unmatched_fail = FALSE) {
   }
 
   names_params <- names(params)
-  for(i in seq_along(params)) {
-    if(matched_names[i]) {
+  for (i in seq_along(params)) {
+    if (matched_names[i]) {
       fn <- pm[names(pm) == names_params[i]]
-      if(!is.null(params[[i]])) {
+      if (!is.null(params[[i]])) {
         new_val <- do.call(fn[[1]], list(x = params[[i]]))
-        if(is.null(new_val) != is.null(params[[i]])) stop("NULL value not valid")
-        if(!is.null(new_val)) params[[i]] <- new_val
+        if (is.null(new_val) != is.null(params[[i]])) {
+          stop("NULL value not valid")
+        }
+        if (!is.null(new_val)) params[[i]] <- new_val
       }
     }
   }

@@ -38,4 +38,3 @@ test_that("ml_corr() errors on bad column specification", {
 })
 
 test_clear_cache()
-

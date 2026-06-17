@@ -124,7 +124,6 @@ test_that("can strip names", {
       collect()
   )
 
-
   expect_equivalent(
     out,
     dplyr::tibble(
@@ -192,4 +191,3 @@ test_that("nesting no columns nests all inputs", {
 })
 
 test_clear_cache()
-

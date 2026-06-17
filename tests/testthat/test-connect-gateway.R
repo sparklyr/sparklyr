@@ -17,4 +17,3 @@ test_that("can connect to an existing session via gateway", {
 })
 
 test_clear_cache()
-

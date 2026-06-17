@@ -27,7 +27,14 @@
 #' }
 #'
 #' @export
-ft_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_string("binarizer_"), ...) {
+ft_binarizer <- function(
+  x,
+  input_col,
+  output_col,
+  threshold = 0,
+  uid = random_string("binarizer_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_binarizer")
 }
@@ -35,8 +42,14 @@ ft_binarizer <- function(x, input_col, output_col, threshold = 0, uid = random_s
 ml_binarizer <- ft_binarizer
 
 #' @export
-ft_binarizer.spark_connection <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
-                                          uid = random_string("binarizer_"), ...) {
+ft_binarizer.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  threshold = 0,
+  uid = random_string("binarizer_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -47,7 +60,8 @@ ft_binarizer.spark_connection <- function(x, input_col = NULL, output_col = NULL
     validator_ml_binarizer()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.Binarizer",
+    x,
+    "org.apache.spark.ml.feature.Binarizer",
     input_col = .args[["input_col"]],
     output_col = .args[["output_col"]],
     uid = .args[["uid"]]
@@ -58,8 +72,14 @@ ft_binarizer.spark_connection <- function(x, input_col = NULL, output_col = NULL
 }
 
 #' @export
-ft_binarizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
-                                     uid = random_string("binarizer_"), ...) {
+ft_binarizer.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  threshold = 0,
+  uid = random_string("binarizer_"),
+  ...
+) {
   stage <- ft_binarizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -72,8 +92,14 @@ ft_binarizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, thr
 }
 
 #' @export
-ft_binarizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL, threshold = 0,
-                                   uid = random_string("binarizer_"), ...) {
+ft_binarizer.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  threshold = 0,
+  uid = random_string("binarizer_"),
+  ...
+) {
   stage <- ft_binarizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

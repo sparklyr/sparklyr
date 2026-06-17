@@ -9,34 +9,56 @@ test_that("we can invoke_static with 0 arguments", {
 })
 
 test_that("we can invoke_static with 1 scalar argument", {
-  expect_equal(invoke_static(
-    sc, "sparklyr.Test", "unaryPrimitiveInt",
-    5L
-  ), 25)
+  expect_equal(
+    invoke_static(
+      sc,
+      "sparklyr.Test",
+      "unaryPrimitiveInt",
+      5L
+    ),
+    25
+  )
 
   expect_error(invoke_static(sc, "sparklyr.Test", "unaryPrimitiveInt", NULL))
 
   expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", 0L), TRUE)
-  expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", -2147483647L), FALSE)
-  expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", 2147483647L), FALSE)
+  expect_equal(
+    invoke_static(sc, "sparklyr.Test", "unaryInteger", -2147483647L),
+    FALSE
+  )
+  expect_equal(
+    invoke_static(sc, "sparklyr.Test", "unaryInteger", 2147483647L),
+    FALSE
+  )
   expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", 1L), FALSE)
 
   # check (i == 0) evaluates to false in scala if i is null (i.e., serialization does not turn null value into 0)
   expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", NULL), FALSE)
   expect_equal(invoke_static(sc, "sparklyr.Test", "unaryInteger", NA), FALSE)
 
-  expect_equal(invoke_static(
-    sc, "sparklyr.Test", "unaryNullableInteger",
-    5L
-  ), 25)
+  expect_equal(
+    invoke_static(
+      sc,
+      "sparklyr.Test",
+      "unaryNullableInteger",
+      5L
+    ),
+    25
+  )
 
-  expect_equal(invoke_static(sc, "sparklyr.Test", "unaryNullableInteger", NULL), -1)
+  expect_equal(
+    invoke_static(sc, "sparklyr.Test", "unaryNullableInteger", NULL),
+    -1
+  )
 })
 
 test_that("we can invoke_static with 1 Seq argument", {
   expect_equal(invoke_static(sc, "sparklyr.Test", "unarySeq", list(3, 4)), 25)
 
-  expect_equal(invoke_static(sc, "sparklyr.Test", "unaryNullableSeq", list(3, 4)), 25)
+  expect_equal(
+    invoke_static(sc, "sparklyr.Test", "unaryNullableSeq", list(3, 4)),
+    25
+  )
 })
 
 test_that("we can invoke_static with null Seq argument", {
@@ -122,4 +144,3 @@ test_that("NaN is handled correctly", {
 })
 
 test_clear_cache()
-

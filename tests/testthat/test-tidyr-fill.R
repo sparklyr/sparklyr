@@ -64,9 +64,10 @@ test_that("missings filled down for each atomic vector", {
       dbl = c(1, NA),
       chr = c("a", NA)
     )
-  ) %>% dplyr::mutate(
-    arr = dplyr::sql("IF(lgl, array(1, 2, 3, 4, 5), NULL)")
-  )
+  ) %>%
+    dplyr::mutate(
+      arr = dplyr::sql("IF(lgl, array(1, 2, 3, 4, 5), NULL)")
+    )
   out <- sdf %>%
     tidyr::fill(tidyselect::everything()) %>%
     collect()
@@ -90,9 +91,10 @@ test_that("missings filled up for each atomic vector", {
       dbl = c(NA, 1),
       chr = c(NA, "a")
     )
-  ) %>% dplyr::mutate(
-    arr = dplyr::sql("IF(lgl, array(1, 2, 3, 4, 5), NULL)")
-  )
+  ) %>%
+    dplyr::mutate(
+      arr = dplyr::sql("IF(lgl, array(1, 2, 3, 4, 5), NULL)")
+    )
   out <- sdf %>%
     tidyr::fill(tidyselect::everything(), .direction = "up") %>%
     collect()
@@ -167,4 +169,3 @@ test_that("fill respects grouping", {
 })
 
 test_clear_cache()
-

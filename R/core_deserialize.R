@@ -4,17 +4,37 @@ read_bin <- function(con, what, n, endian = NULL) {
 
 #' @export
 read_bin.default <- function(con, what, n, endian = NULL) {
-  if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+  if (is.null(endian)) {
+    readBin(con, what, n)
+  } else {
+    readBin(con, what, n, endian = endian)
+  }
 }
 
 read_bin_wait <- function(con, what, n, endian = NULL) {
   sc <- con
-  con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) sc$monitoring else sc$backend
+  con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) {
+    sc$monitoring
+  } else {
+    sc$backend
+  }
 
-  timeout <- spark_config_value(sc$config, "sparklyr.backend.timeout", 30 * 24 * 60 * 60)
-  progressInterval <- spark_config_value(sc$config, "sparklyr.progress.interval", 3)
+  timeout <- spark_config_value(
+    sc$config,
+    "sparklyr.backend.timeout",
+    30 * 24 * 60 * 60
+  )
+  progressInterval <- spark_config_value(
+    sc$config,
+    "sparklyr.progress.interval",
+    3
+  )
 
-  result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+  result <- if (is.null(endian)) {
+    readBin(con, what, n)
+  } else {
+    readBin(con, what, n, endian = endian)
+  }
 
   progressTimeout <- Sys.time() + progressInterval
   if (is.null(sc$state$progress)) {
@@ -28,7 +48,11 @@ read_bin_wait <- function(con, what, n, endian = NULL) {
     Sys.sleep(waitInterval)
     waitInterval <- min(0.1, waitInterval + 0.01)
 
-    result <- if (is.null(endian)) readBin(con, what, n) else readBin(con, what, n, endian = endian)
+    result <- if (is.null(endian)) {
+      readBin(con, what, n)
+    } else {
+      readBin(con, what, n, endian = endian)
+    }
 
     if (Sys.time() > progressTimeout) {
       progressTimeout <- Sys.time() + progressInterval
@@ -39,10 +63,14 @@ read_bin_wait <- function(con, what, n, endian = NULL) {
     }
   }
 
-  if (progressUpdated) connection_progress_terminated(sc)
+  if (progressUpdated) {
+    connection_progress_terminated(sc)
+  }
 
   if (commandStart + timeout <= Sys.time()) {
-    stop("Operation timed out, increase config option sparklyr.backend.timeout if needed.")
+    stop(
+      "Operation timed out, increase config option sparklyr.backend.timeout if needed."
+    )
   }
 
   result
@@ -69,7 +97,8 @@ readObject <- function(con) {
 }
 
 readTypedObject <- function(con, type) {
-  switch(type,
+  switch(
+    type,
     "i" = readInt(con),
     "c" = readString(con),
     "b" = readBoolean(con),
@@ -86,7 +115,8 @@ readTypedObject <- function(con, type) {
     "j" = getJobj(con, readString(con)),
     "J" = jsonlite::fromJSON(
       readString(con),
-      simplifyDataFrame = FALSE, simplifyMatrix = FALSE
+      simplifyDataFrame = FALSE,
+      simplifyMatrix = FALSE
     ),
     stop(paste("Unsupported type for deserialization", type))
   )
@@ -95,20 +125,18 @@ readTypedObject <- function(con, type) {
 readString <- function(con) {
   stringLen <- readInt(con)
 
-  string <- (
-    if (stringLen > 0) {
-      raw <- read_bin(con, raw(), stringLen, endian = "big")
-      if (is.element("00", raw)) {
-        warning("Input contains embedded nuls, removing.")
-        raw <- raw[raw != "00"]
-      }
-      rawToChar(raw)
-    } else if (stringLen == 0) {
-      ""
-    } else {
-      NA_character_
+  string <- (if (stringLen > 0) {
+    raw <- read_bin(con, raw(), stringLen, endian = "big")
+    if (is.element("00", raw)) {
+      warning("Input contains embedded nuls, removing.")
+      raw <- raw[raw != "00"]
     }
-  )
+    rawToChar(raw)
+  } else if (stringLen == 0) {
+    ""
+  } else {
+    NA_character_
+  })
 
   Encoding(string) <- "UTF-8"
   string
