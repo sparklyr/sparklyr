@@ -175,17 +175,17 @@ ml_multiclass_classification_evaluator(pred)
 
 }
 \seealso{
-Other ml algorithms: 
-\code{\link{ml_aft_survival_regression}()},
-\code{\link{ml_gbt_classifier}()},
-\code{\link{ml_generalized_linear_regression}()},
-\code{\link{ml_isotonic_regression}()},
-\code{\link{ml_linear_regression}()},
-\code{\link{ml_linear_svc}()},
-\code{\link{ml_logistic_regression}()},
-\code{\link{ml_multilayer_perceptron_classifier}()},
-\code{\link{ml_naive_bayes}()},
-\code{\link{ml_one_vs_rest}()},
-\code{\link{ml_random_forest_classifier}()}
+Other ml algorithms:
+\code{\link[=ml_aft_survival_regression]{ml_aft_survival_regression()}},
+\code{\link[=ml_gbt_classifier]{ml_gbt_classifier()}},
+\code{\link[=ml_generalized_linear_regression]{ml_generalized_linear_regression()}},
+\code{\link[=ml_isotonic_regression]{ml_isotonic_regression()}},
+\code{\link[=ml_linear_regression]{ml_linear_regression()}},
+\code{\link[=ml_linear_svc]{ml_linear_svc()}},
+\code{\link[=ml_logistic_regression]{ml_logistic_regression()}},
+\code{\link[=ml_multilayer_perceptron_classifier]{ml_multilayer_perceptron_classifier()}},
+\code{\link[=ml_naive_bayes]{ml_naive_bayes()}},
+\code{\link[=ml_one_vs_rest]{ml_one_vs_rest()}},
+\code{\link[=ml_random_forest_classifier]{ml_random_forest_classifier()}}
 }
 \concept{ml algorithms}

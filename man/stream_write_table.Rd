@@ -41,8 +41,8 @@ information to guarantee end-to-end fault-tolerance.}
 Writes a Spark dataframe stream into a table.
 }
 \seealso{
-Other Spark stream serialization: 
-\code{\link{stream_write_csv}()},
-\code{\link{stream_write_memory}()}
+Other Spark stream serialization:
+\code{\link[=stream_write_csv]{stream_write_csv()}},
+\code{\link[=stream_write_memory]{stream_write_memory()}}
 }
 \concept{Spark stream serialization}

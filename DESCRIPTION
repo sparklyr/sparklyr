@@ -115,7 +115,6 @@ Suggests:
     testthat,
     rprojroot
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 SystemRequirements: Spark: 2.x, or 3.x, or 4.x
 Collate:
     'spark_data_build_types.R'
@@ -357,3 +356,4 @@ Collate:
     'yarn_config.R'
     'yarn_ui.R'
     'zzz.R'
+Config/roxygen2/version: 8.0.0

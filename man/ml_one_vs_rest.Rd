@@ -43,17 +43,17 @@ the predictions added to it.
 Reduction of Multiclass Classification to Binary Classification. Performs reduction using one against all strategy. For a multiclass classification with k classes, train k models (one per class). Each example is scored against all k models and the model with highest score is picked to label the example.
 }
 \seealso{
-Other ml algorithms: 
-\code{\link{ml_aft_survival_regression}()},
-\code{\link{ml_decision_tree_classifier}()},
-\code{\link{ml_gbt_classifier}()},
-\code{\link{ml_generalized_linear_regression}()},
-\code{\link{ml_isotonic_regression}()},
-\code{\link{ml_linear_regression}()},
-\code{\link{ml_linear_svc}()},
-\code{\link{ml_logistic_regression}()},
-\code{\link{ml_multilayer_perceptron_classifier}()},
-\code{\link{ml_naive_bayes}()},
-\code{\link{ml_random_forest_classifier}()}
+Other ml algorithms:
+\code{\link[=ml_aft_survival_regression]{ml_aft_survival_regression()}},
+\code{\link[=ml_decision_tree_classifier]{ml_decision_tree_classifier()}},
+\code{\link[=ml_gbt_classifier]{ml_gbt_classifier()}},
+\code{\link[=ml_generalized_linear_regression]{ml_generalized_linear_regression()}},
+\code{\link[=ml_isotonic_regression]{ml_isotonic_regression()}},
+\code{\link[=ml_linear_regression]{ml_linear_regression()}},
+\code{\link[=ml_linear_svc]{ml_linear_svc()}},
+\code{\link[=ml_logistic_regression]{ml_logistic_regression()}},
+\code{\link[=ml_multilayer_perceptron_classifier]{ml_multilayer_perceptron_classifier()}},
+\code{\link[=ml_naive_bayes]{ml_naive_bayes()}},
+\code{\link[=ml_random_forest_classifier]{ml_random_forest_classifier()}}
 }
 \concept{ml algorithms}

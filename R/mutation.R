@@ -29,7 +29,7 @@
 #' @name sdf_bind
 NULL
 
-#' @rawNamespace S3method(rbind,tbl_spark)
+#' @export
 rbind.tbl_spark <- function(
   ...,
   deparse.level = 1,
@@ -160,7 +160,7 @@ sdf_bind_rows <- function(..., id = NULL) {
   do.call(rbind, augmented_dots)
 }
 
-#' @rawNamespace S3method(cbind,tbl_spark)
+#' @export
 cbind.tbl_spark <- function(
   ...,
   deparse.level = 1,

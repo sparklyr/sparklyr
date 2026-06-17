@@ -1,6 +1,7 @@
 # nocov start
 #' @include shell_connection.R
 
+#' @export
 create_hive_context.livy_connection <- function(sc) {
   invoke_new(
     sc,

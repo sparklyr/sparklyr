@@ -35,19 +35,19 @@ Generator method for creating a single-column Spark dataframes comprised of
 i.i.d. samples from the standard normal distribution.
 }
 \seealso{
-Other Spark statistical routines: 
-\code{\link{sdf_rbeta}()},
-\code{\link{sdf_rbinom}()},
-\code{\link{sdf_rcauchy}()},
-\code{\link{sdf_rchisq}()},
-\code{\link{sdf_rexp}()},
-\code{\link{sdf_rgamma}()},
-\code{\link{sdf_rgeom}()},
-\code{\link{sdf_rhyper}()},
-\code{\link{sdf_rlnorm}()},
-\code{\link{sdf_rpois}()},
-\code{\link{sdf_rt}()},
-\code{\link{sdf_runif}()},
-\code{\link{sdf_rweibull}()}
+Other Spark statistical routines:
+\code{\link[=sdf_rbeta]{sdf_rbeta()}},
+\code{\link[=sdf_rbinom]{sdf_rbinom()}},
+\code{\link[=sdf_rcauchy]{sdf_rcauchy()}},
+\code{\link[=sdf_rchisq]{sdf_rchisq()}},
+\code{\link[=sdf_rexp]{sdf_rexp()}},
+\code{\link[=sdf_rgamma]{sdf_rgamma()}},
+\code{\link[=sdf_rgeom]{sdf_rgeom()}},
+\code{\link[=sdf_rhyper]{sdf_rhyper()}},
+\code{\link[=sdf_rlnorm]{sdf_rlnorm()}},
+\code{\link[=sdf_rpois]{sdf_rpois()}},
+\code{\link[=sdf_rt]{sdf_rt()}},
+\code{\link[=sdf_runif]{sdf_runif()}},
+\code{\link[=sdf_rweibull]{sdf_rweibull()}}
 }
 \concept{Spark statistical routines}

@@ -16,12 +16,12 @@ spark_adaptive_query_execution(sc, enable = NULL)
 Retrieves or sets whether Spark adaptive query execution is enabled
 }
 \seealso{
-Other Spark runtime configuration: 
-\code{\link{spark_advisory_shuffle_partition_size}()},
-\code{\link{spark_auto_broadcast_join_threshold}()},
-\code{\link{spark_coalesce_initial_num_partitions}()},
-\code{\link{spark_coalesce_min_num_partitions}()},
-\code{\link{spark_coalesce_shuffle_partitions}()},
-\code{\link{spark_session_config}()}
+Other Spark runtime configuration:
+\code{\link[=spark_advisory_shuffle_partition_size]{spark_advisory_shuffle_partition_size()}},
+\code{\link[=spark_auto_broadcast_join_threshold]{spark_auto_broadcast_join_threshold()}},
+\code{\link[=spark_coalesce_initial_num_partitions]{spark_coalesce_initial_num_partitions()}},
+\code{\link[=spark_coalesce_min_num_partitions]{spark_coalesce_min_num_partitions()}},
+\code{\link[=spark_coalesce_shuffle_partitions]{spark_coalesce_shuffle_partitions()}},
+\code{\link[=spark_session_config]{spark_session_config()}}
 }
 \concept{Spark runtime configuration}
