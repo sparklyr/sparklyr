@@ -65,4 +65,3 @@ test_that("ml_recommend() works", {
 })
 
 test_clear_cache()
-

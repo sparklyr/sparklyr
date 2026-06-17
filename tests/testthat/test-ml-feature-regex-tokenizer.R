@@ -45,14 +45,27 @@ test_that("ft_regex_tokenizer() works", {
   )
 
   rt <- ft_regex_tokenizer(
-    sc, "sentence", "words",
-    gaps = TRUE, min_token_length = 2, pattern = "\\W", to_lower_case = FALSE
+    sc,
+    "sentence",
+    "words",
+    gaps = TRUE,
+    min_token_length = 2,
+    pattern = "\\W",
+    to_lower_case = FALSE
   )
 
   expect_equal(
-    ml_params(rt, list(
-      "input_col", "output_col", "gaps", "min_token_length", "pattern", "to_lower_case"
-    )),
+    ml_params(
+      rt,
+      list(
+        "input_col",
+        "output_col",
+        "gaps",
+        "min_token_length",
+        "pattern",
+        "to_lower_case"
+      )
+    ),
     list(
       input_col = "sentence",
       output_col = "words",
@@ -65,4 +78,3 @@ test_that("ft_regex_tokenizer() works", {
 })
 
 test_clear_cache()
-

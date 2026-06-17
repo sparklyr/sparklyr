@@ -30,7 +30,7 @@ test_that("ml_prefixspan() works as expected", {
 
   expect_equal(nrow(res), 5)
   expect_setequal(
-    lapply(seq(nrow(res)), function(i) as.list(res[i,])),
+    lapply(seq(nrow(res)), function(i) as.list(res[i, ])),
     list(
       list(sequence = list(list(list(3))), freq = 2),
       list(sequence = list(list(list(2))), freq = 3),
@@ -42,4 +42,3 @@ test_that("ml_prefixspan() works as expected", {
 })
 
 test_clear_cache()
-

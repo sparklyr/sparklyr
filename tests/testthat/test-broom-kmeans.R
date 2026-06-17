@@ -4,7 +4,6 @@ skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("kmeans.tidy() works", {
-
   ## ---------------- Connection and data upload to Spark ----------------------
 
   sc <- testthat_spark_connection()
@@ -18,10 +17,7 @@ test_that("kmeans.tidy() works", {
 
   td1 <- tidy(model)
 
-  check_tidy(td1,
-    exp.row = 4,
-    exp.names = c("mpg", "cyl", "size", "cluster")
-  )
+  check_tidy(td1, exp.row = 4, exp.names = c("mpg", "cyl", "size", "cluster"))
   expect_equal(td1$size, model$summary$cluster_sizes())
 
   ## --------------------------- augment() -------------------------------------
@@ -30,7 +26,8 @@ test_that("kmeans.tidy() works", {
     augment() %>%
     collect()
 
-  check_tidy(au1,
+  check_tidy(
+    au1,
     exp.row = nrow(mtcars),
     exp.name = c(names(mtcars), ".cluster")
   )
@@ -41,26 +38,15 @@ test_that("kmeans.tidy() works", {
     augment(newdata = head(mtcars_tbl, 25)) %>%
     collect()
 
-  check_tidy(au2,
-    exp.row = 25,
-    exp.name = c(names(mtcars), ".cluster")
-  )
-
+  check_tidy(au2, exp.row = 25, exp.name = c(names(mtcars), ".cluster"))
 
   gl1 <- glance(model)
 
   if (spark_version(sc) >= "2.3.0") {
-    check_tidy(gl1,
-      exp.row = 1,
-      exp.names = c("k", "wssse", "silhouette")
-    )
+    check_tidy(gl1, exp.row = 1, exp.names = c("k", "wssse", "silhouette"))
   } else {
-    check_tidy(gl1,
-      exp.row = 1,
-      exp.names = c("k", "wssse")
-    )
+    check_tidy(gl1, exp.row = 1, exp.names = c("k", "wssse"))
   }
 })
 
 test_clear_cache()
-

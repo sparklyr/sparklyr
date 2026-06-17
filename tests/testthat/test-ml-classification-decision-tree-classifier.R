@@ -32,4 +32,3 @@ test_that("ml_decision_tree_classifier() param setting", {
 })
 
 test_clear_cache()
-

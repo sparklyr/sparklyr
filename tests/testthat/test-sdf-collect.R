@@ -15,7 +15,7 @@ test_that("sdf_collect() can collect the first n rows of a Spark dataframe", {
 
   mtcars_data <- sdf_collect(mtcars_tbl, n = 10)
 
-  expect_equivalent(mtcars[1:10,], mtcars_data)
+  expect_equivalent(mtcars[1:10, ], mtcars_data)
 })
 
 test_that("sdf_collect() works properly with impl = \"row-wise-iter\"", {
@@ -34,7 +34,9 @@ test_that("sdf_collect() works properly with impl = \"column-wise\"", {
 
 test_that("sdf_collect() works with nested lists", {
   if (spark_version(sc) < "2.4") {
-    skip("serializing nested list into Spark StructType is only supported in Spark 2.4+")
+    skip(
+      "serializing nested list into Spark StructType is only supported in Spark 2.4+"
+    )
   }
 
   df <- dplyr::tibble(
@@ -50,7 +52,9 @@ test_that("sdf_collect() works with nested lists", {
 
 test_that("sdf_collect() works with nested named lists", {
   if (spark_version(sc) < "2.4") {
-    skip("serializing nested named list into Spark StructType is only supported in Spark 2.4+")
+    skip(
+      "serializing nested named list into Spark StructType is only supported in Spark 2.4+"
+    )
   }
 
   df <- dplyr::tibble(
@@ -74,7 +78,8 @@ test_that("sdf_collect() works with boolean array column", {
 
   sdf <- dplyr::tbl(
     sc,
-    dplyr::sql("
+    dplyr::sql(
+      "
       SELECT
         *
       FROM
@@ -83,7 +88,8 @@ test_that("sdf_collect() works with boolean array column", {
                NULL,
                (ARRAY(TRUE, NULL, FALSE))
       AS TAB(`arr`)
-    ")
+    "
+    )
   )
   expect_equivalent(
     sdf %>% sdf_collect(),
@@ -96,7 +102,8 @@ test_that("sdf_collect() works with byte array column", {
 
   sdf <- dplyr::tbl(
     sc,
-    dplyr::sql("
+    dplyr::sql(
+      "
       SELECT
         *
       FROM
@@ -105,7 +112,8 @@ test_that("sdf_collect() works with byte array column", {
                NULL,
                ARRAY(CAST(101 AS BYTE))
       AS TAB(`arr`)
-    ")
+    "
+    )
   )
   df <- sdf %>% collect()
 
@@ -185,13 +193,15 @@ test_that("sdf_collect() works with string array column", {
 
   sdf <- dplyr::tbl(
     sc,
-    dplyr::sql("
+    dplyr::sql(
+      "
       SELECT
         *
       FROM
         VALUES ARRAY('ab'), ARRAY('bcd', 'e'), NULL, ARRAY('fghi', NULL, 'jk')
       AS TAB(`arr`)
-    ")
+    "
+    )
   )
   expect_equivalent(
     sdf %>% sdf_collect(),
@@ -237,12 +247,19 @@ test_that("sdf_collect() works with temporal array column", {
 
 test_that("sdf_collect() works with struct array column", {
   if (spark_version(sc) < "2.3") {
-    skip("deserializing Spark StructType into named list is only supported in Spark 2.3+")
+    skip(
+      "deserializing Spark StructType into named list is only supported in Spark 2.3+"
+    )
   }
 
   jsonFilePath <- get_test_data_path("struct-inside-arrays.json")
 
-  sentences <- spark_read_json(sc, name = "sentences", path = jsonFilePath, overwrite = TRUE)
+  sentences <- spark_read_json(
+    sc,
+    name = "sentences",
+    path = jsonFilePath,
+    overwrite = TRUE
+  )
 
   expect_warning_on_arrow(
     sentences_local <- sdf_collect(sentences)
@@ -271,7 +288,9 @@ test_that("sdf_collect() works with struct array column", {
 
 test_that("sdf_collect() works with structs inside nested arrays", {
   if (spark_version(sc) < "2.3") {
-    skip("deserializing Spark StructType into named list is only supported in Spark 2.3+")
+    skip(
+      "deserializing Spark StructType into named list is only supported in Spark 2.3+"
+    )
   }
   if (spark_version(sc) < "2.4") {
     skip("to_json on nested arrays is only supported in Spark 2.4+")
@@ -279,7 +298,12 @@ test_that("sdf_collect() works with structs inside nested arrays", {
 
   jsonFilePath <- get_test_data_path("struct-inside-nested-arrays.json")
 
-  sentences <- spark_read_json(sc, name = "sentences", path = jsonFilePath, overwrite = TRUE)
+  sentences <- spark_read_json(
+    sc,
+    name = "sentences",
+    path = jsonFilePath,
+    overwrite = TRUE
+  )
 
   expect_warning_on_arrow(
     sentences_local <- sdf_collect(sentences)
@@ -307,12 +331,17 @@ test_that("sdf_collect() works with structs inside nested arrays", {
 })
 
 test_that("sdf_collect() supports callback", {
-  if (spark_version(sc) < "2.0") skip("batch collection requires Spark 2.0")
+  if (spark_version(sc) < "2.0") {
+    skip("batch collection requires Spark 2.0")
+  }
 
   batch_count <- 0
   row_count <- 0
 
-  df <- tibble(id = seq(1, 10), val = lapply(seq(1, 10), function(x) list(a = x, b = as.character(x))))
+  df <- tibble(
+    id = seq(1, 10),
+    val = lapply(seq(1, 10), function(x) list(a = x, b = as.character(x)))
+  )
   sdf <- sdf_copy_to(sc, df, repartition = 2, overwrite = TRUE)
 
   collected <- list()
@@ -383,7 +412,9 @@ test_that("sdf_collect() supports callback", {
 })
 
 test_that("sdf_collect() supports callback expression", {
-  if (spark_version(sc) < "2.0") skip("batch collection requires Spark 2.0")
+  if (spark_version(sc) < "2.0") {
+    skip("batch collection requires Spark 2.0")
+  }
 
   row_count <- 0
   sdf_len(sc, 10, repartition = 2) %>%
@@ -403,4 +434,3 @@ test_that("sdf_collect() preserves NA_real_", {
 })
 
 test_clear_cache()
-

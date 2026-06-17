@@ -104,7 +104,9 @@ test_that("ml_transform take list of transformers (#1444)", {
   pipeline <- ml_pipeline(string_indexer) %>%
     ft_vector_assembler(c("Petal_Width", "Petal_Length"), "features") %>%
     ml_logistic_regression() %>%
-    ft_index_to_string("prediction", "predicted_label",
+    ft_index_to_string(
+      "prediction",
+      "predicted_label",
       labels = ml_labels(string_indexer)
     )
   pipeline_model <- ml_fit(pipeline, iris_tbl)
@@ -113,10 +115,13 @@ test_that("ml_transform take list of transformers (#1444)", {
 
   transformed1 <- ml_transform(stages, iris_tbl) %>%
     dplyr::pull(prediction)
-  transformed2 <- Reduce(function(transformer, data) ml_transform(data, transformer), stages, init = iris_tbl) %>%
+  transformed2 <- Reduce(
+    function(transformer, data) ml_transform(data, transformer),
+    stages,
+    init = iris_tbl
+  ) %>%
     dplyr::pull(prediction)
   expect_equal(transformed1, transformed2)
 })
 
 test_clear_cache()
-

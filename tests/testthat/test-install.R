@@ -26,7 +26,9 @@ test_that("Install commands work", {
   )
 
   spark_home <- Sys.getenv("SPARK_HOME")
-  if(spark_home == "") spark_home <- NULL
+  if (spark_home == "") {
+    spark_home <- NULL
+  }
   expect_equal(spark_home(), spark_home)
 })
 
@@ -43,7 +45,7 @@ test_that("supported spark_versions can be downloaded", {
       RCurl::url.exists(version$download),
       label = paste(version$spark, version$hadoop),
       info = version$download
-      )
+    )
   }
 })
 
@@ -58,9 +60,8 @@ test_that("spark_versions downloads use https", {
       length(grep("^https", version$download)) == 1,
       label = paste(version$spark, version$hadoop),
       info = version$download
-      )
+    )
   }
 })
 
 test_clear_cache()
-

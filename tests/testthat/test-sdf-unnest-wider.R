@@ -71,4 +71,3 @@ test_that("`transform` works as expected", {
 })
 
 test_clear_cache()
-

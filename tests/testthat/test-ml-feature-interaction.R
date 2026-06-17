@@ -16,7 +16,12 @@ test_that("ft_interaction() param setting", {
 test_that("ft_interaction() works properly", {
   sc <- testthat_spark_connection()
   df <- data.frame(
-    V1 = 1, V2 = 2, V3 = 3, V4 = 8, V5 = 4, V6 = 5
+    V1 = 1,
+    V2 = 2,
+    V3 = 3,
+    V4 = 8,
+    V5 = 4,
+    V6 = 5
   )
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE)
 
@@ -35,4 +40,3 @@ test_that("ft_interaction() works properly", {
 })
 
 test_clear_cache()
-

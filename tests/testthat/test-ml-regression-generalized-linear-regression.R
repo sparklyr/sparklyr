@@ -38,9 +38,11 @@ test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits and
   mtcars_tbl <- testthat_tbl("mtcars")
 
   r <- glm(mpg ~ cyl + wt, data = mtcars, family = gaussian(link = "identity"))
-  s <- ml_generalized_linear_regression(mtcars_tbl,
+  s <- ml_generalized_linear_regression(
+    mtcars_tbl,
     response = "mpg",
-    features = c("cyl", "wt"), family = gaussian(link = "identity")
+    features = c("cyl", "wt"),
+    family = gaussian(link = "identity")
   )
   expect_equal(coef(r), coef(s))
   expect_equal(residuals(r) %>% unname(), residuals(s))
@@ -54,9 +56,11 @@ test_that("'ml_generalized_linear_regression' and 'glm' produce similar fits and
   beaver_tbl <- testthat_tbl("beaver2")
 
   r <- glm(data = beaver2, activ ~ temp, family = binomial(link = "logit"))
-  s <- ml_generalized_linear_regression(beaver_tbl,
+  s <- ml_generalized_linear_regression(
+    beaver_tbl,
     response = "activ",
-    features = "temp", family = binomial(link = "logit")
+    features = "temp",
+    family = binomial(link = "logit")
   )
   expect_equal(coef(r), coef(s))
   expect_equal(residuals(r) %>% unname(), residuals(s))
@@ -84,20 +88,27 @@ test_that("weights column works for glm", {
     )
   iris_weighted_tbl <- testthat_tbl("iris_weighted")
 
-  r <- glm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
-    family = gaussian, weights = weights, data = iris_weighted
+  r <- glm(
+    Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+    family = gaussian,
+    weights = weights,
+    data = iris_weighted
   )
-  s <- ml_generalized_linear_regression(iris_weighted_tbl,
+  s <- ml_generalized_linear_regression(
+    iris_weighted_tbl,
     response = "Sepal_Length",
     features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
     weight_col = "weights"
   )
   expect_equal(unname(coef(r)), unname(coef(s)))
 
-  r <- glm(Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
-    family = gaussian, data = iris_weighted
+  r <- glm(
+    Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+    family = gaussian,
+    data = iris_weighted
   )
-  s <- ml_generalized_linear_regression(iris_weighted_tbl,
+  s <- ml_generalized_linear_regression(
+    iris_weighted_tbl,
     response = "Sepal_Length",
     features = c("Sepal_Width", "Petal_Length", "Petal_Width"),
     weight_col = "ones"
@@ -110,7 +121,8 @@ test_that("ml_generalized_linear_regression print methods work", {
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
   glm_model <- ml_generalized_linear_regression(
-    iris_tbl, Petal_Length ~ Petal_Width
+    iris_tbl,
+    Petal_Length ~ Petal_Width
   )
 
   expect_known_output(
@@ -154,4 +166,3 @@ test_that("Tuning works GLM", {
 })
 
 test_clear_cache()
-

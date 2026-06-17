@@ -10,7 +10,11 @@ call_sparkr <- function(method, ...) {
 }
 
 test_that("sparklyr gateway for Synapse should be configured properly", {
-  connector <- invoke_static(sc, "org.apache.spark.sparklyr.SparklyrConnector", "getOrCreate")
+  connector <- invoke_static(
+    sc,
+    "org.apache.spark.sparklyr.SparklyrConnector",
+    "getOrCreate"
+  )
   expect_false(is.null(connector))
   gateway_url <- invoke_method(sc, FALSE, connector, "getUri")
   expect_true(grepl("sparklyr://[^:]+:\\d{1,5}", gateway_url))
@@ -24,4 +28,3 @@ test_that("sparklyr spark session should be configured properly", {
 })
 
 test_clear_cache()
-

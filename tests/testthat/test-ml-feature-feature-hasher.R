@@ -19,9 +19,9 @@ test_that("ft_feature_hasher() works", {
   sc <- testthat_spark_connection()
   test_requires_version("2.3.0", "ft_feature_hasher() requires spark 2.3+")
   df <- tribble(
-    ~real, ~bool, ~stringNum, ~string,
-    2.0, TRUE, "1", "foo",
-    3.0, FALSE, "2", "bar"
+    ~real , ~bool , ~stringNum , ~string ,
+    2.0   , TRUE  , "1"        , "foo"   ,
+    3.0   , FALSE , "2"        , "bar"
   )
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE)
 
@@ -41,4 +41,3 @@ test_that("ft_feature_hasher() works", {
 })
 
 test_clear_cache()
-

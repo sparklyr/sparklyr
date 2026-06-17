@@ -37,7 +37,6 @@ test_that("ml_save/ml_load work for unnested pipelines", {
 
   p2 <- ml_load(sc, path)
 
-
   p1_params <- p1 %>%
     ml_stages() %>%
     lapply(ml_param_map)
@@ -107,7 +106,10 @@ test_that("ml_[save/load]_model() work for ml_pipeline_model", {
         pull(probability)
     )
   }
-  expect_equal(score_test_set(model1, test_tbl), score_test_set(model2, test_tbl))
+  expect_equal(
+    score_test_set(model1, test_tbl),
+    score_test_set(model2, test_tbl)
+  )
 })
 
 test_that("we can ml_save/load a feature transformer", {
@@ -188,4 +190,3 @@ test_that("we can fit a pipeline saved then loaded from ml_model", {
 })
 
 test_clear_cache()
-

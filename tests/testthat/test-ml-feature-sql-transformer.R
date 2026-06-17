@@ -28,7 +28,8 @@ test_that("ft_sql_transformer() works", {
   )
 
   sql_transformer <- ft_sql_transformer(
-    sc, "select *, petal_width * 2 as pw2 from `__THIS__`"
+    sc,
+    "select *, petal_width * 2 as pw2 from `__THIS__`"
   )
 
   expect_equal(
@@ -38,4 +39,3 @@ test_that("ft_sql_transformer() works", {
 })
 
 test_clear_cache()
-

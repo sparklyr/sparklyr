@@ -5,7 +5,9 @@ sc <- testthat_spark_connection()
 
 iris_tbl <- testthat_tbl("iris")
 
-dates <- data.frame(dates = c(as.Date("2015/12/19"), as.Date(NA), as.Date("2015/12/19")))
+dates <- data.frame(
+  dates = c(as.Date("2015/12/19"), as.Date(NA), as.Date("2015/12/19"))
+)
 dates_tbl <- testthat_tbl("dates")
 
 colnas <- data.frame(c1 = c("A", "B"), c2 = c(NA, NA))
@@ -20,21 +22,37 @@ test_that("'spark_apply' can filter columns", {
 
 test_that("'spark_apply' can add columns", {
   expect_equivalent(
-    iris_tbl %>% spark_apply(function(e) cbind(e, 1), names = c(colnames(iris_tbl), "new")) %>% collect(),
+    iris_tbl %>%
+      spark_apply(
+        function(e) cbind(e, 1),
+        names = c(colnames(iris_tbl), "new")
+      ) %>%
+      collect(),
     iris_tbl %>% mutate(new = 1) %>% collect()
   )
 })
 
 test_that("'spark_apply' can concatenate", {
   expect_equivalent(
-    iris_tbl %>% spark_apply(function(e) apply(e, 1, paste, collapse = " "), names = "s") %>% collect(),
-    iris_tbl %>% transmute(s = paste(Sepal_Length, Sepal_Width, Petal_Length, Petal_Width, Species)) %>% collect()
+    iris_tbl %>%
+      spark_apply(
+        function(e) apply(e, 1, paste, collapse = " "),
+        names = "s"
+      ) %>%
+      collect(),
+    iris_tbl %>%
+      transmute(
+        s = paste(Sepal_Length, Sepal_Width, Petal_Length, Petal_Width, Species)
+      ) %>%
+      collect()
   )
 })
 
 test_that("'spark_apply' can filter", {
   expect_equivalent(
-    iris_tbl %>% spark_apply(function(e) e[e$Species == "setosa", ]) %>% collect(),
+    iris_tbl %>%
+      spark_apply(function(e) e[e$Species == "setosa", ]) %>%
+      collect(),
     iris_tbl %>% filter(Species == "setosa") %>% collect()
   )
 })
@@ -58,7 +76,6 @@ test_that("'spark_apply' works with 'group_by' over multiple columns", {
   iris_tbl_ints <- iris_tbl %>%
     mutate(Petal_Width_Int = as.integer(Petal_Width))
 
-
   grouped_lm <- spark_apply(
     iris_tbl_ints,
     function(e, species, petal_width) {
@@ -66,12 +83,14 @@ test_that("'spark_apply' works with 'group_by' over multiple columns", {
     },
     names = "Intercept",
     group_by = c("Species", "Petal_Width_Int")
-  ) %>% collect()
+  ) %>%
+    collect()
 
-  iris_int <- iris %>% mutate(
-    Petal_Width_Int = as.integer(Petal.Width),
-    GroupBy = paste(Species, Petal_Width_Int, sep = "|")
-  )
+  iris_int <- iris %>%
+    mutate(
+      Petal_Width_Int = as.integer(Petal.Width),
+      GroupBy = paste(Species, Petal_Width_Int, sep = "|")
+    )
 
   lapply(
     unique(iris_int$GroupBy),
@@ -81,8 +100,17 @@ test_that("'spark_apply' works with 'group_by' over multiple columns", {
       petal_width_test <- as.integer(parts[[1]][[2]])
 
       expect_equal(
-        grouped_lm[grouped_lm$Species == species_test & grouped_lm$Petal_Width_Int == petal_width_test, ]$Intercept,
-        lm(Petal.Width ~ Petal.Length, iris_int[iris_int$Species == species_test & iris_int$Petal_Width_Int == petal_width_test, ])$coefficients[["(Intercept)"]]
+        grouped_lm[
+          grouped_lm$Species == species_test &
+            grouped_lm$Petal_Width_Int == petal_width_test,
+        ]$Intercept,
+        lm(
+          Petal.Width ~ Petal.Length,
+          iris_int[
+            iris_int$Species == species_test &
+              iris_int$Petal_Width_Int == petal_width_test,
+          ]
+        )$coefficients[["(Intercept)"]]
       )
     }
   )
@@ -156,7 +184,9 @@ test_that("'spark_apply' can return 'NA's for dates", {
   skip_slow("takes too long to measure coverage")
   expect_equal(
     sdf_len(sc, 1) %>%
-      spark_apply(function(e) data.frame(dates = c(as.Date("2001/1/1"), NA))) %>%
+      spark_apply(function(e) {
+        data.frame(dates = c(as.Date("2001/1/1"), NA))
+      }) %>%
       collect() %>%
       nrow(),
     2
@@ -205,7 +235,13 @@ test_that("'spark_apply' supports grouped empty results", {
     stringsAsFactors = FALSE
   )
 
-  data_spark <- sdf_copy_to(sc, data, "grp_data", memory = TRUE, overwrite = TRUE)
+  data_spark <- sdf_copy_to(
+    sc,
+    data,
+    "grp_data",
+    memory = TRUE,
+    overwrite = TRUE
+  )
 
   collected <- data_spark %>%
     spark_apply(
@@ -238,10 +274,15 @@ test_that("'spark_apply' can use anonymous functions", {
 
 test_that("'spark_apply' can apply function with 'NA's column", {
   skip_slow("takes too long to measure coverage")
-  if (spark_version(sc) < "2.0.0") skip("automatic column types supported in Spark 2.0+")
+  if (spark_version(sc) < "2.0.0") {
+    skip("automatic column types supported in Spark 2.0+")
+  }
 
   expect_equivalent(
-    colnas_tbl %>% mutate(c2 = as.integer(c2)) %>% spark_apply(~ class(.x[[2]])) %>% pull(),
+    colnas_tbl %>%
+      mutate(c2 = as.integer(c2)) %>%
+      spark_apply(~ class(.x[[2]])) %>%
+      pull(),
     "integer"
   )
 
@@ -258,7 +299,7 @@ test_that("'spark_apply' can apply function with 'NA's column", {
 })
 
 test_that("can infer R package dependencies", {
- fn1 <- function(x) {
+  fn1 <- function(x) {
     library(utf8)
     x + 1
   }
@@ -281,7 +322,9 @@ test_that("can infer R package dependencies", {
     x + 4
   }
   expected_deps <- tools::package_dependencies(
-    "sparklyr", db = installed.packages(), recursive = TRUE
+    "sparklyr",
+    db = installed.packages(),
+    recursive = TRUE
   )
   testthat::expect_setequal(
     union(expected_deps$sparklyr, c("base", "sparklyr")),
@@ -290,4 +333,3 @@ test_that("can infer R package dependencies", {
 })
 
 test_clear_cache()
-

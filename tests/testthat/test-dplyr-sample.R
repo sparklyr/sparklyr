@@ -6,7 +6,6 @@ skip_on_livy()
 sc <- testthat_spark_connection()
 
 
-
 test_that("set.seed makes sampling outcomes deterministic", {
   skip_connection("sample-with-seed")
   sdf <- copy_to(sc, dplyr::tibble(id = seq(1000), weight = rep(seq(5), 200)))
@@ -64,4 +63,3 @@ test_that("dplyr query is executed before sampling (frac)", {
 })
 
 test_clear_cache()
-

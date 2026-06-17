@@ -52,4 +52,3 @@ test_that("ml_fpgrowth() works properly", {
 })
 
 test_clear_cache()
-

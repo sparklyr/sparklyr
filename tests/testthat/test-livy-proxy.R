@@ -17,8 +17,7 @@ test_that("Livy connection works with HTTP proxy", {
   proxy_port <- 9999
   np <- num_open_fds(proxy_port)
 
-  if(np > 0) {
-
+  if (np > 0) {
     handle <- local_tcp_proxy(proxy_port = proxy_port, dest_port = 8998)
 
     expect_equal(np, 1)
@@ -35,13 +34,13 @@ test_that("Livy connection works with HTTP proxy", {
     )
     expect_gte(num_open_fds(proxy_port), 2)
 
-    expect_equivalent(sdf_len(sc, 10) %>% collect(), dplyr::tibble(id = seq(10)))
+    expect_equivalent(
+      sdf_len(sc, 10) %>% collect(),
+      dplyr::tibble(id = seq(10))
+    )
 
     spark_disconnect(sc)
   }
-
-
-
 })
 
 test_clear_cache()

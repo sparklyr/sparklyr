@@ -11,4 +11,3 @@ test_that("'spark_extension' creation succeeds", {
 })
 
 test_clear_cache()
-

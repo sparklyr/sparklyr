@@ -47,7 +47,10 @@ test_that("ft_quantile_discretizer works", {
 })
 
 test_that("ft_quantile_discretizer works on multiple columns", {
-  test_requires_version("2.3.0", comment = "multiple columns support requires spark 2.3+")
+  test_requires_version(
+    "2.3.0",
+    comment = "multiple columns support requires spark 2.3+"
+  )
   sc <- testthat_spark_connection()
   df <- tibble(
     id = 0:4L,
@@ -68,7 +71,10 @@ test_that("ft_quantile_discretizer works on multiple columns", {
 })
 
 test_that("ft_quantile_discretizer can approximate weighted percentiles", {
-  test_requires_version("3.0.0", comment = "weighted quantile discretizer requires spark 3.0+")
+  test_requires_version(
+    "3.0.0",
+    comment = "weighted quantile discretizer requires spark 3.0+"
+  )
   sc <- testthat_spark_connection()
 
   df <- tibble(
@@ -93,4 +99,3 @@ test_that("ft_quantile_discretizer can approximate weighted percentiles", {
 })
 
 test_clear_cache()
-

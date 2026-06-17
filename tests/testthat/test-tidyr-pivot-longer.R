@@ -13,7 +13,7 @@ test_that("can pivot all cols to long", {
   expect_same_remote_result(
     dplyr::tibble(x = 1:2, y = 3:4),
     . %>% tidyr::pivot_longer(x:y)
-    )
+  )
 })
 
 test_that("values interleaved correctly", {
@@ -40,13 +40,15 @@ test_that("preserves original keys", {
 test_that("can handle missing combinations", {
   expect_same_remote_result(
     dplyr::tribble(
-      ~id, ~x_1, ~x_2, ~y_2,
-      "A",    1,    2,  "a",
-      "B",    3,    4,  "b",
+      ~id , ~x_1 , ~x_2 , ~y_2 ,
+      "A" ,    1 ,    2 , "a"  ,
+      "B" ,    3 ,    4 , "b"  ,
     ),
-    . %>% tidyr::pivot_longer(
+    . %>%
+      tidyr::pivot_longer(
         -id,
-        names_to = c(".value", "n"), names_sep = "_"
+        names_to = c(".value", "n"),
+        names_sep = "_"
       )
   )
 })
@@ -55,24 +57,27 @@ test_that("can override default output column type", {
   skip_connection("pivot-longer-values-transform")
   expect_same_remote_result(
     dplyr::tibble(x = 1L, y = 2L),
-    . %>% tidyr::pivot_longer(
-      x:y,
-      values_transform = list(value = as.character)
-    )
+    . %>%
+      tidyr::pivot_longer(
+        x:y,
+        values_transform = list(value = as.character)
+      )
   )
 })
 
 test_that("original col order is preserved", {
   expect_same_remote_result(
     dplyr::tribble(
-      ~id, ~z_1, ~y_1, ~x_1, ~z_2, ~y_2, ~x_2,
-      "A", 1, 2, 3, 4, 5, 6,
-      "B", 7, 8, 9, 10, 11, 12,
+      ~id , ~z_1 , ~y_1 , ~x_1 , ~z_2 , ~y_2 , ~x_2 ,
+      "A" ,    1 ,    2 ,    3 ,    4 ,    5 ,    6 ,
+      "B" ,    7 ,    8 ,    9 ,   10 ,   11 ,   12 ,
     ),
-    . %>% tidyr::pivot_longer(
-      -id,
-      names_to = c(".value", "n"), names_sep = "_"
-    )
+    . %>%
+      tidyr::pivot_longer(
+        -id,
+        names_to = c(".value", "n"),
+        names_sep = "_"
+      )
   )
 })
 
@@ -84,7 +89,12 @@ test_that("can pivot duplicated names to .value", {
 
   expect_same_remote_result(
     dplyr::tibble(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4),
-    . %>% tidyr::pivot_longer(-x, names_to = c(".value", NA), names_pattern = "(.)_(.)")
+    . %>%
+      tidyr::pivot_longer(
+        -x,
+        names_to = c(".value", NA),
+        names_pattern = "(.)_(.)"
+      )
   )
 
   expect_same_remote_result(
@@ -94,7 +104,6 @@ test_that("can pivot duplicated names to .value", {
 })
 
 test_that(".value can be at any position in `names_to`", {
-
   samp_sdf <- copy_to(
     sc,
     dplyr::tibble(
@@ -116,12 +125,16 @@ test_that(".value can be at any position in `names_to`", {
   pv <- lapply(
     list(
       tidyr::pivot_longer(
-        samp_sdf, -i,
-        names_to = c(".value", "time"), names_sep = "_"
+        samp_sdf,
+        -i,
+        names_to = c(".value", "time"),
+        names_sep = "_"
       ),
       tidyr::pivot_longer(
-        samp_sdf2, -i,
-        names_to = c("time", ".value"), names_sep = "_"
+        samp_sdf2,
+        -i,
+        names_to = c("time", ".value"),
+        names_sep = "_"
       )
     ),
     collect
@@ -149,8 +162,12 @@ test_that("grouping is preserved", {
 test_that("names repair preserves grouping vars and pivot longer spec", {
   skip_connection("pivot-longer-names-repair")
   sdf_local <- dplyr::tibble(
-    a = 1, b = 2,
-    x_a_1 = c(1, 3), x_a_2 = c(2, 4), x_b_1 = c(1, 2), x_b_2 = c(3, 4)
+    a = 1,
+    b = 2,
+    x_a_1 = c(1, 3),
+    x_a_2 = c(2, 4),
+    x_b_1 = c(1, 2),
+    x_b_2 = c(3, 4)
   )
 
   pipeline <- . %>%
@@ -188,7 +205,9 @@ test_that("multiple names requires names_sep/names_pattern", {
   )
 
   expect_error(
-    build_longer_spec(trivial_sdf, x_y,
+    build_longer_spec(
+      trivial_sdf,
+      x_y,
       names_to = c("a", "b"),
       names_sep = "x",
       names_pattern = "x"
@@ -199,8 +218,10 @@ test_that("multiple names requires names_sep/names_pattern", {
 
 test_that("names_sep generates correct spec", {
   sp <- build_longer_spec(
-    trivial_sdf, x_y,
-    names_to = c("a", "b"), names_sep = "_"
+    trivial_sdf,
+    x_y,
+    names_to = c("a", "b"),
+    names_sep = "_"
   )
 
   expect_equal(sp$a, "x")
@@ -217,15 +238,19 @@ test_that("names_sep fails with single name", {
 test_that("names_pattern generates correct spec", {
   sdf <- copy_to(sc, dplyr::tibble(zx_y = 1))
   sp <- build_longer_spec(
-    sdf, zx_y,
-    names_to = c("a", "b"), names_pattern = "z(.)_(.)"
+    sdf,
+    zx_y,
+    names_to = c("a", "b"),
+    names_pattern = "z(.)_(.)"
   )
   expect_equal(sp$a, "x")
   expect_equal(sp$b, "y")
 
   sp <- build_longer_spec(
-    sdf, zx_y,
-    names_to = "a", names_pattern = "z(.)"
+    sdf,
+    zx_y,
+    names_to = "a",
+    names_pattern = "z(.)"
   )
   expect_equal(sp$a, "x")
 })
@@ -234,8 +259,10 @@ test_that("names_to can override value_to", {
   test_requires_version("2.0.0")
 
   sp <- build_longer_spec(
-    trivial_sdf, x_y,
-    names_to = c("a", ".value"), names_sep = "_"
+    trivial_sdf,
+    x_y,
+    names_to = c("a", ".value"),
+    names_sep = "_"
   )
 
   expect_equal(sp$.value, "y")
@@ -268,4 +295,3 @@ test_that("Error if the `col` can't be selected.", {
 })
 
 test_clear_cache()
-

@@ -13,7 +13,8 @@ test_that("basic binary classification evaluation works", {
   auc <- ml_binary_classification_evaluator(
     model %>%
       ml_predict(ft_vector_assembler(df_tbl, "features1", "features")),
-    label_col = "label", raw_prediction_col = "rawPrediction"
+    label_col = "label",
+    raw_prediction_col = "rawPrediction"
   )
   expect_equal(auc, 1)
 })
@@ -31,7 +32,9 @@ test_that("basic regression evaluation works", {
 
   mse_s <- ml_regression_evaluator(
     df_tbl,
-    label_col = "label", prediction_col = "prediction", metric_name = "mse"
+    label_col = "label",
+    prediction_col = "prediction",
+    metric_name = "mse"
   )
 
   expect_equal(mse_r, mse_s)
@@ -49,7 +52,8 @@ test_that("ml evaluator print methods work", {
   expect_known_output(
     ml_multiclass_classification_evaluator(sc, uid = "foo"),
     output_file(
-      ifelse(spark_version(sc) < "3.0.0",
+      ifelse(
+        spark_version(sc) < "3.0.0",
         "print/multiclass-classification-evaluator.txt",
         "print/multiclass-classification-evaluator-spark-3.0.0.txt"
       )
@@ -65,4 +69,3 @@ test_that("ml evaluator print methods work", {
 })
 
 test_clear_cache()
-

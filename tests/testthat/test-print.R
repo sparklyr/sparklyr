@@ -13,7 +13,8 @@ expect_regexes <- function(printed, regexes) {
 verify_table_src <- function(printed) {
   expect_output(
     printed,
-    regexp =  "# Source:   table<*\\>")
+    regexp = "# Source:   table<*\\>"
+  )
 }
 
 test_that("print supports spark tables", {
@@ -51,4 +52,3 @@ test_that("print supports spark context", {
 })
 
 test_clear_cache()
-

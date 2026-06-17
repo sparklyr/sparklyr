@@ -11,7 +11,8 @@ test_that("ml_load prefers Spark JSON glob and loads the model", {
   model <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
     ml_logistic_regression(Species ~ .)
 
-  dir <- tempfile("mlp_"); dir.create(dir)
+  dir <- tempfile("mlp_")
+  dir.create(dir)
   ml_save(model, dir, overwrite = TRUE)
 
   loaded <- ml_load(sc, dir)
@@ -31,16 +32,24 @@ test_that("ml_load falls back to legacy textFile when Spark JSON glob fails", {
   model <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
     ml_logistic_regression(Species ~ .)
 
-  dir <- tempfile("mlp_"); dir.create(dir)
+  dir <- tempfile("mlp_")
+  dir.create(dir)
   ml_save(model, dir, overwrite = TRUE)
 
   orig <- getFromNamespace("spark_read_json", "sparklyr")
   unlockBinding("spark_read_json", asNamespace("sparklyr"))
-  assignInNamespace("spark_read_json", function(...) stop("forced failure for fallback test"), "sparklyr")
-  on.exit({
-    assignInNamespace("spark_read_json", orig, "sparklyr")
-    lockBinding("spark_read_json", asNamespace("sparklyr"))
-  }, add = TRUE)
+  assignInNamespace(
+    "spark_read_json",
+    function(...) stop("forced failure for fallback test"),
+    "sparklyr"
+  )
+  on.exit(
+    {
+      assignInNamespace("spark_read_json", orig, "sparklyr")
+      lockBinding("spark_read_json", asNamespace("sparklyr"))
+    },
+    add = TRUE
+  )
 
   loaded <- ml_load(sc, dir)
   expect_s3_class(loaded, "ml_transformer")

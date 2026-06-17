@@ -18,29 +18,36 @@ test_that("logistic_regression tidiers work", {
 
   # Fitting model using sparklyr api
   lr_model <- iris_tbl %>%
-    ml_logistic_regression(Species ~ Sepal_Length + Sepal_Width, family = "binomial")
+    ml_logistic_regression(
+      Species ~ Sepal_Length + Sepal_Width,
+      family = "binomial"
+    )
 
   ## ----------------------------- tidy() --------------------------------------
 
   td1 <- tidy(lr_model)
 
-  check_tidy(td1,
-    exp.row = 3, exp.col = 2,
+  check_tidy(
+    td1,
+    exp.row = 3,
+    exp.col = 2,
     exp.names = c("features", "coefficients")
   )
 
   expect_equal(
     td1$coefficients,
     c(-13.0460, 1.9024, 0.4047),
-    tolerance = 0.01, scale = 1
-    )
+    tolerance = 0.01,
+    scale = 1
+  )
 
   ## --------------------------- augment() -------------------------------------
 
   # without newdata
   au1 <- collect(augment(lr_model))
 
-  check_tidy(au1,
+  check_tidy(
+    au1,
     exp.row = nrow(iris_local),
     exp.name = c(dplyr::tbl_vars(iris_tbl), ".predicted_label")
   )
@@ -48,18 +55,16 @@ test_that("logistic_regression tidiers work", {
   # with newdata
   au2 <- collect(augment(lr_model, newdata = iris_tbl))
 
-  check_tidy(au2,
-             exp.row = nrow(iris_local),
-             exp.name = c(dplyr::tbl_vars(iris_tbl), ".predicted_label")
+  check_tidy(
+    au2,
+    exp.row = nrow(iris_local),
+    exp.name = c(dplyr::tbl_vars(iris_tbl), ".predicted_label")
   )
 
   ## ---------------------------- glance() -------------------------------------
   gu1 <- glance(lr_model)
 
-  check_tidy(gu1,
-    exp.row = 1,
-    exp.names = c("elastic_net_param", "lambda")
-  )
+  check_tidy(gu1, exp.row = 1, exp.names = c("elastic_net_param", "lambda"))
 
   lr_parsnip <- parsnip::logistic_reg(engine = "spark") %>%
     parsnip::fit(Species ~ Sepal_Length + Sepal_Width, iris_tbl)
@@ -76,4 +81,3 @@ test_that("logistic_regression tidiers work", {
 })
 
 test_clear_cache()
-

@@ -37,4 +37,3 @@ test_that("'spark_default_compilation_spec' can create default specification", {
 })
 
 test_clear_cache()
-

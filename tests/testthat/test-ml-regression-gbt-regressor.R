@@ -76,4 +76,3 @@ test_that("Tuning works GBT", {
 })
 
 test_clear_cache()
-

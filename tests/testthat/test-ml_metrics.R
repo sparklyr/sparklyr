@@ -14,13 +14,14 @@ test_that("Multiclass metrics return expected results", {
   expect_equal(dim(metrics), c(1, 3))
   expect_equal(pull(metrics, .estimate), 1)
 
-
-  metrics <- ml_metrics_multiclass(tbl_predictions, metrics = c("recall", "precision"))
+  metrics <- ml_metrics_multiclass(
+    tbl_predictions,
+    metrics = c("recall", "precision")
+  )
 
   expect_is(metrics, "data.frame")
   expect_equal(dim(metrics), c(2, 3))
   expect_equal(pull(metrics, .estimate), c(1, 1))
-
 })
 
 test_that("Binary metrics return expected results", {
@@ -38,13 +39,15 @@ test_that("Binary metrics return expected results", {
   expect_is(metrics, "data.frame")
   expect_equal(dim(metrics), c(2, 3))
   expect_equal(pull(metrics, .estimate), c(0.959, 0.910), tolerance = 0.001)
-
 })
 
 test_that("Regression metrics return expected results", {
   tbl_iris <- testthat_tbl("iris")
 
-  model <- ml_generalized_linear_regression(tbl_iris, "Sepal_Length ~ Sepal_Width + Petal_Length + Petal_Width ")
+  model <- ml_generalized_linear_regression(
+    tbl_iris,
+    "Sepal_Length ~ Sepal_Width + Petal_Length + Petal_Width "
+  )
 
   tbl_predictions <- ml_predict(model, tbl_iris)
 
@@ -52,9 +55,11 @@ test_that("Regression metrics return expected results", {
 
   expect_is(metrics, "data.frame")
   expect_equal(dim(metrics), c(3, 3))
-  expect_equal(pull(metrics, .estimate), c(0.310, 0.859, 0.252), tolerance = 0.001)
-
+  expect_equal(
+    pull(metrics, .estimate),
+    c(0.310, 0.859, 0.252),
+    tolerance = 0.001
+  )
 })
 
 test_clear_cache()
-

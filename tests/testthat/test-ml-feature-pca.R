@@ -44,7 +44,6 @@ test_that("ft_pca() works", {
 # Backwards compat
 
 test_that("ml_pca() agrees with Scala result", {
-
   # import org.apache.spark.ml.feature.PCA
   # import org.apache.spark.ml.linalg.Vectors
   #
@@ -110,11 +109,8 @@ test_that("sdf_project() takes newdata argument", {
       ml_pca(k = 3) %>%
       sdf_project() %>%
       collect(),
-    mat_tbl %>% ml_pca(k = 3) %>%
-      sdf_project(mat_tbl) %>%
-      collect()
+    mat_tbl %>% ml_pca(k = 3) %>% sdf_project(mat_tbl) %>% collect()
   )
 })
 
 test_clear_cache()
-

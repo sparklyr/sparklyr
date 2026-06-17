@@ -39,7 +39,10 @@ test_that("ml_pipeline() combines pipeline_stages into a pipeline", {
   pipeline <- ml_pipeline(tokenizer, binarizer)
   individual_stage_uids <- c(tokenizer$uid, binarizer$uid)
   expect_equal(pipeline$stage_uids, individual_stage_uids)
-  expect_equal(class(pipeline), c("ml_pipeline", "ml_estimator", "ml_pipeline_stage"))
+  expect_equal(
+    class(pipeline),
+    c("ml_pipeline", "ml_estimator", "ml_pipeline_stage")
+  )
 })
 
 test_that("we can create nested pipelines", {
@@ -83,7 +86,10 @@ test_that("pipeline printing works", {
   output <- capture.output(ml_pipeline(ft_binarizer(sc, "in", "out")))
   expect_identical(output[1], "Pipeline (Estimator) with 1 stage")
 
-  output <- capture.output(ml_pipeline(ft_binarizer(sc, "in", "out"), ml_logistic_regression(sc)))
+  output <- capture.output(ml_pipeline(
+    ft_binarizer(sc, "in", "out"),
+    ml_logistic_regression(sc)
+  ))
   expect_identical(output[1], "Pipeline (Estimator) with 2 stages")
   expect_identical(output[4], "  |--1 Binarizer (Transformer)")
   expect_identical(output[6], "  |     (Parameters -- Column Names)")
@@ -104,4 +110,3 @@ test_that("Error when specifying formula without tbl_spark for ml_ routines", {
 })
 
 test_clear_cache()
-

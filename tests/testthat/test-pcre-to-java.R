@@ -87,9 +87,25 @@ test_that("pcre_to_java converts [:digit:] correctly", {
 test_that("pcre_to_java converts [:graph:] correctly", {
   test_requires_version("2.0.0")
 
-  for (delim in c("A", "Z", "a", "z", "0", "9", "\"", "&", "@", "[", "]", "^", "~")) {
+  for (delim in c(
+    "A",
+    "Z",
+    "a",
+    "z",
+    "0",
+    "9",
+    "\"",
+    "&",
+    "@",
+    "[",
+    "]",
+    "^",
+    "~"
+  )) {
     expect_split(
-      sprintf("\x02%s\x03%s ", delim, delim), "[[:graph:]]", list("\x02", "\x03", " ")
+      sprintf("\x02%s\x03%s ", delim, delim),
+      "[[:graph:]]",
+      list("\x02", "\x03", " ")
     )
     expect_split(
       sprintf("\x02%s\x03\x01\x04%s ", delim, delim),
@@ -111,9 +127,25 @@ test_that("pcre_to_java converts [:lower:] correctly", {
 test_that("pcre_to_java converts [:print:] correctly", {
   test_requires_version("2.0.0")
 
-  for (delim in c("A", "Z", "a", "z", "0", "9", "\"", "&", "@", "[", "]", "^", "~")) {
+  for (delim in c(
+    "A",
+    "Z",
+    "a",
+    "z",
+    "0",
+    "9",
+    "\"",
+    "&",
+    "@",
+    "[",
+    "]",
+    "^",
+    "~"
+  )) {
     expect_split(
-      sprintf("\x01%s\x19%s\x7F", delim, delim), "[[:print:]]", list("\x01", "\x19", "\x7F")
+      sprintf("\x01%s\x19%s\x7F", delim, delim),
+      "[[:print:]]",
+      list("\x01", "\x19", "\x7F")
     )
     expect_split(
       sprintf("\x02%s\x19\x01\x7F%s\x10", delim, delim),
@@ -127,17 +159,48 @@ test_that("pcre_to_java converts [:punct:] correctly", {
   test_requires_version("2.0.0")
 
   for (delim in c(
-    "!", "\"", "#", "$", "%", "&", "'", "(",
-    ")", "*", "+", ",", "-", ".", "/", ":",
-    ";", "<", "=", ">", "?", "@", "[", "\\",
-    "]", "^", "_", "'", "{", "|", "}", "~"
-  )
-  ) {
+    "!",
+    "\"",
+    "#",
+    "$",
+    "%",
+    "&",
+    "'",
+    "(",
+    ")",
+    "*",
+    "+",
+    ",",
+    "-",
+    ".",
+    "/",
+    ":",
+    ";",
+    "<",
+    "=",
+    ">",
+    "?",
+    "@",
+    "[",
+    "\\",
+    "]",
+    "^",
+    "_",
+    "'",
+    "{",
+    "|",
+    "}",
+    "~"
+  )) {
     expect_split(
-      sprintf("a%sb%sc", delim, delim), "[[:punct:]]", list("a", "b", "c")
+      sprintf("a%sb%sc", delim, delim),
+      "[[:punct:]]",
+      list("a", "b", "c")
     )
     expect_split(
-      sprintf("a%sb%scAd", delim, delim), "[A[:punct:]]", list("a", "b", "c", "d")
+      sprintf("a%sb%scAd", delim, delim),
+      "[A[:punct:]]",
+      list("a", "b", "c", "d")
     )
   }
 })
@@ -147,10 +210,14 @@ test_that("pcre_to_java converts [:space:] correctly", {
 
   for (delim in c(" ", "\t", "\r", "\n", "\v", "\f")) {
     expect_split(
-      sprintf("a%sb%sc", delim, delim), "[[:space:]]", list("a", "b", "c")
+      sprintf("a%sb%sc", delim, delim),
+      "[[:space:]]",
+      list("a", "b", "c")
     )
     expect_split(
-      sprintf("a%sb%sc&d", delim, delim), "[&[:space:]]", list("a", "b", "c", "d")
+      sprintf("a%sb%sc&d", delim, delim),
+      "[&[:space:]]",
+      list("a", "b", "c", "d")
     )
   }
 })
@@ -178,14 +245,22 @@ test_that("pcre_to_java converts [:xdigits:] correctly", {
 
   for (delim in c(
     as.character(seq(0, 9)),
-    "a", "b", "c", "d", "e", "f",
-    "A", "B", "C", "D", "E", "F"
-  )
-  ) {
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  )) {
     expect_split(sprintf("g%sh", delim), "[[:xdigit:]]", list("g", "h"))
     expect_split(sprintf("G%sH|I", delim), "[|[:xdigit:]]", list("G", "H", "I"))
   }
 })
 
 test_clear_cache()
-

@@ -9,8 +9,12 @@ persisted_table_name <- random_table_name("persisted_")
 temp_table_name <- random_table_name("temporary_")
 
 test_that("dbWriteTable can write a table", {
-  if (spark_version(sc) < "2.2.0") skip("Tables not supported before 2.0.0")
-  if (spark_version(sc) >= "3.3.0") skip("Show Tables with Delta does not works")
+  if (spark_version(sc) < "2.2.0") {
+    skip("Tables not supported before 2.0.0")
+  }
+  if (spark_version(sc) >= "3.3.0") {
+    skip("Show Tables with Delta does not works")
+  }
 
   test_requires("DBI")
 
@@ -30,7 +34,10 @@ test_that("dbWriteTable can write a table", {
   )
 
   dbWriteTable(sc, persisted_table_name, dbi_df[c("a")], overwrite = TRUE)
-  dbi_df_content <- dbGetQuery(sc, paste("SELECT * FROM ", persisted_table_name))
+  dbi_df_content <- dbGetQuery(
+    sc,
+    paste("SELECT * FROM ", persisted_table_name)
+  )
 
   expect_equal(dbi_df[c("a")], dbi_df_content)
 })
@@ -39,7 +46,11 @@ test_that("dbGetQuery works with parameterized queries", {
   setosa <- dbGetQuery(sc, "SELECT * FROM iris WHERE species = ?", "setosa")
   expect_equal(nrow(setosa), 50)
 
-  virginica <- dbGetQuery(sc, "SELECT * FROM iris WHERE species = ?virginica", virginica = "virginica")
+  virginica <- dbGetQuery(
+    sc,
+    "SELECT * FROM iris WHERE species = ?virginica",
+    virginica = "virginica"
+  )
   expect_equal(nrow(virginica), 50)
 })
 
@@ -51,7 +62,7 @@ test_that("dbGetQuery works with native parameterized queries", {
     conn = sc,
     statement = "SELECT * FROM iris WHERE species = :species",
     params = list(species = "setosa")
-    )
+  )
   expect_equal(nrow(setosa), 50)
 
   virginica <- dbGetQuery(
@@ -59,7 +70,7 @@ test_that("dbGetQuery works with native parameterized queries", {
 
     statement = "SELECT * FROM iris WHERE species = :virginica",
     params = list(virginica = "virginica")
-    )
+  )
   expect_equal(nrow(virginica), 50)
 })
 
@@ -75,13 +86,24 @@ test_that("dbColumnInfo list the columns with its type and sql type", {
   res <- dbSendQuery(sc, "SELECT * FROM iris", "setosa")
   columns_info <- dbColumnInfo(res)
 
-  expect_equal(columns_info$name, c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width", "Species"))
-  expect_equal(columns_info$type, c("numeric", "numeric", "numeric", "numeric", "character"))
-  expect_equal(columns_info$sql.type, c("DoubleType", "DoubleType", "DoubleType", "DoubleType", "StringType"))
+  expect_equal(
+    columns_info$name,
+    c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width", "Species")
+  )
+  expect_equal(
+    columns_info$type,
+    c("numeric", "numeric", "numeric", "numeric", "character")
+  )
+  expect_equal(
+    columns_info$sql.type,
+    c("DoubleType", "DoubleType", "DoubleType", "DoubleType", "StringType")
+  )
 })
 
 test_that("dbListTables list all the existing tables", {
-  if (spark_version(sc) >= "3.3.0") skip("Show Tables with Delta does not works")
+  if (spark_version(sc) >= "3.3.0") {
+    skip("Show Tables with Delta does not works")
+  }
   expect_true(persisted_table_name %in% dbListTables(sc))
 })
 
@@ -95,4 +117,3 @@ teardown({
 })
 
 test_clear_cache()
-

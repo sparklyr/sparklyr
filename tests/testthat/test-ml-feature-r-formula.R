@@ -40,14 +40,12 @@ test_that("r formula works as expected", {
       collect()
   )
 
-
   expect_warning_on_arrow(
     df3 <- iris_tbl %>%
       ft_r_formula("Sepal_Length ~ Petal_Width + Species") %>%
       select(features, label) %>%
       collect()
   )
-
 
   expect_equal(pull(df1, features), pull(df2, features))
   expect_equal(pull(df1, features), pull(df3, features))
@@ -92,4 +90,3 @@ test_that("ft_r_formula takes formula", {
 })
 
 test_clear_cache()
-

@@ -30,7 +30,6 @@ test_that("ml_decision_tree_regressor() param setting", {
 })
 
 test_that("ML Pipeline works for Regression Trees", {
-
   sc <- testthat_spark_connection()
   iris_tbl <- testthat_tbl("iris")
 
@@ -75,4 +74,3 @@ test_that("Tuning works with Decision Tree Reg", {
 
 
 test_clear_cache()
-

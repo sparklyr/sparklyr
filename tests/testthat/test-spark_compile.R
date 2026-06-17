@@ -2,7 +2,6 @@ skip("Skipping compilation until Spark 3.5 is GA")
 skip_connection("spark_compile")
 
 test_that("jar file is created", {
-
   number_of_jars <- 7
 
   jar_folder <- path.expand("~/testjar")
@@ -11,9 +10,15 @@ test_that("jar file is created", {
 
   major_v <- strsplit(s_version, "\\.")[[1]][[1]]
 
-  if(major_v >= 1) scala_v <- "2.10"
-  if(major_v >= 2) scala_v <- "2.11"
-  if(major_v >= 3) scala_v <- "2.12"
+  if (major_v >= 1) {
+    scala_v <- "2.10"
+  }
+  if (major_v >= 2) {
+    scala_v <- "2.11"
+  }
+  if (major_v >= 3) {
+    scala_v <- "2.12"
+  }
 
   jar_name <- sprintf("%s-%s-test.jar", s_version, scala_v)
 
@@ -36,7 +41,7 @@ test_that("jar file is created", {
   expect_message(
     sparklyr_jar_verify_spark(),
     "- Spark version"
-    )
+  )
 
   expect_length(
     sparklyr_jar_spec_list(),
@@ -54,4 +59,3 @@ test_that("jar file is created", {
 })
 
 test_clear_cache()
-

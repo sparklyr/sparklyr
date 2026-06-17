@@ -22,4 +22,3 @@ test_that("ft_hashing_tf() param setting", {
 })
 
 test_clear_cache()
-

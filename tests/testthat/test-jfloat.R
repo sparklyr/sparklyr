@@ -10,9 +10,9 @@ test_that("jfloat() works as expected", {
   expect_true(inherits(jflt, "spark_jobj"))
   expect_equal(jflt %>% invoke("doubleValue"), x)
   expect_equal(
-    invoke_static(sc, "sparklyr.Test", "readFloat", jflt), x
+    invoke_static(sc, "sparklyr.Test", "readFloat", jflt),
+    x
   )
 })
 
 test_clear_cache()
-

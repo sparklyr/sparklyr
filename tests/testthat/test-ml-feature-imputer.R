@@ -32,4 +32,3 @@ test_that("ft_imputer() works properly", {
 })
 
 test_clear_cache()
-

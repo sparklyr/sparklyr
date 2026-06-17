@@ -8,7 +8,8 @@ test_that("spark_kubernetes_config can generate correct config", {
       master = "k8s://https://192.168.99.100:8443",
       version = "3.0",
       driver = "spark-driver",
-      forward = FALSE, fix_config = FALSE
+      forward = FALSE,
+      fix_config = FALSE
     ),
     list(
       spark.master = "k8s://https://192.168.99.100:8443",
@@ -34,4 +35,3 @@ test_that("spark_kubernetes_config can generate correct config", {
 })
 
 test_clear_cache()
-

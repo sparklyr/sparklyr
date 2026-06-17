@@ -66,4 +66,3 @@ test_that("ft_discrete_cosine_transform() backwards compat", {
 })
 
 test_clear_cache()
-

@@ -20,7 +20,15 @@ expect_subsets_eq <- function(x) {
 
 test_that("`[.tbl_spark` works as expected", {
   test_cases <- list(
-    4L, 2:4, 4:2, -3L, -2:-4, c(2L, 4L), "col5", c("col1", "col3", "col6"), NULL
+    4L,
+    2:4,
+    4:2,
+    -3L,
+    -2:-4,
+    c(2L, 4L),
+    "col5",
+    c("col1", "col3", "col6"),
+    NULL
   )
 
   for (x in test_cases) {
@@ -31,4 +39,3 @@ test_that("`[.tbl_spark` works as expected", {
 })
 
 test_clear_cache()
-

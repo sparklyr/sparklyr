@@ -27,9 +27,14 @@ test_that("ml_gaussian_mixture param setting", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "gaussian mixture requires 2.0+")
   args <- list(
-    x = sc, k = 9, max_iter = 120, tol = 0.02,
-    seed = 98, features_col = "fcol",
-    prediction_col = "pcol", probability_col = "prcol"
+    x = sc,
+    k = 9,
+    max_iter = 120,
+    tol = 0.02,
+    seed = 98,
+    features_col = "fcol",
+    prediction_col = "pcol",
+    probability_col = "prcol"
   )
   predictor <- do.call(ml_gaussian_mixture, args)
 
@@ -58,7 +63,9 @@ test_that("ml_gaussian_mixture() works properly", {
   sc <- testthat_spark_connection()
   test_requires_version("2.0.0", "gaussian mixture requires 2.0+")
   sample_data_path <- get_test_data_path("sample_kmeans_data.txt")
-  sample_data <- spark_read_libsvm(sc, "sample_data",
+  sample_data <- spark_read_libsvm(
+    sc,
+    "sample_data",
     sample_data_path,
     overwrite = TRUE
   )
@@ -90,4 +97,3 @@ test_that("ml_gaussian_mixture() works properly", {
 })
 
 test_clear_cache()
-

@@ -19,12 +19,11 @@ test_that("to_avro and from_avro work properly", {
   sdf_transformed <- sdf_to_avro(sdf)
   sdf_transformed %>%
     sdf_collect() %>%
-    (
-      function(collected) {
-        expect_equal(colnames(collected), c("student"))
-        expect_equal(typeof(collected$student), "list")
-        expect_equal(typeof(collected$student[[1]]), "raw")
-      })
+    (function(collected) {
+      expect_equal(colnames(collected), c("student"))
+      expect_equal(typeof(collected$student), "list")
+      expect_equal(typeof(collected$student[[1]]), "raw")
+    })
 
   schema <- list(
     type = "record",
@@ -77,4 +76,3 @@ test_that("to_avro and from_avro work properly", {
 })
 
 test_clear_cache()
-

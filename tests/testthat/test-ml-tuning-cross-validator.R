@@ -49,7 +49,8 @@ test_that("ml_cross_validator() works correctly", {
   cv <- ml_cross_validator(
     sc,
     estimator = pipeline,
-    evaluator = ml_binary_classification_evaluator(sc,
+    evaluator = ml_binary_classification_evaluator(
+      sc,
       label_col = "label",
       raw_prediction_col = "rawPrediction"
     ),
@@ -67,7 +68,8 @@ test_that("ml_cross_validator() works correctly", {
     l[sort(names(l))]
   }
 
-  diff <- mapply(function(x, y) mapply(function(a, b) setdiff(a, b), x, y),
+  diff <- mapply(
+    function(x, y) mapply(function(a, b) setdiff(a, b), x, y),
     lapply(expected_param_maps, list_sorter),
     lapply(cv$estimator_param_maps, list_sorter),
     SIMPLIFY = FALSE
@@ -75,10 +77,13 @@ test_that("ml_cross_validator() works correctly", {
 
   expect_identical(
     c(diff),
-    rep(list(list(
-      hashing_tf_1 = list(),
-      logistic_1 = list()
-    )), 8)
+    rep(
+      list(list(
+        hashing_tf_1 = list(),
+        logistic_1 = list()
+      )),
+      8
+    )
   )
 
   expect_identical(
@@ -107,9 +112,11 @@ test_that("we can cross validate a logistic regression with xval", {
   expect_error(
     ml_cross_validator(
       iris_tbl,
-      estimator = pipeline, estimator_param_maps = bad_grid,
+      estimator = pipeline,
+      estimator_param_maps = bad_grid,
       evaluator = ml_multiclass_classification_evaluator(sc),
-      seed = 1, uid = "cv_1"
+      seed = 1,
+      uid = "cv_1"
     ),
     "The name logistic matches no stages in the pipeline"
   )
@@ -123,10 +130,12 @@ test_that("we can cross validate a logistic regression with xval", {
 
   cvm <- ml_cross_validator(
     iris_tbl,
-    estimator = pipeline, estimator_param_maps = grid,
+    estimator = pipeline,
+    estimator_param_maps = grid,
     evaluator = ml_multiclass_classification_evaluator(sc, uid = "eval1"),
     collect_sub_models = TRUE,
-    seed = 1, uid = "cv_1"
+    seed = 1,
+    uid = "cv_1"
   )
 
   expect_identical(
@@ -169,16 +178,19 @@ test_that("ml_validation_metrics() works properly", {
   )
   cv <- ml_cross_validator(
     sc,
-    estimator = pipeline, estimator_param_maps = grid,
+    estimator = pipeline,
+    estimator_param_maps = grid,
     evaluator = ml_multiclass_classification_evaluator(sc),
-    num_folds = 2, parallelism = 4
+    num_folds = 2,
+    parallelism = 4
   )
   cv_model <- ml_fit(cv, iris_tbl)
   cv_metrics <- ml_validation_metrics(cv_model)
 
   tvs <- ml_train_validation_split(
     sc,
-    estimator = pipeline, estimator_param_maps = grid,
+    estimator = pipeline,
+    estimator_param_maps = grid,
     evaluator = ml_multiclass_classification_evaluator(sc),
     parallelism = 4
   )
@@ -248,4 +260,3 @@ test_that("cross validator print methods", {
 })
 
 test_clear_cache()
-

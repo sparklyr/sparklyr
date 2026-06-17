@@ -35,9 +35,17 @@ test_that("rowSums works as expected", {
     )
   }
   test_cases <- list(
-    4L, 2:4, 4:2, -3L, -2:-4, c(2L, 4L),
-    "col5", c("col1", "col3", "col6"),
-    "na", c("col1", "na"), c("col1", "na", "col3", "col6"),
+    4L,
+    2:4,
+    4:2,
+    -3L,
+    -2:-4,
+    c(2L, 4L),
+    "col5",
+    c("col1", "col3", "col6"),
+    "na",
+    c("col1", "na"),
+    c("col1", "na", "col3", "col6"),
     NULL
   )
 

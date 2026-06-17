@@ -15,7 +15,8 @@ test_that("ft_min_max_scaler() param setting", {
   test_args <- list(
     input_col = "foo",
     output_col = "bar",
-    min = -1, max = 2
+    min = -1,
+    max = 2
   )
   test_param_setting(sc, ft_min_max_scaler, test_args)
 })
@@ -47,4 +48,3 @@ test_that("ft_min_max_scaler() works properly", {
 })
 
 test_clear_cache()
-

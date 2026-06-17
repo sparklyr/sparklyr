@@ -30,7 +30,9 @@ test_that("ml_naive_bayes() works properly", {
   test_requires_version("2.0.0", "accuracy metric support")
   sample_data_path <- get_test_data_path("sample_libsvm_data.txt")
 
-  sample_data <- spark_read_libsvm(sc, "sample_data",
+  sample_data <- spark_read_libsvm(
+    sc,
+    "sample_data",
     sample_data_path,
     overwrite = TRUE
   )
@@ -46,7 +48,8 @@ test_that("ml_naive_bayes() works properly", {
   expect_equal(
     ml_multiclass_classification_evaluator(
       predictions,
-      label_col = "label", prediction_col = "prediction",
+      label_col = "label",
+      prediction_col = "prediction",
       metric_name = "accuracy"
     ),
     1.0
@@ -98,4 +101,3 @@ test_that("ml_naive_bayes() print outputs are correct", {
 })
 
 test_clear_cache()
-

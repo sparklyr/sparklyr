@@ -33,4 +33,3 @@ test_that("ft_robust_scaler() works properly", {
 })
 
 test_clear_cache()
-

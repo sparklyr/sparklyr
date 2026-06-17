@@ -23,10 +23,10 @@ test_that("ft_normalizer() param setting", {
 test_that("ft_normalizer works properly", {
   sc <- testthat_spark_connection()
   df <- tribble(
-    ~id, ~V1, ~V2, ~V3,
-    0, 1, 0.5, -1,
-    1, 2, 1, 1,
-    2, 4, 10, 2
+    ~id , ~V1 , ~V2  , ~V3 ,
+      0 ,   1 ,  0.5 ,  -1 ,
+      1 ,   2 ,  1   ,   1 ,
+      2 ,   4 , 10   ,   2
   )
   df_tbl <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
     ft_vector_assembler(paste0("V", 1:3), "features")
@@ -71,4 +71,3 @@ test_that("ft_normalizer errors for bad p", {
 })
 
 test_clear_cache()
-

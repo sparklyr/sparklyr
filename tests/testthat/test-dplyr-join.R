@@ -83,7 +83,6 @@ test_that("joins works with user-supplied `.` suffixes", {
     "Replacing '.' with '_' in suffixes. New suffixes: _x, _y"
   )
 
-
   expect_message(
     inner_join(d1, d2, by = "group", suffix = c(".x", ".y")),
     "Replacing '.' with '_' in suffixes. New suffixes: _x, _y"

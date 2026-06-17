@@ -35,7 +35,8 @@ test_that("ft_bucketizer() works properly", {
     mtcars_tbl %>%
       select(drat) %>%
       ft_bucketizer(
-        "drat", "drat_out",
+        "drat",
+        "drat_out",
         splits = c(-Inf, 2, 4, Inf)
       ) %>%
       colnames(),
@@ -60,4 +61,3 @@ test_that("ft_bucketizer() can mutate multiple columns", {
 })
 
 test_clear_cache()
-

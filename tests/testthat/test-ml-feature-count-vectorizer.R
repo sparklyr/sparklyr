@@ -64,15 +64,27 @@ test_that("ft_count_vectorizer() works", {
   expect_identical(cv_model$vocabulary, list("a", "b", "c"))
 
   cv <- ft_count_vectorizer(
-    sc, "words", "features",
-    binary = TRUE, min_df = 2, min_tf = 2,
+    sc,
+    "words",
+    "features",
+    binary = TRUE,
+    min_df = 2,
+    min_tf = 2,
     vocab_size = 1024
   )
 
   expect_equal(
-    ml_params(cv, list(
-      "input_col", "output_col", "binary", "min_df", "min_tf", "vocab_size"
-    )),
+    ml_params(
+      cv,
+      list(
+        "input_col",
+        "output_col",
+        "binary",
+        "min_df",
+        "min_tf",
+        "vocab_size"
+      )
+    ),
     list(
       input_col = "words",
       output_col = "features",
@@ -85,4 +97,3 @@ test_that("ft_count_vectorizer() works", {
 })
 
 test_clear_cache()
-

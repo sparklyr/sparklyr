@@ -4,7 +4,6 @@ skip_on_arrow_devel()
 
 skip_databricks_connect()
 test_that("als tidiers works", {
-
   ## ---------------- Connection and data upload to Spark ----------------------
 
   sc <- testthat_spark_connection()
@@ -16,22 +15,20 @@ test_that("als tidiers works", {
     rating = c(3, 1, 2, 4, 5, 4)
   )
 
-  movies_tbl <- sdf_copy_to(sc,
-    movies,
-    name = "movies_tbl",
-    overwrite = TRUE
-  )
+  movies_tbl <- sdf_copy_to(sc, movies, name = "movies_tbl", overwrite = TRUE)
 
   ## ----------------------------- tidy() --------------------------------------
 
   als_model <- movies_tbl %>%
     ml_als(rating ~ user + item)
 
-  td1 <-  tidy(als_model) %>%
+  td1 <- tidy(als_model) %>%
     collect()
 
-  check_tidy(td1,
-    exp.row = 3, exp.col = 3,
+  check_tidy(
+    td1,
+    exp.row = 3,
+    exp.col = 3,
     exp.names = c("id", "user_factors", "item_factors")
   )
 
@@ -41,7 +38,8 @@ test_that("als tidiers works", {
     augment() %>%
     collect()
 
-  check_tidy(au1,
+  check_tidy(
+    au1,
     exp.col = 4,
     exp.name = c("user", "item", "rating", ".prediction")
   )
@@ -50,11 +48,7 @@ test_that("als tidiers works", {
 
   gl1 <- glance(als_model)
 
-  check_tidy(gl1,
-    exp.row = 1,
-    exp.names = c("rank", "cold_start_strategy")
-  )
+  check_tidy(gl1, exp.row = 1, exp.names = c("rank", "cold_start_strategy"))
 })
 
 test_clear_cache()
-

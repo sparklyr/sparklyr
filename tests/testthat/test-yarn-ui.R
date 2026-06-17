@@ -12,4 +12,3 @@ test_that("'spark_connection_yarn_ui()' can build a default URL", {
 })
 
 test_clear_cache()
-

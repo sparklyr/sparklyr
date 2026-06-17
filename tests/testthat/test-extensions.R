@@ -20,4 +20,3 @@ test_that("spark_dependency_fallback() works correctly", {
 })
 
 test_clear_cache()
-

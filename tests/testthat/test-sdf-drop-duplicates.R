@@ -28,4 +28,3 @@ test_that("sdf_drop_duplicates() checks column name", {
 })
 
 test_clear_cache()
-

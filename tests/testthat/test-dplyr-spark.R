@@ -3,17 +3,21 @@ skip_connection("dplyr-spark")
 test_that("Connection functions work", {
   sc <- testthat_spark_connection()
 
-
   tbl_mtcars <- testthat_tbl("mtcars")
 
   sql_mtcars <- dbplyr::remote_query(tbl_mtcars)
 
   expect_equal(
-    capture.output(copy_to.src_spark(sc, mtcars, "src_mtcars", overwrite = TRUE))[[1]],
+    capture.output(copy_to.src_spark(
+      sc,
+      mtcars,
+      "src_mtcars",
+      overwrite = TRUE
+    ))[[1]],
     "# Source:   table<`src_mtcars`> [?? x 11]"
   )
 
-  if(using_livy()) {
+  if (using_livy()) {
     expect_error(
       print.src_spark(sc)
     )
@@ -53,8 +57,6 @@ test_that("Connection functions work", {
   #   spark_db_desc(sc)
   # )
   #
-
-
 })
 
 test_clear_cache()

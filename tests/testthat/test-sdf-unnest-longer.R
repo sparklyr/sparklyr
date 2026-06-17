@@ -150,7 +150,9 @@ test_that("`values_to` and `indices_to` works as expected", {
       sdf_unnest_longer(y, values_to = "y_values", indices_to = "y_names") %>%
       collect(),
     dplyr::tibble(
-      x = c(1L, 1L, 2L, 2L), y_values = 1:4, y_names = rep(c("a", "b"), 2)
+      x = c(1L, 1L, 2L, 2L),
+      y_values = 1:4,
+      y_names = rep(c("a", "b"), 2)
     )
   )
 })
@@ -237,4 +239,3 @@ test_that("`transform` works as expected", {
 })
 
 test_clear_cache()
-
