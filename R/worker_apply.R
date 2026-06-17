@@ -22,7 +22,11 @@ spark_worker_init_packages <- function(sc, context) {
     bundleName <- basename(bundlePath)
     worker_log("using bundle name ", bundleName)
 
-    workerRootDir <- worker_invoke_static(sc, "org.apache.spark.SparkFiles", "getRootDirectory")
+    workerRootDir <- worker_invoke_static(
+      sc,
+      "org.apache.spark.SparkFiles",
+      "getRootDirectory"
+    )
     sparkBundlePath <- file.path(workerRootDir, bundleName)
 
     worker_log("using bundle path ", normalizePath(sparkBundlePath))
@@ -39,10 +43,14 @@ spark_worker_init_packages <- function(sc, context) {
 
     .libPaths(unbundlePath)
     worker_log("updated .libPaths with bundle packages")
-  }
-  else {
+  } else {
     spark_env <- worker_invoke_static(sc, "org.apache.spark.SparkEnv", "get")
-    spark_libpaths <- worker_invoke(worker_invoke(spark_env, "conf"), "get", "spark.r.libpaths", NULL)
+    spark_libpaths <- worker_invoke(
+      worker_invoke(spark_env, "conf"),
+      "get",
+      "spark.r.libpaths",
+      NULL
+    )
     if (!is.null(spark_libpaths)) {
       spark_libpaths <- unlist(strsplit(spark_libpaths, split = ","))
       .libPaths(spark_libpaths)
@@ -51,14 +59,15 @@ spark_worker_init_packages <- function(sc, context) {
 }
 
 spark_worker_execute_closure <- function(
-                                         sc,
-                                         closure,
-                                         df,
-                                         funcContext,
-                                         grouped_by,
-                                         barrier_map,
-                                         fetch_result_as_sdf,
-                                         partition_index) {
+  sc,
+  closure,
+  df,
+  funcContext,
+  grouped_by,
+  barrier_map,
+  fetch_result_as_sdf,
+  partition_index
+) {
   if (nrow(df) == 0) {
     worker_log("found that source has no rows to be proceesed")
     return(NULL)
@@ -71,14 +80,18 @@ spark_worker_execute_closure <- function(
     barrier_arg <- list(barrier = barrier_map)
   }
   closure_params <- length(formals(closure))
-  has_partition_index_param <- (
-    !is.null(funcContext$partition_index_param) &&
-      nchar(funcContext$partition_index_param) > 0
-  )
-  if (has_partition_index_param) closure_params <- closure_params - 1
+  has_partition_index_param <- (!is.null(funcContext$partition_index_param) &&
+    nchar(funcContext$partition_index_param) > 0)
+  if (has_partition_index_param) {
+    closure_params <- closure_params - 1
+  }
   closure_args <- c(
     list(df),
-    if (!is.null(funcContext$user_context)) list(funcContext$user_context) else NULL,
+    if (!is.null(funcContext$user_context)) {
+      list(funcContext$user_context)
+    } else {
+      NULL
+    },
     lapply(grouped_by, function(group_by_name) df[[group_by_name]][[1]]),
     barrier_arg
   )[0:closure_params]
@@ -108,16 +121,21 @@ spark_worker_execute_closure <- function(
 
 spark_worker_clean_factors <- function(result) {
   if (any(sapply(result, is.factor))) {
-    result <- as.data.frame(lapply(result, function(x) if (is.factor(x)) as.character(x) else x), stringsAsFactors = FALSE)
+    result <- as.data.frame(
+      lapply(result, function(x) if (is.factor(x)) as.character(x) else x),
+      stringsAsFactors = FALSE
+    )
   }
 
   result
 }
 
 spark_worker_maybe_serialize_list_cols_as_json <- function(config, result) {
-  if (identical(config$fetch_result_as_sdf, TRUE) &&
-    config$spark_version >= "2.4.0" &&
-    any(sapply(result, is.list))) {
+  if (
+    identical(config$fetch_result_as_sdf, TRUE) &&
+      config$spark_version >= "2.4.0" &&
+      any(sapply(result, is.list))
+  ) {
     result <- do.call(
       dplyr::tibble,
       lapply(
@@ -186,22 +204,27 @@ spark_worker_build_types <- function(context, columns) {
 
 spark_worker_get_group_batch <- function(batch) {
   worker_invoke(
-    batch, "get", 0L
+    batch,
+    "get",
+    0L
   )
 }
 
 spark_worker_add_group_by_column <- function(df, result, grouped, grouped_by) {
   if (grouped) {
     if (nrow(result) > 0) {
-      new_column_values <- lapply(grouped_by, function(grouped_by_name) df[[grouped_by_name]][[1]])
+      new_column_values <- lapply(grouped_by, function(grouped_by_name) {
+        df[[grouped_by_name]][[1]]
+      })
       names(new_column_values) <- grouped_by
 
-      if ("AsIs" %in% class(result)) class(result) <- class(result)[-match("AsIs", class(result))]
+      if ("AsIs" %in% class(result)) {
+        class(result) <- class(result)[-match("AsIs", class(result))]
+      }
       result <- do.call("cbind", list(new_column_values, result))
 
       names(result) <- gsub("\\.", "_", make.unique(names(result)))
-    }
-    else {
+    } else {
       result <- NULL
     }
   }
@@ -246,7 +269,9 @@ spark_worker_apply_arrow <- function(sc, config) {
   if (grouped) {
     record_batch_raw_groups <- worker_invoke(context, "getSourceArray")
     record_batch_raw_groups_idx <- 1
-    record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
+    record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[
+      record_batch_raw_groups_idx
+    ]])
   } else {
     row_iterator <- worker_invoke(context, "getIterator")
     arrow_converters_impl <- get_arrow_converters_impl(context, config)
@@ -290,7 +315,12 @@ spark_worker_apply_arrow <- function(sc, config) {
         partition_index
       )
 
-      result <- spark_worker_add_group_by_column(df, result, grouped, grouped_by)
+      result <- spark_worker_add_group_by_column(
+        df,
+        result,
+        grouped,
+        grouped_by
+      )
 
       result <- spark_worker_clean_factors(result)
 
@@ -301,7 +331,10 @@ spark_worker_apply_arrow <- function(sc, config) {
 
     if (!is.null(result)) {
       if (is.null(schema_output)) {
-        schema_output <- spark_worker_build_types(context, lapply(result, class))
+        schema_output <- spark_worker_build_types(
+          context,
+          lapply(result, class)
+        )
       }
       raw_batch <- arrow_write_record_batch(result, config$spark_version)
 
@@ -311,9 +344,15 @@ spark_worker_apply_arrow <- function(sc, config) {
 
     record_entry <- arrow_read_record_batch(reader)
 
-    if (grouped && is.null(record_entry) && record_batch_raw_groups_idx < length(record_batch_raw_groups)) {
+    if (
+      grouped &&
+        is.null(record_entry) &&
+        record_batch_raw_groups_idx < length(record_batch_raw_groups)
+    ) {
       record_batch_raw_groups_idx <- record_batch_raw_groups_idx + 1
-      record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[record_batch_raw_groups_idx]])
+      record_batch_raw <- spark_worker_get_group_batch(record_batch_raw_groups[[
+        record_batch_raw_groups_idx
+      ]])
 
       reader <- arrow_record_stream_reader(record_batch_raw)
       record_entry <- arrow_read_record_batch(reader)
@@ -321,13 +360,30 @@ spark_worker_apply_arrow <- function(sc, config) {
   }
 
   if (length(all_batches) > 0) {
-    worker_log("updating ", total_rows, " rows using ", length(all_batches), " row batches")
+    worker_log(
+      "updating ",
+      total_rows,
+      " rows using ",
+      length(all_batches),
+      " row batches"
+    )
 
     arrow_converters <- get_arrow_converters(context, config)
-    row_iter <- worker_invoke(arrow_converters, "fromPayloadArray", all_batches, schema_output)
+    row_iter <- worker_invoke(
+      arrow_converters,
+      "fromPayloadArray",
+      all_batches,
+      schema_output
+    )
 
     worker_invoke(context, "setResultIter", row_iter)
-    worker_log("updated ", total_rows, " rows using ", length(all_batches), " row batches")
+    worker_log(
+      "updated ",
+      total_rows,
+      " rows using ",
+      length(all_batches),
+      " row batches"
+    )
   } else {
     worker_log("found no rows in closure result")
   }
@@ -336,7 +392,10 @@ spark_worker_apply_arrow <- function(sc, config) {
 }
 
 spark_worker_get_serializer <- function(sc) {
-  serializer <- unserialize(worker_invoke(spark_worker_context(sc), "getSerializer"))
+  serializer <- unserialize(worker_invoke(
+    spark_worker_context(sc),
+    "getSerializer"
+  ))
   if (is.list(serializer)) {
     function(x, ...) serializer$serializer(x)
   } else {
@@ -354,14 +413,16 @@ spark_worker_apply <- function(sc, config) {
 
   grouped_by <- worker_invoke(context, "getGroupBy")
   grouped <- !is.null(grouped_by) && length(grouped_by) > 0
-  if (grouped) worker_log("working over grouped data")
+  if (grouped) {
+    worker_log("working over grouped data")
+  }
 
   length <- worker_invoke(context, "getSourceArrayLength")
   worker_log("found ", length, " rows")
 
   is_read <- ifelse(!is.null(config$spark_read), config$spark_read, FALSE)
 
-  groups_func <- if(grouped) {
+  groups_func <- if (grouped) {
     "getSourceArrayGroupedSeq"
   } else if (is_read && config$spark_version >= "4") {
     "getSourceArraySeq2"
@@ -397,42 +458,53 @@ spark_worker_apply <- function(sc, config) {
   barrier_map <- as.list(worker_invoke(context, "getBarrier"))
   partition_index <- worker_invoke(context, "getPartitionIndex")
 
-  if (!grouped) groups <- list(list(groups))
+  if (!grouped) {
+    groups <- list(list(groups))
+  }
 
   all_results <- NULL
 
   for (group_entry in groups) {
     # serialized groups are wrapped over single lists
     data <- group_entry[[1]]
-    if(config$spark_version >= "4" && !grouped && !is_read) {
+    if (config$spark_version >= "4" && !grouped && !is_read) {
       data <- lapply(data, unlist, recursive = FALSE)
     }
-    df <- (
-      if (config$single_binary_column) {
-        dplyr::tibble(encoded = lapply(data, function(x) x[[1]]))
-      } else {
-        bind_rows <- core_get_package_function("dplyr", "bind_rows")
-        as_tibble <- core_get_package_function("tibble", "as_tibble")
-        if (!is.null(bind_rows) && !is.null(as_tibble)) {
-          do.call(
-            bind_rows,
-            lapply(
-              data, function(x) { as_tibble(x, .name_repair = "universal") }
-            )
+    df <- (if (config$single_binary_column) {
+      dplyr::tibble(encoded = lapply(data, function(x) x[[1]]))
+    } else {
+      bind_rows <- core_get_package_function("dplyr", "bind_rows")
+      as_tibble <- core_get_package_function("tibble", "as_tibble")
+      if (!is.null(bind_rows) && !is.null(as_tibble)) {
+        do.call(
+          bind_rows,
+          lapply(
+            data,
+            function(x) {
+              as_tibble(x, .name_repair = "universal")
+            }
           )
-        } else {
-          warning("dplyr::bind_rows or dplyr::as_tibble is unavailable, ",
-                  "falling back to rbind implementation in base R. ",
-                  "Inputs with list column(s) will not work.")
+        )
+      } else {
+        warning(
+          "dplyr::bind_rows or dplyr::as_tibble is unavailable, ",
+          "falling back to rbind implementation in base R. ",
+          "Inputs with list column(s) will not work."
+        )
 
-          do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
-        }
-      })
+        do.call(rbind.data.frame, c(data, list(stringsAsFactors = FALSE)))
+      }
+    })
 
     if (!config$single_binary_column) {
       # rbind removes Date classes so we re-assign them here
       if (length(data) > 0 && ncol(df) > 0 && nrow(df) > 0) {
-        if (any(sapply(data[[1]], function(e) class(e)[[1]]) %in% c("Date", "POSIXct"))) {
+        if (
+          any(
+            sapply(data[[1]], function(e) class(e)[[1]]) %in%
+              c("Date", "POSIXct")
+          )
+        ) {
           first_row <- data[[1]]
           for (idx in seq_along(first_row)) {
             first_class <- class(first_row[[idx]])[[1]]
@@ -448,7 +520,10 @@ spark_worker_apply <- function(sc, config) {
         for (i in seq_along(df)) {
           target_type <- funcContext$column_types[[i]]
           if (!is.null(target_type) && class(df[[i]]) != target_type) {
-            df[[i]] <- do.call(paste("as", target_type, sep = "."), args = list(df[[i]]))
+            df[[i]] <- do.call(
+              paste("as", target_type, sep = "."),
+              args = list(df[[i]])
+            )
           }
         }
       }
@@ -481,7 +556,9 @@ spark_worker_apply <- function(sc, config) {
   if (!is.null(all_results) && nrow(all_results) > 0) {
     worker_log("updating ", nrow(all_results), " rows")
 
-    all_data <- lapply(seq_len(nrow(all_results)), function(i) as.list(all_results[i, ]))
+    all_data <- lapply(seq_len(nrow(all_results)), function(i) {
+      as.list(all_results[i, ])
+    })
 
     worker_invoke(context, "setResultArraySeq", all_data)
     worker_log("updated ", nrow(all_results), " rows")
@@ -516,10 +593,15 @@ worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
   extractPath <- file.path(base_path, spark_worker_unbundle_path(), bundle_name)
   lockFile <- file.path(extractPath, "sparklyr.lock")
 
-  if (!dir.exists(extractPath)) dir.create(extractPath, recursive = TRUE)
+  if (!dir.exists(extractPath)) {
+    dir.create(extractPath, recursive = TRUE)
+  }
 
   if (length(dir(extractPath)) == 0) {
-    worker_log("found that the unbundle path is empty, extracting:", extractPath)
+    worker_log(
+      "found that the unbundle path is empty, extracting:",
+      extractPath
+    )
 
     writeLines("", lockFile)
     system2("tar", c("-xf", bundle_path, "-C", extractPath))

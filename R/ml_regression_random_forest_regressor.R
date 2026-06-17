@@ -1,22 +1,53 @@
 #' @rdname ml_random_forest
 #' @export
-ml_random_forest_regressor <- function(x, formula = NULL, num_trees = 20, subsampling_rate = 1,
-                                       max_depth = 5, min_instances_per_node = 1, feature_subset_strategy = "auto",
-                                       impurity = "variance", min_info_gain = 0, max_bins = 32,
-                                       seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
-                                       max_memory_in_mb = 256, features_col = "features", label_col = "label",
-                                       prediction_col = "prediction", uid = random_string("random_forest_regressor_"), ...) {
+ml_random_forest_regressor <- function(
+  x,
+  formula = NULL,
+  num_trees = 20,
+  subsampling_rate = 1,
+  max_depth = 5,
+  min_instances_per_node = 1,
+  feature_subset_strategy = "auto",
+  impurity = "variance",
+  min_info_gain = 0,
+  max_bins = 32,
+  seed = NULL,
+  checkpoint_interval = 10,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("random_forest_regressor_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_random_forest_regressor")
 }
 
-ml_random_forest_regressor_impl <- function(x, formula = NULL, num_trees = 20, subsampling_rate = 1,
-                                               max_depth = 5, min_instances_per_node = 1, feature_subset_strategy = "auto",
-                                               impurity = "variance", min_info_gain = 0, max_bins = 32,
-                                               seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
-                                               max_memory_in_mb = 256, features_col = "features", label_col = "label",
-                                               prediction_col = "prediction", uid = random_string("random_forest_regressor_"),
-                                               response = NULL, features = NULL, ...) {
+ml_random_forest_regressor_impl <- function(
+  x,
+  formula = NULL,
+  num_trees = 20,
+  subsampling_rate = 1,
+  max_depth = 5,
+  min_instances_per_node = 1,
+  feature_subset_strategy = "auto",
+  impurity = "variance",
+  min_info_gain = 0,
+  max_bins = 32,
+  seed = NULL,
+  checkpoint_interval = 10,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("random_forest_regressor_"),
+  response = NULL,
+  features = NULL,
+  ...
+) {
   ml_process_model(
     x = x,
     r_class = "ml_random_forest_regressor",
@@ -60,7 +91,9 @@ new_ml_random_forest_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
     # `lazy val featureImportances`
-    feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
+    feature_importances = possibly_null(
+      ~ read_spark_vector(jobj, "featureImportances")
+    ),
     # `lazy val totalNumNodes`
     total_num_nodes = function() invoke(jobj, "totalNumNodes"),
     # `def treeWeights`, `def trees`

@@ -10,8 +10,14 @@
 #'
 #' @param inverse Indicates whether to perform the inverse DCT (TRUE) or forward DCT (FALSE).
 #' @export
-ft_dct <- function(x, input_col = NULL, output_col = NULL,
-                   inverse = FALSE, uid = random_string("dct_"), ...) {
+ft_dct <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  inverse = FALSE,
+  uid = random_string("dct_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_dct")
 }
@@ -19,8 +25,14 @@ ft_dct <- function(x, input_col = NULL, output_col = NULL,
 ml_dct <- ft_dct
 
 #' @export
-ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                    inverse = FALSE, uid = random_string("dct_"), ...) {
+ft_dct.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  inverse = FALSE,
+  uid = random_string("dct_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -31,8 +43,11 @@ ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
     validator_ml_dct()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.DCT",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.DCT",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
     invoke("setInverse", .args[["inverse"]])
 
@@ -40,8 +55,14 @@ ft_dct.spark_connection <- function(x, input_col = NULL, output_col = NULL,
 }
 
 #' @export
-ft_dct.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                               inverse = FALSE, uid = random_string("dct_"), ...) {
+ft_dct.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  inverse = FALSE,
+  uid = random_string("dct_"),
+  ...
+) {
   transformer <- ft_dct.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -53,8 +74,14 @@ ft_dct.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
 }
 
 #' @export
-ft_dct.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                             inverse = FALSE, uid = random_string("dct_"), ...) {
+ft_dct.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  inverse = FALSE,
+  uid = random_string("dct_"),
+  ...
+) {
   transformer <- ft_dct.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -72,7 +99,14 @@ new_ml_dct <- function(jobj) {
 #' @rdname ft_dct
 #' @details \code{ft_discrete_cosine_transform()} is an alias for \code{ft_dct} for backwards compatibility.
 #' @export
-ft_discrete_cosine_transform <- function(x, input_col, output_col, inverse = FALSE, uid = random_string("dct_"), ...) {
+ft_discrete_cosine_transform <- function(
+  x,
+  input_col,
+  output_col,
+  inverse = FALSE,
+  uid = random_string("dct_"),
+  ...
+) {
   UseMethod("ft_dct")
 }
 

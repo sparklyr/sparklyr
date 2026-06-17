@@ -33,17 +33,23 @@ sdf_crosstab <- function(x, col1, col2) {
 NULL
 
 gen_samples_sdf <- function(
-                            sc,
-                            method,
-                            dist_params,
-                            n,
-                            num_partitions,
-                            seed,
-                            output_col,
-                            output_col_type = "double",
-                            cls = "org.apache.spark.mllib.random.RandomRDDs") {
-  num_partitions <- as.integer(num_partitions %||%
-    tryCatch(spark_context(sc) %>% invoke("defaultParallelism"), error = function(e) 4L))
+  sc,
+  method,
+  dist_params,
+  n,
+  num_partitions,
+  seed,
+  output_col,
+  output_col_type = "double",
+  cls = "org.apache.spark.mllib.random.RandomRDDs"
+) {
+  num_partitions <- as.integer(
+    num_partitions %||%
+      tryCatch(
+        spark_context(sc) %>% invoke("defaultParallelism"),
+        error = function(e) 4L
+      )
+  )
   seed <- as.numeric(seed %||% Sys.time())
   columns <- list(output_col_type)
   names(columns) <- output_col
@@ -54,7 +60,12 @@ gen_samples_sdf <- function(
       append(unname(dist_params)) %>%
       append(list(n, num_partitions, seed))
   ) %>%
-    invoke_static(sc, "sparklyr.RddUtils", paste0(output_col_type, "ToRow"), .) %>%
+    invoke_static(
+      sc,
+      "sparklyr.RddUtils",
+      paste0(output_col_type, "ToRow"),
+      .
+    ) %>%
     invoke(spark_session(sc), "createDataFrame", ., schema) %>%
     sdf_register()
 }
@@ -70,7 +81,15 @@ gen_samples_sdf <- function(
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rbeta <- function(sc, n, shape1, shape2, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rbeta <- function(
+  sc,
+  n,
+  shape1,
+  shape2,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "betaRDD",
@@ -94,7 +113,15 @@ sdf_rbeta <- function(sc, n, shape1, shape2, num_partitions = NULL, seed = NULL,
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rbinom <- function(sc, n, size, prob, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rbinom <- function(
+  sc,
+  n,
+  size,
+  prob,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "binomialRDD",
@@ -119,7 +146,15 @@ sdf_rbinom <- function(sc, n, size, prob, num_partitions = NULL, seed = NULL, ou
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rcauchy <- function(sc, n, location = 0, scale = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rcauchy <- function(
+  sc,
+  n,
+  location = 0,
+  scale = 1,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "cauchyRDD",
@@ -142,7 +177,14 @@ sdf_rcauchy <- function(sc, n, location = 0, scale = 1, num_partitions = NULL, s
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rchisq <- function(sc, n, df, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rchisq <- function(
+  sc,
+  n,
+  df,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "chiSquaredRDD",
@@ -166,7 +208,14 @@ sdf_rchisq <- function(sc, n, df, num_partitions = NULL, seed = NULL, output_col
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rexp <- function(sc, n, rate = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rexp <- function(
+  sc,
+  n,
+  rate = 1,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "exponentialRDD",
@@ -189,7 +238,15 @@ sdf_rexp <- function(sc, n, rate = 1, num_partitions = NULL, seed = NULL, output
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rgamma <- function(sc, n, shape, rate = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rgamma <- function(
+  sc,
+  n,
+  shape,
+  rate = 1,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "gammaRDD",
@@ -211,7 +268,14 @@ sdf_rgamma <- function(sc, n, shape, rate = 1, num_partitions = NULL, seed = NUL
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rgeom <- function(sc, n, prob, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rgeom <- function(
+  sc,
+  n,
+  prob,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "geometricRDD",
@@ -238,7 +302,16 @@ sdf_rgeom <- function(sc, n, prob, num_partitions = NULL, seed = NULL, output_co
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rhyper <- function(sc, nn, m, n, k, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rhyper <- function(
+  sc,
+  nn,
+  m,
+  n,
+  k,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "hypergeometricRDD",
@@ -267,7 +340,15 @@ sdf_rhyper <- function(sc, nn, m, n, k, num_partitions = NULL, seed = NULL, outp
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rlnorm <- function(sc, n, meanlog = 0, sdlog = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rlnorm <- function(
+  sc,
+  n,
+  meanlog = 0,
+  sdlog = 1,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "logNormalRDD",
@@ -290,14 +371,21 @@ sdf_rlnorm <- function(sc, n, meanlog = 0, sdlog = 1, num_partitions = NULL, see
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rnorm <- function(sc, n, mean = 0, sd = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rnorm <- function(
+  sc,
+  n,
+  mean = 0,
+  sd = 1,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   standard_normal_dist <- (mean == 0 && sd == 1)
-  cls <- (
-    if (standard_normal_dist) {
-      "org.apache.spark.mllib.random.RandomRDDs"
-    } else {
-      "sparklyr.RandomRDDs"
-    })
+  cls <- (if (standard_normal_dist) {
+    "org.apache.spark.mllib.random.RandomRDDs"
+  } else {
+    "sparklyr.RandomRDDs"
+  })
 
   gen_samples_sdf(
     sc,
@@ -321,7 +409,14 @@ sdf_rnorm <- function(sc, n, mean = 0, sd = 1, num_partitions = NULL, seed = NUL
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rpois <- function(sc, n, lambda, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rpois <- function(
+  sc,
+  n,
+  lambda,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "poissonRDD",
@@ -343,7 +438,14 @@ sdf_rpois <- function(sc, n, lambda, num_partitions = NULL, seed = NULL, output_
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rt <- function(sc, n, df, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rt <- function(
+  sc,
+  n,
+  df,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "tRDD",
@@ -367,7 +469,15 @@ sdf_rt <- function(sc, n, df, num_partitions = NULL, seed = NULL, output_col = "
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_rweibull <- function(sc, n, shape, scale = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_rweibull <- function(
+  sc,
+  n,
+  shape,
+  scale = 1,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   gen_samples_sdf(
     sc,
     method = "weibullRDD",
@@ -391,14 +501,21 @@ sdf_rweibull <- function(sc, n, shape, scale = 1, num_partitions = NULL, seed = 
 #'
 #' @family Spark statistical routines
 #' @export
-sdf_runif <- function(sc, n, min = 0, max = 1, num_partitions = NULL, seed = NULL, output_col = "x") {
+sdf_runif <- function(
+  sc,
+  n,
+  min = 0,
+  max = 1,
+  num_partitions = NULL,
+  seed = NULL,
+  output_col = "x"
+) {
   standard_unif_dist <- (min == 0 && max == 1)
-  cls <- (
-    if (standard_unif_dist) {
-      "org.apache.spark.mllib.random.RandomRDDs"
-    } else {
-      "sparklyr.RandomRDDs"
-    })
+  cls <- (if (standard_unif_dist) {
+    "org.apache.spark.mllib.random.RandomRDDs"
+  } else {
+    "sparklyr.RandomRDDs"
+  })
 
   gen_samples_sdf(
     sc,

@@ -1,4 +1,3 @@
-
 sparkConnectionsEnv <- new.env(parent = emptyenv())
 
 spark_connection_instances <- function() {
@@ -27,9 +26,12 @@ spark_connections_remove <- function(sc) {
 }
 
 spark_connection_find_scon <- function(test) {
-  Filter(function(e) {
-    test(e)
-  }, spark_connection_instances())
+  Filter(
+    function(e) {
+      test(e)
+    },
+    spark_connection_instances()
+  )
 }
 
 #' Find Spark Connection
@@ -42,9 +44,11 @@ spark_connection_find_scon <- function(test) {
 #' @param method The method used to connect to Spark.
 #'
 #' @export
-spark_connection_find <- function(master = NULL,
-                                  app_name = NULL,
-                                  method = NULL) {
+spark_connection_find <- function(
+  master = NULL,
+  app_name = NULL,
+  method = NULL
+) {
   filter <- function(e) {
     connection_is_open(e) &&
       (identical(method, NULL) || identical(e$method, method)) &&

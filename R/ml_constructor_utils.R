@@ -1,5 +1,4 @@
 find_in_extensions <- function(what) {
-
   # Get package namespaces for sparkly and extensions.
   namespaces <- c("sparklyr", genv_get_extension_packages()) %>%
     purrr::map(asNamespace)
@@ -10,13 +9,24 @@ find_in_extensions <- function(what) {
     }
 
     # Look in `namespaces` one at a time for the function
-    purrr::possibly(get, NULL)(what, envir = namespaces[[1]], mode = "function") %||%
+    purrr::possibly(get, NULL)(
+      what,
+      envir = namespaces[[1]],
+      mode = "function"
+    ) %||%
       Recall(what, namespaces[-1])
   })(what, namespaces)
 }
 
 find_constructor <- function(candidates, jobj) {
-  if (!length(candidates)) stop("Constructor not found for `", jobj_class(jobj)[[1]], "`.", call. = FALSE)
+  if (!length(candidates)) {
+    stop(
+      "Constructor not found for `",
+      jobj_class(jobj)[[1]],
+      "`.",
+      call. = FALSE
+    )
+  }
 
   # For each candidate function, look in extension namespaces, and return the first one found
   find_in_extensions(candidates[[1]]) %||% Recall(candidates[-1])

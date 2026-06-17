@@ -1,8 +1,7 @@
-new_ml_model_als <- function(pipeline_model,
-                             formula,
-                             dataset) {
+new_ml_model_als <- function(pipeline_model, formula, dataset) {
   m <- new_ml_model_recommendation(
-    pipeline_model, formula,
+    pipeline_model,
+    formula,
     dataset = dataset,
     class = "ml_model_als"
   )

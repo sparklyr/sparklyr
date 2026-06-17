@@ -17,9 +17,20 @@ NULL
 
 #' @export
 #' @rdname ml-model-constructors
-new_ml_model_prediction <- function(pipeline_model, formula, dataset, label_col, features_col,
-                                    ..., class = character()) {
-  feature_names <- ml_feature_names_metadata(pipeline_model, dataset, features_col)
+new_ml_model_prediction <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col,
+  ...,
+  class = character()
+) {
+  feature_names <- ml_feature_names_metadata(
+    pipeline_model,
+    dataset,
+    features_col
+  )
   response <- gsub("~.+$", "", formula) %>% trimws()
 
   new_ml_model(
@@ -37,7 +48,13 @@ new_ml_model_prediction <- function(pipeline_model, formula, dataset, label_col,
 
 #' @export
 #' @rdname ml-model-constructors
-new_ml_model <- function(pipeline_model, formula, dataset, ..., class = character()) {
+new_ml_model <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  ...,
+  class = character()
+) {
   sc <- spark_connection(pipeline_model)
 
   stages <- ml_stages(pipeline_model)
@@ -45,7 +62,11 @@ new_ml_model <- function(pipeline_model, formula, dataset, ..., class = characte
 
   # for pipeline, fix data prep transformation but use the un-fitted estimator predictor
   pipeline <- stages %>% head(-1)
-  pipeline <- rlang::exec(ml_pipeline, !!!pipeline, uid = ml_uid(pipeline_model)) %>%
+  pipeline <- rlang::exec(
+    ml_pipeline,
+    !!!pipeline,
+    uid = ml_uid(pipeline_model)
+  ) %>%
     ml_add_stage(predictor)
 
   # workaround for https://issues.apache.org/jira/browse/SPARK-19953
@@ -77,9 +98,16 @@ new_ml_model <- function(pipeline_model, formula, dataset, ..., class = characte
 
 #' @export
 #' @rdname ml-model-constructors
-new_ml_model_classification <- function(pipeline_model, formula, dataset, label_col,
-                                        features_col, predicted_label_col, ...,
-                                        class = character()) {
+new_ml_model_classification <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col,
+  predicted_label_col,
+  ...,
+  class = character()
+) {
   m <- new_ml_model_prediction(
     pipeline_model,
     formula = formula,
@@ -93,7 +121,11 @@ new_ml_model_classification <- function(pipeline_model, formula, dataset, label_
 
   label_indexer_model <- ml_stages(pipeline_model) %>%
     dplyr::nth(-2) # second from last, either RFormulaModel or StringIndexerModel
-  index_labels <- ml_index_labels_metadata(label_indexer_model, dataset, label_col)
+  index_labels <- ml_index_labels_metadata(
+    label_indexer_model,
+    dataset,
+    label_col
+  )
 
   if (!is.null(index_labels)) {
     sc <- spark_connection(pipeline_model)
@@ -119,9 +151,15 @@ new_ml_model_classification <- function(pipeline_model, formula, dataset, label_
 
 #' @export
 #' @rdname ml-model-constructors
-new_ml_model_regression <- function(pipeline_model, formula, dataset, label_col,
-                                    features_col, ...,
-                                    class = character()) {
+new_ml_model_regression <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col,
+  ...,
+  class = character()
+) {
   new_ml_model_prediction(
     pipeline_model,
     formula,
@@ -135,9 +173,14 @@ new_ml_model_regression <- function(pipeline_model, formula, dataset, label_col,
 
 #' @export
 #' @rdname ml-model-constructors
-new_ml_model_clustering <- function(pipeline_model, formula, dataset,
-                                    features_col, ...,
-                                    class = character()) {
+new_ml_model_clustering <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  features_col,
+  ...,
+  class = character()
+) {
   predictor <- dplyr::last(pipeline_model$stages)
 
   # LDA uses more than one preprocessor and ml_feature_names_metadata()
@@ -145,7 +188,11 @@ new_ml_model_clustering <- function(pipeline_model, formula, dataset,
   if (inherits(predictor, "ml_lda_model")) {
     feature_names <- gsub("~", "", formula) # LDA uses just one feature
   } else {
-    feature_names <- ml_feature_names_metadata(pipeline_model, dataset, features_col)
+    feature_names <- ml_feature_names_metadata(
+      pipeline_model,
+      dataset,
+      features_col
+    )
   }
 
   new_ml_model(
@@ -159,8 +206,13 @@ new_ml_model_clustering <- function(pipeline_model, formula, dataset,
   )
 }
 
-new_ml_model_recommendation <- function(pipeline_model, formula, dataset, ...,
-                                        class = character()) {
+new_ml_model_recommendation <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  ...,
+  class = character()
+) {
   new_ml_model(
     pipeline_model,
     formula,

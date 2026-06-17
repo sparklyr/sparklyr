@@ -3,14 +3,16 @@
 #' @include utils.R
 NULL
 
-spark_apply_worker_config <- function(sc,
-                                      debug,
-                                      profile,
-                                      schema = FALSE,
-                                      arrow = FALSE,
-                                      fetch_result_as_sdf = TRUE,
-                                      single_binary_column = FALSE,
-                                      spark_read = FALSE) {
+spark_apply_worker_config <- function(
+  sc,
+  debug,
+  profile,
+  schema = FALSE,
+  arrow = FALSE,
+  fetch_result_as_sdf = TRUE,
+  single_binary_column = FALSE,
+  spark_read = FALSE
+) {
   worker_config_serialize(
     c(
       list(
@@ -129,39 +131,41 @@ spark_apply_worker_config <- function(sc,
 #'
 #' @export
 spark_apply <- function(
-    x,
-    f,
-    columns = NULL,
-    memory = TRUE,
-    group_by = NULL,
-    packages = NULL,
-    context = NULL,
-    name = NULL,
-    barrier = NULL,
-    fetch_result_as_sdf = TRUE,
-    partition_index_param = "",
-    arrow_max_records_per_batch = NULL,
-    auto_deps = FALSE,
-    ...) {
+  x,
+  f,
+  columns = NULL,
+  memory = TRUE,
+  group_by = NULL,
+  packages = NULL,
+  context = NULL,
+  name = NULL,
+  barrier = NULL,
+  fetch_result_as_sdf = TRUE,
+  partition_index_param = "",
+  arrow_max_records_per_batch = NULL,
+  auto_deps = FALSE,
+  ...
+) {
   UseMethod("spark_apply")
 }
 
 #' @export
 spark_apply.default <- function(
-    x,
-    f,
-    columns = NULL,
-    memory = TRUE,
-    group_by = NULL,
-    packages = NULL,
-    context = NULL,
-    name = NULL,
-    barrier = NULL,
-    fetch_result_as_sdf = TRUE,
-    partition_index_param = "",
-    arrow_max_records_per_batch = NULL,
-    auto_deps = FALSE,
-    ...) {
+  x,
+  f,
+  columns = NULL,
+  memory = TRUE,
+  group_by = NULL,
+  packages = NULL,
+  context = NULL,
+  name = NULL,
+  barrier = NULL,
+  fetch_result_as_sdf = TRUE,
+  partition_index_param = "",
+  arrow_max_records_per_batch = NULL,
+  auto_deps = FALSE,
+  ...
+) {
   if (!is.character(partition_index_param)) {
     stop("Expected 'partition_index_param' to be a string.")
   }
@@ -184,7 +188,9 @@ spark_apply.default <- function(
     }
   }
   assert_that(is.function(f) || is.raw(f) || is.language(f))
-  if (is.language(f)) f <- rlang::as_closure(f)
+  if (is.language(f)) {
+    f <- rlang::as_closure(f)
+  }
 
   sc <- spark_connection(x)
   sdf <- spark_dataframe(x)
@@ -213,15 +219,25 @@ spark_apply.default <- function(
   grouped <- !is.null(group_by)
 
   rlang <- spark_config_value(sc$config, "sparklyr.apply.rlang", FALSE)
-  packages_config <- spark_config_value(sc$config, "sparklyr.apply.packages", NULL)
+  packages_config <- spark_config_value(
+    sc$config,
+    "sparklyr.apply.packages",
+    NULL
+  )
   proc_env <- c(connection_config(sc, "sparklyr.apply.env."), args$env)
-  serialize_version <- spark_config_value(sc$config, "sparklyr.apply.serializer", 2)
+  serialize_version <- spark_config_value(
+    sc$config,
+    "sparklyr.apply.serializer",
+    2
+  )
 
   time_zone <- ""
   records_per_batch <- NULL
   arrow <- if (!is.null(args$arrow)) args$arrow else arrow_enabled(sc, sdf)
-  if (identical(fetch_result_as_sdf, FALSE) &&
-    identical(arrow, TRUE)) {
+  if (
+    identical(fetch_result_as_sdf, FALSE) &&
+      identical(arrow, TRUE)
+  ) {
     warning(
       "Disabling arrow due to its potential",
       " incompatibility with fetch_result_as_sdf = FALSE"
@@ -235,7 +251,9 @@ spark_apply.default <- function(
       invoke("sessionLocalTimeZone")
     records_per_batch <- as.integer(
       arrow_max_records_per_batch %||%
-        spark_session_config(sc)[["spark.sql.execution.arrow.maxRecordsPerBatch"]] %||%
+        spark_session_config(sc)[[
+          "spark.sql.execution.arrow.maxRecordsPerBatch"
+        ]] %||%
         10000
     )
   }
@@ -268,7 +286,9 @@ spark_apply.default <- function(
 
   columns_typed <- length(names(columns)) > 0
 
-  if (rlang) warning("The `rlang` parameter is under active development.")
+  if (rlang) {
+    warning("The `rlang` parameter is under active development.")
+  }
 
   # disable package distribution for local connections
   if (spark_master_is_local(sc$master)) {
@@ -292,21 +312,19 @@ spark_apply.default <- function(
 
   # create closure for the given function
   serializer <- spark_apply_serializer()
-  serialize_impl <- (
-    if (is.list(serializer)) {
-      function(x, ...) serializer$serializer(x)
-    } else {
-      serializer
-    })
+  serialize_impl <- (if (is.list(serializer)) {
+    function(x, ...) serializer$serializer(x)
+  } else {
+    serializer
+  })
   deserializer <- spark_apply_deserializer()
-  closure <- (
-    if (create_rlang_closure) {
-      serialize_impl(NULL, version = serialize_version)
-    } else if (is.function(f)) {
-      suppressWarnings(serialize_impl(f, version = serialize_version))
-    } else {
-      f
-    })
+  closure <- (if (create_rlang_closure) {
+    serialize_impl(NULL, version = serialize_version)
+  } else if (is.function(f)) {
+    suppressWarnings(serialize_impl(f, version = serialize_version))
+  } else {
+    f
+  })
   context_serialize <- serialize_impl(context, version = serialize_version)
 
   # create rlang closure
@@ -314,10 +332,18 @@ spark_apply.default <- function(
 
   # add debug connection message
   if (isTRUE(args$debug)) {
-    message("Debugging spark_apply(), connect to worker debugging session as follows:")
-    message("  1. Find the workers <sessionid> and <port> in the worker logs, from RStudio click")
-    message("     'Log' under the connection, look for the last entry with contents:")
-    message("     'Session (<sessionid>) is waiting for sparklyr client to connect to port <port>'")
+    message(
+      "Debugging spark_apply(), connect to worker debugging session as follows:"
+    )
+    message(
+      "  1. Find the workers <sessionid> and <port> in the worker logs, from RStudio click"
+    )
+    message(
+      "     'Log' under the connection, look for the last entry with contents:"
+    )
+    message(
+      "     'Session (<sessionid>) is waiting for sparklyr client to connect to port <port>'"
+    )
     message("  2. From a new R session run:")
     message("     debugonce(sparklyr:::spark_worker_main)")
     message("     sparklyr:::spark_worker_main(<sessionid>, <port>)")
@@ -325,7 +351,9 @@ spark_apply.default <- function(
 
   if (grouped) {
     colpos <- which(colnames(x) %in% group_by)
-    if (length(colpos) != length(group_by)) stop("Not all group_by columns found.")
+    if (length(colpos) != length(group_by)) {
+      stop("Not all group_by columns found.")
+    }
 
     group_by_list <- as.list(as.integer(colpos - 1))
 
@@ -397,7 +425,9 @@ spark_apply.default <- function(
     as.character
   )
   if (!is.null(records_per_batch)) {
-    spark_apply_options[["maxRecordsPerBatch"]] <- as.character(records_per_batch)
+    spark_apply_options[["maxRecordsPerBatch"]] <- as.character(
+      records_per_batch
+    )
   }
 
   if (identical(args$rdd, TRUE)) {
@@ -458,17 +488,24 @@ spark_apply.default <- function(
     }
 
     # cache by default
-    if (memory) rdd <- invoke(rdd, "cache")
+    if (memory) {
+      rdd <- invoke(rdd, "cache")
+    }
 
     schema <- spark_schema_from_rdd(sc, rdd, columns)
 
     transformed <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
   } else {
-# ----------------------- Post Spark 2.0 a.k.a non-RDD -------------------------
+    # ----------------------- Post Spark 2.0 a.k.a non-RDD -------------------------
 
-    if(spark_version(sc) >= "4" && !grouped && !arrow) {
+    if (spark_version(sc) >= "4" && !grouped && !arrow) {
       sdf <- invoke_static(sc, "sparklyr.LatestUtils", "convertToArray", sdf)
-      sdf_limit <- invoke_static(sc, "sparklyr.LatestUtils", "convertToArray", sdf_limit)
+      sdf_limit <- invoke_static(
+        sc,
+        "sparklyr.LatestUtils",
+        "convertToArray",
+        sdf_limit
+      )
     }
 
     json_cols <- c()
@@ -516,8 +553,13 @@ spark_apply.default <- function(
       columns_query <- columns_op %>% sdf_collect()
 
       columns_infer <- strsplit(columns_query[1, ]$types, split = "\\|")[[1]]
-      names(columns_infer) <- strsplit(columns_query[1, ]$names, split = "\\|")[[1]]
-      json_cols <- array(strsplit(columns_query[1, ]$json_cols, split = "\\|")[[1]])
+      names(columns_infer) <- strsplit(
+        columns_query[1, ]$names,
+        split = "\\|"
+      )[[1]]
+      json_cols <- array(strsplit(columns_query[1, ]$json_cols, split = "\\|")[[
+        1
+      ]])
 
       if (is.character(columns)) {
         names(columns_infer)[seq_along(columns)] <- columns
@@ -562,7 +604,9 @@ spark_apply.default <- function(
       serialize(deserializer, NULL, version = serialize_version)
     )
 
-    if (spark_version(sc) >= "2.4.0" && !is.na(json_cols) && length(json_cols) > 0) {
+    if (
+      spark_version(sc) >= "2.4.0" && !is.na(json_cols) && length(json_cols) > 0
+    ) {
       transformed <- invoke_static(
         sc,
         "sparklyr.StructColumnUtils",
@@ -586,10 +630,11 @@ spark_apply.default <- function(
   if (identical(fetch_result_as_sdf, FALSE)) {
     registered %>%
       sdf_collect(arrow = arrow) %>%
-      (
-        function(x) {
-          lapply(x$spark_apply_binary_result, function(res) deserializer(res[[1]]))
+      (function(x) {
+        lapply(x$spark_apply_binary_result, function(res) {
+          deserializer(res[[1]])
         })
+      })
   } else {
     registered
   }
@@ -606,20 +651,19 @@ spark_apply_rlang_serialize <- function() {
 
 spark_apply_serializer <- function() {
   serializer <- getOption("sparklyr.spark_apply.serializer")
-  impl <- (
-    if (identical(serializer, "qs")) {
-      qserialize <- core_get_package_function("qs", "qserialize")
-      if (is.null(qserialize)) {
-        stop(
-          "Unable to locate qs::qserialize(). Please ensure 'qs' is installed."
-        )
-      }
-      function(x, ...) qserialize(x)
-    } else if (is.null(serializer)) {
-      function(x, version = NULL) serialize(x, NULL, version = version)
-    } else {
-      list(serializer = serializer)
-    })
+  impl <- (if (identical(serializer, "qs")) {
+    qserialize <- core_get_package_function("qs", "qserialize")
+    if (is.null(qserialize)) {
+      stop(
+        "Unable to locate qs::qserialize(). Please ensure 'qs' is installed."
+      )
+    }
+    function(x, ...) qserialize(x)
+  } else if (is.null(serializer)) {
+    function(x, version = NULL) serialize(x, NULL, version = version)
+  } else {
+    list(serializer = serializer)
+  })
 
   impl
 }

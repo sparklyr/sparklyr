@@ -26,8 +26,13 @@
 #' @template roxlate-ml-feature-transformer
 #' @template roxlate-ml-feature-estimator-transformer
 #' @export
-ft_max_abs_scaler <- function(x, input_col = NULL, output_col = NULL,
-                              uid = random_string("max_abs_scaler_"), ...) {
+ft_max_abs_scaler <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  uid = random_string("max_abs_scaler_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_max_abs_scaler")
 }
@@ -35,8 +40,13 @@ ft_max_abs_scaler <- function(x, input_col = NULL, output_col = NULL,
 ml_max_abs_scaler <- ft_max_abs_scaler
 
 #' @export
-ft_max_abs_scaler.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                               uid = random_string("max_abs_scaler_"), ...) {
+ft_max_abs_scaler.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  uid = random_string("max_abs_scaler_"),
+  ...
+) {
   spark_require_version(x, "2.0.0", "MaxAbsScaler")
 
   .args <- list(
@@ -48,18 +58,25 @@ ft_max_abs_scaler.spark_connection <- function(x, input_col = NULL, output_col =
     validator_ml_max_abs_scaler()
 
   estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.MaxAbsScaler",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.MaxAbsScaler",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
     new_ml_max_abs_scaler()
-
 
   estimator
 }
 
 #' @export
-ft_max_abs_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                          uid = random_string("max_abs_scaler_"), ...) {
+ft_max_abs_scaler.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  uid = random_string("max_abs_scaler_"),
+  ...
+) {
   stage <- ft_max_abs_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -71,8 +88,13 @@ ft_max_abs_scaler.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
 }
 
 #' @export
-ft_max_abs_scaler.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                        uid = random_string("max_abs_scaler_"), ...) {
+ft_max_abs_scaler.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  uid = random_string("max_abs_scaler_"),
+  ...
+) {
   stage <- ft_max_abs_scaler.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

@@ -17,8 +17,17 @@ validate_args <- function(into, sep) {
 
 #' @importFrom tidyr separate
 #' @export
-separate.tbl_spark <- function(data, col, into, sep = "[^[:alnum:]]+",
-                               remove = TRUE, convert = FALSE, extra = "warn", fill = "warn", ...) {
+separate.tbl_spark <- function(
+  data,
+  col,
+  into,
+  sep = "[^[:alnum:]]+",
+  remove = TRUE,
+  convert = FALSE,
+  extra = "warn",
+  fill = "warn",
+  ...
+) {
   if (!identical(convert, FALSE)) {
     rlang::warn("`convert` will be ignored for Spark dataframes!")
   }
@@ -43,5 +52,6 @@ separate.tbl_spark <- function(data, col, into, sep = "[^[:alnum:]]+",
   output_cols <- output_cols %>% lapply(as.symbol)
 
   update_group_vars(data, out, preserved) %>>%
-    dplyr::select %@% output_cols
+    dplyr::select %@%
+    output_cols
 }

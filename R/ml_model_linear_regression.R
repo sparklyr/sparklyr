@@ -1,9 +1,16 @@
-new_ml_model_linear_regression <- function(pipeline_model, formula, dataset, label_col,
-                                           features_col) {
+new_ml_model_linear_regression <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col
+) {
   m <- new_ml_model_regression(
-    pipeline_model, formula,
+    pipeline_model,
+    formula,
     dataset = dataset,
-    label_col = label_col, features_col = features_col,
+    label_col = label_col,
+    features_col = features_col,
     class = "ml_model_linear_regression"
   )
 
@@ -44,10 +51,13 @@ summary.ml_model_linear_regression <- function(object, ...) {
   print_newline()
 
   cat(paste("R-Squared:", signif(object$summary$r2, 4)), sep = "\n")
-  cat(paste(
-    "Root Mean Squared Error:",
-    signif(object$summary$root_mean_squared_error, 4)
-  ), sep = "\n")
+  cat(
+    paste(
+      "Root Mean Squared Error:",
+      signif(object$summary$root_mean_squared_error, 4)
+    ),
+    sep = "\n"
+  )
 }
 
 #' @export

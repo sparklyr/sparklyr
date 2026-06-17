@@ -3,7 +3,11 @@ NULL
 
 #' @importFrom tidyr fill
 #' @export
-fill.tbl_spark <- function(data, ..., .direction = c("down", "up", "downup", "updown")) {
+fill.tbl_spark <- function(
+  data,
+  ...,
+  .direction = c("down", "up", "downup", "updown")
+) {
   if (data %>% spark_connection() %>% spark_version() < "2.0.0") {
     rlang::abort("`fill.tbl_spark` requires Spark 2.0.0 or higher")
   }
@@ -20,7 +24,10 @@ fill.tbl_spark <- function(data, ..., .direction = c("down", "up", "downup", "up
   }
 
   cols <- colnames(data)
-  vars <- names(tidyselect::eval_select(rlang::expr(c(...)), replicate_colnames(data)))
+  vars <- names(tidyselect::eval_select(
+    rlang::expr(c(...)),
+    replicate_colnames(data)
+  ))
 
   sql <- lapply(
     vars,
@@ -65,16 +72,15 @@ fill_up_sql <- function(col, group_vars, order_exprs) {
 }
 
 to_partition_spec <- function(group_vars, order_exprs) {
-  spec <- (
-    if (length(group_vars) > 0) {
-      sprintf(
-        "PARTITION BY (%s)",
-        lapply(group_vars, quote_sql_name) %>%
-          paste0(collapse = ", ")
-      )
-    } else {
-      ""
-    })
+  spec <- (if (length(group_vars) > 0) {
+    sprintf(
+      "PARTITION BY (%s)",
+      lapply(group_vars, quote_sql_name) %>%
+        paste0(collapse = ", ")
+    )
+  } else {
+    ""
+  })
   if (length(order_exprs) > 0) {
     spec <- sprintf(
       "%s ORDER BY %s",
@@ -82,7 +88,10 @@ to_partition_spec <- function(group_vars, order_exprs) {
       order_exprs %>%
         lapply(
           function(x) {
-            as.character(dbplyr::translate_sql(!!x, con = dbplyr::simulate_hive()))
+            as.character(dbplyr::translate_sql(
+              !!x,
+              con = dbplyr::simulate_hive()
+            ))
           }
         ) %>%
         paste0(collapse = ", ")

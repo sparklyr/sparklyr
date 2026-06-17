@@ -4,8 +4,7 @@ stream_progress <- function(stream) {
 
   if (is.null(lastProgress)) {
     NULL
-  }
-  else {
+  } else {
     lastProgress %>%
       invoke("toString") %>%
       fromJSON()
@@ -34,8 +33,9 @@ stream_progress <- function(stream) {
 #' }
 #' @export
 stream_view <- function(
-                        stream,
-                        ...) {
+  stream,
+  ...
+) {
   stream_package_check("shiny")
 
   validate <- stream_progress(stream)
@@ -54,13 +54,15 @@ stream_view <- function(
   ui <- shinyUI(
     div(
       tags$head(
-        tags$style(HTML("
+        tags$style(HTML(
+          "
           html, body, body > div {
             width: 100%;
             height: 100%;
             margin: 0px;
           }
-        "))
+        "
+        ))
       ),
       d3Output("plot", width = "100%", height = "100%")
     )
@@ -90,13 +92,24 @@ stream_view <- function(
 
       data <- stream_progress(stream)
 
-      session$sendCustomMessage(type = "sparklyr_stream_view", list(
-        timestamp = data$timestamp,
-        rps = list(
-          "in" = if (is.numeric(data$inputRowsPerSecond)) floor(data$inputRowsPerSecond) else 0,
-          "out" = if (is.numeric(data$processedRowsPerSecond)) floor(data$processedRowsPerSecond) else 0
+      session$sendCustomMessage(
+        type = "sparklyr_stream_view",
+        list(
+          timestamp = data$timestamp,
+          rps = list(
+            "in" = if (is.numeric(data$inputRowsPerSecond)) {
+              floor(data$inputRowsPerSecond)
+            } else {
+              0
+            },
+            "out" = if (is.numeric(data$processedRowsPerSecond)) {
+              floor(data$processedRowsPerSecond)
+            } else {
+              0
+            }
+          )
         )
-      ))
+      )
     })
   }
 
@@ -142,8 +155,16 @@ stream_stats <- function(stream, stats = list()) {
   stats$stats[[length(stats$stats) + 1]] <- list(
     timestamp = data$timestamp,
     rps = list(
-      "in" = if (is.numeric(data$inputRowsPerSecond)) floor(data$inputRowsPerSecond) else 0,
-      "out" = if (is.numeric(data$processedRowsPerSecond)) floor(data$processedRowsPerSecond) else 0
+      "in" = if (is.numeric(data$inputRowsPerSecond)) {
+        floor(data$inputRowsPerSecond)
+      } else {
+        0
+      },
+      "out" = if (is.numeric(data$processedRowsPerSecond)) {
+        floor(data$processedRowsPerSecond)
+      } else {
+        0
+      }
     )
   )
 
@@ -177,11 +198,11 @@ stream_stats <- function(stream, stats = list()) {
 #' }
 #' @export
 stream_render <- function(
-                          stream = NULL,
-                          collect = 10,
-                          stats = NULL,
-                          ...) {
-
+  stream = NULL,
+  collect = 10,
+  stats = NULL,
+  ...
+) {
   stream_package_check("r2d3")
   r2d3 <- get("r2d3", envir = asNamespace("r2d3"))
 
@@ -209,6 +230,6 @@ stream_render <- function(
 
 stream_package_check <- function(x) {
   if (!(x %in% installed.packages())) {
-    stop(glue::glue("The '{x}' package is required for this operation.") )
+    stop(glue::glue("The '{x}' package is required for this operation."))
   }
 }

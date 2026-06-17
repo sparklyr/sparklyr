@@ -2,7 +2,8 @@ register_mapping_tables <- function() {
   flip_named_list <- function(x) stats::setNames(as.list(names(x)), unlist(x))
   create_env_from_mappings <- function(x) {
     purrr::reduce(
-      purrr::map(x, ~ list2env(.x, parent = emptyenv())), rlang::env_poke_parent
+      purrr::map(x, ~ list2env(.x, parent = emptyenv())),
+      rlang::env_poke_parent
     )
   }
 
@@ -10,7 +11,16 @@ register_mapping_tables <- function() {
     pkgs <- registered_extensions()
     mappings <- pkgs %>%
       purrr::map_chr(function(pkg) {
-        if (nzchar(devtools_file <- system.file("inst", "sparkml", file_name, package = pkg))) {
+        if (
+          nzchar(
+            devtools_file <- system.file(
+              "inst",
+              "sparkml",
+              file_name,
+              package = pkg
+            )
+          )
+        ) {
           return(devtools_file)
         }
         system.file("sparkml", file_name, package = pkg)
@@ -34,7 +44,9 @@ register_mapping_tables <- function() {
   param_mapping_s_to_r <- read_base_mapping("param_mapping.json") %>%
     as.environment()
 
-  extension_param_mappings <- read_extension_mappings(file_name = "param_mapping.json")
+  extension_param_mappings <- read_extension_mappings(
+    file_name = "param_mapping.json"
+  )
 
   if (!is.null(extension_param_mappings)) {
     extension_param_mappings_r_to_s <- extension_param_mappings %>%
@@ -44,8 +56,14 @@ register_mapping_tables <- function() {
     extension_param_mappings_s_to_r <- extension_param_mappings %>%
       create_env_from_mappings()
 
-    rlang::env_poke_parent(param_mapping_r_to_s, extension_param_mappings_r_to_s)
-    rlang::env_poke_parent(param_mapping_s_to_r, extension_param_mappings_s_to_r)
+    rlang::env_poke_parent(
+      param_mapping_r_to_s,
+      extension_param_mappings_r_to_s
+    )
+    rlang::env_poke_parent(
+      param_mapping_s_to_r,
+      extension_param_mappings_s_to_r
+    )
   }
 
   genv_set_param_mapping_r_to_s(param_mapping_r_to_s)
@@ -55,22 +73,28 @@ register_mapping_tables <- function() {
   ml_class_mapping <- read_base_mapping(file_name = "class_mapping.json") %>%
     as.environment()
 
-  extension_class_mappings <- read_extension_mappings(file_name = "class_mapping.json")
+  extension_class_mappings <- read_extension_mappings(
+    file_name = "class_mapping.json"
+  )
 
   ml_package_mapping <- read_base_mapping(file_name = "class_mapping.json") %>%
     purrr::map(~"sparklyr") %>%
     as.environment()
 
-  extension_package_mappings <- read_extension_mappings(file_name = "class_mapping.json") %>%
+  extension_package_mappings <- read_extension_mappings(
+    file_name = "class_mapping.json"
+  ) %>%
     purrr::imap(function(l, pkg) purrr::map(l, ~pkg))
 
-
-
   if (!is.null(extension_class_mappings)) {
-    extension_class_mappings <- create_env_from_mappings(extension_class_mappings)
+    extension_class_mappings <- create_env_from_mappings(
+      extension_class_mappings
+    )
     rlang::env_poke_parent(ml_class_mapping, extension_class_mappings)
 
-    extension_package_mappings <- create_env_from_mappings(extension_package_mappings)
+    extension_package_mappings <- create_env_from_mappings(
+      extension_package_mappings
+    )
     rlang::env_poke_parent(ml_package_mapping, extension_package_mappings)
   }
 

@@ -1,9 +1,16 @@
-new_ml_model_generalized_linear_regression <- function(pipeline_model, formula, dataset, label_col,
-                                                       features_col) {
+new_ml_model_generalized_linear_regression <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col
+) {
   m <- new_ml_model_regression(
-    pipeline_model, formula,
+    pipeline_model,
+    formula,
     dataset = dataset,
-    label_col = label_col, features_col = features_col,
+    label_col = label_col,
+    features_col = features_col,
     class = "ml_model_generalized_linear_regression"
   )
 
@@ -39,18 +46,29 @@ print.ml_model_generalized_linear_regression <-
       ),
       sep = "\n"
     )
-    cat(sprintf("Null Deviance:       %s", signif(x$summary$null_deviance(), digits)), sep = "\n")
-    cat(sprintf(
-      "Residual Deviance:   %s\tAIC: %s",
-      signif(x$summary$deviance(), digits),
-      signif(x$summary$aic(), digits)
-    ), sep = "\n")
+    cat(
+      sprintf(
+        "Null Deviance:       %s",
+        signif(x$summary$null_deviance(), digits)
+      ),
+      sep = "\n"
+    )
+    cat(
+      sprintf(
+        "Residual Deviance:   %s\tAIC: %s",
+        signif(x$summary$deviance(), digits),
+        signif(x$summary$aic(), digits)
+      ),
+      sep = "\n"
+    )
   }
 
 #' @export
-summary.ml_model_generalized_linear_regression <- function(object,
-                                                           digits = max(3L, getOption("digits") - 3L),
-                                                           ...) {
+summary.ml_model_generalized_linear_regression <- function(
+  object,
+  digits = max(3L, getOption("digits") - 3L),
+  ...
+) {
   ml_model_print_residuals(object, residuals.header = "Deviance Residuals")
   print_newline()
   ml_model_print_coefficients_detailed(object)
@@ -80,9 +98,10 @@ summary.ml_model_generalized_linear_regression <- function(object,
 
 #' @export
 residuals.ml_model_generalized_linear_regression <- function(
-                                                             object,
-                                                             type = c("deviance", "pearson", "working", "response"),
-                                                             ...) {
+  object,
+  type = c("deviance", "pearson", "working", "response"),
+  ...
+) {
   type <- rlang::arg_match(type) %>%
     cast_string()
 
@@ -97,9 +116,11 @@ residuals.ml_model_generalized_linear_regression <- function(
 #' @rdname sdf_residuals
 #' @param type type of residuals which should be returned.
 #' @export
-sdf_residuals.ml_model_generalized_linear_regression <- function(object,
-                                                                 type = c("deviance", "pearson", "working", "response"),
-                                                                 ...) {
+sdf_residuals.ml_model_generalized_linear_regression <- function(
+  object,
+  type = c("deviance", "pearson", "working", "response"),
+  ...
+) {
   type <- rlang::arg_match(type) %>%
     cast_string()
 

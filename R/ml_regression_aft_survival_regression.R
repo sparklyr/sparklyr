@@ -42,62 +42,78 @@
 #'
 #' @export
 ml_aft_survival_regression <-
-  function(x,
-           formula = NULL,
-           censor_col = "censor",
-           quantile_probabilities = c(
-             0.01, 0.05, 0.1, 0.25, 0.5,
-             0.75, 0.9, 0.95, 0.99
-           ),
-           fit_intercept = TRUE,
-           max_iter = 100L,
-           tol = 1e-06,
-           aggregation_depth = 2,
-           quantiles_col = NULL,
-           features_col = "features",
-           label_col = "label",
-           prediction_col = "prediction",
-           uid = random_string("aft_survival_regression_"),
-           ...) {
+  function(
+    x,
+    formula = NULL,
+    censor_col = "censor",
+    quantile_probabilities = c(
+      0.01,
+      0.05,
+      0.1,
+      0.25,
+      0.5,
+      0.75,
+      0.9,
+      0.95,
+      0.99
+    ),
+    fit_intercept = TRUE,
+    max_iter = 100L,
+    tol = 1e-06,
+    aggregation_depth = 2,
+    quantiles_col = NULL,
+    features_col = "features",
+    label_col = "label",
+    prediction_col = "prediction",
+    uid = random_string("aft_survival_regression_"),
+    ...
+  ) {
     check_dots_used()
     UseMethod("ml_aft_survival_regression")
   }
 
-ml_aft_survival_regression_impl <- function(x, formula = NULL, censor_col = "censor",
-                                            quantile_probabilities = c( 0.01, 0.05, 0.1,
-                                                                        0.25, 0.5, 0.75, 0.9,
-                                                                        0.95, 0.99),
-                                            fit_intercept = TRUE, max_iter = 100L,
-                                            tol = 1e-06, aggregation_depth = 2,
-                                            quantiles_col = NULL,features_col = "features",
-                                            label_col = "label", prediction_col = "prediction",
-                                            uid = random_string("aft_survival_regression_"),
-                                            response = NULL, features = NULL, ...) {
-
+ml_aft_survival_regression_impl <- function(
+  x,
+  formula = NULL,
+  censor_col = "censor",
+  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+  fit_intercept = TRUE,
+  max_iter = 100L,
+  tol = 1e-06,
+  aggregation_depth = 2,
+  quantiles_col = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("aft_survival_regression_"),
+  response = NULL,
+  features = NULL,
+  ...
+) {
   aggregation_depth <- param_min_version(x, aggregation_depth, "2.1.0", 2)
 
-    ml_process_model(
-      x = x,
-      r_class = "ml_aft_survival_regression",
-      ml_function = new_ml_model_aft_survival_regression,
-      features = features,
-      response = response,
-      uid = uid,
-      formula = formula,
-      invoke_steps = list(
-        features_col = features_col,
-        label_col = label_col,
-        prediction_col = prediction_col,
-        fit_intercept = fit_intercept,
-        max_iter = max_iter,
-        tol = tol,
-        censor_col = censor_col,
-        quantile_probabilities = quantile_probabilities,
-        aggregation_depth = aggregation_depth,
-        quantiles_col = quantiles_col
-      )
+  ml_process_model(
+    x = x,
+    r_class = "ml_aft_survival_regression",
+    ml_function = new_ml_model_aft_survival_regression,
+    features = features,
+    response = response,
+    uid = uid,
+    formula = formula,
+    invoke_steps = list(
+      features_col = features_col,
+      label_col = label_col,
+      prediction_col = prediction_col,
+      fit_intercept = fit_intercept,
+      max_iter = max_iter,
+      tol = tol,
+      censor_col = censor_col,
+      quantile_probabilities = quantile_probabilities,
+      aggregation_depth = aggregation_depth,
+      quantiles_col = quantiles_col
     )
-  }
+  )
+}
 
 # ------------------------------- Methods --------------------------------------
 
@@ -127,12 +143,19 @@ new_ml_aft_survival_regression_model <- function(jobj) {
 
 # ------------------------------ Fitted models ---------------------------------
 
-new_ml_model_aft_survival_regression <- function(pipeline_model, formula, dataset,
-                                                 label_col, features_col) {
+new_ml_model_aft_survival_regression <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col
+) {
   m <- new_ml_model_regression(
     pipeline_model,
-    formula = formula, dataset = dataset,
-    label_col = label_col, features_col = features_col,
+    formula = formula,
+    dataset = dataset,
+    label_col = label_col,
+    features_col = features_col,
     class = "ml_model_aft_survival_regression"
   )
 
@@ -165,14 +188,24 @@ print.ml_model_aft_survival_regression <- function(x, ...) {
 #' @template roxlate-ml-old-feature-response
 #' @details \code{ml_survival_regression()} is an alias for \code{ml_aft_survival_regression()} for backwards compatibility.
 #' @export
-ml_survival_regression <- function(x, formula = NULL, censor_col = "censor",
-                                   quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
-                                   fit_intercept = TRUE, max_iter = 100L, tol = 1e-06,
-                                   aggregation_depth = 2, quantiles_col = NULL,
-                                   features_col = "features", label_col = "label",
-                                   prediction_col = "prediction",
-                                   uid = random_string("aft_survival_regression_"),
-                                   response = NULL, features = NULL, ...) {
+ml_survival_regression <- function(
+  x,
+  formula = NULL,
+  censor_col = "censor",
+  quantile_probabilities = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99),
+  fit_intercept = TRUE,
+  max_iter = 100L,
+  tol = 1e-06,
+  aggregation_depth = 2,
+  quantiles_col = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("aft_survival_regression_"),
+  response = NULL,
+  features = NULL,
+  ...
+) {
   .Deprecated("ml_aft_survival_regression")
   UseMethod("ml_aft_survival_regression")
 }

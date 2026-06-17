@@ -7,8 +7,7 @@ connection_is_open.spark_worker_connection <- function(sc) {
       {
         bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
       },
-      error = function(e) {
-      }
+      error = function(e) {}
     )
   }
   bothOpen

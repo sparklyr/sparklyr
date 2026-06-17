@@ -62,16 +62,26 @@ NULL
 #' @rdname ml_evaluator
 #' @export
 #' @param raw_prediction_col Raw prediction (a.k.a. confidence) column name.
-ml_binary_classification_evaluator <- function(x, label_col = "label", raw_prediction_col = "rawPrediction",
-                                               metric_name = "areaUnderROC",
-                                               uid = random_string("binary_classification_evaluator_"), ...) {
+ml_binary_classification_evaluator <- function(
+  x,
+  label_col = "label",
+  raw_prediction_col = "rawPrediction",
+  metric_name = "areaUnderROC",
+  uid = random_string("binary_classification_evaluator_"),
+  ...
+) {
   UseMethod("ml_binary_classification_evaluator")
 }
 
 #' @export
-ml_binary_classification_evaluator.spark_connection <- function(x, label_col = "label", raw_prediction_col = "rawPrediction",
-                                                                metric_name = "areaUnderROC",
-                                                                uid = random_string("binary_classification_evaluator_"), ...) {
+ml_binary_classification_evaluator.spark_connection <- function(
+  x,
+  label_col = "label",
+  raw_prediction_col = "rawPrediction",
+  metric_name = "areaUnderROC",
+  uid = random_string("binary_classification_evaluator_"),
+  ...
+) {
   .args <- list(
     label_col = label_col,
     raw_prediction_col = raw_prediction_col,
@@ -79,7 +89,11 @@ ml_binary_classification_evaluator.spark_connection <- function(x, label_col = "
   ) %>%
     validator_ml_binary_classification_evaluator()
 
-  spark_pipeline_stage(x, "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator", uid) %>%
+  spark_pipeline_stage(
+    x,
+    "org.apache.spark.ml.evaluation.BinaryClassificationEvaluator",
+    uid
+  ) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
     invoke("setRawPredictionCol", .args[["raw_prediction_col"]]) %>%
     invoke("setMetricName", .args[["metric_name"]]) %>%
@@ -87,9 +101,14 @@ ml_binary_classification_evaluator.spark_connection <- function(x, label_col = "
 }
 
 #' @export
-ml_binary_classification_evaluator.tbl_spark <- function(x, label_col = "label", raw_prediction_col = "rawPrediction",
-                                                         metric_name = "areaUnderROC",
-                                                         uid = random_string("binary_classification_evaluator_"), ...) {
+ml_binary_classification_evaluator.tbl_spark <- function(
+  x,
+  label_col = "label",
+  raw_prediction_col = "rawPrediction",
+  metric_name = "areaUnderROC",
+  uid = random_string("binary_classification_evaluator_"),
+  ...
+) {
   evaluator <- ml_binary_classification_evaluator.spark_connection(
     x = spark_connection(x),
     label_col = label_col,
@@ -107,14 +126,22 @@ ml_binary_classification_evaluator.tbl_spark <- function(x, label_col = "label",
 validator_ml_binary_classification_evaluator <- function(.args) {
   .args[["label_col"]] <- cast_string(.args[["label_col"]])
   .args[["raw_prediction_col"]] <- cast_string(.args[["raw_prediction_col"]])
-  .args[["metric_name"]] <- cast_choice(.args[["metric_name"]], c("areaUnderROC", "areaUnderPR"))
+  .args[["metric_name"]] <- cast_choice(
+    .args[["metric_name"]],
+    c("areaUnderROC", "areaUnderPR")
+  )
   .args
 }
 
 #' @rdname ml_evaluator
 #' @details \code{ml_binary_classification_eval()} is an alias for \code{ml_binary_classification_evaluator()} for backwards compatibility.
 #' @export
-ml_binary_classification_eval <- function(x, label_col = "label", prediction_col = "prediction", metric_name = "areaUnderROC") {
+ml_binary_classification_eval <- function(
+  x,
+  label_col = "label",
+  prediction_col = "prediction",
+  metric_name = "areaUnderROC"
+) {
   .Deprecated("ml_binary_classification_evaluator")
   UseMethod("ml_binary_classification_evaluator")
 }
@@ -122,18 +149,26 @@ ml_binary_classification_eval <- function(x, label_col = "label", prediction_col
 
 #' @rdname ml_evaluator
 #' @export
-ml_multiclass_classification_evaluator <- function(x, label_col = "label", prediction_col = "prediction",
-                                                   metric_name = "f1",
-                                                   uid = random_string("multiclass_classification_evaluator_"),
-                                                   ...) {
+ml_multiclass_classification_evaluator <- function(
+  x,
+  label_col = "label",
+  prediction_col = "prediction",
+  metric_name = "f1",
+  uid = random_string("multiclass_classification_evaluator_"),
+  ...
+) {
   UseMethod("ml_multiclass_classification_evaluator")
 }
 
 #' @export
-ml_multiclass_classification_evaluator.spark_connection <- function(x, label_col = "label", prediction_col = "prediction",
-                                                                    metric_name = "f1",
-                                                                    uid = random_string("multiclass_classification_evaluator_"),
-                                                                    ...) {
+ml_multiclass_classification_evaluator.spark_connection <- function(
+  x,
+  label_col = "label",
+  prediction_col = "prediction",
+  metric_name = "f1",
+  uid = random_string("multiclass_classification_evaluator_"),
+  ...
+) {
   .args <- list(
     label_col = label_col,
     prediction_col = prediction_col,
@@ -142,16 +177,35 @@ ml_multiclass_classification_evaluator.spark_connection <- function(x, label_col
     validator_ml_multiclass_classification_evaluator()
 
   spark_metric <- list(
-    "1.6" = c("f1", "precision", "recall", "weightedPrecision", "weightedRecall"),
+    "1.6" = c(
+      "f1",
+      "precision",
+      "recall",
+      "weightedPrecision",
+      "weightedRecall"
+    ),
     "2.0" = c("f1", "weightedPrecision", "weightedRecall", "accuracy")
   )
 
-  if (spark_version(x) >= "2.0.0" && !metric_name %in% spark_metric[["2.0"]] ||
-    spark_version(x) < "2.0.0" && !metric_name %in% spark_metric[["1.6"]]) {
-    stop("Metric `", metric_name, "` is unsupported in Spark ", spark_version(x), ".")
+  if (
+    spark_version(x) >= "2.0.0" &&
+      !metric_name %in% spark_metric[["2.0"]] ||
+      spark_version(x) < "2.0.0" && !metric_name %in% spark_metric[["1.6"]]
+  ) {
+    stop(
+      "Metric `",
+      metric_name,
+      "` is unsupported in Spark ",
+      spark_version(x),
+      "."
+    )
   }
 
-  spark_pipeline_stage(x, "org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator", uid) %>%
+  spark_pipeline_stage(
+    x,
+    "org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator",
+    uid
+  ) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
     invoke("setPredictionCol", .args[["prediction_col"]]) %>%
     invoke("setMetricName", .args[["metric_name"]]) %>%
@@ -159,10 +213,14 @@ ml_multiclass_classification_evaluator.spark_connection <- function(x, label_col
 }
 
 #' @export
-ml_multiclass_classification_evaluator.tbl_spark <- function(x, label_col = "label", prediction_col = "prediction",
-                                                             metric_name = "f1",
-                                                             uid = random_string("multiclass_classification_evaluator_"),
-                                                             ...) {
+ml_multiclass_classification_evaluator.tbl_spark <- function(
+  x,
+  label_col = "label",
+  prediction_col = "prediction",
+  metric_name = "f1",
+  uid = random_string("multiclass_classification_evaluator_"),
+  ...
+) {
   evaluator <- ml_multiclass_classification_evaluator.spark_connection(
     x = spark_connection(x),
     label_col = label_col,
@@ -181,7 +239,14 @@ validator_ml_multiclass_classification_evaluator <- function(.args) {
   .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
   .args[["metric_name"]] <- cast_choice(
     .args[["metric_name"]],
-    c("f1", "precision", "recall", "weightedPrecision", "weightedRecall", "accuracy")
+    c(
+      "f1",
+      "precision",
+      "recall",
+      "weightedPrecision",
+      "weightedRecall",
+      "accuracy"
+    )
   )
   .args
 }
@@ -189,21 +254,38 @@ validator_ml_multiclass_classification_evaluator <- function(.args) {
 #' @rdname ml_evaluator
 #' @details \code{ml_classification_eval()} is an alias for \code{ml_multiclass_classification_evaluator()} for backwards compatibility.
 #' @export
-ml_classification_eval <- function(x, label_col = "label", prediction_col = "prediction", metric_name = "f1") {
+ml_classification_eval <- function(
+  x,
+  label_col = "label",
+  prediction_col = "prediction",
+  metric_name = "f1"
+) {
   .Deprecated("ml_multiclass_classification_evaluator")
   UseMethod("ml_multiclass_classification_evaluator")
 }
 
 #' @rdname ml_evaluator
 #' @export
-ml_regression_evaluator <- function(x, label_col = "label", prediction_col = "prediction", metric_name = "rmse",
-                                    uid = random_string("regression_evaluator_"), ...) {
+ml_regression_evaluator <- function(
+  x,
+  label_col = "label",
+  prediction_col = "prediction",
+  metric_name = "rmse",
+  uid = random_string("regression_evaluator_"),
+  ...
+) {
   UseMethod("ml_regression_evaluator")
 }
 
 #' @export
-ml_regression_evaluator.spark_connection <- function(x, label_col = "label", prediction_col = "prediction", metric_name = "rmse",
-                                                     uid = random_string("regression_evaluator_"), ...) {
+ml_regression_evaluator.spark_connection <- function(
+  x,
+  label_col = "label",
+  prediction_col = "prediction",
+  metric_name = "rmse",
+  uid = random_string("regression_evaluator_"),
+  ...
+) {
   .args <- list(
     label_col = label_col,
     prediction_col = prediction_col,
@@ -211,7 +293,11 @@ ml_regression_evaluator.spark_connection <- function(x, label_col = "label", pre
   ) %>%
     validator_ml_regression_evaluator()
 
-  evaluator <- spark_pipeline_stage(x, "org.apache.spark.ml.evaluation.RegressionEvaluator", uid) %>%
+  evaluator <- spark_pipeline_stage(
+    x,
+    "org.apache.spark.ml.evaluation.RegressionEvaluator",
+    uid
+  ) %>%
     invoke("setLabelCol", .args[["label_col"]]) %>%
     invoke("setPredictionCol", .args[["prediction_col"]]) %>%
     invoke("setMetricName", .args[["metric_name"]]) %>%
@@ -221,8 +307,14 @@ ml_regression_evaluator.spark_connection <- function(x, label_col = "label", pre
 }
 
 #' @export
-ml_regression_evaluator.tbl_spark <- function(x, label_col = "label", prediction_col = "prediction", metric_name = "rmse",
-                                              uid = random_string("regression_evaluator_"), ...) {
+ml_regression_evaluator.tbl_spark <- function(
+  x,
+  label_col = "label",
+  prediction_col = "prediction",
+  metric_name = "rmse",
+  uid = random_string("regression_evaluator_"),
+  ...
+) {
   evaluator <- ml_regression_evaluator.spark_connection(
     x = spark_connection(x),
     label_col = label_col,
@@ -237,7 +329,10 @@ ml_regression_evaluator.tbl_spark <- function(x, label_col = "label", prediction
 validator_ml_regression_evaluator <- function(.args) {
   .args[["label_col"]] <- cast_string(.args[["label_col"]])
   .args[["prediction_col"]] <- cast_string(.args[["prediction_col"]])
-  .args[["metric_name"]] <- cast_choice(.args[["metric_name"]], c("rmse", "mse", "r2", "mae"))
+  .args[["metric_name"]] <- cast_choice(
+    .args[["metric_name"]],
+    c("rmse", "mse", "r2", "mae")
+  )
   .args
 }
 

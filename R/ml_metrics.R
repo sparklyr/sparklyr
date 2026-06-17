@@ -34,9 +34,13 @@
 #'   ml_metrics_regression(Sepal_Length)
 #' }
 #' @export
-ml_metrics_regression <- function(x, truth, estimate = prediction,
-                                  metrics = c("rmse", "rsq", "mae"),
-                                  ...) {
+ml_metrics_regression <- function(
+  x,
+  truth,
+  estimate = prediction,
+  metrics = c("rmse", "rsq", "mae"),
+  ...
+) {
   ml_metrics_impl(
     x = x,
     truth = as_name(enquo(truth)),
@@ -71,9 +75,13 @@ ml_metrics_regression <- function(x, truth, estimate = prediction,
 #' ml_metrics_binary(tbl_predictions)
 #' }
 #' @export
-ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
-                              metrics = c("roc_auc", "pr_auc"),
-                              ...) {
+ml_metrics_binary <- function(
+  x,
+  truth = label,
+  estimate = rawPrediction,
+  metrics = c("roc_auc", "pr_auc"),
+  ...
+) {
   ml_metrics_impl(
     x = x,
     truth = as_name(enquo(truth)),
@@ -121,9 +129,14 @@ ml_metrics_binary <- function(x, truth = label, estimate = rawPrediction,
 #' }
 #' @inherit ml_metrics_regression
 #' @export
-ml_metrics_multiclass <- function(x, truth = label, estimate = prediction,
-                                  metrics = c("accuracy"), beta = NULL,
-                                  ...) {
+ml_metrics_multiclass <- function(
+  x,
+  truth = label,
+  estimate = prediction,
+  metrics = c("accuracy"),
+  beta = NULL,
+  ...
+) {
   ml_metrics_impl(
     x = x,
     truth = as_name(enquo(truth)),
@@ -136,12 +149,20 @@ ml_metrics_multiclass <- function(x, truth = label, estimate = prediction,
   )
 }
 
-ml_metrics_impl <- function(x, truth, estimate, metrics,
-                            evaluator, pred_col, estimator_name,
-                            beta = NULL) {
-
-  if(spark_version(spark_connection(x)) >= "3") {
-    if(is.null(beta) && evaluator == "MulticlassClassificationEvaluator") beta <- 1
+ml_metrics_impl <- function(
+  x,
+  truth,
+  estimate,
+  metrics,
+  evaluator,
+  pred_col,
+  estimator_name,
+  beta = NULL
+) {
+  if (spark_version(spark_connection(x)) >= "3") {
+    if (is.null(beta) && evaluator == "MulticlassClassificationEvaluator") {
+      beta <- 1
+    }
   }
 
   init_steps <- list(truth, estimate)
@@ -149,7 +170,8 @@ ml_metrics_impl <- function(x, truth, estimate, metrics,
 
   conn <- spark_connection(x)
   new_jobj <- invoke_new(
-    conn, list(
+    conn,
+    list(
       paste0("org.apache.spark.ml.evaluation.", evaluator),
       random_string("metric_")
     )
@@ -160,7 +182,9 @@ ml_metrics_impl <- function(x, truth, estimate, metrics,
     metrics,
     ~ {
       steps <- list("setMetricName" = ml_metrics_conversion(.x))
-      if (!is.null(beta)) steps <- c(steps, list("setBeta" = beta))
+      if (!is.null(beta)) {
+        steps <- c(steps, list("setBeta" = beta))
+      }
       steps <- c(steps, list("evaluate" = spark_dataframe(x)))
       val <- ml_metrics_steps(init, steps)
       tibble(.metric = .x, .estimator = estimator_name, .estimate = val)
@@ -169,7 +193,6 @@ ml_metrics_impl <- function(x, truth, estimate, metrics,
 }
 
 ml_metrics_conversion <- function(x) {
-
   # Spark's value ------- R arg value
   conv_table <- c(
     "weightedPrecision" = "precision",

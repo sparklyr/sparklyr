@@ -10,21 +10,26 @@
 #' @name join.tbl_spark
 NULL
 
-join_tbl_spark_impl <- function(x, y, by = NULL, copy = FALSE,
-                                suffix = c("_x", "_y"), auto_index = FALSE,
-                                ..., sql_on = NULL
-                                ) {
-
-    if (any(grepl("\\.", suffix))) {
-      suffix <- gsub("\\.", "_", suffix)
-      message(
-        "Replacing '.' with '_' in suffixes. New suffixes: ",
-        paste(suffix, collapse = ", ")
-      )
-    }
-
-    NextMethod(suffix = suffix)
+join_tbl_spark_impl <- function(
+  x,
+  y,
+  by = NULL,
+  copy = FALSE,
+  suffix = c("_x", "_y"),
+  auto_index = FALSE,
+  ...,
+  sql_on = NULL
+) {
+  if (any(grepl("\\.", suffix))) {
+    suffix <- gsub("\\.", "_", suffix)
+    message(
+      "Replacing '.' with '_' in suffixes. New suffixes: ",
+      paste(suffix, collapse = ", ")
+    )
   }
+
+  NextMethod(suffix = suffix)
+}
 
 #' @rdname join.tbl_spark
 #' @export

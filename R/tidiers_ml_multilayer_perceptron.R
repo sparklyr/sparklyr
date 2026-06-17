@@ -9,8 +9,7 @@ NULL
 
 #' @rdname ml_multilayer_perceptron_tidiers
 #' @export
-tidy.ml_model_multilayer_perceptron_classification <- function(x,
-                                                               ...) {
+tidy.ml_model_multilayer_perceptron_classification <- function(x, ...) {
   num_layers <- length(x$model$layers)
   weight_param <- NULL
 
@@ -26,7 +25,8 @@ tidy.ml_model_multilayer_perceptron_classification <- function(x,
   # matrix
   weight_matrix <- list()
   weight_matrix <- purrr::map(seq_len(length(weight_param) - 1), function(e) {
-    matrix(x$model$weights[(weight_param[e] + 1):weight_param[e + 1]],
+    matrix(
+      x$model$weights[(weight_param[e] + 1):weight_param[e + 1]],
       nrow = x$model$layers[e] + 1,
       ncol = x$model$layers[e + 1],
       byrow = TRUE
@@ -44,8 +44,11 @@ tidy.ml_model_multilayer_perceptron_classification <- function(x,
 #' @param newdata a tbl_spark of new data to use for prediction.
 #'
 #' @export
-augment.ml_model_multilayer_perceptron_classification <- function(x, newdata = NULL,
-                                                                  ...) {
+augment.ml_model_multilayer_perceptron_classification <- function(
+  x,
+  newdata = NULL,
+  ...
+) {
   broom_augment_supervised(x, newdata = newdata)
 }
 

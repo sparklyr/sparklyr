@@ -5,7 +5,12 @@ sparklyr_gateway_trouble_shooting_msg <- function() {
   )
 }
 
-wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting) {
+wait_connect_gateway <- function(
+  gatewayAddress,
+  gatewayPort,
+  config,
+  isStarting
+) {
   waitSeconds <- if (isStarting) {
     spark_config_value(config, "sparklyr.connect.timeout", 60)
   } else {
@@ -30,8 +35,7 @@ wait_connect_gateway <- function(gatewayAddress, gatewayPort, config, isStarting
           )
         })
       },
-      error = function(err) {
-      }
+      error = function(err) {}
     )
 
     startWait <- spark_config_value(config, "sparklyr.gateway.wait", 50 / 1000)
@@ -63,7 +67,9 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   redirectGatewayPort <- NULL
 
   commandStart <- Sys.time()
-  while (length(backendSessionId) == 0 && commandStart + waitSeconds > Sys.time()) {
+  while (
+    length(backendSessionId) == 0 && commandStart + waitSeconds > Sys.time()
+  ) {
     backendSessionId <- readInt(gateway)
     Sys.sleep(0.1)
   }
@@ -71,7 +77,11 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
   redirectGatewayPort <- readInt(gateway)
   backendPort <- readInt(gateway)
 
-  if (length(backendSessionId) == 0 || length(redirectGatewayPort) == 0 || length(backendPort) == 0) {
+  if (
+    length(backendSessionId) == 0 ||
+      length(redirectGatewayPort) == 0 ||
+      length(backendPort) == 0
+  ) {
     if (isStarting) {
       stop(
         "Sparklyr gateway did not respond while retrieving ports information after ",
@@ -92,33 +102,45 @@ query_gateway_for_port <- function(gateway, sessionId, config, isStarting) {
 }
 
 spark_connect_gateway <- function(
-                                  gatewayAddress,
-                                  gatewayPort,
-                                  sessionId,
-                                  config,
-                                  isStarting = FALSE) {
-
+  gatewayAddress,
+  gatewayPort,
+  sessionId,
+  config,
+  isStarting = FALSE
+) {
   # try connecting to existing gateway
-  gateway <- wait_connect_gateway(gatewayAddress, gatewayPort, config, isStarting)
+  gateway <- wait_connect_gateway(
+    gatewayAddress,
+    gatewayPort,
+    config,
+    isStarting
+  )
 
   if (is.null(gateway)) {
     if (isStarting) {
       stop(
-        "Gateway in ", gatewayAddress, ":", gatewayPort, " did not respond.",
+        "Gateway in ",
+        gatewayAddress,
+        ":",
+        gatewayPort,
+        " did not respond.",
         sparklyr_gateway_trouble_shooting_msg()
       )
     }
 
     NULL
-  }
-  else {
+  } else {
     worker_log("is querying ports from backend using port ", gatewayPort)
 
     gateway_ports_query_attempts <- as.integer(
       spark_config_value(config, "sparklyr.gateway.port.query.attempts", 3L)
     )
     gateway_ports_query_retry_interval_s <- as.integer(
-      spark_config_value(config, "sparklyr.gateway.port.query.retry.interval.seconds", 4L)
+      spark_config_value(
+        config,
+        "sparklyr.gateway.port.query.retry.interval.seconds",
+        4L
+      )
     )
     while (gateway_ports_query_attempts > 0) {
       gateway_ports_query_attempts <- gateway_ports_query_attempts - 1
@@ -155,16 +177,27 @@ spark_connect_gateway <- function(
       close(gateway)
 
       if (isStarting) {
-        stop("Gateway in ", gatewayAddress, ":", gatewayPort, " does not have the requested session registered")
+        stop(
+          "Gateway in ",
+          gatewayAddress,
+          ":",
+          gatewayPort,
+          " does not have the requested session registered"
+        )
       }
 
       NULL
     } else if (redirectGatewayPort != gatewayPort) {
       close(gateway)
 
-      spark_connect_gateway(gatewayAddress, redirectGatewayPort, sessionId, config, isStarting)
-    }
-    else {
+      spark_connect_gateway(
+        gatewayAddress,
+        redirectGatewayPort,
+        sessionId,
+        config,
+        isStarting
+      )
+    } else {
       list(
         gateway = gateway,
         backendPort = backendPort

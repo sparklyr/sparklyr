@@ -6,7 +6,9 @@ master_is_gateway <- function(master) {
 
 gateway_connection <- function(master, config) {
   if (!master_is_gateway(master)) {
-    stop("sparklyr gateway master expected to be formatted as sparklyr://address:port")
+    stop(
+      "sparklyr gateway master expected to be formatted as sparklyr://address:port"
+    )
   }
 
   protocol <- strsplit(master, "//")[[1]]
@@ -14,7 +16,11 @@ gateway_connection <- function(master, config) {
   gatewayAddress <- components[[1]]
   portAndSesssion <- strsplit(components[[2]], "/")[[1]]
   gatewayPort <- as.integer(portAndSesssion[[1]])
-  sessionId <- if (length(portAndSesssion) > 1) as.integer(portAndSesssion[[2]]) else 0
+  sessionId <- if (length(portAndSesssion) > 1) {
+    as.integer(portAndSesssion[[2]])
+  } else {
+    0
+  }
 
   gatewayInfo <- spark_connect_gateway(
     gatewayAddress = gatewayAddress,
@@ -36,7 +42,12 @@ gateway_connection <- function(master, config) {
   sc
 }
 
-spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress) {
+spark_gateway_connection <- function(
+  master,
+  config,
+  gatewayInfo,
+  gatewayAddress
+) {
   tryCatch(
     {
       interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
@@ -84,11 +95,15 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
   ))
 
   # stop shell on R exit
-  reg.finalizer(baseenv(), function(x) {
-    if (connection_is_open(sc)) {
-      stop_shell(sc)
-    }
-  }, onexit = TRUE)
+  reg.finalizer(
+    baseenv(),
+    function(x) {
+      if (connection_is_open(sc)) {
+        stop_shell(sc)
+      }
+    },
+    onexit = TRUE
+  )
 
   sc
 }
@@ -97,13 +112,22 @@ spark_gateway_connection <- function(master, config, gatewayInfo, gatewayAddress
 connection_is_open.spark_gateway_connection <- connection_is_open.spark_shell_connection
 
 #' @export
-spark_log.spark_gateway_connection <- function(sc, n = 100, filter = NULL, ...) {
-  stop("spark_log is not available while connecting through an sparklyr gateway")
+spark_log.spark_gateway_connection <- function(
+  sc,
+  n = 100,
+  filter = NULL,
+  ...
+) {
+  stop(
+    "spark_log is not available while connecting through an sparklyr gateway"
+  )
 }
 
 #' @export
 spark_web.spark_gateway_connection <- function(sc, ...) {
-  stop("spark_web is not available while connecting through an sparklyr gateway")
+  stop(
+    "spark_web is not available while connecting through an sparklyr gateway"
+  )
 }
 
 #' @export

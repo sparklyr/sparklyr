@@ -25,19 +25,37 @@ NULL
 #' }
 #'
 #' @export
-ml_gaussian_mixture <- function(x, formula = NULL, k = 2, max_iter = 100,
-                                tol = 0.01, seed = NULL, features_col = "features",
-                                prediction_col = "prediction", probability_col = "probability",
-                                uid = random_string("gaussian_mixture_"), ...) {
+ml_gaussian_mixture <- function(
+  x,
+  formula = NULL,
+  k = 2,
+  max_iter = 100,
+  tol = 0.01,
+  seed = NULL,
+  features_col = "features",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  uid = random_string("gaussian_mixture_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_gaussian_mixture")
 }
 
 #' @export
-ml_gaussian_mixture.spark_connection <- function(x, formula = NULL, k = 2, max_iter = 100,
-                                                 tol = 0.01, seed = NULL, features_col = "features",
-                                                 prediction_col = "prediction", probability_col = "probability",
-                                                 uid = random_string("gaussian_mixture_"), ...) {
+ml_gaussian_mixture.spark_connection <- function(
+  x,
+  formula = NULL,
+  k = 2,
+  max_iter = 100,
+  tol = 0.01,
+  seed = NULL,
+  features_col = "features",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  uid = random_string("gaussian_mixture_"),
+  ...
+) {
   spark_require_version(spark_connection(x), "2.0.0", "GaussianMixture")
 
   .args <- list(
@@ -53,9 +71,13 @@ ml_gaussian_mixture.spark_connection <- function(x, formula = NULL, k = 2, max_i
     validator_ml_gaussian_mixture()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.clustering.GaussianMixture", uid,
+    x,
+    "org.apache.spark.ml.clustering.GaussianMixture",
+    uid,
     features_col = .args[["features_col"]],
-    k = .args[["k"]], max_iter = .args[["max_iter"]], seed = .args[["seed"]]
+    k = .args[["k"]],
+    max_iter = .args[["max_iter"]],
+    seed = .args[["seed"]]
   ) %>%
     invoke("setTol", .args[["tol"]]) %>%
     invoke("setPredictionCol", .args[["prediction_col"]]) %>%
@@ -65,10 +87,19 @@ ml_gaussian_mixture.spark_connection <- function(x, formula = NULL, k = 2, max_i
 }
 
 #' @export
-ml_gaussian_mixture.ml_pipeline <- function(x, formula = NULL, k = 2, max_iter = 100,
-                                            tol = 0.01, seed = NULL, features_col = "features",
-                                            prediction_col = "prediction", probability_col = "probability",
-                                            uid = random_string("gaussian_mixture_"), ...) {
+ml_gaussian_mixture.ml_pipeline <- function(
+  x,
+  formula = NULL,
+  k = 2,
+  max_iter = 100,
+  tol = 0.01,
+  seed = NULL,
+  features_col = "features",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  uid = random_string("gaussian_mixture_"),
+  ...
+) {
   stage <- ml_gaussian_mixture.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -86,10 +117,20 @@ ml_gaussian_mixture.ml_pipeline <- function(x, formula = NULL, k = 2, max_iter =
 }
 
 #' @export
-ml_gaussian_mixture.tbl_spark <- function(x, formula = NULL, k = 2, max_iter = 100,
-                                          tol = 0.01, seed = NULL, features_col = "features",
-                                          prediction_col = "prediction", probability_col = "probability",
-                                          uid = random_string("gaussian_mixture_"), features = NULL, ...) {
+ml_gaussian_mixture.tbl_spark <- function(
+  x,
+  formula = NULL,
+  k = 2,
+  max_iter = 100,
+  tol = 0.01,
+  seed = NULL,
+  features_col = "features",
+  prediction_col = "prediction",
+  probability_col = "probability",
+  uid = random_string("gaussian_mixture_"),
+  features = NULL,
+  ...
+) {
   formula <- ml_standardize_formula(formula, features = features)
 
   stage <- ml_gaussian_mixture.spark_connection(
@@ -146,7 +187,9 @@ new_ml_gaussian_mixture_model <- function(jobj) {
       invoke(jobj, "gaussiansDF") %>% # def
         sdf_register() %>%
         collect() %>%
-        dplyr::mutate(!!rlang::sym("cov") := lapply(!!rlang::sym("cov"), read_spark_matrix))
+        dplyr::mutate(
+          !!rlang::sym("cov") := lapply(!!rlang::sym("cov"), read_spark_matrix)
+        )
     },
     weights = invoke(jobj, "weights"),
     summary = summary,

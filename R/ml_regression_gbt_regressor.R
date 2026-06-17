@@ -1,29 +1,62 @@
 #' @rdname ml_gradient_boosted_trees
 #' @template roxlate-ml-predictor-params
 #' @export
-ml_gbt_regressor <- function(x, formula = NULL, max_iter = 20, max_depth = 5,
-                             step_size = 0.1, subsampling_rate = 1,
-                             feature_subset_strategy = "auto", min_instances_per_node = 1,
-                             max_bins = 32, min_info_gain = 0, loss_type = "squared",
-                             seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
-                             max_memory_in_mb = 256, features_col = "features",
-                             label_col = "label", prediction_col = "prediction",
-                             uid = random_string("gbt_regressor_"), ...) {
+ml_gbt_regressor <- function(
+  x,
+  formula = NULL,
+  max_iter = 20,
+  max_depth = 5,
+  step_size = 0.1,
+  subsampling_rate = 1,
+  feature_subset_strategy = "auto",
+  min_instances_per_node = 1,
+  max_bins = 32,
+  min_info_gain = 0,
+  loss_type = "squared",
+  seed = NULL,
+  checkpoint_interval = 10,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("gbt_regressor_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_gbt_regressor")
 }
 
-ml_gbt_regressor_impl <- function(x, formula = NULL, max_iter = 20, max_depth = 5,
-                                     step_size = 0.1, subsampling_rate = 1,
-                                     feature_subset_strategy = "auto", min_instances_per_node = 1,
-                                     max_bins = 32, min_info_gain = 0, loss_type = "squared",
-                                     seed = NULL, checkpoint_interval = 10, cache_node_ids = FALSE,
-                                     max_memory_in_mb = 256, features_col = "features",
-                                     label_col = "label", prediction_col = "prediction",
-                                     uid = random_string("gbt_regressor_"),
-                                     response = NULL, features = NULL, ...) {
-
-  feature_subset_strategy <- param_min_version(x, feature_subset_strategy, "2.3.0", "auto")
+ml_gbt_regressor_impl <- function(
+  x,
+  formula = NULL,
+  max_iter = 20,
+  max_depth = 5,
+  step_size = 0.1,
+  subsampling_rate = 1,
+  feature_subset_strategy = "auto",
+  min_instances_per_node = 1,
+  max_bins = 32,
+  min_info_gain = 0,
+  loss_type = "squared",
+  seed = NULL,
+  checkpoint_interval = 10,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("gbt_regressor_"),
+  response = NULL,
+  features = NULL,
+  ...
+) {
+  feature_subset_strategy <- param_min_version(
+    x,
+    feature_subset_strategy,
+    "2.3.0",
+    "auto"
+  )
 
   ml_process_model(
     x = x,
@@ -69,7 +102,9 @@ new_ml_gbt_regression_model <- function(jobj) {
   new_ml_prediction_model(
     jobj,
     # `lazy val featureImportances`
-    feature_importances = possibly_null(~ read_spark_vector(jobj, "featureImportances")),
+    feature_importances = possibly_null(
+      ~ read_spark_vector(jobj, "featureImportances")
+    ),
     # `lazy val totalNumNodes`
     total_num_nodes = invoke(jobj, "totalNumNodes"),
     # `def treeWeights`

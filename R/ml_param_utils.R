@@ -100,7 +100,9 @@ ml_map_param_list_names <- function(x, direction = c("sr", "rs"), ...) {
     unname(
       sapply(
         names(x),
-        function(nm) rlang::env_get(mapping, nm, default = NULL, inherit = TRUE) %||% nm
+        function(nm) {
+          rlang::env_get(mapping, nm, default = NULL, inherit = TRUE) %||% nm
+        }
       )
     )
   )
@@ -117,7 +119,9 @@ ml_map_param_names <- function(x, direction = c("sr", "rs"), ...) {
   unname(
     sapply(
       x,
-      function(nm) rlang::env_get(mapping, nm, default = NULL, inherit = TRUE) %||% nm
+      function(nm) {
+        rlang::env_get(mapping, nm, default = NULL, inherit = TRUE) %||% nm
+      }
     )
   )
 }

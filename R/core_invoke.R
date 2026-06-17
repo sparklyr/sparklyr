@@ -38,10 +38,19 @@ core_invoke_cancel_running <- function(sc) {
     invoke(spark_context(sc), "cancelAllJobs")
   })
 
-  if (exists("connection_progress_terminated")) connection_progress_terminated(sc)
+  if (exists("connection_progress_terminated")) {
+    connection_progress_terminated(sc)
+  }
 }
 
-write_bin_args <- function(backend, object, static, method, args, return_jobj_ref = FALSE) {
+write_bin_args <- function(
+  backend,
+  object,
+  static,
+  method,
+  args,
+  return_jobj_ref = FALSE
+) {
   rc <- rawConnection(raw(), "r+")
   writeString(rc, object)
   writeBoolean(rc, static)
@@ -99,14 +108,45 @@ core_invoke_socket_name <- function(sc) {
 }
 
 core_remove_jobjs <- function(sc, ids) {
-  core_invoke_method_impl(sc, static = TRUE, noreply = TRUE, "Handler", "rm", FALSE, as.list(ids))
+  core_invoke_method_impl(
+    sc,
+    static = TRUE,
+    noreply = TRUE,
+    "Handler",
+    "rm",
+    FALSE,
+    as.list(ids)
+  )
 }
 
-core_invoke_method <- function(sc, static, object, method, return_jobj_ref, ...) {
-  core_invoke_method_impl(sc, static, noreply = FALSE, object, method, return_jobj_ref, ...)
+core_invoke_method <- function(
+  sc,
+  static,
+  object,
+  method,
+  return_jobj_ref,
+  ...
+) {
+  core_invoke_method_impl(
+    sc,
+    static,
+    noreply = FALSE,
+    object,
+    method,
+    return_jobj_ref,
+    ...
+  )
 }
 
-core_invoke_method_impl <- function(sc, static, noreply, object, method, return_jobj_ref, ...) {
+core_invoke_method_impl <- function(
+  sc,
+  static,
+  noreply,
+  object,
+  method,
+  return_jobj_ref,
+  ...
+) {
   # N.B.: the reference to `object` must be retained until after a value or exception is returned to us
   # from the invoked method here (i.e., cannot have `object <- something_else` before that), because any
   # re-assignment could cause the last reference to `object` to be destroyed and the underlying JVM object
@@ -137,8 +177,14 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, return_
     }
   }
 
-  if (!identical(object, "Handler") &&
-    spark_config_value(sc$config, c("sparklyr.cancellable", "sparklyr.connection.cancellable"), TRUE)) {
+  if (
+    !identical(object, "Handler") &&
+      spark_config_value(
+        sc$config,
+        c("sparklyr.cancellable", "sparklyr.connection.cancellable"),
+        TRUE
+      )
+  ) {
     # if connection still running, sync to valid state
     if (identical(sc$state$status[[connection_name]], "running")) {
       core_invoke_sync(sc)
@@ -155,8 +201,11 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, return_
 
   write_bin_args(backend, objId, static, method, args, return_jobj_ref)
 
-  if (identical(object, "Handler") &&
-    (identical(method, "terminateBackend") || identical(method, "stopBackend"))) {
+  if (
+    identical(object, "Handler") &&
+      (identical(method, "terminateBackend") ||
+        identical(method, "stopBackend"))
+  ) {
     # by the time we read response, backend might be already down.
     return(NULL)
   }
@@ -170,30 +219,36 @@ core_invoke_method_impl <- function(sc, static, noreply, object, method, return_
       # read the spark log
       msg <- core_read_spark_log_error(sc)
 
-      withr::with_options(list(
-        warning.length = 8000
-      ), {
-        stop(
-          "Unexpected state in sparklyr backend: ",
-          msg,
-          call. = FALSE
-        )
-      })
+      withr::with_options(
+        list(
+          warning.length = 8000
+        ),
+        {
+          stop(
+            "Unexpected state in sparklyr backend: ",
+            msg,
+            call. = FALSE
+          )
+        }
+      )
     }
 
     if (returnStatus != 0) {
       # get error message from backend and report to R
       msg <- readString(sc)
-      withr::with_options(list(
-        warning.length = 8000
-      ), {
-        if (nzchar(msg)) {
-          core_handle_known_errors(sc, msg)
-        } else {
-          # read the spark log
-          msg <- core_read_spark_log_error(sc)
+      withr::with_options(
+        list(
+          warning.length = 8000
+        ),
+        {
+          if (nzchar(msg)) {
+            core_handle_known_errors(sc, msg)
+          } else {
+            # read the spark log
+            msg <- core_read_spark_log_error(sc)
+          }
         }
-      })
+      )
       spark_error(msg)
     }
 
@@ -229,11 +284,16 @@ core_handle_known_errors <- function(sc, msg) {
       "Failed to retrieve localhost, please validate that the hostname is correctly mapped. ",
       "Consider running `hostname` and adding that entry to your `/etc/hosts` file."
     )
-  } else if (grepl("check worker logs for details", msg, ignore.case = TRUE) &&
-    spark_master_is_local(sc$master)) {
+  } else if (
+    grepl("check worker logs for details", msg, ignore.case = TRUE) &&
+      spark_master_is_local(sc$master)
+  ) {
     abort_shell(
       "sparklyr worker rscript failure, check worker logs for details",
-      NULL, NULL, sc$output_file, sc$error_file
+      NULL,
+      NULL,
+      sc$output_file,
+      sc$error_file
     )
   }
 }
@@ -294,14 +354,25 @@ spark_error <- function(message) {
     }
 
     msg_fun <- paste0(
-      msg_l, scheme, ":", msg_fn, msg_r, "`", msg_fn, "`", msg_l, msg_r
+      msg_l,
+      scheme,
+      ":",
+      msg_fn,
+      msg_r,
+      "`",
+      msg_fn,
+      "`",
+      msg_l,
+      msg_r
     )
   } else {
     msg_fun <- paste0("`", msg_fn, "`")
   }
 
   last_err <- paste0(
-    "Run ", msg_fun, " to see the full Spark error (multiple lines)"
+    "Run ",
+    msg_fun,
+    " to see the full Spark error (multiple lines)"
   )
 
   option_msg <- paste(

@@ -15,17 +15,27 @@ new_ml_sample_transformer <- function(jobj) {
 #'
 #' @param tbl A \code{tbl_spark} generated using \code{dplyr} transformations.
 #' @export
-ft_dplyr_transformer <- function(x, tbl,
-                                 uid = random_string("dplyr_transformer_"), ...) {
+ft_dplyr_transformer <- function(
+  x,
+  tbl,
+  uid = random_string("dplyr_transformer_"),
+  ...
+) {
   UseMethod("ft_dplyr_transformer")
 }
 
 ml_dplyr_transformer <- ft_dplyr_transformer
 
 #' @export
-ft_dplyr_transformer.spark_connection <- function(x, tbl,
-                                                  uid = random_string("dplyr_transformer_"), ...) {
-  if (!identical(class(tbl)[1], "tbl_spark")) stop("'tbl' must be a Spark table")
+ft_dplyr_transformer.spark_connection <- function(
+  x,
+  tbl,
+  uid = random_string("dplyr_transformer_"),
+  ...
+) {
+  if (!identical(class(tbl)[1], "tbl_spark")) {
+    stop("'tbl' must be a Spark table")
+  }
 
   if (is.null(attributes(tbl)$sampling_params)) {
     ft_sql_transformer(x, ft_extract_sql(tbl), uid = uid)
@@ -61,8 +71,12 @@ ft_dplyr_transformer.spark_connection <- function(x, tbl,
 }
 
 #' @export
-ft_dplyr_transformer.ml_pipeline <- function(x, tbl,
-                                             uid = random_string("dplyr_transformer_"), ...) {
+ft_dplyr_transformer.ml_pipeline <- function(
+  x,
+  tbl,
+  uid = random_string("dplyr_transformer_"),
+  ...
+) {
   stage <- ft_dplyr_transformer.spark_connection(
     x = spark_connection(x),
     tbl = tbl,
@@ -73,8 +87,12 @@ ft_dplyr_transformer.ml_pipeline <- function(x, tbl,
 }
 
 #' @export
-ft_dplyr_transformer.tbl_spark <- function(x, tbl,
-                                           uid = random_string("dplyr_transformer_"), ...) {
+ft_dplyr_transformer.tbl_spark <- function(
+  x,
+  tbl,
+  uid = random_string("dplyr_transformer_"),
+  ...
+) {
   stage <- ft_dplyr_transformer.spark_connection(
     x = spark_connection(x),
     tbl = tbl,
@@ -85,7 +103,6 @@ ft_dplyr_transformer.tbl_spark <- function(x, tbl,
 }
 
 ft_extract_sql <- function(x) {
-
   get_base_name <- function(o) {
     if (!inherits(o$x, "lazy_base_query")) {
       get_base_name(o$x)

@@ -44,16 +44,20 @@ spark_dataframe.spark_connection <- function(x, sql = NULL, ...) {
 #' @template roxlate-ml-x
 #'
 #' @export
-sdf_schema <- function(x,
-                       expand_nested_cols = FALSE,
-                       expand_struct_cols = FALSE) {
+sdf_schema <- function(
+  x,
+  expand_nested_cols = FALSE,
+  expand_struct_cols = FALSE
+) {
   UseMethod("sdf_schema")
 }
 
 #' @export
-sdf_schema.tbl_spark <- function(x,
-                                 expand_nested_cols = FALSE,
-                                 expand_struct_cols = FALSE) {
+sdf_schema.tbl_spark <- function(
+  x,
+  expand_nested_cols = FALSE,
+  expand_struct_cols = FALSE
+) {
   x[["schema"]](
     x,
     sdf_schema_impl,
@@ -63,9 +67,11 @@ sdf_schema.tbl_spark <- function(x,
 }
 
 #' @export
-sdf_schema.default <- function(x,
-                               expand_nested_cols = FALSE,
-                               expand_struct_cols = FALSE) {
+sdf_schema.default <- function(
+  x,
+  expand_nested_cols = FALSE,
+  expand_struct_cols = FALSE
+) {
   sdf_schema_impl(
     x,
     expand_nested_cols = expand_nested_cols,
@@ -73,26 +79,25 @@ sdf_schema.default <- function(x,
   )
 }
 
-sdf_schema_impl <- function(x,
-                            expand_nested_cols,
-                            expand_struct_cols) {
+sdf_schema_impl <- function(x, expand_nested_cols, expand_struct_cols) {
   process_struct_type <- function(x) {
     fields <- x$fields
     fields_list <- lapply(
       fields,
       function(field) {
         name <- field$name
-        type <- (
-          if ("fields" %in% names(field$dtype)) {
-            process_struct_type(field$dtype)
-          } else if ("elementType" %in% names(field$dtype)) {
-            dtype <- "array"
-            attributes(dtype)$element_type <- process_struct_type(field$dtype$elementType)
+        type <- (if ("fields" %in% names(field$dtype)) {
+          process_struct_type(field$dtype)
+        } else if ("elementType" %in% names(field$dtype)) {
+          dtype <- "array"
+          attributes(dtype)$element_type <- process_struct_type(
+            field$dtype$elementType
+          )
 
-            dtype
-          } else {
-            field$dtype$repr
-          })
+          dtype
+        } else {
+          field$dtype$repr
+        })
 
         list(name = name, type = type)
       }
@@ -171,7 +176,11 @@ sdf_read_column.tbl_spark <- function(x, column) {
 #' @param ... Additional options.
 #'
 #' @export
-sdf_collect <- function(object, impl = c("row-wise", "row-wise-iter", "column-wise"), ...) {
+sdf_collect <- function(
+  object,
+  impl = c("row-wise", "row-wise-iter", "column-wise"),
+  ...
+) {
   args <- list(...)
   impl <- match.arg(impl)
   sc <- spark_connection(object)
@@ -276,9 +285,9 @@ sdf_collect_data_frame <- function(sdf, collected) {
       converter <- switch(
         typeof(column),
         character = as.character,
-        logical   = as.logical,
-        integer   = as.integer,
-        double    = as.double,
+        logical = as.logical,
+        integer = as.integer,
+        double = as.double,
         identity
       )
       return(converter(rep(NA, rows)))
@@ -326,8 +335,17 @@ sdf_collect_static <- function(object, impl, ...) {
   # note that this issue should be resolved with Spark >2.0.0
   collected <- if (spark_version(sc) > "2.0.0") {
     if (!identical(args$callback, NULL)) {
-      batch_size <- spark_config_value(sc$config, "sparklyr.collect.batch", as.integer(10^5L))
-      ctx <- invoke_static(sc, "sparklyr.DFCollectionUtils", "prepareDataFrameForCollection", sdf)
+      batch_size <- spark_config_value(
+        sc$config,
+        "sparklyr.collect.batch",
+        as.integer(10^5L)
+      )
+      ctx <- invoke_static(
+        sc,
+        "sparklyr.DFCollectionUtils",
+        "prepareDataFrameForCollection",
+        sdf
+      )
       sdf <- invoke(ctx, "_1")
       dtypes <- invoke(ctx, "_2")
       sdf_iter <- invoke(sdf, "toLocalIterator")
@@ -345,9 +363,15 @@ sdf_collect_static <- function(object, impl, ...) {
         )
         df <- sdf_collect_data_frame(sdf, raw_df)
         cb <- args$callback
-        if (is.language(cb)) cb <- rlang::as_closure(cb)
+        if (is.language(cb)) {
+          cb <- rlang::as_closure(cb)
+        }
 
-        if (length(formals(cb)) >= 2) cb(df, iter) else cb(df)
+        if (length(formals(cb)) >= 2) {
+          cb(df, iter)
+        } else {
+          cb(df)
+        }
         iter <- iter + 1
       }
 
@@ -363,7 +387,9 @@ sdf_collect_static <- function(object, impl, ...) {
       )
     }
   } else {
-    if (!identical(args$callback, NULL)) stop("Parameter 'callback' requires Spark 2.0+")
+    if (!identical(args$callback, NULL)) {
+      stop("Parameter 'callback' requires Spark 2.0+")
+    }
 
     columns <- invoke(sdf, "columns") %>% as.character()
     chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
@@ -386,9 +412,11 @@ sdf_collect_static <- function(object, impl, ...) {
 }
 
 # Split a Spark DataFrame
-sdf_split <- function(object,
-                      weights = c(0.5, 0.5),
-                      seed = sample(.Machine$integer.max, 1)) {
+sdf_split <- function(
+  object,
+  weights = c(0.5, 0.5),
+  seed = sample(.Machine$integer.max, 1)
+) {
   jobj <- spark_dataframe(object)
   invoke(jobj, "randomSplit", as.list(weights), as.integer(seed))
 }
@@ -448,7 +476,10 @@ sdf_pivot <- function(x, formula, fun.aggregate = "count") {
   # ensure no duplication of variables on each side
   intersection <- intersect(grouped_cols, pivot_cols)
   if (length(intersection)) {
-    stop("variables on both sides of forumla: ", paste(deparse(intersection), collapse = " "))
+    stop(
+      "variables on both sides of forumla: ",
+      paste(deparse(intersection), collapse = " ")
+    )
   }
 
   # ensure variables exist in dataset
@@ -456,7 +487,10 @@ sdf_pivot <- function(x, formula, fun.aggregate = "count") {
   all_cols <- c(grouped_cols, pivot_cols)
   missing_cols <- setdiff(all_cols, nm)
   if (length(missing_cols)) {
-    stop("missing variables in dataset: ", paste(deparse(missing_cols), collapse = " "))
+    stop(
+      "missing variables in dataset: ",
+      paste(deparse(missing_cols), collapse = " ")
+    )
   }
 
   # ensure pivot is length one (for now)
@@ -505,9 +539,7 @@ sdf_pivot <- function(x, formula, fun.aggregate = "count") {
 #'   names to the (1-based) index at which a particular
 #'   vector element should be extracted.
 #' @export
-sdf_separate_column <- function(x,
-                                column,
-                                into = NULL) {
+sdf_separate_column <- function(x, column, into = NULL) {
   column <- cast_string(column)
 
   # extract spark dataframe reference, connection
@@ -518,7 +550,6 @@ sdf_separate_column <- function(x,
 
   # when 'into' is NULL, we auto-generate a names -> index map
   if (is.null(into)) {
-
     # determine the length of vector elements (assume all
     # elements have the same length as the first) and
     # generate indices

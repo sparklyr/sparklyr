@@ -33,23 +33,47 @@
 #' }
 #'
 #' @export
-ml_linear_svc <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
-                          max_iter = 100, standardization = TRUE, weight_col = NULL,
-                          tol = 1e-6, threshold = 0, aggregation_depth = 2,
-                          features_col = "features", label_col = "label",
-                          prediction_col = "prediction", raw_prediction_col = "rawPrediction",
-                          uid = random_string("linear_svc_"), ...) {
+ml_linear_svc <- function(
+  x,
+  formula = NULL,
+  fit_intercept = TRUE,
+  reg_param = 0,
+  max_iter = 100,
+  standardization = TRUE,
+  weight_col = NULL,
+  tol = 1e-6,
+  threshold = 0,
+  aggregation_depth = 2,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("linear_svc_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_linear_svc")
 }
 
 #' @export
-ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
-                                           max_iter = 100, standardization = TRUE, weight_col = NULL,
-                                           tol = 1e-6, threshold = 0, aggregation_depth = 2,
-                                           features_col = "features", label_col = "label",
-                                           prediction_col = "prediction", raw_prediction_col = "rawPrediction",
-                                           uid = random_string("linear_svc_"), ...) {
+ml_linear_svc.spark_connection <- function(
+  x,
+  formula = NULL,
+  fit_intercept = TRUE,
+  reg_param = 0,
+  max_iter = 100,
+  standardization = TRUE,
+  weight_col = NULL,
+  tol = 1e-6,
+  threshold = 0,
+  aggregation_depth = 2,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("linear_svc_"),
+  ...
+) {
   .args <- list(
     fit_intercept = fit_intercept,
     reg_param = reg_param,
@@ -69,35 +93,44 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
 
   sc <- spark_connection(x)
   if (spark_version(sc) >= "3.0" && !is.null(.args[["weight_col"]])) {
-    warning("Support for `weight_col` is removed in Spark 3.0 or above because",
-            "it is not intended for users (see ",
-            "https://spark.apache.org/docs/latest/ml-migration-guide.html#breaking-changes",
-            "). The `weight_col` parameter will be ignored.")
+    warning(
+      "Support for `weight_col` is removed in Spark 3.0 or above because",
+      "it is not intended for users (see ",
+      "https://spark.apache.org/docs/latest/ml-migration-guide.html#breaking-changes",
+      "). The `weight_col` parameter will be ignored."
+    )
     .args[["weight_col"]] <- NULL
   }
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.classification.LinearSVC", uid,
-    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    x,
+    "org.apache.spark.ml.classification.LinearSVC",
+    uid,
+    features_col = .args[["features_col"]],
+    label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]]
-  ) %>% (
-    function(obj) {
+  ) %>%
+    (function(obj) {
       do.call(
         invoke,
-        c(obj, "%>%", Filter(
-          function(x) !is.null(x),
-          list(
-            list("setRawPredictionCol", .args[["raw_prediction_col"]]),
-            list("setFitIntercept", .args[["fit_intercept"]]),
-            list("setRegParam", .args[["reg_param"]]),
-            list("setMaxIter", .args[["max_iter"]]),
-            list("setStandardization", .args[["standardization"]]),
-            list("setTol", .args[["tol"]]),
-            list("setAggregationDepth", .args[["aggregation_depth"]]),
-            list("setThreshold", .args[["threshold"]]),
-            jobj_set_param_helper(obj, "setWeightCol", .args[["weight_col"]])
+        c(
+          obj,
+          "%>%",
+          Filter(
+            function(x) !is.null(x),
+            list(
+              list("setRawPredictionCol", .args[["raw_prediction_col"]]),
+              list("setFitIntercept", .args[["fit_intercept"]]),
+              list("setRegParam", .args[["reg_param"]]),
+              list("setMaxIter", .args[["max_iter"]]),
+              list("setStandardization", .args[["standardization"]]),
+              list("setTol", .args[["tol"]]),
+              list("setAggregationDepth", .args[["aggregation_depth"]]),
+              list("setThreshold", .args[["threshold"]]),
+              jobj_set_param_helper(obj, "setWeightCol", .args[["weight_col"]])
+            )
           )
-        ))
+        )
       )
     })
 
@@ -105,12 +138,24 @@ ml_linear_svc.spark_connection <- function(x, formula = NULL, fit_intercept = TR
 }
 
 #' @export
-ml_linear_svc.ml_pipeline <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
-                                      max_iter = 100, standardization = TRUE, weight_col = NULL,
-                                      tol = 1e-6, threshold = 0, aggregation_depth = 2,
-                                      features_col = "features", label_col = "label",
-                                      prediction_col = "prediction", raw_prediction_col = "rawPrediction",
-                                      uid = random_string("linear_svc_"), ...) {
+ml_linear_svc.ml_pipeline <- function(
+  x,
+  formula = NULL,
+  fit_intercept = TRUE,
+  reg_param = 0,
+  max_iter = 100,
+  standardization = TRUE,
+  weight_col = NULL,
+  tol = 1e-6,
+  threshold = 0,
+  aggregation_depth = 2,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("linear_svc_"),
+  ...
+) {
   stage <- ml_linear_svc.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -133,13 +178,27 @@ ml_linear_svc.ml_pipeline <- function(x, formula = NULL, fit_intercept = TRUE, r
 }
 
 #' @export
-ml_linear_svc.tbl_spark <- function(x, formula = NULL, fit_intercept = TRUE, reg_param = 0,
-                                    max_iter = 100, standardization = TRUE, weight_col = NULL,
-                                    tol = 1e-6, threshold = 0, aggregation_depth = 2,
-                                    features_col = "features", label_col = "label",
-                                    prediction_col = "prediction", raw_prediction_col = "rawPrediction",
-                                    uid = random_string("linear_svc_"), response = NULL,
-                                    features = NULL, predicted_label_col = "predicted_label", ...) {
+ml_linear_svc.tbl_spark <- function(
+  x,
+  formula = NULL,
+  fit_intercept = TRUE,
+  reg_param = 0,
+  max_iter = 100,
+  standardization = TRUE,
+  weight_col = NULL,
+  tol = 1e-6,
+  threshold = 0,
+  aggregation_depth = 2,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  raw_prediction_col = "rawPrediction",
+  uid = random_string("linear_svc_"),
+  response = NULL,
+  features = NULL,
+  predicted_label_col = "predicted_label",
+  ...
+) {
   formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_linear_svc.spark_connection(
@@ -184,7 +243,9 @@ validator_ml_linear_svc <- function(.args) {
   .args[["fit_intercept"]] <- cast_scalar_logical(.args[["fit_intercept"]])
   .args[["standardization"]] <- cast_scalar_logical(.args[["standardization"]])
   .args[["tol"]] <- cast_scalar_double(.args[["tol"]])
-  .args[["aggregation_depth"]] <- cast_scalar_integer(.args[["aggregation_depth"]])
+  .args[["aggregation_depth"]] <- cast_scalar_integer(.args[[
+    "aggregation_depth"
+  ]])
   .args[["raw_prediction_col"]] <- cast_string(.args[["raw_prediction_col"]])
   .args[["threshold"]] <- cast_scalar_double(.args[["threshold"]])
   .args[["weight_col"]] <- cast_nullable_string(.args[["weight_col"]])

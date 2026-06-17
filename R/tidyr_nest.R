@@ -25,14 +25,15 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = NULL) {
     } else {
       rlang::warn(paste0(
         "`...` must not be empty for ungrouped data frames.\n",
-        "Did you want `", .key, " = everything()`?"
+        "Did you want `",
+        .key,
+        " = everything()`?"
       ))
-      if(is.null(.key)) {
-        nested_cols <-  rlang::list2(data = colnames(.data))
+      if (is.null(.key)) {
+        nested_cols <- rlang::list2(data = colnames(.data))
       } else {
         nested_cols <- rlang::list2(!!.key := colnames(.data))
       }
-
     }
   } else {
     cols <- replicate_colnames(.data)
@@ -56,7 +57,10 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = NULL) {
           src_name <- fields[[idx]]
           sprintf(
             "%s, %s",
-            dbplyr::translate_sql_(list(dst_name), con = dbplyr::simulate_hive()),
+            dbplyr::translate_sql_(
+              list(dst_name),
+              con = dbplyr::simulate_hive()
+            ),
             quote_sql_name(src_name)
           )
         }) %>%
@@ -79,10 +83,15 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = NULL) {
   names(handle_empty_lists_sql) <- names(nested_cols)
 
   dplyr::ungroup(.data) %>>%
-    dplyr::group_by %@% lapply(non_nested_cols, as.symbol) %>>%
-    dplyr::summarize %@% nesting_sql %>%
+    dplyr::group_by %@%
+    lapply(non_nested_cols, as.symbol) %>>%
+    dplyr::summarize %@%
+    nesting_sql %>%
     dplyr::ungroup() %>>%
-    dplyr::group_by %@% lapply(group_vars, as.symbol) %>>%
-    dplyr::mutate %@% handle_empty_lists_sql %>>%
-    dplyr::select %@% lapply(output_cols, as.symbol)
+    dplyr::group_by %@%
+    lapply(group_vars, as.symbol) %>>%
+    dplyr::mutate %@%
+    handle_empty_lists_sql %>>%
+    dplyr::select %@%
+    lapply(output_cols, as.symbol)
 }

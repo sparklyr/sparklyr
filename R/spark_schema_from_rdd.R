@@ -10,12 +10,13 @@ spark_schema_from_rdd <- function(sc, rdd, column_names) {
     return(schema)
   }
 
-  sampleRows <- rdd %>% invoke(
-    "take",
-    cast_scalar_integer(
-      spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+  sampleRows <- rdd %>%
+    invoke(
+      "take",
+      cast_scalar_integer(
+        spark_config_value(sc$config, "sparklyr.apply.schema.infer", 10)
+      )
     )
-  )
 
   map_special_types <- list(
     date = "date",

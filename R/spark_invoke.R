@@ -114,13 +114,22 @@ invoke_trace <- function(sc, ...) {
     args <- list(...)
     trace_message <- paste(args, collapse = " ")
 
-    if (identical(invoke_config, "cat")) cat(paste0(trace_message, "\n")) else message(trace_message)
+    if (identical(invoke_config, "cat")) {
+      cat(paste0(trace_message, "\n"))
+    } else {
+      message(trace_message)
+    }
 
     if (identical(invoke_config, "callstack")) {
       frame_names <- list()
       for (i in 1:sys.nframe()) {
         current_call <- sys.call(i)
-        frame_names[[i]] <- paste(i, ": ", paste(head(deparse(current_call), 5), collapse = "\n"), sep = "")
+        frame_names[[i]] <- paste(
+          i,
+          ": ",
+          paste(head(deparse(current_call), 5), collapse = "\n"),
+          sep = ""
+        )
       }
 
       message(paste(frame_names, collapse = "\n"))

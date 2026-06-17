@@ -15,8 +15,7 @@ spark_apply_packages <- function(packages) {
         }
       )
       genv_set_avail_package_cache(db)
-    }
-    else {
+    } else {
       db <- genv_get_avail_package_cache()
     }
   }
@@ -65,11 +64,19 @@ spark_apply_bundle_file <- function(packages, base_path, session_id) {
 #' @param session_id An optional ID string to include in the bundle file name to allow the bundle to be session-specific
 #'
 #' @export
-spark_apply_bundle <- function(packages = TRUE, base_path = getwd(), session_id = NULL) {
+spark_apply_bundle <- function(
+  packages = TRUE,
+  base_path = getwd(),
+  session_id = NULL
+) {
   # If session_id is not provied use a random string to avoid file name collision.
   session_id <- session_id %||% uuid::UUIDgenerate(use.time = TRUE)
 
-  packages <- if (is.character(packages)) spark_apply_packages(packages) else packages
+  packages <- if (is.character(packages)) {
+    spark_apply_packages(packages)
+  } else {
+    packages
+  }
 
   packagesTar <- spark_apply_bundle_file(packages, base_path, session_id)
 
@@ -83,7 +90,8 @@ spark_apply_bundle <- function(packages = TRUE, base_path = getwd(), session_id 
     if (isTRUE(packages)) {
       lapply(.libPaths(), function(e) {
         c("-C", e, ".")
-      }) %>% unlist()
+      }) %>%
+        unlist()
     } else {
       added_packages <- list()
       lapply(.libPaths(), function(e) {
@@ -95,10 +103,12 @@ spark_apply_bundle <- function(packages = TRUE, base_path = getwd(), session_id 
               p
             }
           })
-        ) %>% unlist()
+        ) %>%
+          unlist()
 
         if (length(sublib_packages) > 0) c("-C", e, sublib_packages) else NULL
-      }) %>% unlist()
+      }) %>%
+        unlist()
     }
   )
 

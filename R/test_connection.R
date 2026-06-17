@@ -1,9 +1,11 @@
-test_connection <- function(master = master,
-                            config = config,
-                            app_name,
-                            version,
-                            hadoop_version,
-                            extensions) {
+test_connection <- function(
+  master = master,
+  config = config,
+  app_name,
+  version,
+  hadoop_version,
+  extensions
+) {
   sc <- new_test_connection(list(
     # spark_connection
     master = master,
@@ -19,12 +21,10 @@ test_connection <- function(master = master,
 }
 
 #' @export
-spark_log.test_connection <- function(sc, n = 100, filter = NULL, ...) {
-}
+spark_log.test_connection <- function(sc, n = 100, filter = NULL, ...) {}
 
 #' @export
-spark_web.test_connection <- function(sc, ...) {
-}
+spark_web.test_connection <- function(sc, ...) {}
 
 #' @export
 connection_is_open.test_connection <- function(sc) {
@@ -37,12 +37,10 @@ spark_disconnect.test_connection <- function(sc, ...) {
 }
 
 #' @export
-invoke_static.test_connection <- function(sc, class, method, ...) {
-}
+invoke_static.test_connection <- function(sc, class, method, ...) {}
 
 #' @export
-invoke_new.test_connection <- function(sc, class, ...) {
-}
+invoke_new.test_connection <- function(sc, class, ...) {}
 
 #' @export
 initialize_connection.test_connection <- function(sc) {
@@ -87,8 +85,7 @@ invoke_new.test_connection <- function(sc, class, ...) {
 j_invoke_new.test_connection <- invoke_new.test_connection
 
 #' @export
-print_jobj.test_connection <- function(sc, jobj, ...) {
-}
+print_jobj.test_connection <- function(sc, jobj, ...) {}
 
 #' @export
 sdf_import.test_connection <- function(x, sc, ...) {

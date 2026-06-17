@@ -46,39 +46,45 @@ NULL
 #'
 #' @name sdf_copy_to
 #' @export
-sdf_copy_to <- function(sc,
-                        x,
-                        name,
-                        memory,
-                        repartition,
-                        overwrite,
-                        struct_columns,
-                        ...) {
+sdf_copy_to <- function(
+  sc,
+  x,
+  name,
+  memory,
+  repartition,
+  overwrite,
+  struct_columns,
+  ...
+) {
   UseMethod("sdf_copy_to")
 }
 
 #' @export
-sdf_copy_to.default <- function(sc,
-                                x,
-                                name = spark_table_name(substitute(x)),
-                                memory = TRUE,
-                                repartition = 0L,
-                                overwrite = FALSE,
-                                struct_columns = list(),
-                                ...) {
+sdf_copy_to.default <- function(
+  sc,
+  x,
+  name = spark_table_name(substitute(x)),
+  memory = TRUE,
+  repartition = 0L,
+  overwrite = FALSE,
+  struct_columns = list(),
+  ...
+) {
   sdf_import(x, sc, name, memory, repartition, overwrite, struct_columns, ...)
 }
 
 #' @name sdf_copy_to
 #' @export
-sdf_import <- function(x,
-                       sc,
-                       name,
-                       memory,
-                       repartition,
-                       overwrite,
-                       struct_columns,
-                       ...) {
+sdf_import <- function(
+  x,
+  sc,
+  name,
+  memory,
+  repartition,
+  overwrite,
+  struct_columns,
+  ...
+) {
   UseMethod("sdf_import")
 }
 
@@ -93,14 +99,16 @@ sdf_prepare_dataframe <- function(x) {
 
 #' @export
 #' @importFrom dplyr tbl
-sdf_import.default <- function(x,
-                               sc,
-                               name = random_string("sparklyr_tmp_"),
-                               memory = TRUE,
-                               repartition = 0L,
-                               overwrite = FALSE,
-                               struct_columns = list(),
-                               ...) {
+sdf_import.default <- function(
+  x,
+  sc,
+  name = random_string("sparklyr_tmp_"),
+  memory = TRUE,
+  repartition = 0L,
+  overwrite = FALSE,
+  struct_columns = list(),
+  ...
+) {
   if (overwrite) {
     spark_remove_table_if_exists(sc, name)
   } else if (name %in% src_tbls(sc)) {
@@ -160,7 +168,8 @@ sdf_register.list <- function(x, name = NULL) {
 #' @export
 #' @importFrom dplyr tbl
 sdf_register.spark_jobj <- function(x, name = NULL) {
-  name <- name %||% paste0("sparklyr_tmp_", gsub("-", "_", uuid::UUIDgenerate()))
+  name <- name %||%
+    paste0("sparklyr_tmp_", gsub("-", "_", uuid::UUIDgenerate()))
   sc <- spark_connection(x)
 
   if (spark_version(sc) < "2.0.0") {
@@ -195,7 +204,12 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL) {
       invoke("sample", as.logical(replacement), as.double(fraction))
   } else {
     sdf %>%
-      invoke("sample", as.logical(replacement), as.double(fraction), as.integer(seed))
+      invoke(
+        "sample",
+        as.logical(replacement),
+        as.double(fraction),
+        as.integer(seed)
+      )
   }
 
   sdf_register(sampled)
@@ -219,7 +233,13 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL) {
 #' @family Spark data frames
 #'
 #' @export
-sdf_weighted_sample <- function(x, weight_col, k, replacement = TRUE, seed = NULL) {
+sdf_weighted_sample <- function(
+  x,
+  weight_col,
+  k,
+  replacement = TRUE,
+  seed = NULL
+) {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
   schema <- invoke(sdf, "schema")
@@ -386,17 +406,21 @@ sdf_last_index <- function(x, id = "id") {
 #'   frequencies of sample data points.
 #'
 #' @export
-sdf_quantile <- function(x,
-                         column,
-                         probabilities = c(0.00, 0.25, 0.50, 0.75, 1.00),
-                         relative.error = 1E-5,
-                         weight.column = NULL) {
+sdf_quantile <- function(
+  x,
+  column,
+  probabilities = c(0.00, 0.25, 0.50, 0.75, 1.00),
+  relative.error = 1E-5,
+  weight.column = NULL
+) {
   sdf <- spark_dataframe(x)
 
   if (is.null(weight.column)) {
     if (length(column) > 1) {
-      if (package_version2(sdf$connection$home_version) <
-        package_version2("2.0.0")) {
+      if (
+        package_version2(sdf$connection$home_version) <
+          package_version2("2.0.0")
+      ) {
         stop("Spark 2.0+ is required when length(column) > 1")
       }
     }
@@ -410,26 +434,25 @@ sdf_quantile <- function(x,
   probabilities <- as.list(as.numeric(probabilities))
   relative.error <- cast_scalar_double(relative.error)
 
-  quantiles <- (
-    if (is.null(weight.column)) {
-      sdf %>%
-        invoke(
-          "%>%",
-          list("stat"),
-          list("approxQuantile", column, probabilities, relative.error)
-        )
-    } else {
-      invoke_static(
-        spark_connection(x),
-        "sparklyr.WeightedQuantileSummaries",
-        "approxWeightedQuantile",
-        sdf,
-        column,
-        weight.column,
-        probabilities,
-        relative.error
+  quantiles <- (if (is.null(weight.column)) {
+    sdf %>%
+      invoke(
+        "%>%",
+        list("stat"),
+        list("approxQuantile", column, probabilities, relative.error)
       )
-    })
+  } else {
+    invoke_static(
+      spark_connection(x),
+      "sparklyr.WeightedQuantileSummaries",
+      "approxWeightedQuantile",
+      sdf,
+      column,
+      weight.column,
+      probabilities,
+      relative.error
+    )
+  })
 
   if (length(column) == 1) {
     quantiles <- unlist(quantiles)
@@ -509,7 +532,8 @@ sdf_broadcast <- function(x) {
   invoke_static(
     sc,
     "org.apache.spark.sql.functions",
-    "broadcast", sdf
+    "broadcast",
+    sdf
   ) %>%
     sdf_register()
 }
@@ -526,14 +550,21 @@ sdf_repartition <- function(x, partitions = NULL, partition_by = NULL) {
   sdf <- spark_dataframe(x)
   sc <- spark_connection(sdf)
 
-  partitions <- partitions %||% 0L %>%
-    cast_scalar_integer()
+  partitions <- partitions %||% 0L %>% cast_scalar_integer()
 
   if (spark_version(sc) >= "2.0.0") {
-    partition_by <- cast_string_list(partition_by, allow_null = TRUE) %||% list()
+    partition_by <- cast_string_list(partition_by, allow_null = TRUE) %||%
+      list()
 
     return(
-      invoke_static(sc, "sparklyr.Repartition", "repartition", sdf, partitions, partition_by) %>%
+      invoke_static(
+        sc,
+        "sparklyr.Repartition",
+        "repartition",
+        sdf,
+        partitions,
+        partition_by
+      ) %>%
         sdf_register()
     )
   } else {
@@ -736,12 +767,13 @@ sdf_from_avro <- function(x, cols) {
 #'
 #' @export
 sdf_expand_grid <- function(
-                            sc,
-                            ...,
-                            broadcast_vars = NULL,
-                            memory = TRUE,
-                            repartition = NULL,
-                            partition_by = NULL) {
+  sc,
+  ...,
+  broadcast_vars = NULL,
+  memory = TRUE,
+  repartition = NULL,
+  partition_by = NULL
+) {
   if (spark_version(sc) < "2.0.0") {
     stop("`sdf_expand_grid()` requires Spark 2.0.0 or above")
   }
@@ -760,7 +792,8 @@ sdf_expand_grid <- function(
       }
       if (!"tbl_spark" %in% class(vars[[i]])) {
         vars[[i]] <- sdf_copy_to(
-          sc, data.frame(vars[i]),
+          sc,
+          data.frame(vars[i]),
           name = random_string("sparklyr_tmp_")
         )
       }
@@ -768,14 +801,13 @@ sdf_expand_grid <- function(
     broadcast_vars <- rlang::enexpr(broadcast_vars)
     if (!rlang::is_null(broadcast_vars)) {
       broadcast_vars <- broadcast_vars %>%
-        (
-          function(exprs) {
-            if (length(exprs) > 1) {
-              as.list(exprs)[-1]
-            } else {
-              as.list(exprs)[1]
-            }
-          }) %>%
+        (function(exprs) {
+          if (length(exprs) > 1) {
+            as.list(exprs)[-1]
+          } else {
+            as.list(exprs)[1]
+          }
+        }) %>%
         lapply(rlang::as_string) %>%
         unlist()
     }

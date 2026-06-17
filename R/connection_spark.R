@@ -9,9 +9,13 @@ NULL
 
 methods::setOldClass(c("livy_connection", "spark_connection"))
 methods::setOldClass(
-  c("databricks_connection", "spark_gateway_connection",
-    "spark_shell_connection", "spark_connection")
+  c(
+    "databricks_connection",
+    "spark_gateway_connection",
+    "spark_shell_connection",
+    "spark_connection"
   )
+)
 methods::setOldClass(c("test_connection", "spark_connection"))
 
 #' spark_jobj class
@@ -75,7 +79,10 @@ spark_default_app_jar <- function(version, scala_version = NULL) {
 NULL
 
 spark_master_local_cores <- function(master, config) {
-  cores <- spark_config_value(config, c("sparklyr.cores.local", "sparklyr.connect.cores.local"))
+  cores <- spark_config_value(
+    config,
+    c("sparklyr.cores.local", "sparklyr.connect.cores.local")
+  )
   if (master == "local" && !identical(cores, NULL)) {
     master <- paste("local[", cores, "]", sep = "")
   }
@@ -85,7 +92,10 @@ spark_master_local_cores <- function(master, config) {
 
 spark_config_shell_args <- function(config, master) {
   if (!is.null(config$sparklyr.shell.packages)) {
-    config$sparklyr.shell.packages <- paste0(config$sparklyr.shell.packages, collapse = ",")
+    config$sparklyr.shell.packages <- paste0(
+      config$sparklyr.shell.packages,
+      collapse = ","
+    )
   }
 
   # determine shell_args (use fake connection b/c we don't yet
@@ -129,17 +139,18 @@ no_databricks_guid <- function() {
 #' JAR can also be specified through the \code{sparklyr.livy.jar} setting.
 #'
 #' @export
-spark_connect <- function(master,
-                          spark_home = Sys.getenv("SPARK_HOME"),
-                          method = c("shell", "livy", "databricks", "test", "qubole", "synapse"),
-                          app_name = "sparklyr",
-                          version = NULL,
-                          config = spark_config(),
-                          extensions = sparklyr::registered_extensions(),
-                          packages = NULL,
-                          scala_version = NULL,
-                          ...) {
-
+spark_connect <- function(
+  master,
+  spark_home = Sys.getenv("SPARK_HOME"),
+  method = c("shell", "livy", "databricks", "test", "qubole", "synapse"),
+  app_name = "sparklyr",
+  version = NULL,
+  config = spark_config(),
+  extensions = sparklyr::registered_extensions(),
+  packages = NULL,
+  scala_version = NULL,
+  ...
+) {
   method <- method[[1L]]
 
   # pysparklyr provides S3 methods/support for
@@ -147,9 +158,13 @@ spark_connect <- function(master,
   # load pysparklyr to make sure methods are available.
   # Note: databricks_connect != databricks-connect !!
   # databricks-connect will eventually be deprecated and removed.
-  if(method %in% c("databricks_connect", "spark_connect"))
-    if(!requireNamespace2("pysparklyr", quietly = TRUE))
-      rlang::abort(glue::glue("Please install {{pysparklyr}} for method = '{method}'"))
+  if (method %in% c("databricks_connect", "spark_connect")) {
+    if (!requireNamespace2("pysparklyr", quietly = TRUE)) {
+      rlang::abort(glue::glue(
+        "Please install {{pysparklyr}} for method = '{method}'"
+      ))
+    }
+  }
 
   # A Databricks GUID indicates that it is running on a Databricks cluster,
   # so if there is no GUID, then method = "databricks" must refer to Databricks Connect
@@ -161,7 +176,9 @@ spark_connect <- function(master,
   # ensure app_name is part of the spark-submit args
   config$`sparklyr.shell.name` <- config$`sparklyr.shell.name` %||% app_name
   master_override <- spark_config_value(config, "sparklyr.connect.master", NULL)
-  if (!is.null(master_override)) master <- master_override
+  if (!is.null(master_override)) {
+    master <- master_override
+  }
 
   # master can be missing if it's specified in the config file
   if (missing(master)) {
@@ -196,11 +213,16 @@ spark_connect <- function(master,
     spark_home <- spark_config_value(config, "spark.home", "")
   }
 
-  if(!is.null(master)) {
+  if (!is.null(master)) {
     # increase default memory
-    if (spark_master_is_local(master) &&
-        identical(spark_config_value(config, "sparklyr.shell.driver-memory"), NULL) &&
-        java_is_x64()) {
+    if (
+      spark_master_is_local(master) &&
+        identical(
+          spark_config_value(config, "sparklyr.shell.driver-memory"),
+          NULL
+        ) &&
+        java_is_x64()
+    ) {
       config$`sparklyr.shell.driver-memory` <- "2g"
     }
 
@@ -270,7 +292,8 @@ spark_connect <- function(master,
 
   # notify connection viewer of connection
   libs <- c("sparklyr", extensions)
-  libs <- vapply(libs,
+  libs <- vapply(
+    libs,
     function(lib) paste0("library(", lib, ")"),
     character("1"),
     USE.NAMES = FALSE
@@ -280,7 +303,8 @@ spark_connect <- function(master,
     libs <- paste(libs, "library(dplyr)", sep = "\n")
   }
   parentCall <- match.call()
-  connectCall <- paste(libs,
+  connectCall <- paste(
+    libs,
     paste("sc <-", deparse(parentCall, width.cutoff = 500), collapse = " "),
     sep = "\n"
   )
@@ -290,15 +314,23 @@ spark_connect <- function(master,
   spark_ide_connection_open(scon, globalenv(), connectCall)
 
   # Register a finalizer to sleep on R exit to support older versions of the RStudio IDE
-  reg.finalizer(asNamespace("sparklyr"), function(x) {
-    if (connection_is_open(scon)) {
-      Sys.sleep(1)
-    }
-  }, onexit = TRUE)
+  reg.finalizer(
+    asNamespace("sparklyr"),
+    function(x) {
+      if (connection_is_open(scon)) {
+        Sys.sleep(1)
+      }
+    },
+    onexit = TRUE
+  )
 
   if (method == "databricks-connect") {
     spark_context(scon) %>%
-      invoke("setLocalProperty", "spark.databricks.service.client.type", "sparklyr")
+      invoke(
+        "setLocalProperty",
+        "spark.databricks.service.client.type",
+        "sparklyr"
+      )
   }
 
   # add to our internal list
@@ -320,34 +352,35 @@ requireNamespace2 <- function(...) {
 #' @param hadoop_version Version of Hadoop to use
 #' @export
 spark_connect_method <- function(
-    x,
-    method,
-    master,
-    spark_home,
-    config,
-    app_name,
-    version,
-    hadoop_version,
-    extensions,
-    scala_version,
-    ...) {
+  x,
+  method,
+  master,
+  spark_home,
+  config,
+  app_name,
+  version,
+  hadoop_version,
+  extensions,
+  scala_version,
+  ...
+) {
   UseMethod("spark_connect_method")
 }
 
 #' @export
 spark_connect_method.default <- function(
-    x,
-    method,
-    master,
-    spark_home,
-    config,
-    app_name,
-    version,
-    hadoop_version = NULL,
-    extensions,
-    scala_version,
-    ...) {
-
+  x,
+  method,
+  master,
+  spark_home,
+  config,
+  app_name,
+  version,
+  hadoop_version = NULL,
+  extensions,
+  scala_version,
+  ...
+) {
   shell_args <- spark_config_shell_args(config, master)
 
   # spark-shell (local install of spark)
@@ -379,7 +412,8 @@ spark_connect_method.default <- function(
       scon$method <- method
     }
   } else if (method == "livy") {
-    scon <- livy_connection(master,
+    scon <- livy_connection(
+      master,
       config,
       app_name,
       version,
@@ -427,7 +461,6 @@ as_spark_method <- function(x) {
 }
 
 
-
 #' @name spark-connections
 #' @export
 spark_connection_is_open <- function(sc) {
@@ -447,8 +480,7 @@ spark_disconnect.spark_connection <- function(sc, ...) {
       subclass <- remove_class(sc, "spark_connection")
       spark_disconnect(subclass, ...)
     },
-    error = function(err) {
-    }
+    error = function(err) {}
   )
 
   spark_connections_remove(sc)
@@ -495,12 +527,13 @@ spark_log_file <- function(sc) {
 
 # TRUE if the Spark Connection is a local install
 spark_connection_is_local <- function(sc) {
-  spark_master_is_local(sc$master) && !identical(sc$method, "databricks-connect")
+  spark_master_is_local(sc$master) &&
+    !identical(sc$method, "databricks-connect")
 }
 
 spark_master_is_local <- function(master) {
   out <- FALSE
-  if(!is.null(master)) {
+  if (!is.null(master)) {
     out <- grepl("^local(\\[[0-9\\*]*\\])?$", master, perl = TRUE)
   }
   out
@@ -517,18 +550,14 @@ spark_connection_is_yarn <- function(sc) {
 
 spark_connection_is_yarn_client <- function(sc) {
   grepl("^yarn-client$", sc$master, ignore.case = TRUE, perl = TRUE) ||
-    (
-      grepl("^yarn$", sc$master, ignore.case = TRUE, perl = TRUE) &&
-        !identical(sc$config$`sparklyr.shell.deploy-mode`, "cluster")
-    )
+    (grepl("^yarn$", sc$master, ignore.case = TRUE, perl = TRUE) &&
+      !identical(sc$config$`sparklyr.shell.deploy-mode`, "cluster"))
 }
 
 spark_master_is_yarn_cluster <- function(master, config) {
   grepl("^yarn-cluster$", master, ignore.case = TRUE, perl = TRUE) ||
-    (
-      identical(config[["sparklyr.shell.deploy-mode"]], "cluster") &&
-        identical(master, "yarn")
-    )
+    (identical(config[["sparklyr.shell.deploy-mode"]], "cluster") &&
+      identical(master, "yarn"))
 }
 
 spark_master_is_gateway <- function(master) {

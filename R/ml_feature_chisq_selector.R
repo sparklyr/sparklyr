@@ -16,10 +16,20 @@
 #'
 #'
 #' @export
-ft_chisq_selector <- function(x, features_col = "features", output_col = NULL, label_col = "label",
-                              selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
-                              num_top_features = 50, percentile = 0.1,
-                              uid = random_string("chisq_selector_"), ...) {
+ft_chisq_selector <- function(
+  x,
+  features_col = "features",
+  output_col = NULL,
+  label_col = "label",
+  selector_type = "numTopFeatures",
+  fdr = 0.05,
+  fpr = 0.05,
+  fwe = 0.05,
+  num_top_features = 50,
+  percentile = 0.1,
+  uid = random_string("chisq_selector_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_chisq_selector")
 }
@@ -27,10 +37,20 @@ ft_chisq_selector <- function(x, features_col = "features", output_col = NULL, l
 ml_chisq_selector <- ft_chisq_selector
 
 #' @export
-ft_chisq_selector.spark_connection <- function(x, features_col = "features", output_col = NULL, label_col = "label",
-                                               selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
-                                               num_top_features = 50, percentile = 0.1,
-                                               uid = random_string("chisq_selector_"), ...) {
+ft_chisq_selector.spark_connection <- function(
+  x,
+  features_col = "features",
+  output_col = NULL,
+  label_col = "label",
+  selector_type = "numTopFeatures",
+  fdr = 0.05,
+  fpr = 0.05,
+  fwe = 0.05,
+  num_top_features = 50,
+  percentile = 0.1,
+  uid = random_string("chisq_selector_"),
+  ...
+) {
   .args <- list(
     features_col = features_col,
     output_col = output_col,
@@ -47,39 +67,83 @@ ft_chisq_selector.spark_connection <- function(x, features_col = "features", out
     validator_ml_chisq_selector()
 
   estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.ChiSqSelector",
+    x,
+    "org.apache.spark.ml.feature.ChiSqSelector",
     output_col = .args[["output_col"]],
     uid = .args[["uid"]]
   ) %>%
-    (
-      function(obj) {
-        do.call(
-          invoke,
-          c(obj, "%>%", Filter(
+    (function(obj) {
+      do.call(
+        invoke,
+        c(
+          obj,
+          "%>%",
+          Filter(
             function(x) !is.null(x),
             list(
-              jobj_set_param_helper(obj, "setFdr", .args[["fdr"]], "2.2.0", 0.05),
+              jobj_set_param_helper(
+                obj,
+                "setFdr",
+                .args[["fdr"]],
+                "2.2.0",
+                0.05
+              ),
               list("setFeaturesCol", .args[["features_col"]]),
-              jobj_set_param_helper(obj, "setFpr", .args[["fpr"]], "2.1.0", 0.05),
-              jobj_set_param_helper(obj, "setFwe", .args[["fwe"]], "2.2.0", 0.05),
+              jobj_set_param_helper(
+                obj,
+                "setFpr",
+                .args[["fpr"]],
+                "2.1.0",
+                0.05
+              ),
+              jobj_set_param_helper(
+                obj,
+                "setFwe",
+                .args[["fwe"]],
+                "2.2.0",
+                0.05
+              ),
               list("setLabelCol", .args[["label_col"]]),
               list("setNumTopFeatures", .args[["num_top_features"]]),
-              jobj_set_param_helper(obj, "setPercentile", .args[["percentile"]], "2.1.0", 0.1),
-              jobj_set_param_helper(obj, "setSelectorType", .args[["selector_type"]], "2.1.0", "numTopFeatures")
+              jobj_set_param_helper(
+                obj,
+                "setPercentile",
+                .args[["percentile"]],
+                "2.1.0",
+                0.1
+              ),
+              jobj_set_param_helper(
+                obj,
+                "setSelectorType",
+                .args[["selector_type"]],
+                "2.1.0",
+                "numTopFeatures"
+              )
             )
-          ))
+          )
         )
-      }) %>%
+      )
+    }) %>%
     new_ml_chisq_selector()
 
   estimator
 }
 
 #' @export
-ft_chisq_selector.ml_pipeline <- function(x, features_col = "features", output_col = NULL, label_col = "label",
-                                          selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
-                                          num_top_features = 50, percentile = 0.1,
-                                          uid = random_string("chisq_selector_"), ...) {
+ft_chisq_selector.ml_pipeline <- function(
+  x,
+  features_col = "features",
+  output_col = NULL,
+  label_col = "label",
+  selector_type = "numTopFeatures",
+  fdr = 0.05,
+  fpr = 0.05,
+  fwe = 0.05,
+  num_top_features = 50,
+  percentile = 0.1,
+  uid = random_string("chisq_selector_"),
+  ...
+) {
   stage <- ft_chisq_selector.spark_connection(
     x = spark_connection(x),
     features_col = features_col,
@@ -98,10 +162,20 @@ ft_chisq_selector.ml_pipeline <- function(x, features_col = "features", output_c
 }
 
 #' @export
-ft_chisq_selector.tbl_spark <- function(x, features_col = "features", output_col = NULL, label_col = "label",
-                                        selector_type = "numTopFeatures", fdr = 0.05, fpr = 0.05, fwe = 0.05,
-                                        num_top_features = 50, percentile = 0.1,
-                                        uid = random_string("chisq_selector_"), ...) {
+ft_chisq_selector.tbl_spark <- function(
+  x,
+  features_col = "features",
+  output_col = NULL,
+  label_col = "label",
+  selector_type = "numTopFeatures",
+  fdr = 0.05,
+  fpr = 0.05,
+  fwe = 0.05,
+  num_top_features = 50,
+  percentile = 0.1,
+  uid = random_string("chisq_selector_"),
+  ...
+) {
   stage <- ft_chisq_selector.spark_connection(
     x = spark_connection(x),
     features_col = features_col,
@@ -139,7 +213,9 @@ validator_ml_chisq_selector <- function(.args) {
   .args[["fdr"]] <- cast_scalar_double(.args[["fdr"]])
   .args[["fpr"]] <- cast_scalar_double(.args[["fpr"]])
   .args[["fwe"]] <- cast_scalar_double(.args[["fwe"]])
-  .args[["num_top_features"]] <- cast_scalar_integer(.args[["num_top_features"]])
+  .args[["num_top_features"]] <- cast_scalar_integer(.args[[
+    "num_top_features"
+  ]])
   .args[["percentile"]] <- cast_scalar_double(.args[["percentile"]])
   .args[["selector_type"]] <- cast_choice(
     .args[["selector_type"]],

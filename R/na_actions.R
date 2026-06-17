@@ -52,12 +52,16 @@ na.omit.spark_jobj <- function(object, columns = NULL, ...) {
   sc <- spark_connection(object)
 
   # report number of rows dropped if requested
-  verbose <- spark_config_value(sc$config, c(
-    "sparklyr.verbose.na",
-    "sparklyr.na.omit.verbose",
-    "sparklyr.na.action.verbose",
-    "sparklyr.verbose"
-  ), TRUE)
+  verbose <- spark_config_value(
+    sc$config,
+    c(
+      "sparklyr.verbose.na",
+      "sparklyr.na.omit.verbose",
+      "sparklyr.na.action.verbose",
+      "sparklyr.verbose"
+    ),
+    TRUE
+  )
 
   n_before <- invoke(object, "count")
   dropped <- sdf_na_omit(object, columns)
@@ -104,7 +108,6 @@ na.fail.spark_jobj <- function(object, columns = NULL, ...) {
 # Spark DataFrame NA Routines ----
 
 apply_na_action <- function(x, response = NULL, features = NULL, na.action) {
-
   # early exit for NULL, NA na.action
   if (is.null(na.action)) {
     return(x)
@@ -124,7 +127,8 @@ apply_na_action <- function(x, response = NULL, features = NULL, na.action) {
   }
 
   # attempt to apply 'na.action'
-  na.action(x,
+  na.action(
+    x,
     response = response,
     features = features,
     columns = c(response, features)

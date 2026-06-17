@@ -12,8 +12,12 @@
 #'
 #' @rdname sql-transformer
 #' @export
-ft_sql_transformer <- function(x, statement = NULL,
-                               uid = random_string("sql_transformer_"), ...) {
+ft_sql_transformer <- function(
+  x,
+  statement = NULL,
+  uid = random_string("sql_transformer_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_sql_transformer")
 }
@@ -21,8 +25,12 @@ ft_sql_transformer <- function(x, statement = NULL,
 ml_sql_transformer <- ft_sql_transformer
 
 #' @export
-ft_sql_transformer.spark_connection <- function(x, statement = NULL,
-                                                uid = random_string("sql_transformer_"), ...) {
+ft_sql_transformer.spark_connection <- function(
+  x,
+  statement = NULL,
+  uid = random_string("sql_transformer_"),
+  ...
+) {
   .args <- list(
     statement = statement,
     uid = uid
@@ -31,7 +39,8 @@ ft_sql_transformer.spark_connection <- function(x, statement = NULL,
     validator_ml_sql_transformer()
 
   jobj <- invoke_new(
-    x, "org.apache.spark.ml.feature.SQLTransformer",
+    x,
+    "org.apache.spark.ml.feature.SQLTransformer",
     .args[["uid"]]
   ) %>%
     jobj_set_param("setStatement", .args[["statement"]])
@@ -40,8 +49,12 @@ ft_sql_transformer.spark_connection <- function(x, statement = NULL,
 }
 
 #' @export
-ft_sql_transformer.ml_pipeline <- function(x, statement = NULL,
-                                           uid = random_string("sql_transformer_"), ...) {
+ft_sql_transformer.ml_pipeline <- function(
+  x,
+  statement = NULL,
+  uid = random_string("sql_transformer_"),
+  ...
+) {
   stage <- ft_sql_transformer.spark_connection(
     x = spark_connection(x),
     statement = statement,
@@ -52,8 +65,12 @@ ft_sql_transformer.ml_pipeline <- function(x, statement = NULL,
 }
 
 #' @export
-ft_sql_transformer.tbl_spark <- function(x, statement = NULL,
-                                         uid = random_string("sql_transformer_"), ...) {
+ft_sql_transformer.tbl_spark <- function(
+  x,
+  statement = NULL,
+  uid = random_string("sql_transformer_"),
+  ...
+) {
   stage <- ft_sql_transformer.spark_connection(
     x = spark_connection(x),
     statement = statement,

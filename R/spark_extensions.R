@@ -50,27 +50,37 @@ registered_extensions <- function() {
 #' @return An object of type `spark_dependency`
 #'
 #' @export
-spark_dependency <- function(jars = NULL,
-                             packages = NULL,
-                             initializer = NULL,
-                             catalog = NULL,
-                             repositories = NULL,
-                             dbplyr_sql_variant = NULL,
-                             ...) {
-  structure(class = "spark_dependency", list(
-    jars = jars,
-    packages = packages,
-    initializer = initializer,
-    catalog = catalog,
-    repositories = repositories,
-    dbplyr_sql_variant = dbplyr_sql_variant
-  ))
+spark_dependency <- function(
+  jars = NULL,
+  packages = NULL,
+  initializer = NULL,
+  catalog = NULL,
+  repositories = NULL,
+  dbplyr_sql_variant = NULL,
+  ...
+) {
+  structure(
+    class = "spark_dependency",
+    list(
+      jars = jars,
+      packages = packages,
+      initializer = initializer,
+      catalog = catalog,
+      repositories = repositories,
+      dbplyr_sql_variant = dbplyr_sql_variant
+    )
+  )
 }
 
-spark_dependencies_from_extensions <- function(spark_version, scala_version, extensions, config) {
+spark_dependencies_from_extensions <- function(
+  spark_version,
+  scala_version,
+  extensions,
+  config
+) {
   scala_version <- numeric_version(
-    scala_version %||% (
-      if (spark_version < "2.0") {
+    scala_version %||%
+      (if (spark_version < "2.0") {
         scala_version <- "2.10"
       } else if (spark_version < "3.0") {
         scala_version <- "2.11"
@@ -83,10 +93,18 @@ spark_dependencies_from_extensions <- function(spark_version, scala_version, ext
   initializers <- list()
   catalog_jars <- character()
   repositories <- character()
-  dbplyr_sql_variant <- list(scalar = list(), aggregate = list(), window = list())
+  dbplyr_sql_variant <- list(
+    scalar = list(),
+    aggregate = list(),
+    window = list()
+  )
 
   for (extension in extensions) {
-    dependencies <- spark_dependencies_from_extension(spark_version, scala_version, extension)
+    dependencies <- spark_dependencies_from_extension(
+      spark_version,
+      scala_version,
+      extension
+    )
     for (dependency in dependencies) {
       jars <- c(jars, dependency$jars)
       packages <- c(packages, dependency$packages)
@@ -97,18 +115,35 @@ spark_dependencies_from_extensions <- function(spark_version, scala_version, ext
         if (!is.null(dependency$dbplyr_sql_variant[[x]])) {
           for (fn in names(dependency$dbplyr_sql_variant[[x]])) {
             if (fn %in% names(dbplyr_sql_variant[[x]][[fn]])) {
-              warning("overriding existing dbplyr sql translation for '", fn, "'")
+              warning(
+                "overriding existing dbplyr sql translation for '",
+                fn,
+                "'"
+              )
             }
-            dbplyr_sql_variant[[x]][[fn]] <- dependency$dbplyr_sql_variant[[x]][[fn]]
+            dbplyr_sql_variant[[x]][[fn]] <- dependency$dbplyr_sql_variant[[
+              x
+            ]][[fn]]
           }
         }
       }
-      config_catalog <- spark_config_value(config, "sparklyr.extensions.catalog", TRUE)
-      if (!identical(dependency$catalog, NULL) && !identical(config_catalog, FALSE)) {
+      config_catalog <- spark_config_value(
+        config,
+        "sparklyr.extensions.catalog",
+        TRUE
+      )
+      if (
+        !identical(dependency$catalog, NULL) &&
+          !identical(config_catalog, FALSE)
+      ) {
         catalog_path <- dependency$catalog
-        if (is.character(config_catalog)) catalog_path <- config_catalog
+        if (is.character(config_catalog)) {
+          catalog_path <- config_catalog
+        }
 
-        if (!grepl("%s", config_catalog)) config_catalog <- paste0(config_catalog, "%s")
+        if (!grepl("%s", config_catalog)) {
+          config_catalog <- paste0(config_catalog, "%s")
+        }
 
         catalog_jars <- c(
           catalog_jars,
@@ -128,15 +163,21 @@ spark_dependencies_from_extensions <- function(spark_version, scala_version, ext
   )
 }
 
-spark_dependencies_from_extension <- function(spark_version, scala_version, extension) {
+spark_dependencies_from_extension <- function(
+  spark_version,
+  scala_version,
+  extension
+) {
   # attempt to find the function
   spark_dependencies <- tryCatch(
     {
       get("spark_dependencies", asNamespace(extension), inherits = FALSE)
     },
     error = function(e) {
-      stop("spark_dependencies function not found within ",
-        "extension package ", extension,
+      stop(
+        "spark_dependencies function not found within ",
+        "extension package ",
+        extension,
         call. = FALSE
       )
     }
@@ -173,15 +214,17 @@ spark_dependencies_from_extension <- function(spark_version, scala_version, exte
 #'
 #' @export
 spark_dependency_fallback <- function(spark_version, supported_versions) {
-  supported <- supported_versions[package_version2(supported_versions) <= spark_version]
+  supported <- supported_versions[
+    package_version2(supported_versions) <= spark_version
+  ]
   sort(supported, decreasing = TRUE)[[1]]
 }
 
 sparklyr_jar_path <- function(spark_version, scala_version = NULL) {
-  scala_version <- scala_version %||% (
-    if (spark_version < "3.0") {
+  scala_version <- scala_version %||%
+    (if (spark_version < "3.0") {
       "2.12"
-    }  else {
+    } else {
       "2.13"
     })
 

@@ -28,10 +28,14 @@ setMethod("sqlParseVariables", "spark_connection", function(conn, sql, ...) {
   method(conn, sql, ...)
 })
 
-setMethod("sqlInterpolate", "spark_connection", function(conn, sql, ..., .dots = list()) {
-  method <- getMethod("sqlInterpolate", "DBIConnection")
-  method(conn, sql, ..., .dots = .dots)
-})
+setMethod(
+  "sqlInterpolate",
+  "spark_connection",
+  function(conn, sql, ..., .dots = list()) {
+    method <- getMethod("sqlInterpolate", "DBIConnection")
+    method(conn, sql, ..., .dots = .dots)
+  }
+)
 
 setMethod("dbQuoteLiteral", "spark_connection", function(conn, x, ...) {
   method <- getMethod("dbQuoteLiteral", "DBIConnection")
@@ -43,7 +47,8 @@ get_data_type <- function(obj) {
     return("TEXT")
   }
 
-  switch(typeof(obj),
+  switch(
+    typeof(obj),
     integer = "INTEGER",
     double = "REAL",
     character = "STRING",
@@ -59,41 +64,59 @@ dbi_ensure_no_backtick <- function(x) {
   }
 }
 
-setMethod("dbQuoteIdentifier", c("spark_connection", "character"), function(conn, x, ...) {
-  if (is(x, "SQL")) return(x)
-  split_x <- unlist(strsplit(x, "\\."))
-  possible_schema <- FALSE
-  if(length(split_x) > 1) {
-    if(!any(split_x == "")) possible_schema <- TRUE
+setMethod(
+  "dbQuoteIdentifier",
+  c("spark_connection", "character"),
+  function(conn, x, ...) {
+    if (is(x, "SQL")) {
+      return(x)
+    }
+    split_x <- unlist(strsplit(x, "\\."))
+    possible_schema <- FALSE
+    if (length(split_x) > 1) {
+      if (!any(split_x == "")) possible_schema <- TRUE
+    }
+    if (
+      length(x) == 0L ||
+        (inherits(x, "ident") && possible_schema) ||
+        (regexpr("`", x)[[1]] >= 0 && possible_schema)
+    ) {
+      out <- x
+    } else {
+      dbi_ensure_no_backtick(x)
+      y <- paste("`", x, "`", sep = "")
+      out <- SQL(y)
+    }
+    out
   }
-  if (length(x) == 0L ||
-      (inherits(x, "ident") && possible_schema) ||
-      (regexpr("`", x)[[1]] >= 0 && possible_schema)) {
-    out <- x
-  } else {
-    dbi_ensure_no_backtick(x)
-    y <- paste("`", x, "`", sep = "")
-    out <- SQL(y)
-  }
-  out
-})
+)
 
-setMethod("dbQuoteString", c("spark_connection", "character"), function(conn, x, ...) {
-  SQL(paste('"', gsub('"', '\\\\"', x), '"', sep = ""))
-})
+setMethod(
+  "dbQuoteString",
+  c("spark_connection", "character"),
+  function(conn, x, ...) {
+    SQL(paste('"', gsub('"', '\\\\"', x), '"', sep = ""))
+  }
+)
 
 # Sets a property for the connection
-setGeneric("dbSetProperty", function(conn, property, value) standardGeneric("dbSetProperty"))
+setGeneric("dbSetProperty", function(conn, property, value) {
+  standardGeneric("dbSetProperty")
+})
 # Sets a property for the connection
-setMethod("dbSetProperty", c("spark_connection", "character", "character"), function(conn, property, value) {
-  dbGetQuery(
-    conn,
-    paste(
-      "SET",
-      paste(property, value, sep = "=")
+setMethod(
+  "dbSetProperty",
+  c("spark_connection", "character", "character"),
+  function(conn, property, value) {
+    dbGetQuery(
+      conn,
+      paste(
+        "SET",
+        paste(property, value, sep = "=")
+      )
     )
-  )
-})
+  }
+)
 
 # ---- DBI Transactions ----
 

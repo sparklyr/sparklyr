@@ -6,7 +6,8 @@
 spark_verify_embedded_sources <- function() {
   expected <- tempfile(pattern = "spark_embedded_sources_", fileext = ".R")
   spark_gen_embedded_sources(output = expected)
-  jar <- find_jar() %||% path_program("jar", fmt = "Unable to locate '%s' binary")
+  jar <- find_jar() %||%
+    path_program("jar", fmt = "Unable to locate '%s' binary")
 
   pkg_root <- normalizePath(".")
   on.exit(setwd(pkg_root))
@@ -31,7 +32,9 @@ spark_verify_embedded_sources <- function() {
       if (any(diff)) {
         print(diff)
         stop(c(
-          "Embedded sources from '", sparklyr_jar, "' is not up-to-date!\n\n",
+          "Embedded sources from '",
+          sparklyr_jar,
+          "' is not up-to-date!\n\n",
           "Please run 'Rscript update_embedded_sources.R' to fix this error ",
           "(also see ",
           "https://github.com/sparklyr/sparklyr/wiki/Development#updating-embedded-sources",

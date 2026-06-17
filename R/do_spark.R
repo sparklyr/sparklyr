@@ -46,7 +46,9 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
     # filter out unnamed arguments with a warning
     unnamed <- !nzchar(optnames)
     if (any(unnamed)) {
-      warning("ignoring doSpark package option(s) specified with unnamed argument")
+      warning(
+        "ignoring doSpark package option(s) specified with unnamed argument"
+      )
       opts <- opts[!unnamed]
       optnames <- optnames[!unnamed]
     }
@@ -54,10 +56,13 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
     # filter out unrecognized options with a warning
     recog <- optnames %in% genv_get_do_spark("valid_options")
     if (any(!recog)) {
-      warning(sprintf(
-        "ignoring unrecognized doSpark package option(s): %s",
-        paste(optnames[!recog], collapse = ", ")
-      ), call. = FALSE)
+      warning(
+        sprintf(
+          "ignoring unrecognized doSpark package option(s): %s",
+          paste(optnames[!recog], collapse = ", ")
+        ),
+        call. = FALSE
+      )
       opts <- opts[recog]
       optnames <- optnames[recog]
     }
@@ -78,14 +83,22 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
   .doSpark <- function(obj, expr, envir, data) {
     # internal function to compile an expression if possible
     .compile <- function(expr, ...) {
-      if (getRversion() < "2.13.0" || isTRUE(genv_get_do_spark("options")$nocompile)) {
+      if (
+        getRversion() < "2.13.0" ||
+          isTRUE(genv_get_do_spark("options")$nocompile)
+      ) {
         expr
       } else {
         compiler::compile(expr, ...)
       }
     }
 
-    expr_globals <- globals::globalsOf(expr, envir = envir, recursive = TRUE, mustExist = FALSE)
+    expr_globals <- globals::globalsOf(
+      expr,
+      envir = envir,
+      recursive = TRUE,
+      mustExist = FALSE
+    )
 
     # internal function to process spark data frames
     .process_spark_items <- function(spark_items, ...) {
@@ -151,7 +164,8 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
     )
     expr <- .compile(expr)
     res <- do.call(
-      .process_spark_items, append(list(spark_items), as.list(spark_apply_args))
+      .process_spark_items,
+      append(list(spark_items), as.list(spark_apply_args))
     )
     tryCatch(
       accumulator(res, seq(along = res)),
@@ -163,7 +177,11 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
     err_val <- foreach::getErrorValue(it)
     err_idx <- foreach::getErrorIndex(it)
     if (identical(obj$errorHandling, "stop") && !is.null(err_val)) {
-      msg <- sprintf("task %d failed - \"%s\"", err_idx, conditionMessage(err_val))
+      msg <- sprintf(
+        "task %d failed - \"%s\"",
+        err_idx,
+        conditionMessage(err_val)
+      )
       stop(simpleError(msg, call = expr))
     } else {
       foreach::getResult(it)
@@ -173,7 +191,8 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
   # internal function reporting info about the sparklyr parallel backend
   .info <- function(data, item) {
     pkgName <- "doSpark"
-    switch(item,
+    switch(
+      item,
       name = pkgName,
       version = packageDescription(pkgName, fields = "Version"),
       workers = do_spark_parallelism,
@@ -187,7 +206,8 @@ registerDoSpark <- function(spark_conn, parallelism = NULL, ...) {
       valid_options = c("nocompile"),
       # options from the last successful call to registerDoSpark
       options = new.env(parent = emptyenv())
-    ))
+    )
+  )
 
   .processOpts(...)
   foreach::setDoPar(

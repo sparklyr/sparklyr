@@ -33,7 +33,9 @@ NULL
 
 require_file_exists <- function(path, fmt = NULL) {
   fmt <- fmt %||% "no file at path '%s'"
-  if (!file.exists(path)) stopf(fmt, path)
+  if (!file.exists(path)) {
+    stopf(fmt, path)
+  }
   path
 }
 
@@ -41,7 +43,9 @@ require_directory_exists <- function(path, fmt = NULL) {
   fmt <- fmt %||% "no file at path '%s'"
   require_file_exists(path)
   info <- file.info(path)
-  if (!isTRUE(info$isdir)) stopf(fmt, path)
+  if (!isTRUE(info$isdir)) {
+    stopf(fmt, path)
+  }
   path
 }
 

@@ -19,16 +19,25 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
   baseConfig <- list()
 
   if (use_default) {
-    localConfigFile <- system.file(file.path("conf", "config-template.yml"), package = "sparklyr")
+    localConfigFile <- system.file(
+      file.path("conf", "config-template.yml"),
+      package = "sparklyr"
+    )
     baseConfig <- config::get(file = localConfigFile)
   }
 
   # allow options to specify sparklyr configuration settings
-  optionsConfigCheck <- grepl("^spark\\.|^sparklyr\\.|^livy\\.", names(options()))
+  optionsConfigCheck <- grepl(
+    "^spark\\.|^sparklyr\\.|^livy\\.",
+    names(options())
+  )
   optionsConfig <- options()[optionsConfigCheck]
   baseConfig <- merge_lists(optionsConfig, baseConfig)
 
-  userEnvConfig <- tryCatch(config::get(file = Sys.getenv("SPARKLYR_CONFIG_FILE")), error = function(e) NULL)
+  userEnvConfig <- tryCatch(
+    config::get(file = Sys.getenv("SPARKLYR_CONFIG_FILE")),
+    error = function(e) NULL
+  )
   baseEnvConfig <- merge_lists(baseConfig, userEnvConfig)
 
   isFileProvided <- !missing(file)
@@ -38,7 +47,9 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
       if (isFileProvided) {
         warnMessage <- sprintf(
           "Error reading config file: %s in spark_config(): %s: %s. File will be ignored.",
-          file, deparse(e[["call"]]), e[["message"]]
+          file,
+          deparse(e[["call"]]),
+          e[["message"]]
         )
         warning(warnMessage, call. = FALSE)
       }
@@ -48,16 +59,30 @@ spark_config <- function(file = "config.yml", use_default = TRUE) {
 
   mergedConfig <- merge_lists(baseEnvConfig, userConfig)
 
-  if (nchar(Sys.getenv("SPARK_DRIVER_CLASSPATH")) > 0 &&
-    is.null(mergedConfig$master$`sparklyr.shell.driver-class-path`)) {
-    mergedConfig$master$`sparklyr.shell.driver-class-path` <- Sys.getenv("SPARK_DRIVER_CLASSPATH")
+  if (
+    nchar(Sys.getenv("SPARK_DRIVER_CLASSPATH")) > 0 &&
+      is.null(mergedConfig$master$`sparklyr.shell.driver-class-path`)
+  ) {
+    mergedConfig$master$`sparklyr.shell.driver-class-path` <- Sys.getenv(
+      "SPARK_DRIVER_CLASSPATH"
+    )
   }
 
-  if (is.null(spark_config_value(mergedConfig, c("sparklyr.cores.local", "sparklyr.connect.cores.local")))) {
+  if (
+    is.null(spark_config_value(
+      mergedConfig,
+      c("sparklyr.cores.local", "sparklyr.connect.cores.local")
+    ))
+  ) {
     mergedConfig$sparklyr.connect.cores.local <- parallel::detectCores()
   }
 
-  if (is.null(spark_config_value(mergedConfig, "spark.sql.shuffle.partitions.local"))) {
+  if (
+    is.null(spark_config_value(
+      mergedConfig,
+      "spark.sql.shuffle.partitions.local"
+    ))
+  ) {
     mergedConfig$spark.sql.shuffle.partitions.local <- parallel::detectCores()
   }
 
@@ -122,7 +147,9 @@ spark_config_value_retries <- function(config, name, default, retries) {
           message("Reading ", name, " failed with error: ", e$message)
         }
 
-        if (retries > 0) Sys.sleep(1)
+        if (retries > 0) {
+          Sys.sleep(1)
+        }
 
         list(
           success = FALSE
@@ -151,34 +178,49 @@ spark_config_value_retries <- function(config, name, default, retries) {
 #'
 #' @keywords internal
 #' @export
-spark_config_packages <- function(config, packages, version, scala_version = NULL, ...) {
+spark_config_packages <- function(
+  config,
+  packages,
+  version,
+  scala_version = NULL,
+  ...
+) {
   version <- spark_version_latest(version)
 
-  scala_version <- scala_version %||% (
-    if (version >= "4.0.0") {
+  scala_version <- scala_version %||%
+    (if (version >= "4.0.0") {
       "2.13"
     } else if (version >= "3.0.0") {
       "2.12"
     } else {
       "2.11"
-    }
-  )
+    })
 
   if ("kafka" %in% packages) {
     packages <- packages[-which(packages == "kafka")]
 
-    if (version < "2.0.0") stop("Kafka requires Spark 2.x")
+    if (version < "2.0.0") {
+      stop("Kafka requires Spark 2.x")
+    }
 
-    kafka_package <- sprintf("org.apache.spark:spark-sql-kafka-0-10_%s:", scala_version)
+    kafka_package <- sprintf(
+      "org.apache.spark:spark-sql-kafka-0-10_%s:",
+      scala_version
+    )
     kafka_package <- paste0(kafka_package, version)
 
-    config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, kafka_package)
+    config$sparklyr.shell.packages <- c(
+      config$sparklyr.shell.packages,
+      kafka_package
+    )
   }
 
   if ("delta" %in% packages) {
     packages <- packages[-which(packages == "delta")]
 
-    if (version < "2.4.2") stop("Delta Lake requires Spark 2.4.2 or newer")
+    if (version < "2.4.2") {
+      stop("Delta Lake requires Spark 2.4.2 or newer")
+    }
 
     delta <- list(
       list(spark = "2.4", delta = "0.6.0"),
@@ -196,9 +238,9 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
 
     delta_version <- delta[2]
 
-    if(version >= "3.5") {
+    if (version >= "3.5") {
       delta_name <- "delta-spark"
-    } else{
+    } else {
       delta_name <- "delta-core"
     }
 
@@ -209,9 +251,9 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
         delta_name,
         scala_version,
         delta_version
-        )
+      )
     )
-    if(version >= 3.3) {
+    if (version >= 3.3) {
       config$`spark.sql.extensions` <- "io.delta.sql.DeltaSparkSessionExtension"
       config$`spark.sql.catalog.spark_catalog` <- "org.apache.spark.sql.delta.catalog.DeltaCatalog"
     }
@@ -243,12 +285,13 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
     additional_configs <- list(...)
     config$sparklyr.shell.packages <- c(
       config$sparklyr.shell.packages,
-      (
-        if (additional_configs$method %in% c("databricks", "databricks-connect")) {
-          "com.nvidia:rapids-4-spark_2.12:0.1.0-databricks"
-        } else {
-          "com.nvidia:rapids-4-spark_2.12:0.1.0"
-        }),
+      (if (
+        additional_configs$method %in% c("databricks", "databricks-connect")
+      ) {
+        "com.nvidia:rapids-4-spark_2.12:0.1.0-databricks"
+      } else {
+        "com.nvidia:rapids-4-spark_2.12:0.1.0"
+      }),
       "ai.rapids:cudf:0.14"
     )
 
@@ -274,7 +317,10 @@ spark_config_packages <- function(config, packages, version, scala_version = NUL
   }
 
   if (!is.null(packages)) {
-    config$sparklyr.shell.packages <- c(config$sparklyr.shell.packages, packages)
+    config$sparklyr.shell.packages <- c(
+      config$sparklyr.shell.packages,
+      packages
+    )
   }
 
   config

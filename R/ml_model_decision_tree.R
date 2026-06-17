@@ -38,14 +38,31 @@ NULL
 #' }
 #'
 #' @export
-ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "classification"),
-                             features_col = "features", label_col = "label",
-                             prediction_col = "prediction", variance_col = NULL, probability_col = "probability",
-                             raw_prediction_col = "rawPrediction", checkpoint_interval = 10L,
-                             impurity = "auto", max_bins = 32L, max_depth = 5L, min_info_gain = 0,
-                             min_instances_per_node = 1L, seed = NULL, thresholds = NULL,
-                             cache_node_ids = FALSE, max_memory_in_mb = 256L, uid = random_string("decision_tree_"),
-                             response = NULL, features = NULL, ...) {
+ml_decision_tree <- function(
+  x,
+  formula = NULL,
+  type = c("auto", "regression", "classification"),
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  variance_col = NULL,
+  probability_col = "probability",
+  raw_prediction_col = "rawPrediction",
+  checkpoint_interval = 10L,
+  impurity = "auto",
+  max_bins = 32L,
+  max_depth = 5L,
+  min_info_gain = 0,
+  min_instances_per_node = 1L,
+  seed = NULL,
+  thresholds = NULL,
+  cache_node_ids = FALSE,
+  max_memory_in_mb = 256L,
+  uid = random_string("decision_tree_"),
+  response = NULL,
+  features = NULL,
+  ...
+) {
   formula <- ml_standardize_formula(formula, response, features)
   response_col <- gsub("~.+$", "", formula) %>% trimws()
 
@@ -69,7 +86,10 @@ ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "
     if (identical(model_type, "regression")) "variance" else "gini"
   } else if (identical(model_type, "classification")) {
     if (!impurity %in% c("gini", "entropy")) {
-      stop("`impurity` must be \"gini\" or \"entropy\" for classification.", call. = FALSE)
+      stop(
+        "`impurity` must be \"gini\" or \"entropy\" for classification.",
+        call. = FALSE
+      )
     }
     impurity
   } else {
@@ -124,23 +144,38 @@ ml_decision_tree <- function(x, formula = NULL, type = c("auto", "regression", "
   )
 }
 
-new_ml_model_decision_tree_classification <- function(pipeline_model, formula, dataset, label_col,
-                                                      features_col, predicted_label_col) {
+new_ml_model_decision_tree_classification <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col,
+  predicted_label_col
+) {
   new_ml_model_classification(
-    pipeline_model, formula,
+    pipeline_model,
+    formula,
     dataset = dataset,
-    label_col = label_col, features_col = features_col,
+    label_col = label_col,
+    features_col = features_col,
     predicted_label_col = predicted_label_col,
     class = "ml_model_decision_tree_classification"
   )
 }
 
-new_ml_model_decision_tree_regression <- function(pipeline_model, formula, dataset, label_col,
-                                                  features_col) {
+new_ml_model_decision_tree_regression <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  label_col,
+  features_col
+) {
   new_ml_model_regression(
-    pipeline_model, formula,
+    pipeline_model,
+    formula,
     dataset = dataset,
-    label_col = label_col, features_col = features_col,
+    label_col = label_col,
+    features_col = features_col,
     class = "ml_model_decision_tree_regression"
   )
 }

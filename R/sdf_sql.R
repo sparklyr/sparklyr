@@ -1,4 +1,3 @@
-
 df_from_sql <- function(sc, sql) {
   sdf <- invoke(hive_context(sc), "sql", as.character(sql))
   df_from_sdf(sc, sdf)

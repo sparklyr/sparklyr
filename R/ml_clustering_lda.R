@@ -176,22 +176,50 @@ NULL
 #'
 #' @export
 ml_lda <- function(
-    x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
-    subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
-    keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
-    optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
-    topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
+  x,
+  formula = NULL,
+  k = 10,
+  max_iter = 20,
+  doc_concentration = NULL,
+  topic_concentration = NULL,
+  subsampling_rate = 0.05,
+  optimizer = "online",
+  checkpoint_interval = 10,
+  keep_last_checkpoint = TRUE,
+  learning_decay = 0.51,
+  learning_offset = 1024,
+  optimize_doc_concentration = TRUE,
+  seed = NULL,
+  features_col = "features",
+  topic_distribution_col = "topicDistribution",
+  uid = random_string("lda_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_lda")
 }
 
 #' @export
 ml_lda.spark_connection <- function(
-    x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
-    subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
-    keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
-    optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
-    topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
+  x,
+  formula = NULL,
+  k = 10,
+  max_iter = 20,
+  doc_concentration = NULL,
+  topic_concentration = NULL,
+  subsampling_rate = 0.05,
+  optimizer = "online",
+  checkpoint_interval = 10,
+  keep_last_checkpoint = TRUE,
+  learning_decay = 0.51,
+  learning_offset = 1024,
+  optimize_doc_concentration = TRUE,
+  seed = NULL,
+  features_col = "features",
+  topic_distribution_col = "topicDistribution",
+  uid = random_string("lda_"),
+  ...
+) {
   .args <- list(
     k = k,
     max_iter = max_iter,
@@ -213,29 +241,53 @@ ml_lda.spark_connection <- function(
 
   uid <- cast_string(uid)
 
-  jobj <- invoke_new(x, "org.apache.spark.ml.clustering.LDA", uid) %>% (
-    function(obj) {
+  jobj <- invoke_new(x, "org.apache.spark.ml.clustering.LDA", uid) %>%
+    (function(obj) {
       do.call(
         invoke,
-        c(obj, "%>%", Filter(
-          function(x) !is.null(x),
-          list(
-            list("setK", .args[["k"]]),
-            list("setMaxIter", .args[["max_iter"]]),
-            list("setSubsamplingRate", .args[["subsampling_rate"]]),
-            list("setOptimizer", .args[["optimizer"]]),
-            list("setCheckpointInterval", .args[["checkpoint_interval"]]),
-            jobj_set_param_helper(obj, "setKeepLastCheckpoint", .args[["keep_last_checkpoint"]], "2.0.0", TRUE),
-            list("setLearningDecay", .args[["learning_decay"]]),
-            list("setLearningOffset", .args[["learning_offset"]]),
-            list("setOptimizeDocConcentration", .args[["optimize_doc_concentration"]]),
-            list("setFeaturesCol", .args[["features_col"]]),
-            list("setTopicDistributionCol", .args[["topic_distribution_col"]]),
-            jobj_set_param_helper(obj, "setDocConcentration", .args[["doc_concentration"]]),
-            jobj_set_param_helper(obj, "setTopicConcentration", .args[["topic_concentration"]]),
-            jobj_set_param_helper(obj, "setSeed", .args[["seed"]])
+        c(
+          obj,
+          "%>%",
+          Filter(
+            function(x) !is.null(x),
+            list(
+              list("setK", .args[["k"]]),
+              list("setMaxIter", .args[["max_iter"]]),
+              list("setSubsamplingRate", .args[["subsampling_rate"]]),
+              list("setOptimizer", .args[["optimizer"]]),
+              list("setCheckpointInterval", .args[["checkpoint_interval"]]),
+              jobj_set_param_helper(
+                obj,
+                "setKeepLastCheckpoint",
+                .args[["keep_last_checkpoint"]],
+                "2.0.0",
+                TRUE
+              ),
+              list("setLearningDecay", .args[["learning_decay"]]),
+              list("setLearningOffset", .args[["learning_offset"]]),
+              list(
+                "setOptimizeDocConcentration",
+                .args[["optimize_doc_concentration"]]
+              ),
+              list("setFeaturesCol", .args[["features_col"]]),
+              list(
+                "setTopicDistributionCol",
+                .args[["topic_distribution_col"]]
+              ),
+              jobj_set_param_helper(
+                obj,
+                "setDocConcentration",
+                .args[["doc_concentration"]]
+              ),
+              jobj_set_param_helper(
+                obj,
+                "setTopicConcentration",
+                .args[["topic_concentration"]]
+              ),
+              jobj_set_param_helper(obj, "setSeed", .args[["seed"]])
+            )
           )
-        ))
+        )
       )
     })
 
@@ -244,11 +296,25 @@ ml_lda.spark_connection <- function(
 
 #' @export
 ml_lda.ml_pipeline <- function(
-    x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
-    subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
-    keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
-    optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
-    topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
+  x,
+  formula = NULL,
+  k = 10,
+  max_iter = 20,
+  doc_concentration = NULL,
+  topic_concentration = NULL,
+  subsampling_rate = 0.05,
+  optimizer = "online",
+  checkpoint_interval = 10,
+  keep_last_checkpoint = TRUE,
+  learning_decay = 0.51,
+  learning_offset = 1024,
+  optimize_doc_concentration = TRUE,
+  seed = NULL,
+  features_col = "features",
+  topic_distribution_col = "topicDistribution",
+  uid = random_string("lda_"),
+  ...
+) {
   stage <- ml_lda.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -274,11 +340,25 @@ ml_lda.ml_pipeline <- function(
 
 #' @export
 ml_lda.tbl_spark <- function(
-    x, formula = NULL, k = 10, max_iter = 20, doc_concentration = NULL, topic_concentration = NULL,
-    subsampling_rate = 0.05, optimizer = "online", checkpoint_interval = 10,
-    keep_last_checkpoint = TRUE, learning_decay = 0.51, learning_offset = 1024,
-    optimize_doc_concentration = TRUE, seed = NULL, features_col = "features",
-    topic_distribution_col = "topicDistribution", uid = random_string("lda_"), ...) {
+  x,
+  formula = NULL,
+  k = 10,
+  max_iter = 20,
+  doc_concentration = NULL,
+  topic_concentration = NULL,
+  subsampling_rate = 0.05,
+  optimizer = "online",
+  checkpoint_interval = 10,
+  keep_last_checkpoint = TRUE,
+  learning_decay = 0.51,
+  learning_offset = 1024,
+  optimize_doc_concentration = TRUE,
+  seed = NULL,
+  features_col = "features",
+  topic_distribution_col = "topicDistribution",
+  uid = random_string("lda_"),
+  ...
+) {
   formula <- ml_standardize_formula(formula)
 
   stage <- ml_lda.spark_connection(
@@ -317,7 +397,14 @@ ml_lda.tbl_spark <- function(
   }
 }
 
-ml_construct_model_lda <- function(constructor, predictor, formula, dataset, features_col, ...) {
+ml_construct_model_lda <- function(
+  constructor,
+  predictor,
+  formula,
+  dataset,
+  features_col,
+  ...
+) {
   sc <- spark_connection(predictor)
   dots <- list(...)
 
@@ -365,13 +452,24 @@ ml_construct_model_lda <- function(constructor, predictor, formula, dataset, fea
 }
 
 ml_lda_pipeline <- function(
-    predictor, dataset, formula, features_col,
-    # regex tokenizer parameters
-    gaps, min_token_length, pattern, to_lower_case,
-    # stop words remover parameters
-    case_sensitive, stop_words,
-    # count vectorizer parameters
-    binary, min_df, min_tf, vocab_size) {
+  predictor,
+  dataset,
+  formula,
+  features_col,
+  # regex tokenizer parameters
+  gaps,
+  min_token_length,
+  pattern,
+  to_lower_case,
+  # stop words remover parameters
+  case_sensitive,
+  stop_words,
+  # count vectorizer parameters
+  binary,
+  min_df,
+  min_tf,
+  vocab_size
+) {
   sc <- spark_connection(predictor)
 
   # Temporary column names to prevent clashes
@@ -402,7 +500,10 @@ ml_lda_pipeline <- function(
       min_tf = min_tf,
       vocab_size = vocab_size
     ) %>%
-    ft_r_formula(paste0("~", count_vectorizer_out), features_col = features_col) %>%
+    ft_r_formula(
+      paste0("~", count_vectorizer_out),
+      features_col = features_col
+    ) %>%
     ml_add_stage(predictor)
 
   pipeline %>%
@@ -413,16 +514,28 @@ ml_lda_pipeline <- function(
 validator_ml_lda <- function(.args) {
   .args <- validate_args_clustering(.args)
 
-  .args[["doc_concentration"]] <- cast_nullable_scalar_double(.args[["doc_concentration"]])
-  .args[["topic_concentration"]] <- cast_nullable_scalar_double(.args[["topic_concentration"]])
+  .args[["doc_concentration"]] <- cast_nullable_scalar_double(.args[[
+    "doc_concentration"
+  ]])
+  .args[["topic_concentration"]] <- cast_nullable_scalar_double(.args[[
+    "topic_concentration"
+  ]])
   .args[["subsampling_rate"]] <- cast_scalar_double(.args[["subsampling_rate"]])
   .args[["optimizer"]] <- cast_choice(.args[["optimizer"]], c("online", "em"))
-  .args[["checkpoint_interval"]] <- cast_scalar_integer(.args[["checkpoint_interval"]])
-  .args[["keep_last_checkpoint"]] <- cast_scalar_logical(.args[["keep_last_checkpoint"]])
+  .args[["checkpoint_interval"]] <- cast_scalar_integer(.args[[
+    "checkpoint_interval"
+  ]])
+  .args[["keep_last_checkpoint"]] <- cast_scalar_logical(.args[[
+    "keep_last_checkpoint"
+  ]])
   .args[["learning_decay"]] <- cast_scalar_double(.args[["learning_decay"]])
   .args[["learning_offset"]] <- cast_scalar_double(.args[["learning_offset"]])
-  .args[["optimize_doc_concentration"]] <- cast_scalar_logical(.args[["optimize_doc_concentration"]])
-  .args[["topic_distribution_col"]] <- cast_string(.args[["topic_distribution_col"]])
+  .args[["optimize_doc_concentration"]] <- cast_scalar_logical(.args[[
+    "optimize_doc_concentration"
+  ]])
+  .args[["topic_distribution_col"]] <- cast_string(.args[[
+    "topic_distribution_col"
+  ]])
   .args
 }
 
@@ -439,12 +552,20 @@ new_ml_lda_model <- function(jobj) {
       invoke(jobj, "describeTopics", max_terms_per_topic) %>%
         sdf_register()
     },
-    estimated_doc_concentration = possibly_null(~ invoke(jobj, "estimatedDocConcentration")), # def
-    log_likelihood = function(dataset) invoke(jobj, "logLikelihood", spark_dataframe(dataset)),
-    log_perplexity = function(dataset) invoke(jobj, "logPerplexity", spark_dataframe(dataset)),
+    estimated_doc_concentration = possibly_null(
+      ~ invoke(jobj, "estimatedDocConcentration")
+    ), # def
+    log_likelihood = function(dataset) {
+      invoke(jobj, "logLikelihood", spark_dataframe(dataset))
+    },
+    log_perplexity = function(dataset) {
+      invoke(jobj, "logPerplexity", spark_dataframe(dataset))
+    },
     # topicsMatrix deprecated
     topicsMatrix = function() {
-      warning("`topicMatrix()` is deprecated; please use `topics_matrix()` instead.")
+      warning(
+        "`topicMatrix()` is deprecated; please use `topics_matrix()` instead."
+      )
       possibly_null(read_spark_matrix)(jobj, "topicsMatrix") # def
     },
     topics_matrix = possibly_null(~ read_spark_matrix(jobj, "topicsMatrix")), # def

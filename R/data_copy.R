@@ -5,10 +5,12 @@
 spark_serialize_rds <- function(sc, df, columns, repartition) {
   num_rows <- nrow(df)
   timestamp_col_idxes <- Filter(
-    function(i) inherits(df[[i + 1L]], "POSIXt"), seq(ncol(df)) - 1L
+    function(i) inherits(df[[i + 1L]], "POSIXt"),
+    seq(ncol(df)) - 1L
   )
   string_col_idxes <- Filter(
-    function(i) inherits(df[[i + 1L]], c("character", "factor")), seq(ncol(df)) - 1L
+    function(i) inherits(df[[i + 1L]], c("character", "factor")),
+    seq(ncol(df)) - 1L
   )
   cols <- lapply(df, function(x) {
     as.list(
@@ -47,7 +49,6 @@ spark_serialize_rds <- function(sc, df, columns, repartition) {
     schema
   )
 
-
   invoke_static(
     sc,
     "org.apache.spark.sql.SQLUtils",
@@ -80,11 +81,16 @@ spark_data_translate_columns <- function(df) {
   })
 }
 
-spark_data_perform_copy <- function(sc, serializer, df_data, repartition, raw_columns = list()) {
+spark_data_perform_copy <- function(
+  sc,
+  serializer,
+  df_data,
+  repartition,
+  raw_columns = list()
+) {
   if (identical(class(df_data), "iterator")) {
     df <- df_data()
-  }
-  else {
+  } else {
     df_list <- df_data
     if (!identical(class(df_data), "list")) {
       df_list <- list(df_data)
@@ -96,11 +102,17 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition, raw_co
   sdf_list <- list()
   i <- 1
   while (!is.null(df)) {
-    if (is.function(df)) df <- df()
-    if (is.language(df)) df <- rlang::as_closure(df)()
+    if (is.function(df)) {
+      df <- df()
+    }
+    if (is.language(df)) {
+      df <- rlang::as_closure(df)()
+    }
 
     # ensure data.frame
-    if (!is.data.frame(df)) df <- sdf_prepare_dataframe(df)
+    if (!is.data.frame(df)) {
+      df <- sdf_prepare_dataframe(df)
+    }
 
     names(df) <- spark_sanitize_names(names(df), sc$config)
     columns <- spark_data_translate_columns(df)
@@ -113,8 +125,7 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition, raw_co
     i <- i + 1
     if (identical(class(df_data), "iterator")) {
       df <- df_data()
-    }
-    else {
+    } else {
       df <- if (i <= length(df_list)) df_list[[i]] else NULL
     }
 
@@ -135,7 +146,13 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition, raw_co
       rdd_list[[i]] <- invoke(sdf_list[[i]], "rdd")
     }
 
-    rdd <- invoke_static(sc, "sparklyr.Utils", "unionRdd", spark_context(sc), rdd_list)
+    rdd <- invoke_static(
+      sc,
+      "sparklyr.Utils",
+      "unionRdd",
+      spark_context(sc),
+      rdd_list
+    )
     schema <- invoke(sdf_list[[1]], "schema")
     sdf <- invoke(hive_context(sc), "createDataFrame", rdd, schema)
   }
@@ -144,13 +161,14 @@ spark_data_perform_copy <- function(sc, serializer, df_data, repartition, raw_co
 }
 
 spark_data_copy <- function(
-                            sc,
-                            df,
-                            name,
-                            repartition,
-                            serializer = NULL,
-                            struct_columns = list(),
-                            raw_columns = list()) {
+  sc,
+  df,
+  name,
+  repartition,
+  serializer = NULL,
+  struct_columns = list(),
+  raw_columns = list()
+) {
   if (!is.numeric(repartition)) {
     stop("The repartition parameter must be an integer")
   }
@@ -177,13 +195,15 @@ spark_data_copy <- function(
         }
         if ("Date" %in% class(arr)) {
           temporal_array_columns$date_array_columns <- append(
-            temporal_array_columns$date_array_columns, list(col)
+            temporal_array_columns$date_array_columns,
+            list(col)
           )
           break
         }
         if ("POSIXct" %in% class(arr)) {
           temporal_array_columns$timestamp_array_columns <- append(
-            temporal_array_columns$date_array_columns, list(col)
+            temporal_array_columns$date_array_columns,
+            list(col)
           )
           break
         }
@@ -230,8 +250,13 @@ spark_data_copy <- function(
     "arrow" = spark_serialize_arrow
   )
 
-
-  df <- spark_data_perform_copy(sc, serializers[[serializer]], df, repartition, raw_columns)
+  df <- spark_data_perform_copy(
+    sc,
+    serializers[[serializer]],
+    df,
+    repartition,
+    raw_columns
+  )
 
   if (length(struct_columns) > 0 && spark_version(sc) >= "2.4") {
     df <- invoke_static(
@@ -243,9 +268,11 @@ spark_data_copy <- function(
     )
   }
 
-  if ((length(temporal_array_columns$date_array_columns) > 0 ||
-    length(temporal_array_columns$timestamp_array_columns) > 0) &&
-    spark_version(sc) >= "3.0") {
+  if (
+    (length(temporal_array_columns$date_array_columns) > 0 ||
+      length(temporal_array_columns$timestamp_array_columns) > 0) &&
+      spark_version(sc) >= "3.0"
+  ) {
     df <- invoke_static(
       sc,
       "sparklyr.TemporalArrayColumnUtils",

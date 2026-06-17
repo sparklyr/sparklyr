@@ -7,17 +7,31 @@
 #' @template roxlate-ml-predictor-params
 #' @param classifier Object of class \code{ml_estimator}. Base binary classifier that we reduce multiclass classification into.
 #' @export
-ml_one_vs_rest <- function(x, formula = NULL, classifier = NULL, features_col = "features",
-                           label_col = "label", prediction_col = "prediction",
-                           uid = random_string("one_vs_rest_"), ...) {
+ml_one_vs_rest <- function(
+  x,
+  formula = NULL,
+  classifier = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("one_vs_rest_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_one_vs_rest")
 }
 
 #' @export
-ml_one_vs_rest.spark_connection <- function(x, formula = NULL, classifier = NULL, features_col = "features",
-                                            label_col = "label", prediction_col = "prediction",
-                                            uid = random_string("one_vs_rest_"), ...) {
+ml_one_vs_rest.spark_connection <- function(
+  x,
+  formula = NULL,
+  classifier = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("one_vs_rest_"),
+  ...
+) {
   .args <- list(
     classifier = classifier,
     features_col = features_col,
@@ -28,8 +42,11 @@ ml_one_vs_rest.spark_connection <- function(x, formula = NULL, classifier = NULL
     validator_ml_one_vs_rest()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.classification.OneVsRest", uid,
-    features_col = .args[["features_col"]], label_col = .args[["label_col"]],
+    x,
+    "org.apache.spark.ml.classification.OneVsRest",
+    uid,
+    features_col = .args[["features_col"]],
+    label_col = .args[["label_col"]],
     prediction_col = .args[["prediction_col"]]
   ) %>%
     jobj_set_param(
@@ -41,9 +58,16 @@ ml_one_vs_rest.spark_connection <- function(x, formula = NULL, classifier = NULL
 }
 
 #' @export
-ml_one_vs_rest.ml_pipeline <- function(x, formula = NULL, classifier = NULL, features_col = "features",
-                                       label_col = "label", prediction_col = "prediction",
-                                       uid = random_string("one_vs_rest_"), ...) {
+ml_one_vs_rest.ml_pipeline <- function(
+  x,
+  formula = NULL,
+  classifier = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("one_vs_rest_"),
+  ...
+) {
   stage <- ml_one_vs_rest.spark_connection(
     x = spark_connection(x),
     formula = formula,
@@ -58,10 +82,19 @@ ml_one_vs_rest.ml_pipeline <- function(x, formula = NULL, classifier = NULL, fea
 }
 
 #' @export
-ml_one_vs_rest.tbl_spark <- function(x, formula = NULL, classifier = NULL, features_col = "features",
-                                     label_col = "label", prediction_col = "prediction",
-                                     uid = random_string("one_vs_rest_"), response = NULL,
-                                     features = NULL, predicted_label_col = "predicted_label", ...) {
+ml_one_vs_rest.tbl_spark <- function(
+  x,
+  formula = NULL,
+  classifier = NULL,
+  features_col = "features",
+  label_col = "label",
+  prediction_col = "prediction",
+  uid = random_string("one_vs_rest_"),
+  response = NULL,
+  features = NULL,
+  predicted_label_col = "predicted_label",
+  ...
+) {
   formula <- ml_standardize_formula(formula, response, features)
 
   stage <- ml_one_vs_rest.spark_connection(
@@ -98,7 +131,10 @@ validator_ml_one_vs_rest <- function(.args) {
   } else {
     .args[["classifier"]]
   }
-  if (!is.null(.args[["classifier"]]) && !inherits(.args[["classifier"]], "ml_classifier")) {
+  if (
+    !is.null(.args[["classifier"]]) &&
+      !inherits(.args[["classifier"]], "ml_classifier")
+  ) {
     stop("`classifier` must be an `ml_classifier`.", call. = FALSE)
   }
   .args

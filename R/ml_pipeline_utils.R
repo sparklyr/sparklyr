@@ -1,4 +1,3 @@
-
 #' Add a Stage to a Pipeline
 #'
 #' Adds a stage to a pipeline.
@@ -12,19 +11,21 @@ ml_add_stage <- function(x, stage) {
   stages <- if (rlang::is_null(ml_stages(x))) {
     list(spark_jobj(stage))
   } else {
-    tryCatch(spark_jobj(x) %>%
-      invoke("getStages") %>%
-      c(spark_jobj(stage)),
-    error = function(e) {
+    tryCatch(
       spark_jobj(x) %>%
-        invoke("stages") %>%
-        c(spark_jobj(stage))
-    }
+        invoke("getStages") %>%
+        c(spark_jobj(stage)),
+      error = function(e) {
+        spark_jobj(x) %>%
+          invoke("stages") %>%
+          c(spark_jobj(stage))
+      }
     )
   }
 
   jobj <- invoke_static(
-    sc, "sparklyr.MLUtils",
+    sc,
+    "sparklyr.MLUtils",
     "createPipelineFromStages",
     ml_uid(x),
     stages
@@ -47,8 +48,20 @@ ml_add_stage <- function(x, stage) {
 #' @keywords internal
 #'
 #' @export
-jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NULL) {
-  set_param_args <- jobj_set_param_helper(jobj, setter, value, min_version, default)
+jobj_set_param <- function(
+  jobj,
+  setter,
+  value,
+  min_version = NULL,
+  default = NULL
+) {
+  set_param_args <- jobj_set_param_helper(
+    jobj,
+    setter,
+    value,
+    min_version,
+    default
+  )
   if (is.null(set_param_args)) {
     # not setting any param
     jobj
@@ -59,7 +72,13 @@ jobj_set_param <- function(jobj, setter, value, min_version = NULL, default = NU
 
 # returns NULL if no setter should be called, otherwise returns a list of params
 # (aside from jobj itself) to be passed to `invoke`
-jobj_set_param_helper <- function(jobj, setter, value, min_version = NULL, default = NULL) {
+jobj_set_param_helper <- function(
+  jobj,
+  setter,
+  value,
+  min_version = NULL,
+  default = NULL
+) {
   # if value is NULL, don't set
   if (is.null(value)) {
     return(NULL)
@@ -75,8 +94,11 @@ jobj_set_param_helper <- function(jobj, setter, value, min_version = NULL, defau
       if (!isTRUE(all.equal(c(value), default))) {
         # if user does not have required version, and tries to set parameter, throw error
         stop(paste0(
-          "Parameter `", deparse(substitute(value)),
-          "` is only available for Spark ", min_version, " and later."
+          "Parameter `",
+          deparse(substitute(value)),
+          "` is only available for Spark ",
+          min_version,
+          " and later."
         ))
       } else {
         # otherwise, don't call the setter
@@ -109,10 +131,23 @@ jobj_set_param_helper <- function(jobj, setter, value, min_version = NULL, defau
 #' @keywords internal
 #'
 #' @export
-spark_pipeline_stage <- function(sc, class, uid, features_col = NULL, label_col = NULL, prediction_col = NULL,
-                                 probability_col = NULL, raw_prediction_col = NULL,
-                                 k = NULL, max_iter = NULL, seed = NULL, input_col = NULL, input_cols = NULL,
-                                 output_col = NULL, output_cols = NULL) {
+spark_pipeline_stage <- function(
+  sc,
+  class,
+  uid,
+  features_col = NULL,
+  label_col = NULL,
+  prediction_col = NULL,
+  probability_col = NULL,
+  raw_prediction_col = NULL,
+  k = NULL,
+  max_iter = NULL,
+  seed = NULL,
+  input_col = NULL,
+  input_cols = NULL,
+  output_col = NULL,
+  output_cols = NULL
+) {
   args <- list(sc, class)
   if (!is.null(uid)) {
     uid <- cast_string(uid)
@@ -135,10 +170,21 @@ spark_pipeline_stage <- function(sc, class, uid, features_col = NULL, label_col 
     )
 }
 
-jobj_set_ml_params <- function(jobj, features_col, label_col, prediction_col,
-                               probability_col, raw_prediction_col,
-                               k, max_iter, seed, input_col, input_cols,
-                               output_col, output_cols) {
+jobj_set_ml_params <- function(
+  jobj,
+  features_col,
+  label_col,
+  prediction_col,
+  probability_col,
+  raw_prediction_col,
+  k,
+  max_iter,
+  seed,
+  input_col,
+  input_cols,
+  output_col,
+  output_cols
+) {
   params_to_set <- Filter(
     function(x) !is.null(x),
     list(
@@ -166,9 +212,15 @@ jobj_set_ml_params <- function(jobj, features_col, label_col, prediction_col,
 
 validate_args_transformer <- function(.args) {
   .args[["input_col"]] <- cast_nullable_string(.args[["input_col"]])
-  .args[["input_cols"]] <- cast_string_list(.args[["input_cols"]], allow_null = TRUE)
+  .args[["input_cols"]] <- cast_string_list(
+    .args[["input_cols"]],
+    allow_null = TRUE
+  )
   .args[["output_col"]] <- cast_nullable_string(.args[["output_col"]])
-  .args[["output_cols"]] <- cast_string_list(.args[["output_cols"]], allow_null = TRUE)
+  .args[["output_cols"]] <- cast_string_list(
+    .args[["output_cols"]],
+    allow_null = TRUE
+  )
   .args
 }
 
@@ -205,7 +257,8 @@ ml_stage <- function(x, stage) {
     grep(paste0("^", stage), x$stage_uids)
   }
 
-  switch(length(matched_index) %>% as.character(),
+  switch(
+    length(matched_index) %>% as.character(),
     "0" = stop("stage not found"),
     "1" = x$stages[[matched_index]],
     stop("multiple stages found")
@@ -231,7 +284,8 @@ ml_stages <- function(x, stages = NULL) {
 
     if (length(bad_matches)) {
       bad_match <- bad_matches[[1]]
-      switch(as.character(length(bad_match)),
+      switch(
+        as.character(length(bad_match)),
         "0" = stop("no stages found for identifier ", names(bad_matches)[1]),
         stop("multiple stages found for identifier ", names(bad_matches)[1])
       )

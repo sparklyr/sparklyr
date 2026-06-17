@@ -1,17 +1,28 @@
 spark_yarn_get_conf_property <- function(property, fails = TRUE) {
   confDir <- Sys.getenv("YARN_CONF_DIR")
   if (nchar(confDir) == 0) {
-
     # some systems don't set YARN_CONF_DIR but do set HADOOP_CONF_DIR
     confDir <- Sys.getenv("HADOOP_CONF_DIR")
     if (nchar(confDir) == 0) {
-      if (fails) stop("Yarn Cluster mode requires YARN_CONF_DIR or HADOOP_CONF_DIR to be set.") else return(NULL)
+      if (fails) {
+        stop(
+          "Yarn Cluster mode requires YARN_CONF_DIR or HADOOP_CONF_DIR to be set."
+        )
+      } else {
+        return(NULL)
+      }
     }
   }
 
   yarnSite <- file.path(confDir, "yarn-site.xml")
   if (!file.exists(yarnSite)) {
-    if (fails) stop("Yarn Cluster mode requires yarn-site.xml to exist under YARN_CONF_DIR") else return(NULL)
+    if (fails) {
+      stop(
+        "Yarn Cluster mode requires yarn-site.xml to exist under YARN_CONF_DIR"
+      )
+    } else {
+      return(NULL)
+    }
   }
 
   yarnSiteXml <- xml2::read_xml(yarnSite)
@@ -36,14 +47,22 @@ spark_yarn_get_conf_property <- function(property, fails = TRUE) {
     })
   }
 
-  while (length(vars <- get_variables_in_value_strings(yarnPropertyValue)) && length(vars[[1]])) {
+  while (
+    length(vars <- get_variables_in_value_strings(yarnPropertyValue)) &&
+      length(vars[[1]])
+  ) {
     for (var in vars[[1]]) {
       value <- xml2::xml_text(xml2::xml_find_all(
         yarnSiteXml,
         paste0("//name[.='", var, "']/parent::property/value")
       ))
 
-      yarnPropertyValue <- gsub(paste0("${", var, "}"), value, yarnPropertyValue, fixed = TRUE)
+      yarnPropertyValue <- gsub(
+        paste0("${", var, "}"),
+        value,
+        yarnPropertyValue,
+        fixed = TRUE
+      )
     }
   }
 

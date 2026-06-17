@@ -26,7 +26,6 @@ tidy.ml_model_als <- function(x, ...) {
 #'
 #' @export
 augment.ml_model_als <- function(x, newdata = NULL, ...) {
-
   # if the user doesn't provide a new data, this funcion will
   # use the training set
   if (is.null(newdata)) {

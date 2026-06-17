@@ -26,20 +26,34 @@
 #'   Default: \code{2^18}.
 #'
 #' @export
-ft_count_vectorizer <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
-                                min_df = 1, min_tf = 1,
-                                vocab_size = 2^18,
-                                uid = random_string("count_vectorizer_"), ...) {
+ft_count_vectorizer <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  binary = FALSE,
+  min_df = 1,
+  min_tf = 1,
+  vocab_size = 2^18,
+  uid = random_string("count_vectorizer_"),
+  ...
+) {
   UseMethod("ft_count_vectorizer")
 }
 
 ml_count_vectorizer <- ft_count_vectorizer
 
 #' @export
-ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                                 binary = FALSE, min_df = 1, min_tf = 1,
-                                                 vocab_size = 2^18,
-                                                 uid = random_string("count_vectorizer_"), ...) {
+ft_count_vectorizer.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  binary = FALSE,
+  min_df = 1,
+  min_tf = 1,
+  vocab_size = 2^18,
+  uid = random_string("count_vectorizer_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -53,34 +67,53 @@ ft_count_vectorizer.spark_connection <- function(x, input_col = NULL, output_col
     validator_ml_count_vectorizer()
 
   estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.CountVectorizer",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.CountVectorizer",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
-    (
-      function(obj) {
-        do.call(
-          invoke,
-          c(obj, "%>%", Filter(
+    (function(obj) {
+      do.call(
+        invoke,
+        c(
+          obj,
+          "%>%",
+          Filter(
             function(x) !is.null(x),
             list(
-              jobj_set_param_helper(obj, "setBinary", .args[["binary"]], "2.0.0", FALSE),
+              jobj_set_param_helper(
+                obj,
+                "setBinary",
+                .args[["binary"]],
+                "2.0.0",
+                FALSE
+              ),
               list("setMinDF", .args[["min_df"]]),
               list("setMinTF", .args[["min_tf"]]),
               list("setVocabSize", .args[["vocab_size"]])
             )
-          ))
+          )
         )
-      }) %>%
+      )
+    }) %>%
     new_ml_count_vectorizer()
 
   estimator
 }
 
 #' @export
-ft_count_vectorizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                            binary = FALSE, min_df = 1, min_tf = 1,
-                                            vocab_size = 2^18,
-                                            uid = random_string("count_vectorizer_"), ...) {
+ft_count_vectorizer.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  binary = FALSE,
+  min_df = 1,
+  min_tf = 1,
+  vocab_size = 2^18,
+  uid = random_string("count_vectorizer_"),
+  ...
+) {
   stage <- ft_count_vectorizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -97,10 +130,17 @@ ft_count_vectorizer.ml_pipeline <- function(x, input_col = NULL, output_col = NU
 }
 
 #' @export
-ft_count_vectorizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                          binary = FALSE, min_df = 1, min_tf = 1,
-                                          vocab_size = 2^18,
-                                          uid = random_string("count_vectorizer_"), ...) {
+ft_count_vectorizer.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  binary = FALSE,
+  min_df = 1,
+  min_tf = 1,
+  vocab_size = 2^18,
+  uid = random_string("count_vectorizer_"),
+  ...
+) {
   stage <- ft_count_vectorizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -127,7 +167,8 @@ new_ml_count_vectorizer <- function(jobj) {
 }
 
 new_ml_count_vectorizer_model <- function(jobj) {
-  new_ml_transformer(jobj,
+  new_ml_transformer(
+    jobj,
     vocabulary = invoke(jobj, "vocabulary"),
     class = "ml_count_vectorizer_model"
   )

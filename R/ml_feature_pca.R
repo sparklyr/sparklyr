@@ -9,15 +9,27 @@
 #' @param k The number of principal components
 #'
 #' @export
-ft_pca <- function(x, input_col = NULL, output_col = NULL, k = NULL,
-                   uid = random_string("pca_"), ...) {
+ft_pca <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  k = NULL,
+  uid = random_string("pca_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_pca")
 }
 
 #' @export
-ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = NULL,
-                                    uid = random_string("pca_"), ...) {
+ft_pca.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  k = NULL,
+  uid = random_string("pca_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -28,8 +40,11 @@ ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = 
     validator_ml_pca()
 
   estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.PCA",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.PCA",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
     jobj_set_param("setK", .args[["k"]]) %>%
     new_ml_pca()
@@ -38,8 +53,14 @@ ft_pca.spark_connection <- function(x, input_col = NULL, output_col = NULL, k = 
 }
 
 #' @export
-ft_pca.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, k = NULL,
-                               uid = random_string("pca_"), ...) {
+ft_pca.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  k = NULL,
+  uid = random_string("pca_"),
+  ...
+) {
   stage <- ft_pca.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -52,8 +73,14 @@ ft_pca.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, k = NULL,
 }
 
 #' @export
-ft_pca.tbl_spark <- function(x, input_col = NULL, output_col = NULL, k = NULL,
-                             uid = random_string("pca_"), ...) {
+ft_pca.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  k = NULL,
+  uid = random_string("pca_"),
+  ...
+) {
   stage <- ft_pca.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -77,7 +104,9 @@ new_ml_pca <- function(jobj) {
 new_ml_pca_model <- function(jobj) {
   new_ml_transformer(
     jobj,
-    explained_variance = possibly_null(~ read_spark_vector(jobj, "explainedVariance"))(),
+    explained_variance = possibly_null(
+      ~ read_spark_vector(jobj, "explainedVariance")
+    )(),
     pc = possibly_null(~ read_spark_matrix(jobj, "pc"))(),
     class = "ml_pca_model"
   )
@@ -111,11 +140,13 @@ validator_ml_pca <- function(.args) {
 #'
 #' @export
 #' @importFrom dplyr tbl_vars
-ml_pca <- function(x,
-                   features = tbl_vars(x),
-                   k = length(features),
-                   pc_prefix = "PC",
-                   ...) {
+ml_pca <- function(
+  x,
+  features = tbl_vars(x),
+  k = length(features),
+  pc_prefix = "PC",
+  ...
+) {
   # If being used as a constructor alias for `ft_pca()`:
   if (inherits(x, "spark_connection")) {
     return(

@@ -12,14 +12,18 @@ collect.tbl_spark <- function(x, ...) {
 
 #' @export
 #' @importFrom dplyr sample_n
-sample_n.tbl_spark <- function(tbl,
-                               size,
-                               replace = FALSE,
-                               weight = NULL,
-                               .env = parent.frame(),
-                               ...) {
+sample_n.tbl_spark <- function(
+  tbl,
+  size,
+  replace = FALSE,
+  weight = NULL,
+  .env = parent.frame(),
+  ...
+) {
   if (spark_version(spark_connection(tbl)) < "2.0.0") {
-    stop("sample_n() is not supported until Spark 2.0 or later. Use sdf_sample instead.")
+    stop(
+      "sample_n() is not supported until Spark 2.0 or later. Use sdf_sample instead."
+    )
   }
 
   args <- list(
@@ -38,12 +42,14 @@ sample_n.tbl_spark <- function(tbl,
 
 #' @export
 #' @importFrom dplyr sample_frac
-sample_frac.tbl_spark <- function(tbl,
-                                  size = 1,
-                                  replace = FALSE,
-                                  weight = NULL,
-                                  .env = parent.frame(),
-                                  ...) {
+sample_frac.tbl_spark <- function(
+  tbl,
+  size = 1,
+  replace = FALSE,
+  weight = NULL,
+  .env = parent.frame(),
+  ...
+) {
   if (spark_version(spark_connection(tbl)) < "2.0.0") {
     stop("sample_frac() is not supported until Spark 2.0 or later.")
   }

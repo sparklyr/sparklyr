@@ -1,5 +1,9 @@
-new_ml_model_bisecting_kmeans <- function(pipeline_model, formula, dataset,
-                                          features_col) {
+new_ml_model_bisecting_kmeans <- function(
+  pipeline_model,
+  formula,
+  dataset,
+  features_col
+) {
   m <- new_ml_model_clustering(
     pipeline_model = pipeline_model,
     formula = formula,

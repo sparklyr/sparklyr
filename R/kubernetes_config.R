@@ -1,7 +1,8 @@
 spark_config_kubernetes_forward_init <- function(
-                                                 driver,
-                                                 timeout,
-                                                 ports) {
+  driver,
+  timeout,
+  ports
+) {
   Sys.sleep(timeout)
   system2(
     "kubectl",
@@ -27,9 +28,10 @@ spark_config_kubernetes_terminal_id <- function() {
 }
 
 spark_config_kubernetes_forward_init_message <- function(
-                                                         driver,
-                                                         timeout,
-                                                         ports) {
+  driver,
+  timeout,
+  ports
+) {
   message("Please enable port forwarding from your terminal:")
   message(paste("kubectl port-forward", driver, paste(ports, collapse = " ")))
 
@@ -37,29 +39,34 @@ spark_config_kubernetes_forward_init_message <- function(
 }
 
 spark_config_kubernetes_forward_init_terminal <- function(
-                                                          driver,
-                                                          timeout,
-                                                          ports) {
+  driver,
+  timeout,
+  ports
+) {
   Sys.sleep(timeout)
 
   id <- spark_config_kubernetes_terminal_id()
-  command <- paste("kubectl port-forward", driver, paste(ports, collapse = " "), "\r\n")
+  command <- paste(
+    "kubectl port-forward",
+    driver,
+    paste(ports, collapse = " "),
+    "\r\n"
+  )
 
   rstudioapi::terminalSend(id, command)
 }
 
 spark_config_kubernetes_forward_cleanup <- function(
-                                                    driver) {
+  driver
+) {
   if (identical(.Platform$OS.type, "windows")) {
     if (rstudioapi::hasFun("terminalKill")) {
       id <- spark_config_kubernetes_terminal_id()
       rstudioapi::terminalKill(id)
-    }
-    else {
+    } else {
       message("Disconnected, please terminate 'kubectl port-forward'")
     }
-  }
-  else {
+  } else {
     system2("pkill", "kubectl")
   }
 }
@@ -96,19 +103,20 @@ spark_config_kubernetes_forward_cleanup <- function(
 #'
 #' @export
 spark_config_kubernetes <- function(
-                                    master,
-                                    version = "3.2.3",
-                                    image = "spark:sparklyr",
-                                    driver = random_string("sparklyr-"),
-                                    account = "spark",
-                                    jars = "local:///opt/sparklyr",
-                                    forward = TRUE,
-                                    executors = NULL,
-                                    conf = NULL,
-                                    timeout = 120,
-                                    ports = c(8880, 8881, 4040),
-                                    fix_config = identical(.Platform$OS.type, "windows"),
-                                    ...) {
+  master,
+  version = "3.2.3",
+  image = "spark:sparklyr",
+  driver = random_string("sparklyr-"),
+  account = "spark",
+  jars = "local:///opt/sparklyr",
+  forward = TRUE,
+  executors = NULL,
+  conf = NULL,
+  timeout = 120,
+  ports = c(8880, 8881, 4040),
+  fix_config = identical(.Platform$OS.type, "windows"),
+  ...
+) {
   args <- list(...)
 
   submit_function <- NULL
@@ -116,8 +124,7 @@ spark_config_kubernetes <- function(
 
   if (!identical(args$jar, NULL)) {
     jar <- args$jar
-  }
-  else {
+  } else {
     jar_version <- paste(strsplit(version, "\\.")[[1]][1:2], collapse = ".")
     jar <- file.path(
       jars,
@@ -126,10 +133,17 @@ spark_config_kubernetes <- function(
   }
 
   if (fix_config) {
-    defaults <- file.path(spark_install_find(version)$sparkConfDir, "spark-defaults.conf")
+    defaults <- file.path(
+      spark_install_find(version)$sparkConfDir,
+      "spark-defaults.conf"
+    )
     lines <- readLines(defaults)
     lines <- gsub("^spark.local.dir", "# spark.local.dir", lines)
-    lines <- gsub("^spark.sql.warehouse.dir", "# spark.sql.warehouse.dir", lines)
+    lines <- gsub(
+      "^spark.sql.warehouse.dir",
+      "# spark.sql.warehouse.dir",
+      lines
+    )
     writeLines(lines, defaults)
   }
 
@@ -137,16 +151,30 @@ spark_config_kubernetes <- function(
     ports <- paste(ports, ports, sep = ":")
     if (identical(.Platform$OS.type, "windows")) {
       if (rstudioapi::hasFun("terminalCreate")) {
-        submit_function <- function() spark_config_kubernetes_forward_init_terminal(driver, timeout / 2, ports)
+        submit_function <- function() {
+          spark_config_kubernetes_forward_init_terminal(
+            driver,
+            timeout / 2,
+            ports
+          )
+        }
+      } else {
+        submit_function <- function() {
+          spark_config_kubernetes_forward_init_message(
+            driver,
+            timeout / 2,
+            ports
+          )
+        }
       }
-      else {
-        submit_function <- function() spark_config_kubernetes_forward_init_message(driver, timeout / 2, ports)
+    } else {
+      submit_function <- function() {
+        spark_config_kubernetes_forward_init(driver, timeout / 2, ports)
       }
     }
-    else {
-      submit_function <- function() spark_config_kubernetes_forward_init(driver, timeout / 2, ports)
+    disconnect_function <- function() {
+      spark_config_kubernetes_forward_cleanup(driver)
     }
-    disconnect_function <- function() spark_config_kubernetes_forward_cleanup(driver)
   }
 
   list(
@@ -161,8 +189,16 @@ spark_config_kubernetes <- function(
     sparklyr.shell.conf = c(
       paste("spark.kubernetes.container.image", image, sep = "="),
       paste("spark.kubernetes.driver.pod.name", driver, sep = "="),
-      paste("spark.kubernetes.authenticate.driver.serviceAccountName", account, sep = "="),
-      if (!identical(executors, NULL)) paste("spark.executor.instances", executors, sep = "=") else NULL,
+      paste(
+        "spark.kubernetes.authenticate.driver.serviceAccountName",
+        account,
+        sep = "="
+      ),
+      if (!identical(executors, NULL)) {
+        paste("spark.executor.instances", executors, sep = "=")
+      } else {
+        NULL
+      },
       if (!identical(conf, NULL)) paste(names(conf), conf, sep = "=") else NULL
     ),
     sparklyr.gateway.routing = FALSE,

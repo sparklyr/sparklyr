@@ -15,17 +15,21 @@
 #'   A version of Spark known to be compatible with the requested version of
 #'   \samp{livy} is chosen when possible.
 #' @export
-livy_install <- function(version = "0.6.0",
-                         spark_home = NULL,
-                         spark_version = NULL) {
+livy_install <- function(
+  version = "0.6.0",
+  spark_home = NULL,
+  spark_version = NULL
+) {
   version <- cast_string(version)
 
   # determine an appropriate spark version
   if (is.null(spark_version)) {
-
     # if spark_home is set, then infer spark version based on that
     if (!is.null(spark_home)) {
-      spark_version <- spark_version_from_home(spark_home, default = spark_version)
+      spark_version <- spark_version_from_home(
+        spark_home,
+        default = spark_version
+      )
     } else {
       spark_version <- switch(
         version,
@@ -44,8 +48,10 @@ livy_install <- function(version = "0.6.0",
 
   # warn if the user attempts to use livy 0.2.0 with Spark >= 2.0.0
   spark_version <- cast_string(spark_version)
-  if (version == "0.2.0" &&
-    numeric_version(spark_version) >= "2.0.0") {
+  if (
+    version == "0.2.0" &&
+      numeric_version(spark_version) >= "2.0.0"
+  ) {
     stopf("livy %s is not compatible with Spark (>= %s)", version, "2.0.0")
   }
 
@@ -97,7 +103,13 @@ livy_install <- function(version = "0.6.0",
       version
     )
   } else {
-    apache_prefix <- if (package_version2(version) >= package_version2("0.6.0")) "apache-" else ""
+    apache_prefix <- if (
+      package_version2(version) >= package_version2("0.6.0")
+    ) {
+      "apache-"
+    } else {
+      ""
+    }
     url <- sprintf(
       "https://archive.apache.org/dist/incubator/livy/%s-incubating/%slivy-%s-incubating-bin.zip",
       version,
@@ -174,15 +186,19 @@ livy_versions_file_pattern <- function() {
 #' @export
 livy_install_dir <- function() {
   option_dir <- getOption("livy.install.dir")
-  env_dir <- Sys.getenv("R_USER_CONFIG_DIR",unset = NA)
-  if(is.na(env_dir)) {
+  env_dir <- Sys.getenv("R_USER_CONFIG_DIR", unset = NA)
+  if (is.na(env_dir)) {
     env_dir <- NULL
   }
   os <- get_os()
   cache_dir <- NULL
-  if(os == "win") cache_dir <-" %LOCALAPPDATA%/livy"
-  if(os == "mac") cache_dir <- "~/Library/Caches/livy"
-  if(os == "unix") {
+  if (os == "win") {
+    cache_dir <- " %LOCALAPPDATA%/livy"
+  }
+  if (os == "mac") {
+    cache_dir <- "~/Library/Caches/livy"
+  }
+  if (os == "unix") {
     cache_dir <- file.path(Sys.getenv("XDG_CACHE_HOME", "~/.cache"), "livy")
   }
   path <- option_dir %||% env_dir %||% cache_dir
@@ -201,7 +217,10 @@ livy_installed_versions <- function() {
   lapply(dir(livy_install_dir(), full.names = TRUE), function(maybeDir) {
     if (dir.exists(maybeDir)) {
       fileName <- basename(maybeDir)
-      m <- regmatches(fileName, regexec(livy_versions_file_pattern(), fileName))[[1]]
+      m <- regmatches(
+        fileName,
+        regexec(livy_versions_file_pattern(), fileName)
+      )[[1]]
       if (length(m) > 1) {
         livy <<- c(livy, m[[2]])
         dir <<- c(dir, basename(maybeDir))
@@ -221,7 +240,11 @@ livy_installed_versions <- function() {
 
 livy_install_find <- function(livyVersion = NULL) {
   versions <- livy_installed_versions()
-  versions <- if (is.null(livyVersion)) versions else versions[versions$livy == livyVersion, ]
+  versions <- if (is.null(livyVersion)) {
+    versions
+  } else {
+    versions[versions$livy == livyVersion, ]
+  }
 
   if (NROW(versions) == 0) {
     livyInstall <- quote(livy_install(version = ""))

@@ -7,8 +7,13 @@
 #' @template roxlate-ml-feature-transformer
 #'
 #' @export
-ft_tokenizer <- function(x, input_col = NULL, output_col = NULL,
-                         uid = random_string("tokenizer_"), ...) {
+ft_tokenizer <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  uid = random_string("tokenizer_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_tokenizer")
 }
@@ -16,8 +21,13 @@ ft_tokenizer <- function(x, input_col = NULL, output_col = NULL,
 ml_tokenizer <- ft_tokenizer
 
 #' @export
-ft_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                          uid = random_string("tokenizer_"), ...) {
+ft_tokenizer.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  uid = random_string("tokenizer_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -27,16 +37,24 @@ ft_tokenizer.spark_connection <- function(x, input_col = NULL, output_col = NULL
     validator_ml_tokenizer()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.Tokenizer",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.Tokenizer",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   )
 
   new_ml_tokenizer(jobj)
 }
 
 #' @export
-ft_tokenizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                     uid = random_string("tokenizer_"), ...) {
+ft_tokenizer.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  uid = random_string("tokenizer_"),
+  ...
+) {
   stage <- ft_tokenizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -48,8 +66,13 @@ ft_tokenizer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
 }
 
 #' @export
-ft_tokenizer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                   uid = random_string("tokenizer_"), ...) {
+ft_tokenizer.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  uid = random_string("tokenizer_"),
+  ...
+) {
   stage <- ft_tokenizer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

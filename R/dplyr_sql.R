@@ -32,45 +32,43 @@ sql_build.lazy_sample_query <- function(op, con, ...) {
     weight <- rlang::as_name(op$args$weight)
   }
 
-  sample_sdf <- (
-    if (length(grps) > 0) {
-      if (frac) {
-        sdf_stratified_sample_frac(
-          x = sdf,
-          grps = grps,
-          frac = op$args$size,
-          weight = weight,
-          replace = op$args$replace,
-          op$args$seed
-        )
-      } else {
-        sdf_stratified_sample_n(
-          x = sdf,
-          grps = grps,
-          k = op$args$size,
-          weight = weight,
-          replace = op$args$replace,
-          op$args$seed
-        )
-      }
-    } else {
-      sample_size <- (
-        if (frac) {
-          cnt <- sdf %>%
-            spark_dataframe() %>%
-            invoke("count")
-          round(cnt * check_frac(op$args$size, replace = op$args$replace))
-        } else {
-          op$args$size
-        })
-      sdf_weighted_sample(
+  sample_sdf <- (if (length(grps) > 0) {
+    if (frac) {
+      sdf_stratified_sample_frac(
         x = sdf,
-        weight_col = weight,
-        k = sample_size,
-        replacement = op$args$replace,
-        seed = op$args$seed
+        grps = grps,
+        frac = op$args$size,
+        weight = weight,
+        replace = op$args$replace,
+        op$args$seed
       )
+    } else {
+      sdf_stratified_sample_n(
+        x = sdf,
+        grps = grps,
+        k = op$args$size,
+        weight = weight,
+        replace = op$args$replace,
+        op$args$seed
+      )
+    }
+  } else {
+    sample_size <- (if (frac) {
+      cnt <- sdf %>%
+        spark_dataframe() %>%
+        invoke("count")
+      round(cnt * check_frac(op$args$size, replace = op$args$replace))
+    } else {
+      op$args$size
     })
+    sdf_weighted_sample(
+      x = sdf,
+      weight_col = weight,
+      k = sample_size,
+      replacement = op$args$replace,
+      seed = op$args$seed
+    )
+  })
 
   dbplyr::sql_build(sample_sdf)
 }
@@ -121,7 +119,6 @@ distinct.tbl_spark <- function(.data, ..., .keep_all = FALSE) {
       dplyr::group_by(!!!syms(grps))
     out$order_vars <- NULL
     out
-
   }
 }
 utils::globalVariables(c("FIRST"))
@@ -131,7 +128,7 @@ sql_collapse <- function(x) {
 }
 
 remove_matching_strings <- function(x, y) {
-  for(i in seq_along(x)) {
+  for (i in seq_along(x)) {
     y <- y[y != x[i]]
   }
   y
@@ -157,7 +154,8 @@ check_frac <- function(size, replace = FALSE) {
   }
 
   rlang::abort(
-    "size", "of sampled fraction must be less or equal to one, ",
+    "size",
+    "of sampled fraction must be less or equal to one, ",
     "set `replace` = TRUE to use sampling with replacement"
   )
 }

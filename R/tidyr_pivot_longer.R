@@ -5,20 +5,22 @@ NULL
 
 #' @importFrom tidyr pivot_longer
 #' @export
-pivot_longer.tbl_spark <- function(data,
-                                   cols,
-                                   names_to = "name",
-                                   names_prefix = NULL,
-                                   names_sep = NULL,
-                                   names_pattern = NULL,
-                                   names_ptypes = NULL,
-                                   names_transform = NULL,
-                                   names_repair = "check_unique",
-                                   values_to = "value",
-                                   values_drop_na = FALSE,
-                                   values_ptypes = NULL,
-                                   values_transform = NULL,
-                                   ...) {
+pivot_longer.tbl_spark <- function(
+  data,
+  cols,
+  names_to = "name",
+  names_prefix = NULL,
+  names_sep = NULL,
+  names_pattern = NULL,
+  names_ptypes = NULL,
+  names_transform = NULL,
+  names_repair = "check_unique",
+  values_to = "value",
+  values_drop_na = FALSE,
+  values_ptypes = NULL,
+  values_transform = NULL,
+  ...
+) {
   cols <- rlang::enquo(cols)
   spec <- build_longer_spec(
     data,
@@ -42,15 +44,17 @@ pivot_longer.tbl_spark <- function(data,
   )
 }
 
-build_longer_spec <- function(data,
-                              cols,
-                              names_to = "name",
-                              values_to = "value",
-                              names_prefix = NULL,
-                              names_sep = NULL,
-                              names_pattern = NULL,
-                              names_ptypes = NULL,
-                              names_transform = NULL) {
+build_longer_spec <- function(
+  data,
+  cols,
+  names_to = "name",
+  values_to = "value",
+  names_prefix = NULL,
+  names_sep = NULL,
+  names_pattern = NULL,
+  names_ptypes = NULL,
+  names_transform = NULL
+) {
   colnames_df <- replicate_colnames(data)
   cols <- names(tidyselect::eval_select(rlang::enquo(cols), colnames_df))
 
@@ -75,7 +79,10 @@ build_longer_spec <- function(data,
   # optionally, cast variables generated from columns
   cast_cols <- intersect(names(output_names), names(names_ptypes))
   for (col in cast_cols) {
-    output_names[[col]] <- vctrs::vec_cast(output_names[[col]], names_ptypes[[col]])
+    output_names[[col]] <- vctrs::vec_cast(
+      output_names[[col]],
+      names_ptypes[[col]]
+    )
   }
 
   # transform cols
@@ -91,11 +98,13 @@ build_longer_spec <- function(data,
   out
 }
 
-build_output_names <- function(cols,
-                               names_to,
-                               names_prefix,
-                               names_sep,
-                               names_pattern) {
+build_output_names <- function(
+  cols,
+  names_to,
+  names_prefix,
+  names_sep,
+  names_pattern
+) {
   if (is.null(names_prefix)) {
     output_names <- cols
   } else {
@@ -113,7 +122,11 @@ build_output_names <- function(cols,
     if (!is.null(names_sep)) {
       output_names <- .str_separate(output_names, names_to, sep = names_sep)
     } else {
-      output_names <- .str_extract(output_names, names_to, regex = names_pattern)
+      output_names <- .str_extract(
+        output_names,
+        names_to,
+        regex = names_pattern
+      )
     }
   } else if (length(names_to) == 0) {
     output_names <- vctrs::data_frame(.size = length(output_names))
@@ -122,7 +135,11 @@ build_output_names <- function(cols,
       rlang::abort("`names_sep` can not be used with `names_to` of length 1")
     }
     if (!is.null(names_pattern)) {
-      output_names <- .str_extract(output_names, names_to, regex = names_pattern)[[1]]
+      output_names <- .str_extract(
+        output_names,
+        names_to,
+        regex = names_pattern
+      )[[1]]
     }
 
     output_names <- dplyr::tibble(!!names_to := output_names)
@@ -131,12 +148,14 @@ build_output_names <- function(cols,
   output_names
 }
 
-sdf_pivot_longer <- function(data,
-                             spec,
-                             names_repair = "check_unique",
-                             values_drop_na = FALSE,
-                             values_ptypes = NULL,
-                             values_transform = NULL) {
+sdf_pivot_longer <- function(
+  data,
+  spec,
+  names_repair = "check_unique",
+  values_drop_na = FALSE,
+  values_ptypes = NULL,
+  values_transform = NULL
+) {
   sc <- spark_connection(data)
   if (spark_version(sc) < "2.0.0") {
     rlang::abort("`pivot_wider.tbl_spark` requires Spark 2.0.0 or higher")
@@ -163,7 +182,8 @@ sdf_pivot_longer <- function(data,
   list(spec, value_keys, seq_col) %<-% .rename_seq_col(spec, value_keys)
 
   out <- data %>>%
-    dplyr::select %@% setdiff(colnames(data), spec$.name) %>%
+    dplyr::select %@%
+    setdiff(colnames(data), spec$.name) %>%
     spark_dataframe()
 
   for (value in names(values)) {
@@ -177,13 +197,15 @@ sdf_pivot_longer <- function(data,
 
     if (rlang::has_name(values_transform, value)) {
       transform_args <- list(
-        do.call(dplyr::vars, list(as.symbol(value))), values_transform[[value]]
+        do.call(dplyr::vars, list(as.symbol(value))),
+        values_transform[[value]]
       )
       transformed_vals <- stacked_sdf %>%
         invoke("select", value, list()) %>%
         sdf_register() %>%
         dplyr::group_by() %>>%
-        dplyr::summarize_at %@% transform_args
+        dplyr::summarize_at %@%
+        transform_args
       stacked_sdf <- stacked_sdf %>%
         invoke("drop", value) %>%
         sdf_register() %>%
@@ -206,11 +228,23 @@ sdf_pivot_longer <- function(data,
     out <- out %>% invoke("join", stacked_sdf, join_cols, "left_outer")
   }
 
-  .postprocess_pivot_longer_output(data, group_vars, spec, values, id_col, seq_col)(out)
+  .postprocess_pivot_longer_output(
+    data,
+    group_vars,
+    spec,
+    values,
+    id_col,
+    seq_col
+  )(out)
 }
 
 # Perform name repair and update column names
-.apply_pivot_longer_names_repair <- function(data, group_vars, spec, names_repair) {
+.apply_pivot_longer_names_repair <- function(
+  data,
+  group_vars,
+  spec,
+  names_repair
+) {
   # Quick hack to ensure that split() preserves order
   v_fct <- factor(spec$.value, levels = unique(spec$.value))
   values <- split(spec$.name, v_fct)
@@ -222,7 +256,10 @@ sdf_pivot_longer <- function(data,
   unpivoted_cols <- all_cols
   unpivoted_cols_idxes <- seq(length(all_cols))
 
-  val_idxes <- seq(length(all_cols) + 1, length(all_cols) + length(names(values)))
+  val_idxes <- seq(
+    length(all_cols) + 1,
+    length(all_cols) + length(names(values))
+  )
   all_cols <- c(all_cols, names(values))
 
   all_keys <- unique(unname(lapply(value_keys, names)))
@@ -253,7 +290,11 @@ sdf_pivot_longer <- function(data,
     for (v in names(values)) {
       names(value_keys[[v]]) <- unlist(key_renames[names(value_keys[[v]])])
     }
-    names(spec) <- c(".name", ".value", unlist(key_renames[names(spec[-(1:2)])]))
+    names(spec) <- c(
+      ".name",
+      ".value",
+      unlist(key_renames[names(spec[-(1:2)])])
+    )
   }
 
   list(data, group_vars, spec, values, value_keys)
@@ -268,7 +309,8 @@ sdf_pivot_longer <- function(data,
     for (v in names(value_keys)) {
       if (".seq" %in% colnames(value_keys[[v]])) {
         value_keys[[v]] <- value_keys[[v]] %>>%
-          dplyr::rename %@% rename_arg
+          dplyr::rename %@%
+          rename_arg
       }
     }
   } else {
@@ -307,7 +349,14 @@ sdf_pivot_longer <- function(data,
     )
 }
 
-.postprocess_pivot_longer_output <- function(data, group_vars, spec, values, id_col, seq_col) {
+.postprocess_pivot_longer_output <- function(
+  data,
+  group_vars,
+  spec,
+  values,
+  id_col,
+  seq_col
+) {
   key_cols <- colnames(spec[-(1:2)])
   output_cols <- c(
     setdiff(colnames(data), c(spec$.name, id_col)),
@@ -321,8 +370,10 @@ sdf_pivot_longer <- function(data,
     out %>%
       invoke("sort", id_col, as.list(key_cols)) %>%
       sdf_register() %>>%
-      dplyr::select %@% lapply(output_cols, as.symbol) %>>%
-      dplyr::group_by %@% lapply(group_vars, as.symbol)
+      dplyr::select %@%
+      lapply(output_cols, as.symbol) %>>%
+      dplyr::group_by %@%
+      lapply(group_vars, as.symbol)
   }
 
   impl
@@ -406,13 +457,9 @@ deduplicate_longer_spec <- function(spec) {
         gap <- p - length(x)
         for (j in seq(p)) {
           if (fill_left) {
-            out[[j]][[i]] <- (
-              if (j >= gap) x[[j - gap]] else NA
-            )
+            out[[j]][[i]] <- (if (j >= gap) x[[j - gap]] else NA)
           } else {
-            out[[j]][[i]] <- (
-              if (j < length(x)) x[[j]] else NA
-            )
+            out[[j]][[i]] <- (if (j < length(x)) x[[j]] else NA)
           }
         }
       } else {
@@ -496,7 +543,11 @@ deduplicate_longer_spec <- function(spec) {
   out <- .str_match_first(x, regex)
   if (length(out) != length(into)) {
     stop(
-      "`regex` should define ", length(into), " groups; ", ncol(matches), " found.",
+      "`regex` should define ",
+      length(into),
+      " groups; ",
+      ncol(matches),
+      " found.",
       call. = FALSE
     )
   }

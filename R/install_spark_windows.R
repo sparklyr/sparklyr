@@ -13,20 +13,31 @@ is_wow64 <- function() {
 verify_msvcr100 <- function() {
   # determine location of MSVCR100.DLL
   systemRoot <- Sys.getenv("SystemRoot")
-  systemDir <- ifelse(is_win64(), ifelse(is_wow64(), "sysnative", "system32"), "system32")
-  msvcr100Path <- normalizePath(file.path(systemRoot, systemDir, "msvcr100.dll"),
-    winslash = "/", mustWork = FALSE
+  systemDir <- ifelse(
+    is_win64(),
+    ifelse(is_wow64(), "sysnative", "system32"),
+    "system32"
+  )
+  msvcr100Path <- normalizePath(
+    file.path(systemRoot, systemDir, "msvcr100.dll"),
+    winslash = "/",
+    mustWork = FALSE
   )
   haveMsvcr100 <- file.exists(msvcr100Path)
   if (!haveMsvcr100) {
-    msvcr100Url <- ifelse(is_win64(),
+    msvcr100Url <- ifelse(
+      is_win64(),
       "https://www.microsoft.com/en-us/download/details.aspx?id=26999",
       "https://www.microsoft.com/download/en/details.aspx?id=8328"
     )
-    stop("Running Spark on Windows requires the ",
+    stop(
+      "Running Spark on Windows requires the ",
       "Microsoft Visual C++ 2010 SP1 Redistributable Package. ",
-      "Please download and install from: \n\n  ", msvcr100Url, "\n\n",
-      "Then restart R after the installation completes", "\n",
+      "Please download and install from: \n\n  ",
+      msvcr100Url,
+      "\n\n",
+      "Then restart R after the installation completes",
+      "\n",
       call. = FALSE
     )
   }
@@ -48,7 +59,10 @@ prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
   verboseMessage("Confirmed that msvcr100 is installed")
 
   # set HADOOP_HOME
-  hivePath <- normalizePath(file.path(sparkHome, "tmp", "hive"), mustWork = FALSE)
+  hivePath <- normalizePath(
+    file.path(sparkHome, "tmp", "hive"),
+    mustWork = FALSE
+  )
   verboseMessage("HIVE_PATH set to ", hivePath)
 
   if (!dir.exists(hivePath)) {
@@ -56,7 +70,10 @@ prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
     dir.create(hivePath, recursive = TRUE)
   }
 
-  hadoopPath <- normalizePath(file.path(sparkHome, "tmp", "hadoop"), mustWork = FALSE)
+  hadoopPath <- normalizePath(
+    file.path(sparkHome, "tmp", "hadoop"),
+    mustWork = FALSE
+  )
   hadoopBinPath <- normalizePath(file.path(hadoopPath, "bin"), mustWork = FALSE)
   if (!dir.exists(hadoopPath)) {
     verboseMessage("HADOOP_HOME does not exist")
@@ -66,25 +83,32 @@ prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
   verboseMessage("HADOOP_HOME exists under ", hadoopPath)
 
   if (is.null(sparkEnvironment)) {
-    if (nchar(Sys.getenv("HADOOP_HOME")) == 0 ||
-      Sys.getenv("HADOOP_HOME") != hadoopPath) {
+    if (
+      nchar(Sys.getenv("HADOOP_HOME")) == 0 ||
+        Sys.getenv("HADOOP_HOME") != hadoopPath
+    ) {
       if (Sys.getenv("HADOOP_HOME") != hadoopPath) {
-        warning("HADOOP_HOME was already but does not match current Spark installation")
+        warning(
+          "HADOOP_HOME was already but does not match current Spark installation"
+        )
       } else {
         verboseMessage("HADOOP_HOME environment variable not set")
       }
 
       output <- system2(
-        "SETX", c("HADOOP_HOME", shQuote(hadoopPath)),
+        "SETX",
+        c("HADOOP_HOME", shQuote(hadoopPath)),
         stdout = if (verbose) TRUE else NULL
       )
 
       verboseMessage("HADOOP_HOME environment set with output ", output)
     } else {
-      verboseMessage("HADOOP_HOME environment was already set to ", Sys.getenv("HADOOP_HOME"))
+      verboseMessage(
+        "HADOOP_HOME environment was already set to ",
+        Sys.getenv("HADOOP_HOME")
+      )
     }
-  }
-  else {
+  } else {
     # assign HADOOP_HOME to system2 environment which is more reliable than SETX
     sparkEnvironment$HADOOP_HOME <- hadoopPath
   }
@@ -105,7 +129,8 @@ prepare_windows_environment <- function(sparkHome, sparkEnvironment = NULL) {
   verboseMessage("HIVE_TEMP exists under ", appUserTempDir)
 
   # form path to winutils.exe
-  winutils <- normalizePath(file.path(hadoopBinPath, "winutils.exe"),
+  winutils <- normalizePath(
+    file.path(hadoopBinPath, "winutils.exe"),
     mustWork = FALSE
   )
 

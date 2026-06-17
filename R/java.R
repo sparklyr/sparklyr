@@ -1,4 +1,3 @@
-
 #' Find path to Java
 #'
 #' Finds the path to \code{JAVA_HOME}.
@@ -37,7 +36,11 @@ validate_java_version <- function(master, spark_home) {
   # if someone sets SPARK_HOME and we are not in local more, assume Java
   # is available since some systems.
   # (e.g. CDH) use versions of java not discoverable through JAVA_HOME.
-  if (!spark_master_is_local(master) && !is.null(spark_home) && nchar(spark_home) > 0) {
+  if (
+    !spark_master_is_local(master) &&
+      !is.null(spark_home) &&
+      nchar(spark_home) > 0
+  ) {
     return(TRUE)
   }
 
@@ -55,7 +58,10 @@ validate_java_version <- function(master, spark_home) {
   java_version <- validate_java_version_line(master, version)
 
   spark_version <- spark_version_from_home(spark_home)
-  if (compareVersion(java_version, "11") >= 0 && compareVersion(spark_version, "3.0.0") < 0) {
+  if (
+    compareVersion(java_version, "11") >= 0 &&
+      compareVersion(spark_version, "3.0.0") < 0
+  ) {
     stop("Java 11 is only supported for Spark 3.0.0+", call. = FALSE)
   }
 
@@ -87,7 +93,10 @@ validate_java_version_line <- function(master, version) {
   # find line with version info
   versionLine <- version[grepl("version", version)]
   if (length(versionLine) != 1) {
-    stop("Java version detected but couldn't parse version from ", paste(version, collapse = " - "))
+    stop(
+      "Java version detected but couldn't parse version from ",
+      paste(version, collapse = " - ")
+    )
   }
 
   splatVersion <- if (grepl("openjdk version", versionLine)) {
@@ -117,14 +126,19 @@ validate_java_version_line <- function(master, version) {
   # ensure Java 1.7 or higher
   if (compareVersion(parsedVersion, "1.7") == -1) {
     stop(
-      "Java version", parsedVersion, " detected but 1.7+ is required. Please download and install Java from ",
+      "Java version",
+      parsedVersion,
+      " detected but 1.7+ is required. Please download and install Java from ",
       java_install_url()
     )
   }
 
-  if (compareVersion(parsedVersion, "1.9") >= 0 &&
-    compareVersion(parsedVersion, "11") == -1 &&
-    spark_master_is_local(master) && !getOption("sparklyr.java9", FALSE)) {
+  if (
+    compareVersion(parsedVersion, "1.9") >= 0 &&
+      compareVersion(parsedVersion, "11") == -1 &&
+      spark_master_is_local(master) &&
+      !getOption("sparklyr.java9", FALSE)
+  ) {
     stop(
       "Java 9 is currently unsupported in Spark distributions unless you manually install Hadoop 2.8 ",
       "and manually configure Spark. Please consider uninstalling Java 9 and reinstalling Java 8. ",

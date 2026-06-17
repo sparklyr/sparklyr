@@ -9,8 +9,7 @@ NULL
 
 #' @rdname ml_isotonic_regression_tidiers
 #' @export
-tidy.ml_model_isotonic_regression <- function(x,
-                                              ...) {
+tidy.ml_model_isotonic_regression <- function(x, ...) {
   dplyr::tibble(
     boundaries = x$model$boundaries(),
     predictions = x$model$predictions()
@@ -21,8 +20,7 @@ tidy.ml_model_isotonic_regression <- function(x,
 #' @param newdata a tbl_spark of new data to use for prediction.
 #'
 #' @export
-augment.ml_model_isotonic_regression <- function(x, newdata = NULL,
-                                                 ...) {
+augment.ml_model_isotonic_regression <- function(x, newdata = NULL, ...) {
   broom_augment_supervised(x, newdata = newdata)
 }
 

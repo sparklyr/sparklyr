@@ -16,9 +16,15 @@
 #'  Defaults to \code{"frequencyDesc"}.
 #' @seealso \code{\link{ft_index_to_string}}
 #' @export
-ft_string_indexer <- function(x, input_col = NULL, output_col = NULL,
-                              handle_invalid = "error", string_order_type = "frequencyDesc",
-                              uid = random_string("string_indexer_"), ...) {
+ft_string_indexer <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  handle_invalid = "error",
+  string_order_type = "frequencyDesc",
+  uid = random_string("string_indexer_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_string_indexer")
 }
@@ -26,9 +32,15 @@ ft_string_indexer <- function(x, input_col = NULL, output_col = NULL,
 ml_string_indexer <- ft_string_indexer
 
 #' @export
-ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col = NULL,
-                                               handle_invalid = "error", string_order_type = "frequencyDesc",
-                                               uid = random_string("string_indexer_"), ...) {
+ft_string_indexer.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  handle_invalid = "error",
+  string_order_type = "frequencyDesc",
+  uid = random_string("string_indexer_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -39,20 +51,39 @@ ft_string_indexer.spark_connection <- function(x, input_col = NULL, output_col =
     validator_ml_string_indexer()
 
   estimator <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.StringIndexer",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.StringIndexer",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
-    jobj_set_param("setHandleInvalid", .args[["handle_invalid"]], "2.1.0", "error") %>%
-    jobj_set_param("setStringOrderType", .args[["string_order_type"]], "2.3.0", "frequencyDesc") %>%
+    jobj_set_param(
+      "setHandleInvalid",
+      .args[["handle_invalid"]],
+      "2.1.0",
+      "error"
+    ) %>%
+    jobj_set_param(
+      "setStringOrderType",
+      .args[["string_order_type"]],
+      "2.3.0",
+      "frequencyDesc"
+    ) %>%
     new_ml_string_indexer()
 
   estimator
 }
 
 #' @export
-ft_string_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL,
-                                          handle_invalid = "error", string_order_type = "frequencyDesc",
-                                          uid = random_string("string_indexer_"), ...) {
+ft_string_indexer.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  handle_invalid = "error",
+  string_order_type = "frequencyDesc",
+  uid = random_string("string_indexer_"),
+  ...
+) {
   stage <- ft_string_indexer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -66,9 +97,15 @@ ft_string_indexer.ml_pipeline <- function(x, input_col = NULL, output_col = NULL
 }
 
 #' @export
-ft_string_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
-                                        handle_invalid = "error", string_order_type = "frequencyDesc",
-                                        uid = random_string("string_indexer_"), ...) {
+ft_string_indexer.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  handle_invalid = "error",
+  string_order_type = "frequencyDesc",
+  uid = random_string("string_indexer_"),
+  ...
+) {
   stage <- ft_string_indexer.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -81,7 +118,10 @@ ft_string_indexer.tbl_spark <- function(x, input_col = NULL, output_col = NULL,
   # backwards compatibility for params argument
   dots <- rlang::dots_list(...)
   if (rlang::has_name(dots, "params") && is.environment(dots$params)) {
-    warning("`params` has been deprecated and will be removed in a future release.", call. = FALSE)
+    warning(
+      "`params` has been deprecated and will be removed in a future release.",
+      call. = FALSE
+    )
     transformer <- if (is_ml_transformer(stage)) {
       stage
     } else {
@@ -106,7 +146,8 @@ new_ml_string_indexer <- function(jobj) {
 }
 
 new_ml_string_indexer_model <- function(jobj) {
-  new_ml_transformer(jobj,
+  new_ml_transformer(
+    jobj,
     labels = invoke(jobj, "labels") %>%
       as.character(),
     class = "ml_string_indexer_model"
@@ -122,7 +163,8 @@ ml_labels <- function(model) model$labels
 validator_ml_string_indexer <- function(.args) {
   .args <- validate_args_transformer(.args)
   .args[["handle_invalid"]] <- cast_choice(
-    .args[["handle_invalid"]], c("error", "skip", "keep")
+    .args[["handle_invalid"]],
+    c("error", "skip", "keep")
   )
   .args[["string_order_type"]] <- cast_choice(
     .args[["string_order_type"]],

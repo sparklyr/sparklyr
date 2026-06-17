@@ -30,7 +30,11 @@
 NULL
 
 #' @rawNamespace S3method(rbind,tbl_spark)
-rbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparklyr_tmp_")) {
+rbind.tbl_spark <- function(
+  ...,
+  deparse.level = 1,
+  name = random_string("sparklyr_tmp_")
+) {
   dots <- list(...)
   n <- length(dots)
   self <- dots[[1]]
@@ -157,7 +161,11 @@ sdf_bind_rows <- function(..., id = NULL) {
 }
 
 #' @rawNamespace S3method(cbind,tbl_spark)
-cbind.tbl_spark <- function(..., deparse.level = 1, name = random_string("sparklyr_tmp_")) {
+cbind.tbl_spark <- function(
+  ...,
+  deparse.level = 1,
+  name = random_string("sparklyr_tmp_")
+) {
   dots <- list(...)
   n <- length(dots)
   self <- dots[[1]]

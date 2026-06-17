@@ -16,9 +16,10 @@ create_hive_context.livy_connection <- function(sc) {
 livy_validate_http_response <- function(message, req) {
   if (http_error(req)) {
     if (isTRUE(all.equal(status_code(req), 401))) {
-      stop("Livy operation is unauthorized. Try spark_connect with config = livy_config()")
-    }
-    else {
+      stop(
+        "Livy operation is unauthorized. Try spark_connect with config = livy_config()"
+      )
+    } else {
       httpStatus <- http_status(req)
       httpContent <- content(req, as = "text", encoding = "UTF-8")
       stop(message, " (", httpStatus$message, "): ", httpContent)
@@ -81,33 +82,48 @@ livy_available_jars <- function() {
 #' \code{config = spark_config(spark.yarn.queue = "my_queue")}).
 #'
 #' @return Named list with configuration data
-livy_config <- function(config = spark_config(),
-                        username = NULL,
-                        password = NULL,
-                        negotiate = FALSE,
-                        custom_headers = list("X-Requested-By" = "sparklyr"),
-                        proxy = NULL,
-                        curl_opts = NULL,
-                        ...) {
+livy_config <- function(
+  config = spark_config(),
+  username = NULL,
+  password = NULL,
+  negotiate = FALSE,
+  custom_headers = list("X-Requested-By" = "sparklyr"),
+  proxy = NULL,
+  curl_opts = NULL,
+  ...
+) {
   additional_params <- list(...)
 
   if (negotiate) {
-    config[["sparklyr.livy.auth"]] <- httr::authenticate("", "", type = "gssnegotiate")
+    config[["sparklyr.livy.auth"]] <- httr::authenticate(
+      "",
+      "",
+      type = "gssnegotiate"
+    )
   } else if (!is.null(username) || !is.null(password)) {
-    config[["sparklyr.livy.auth"]] <- httr::authenticate(username, password, type = "basic")
+    config[["sparklyr.livy.auth"]] <- httr::authenticate(
+      username,
+      password,
+      type = "basic"
+    )
   }
 
   if (!is.null(custom_headers)) {
     for (l in names(custom_headers)) {
       config[["sparklyr.livy.headers"]] <- c(
-        config[["sparklyr.livy.headers"]], custom_headers[l]
+        config[["sparklyr.livy.headers"]],
+        custom_headers[l]
       )
     }
   }
 
-  if (!is.null(proxy)) config[["sparklyr.livy.proxy"]] <- proxy
+  if (!is.null(proxy)) {
+    config[["sparklyr.livy.proxy"]] <- proxy
+  }
 
-  if (!is.null(curl_opts)) config[["sparklyr.livy.curl_opts"]] <- curl_opts
+  if (!is.null(curl_opts)) {
+    config[["sparklyr.livy.curl_opts"]] <- curl_opts
+  }
 
   if (length(additional_params) > 0) {
     # snake_case to camelCase mapping for allowed Livy params
@@ -133,12 +149,28 @@ livy_config <- function(config = spark_config(),
 
     valid_params <- names(additional_params) %in% allowed_params
     if (!all(valid_params)) {
-      stop(paste0(names(additional_params[!valid_params]), sep = ", "), " are not valid session parameters. Valid parameters are: ", paste0(allowed_params, sep = ", "))
+      stop(
+        paste0(names(additional_params[!valid_params]), sep = ", "),
+        " are not valid session parameters. Valid parameters are: ",
+        paste0(allowed_params, sep = ", ")
+      )
     }
-    singleValues <- c("proxy_user", "driver_memory", "driver_cores", "executor_memory", "executor_cores", "num_executors", "queue", "name", "heartbeat_timeout")
+    singleValues <- c(
+      "proxy_user",
+      "driver_memory",
+      "driver_cores",
+      "executor_memory",
+      "executor_cores",
+      "num_executors",
+      "queue",
+      "name",
+      "heartbeat_timeout"
+    )
     singleValues <- singleValues[singleValues %in% names(additional_params)]
-    additional_params[singleValues] <- lapply(additional_params[singleValues], jsonlite::unbox)
-
+    additional_params[singleValues] <- lapply(
+      additional_params[singleValues],
+      jsonlite::unbox
+    )
 
     for (l in names(additional_params)) {
       # Parse the params names from snake_case to camelCase
@@ -166,10 +198,14 @@ livy_get_httr_config <- function(config, headers) {
 
 #' @importFrom httr GET
 livy_get_json <- function(url, config) {
-  req <- GET(url,
-    config = livy_get_httr_config(config, list(
-      "Content-Type" = "application/json"
-    )),
+  req <- GET(
+    url,
+    config = livy_get_httr_config(
+      config,
+      list(
+        "Content-Type" = "application/json"
+      )
+    ),
     config$sparklyr.livy.auth
   )
 
@@ -188,10 +224,14 @@ livy_get_sessions <- function(master, config) {
 }
 
 livy_config_get_prefix <- function(master, config, prefix, not_prefix) {
-  params <- connection_config(list(
-    master = master,
-    config = config
-  ), prefix, not_prefix)
+  params <- connection_config(
+    list(
+      master = master,
+      config = config
+    ),
+    prefix,
+    not_prefix
+  )
 
   params <- lapply(params, function(param) {
     if (length(param) == 1) jsonlite::unbox(param) else param
@@ -207,7 +247,12 @@ livy_config_get_prefix <- function(master, config, prefix, not_prefix) {
 
 #' @importFrom jsonlite toJSON
 livy_config_get <- function(master, config) {
-  sparkConfig <- livy_config_get_prefix(master, config, "spark.", c("spark.sql."))
+  sparkConfig <- livy_config_get_prefix(
+    master,
+    config,
+    "spark.",
+    c("spark.sql.")
+  )
   c(sparkConfig)
 }
 
@@ -223,12 +268,18 @@ livy_create_session <- function(master, config) {
     prefix = "livy.",
     not_prefix = "livy.session."
   )
-  if (length(session_params) > 0) data <- append(data, session_params)
+  if (length(session_params) > 0) {
+    data <- append(data, session_params)
+  }
 
-  req <- POST(paste(master, "sessions", sep = "/"),
-    config = livy_get_httr_config(config, list(
-      "Content-Type" = "application/json"
-    )),
+  req <- POST(
+    paste(master, "sessions", sep = "/"),
+    config = livy_get_httr_config(
+      config,
+      list(
+        "Content-Type" = "application/json"
+      )
+    ),
     body = toJSON(
       data
     ),
@@ -247,10 +298,14 @@ livy_create_session <- function(master, config) {
 }
 
 livy_destroy_session <- function(sc) {
-  req <- DELETE(paste(sc$master, "sessions", sc$sessionId, sep = "/"),
-    config = livy_get_httr_config(sc$config, list(
-      "Content-Type" = "application/json"
-    )),
+  req <- DELETE(
+    paste(sc$master, "sessions", sc$sessionId, sep = "/"),
+    config = livy_get_httr_config(
+      sc$config,
+      list(
+        "Content-Type" = "application/json"
+      )
+    ),
     body = NULL,
     sc$config$sparklyr.livy.auth
   )
@@ -264,7 +319,10 @@ livy_destroy_session <- function(sc) {
 }
 
 livy_get_session <- function(sc) {
-  session <- livy_get_json(paste(sc$master, "sessions", sc$sessionId, sep = "/"), sc$config)
+  session <- livy_get_json(
+    paste(sc$master, "sessions", sc$sessionId, sep = "/"),
+    sc$config
+  )
 
   assert_that(!is.null(session$state))
   assert_that(session$id == sc$sessionId)
@@ -309,7 +367,13 @@ livy_serialized_chunks <- function(serialized, n) {
 }
 
 livy_statement_compose <- function(sc, static, class, method, ...) {
-  serialized <- livy_invoke_serialize(sc = sc, static = static, object = class, method = method, ...)
+  serialized <- livy_invoke_serialize(
+    sc = sc,
+    static = static,
+    object = class,
+    method = method,
+    ...
+  )
   chunks <- livy_serialized_chunks(serialized, 10000)
 
   chunk_vars <- list()
@@ -318,19 +382,25 @@ livy_statement_compose <- function(sc, static, class, method, ...) {
 
   if (length(chunks) == 1) {
     last_var <- paste("\"", chunks[1], "\"", sep = "")
-  }
-  else {
+  } else {
     last_var <- "builder.toString"
     chunk_vars <- c(chunk_vars, "val builder = StringBuilder.newBuilder")
     for (i in seq_along(chunks)) {
-      chunk_vars <- c(chunk_vars, paste("builder.append(\"", chunks[i], "\") == \"\"", sep = ""))
+      chunk_vars <- c(
+        chunk_vars,
+        paste("builder.append(\"", chunks[i], "\") == \"\"", sep = "")
+      )
     }
   }
 
   var_name <- livy_code_new_return_var(sc)
 
   invoke_var <- paste0(
-    "var ", var_name, " = sparklyr.LivyUtils.invokeFromBase64(", last_var, ")"
+    "var ",
+    var_name,
+    " = sparklyr.LivyUtils.invokeFromBase64(",
+    last_var,
+    ")"
   )
 
   code <- paste(
@@ -364,7 +434,14 @@ livy_statement_compose_magic <- function(lobj, magic) {
 
 livy_get_statement <- function(sc, statementId) {
   statement <- livy_get_json(
-    paste(sc$master, "sessions", sc$sessionId, "statements", statementId, sep = "/"),
+    paste(
+      sc$master,
+      "sessions",
+      sc$sessionId,
+      "statements",
+      statementId,
+      sep = "/"
+    ),
     sc$config
   )
 
@@ -374,9 +451,7 @@ livy_get_statement <- function(sc, statementId) {
   statement
 }
 
-livy_inspect <- function(lobj) {
-
-}
+livy_inspect <- function(lobj) {}
 
 livy_log_operation <- function(sc, text) {
   write(strtrim(text, 200), file = sc$log, append = TRUE)
@@ -387,10 +462,14 @@ livy_log_operation <- function(sc, text) {
 livy_post_statement <- function(sc, code) {
   livy_log_operation(sc, code)
 
-  req <- POST(paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
-    config = livy_get_httr_config(sc$config, list(
-      "Content-Type" = "application/json"
-    )),
+  req <- POST(
+    paste(sc$master, "sessions", sc$sessionId, "statements", sep = "/"),
+    config = livy_get_httr_config(
+      sc$config,
+      list(
+        "Content-Type" = "application/json"
+      )
+    ),
     body = toJSON(
       list(
         code = jsonlite::unbox(code)
@@ -404,15 +483,27 @@ livy_post_statement <- function(sc, code) {
   statementReponse <- content(req)
   assert_that(!is.null(statementReponse$id))
 
-  waitTimeout <- spark_config_value(sc$config, "livy.session.command.timeout", 30 * 24 * 60 * 60)
-  pollInterval <- spark_config_value(sc$config, "livy.session.command.interval", 5)
+  waitTimeout <- spark_config_value(
+    sc$config,
+    "livy.session.command.timeout",
+    30 * 24 * 60 * 60
+  )
+  pollInterval <- spark_config_value(
+    sc$config,
+    "livy.session.command.interval",
+    5
+  )
 
   commandStart <- Sys.time()
 
   sleepTime <- 0.001
-  while ((statementReponse$state == "running" || statementReponse$state == "waiting" ||
-    (statementReponse$state == "available" && is.null(statementReponse$output))) &&
-    Sys.time() < commandStart + waitTimeout) {
+  while (
+    (statementReponse$state == "running" ||
+      statementReponse$state == "waiting" ||
+      (statementReponse$state == "available" &&
+        is.null(statementReponse$output))) &&
+      Sys.time() < commandStart + waitTimeout
+  ) {
     statementReponse <- livy_get_statement(sc, statementReponse$id)
 
     Sys.sleep(sleepTime)
@@ -427,20 +518,23 @@ livy_post_statement <- function(sc, code) {
   assert_that(!is.null(statementReponse$output))
 
   if (statementReponse$output$status == "error") {
-    withr::with_options(list(
-      warning.length = 8000
-    ), {
-      stop(
-        "Failed to execute Livy statement with error: ",
-        if (is.null(statementReponse$output$evalue)) {
-          jsonlite::toJSON(statementReponse)
-        } else {
-          statementReponse$output$evalue
-        },
-        "\nTraceback: ",
-        paste(statementReponse$output$traceback, collapse = "")
-      )
-    })
+    withr::with_options(
+      list(
+        warning.length = 8000
+      ),
+      {
+        stop(
+          "Failed to execute Livy statement with error: ",
+          if (is.null(statementReponse$output$evalue)) {
+            jsonlite::toJSON(statementReponse)
+          } else {
+            statementReponse$output$evalue
+          },
+          "\nTraceback: ",
+          paste(statementReponse$output$traceback, collapse = "")
+        )
+      }
+    )
   }
 
   data <- statementReponse$output$data
@@ -460,8 +554,7 @@ livy_invoke_statement <- function(sc, statement) {
 
   supportedDataTypes <- list(
     "text/plain" = list(
-      dataToResult = function(data) {
-      }
+      dataToResult = function(data) {}
     ),
     "application/json" = list(
       dataToResult = function(data) {
@@ -482,25 +575,54 @@ livy_invoke_statement <- function(sc, statement) {
   result
 }
 
-livy_invoke_statement_command <- function(sc, static, jobj, method, return_jobj_ref, ...) {
+livy_invoke_statement_command <- function(
+  sc,
+  static,
+  jobj,
+  method,
+  return_jobj_ref,
+  ...
+) {
   prefix <- if (return_jobj_ref) "j_" else ""
 
   if (identical(method, "<init>")) {
     paste0("// ", prefix, "invoke_new(sc, '", jobj, "', ...)")
   } else if (is.character(jobj)) {
-    paste0("// ", prefix, "invoke_static(sc, '", jobj, "', '", method, "', ...)")
+    paste0(
+      "// ",
+      prefix,
+      "invoke_static(sc, '",
+      jobj,
+      "', '",
+      method,
+      "', ...)"
+    )
   } else {
     paste0("// ", prefix, "invoke(sc, <jobj>, '", method, "', ...)")
   }
 }
 
-livy_invoke_statement_fetch <- function(sc, static, jobj, method, return_jobj_ref, ...) {
+livy_invoke_statement_fetch <- function(
+  sc,
+  static,
+  jobj,
+  method,
+  return_jobj_ref,
+  ...
+) {
   statement <- livy_statement_compose(sc, static, jobj, method, ...)
 
   # Note: Spark 2.0 requires magic to be present in the statement with the definition.
   statement$code <- paste(
     paste(
-      livy_invoke_statement_command(sc, static, jobj, method, return_jobj_ref, ...),
+      livy_invoke_statement_command(
+        sc,
+        static,
+        jobj,
+        method,
+        return_jobj_ref,
+        ...
+      ),
       statement$code,
       sep = "\n"
     ),
@@ -511,7 +633,11 @@ livy_invoke_statement_fetch <- function(sc, static, jobj, method, return_jobj_re
   result <- livy_invoke_statement(sc, statement)
 
   if (!is.character(result)) {
-    stop("Failed to execute statement, character result expected but ", typeof(result), " was received.")
+    stop(
+      "Failed to execute statement, character result expected but ",
+      typeof(result),
+      " was received."
+    )
   }
 
   # If result is too long that was truncated, retry with livy magic instead
@@ -540,7 +666,9 @@ livy_validate_master <- function(master, config) {
   retries <- 5
   retriesErr <- NULL
   while (retries >= 0) {
-    if (!is.null(retriesErr)) Sys.sleep(1)
+    if (!is.null(retriesErr)) {
+      Sys.sleep(1)
+    }
 
     retriesErr <- tryCatch(
       {
@@ -559,10 +687,19 @@ livy_validate_master <- function(master, config) {
     retries <- retries - 1
   }
 
-  stop("Failed to connect to Livy service at ", master, ". ", retriesErr$message)
+  stop(
+    "Failed to connect to Livy service at ",
+    master,
+    ". ",
+    retriesErr$message
+  )
 }
 
-livy_connection_not_used_warn <- function(value, default = NULL, name = deparse(substitute(value))) {
+livy_connection_not_used_warn <- function(
+  value,
+  default = NULL,
+  name = deparse(substitute(value))
+) {
   if (!identical(value, default)) {
     warning("Livy connections do not support ", name, " parameter")
   }
@@ -579,18 +716,24 @@ livy_connection_jars <- function(config, version, scala_version) {
 
     previous_versions <- Filter(
       function(maybe_version) maybe_version <= major_version,
-      numeric_version(gsub("master", paste(livy_max_version, "1", sep = "."), livy_available_jars()))
+      numeric_version(gsub(
+        "master",
+        paste(livy_max_version, "1", sep = "."),
+        livy_available_jars()
+      ))
     )
 
     target_version <- previous_versions[length(previous_versions)]
 
-    target_jar_pattern <- (
-      if (is.null(scala_version)) {
-        paste0("sparklyr-", target_version)
-      } else {
-        paste0("sparklyr-", target_version, "-", scala_version)
-      })
-    target_jar <- dir(system.file("java", package = "sparklyr"), pattern = target_jar_pattern)
+    target_jar_pattern <- (if (is.null(scala_version)) {
+      paste0("sparklyr-", target_version)
+    } else {
+      paste0("sparklyr-", target_version, "-", scala_version)
+    })
+    target_jar <- dir(
+      system.file("java", package = "sparklyr"),
+      pattern = target_jar_pattern
+    )
     # Select the jar file built with the lowest version of Scala in case there is no
     # requirement for Scala version compatibility
     if (length(target_jar) > 1) {
@@ -599,7 +742,11 @@ livy_connection_jars <- function(config, version, scala_version) {
       target_jar <- "sparklyr-master-2.13.jar"
     }
 
-    livy_branch <- spark_config_value(config, "sparklyr.livy.branch", "feature/sparklyr-1.7.0")
+    livy_branch <- spark_config_value(
+      config,
+      "sparklyr.livy.branch",
+      "feature/sparklyr-1.7.0"
+    )
 
     livy_jars <- paste0(
       "https://github.com/sparklyr/sparklyr/blob/",
@@ -613,15 +760,20 @@ livy_connection_jars <- function(config, version, scala_version) {
   livy_jars
 }
 
-livy_connection <- function(master,
-                            config,
-                            app_name,
-                            version,
-                            hadoop_version,
-                            extensions,
-                            scala_version = NULL) {
+livy_connection <- function(
+  master,
+  config,
+  app_name,
+  version,
+  hadoop_version,
+  extensions,
+  scala_version = NULL
+) {
   if (is.null(version)) {
-    stop("Livy connections now require the Spark version to be specified.", call. = FALSE)
+    stop(
+      "Livy connections now require the Spark version to be specified.",
+      call. = FALSE
+    )
   }
 
   livy_connection_not_used_warn(app_name, "sparklyr")
@@ -637,7 +789,12 @@ livy_connection <- function(master,
 
   livy_validate_master(master, config)
 
-  extensions <- spark_dependencies_from_extensions(version, scala_version, extensions, config)
+  extensions <- spark_dependencies_from_extensions(
+    version,
+    scala_version,
+    extensions,
+    config
+  )
 
   config[["livy.jars"]] <- unique(as.character(c(
     config[["livy.jars"]],
@@ -645,14 +802,24 @@ livy_connection <- function(master,
     extensions$catalog_jars
   )))
 
-  config[["spark.jars.packages"]] <- paste(c(config[["spark.jars.packages"]], extensions$packages), collapse = ",")
-  config[["spark.jars.repositories"]] <- paste(c(config[["spark.jars.repositories"]], extensions$repositories), collapse = ",")
+  config[["spark.jars.packages"]] <- paste(
+    c(config[["spark.jars.packages"]], extensions$packages),
+    collapse = ","
+  )
+  config[["spark.jars.repositories"]] <- paste(
+    c(config[["spark.jars.repositories"]], extensions$repositories),
+    collapse = ","
+  )
 
   livy_create_session_retries <- spark_config_value(
-    config, "sparklyr.livy_create_session.retries", 3L
+    config,
+    "sparklyr.livy_create_session.retries",
+    3L
   )
   livy_create_session_retry_interval_s <- spark_config_value(
-    config, "sparklyr.livy_create_session.retry_interval_s", 5L
+    config,
+    "sparklyr.livy_create_session.retry_interval_s",
+    5L
   )
 
   session <- NULL
@@ -695,10 +862,16 @@ livy_connection <- function(master,
 
   sc$code$totalReturnVars <- 0
 
-  waitStartTimeout <- spark_config_value(config, c("sparklyr.connect.timeout", "livy.session.start.timeout"), 60)
+  waitStartTimeout <- spark_config_value(
+    config,
+    c("sparklyr.connect.timeout", "livy.session.start.timeout"),
+    60
+  )
   waitStartReties <- waitStartTimeout * 10
-  while (session$state == "starting" &&
-    waitStartReties > 0) {
+  while (
+    session$state == "starting" &&
+      waitStartReties > 0
+  ) {
     session <- livy_get_session(sc)
 
     Sys.sleep(0.1)
@@ -708,7 +881,9 @@ livy_connection <- function(master,
   if (session$state == "starting") {
     stop(
       "Failed to launch livy session, session status is",
-      " still starting after waiting for ", waitStartTimeout, " seconds"
+      " still starting after waiting for ",
+      waitStartTimeout,
+      " seconds"
     )
   }
 
@@ -717,27 +892,31 @@ livy_connection <- function(master,
   }
 
   # stop connection on R exit
-  reg.finalizer(baseenv(), function(x) {
-    if (connection_is_open(sc)) {
-      spark_disconnect(sc, terminate = TRUE)
-    }
-  }, onexit = TRUE)
+  reg.finalizer(
+    baseenv(),
+    function(x) {
+      if (connection_is_open(sc)) {
+        spark_disconnect(sc, terminate = TRUE)
+      }
+    },
+    onexit = TRUE
+  )
 
   sc
 }
 
 livy_states_info <- function() {
   list(
-    "not_started"   = list(connected = FALSE),
-    "starting"      = list(connected = TRUE),
-    "recovering"    = list(connected = TRUE),
-    "idle"          = list(connected = TRUE),
-    "running"       = list(connected = TRUE),
-    "busy"          = list(connected = TRUE),
+    "not_started" = list(connected = FALSE),
+    "starting" = list(connected = TRUE),
+    "recovering" = list(connected = TRUE),
+    "idle" = list(connected = TRUE),
+    "running" = list(connected = TRUE),
+    "busy" = list(connected = TRUE),
     "shutting_down" = list(connected = TRUE),
-    "error"         = list(connected = TRUE),
-    "dead"          = list(connected = FALSE),
-    "success"       = list(connected = TRUE)
+    "error" = list(connected = TRUE),
+    "dead" = list(connected = FALSE),
+    "success" = list(connected = TRUE)
   )
 }
 
@@ -756,8 +935,7 @@ connection_is_open.livy_connection <- function(sc) {
   session <- livy_try_get_session(sc)
   if (is.null(session)) {
     FALSE
-  }
-  else {
+  } else {
     stateInfo <- livy_states_info()[[session$state]]
 
     assert_that(!is.null(stateInfo))
@@ -779,12 +957,26 @@ print_jobj.livy_connection <- print_jobj.spark_shell_connection
 
 #' @export
 invoke.livy_jobj <- function(jobj, method, ...) {
-  livy_invoke_statement_fetch(spark_connection(jobj), FALSE, jobj, method, FALSE, ...)
+  livy_invoke_statement_fetch(
+    spark_connection(jobj),
+    FALSE,
+    jobj,
+    method,
+    FALSE,
+    ...
+  )
 }
 
 #' @export
 j_invoke.livy_jobj <- function(jobj, method, ...) {
-  livy_invoke_statement_fetch(spark_connection(jobj), FALSE, jobj, method, TRUE, ...)
+  livy_invoke_statement_fetch(
+    spark_connection(jobj),
+    FALSE,
+    jobj,
+    method,
+    TRUE,
+    ...
+  )
 }
 
 #' @export
@@ -877,7 +1069,7 @@ initialize_connection.livy_connection <- function(sc) {
 #' @importFrom rlang as_label abort
 assert_that <- function(x) {
   y <- enquo(x)
-  if(x) {
+  if (x) {
     TRUE
   } else {
     msg <- glue::glue("'{as_label(y)}' is not `TRUE`")

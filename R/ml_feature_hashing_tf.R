@@ -11,8 +11,15 @@
 #' @param num_features Number of features. Should be greater than 0. (default = \code{2^18})
 #'
 #' @export
-ft_hashing_tf <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
-                          num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
+ft_hashing_tf <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  binary = FALSE,
+  num_features = 2^18,
+  uid = random_string("hashing_tf_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ft_hashing_tf")
 }
@@ -20,8 +27,15 @@ ft_hashing_tf <- function(x, input_col = NULL, output_col = NULL, binary = FALSE
 ml_hashing_tf <- ft_hashing_tf
 
 #' @export
-ft_hashing_tf.spark_connection <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
-                                           num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
+ft_hashing_tf.spark_connection <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  binary = FALSE,
+  num_features = 2^18,
+  uid = random_string("hashing_tf_"),
+  ...
+) {
   .args <- list(
     input_col = input_col,
     output_col = output_col,
@@ -33,8 +47,11 @@ ft_hashing_tf.spark_connection <- function(x, input_col = NULL, output_col = NUL
     validator_ml_hashing_tf()
 
   jobj <- spark_pipeline_stage(
-    x, "org.apache.spark.ml.feature.HashingTF",
-    input_col = .args[["input_col"]], output_col = .args[["output_col"]], uid = .args[["uid"]]
+    x,
+    "org.apache.spark.ml.feature.HashingTF",
+    input_col = .args[["input_col"]],
+    output_col = .args[["output_col"]],
+    uid = .args[["uid"]]
   ) %>%
     jobj_set_param("setBinary", .args[["binary"]], "2.0.0", FALSE) %>%
     invoke("setNumFeatures", .args[["num_features"]])
@@ -43,8 +60,15 @@ ft_hashing_tf.spark_connection <- function(x, input_col = NULL, output_col = NUL
 }
 
 #' @export
-ft_hashing_tf.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
-                                      num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
+ft_hashing_tf.ml_pipeline <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  binary = FALSE,
+  num_features = 2^18,
+  uid = random_string("hashing_tf_"),
+  ...
+) {
   stage <- ft_hashing_tf.spark_connection(
     x = spark_connection(x),
     input_col = input_col,
@@ -58,8 +82,15 @@ ft_hashing_tf.ml_pipeline <- function(x, input_col = NULL, output_col = NULL, bi
 }
 
 #' @export
-ft_hashing_tf.tbl_spark <- function(x, input_col = NULL, output_col = NULL, binary = FALSE,
-                                    num_features = 2^18, uid = random_string("hashing_tf_"), ...) {
+ft_hashing_tf.tbl_spark <- function(
+  x,
+  input_col = NULL,
+  output_col = NULL,
+  binary = FALSE,
+  num_features = 2^18,
+  uid = random_string("hashing_tf_"),
+  ...
+) {
   stage <- ft_hashing_tf.spark_connection(
     x = spark_connection(x),
     input_col = input_col,

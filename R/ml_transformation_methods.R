@@ -81,7 +81,9 @@ ml_transform.ml_transformer <- function(x, dataset, ...) {
 #' @export
 ml_fit_and_transform <- function(x, dataset, ...) {
   if (!is_ml_estimator(x)) {
-    stop("'ml_fit_and_transform()' is only applicable to 'ml_estimator' objects")
+    stop(
+      "'ml_fit_and_transform()' is only applicable to 'ml_estimator' objects"
+    )
   }
   sdf <- spark_dataframe(dataset)
   spark_jobj(x) %>%
@@ -109,9 +111,7 @@ ml_predict.ml_model_regression <- function(x, dataset, ...) {
   }
 
   cols <- x$model %>%
-    ml_params(c("prediction_col", "variance_col"),
-      allow_null = TRUE
-    ) %>%
+    ml_params(c("prediction_col", "variance_col"), allow_null = TRUE) %>%
     Filter(length, .) %>%
     unlist(use.names = FALSE)
 
@@ -123,8 +123,11 @@ ml_predict.ml_model_regression <- function(x, dataset, ...) {
 #' @param probability_prefix String used to prepend the class probability output columns.
 #' @export
 ml_predict.ml_model_classification <- function(
-                                               x, dataset,
-                                               probability_prefix = "probability_", ...) {
+  x,
+  dataset,
+  probability_prefix = "probability_",
+  ...
+) {
   sc <- spark_connection(x$model)
   probability_prefix <- cast_string(probability_prefix)
 
@@ -144,7 +147,8 @@ ml_predict.ml_model_classification <- function(
       sc$config
     )
     sdf_separate_column(
-      predictions, probability_col,
+      predictions,
+      probability_col,
       paste0(probability_prefix, index_labels)
     )
   }

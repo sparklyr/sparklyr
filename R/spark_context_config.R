@@ -6,9 +6,12 @@
 #'
 #' @export
 spark_context_config <- function(sc) {
-  sparkConfigAll <- spark_context(sc) %>% invoke("%>%", list("conf"), list("getAll"))
-  sparkConfigNames <- lapply(sparkConfigAll, function(e) invoke(e, "_1")) %>% as.list()
-  sparkConfig <- lapply(sparkConfigAll, function(e) invoke(e, "_2")) %>% as.list()
+  sparkConfigAll <- spark_context(sc) %>%
+    invoke("%>%", list("conf"), list("getAll"))
+  sparkConfigNames <- lapply(sparkConfigAll, function(e) invoke(e, "_1")) %>%
+    as.list()
+  sparkConfig <- lapply(sparkConfigAll, function(e) invoke(e, "_2")) %>%
+    as.list()
   names(sparkConfig) <- sparkConfigNames
 
   sparkConfig
@@ -48,8 +51,7 @@ spark_session_config <- function(sc, config = TRUE, value = NULL) {
     sc %>%
       hive_context_config() %>%
       `[`(config)
-  }
-  else {
+  } else {
     spark_require_version(sc, "2.0.0")
 
     if (is.numeric(value)) {
@@ -107,7 +109,11 @@ spark_coalesce_shuffle_partitions <- function(sc, enable = NULL) {
     if (enable) {
       spark_adaptive_query_execution(sc, TRUE)
     }
-    spark_session_config(sc, "spark.sql.adaptive.coalescePartitions.enabled", enable)
+    spark_session_config(
+      sc,
+      "spark.sql.adaptive.coalescePartitions.enabled",
+      enable
+    )
   }
 }
 
@@ -132,12 +138,15 @@ spark_advisory_shuffle_partition_size <- function(sc, size = NULL) {
   # but proceed anyways even if we don't detect Spark version 3 or above
   if (is.null(size)) {
     spark_session_config(
-      sc, "spark.sql.adaptive.advisoryPartitionSizeInBytes"
+      sc,
+      "spark.sql.adaptive.advisoryPartitionSizeInBytes"
     )
   } else {
     spark_coalesce_shuffle_partitions(sc, TRUE)
     spark_session_config(
-      sc, "spark.sql.adaptive.advisoryPartitionSizeInBytes", size
+      sc,
+      "spark.sql.adaptive.advisoryPartitionSizeInBytes",
+      size
     )
   }
 }
@@ -163,7 +172,8 @@ spark_coalesce_initial_num_partitions <- function(sc, num_partitions = NULL) {
   # but proceed anyways even if we don't detect Spark version 3 or above
   if (is.null(num_partitions)) {
     spark_session_config(
-      sc, "spark.sql.adaptive.coalescePartitions.initialPartitionNum"
+      sc,
+      "spark.sql.adaptive.coalescePartitions.initialPartitionNum"
     )
   } else {
     spark_coalesce_shuffle_partitions(sc, TRUE)
@@ -196,7 +206,8 @@ spark_coalesce_min_num_partitions <- function(sc, num_partitions = NULL) {
   # but proceed anyways even if we don't detect Spark version 3 or above
   if (is.null(num_partitions)) {
     spark_session_config(
-      sc, "spark.sql.adaptive.coalescePartitions.minPartitionNum"
+      sc,
+      "spark.sql.adaptive.coalescePartitions.minPartitionNum"
     )
   } else {
     spark_coalesce_shuffle_partitions(sc, TRUE)
@@ -225,6 +236,8 @@ spark_coalesce_min_num_partitions <- function(sc, num_partitions = NULL) {
 #' @export
 spark_auto_broadcast_join_threshold <- function(sc, threshold = NULL) {
   spark_session_config(
-    sc, "spark.sql.autoBroadcastJoinThreshold", threshold
+    sc,
+    "spark.sql.autoBroadcastJoinThreshold",
+    threshold
   )
 }

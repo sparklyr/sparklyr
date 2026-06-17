@@ -18,7 +18,9 @@ ml_print_column_name_params <- function(x) {
     grep("col|cols$", ., value = TRUE)
   for (param in sort(out_names)) {
     cat(paste0(
-      "  ", param, ": ",
+      "  ",
+      param,
+      ": ",
       paste0(ml_param(x, param), collapse = ", "),
       "\n"
     ))
@@ -64,8 +66,7 @@ print_newline <- function() {
   cat("", sep = "\n")
 }
 
-ml_model_print_residuals <- function(model,
-                                     residuals.header = "Residuals") {
+ml_model_print_residuals <- function(model, residuals.header = "Residuals") {
   residuals <- model$summary$residuals %>%
     (function(x) if (is.function(x)) x() else x) %>%
     spark_dataframe()
@@ -112,7 +113,6 @@ ml_model_print_coefficients <- function(model) {
 }
 
 ml_model_print_coefficients_detailed <- function(model) {
-
   # extract relevant columns for stats::printCoefmat call
   # (protect against routines that don't provide standard
   # error estimates, etc)

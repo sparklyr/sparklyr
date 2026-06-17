@@ -9,8 +9,7 @@ NULL
 
 #' @rdname ml_naive_bayes_tidiers
 #' @export
-tidy.ml_model_naive_bayes <- function(x,
-                                      ...) {
+tidy.ml_model_naive_bayes <- function(x, ...) {
   theta <- fix_data_frame(x$theta) %>%
     dplyr::rename(.label = !!"term")
 
@@ -28,8 +27,7 @@ tidy.ml_model_naive_bayes <- function(x,
 #' @param newdata a tbl_spark of new data to use for prediction.
 #'
 #' @export
-augment.ml_model_naive_bayes <- function(x, newdata = NULL,
-                                         ...) {
+augment.ml_model_naive_bayes <- function(x, newdata = NULL, ...) {
   broom_augment_supervised(x, newdata = newdata)
 }
 

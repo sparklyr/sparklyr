@@ -15,17 +15,29 @@
 #' @template roxlate-ml-dots
 #' @name ml_fpgrowth
 #' @export
-ml_fpgrowth <- function(x, items_col = "items", min_confidence = 0.8,
-                        min_support = 0.3, prediction_col = "prediction",
-                        uid = random_string("fpgrowth_"), ...) {
+ml_fpgrowth <- function(
+  x,
+  items_col = "items",
+  min_confidence = 0.8,
+  min_support = 0.3,
+  prediction_col = "prediction",
+  uid = random_string("fpgrowth_"),
+  ...
+) {
   check_dots_used()
   UseMethod("ml_fpgrowth")
 }
 
 #' @export
-ml_fpgrowth.spark_connection <- function(x, items_col = "items", min_confidence = 0.8,
-                                         min_support = 0.3, prediction_col = "prediction",
-                                         uid = random_string("fpgrowth_"), ...) {
+ml_fpgrowth.spark_connection <- function(
+  x,
+  items_col = "items",
+  min_confidence = 0.8,
+  min_support = 0.3,
+  prediction_col = "prediction",
+  uid = random_string("fpgrowth_"),
+  ...
+) {
   .args <- list(
     items_col = items_col,
     min_confidence = min_confidence,
@@ -49,9 +61,15 @@ ml_fpgrowth.spark_connection <- function(x, items_col = "items", min_confidence 
 }
 
 #' @export
-ml_fpgrowth.ml_pipeline <- function(x, items_col = "items", min_confidence = 0.8,
-                                    min_support = 0.3, prediction_col = "prediction",
-                                    uid = random_string("fpgrowth_"), ...) {
+ml_fpgrowth.ml_pipeline <- function(
+  x,
+  items_col = "items",
+  min_confidence = 0.8,
+  min_support = 0.3,
+  prediction_col = "prediction",
+  uid = random_string("fpgrowth_"),
+  ...
+) {
   stage <- ml_fpgrowth.spark_connection(
     x = spark_connection(x),
     items_col = items_col,
@@ -65,9 +83,15 @@ ml_fpgrowth.ml_pipeline <- function(x, items_col = "items", min_confidence = 0.8
 }
 
 #' @export
-ml_fpgrowth.tbl_spark <- function(x, items_col = "items", min_confidence = 0.8,
-                                  min_support = 0.3, prediction_col = "prediction",
-                                  uid = random_string("fpgrowth_"), ...) {
+ml_fpgrowth.tbl_spark <- function(
+  x,
+  items_col = "items",
+  min_confidence = 0.8,
+  min_support = 0.3,
+  prediction_col = "prediction",
+  uid = random_string("fpgrowth_"),
+  ...
+) {
   stage <- ml_fpgrowth.spark_connection(
     x = spark_connection(x),
     items_col = items_col,
