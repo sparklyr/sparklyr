@@ -1,4 +1,3 @@
-skip("Testing if CI goest through without it")
 skip_connection("ml-classification-naive-bayes")
 skip_on_livy()
 skip_on_arrow_devel()
@@ -54,6 +53,34 @@ test_that("ml_naive_bayes() works properly", {
     ),
     1.0
   )
+})
+
+test_that("ml_naive_bayes() works inside ml_cross_validator (tuning/reflection)", {
+  sc <- testthat_spark_connection()
+  test_requires_version("3.0.0")
+  iris_tbl <- testthat_tbl("iris")
+
+  pipeline <- ml_pipeline(sc) %>%
+    ft_r_formula(Species ~ Petal_Width + Petal_Length) %>%
+    ml_naive_bayes(uid = "nb_canary")
+
+  cv <- ml_cross_validator(
+    sc,
+    estimator = pipeline,
+    estimator_param_maps = list(nb_canary = list(smoothing = list(0.5, 1.0))),
+    evaluator = ml_multiclass_classification_evaluator(sc),
+    num_folds = 2,
+    seed = 1
+  )
+
+  cv_model <- ml_fit(cv, iris_tbl)
+
+  # best_model is rebuilt by reflection: ml_call_constructor(invoke(jobj, "bestModel")).
+  # This asserts the migrated estimator survives the tuning -> fit -> reflect-back path.
+  best <- cv_model$best_model
+  expect_true(inherits(best, "ml_pipeline_model"))
+  nb_stage <- ml_stage(best, "nb_canary")
+  expect_true(inherits(nb_stage, "ml_naive_bayes_model"))
 })
 
 test_that("ml_naive_bayes() and e1071::naiveBayes produce similar results", {

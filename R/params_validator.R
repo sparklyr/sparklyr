@@ -61,8 +61,40 @@ params_base_validator <- function(x) {
     feature_subset_strategy = function(x) cast_string(x),
     # GBT
     step_size = function(x) cast_scalar_double(x),
-    loss_type = function(x) cast_choice(x, c("squared", "absolute"))
+    loss_type = function(x) cast_choice(x, c("squared", "absolute")),
+    # Classification (shared, non-colliding)
+    probability_col = function(x) cast_string(x),
+    raw_prediction_col = function(x) cast_string(x),
+    thresholds = function(x) cast_double_list(x, allow_null = TRUE),
+    threshold = function(x) cast_scalar_double(x),
+    smoothing = function(x) cast_scalar_double(x),
+    model_type = function(x) cast_choice(x, c("multinomial", "bernoulli"))
   )
+}
+
+# Class-aware overrides for choice-set collisions (see Gotcha D). Each starts from
+# the shared base validator and replaces only the colliding param, leaving the
+# regression definitions intact.
+
+#' @export
+params_validator.ml_decision_tree_classifier <- function(x) {
+  v <- params_base_validator(x)
+  v[["impurity"]] <- function(x) cast_choice(x, c("gini", "entropy"))
+  v
+}
+
+#' @export
+params_validator.ml_random_forest_classifier <- function(x) {
+  v <- params_base_validator(x)
+  v[["impurity"]] <- function(x) cast_choice(x, c("gini", "entropy"))
+  v
+}
+
+#' @export
+params_validator.ml_gbt_classifier <- function(x) {
+  v <- params_base_validator(x)
+  v[["loss_type"]] <- function(x) cast_choice(x, c("logistic"))
+  v
 }
 
 params_validate_estimator <- function(jobj, params = list()) {

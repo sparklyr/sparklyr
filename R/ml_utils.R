@@ -131,7 +131,8 @@ ml_process_model <- function(
   ml_function,
   formula = NULL,
   response = NULL,
-  features = NULL
+  features = NULL,
+  constructor_args = list()
 ) {
   sc <- spark_connection(x)
 
@@ -167,7 +168,8 @@ ml_process_model <- function(
     response = response,
     features = features,
     features_col = invoke_steps$features_col,
-    label_col = invoke_steps$label_col
+    label_col = invoke_steps$label_col,
+    constructor_args = constructor_args
   )
 }
 
@@ -206,7 +208,8 @@ post_ml_obj <- function(
   response,
   features,
   features_col,
-  label_col
+  label_col,
+  constructor_args = list()
 ) {
   UseMethod("post_ml_obj")
 }
@@ -220,7 +223,8 @@ post_ml_obj.spark_connection <- function(
   response,
   features,
   features_col,
-  label_col
+  label_col,
+  constructor_args = list()
 ) {
   nm
 }
@@ -234,7 +238,8 @@ post_ml_obj.ml_pipeline <- function(
   response,
   features,
   features_col,
-  label_col
+  label_col,
+  constructor_args = list()
 ) {
   ml_add_stage(x, nm)
 }
@@ -248,20 +253,23 @@ post_ml_obj.tbl_spark <- function(
   response,
   features,
   features_col,
-  label_col
+  label_col,
+  constructor_args = list()
 ) {
   formula <- ml_standardize_formula(formula, response, features)
 
   if (is.null(formula)) {
     ml_fit(nm, x)
   } else {
-    ml_construct_model_supervised(
+    rlang::exec(
+      ml_construct_model_supervised,
       ml_function,
       predictor = nm,
       formula = formula,
       dataset = x,
       features_col = features_col,
-      label_col = label_col
+      label_col = label_col,
+      !!!constructor_args
     )
   }
 }
