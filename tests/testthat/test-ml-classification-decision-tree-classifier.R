@@ -31,4 +31,13 @@ test_that("ml_decision_tree_classifier() param setting", {
   test_param_setting(sc, ml_decision_tree_classifier, test_args)
 })
 
+test_that("ml_decision_tree_classifier() runs", {
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
+  model <- ml_decision_tree_classifier(iris_tbl, Species ~ .)
+  predictions <- ml_predict(model, iris_tbl)
+  expect_equal(sdf_nrow(predictions), 150L)
+})
+
 test_clear_cache()

@@ -35,4 +35,15 @@ test_that("ml_gbt_classifier() param setting", {
   test_param_setting(sc, ml_gbt_classifier, test_args)
 })
 
+test_that("ml_gbt_classifier() runs", {
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
+  binomial_tbl <- dplyr::filter(iris_tbl, Species != "setosa")
+
+  model <- ml_gbt_classifier(binomial_tbl, Species ~ Sepal_Length + Sepal_Width)
+  predictions <- ml_predict(model, binomial_tbl)
+  expect_equal(sdf_nrow(predictions), 100L)
+})
+
 test_clear_cache()
