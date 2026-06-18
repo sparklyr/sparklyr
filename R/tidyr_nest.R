@@ -59,7 +59,7 @@ nest.tbl_spark <- function(.data, ..., .names_sep = NULL, .key = NULL) {
             "%s, %s",
             dbplyr::translate_sql_(
               list(dst_name),
-              con = dbplyr::simulate_hive()
+              con = dbplyr::simulate_spark_sql()
             ),
             quote_sql_name(src_name)
           )

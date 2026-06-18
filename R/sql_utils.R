@@ -15,7 +15,7 @@ quote_sql_name.name <- function(x, con = NULL) {
   as.character(
     dbplyr::translate_sql_(
       list(x),
-      con = con %||% dbplyr::simulate_hive()
+      con = con %||% dbplyr::simulate_spark_sql()
     )
   )
 }

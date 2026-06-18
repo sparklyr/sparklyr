@@ -1,5 +1,11 @@
 # Sparklyr (dev)
 
+- Restores compatibility with dbplyr (>= 2.6.0), which changed the Hive
+backend to quote identifiers with ANSI double-quotes and rebuilt the lazy
+table `src`. `sparklyr` now renders SQL fragments through the Spark SQL
+backend (`dbplyr::simulate_spark_sql()`) and retrieves the connection from a
+lazy table via `dbplyr::remote_con()`.
+
 - `spark_install()` adds a second attempt at downloading from the Spark
 archive if the link from the primary download location fails.
 

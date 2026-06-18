@@ -11,9 +11,12 @@ expect_regexes <- function(printed, regexes) {
 }
 
 verify_table_src <- function(printed) {
+  # dbplyr (>= 2.6.0) prints lazy tables with a `# A query:` header and a
+  # separate `# Database:` line (previously a single `# Source: table<...>`
+  # line). The `# Database:` line is filled by `db_connection_describe`.
   expect_output(
     printed,
-    regexp = "# Source:   table<*\\>"
+    regexp = "# Database: spark_connection"
   )
 }
 

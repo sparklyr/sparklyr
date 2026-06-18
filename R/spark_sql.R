@@ -98,6 +98,12 @@ spark_sql_query_fields <- function(con, query, ...) {
 spark_sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
   if (packageVersion("dbplyr") <= "2.3.4") {
     name <- dbplyr::as.sql(name)
+  } else if (inherits(name, "dbplyr_table_path")) {
+    # dbplyr (>= 2.6.0) passes the view name as a `dbplyr_table_path`: a
+    # character vector that is already quoted for the backend (e.g.
+    # `` `dbplyr_tmp_xxx` ``). Mark it as literal SQL so `build_sql()` does not
+    # re-escape it as a string literal (which yields an invalid `'`name`'`).
+    name <- sql(as.character(name))
   }
   build_sql(
     "CREATE OR REPLACE ",

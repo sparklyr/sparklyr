@@ -43,7 +43,7 @@ unite.tbl_spark <- function(
   sql <- paste0(
     append(
       list(
-        dbplyr::translate_sql(!!sep, con = dbplyr::simulate_hive())
+        dbplyr::translate_sql(!!sep, con = dbplyr::simulate_spark_sql())
       ),
       concat_ws_args
     ),
