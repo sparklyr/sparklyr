@@ -328,7 +328,7 @@ sdf_pivot_longer <- function(
     function(idx) {
       key_tuple <- value_key[idx, ] %>%
         as.list() %>%
-        dbplyr::translate_sql_(con = dbplyr::simulate_hive()) %>%
+        dbplyr::translate_sql_(con = dbplyr::simulate_spark_sql()) %>%
         lapply(as.character) %>%
         unlist() %>%
         c(id_col)

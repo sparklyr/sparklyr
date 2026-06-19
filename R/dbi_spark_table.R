@@ -93,10 +93,11 @@ setMethod(
 setMethod(
   "dbRemoveTable",
   c("spark_connection", "character"),
-  function(conn, name) {
+  function(conn, name, ..., fail_if_missing = TRUE) {
     dbi_ensure_no_backtick(name)
 
-    dbSendQuery(conn, paste0("DROP TABLE `", name, "`"))
+    if_exists <- if (fail_if_missing) "" else "IF EXISTS "
+    dbSendQuery(conn, paste0("DROP TABLE ", if_exists, "`", name, "`"))
     invisible(TRUE)
   }
 )

@@ -7,15 +7,16 @@ test_that("Connection functions work", {
 
   sql_mtcars <- dbplyr::remote_query(tbl_mtcars)
 
-  expect_equal(
-    capture.output(copy_to.src_spark(
-      sc,
-      mtcars,
-      "src_mtcars",
-      overwrite = TRUE
-    ))[[1]],
-    "# Source:   table<`src_mtcars`> [?? x 11]"
-  )
+  # dbplyr (>= 2.6.0) replaced the single `# Source: table<...>` header with a
+  # `# A query:` line plus a separate `# Database:` line.
+  copy_to_output <- capture.output(copy_to.src_spark(
+    sc,
+    mtcars,
+    "src_mtcars",
+    overwrite = TRUE
+  ))
+  expect_equal(copy_to_output[[1]], "# A query:  ?? x 11")
+  expect_equal(copy_to_output[[2]], "# Database: spark_connection")
 
   if (using_livy()) {
     expect_error(

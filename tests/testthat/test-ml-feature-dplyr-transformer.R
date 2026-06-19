@@ -22,7 +22,10 @@ test_that("ft_dplyr_transformer() works", {
 
   expect_equal(
     ml_param_map(dplyr_transformer),
-    if (packageVersion("dbplyr") > "2.3.4") {
+    # dbplyr (>= 2.6.0) reverted single-table SELECT to an unqualified `*`,
+    # matching the pre-2.4.0 behaviour; only 2.4.0-2.5.x qualify it as
+    # `` `__THIS__`.* ``.
+    if (packageVersion("dbplyr") > "2.3.4" && packageVersion("dbplyr") < "2.6.0") {
       list(
         statement = "SELECT `__THIS__`.*, `Petal_Width` * 2.0 AS `pw2`\nFROM `__THIS__`"
       )

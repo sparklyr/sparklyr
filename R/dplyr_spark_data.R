@@ -34,29 +34,33 @@ spark_remove_table_if_exists <- function(sc, name) {
 }
 
 spark_source_from_ops <- function(x) {
-  classList <- lapply(x, function(e) {
-    attr(e, "class")
-  })
+  # dbplyr (>= 2.6.0) rebuilds the lazy table `src` using the connection's
+  # class (e.g. `src_spark_connection`) rather than `src_spark`, so a Spark
+  # source is identified by its underlying connection instead of a fixed class.
+  is_spark_src <- function(e) {
+    inherits(e, "src_spark") || inherits(e[["con"]], "spark_connection")
+  }
 
-  if (
-    !all(
-      lapply(classList, function(e) !("src" %in% e) || ("src_spark" %in% e)) ==
-        TRUE
-    )
-  ) {
+  # Note: `x` is a `tbl_lazy`, whose `[` method is not list subsetting, so use
+  # `purrr::map_lgl()`/`[[` (which iterate it as a list) rather than
+  # `Filter()`/`Find()`.
+  is_foreign_src <- purrr::map_lgl(
+    x,
+    ~ inherits(.x, "src") && !is_spark_src(.x)
+  )
+  if (any(is_foreign_src)) {
     stop("This operation does not support multiple remote sources")
   }
 
-  src_spark <- which(
-    as.logical(lapply(x, function(e) "src_spark" %in% attr(e, "class")))
-  )
-  x[[src_spark]]
+  is_spark <- purrr::map_lgl(x, ~ inherits(.x, "src") && is_spark_src(.x))
+  x[[which(is_spark)[[1]]]]
 }
 
 #' @importFrom dbplyr sql_render
 spark_sqlresult_from_dplyr <- function(x) {
-  sparkSource <- spark_source_from_ops(x)
-  sc <- spark_connection(sparkSource)
+  # Validate that all remote sources in the lazy ops are Spark sources.
+  spark_source_from_ops(x)
+  sc <- spark_connection(x)
 
   sql <- sql_render(x)
   sqlResult <- invoke(hive_context(sc), "sql", as.character(sql))

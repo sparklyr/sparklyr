@@ -116,7 +116,7 @@ sdf_unnest_longer <- function(
                     "%s.%s, %s",
                     col_sql_name,
                     quote_sql_name(x),
-                    dbplyr::escape(x, con = dbplyr::simulate_hive())
+                    dbplyr::escape(x, con = dbplyr::simulate_spark_sql())
                   )
                 }
               ) %>%

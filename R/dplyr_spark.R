@@ -6,7 +6,11 @@ NULL
 
 #' @export
 spark_connection.tbl_spark <- function(x, ...) {
-  spark_connection(x$src)
+  # Newer versions of dbplyr rebuild `src` from the connection's class (e.g.
+  # `src_spark_connection`), so `spark_connection.src_spark` no longer
+  # dispatches. `remote_con()` is the version-stable way to retrieve the
+  # underlying connection from a lazy table.
+  dbplyr::remote_con(x) %||% spark_connection(x$src)
 }
 
 #' @export
