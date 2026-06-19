@@ -49,3 +49,4 @@
 ^CRAN-SUBMISSION$
 ^\.claude$
 ^CLAUDE\.md$
+^\.git$

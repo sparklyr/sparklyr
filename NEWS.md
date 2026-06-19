@@ -1,5 +1,7 @@
 # Sparklyr (dev)
 
+# Sparklyr 1.9.5
+
 - Restores compatibility with dbplyr (>= 2.6.0), which changed the Hive
 backend to quote identifiers with ANSI double-quotes and rebuilt the lazy
 table `src`. `sparklyr` now renders SQL fragments through the Spark SQL
