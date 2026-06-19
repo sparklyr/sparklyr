@@ -13,8 +13,6 @@ status](https://www.r-pkg.org/badges/version/sparklyr)](https://CRAN.R-project.o
 coverage](https://codecov.io/gh/sparklyr/sparklyr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sparklyr/sparklyr?branch=main)
 <!-- badges: end -->
 
-<img src="tools/readme/sparklyr-diagram.png" width="320" align="right" style="margin-left: 20px; margin-right: 20px"/>
-
 - Install and connect to [Spark](https://spark.apache.org/) using YARN,
   Mesos, Livy or Kubernetes.
 - Use [dplyr](#using-dplyr) to filter and aggregate Spark datasets and
@@ -453,20 +451,14 @@ package, including tools for:
 Once you’ve installed the sparklyr package, you should find a new
 **Spark** pane within the IDE. This pane includes a **New Connection**
 dialog which can be used to make connections to local or remote Spark
-instances:
-
-<img src="tools/readme/spark-connect.png" class="screenshot" width=389 />
+instances.
 
 Once you’ve connected to Spark you’ll be able to browse the tables
 contained within the Spark cluster and preview Spark DataFrames using
-the standard RStudio data viewer:
-
-<img src="tools/readme/spark-dataview.png" class="screenshot" width=639 />
+the standard RStudio data viewer.
 
 You can also connect to Spark through [Livy](https://livy.apache.org/)
-through a new connection dialog:
-
-<img src="tools/readme/spark-connect-livy.png" class="screenshot" width=389 />
+through a new connection dialog.
 
 <div style="margin-bottom: 15px;">
 

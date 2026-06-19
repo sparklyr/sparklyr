@@ -255,7 +255,7 @@ sdf_pivot_wider <- function(
   fv <- values_fill[[value]]
   val_fill_sql <- dbplyr::translate_sql_(
     list(fv),
-    con = dbplyr::simulate_hive()
+    con = dbplyr::simulate_spark_sql()
   ) %>%
     dplyr::sql() %>%
     list()

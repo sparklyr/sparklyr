@@ -90,7 +90,7 @@ to_partition_spec <- function(group_vars, order_exprs) {
           function(x) {
             as.character(dbplyr::translate_sql(
               !!x,
-              con = dbplyr::simulate_hive()
+              con = dbplyr::simulate_spark_sql()
             ))
           }
         ) %>%

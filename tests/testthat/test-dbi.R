@@ -112,8 +112,10 @@ test_that("dbIsValid detects when a connection is opened", {
 })
 
 teardown({
-  dbRemoveTable(sc, persisted_table_name)
-  dbRemoveTable(sc, temp_table_name)
+  # These tables are only created by tests that are skipped on newer Spark
+  # versions, so tolerate them being absent during cleanup.
+  dbRemoveTable(sc, persisted_table_name, fail_if_missing = FALSE)
+  dbRemoveTable(sc, temp_table_name, fail_if_missing = FALSE)
 })
 
 test_clear_cache()

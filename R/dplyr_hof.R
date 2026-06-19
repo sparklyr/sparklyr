@@ -30,7 +30,7 @@ translate_formula <- function(f) {
   } else {
     as.character(vars)
   })
-  body_sql <- dbplyr::translate_sql(!!f[[2]], con = dbplyr::simulate_hive())
+  body_sql <- dbplyr::translate_sql(!!f[[2]], con = dbplyr::simulate_spark_sql())
   lambda <- dbplyr::sql(paste(params_sql, "->", body_sql))
 
   lambda
@@ -114,7 +114,7 @@ process_dest_col <- function(expr, dest_col) {
     c(sep = ",") %>%
     do.call(paste, .)
 
-  body_sql <- dbplyr::translate_sql(..., con = dbplyr::simulate_hive())
+  body_sql <- dbplyr::translate_sql(..., con = dbplyr::simulate_spark_sql())
 
   lambda <- dbplyr::sql(paste(params_sql, "->", body_sql))
   class(lambda) <- c(class(lambda), "spark_sql_lambda")
@@ -169,7 +169,7 @@ hof_transform <- function(
 
   sql <- paste(
     "TRANSFORM(",
-    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_spark_sql())),
     ",",
     as.character(func),
     ")"
@@ -209,7 +209,7 @@ hof_filter <- function(x, func, expr = NULL, dest_col = NULL, ...) {
 
   sql <- paste(
     "FILTER(",
-    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_spark_sql())),
     ",",
     as.character(func),
     ")"
@@ -273,12 +273,12 @@ hof_aggregate <- function(
       "AGGREGATE(",
       as.character(dbplyr::translate_sql(
         !!expr,
-        con = dbplyr::simulate_hive()
+        con = dbplyr::simulate_spark_sql()
       )),
       ",",
       as.character(dbplyr::translate_sql(
         !!rlang::enexpr(start),
-        con = dbplyr::simulate_hive()
+        con = dbplyr::simulate_spark_sql()
       )),
       ",",
       as.character(merge),
@@ -313,7 +313,7 @@ hof_exists <- function(x, pred, expr = NULL, dest_col = NULL, ...) {
 
   sql <- paste(
     "EXISTS(",
-    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_spark_sql())),
     ",",
     as.character(pred),
     ")"
@@ -377,9 +377,9 @@ hof_zip_with <- function(
 
   sql <- paste(
     "ZIP_WITH(",
-    as.character(dbplyr::translate_sql(!!left, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!left, con = dbplyr::simulate_spark_sql())),
     ",",
-    as.character(dbplyr::translate_sql(!!right, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!right, con = dbplyr::simulate_spark_sql())),
     ",",
     as.character(func),
     ")"
@@ -434,7 +434,7 @@ hof_array_sort <- function(
 
   sql <- paste(
     "ARRAY_SORT(",
-    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_spark_sql())),
     ",",
     as.character(func),
     ")"
@@ -481,7 +481,7 @@ hof_map_filter <- function(
 
   sql <- paste(
     "MAP_FILTER(",
-    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_spark_sql())),
     ",",
     as.character(func),
     ")"
@@ -533,7 +533,7 @@ hof_forall <- function(
 
   sql <- paste(
     "FORALL(",
-    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_spark_sql())),
     ",",
     as.character(pred),
     ")"
@@ -579,7 +579,7 @@ hof_transform_keys <- function(
 
   sql <- paste(
     "TRANSFORM_KEYS(",
-    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_spark_sql())),
     ",",
     as.character(func),
     ")"
@@ -625,7 +625,7 @@ hof_transform_values <- function(
 
   sql <- paste(
     "TRANSFORM_VALUES(",
-    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!expr, con = dbplyr::simulate_spark_sql())),
     ",",
     as.character(func),
     ")"
@@ -702,9 +702,9 @@ hof_map_zip_with <- function(
 
   sql <- paste(
     "MAP_ZIP_WITH(",
-    as.character(dbplyr::translate_sql(!!map1, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!map1, con = dbplyr::simulate_spark_sql())),
     ",",
-    as.character(dbplyr::translate_sql(!!map2, con = dbplyr::simulate_hive())),
+    as.character(dbplyr::translate_sql(!!map2, con = dbplyr::simulate_spark_sql())),
     ",",
     as.character(func),
     ")"
