@@ -44,8 +44,7 @@ ft_min_max_scaler <- function(
 
 ml_min_max_scaler <- ft_min_max_scaler
 
-#' @export
-ft_min_max_scaler.spark_connection <- function(
+ft_min_max_scaler_impl <- function(
   x,
   input_col = NULL,
   output_col = NULL,
@@ -54,78 +53,28 @@ ft_min_max_scaler.spark_connection <- function(
   uid = random_string("min_max_scaler_"),
   ...
 ) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    min = min,
-    max = max,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_min_max_scaler()
-
-  estimator <- spark_pipeline_stage(
-    x,
-    "org.apache.spark.ml.feature.MinMaxScaler",
-    input_col = .args[["input_col"]],
-    output_col = .args[["output_col"]],
-    uid = .args[["uid"]]
-  ) %>%
-    invoke("setMin", .args[["min"]]) %>%
-    invoke("setMax", .args[["max"]]) %>%
-    new_ml_min_max_scaler()
-
-  estimator
-}
-
-#' @export
-ft_min_max_scaler.ml_pipeline <- function(
-  x,
-  input_col = NULL,
-  output_col = NULL,
-  min = 0,
-  max = 1,
-  uid = random_string("min_max_scaler_"),
-  ...
-) {
-  stage <- ft_min_max_scaler.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    min = min,
-    max = max,
+  ml_process_feature(
+    x = x,
+    r_class = "ml_min_max_scaler",
     uid = uid,
-    ...
+    stage_constructor = new_ml_min_max_scaler,
+    invoke_steps = list(
+      input_col = input_col,
+      output_col = output_col,
+      min = min,
+      max = max
+    )
   )
-  ml_add_stage(x, stage)
 }
 
 #' @export
-ft_min_max_scaler.tbl_spark <- function(
-  x,
-  input_col = NULL,
-  output_col = NULL,
-  min = 0,
-  max = 1,
-  uid = random_string("min_max_scaler_"),
-  ...
-) {
-  stage <- ft_min_max_scaler.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    min = min,
-    max = max,
-    uid = uid,
-    ...
-  )
+ft_min_max_scaler.spark_connection <- ft_min_max_scaler_impl
 
-  if (is_ml_transformer(stage)) {
-    ml_transform(stage, x)
-  } else {
-    ml_fit_and_transform(stage, x)
-  }
-}
+#' @export
+ft_min_max_scaler.ml_pipeline <- ft_min_max_scaler_impl
+
+#' @export
+ft_min_max_scaler.tbl_spark <- ft_min_max_scaler_impl
 
 new_ml_min_max_scaler <- function(jobj) {
   new_ml_estimator(jobj, class = "ml_min_max_scaler")
@@ -133,11 +82,4 @@ new_ml_min_max_scaler <- function(jobj) {
 
 new_ml_min_max_scaler_model <- function(jobj) {
   new_ml_transformer(jobj, class = "ml_min_max_scaler_model")
-}
-
-validator_ml_min_max_scaler <- function(.args) {
-  .args <- validate_args_transformer(.args)
-  .args[["min"]] <- cast_scalar_double(.args[["min"]])
-  .args[["max"]] <- cast_scalar_double(.args[["max"]])
-  .args
 }

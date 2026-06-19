@@ -22,8 +22,7 @@ ft_normalizer <- function(
 
 ml_normalizer <- ft_normalizer
 
-#' @export
-ft_normalizer.spark_connection <- function(
+ft_normalizer_impl <- function(
   x,
   input_col = NULL,
   output_col = NULL,
@@ -31,76 +30,28 @@ ft_normalizer.spark_connection <- function(
   uid = random_string("normalizer_"),
   ...
 ) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    p = p,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_normalizer()
-
-  jobj <- spark_pipeline_stage(
-    x,
-    "org.apache.spark.ml.feature.Normalizer",
-    input_col = .args[["input_col"]],
-    output_col = .args[["output_col"]],
-    uid = .args[["uid"]]
-  ) %>%
-    invoke("setP", .args[["p"]])
-
-  new_ml_normalizer(jobj)
-}
-
-#' @export
-ft_normalizer.ml_pipeline <- function(
-  x,
-  input_col = NULL,
-  output_col = NULL,
-  p = 2,
-  uid = random_string("normalizer_"),
-  ...
-) {
-  stage <- ft_normalizer.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    p = p,
+  ml_process_feature(
+    x = x,
+    r_class = "ml_normalizer",
     uid = uid,
-    ...
+    stage_constructor = new_ml_normalizer,
+    invoke_steps = list(
+      input_col = input_col,
+      output_col = output_col,
+      p = p
+    )
   )
-  ml_add_stage(x, stage)
 }
 
 #' @export
-ft_normalizer.tbl_spark <- function(
-  x,
-  input_col = NULL,
-  output_col = NULL,
-  p = 2,
-  uid = random_string("normalizer_"),
-  ...
-) {
-  stage <- ft_normalizer.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    p = p,
-    uid = uid,
-    ...
-  )
-  ml_transform(stage, x)
-}
+ft_normalizer.spark_connection <- ft_normalizer_impl
+
+#' @export
+ft_normalizer.ml_pipeline <- ft_normalizer_impl
+
+#' @export
+ft_normalizer.tbl_spark <- ft_normalizer_impl
 
 new_ml_normalizer <- function(jobj) {
   new_ml_transformer(jobj, class = "ml_normalizer")
-}
-
-validator_ml_normalizer <- function(.args) {
-  .args <- validate_args_transformer(.args)
-  .args[["p"]] <- cast_scalar_double(.args[["p"]])
-  if (.args[["p"]] < 1) {
-    stop("`p` must be at least 1.")
-  }
-  .args
 }

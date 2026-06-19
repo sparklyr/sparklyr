@@ -182,6 +182,7 @@ Collate:
     'livy_install.R'
     'livy_invoke.R'
     'livy_service.R'
+    'ml-process.R'
     'ml_clustering.R'
     'ml_classification_decision_tree_classifier.R'
     'ml_classification_gbt_classifier.R'

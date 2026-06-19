@@ -62,4 +62,49 @@ test_that("ft_standard_scaler() works properly", {
   )
 })
 
+test_that("ft_standard_scaler() survives ml_cross_validator (tuning/reflection)", {
+  sc <- testthat_spark_connection()
+  test_requires_version("3.0.0")
+  iris_tbl <- testthat_tbl("iris")
+
+  # A pure feature stage can't be cross-validated alone (CV needs an evaluator,
+  # which needs predictions), so the scaler sits upstream of a model in the tuned
+  # pipeline. This asserts the migrated estimator survives the
+  # tuning -> fit -> reflect-back path with its specific class and mean/std
+  # accessors intact -- i.e. that keeping new_ml_standard_scaler_model matters.
+  pipeline <- ml_pipeline(sc) %>%
+    ft_vector_assembler(
+      c("Sepal_Length", "Sepal_Width", "Petal_Length"),
+      "features_raw"
+    ) %>%
+    ft_standard_scaler(
+      "features_raw",
+      "features",
+      with_mean = TRUE,
+      uid = "ss_canary"
+    ) %>%
+    ft_string_indexer("Species", "label") %>%
+    ml_logistic_regression(uid = "lr_canary")
+
+  cv <- ml_cross_validator(
+    sc,
+    estimator = pipeline,
+    estimator_param_maps = list(lr_canary = list(reg_param = list(0, 0.1))),
+    evaluator = ml_multiclass_classification_evaluator(sc),
+    num_folds = 2,
+    seed = 1
+  )
+
+  cv_model <- ml_fit(cv, iris_tbl)
+
+  best <- cv_model$best_model
+  expect_true(inherits(best, "ml_pipeline_model"))
+  ss_stage <- ml_stage(best, "ss_canary")
+  # reflection must rebuild the *specific* fitted-model class + accessors,
+  # not the generic ml_transformer fallback
+  expect_true(inherits(ss_stage, "ml_standard_scaler_model"))
+  expect_false(is.null(ss_stage$mean))
+  expect_false(is.null(ss_stage$std))
+})
+
 test_clear_cache()

@@ -21,8 +21,12 @@ ft_pca <- function(
   UseMethod("ft_pca")
 }
 
-#' @export
-ft_pca.spark_connection <- function(
+# Note: ft_pca has no `ml_pca <- ft_pca` alias -- ml_pca() is a distinct exported
+# wrapper (defined below) that builds a vector_assembler -> pca pipeline and
+# returns an ml_model. It calls ft_pca.spark_connection directly, so it keeps
+# working with the impl below.
+
+ft_pca_impl <- function(
   x,
   input_col = NULL,
   output_col = NULL,
@@ -30,72 +34,27 @@ ft_pca.spark_connection <- function(
   uid = random_string("pca_"),
   ...
 ) {
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    k = k,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_pca()
-
-  estimator <- spark_pipeline_stage(
-    x,
-    "org.apache.spark.ml.feature.PCA",
-    input_col = .args[["input_col"]],
-    output_col = .args[["output_col"]],
-    uid = .args[["uid"]]
-  ) %>%
-    jobj_set_param("setK", .args[["k"]]) %>%
-    new_ml_pca()
-
-  estimator
-}
-
-#' @export
-ft_pca.ml_pipeline <- function(
-  x,
-  input_col = NULL,
-  output_col = NULL,
-  k = NULL,
-  uid = random_string("pca_"),
-  ...
-) {
-  stage <- ft_pca.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    k = k,
+  ml_process_feature(
+    x = x,
+    r_class = "ml_pca",
     uid = uid,
-    ...
+    stage_constructor = new_ml_pca,
+    invoke_steps = list(
+      input_col = input_col,
+      output_col = output_col,
+      k = k
+    )
   )
-  ml_add_stage(x, stage)
 }
 
 #' @export
-ft_pca.tbl_spark <- function(
-  x,
-  input_col = NULL,
-  output_col = NULL,
-  k = NULL,
-  uid = random_string("pca_"),
-  ...
-) {
-  stage <- ft_pca.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    k = k,
-    uid = uid,
-    ...
-  )
+ft_pca.spark_connection <- ft_pca_impl
 
-  if (is_ml_transformer(stage)) {
-    ml_transform(stage, x)
-  } else {
-    ml_fit_and_transform(stage, x)
-  }
-}
+#' @export
+ft_pca.ml_pipeline <- ft_pca_impl
+
+#' @export
+ft_pca.tbl_spark <- ft_pca_impl
 
 new_ml_pca <- function(jobj) {
   new_ml_estimator(jobj, class = "ml_pca")
@@ -110,12 +69,6 @@ new_ml_pca_model <- function(jobj) {
     pc = possibly_null(~ read_spark_matrix(jobj, "pc"))(),
     class = "ml_pca_model"
   )
-}
-
-validator_ml_pca <- function(.args) {
-  .args <- validate_args_transformer(.args)
-  .args[["k"]] <- cast_nullable_scalar_integer(.args[["k"]])
-  .args
 }
 
 #' @rdname ft_pca

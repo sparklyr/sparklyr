@@ -27,6 +27,8 @@
   "org.apache.spark.ml.feature.MinMaxScalerModel": "ml_min_max_scaler_model",
   "org.apache.spark.ml.feature.MaxAbsScaler": "ml_max_abs_scaler",
   "org.apache.spark.ml.feature.MaxAbsScalerModel": "ml_max_abs_scaler_model",
+  "org.apache.spark.ml.feature.RobustScaler": "ml_robust_scaler",
+  "org.apache.spark.ml.feature.RobustScalerModel": "ml_robust_scaler_model",
   "org.apache.spark.ml.feature.Imputer": "ml_imputer",
   "org.apache.spark.ml.feature.ImputerModel": "ml_imputer_model",
   "org.apache.spark.ml.feature.ChiSqSelector": "ml_chisq_selector",

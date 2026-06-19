@@ -6,8 +6,8 @@
 \usage{
 ft_binarizer(
   x,
-  input_col,
-  output_col,
+  input_col = NULL,
+  output_col = NULL,
   threshold = 0,
   uid = random_string("binarizer_"),
   ...

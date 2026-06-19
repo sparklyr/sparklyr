@@ -39,76 +39,35 @@ ft_max_abs_scaler <- function(
 
 ml_max_abs_scaler <- ft_max_abs_scaler
 
-#' @export
-ft_max_abs_scaler.spark_connection <- function(
+ft_max_abs_scaler_impl <- function(
   x,
   input_col = NULL,
   output_col = NULL,
   uid = random_string("max_abs_scaler_"),
   ...
 ) {
-  spark_require_version(x, "2.0.0", "MaxAbsScaler")
+  spark_require_version(spark_connection(x), "2.0.0", "MaxAbsScaler")
 
-  .args <- list(
-    input_col = input_col,
-    output_col = output_col,
-    uid = uid
-  ) %>%
-    c(rlang::dots_list(...)) %>%
-    validator_ml_max_abs_scaler()
-
-  estimator <- spark_pipeline_stage(
-    x,
-    "org.apache.spark.ml.feature.MaxAbsScaler",
-    input_col = .args[["input_col"]],
-    output_col = .args[["output_col"]],
-    uid = .args[["uid"]]
-  ) %>%
-    new_ml_max_abs_scaler()
-
-  estimator
-}
-
-#' @export
-ft_max_abs_scaler.ml_pipeline <- function(
-  x,
-  input_col = NULL,
-  output_col = NULL,
-  uid = random_string("max_abs_scaler_"),
-  ...
-) {
-  stage <- ft_max_abs_scaler.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
+  ml_process_feature(
+    x = x,
+    r_class = "ml_max_abs_scaler",
     uid = uid,
-    ...
+    stage_constructor = new_ml_max_abs_scaler,
+    invoke_steps = list(
+      input_col = input_col,
+      output_col = output_col
+    )
   )
-  ml_add_stage(x, stage)
 }
 
 #' @export
-ft_max_abs_scaler.tbl_spark <- function(
-  x,
-  input_col = NULL,
-  output_col = NULL,
-  uid = random_string("max_abs_scaler_"),
-  ...
-) {
-  stage <- ft_max_abs_scaler.spark_connection(
-    x = spark_connection(x),
-    input_col = input_col,
-    output_col = output_col,
-    uid = uid,
-    ...
-  )
+ft_max_abs_scaler.spark_connection <- ft_max_abs_scaler_impl
 
-  if (is_ml_transformer(stage)) {
-    ml_transform(stage, x)
-  } else {
-    ml_fit_and_transform(stage, x)
-  }
-}
+#' @export
+ft_max_abs_scaler.ml_pipeline <- ft_max_abs_scaler_impl
+
+#' @export
+ft_max_abs_scaler.tbl_spark <- ft_max_abs_scaler_impl
 
 new_ml_max_abs_scaler <- function(jobj) {
   new_ml_estimator(jobj, class = "ml_max_abs_scaler")
@@ -116,8 +75,4 @@ new_ml_max_abs_scaler <- function(jobj) {
 
 new_ml_max_abs_scaler_model <- function(jobj) {
   new_ml_transformer(jobj, class = "ml_max_abs_scaler_model")
-}
-
-validator_ml_max_abs_scaler <- function(.args) {
-  validate_args_transformer(.args)
 }

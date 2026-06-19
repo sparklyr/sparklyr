@@ -68,7 +68,16 @@ params_base_validator <- function(x) {
     thresholds = function(x) cast_double_list(x, allow_null = TRUE),
     threshold = function(x) cast_scalar_double(x),
     smoothing = function(x) cast_scalar_double(x),
-    model_type = function(x) cast_choice(x, c("multinomial", "bernoulli"))
+    model_type = function(x) cast_choice(x, c("multinomial", "bernoulli")),
+    # Feature transformers/estimators (ml_process_feature) -- input/output columns
+    # are universal across ft_* stages. They were previously cast in
+    # validate_args_transformer(); they now flow through invoke_steps via
+    # setInputCol/setOutputCol. Per-transformer scalar params are class-specific and
+    # live in params_validator.ml_<class> overrides (see R/ml-process.R).
+    input_col = function(x) cast_nullable_string(x),
+    output_col = function(x) cast_nullable_string(x),
+    input_cols = function(x) cast_string_list(x, allow_null = TRUE),
+    output_cols = function(x) cast_string_list(x, allow_null = TRUE)
   )
 }
 
