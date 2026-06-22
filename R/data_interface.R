@@ -846,7 +846,7 @@ spark_read_source <- function(
   path <- target$path
 
   df_reader <- spark_data_read_generic(sc, source, "format", options, columns)
-  df <- if (is.null(path)) {
+  df <- if (is.na(path)) {
     invoke(df_reader, "load")
   } else {
     if (sc$method != "databricks-connect") {
