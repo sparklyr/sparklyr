@@ -814,5 +814,67 @@ test_that("spark_read_image works as expected", {
   )
 })
 
+test_that("spark_save_table() / spark_load_table() warn and delegate", {
+  skip_connection("format-table")
+  skip_databricks_connect()
+  if (spark_version(sc) < "2.0.0") {
+    skip("tables not supported before 2.0.0")
+  }
+  test_requires("dplyr")
+
+  df <- copy_to(sc, data.frame(id = 1:3), overwrite = TRUE)
+  tbl <- random_string("test_deprecated_table")
+
+  # spark_save_table() delegates to spark_write_table()
+  expect_warning(spark_save_table(df, tbl), "deprecated")
+  expect_equal(sdf_nrow(tbl(sc, tbl)), 3)
+
+  # spark_load_table() delegates to spark_read_table(); `path` is ignored
+  expect_warning(loaded <- spark_load_table(sc, tbl, path = tbl), "deprecated")
+  expect_equal(sdf_nrow(loaded), 3)
+})
+
+test_that("spark_expect_jobj_class() errors on a mismatched class", {
+  skip_connection("format-table")
+
+  df <- spark_dataframe(testthat_tbl("iris"))
+  expect_error(
+    spark_expect_jobj_class(df, "org.apache.spark.sql.NotADataFrame"),
+    "only supported on"
+  )
+})
+
+test_that("spark_write_jdbc() errors when the 'url' option is missing", {
+  skip_connection("format-table")
+
+  expect_error(
+    spark_write_jdbc(testthat_tbl("iris"), name = "no_url", options = list()),
+    "Option 'url' is expected"
+  )
+})
+
+test_that("spark_read_libsvm() reads a libsvm file", {
+  skip_connection("format-libsvm")
+  skip_databricks_connect()
+
+  path <- get_test_data_path("sample_libsvm_data.txt")
+  sdf <- spark_read_libsvm(sc, name = random_string(), path = path)
+
+  expect_setequal(colnames(sdf), c("label", "features"))
+  expect_gt(sdf_nrow(sdf), 0)
+})
+
+test_that("spark_write_parquet() accepts a list of modes", {
+  # exercises the list-mode branch of spark_data_apply_mode()
+  skip_connection("format-parquet")
+  skip_databricks_connect()
+
+  sdf <- sdf_copy_to(sc, data.frame(id = 1:3), overwrite = TRUE)
+  path <- tempfile(pattern = "test_write_parquet_list_mode_")
+
+  spark_write_parquet(sdf, path, mode = list("overwrite"))
+  expect_equal(sdf_nrow(spark_read_parquet(sc, random_string(), path)), 3)
+})
+
 
 test_clear_cache()

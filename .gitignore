@@ -63,3 +63,5 @@ tests/testthat/iris-out/
 .Renviron
 .claude/*.json
 
+# roborev snapshots
+/.roborev/
