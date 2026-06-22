@@ -370,18 +370,21 @@ test_that("spark_write_rds() works as expected with multiple Spark dataframe par
 # ---- Coverage tests for R/sdf_interface.R ------------------------------------
 
 test_that("sdf_sort() sorts by one and by multiple columns", {
+  # `a` has a tie (two 2L rows) so the secondary `b` key is actually exercised
   df <- sdf_copy_to(
     sc,
-    data.frame(a = c(3L, 1L, 2L), b = c("z", "y", "x"), stringsAsFactors = FALSE),
+    data.frame(a = c(2L, 1L, 2L), b = c("z", "y", "x"), stringsAsFactors = FALSE),
     name = random_string("test_sdf_sort_"),
     overwrite = TRUE
   )
 
   one <- sdf_sort(df, "a") %>% dplyr::collect()
-  expect_equal(one$a, c(1L, 2L, 3L))
+  expect_equal(one$a, c(1L, 2L, 2L))
 
   multi <- sdf_sort(df, c("a", "b")) %>% dplyr::collect()
-  expect_equal(multi$a, c(1L, 2L, 3L))
+  expect_equal(multi$a, c(1L, 2L, 2L))
+  # within the a == 2 tie, b breaks the tie ascending: "x" before "z"
+  expect_equal(multi$b, c("y", "x", "z"))
 })
 
 test_that("sdf_sort() errors when no columns are supplied", {
