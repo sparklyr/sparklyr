@@ -135,7 +135,7 @@ test_that("jar file is created", {
   )
   skip_connection("spark_compile")
 
-  number_of_jars <- 7
+  number_of_jars <- 4
 
   jar_folder <- path.expand("~/testjar")
 

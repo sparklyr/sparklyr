@@ -1,21 +1,31 @@
-skip_connection("spark-write-rds")
-test_requires("3.0")
+skip_connection("sdf_interface")
 skip_on_livy()
 skip_on_arrow_devel()
 
 sc <- testthat_spark_connection()
 
-jdouble.min <- invoke_static(sc, "java.lang.Double", "MIN_VALUE")
-jdouble.max <- invoke_static(sc, "java.lang.Double", "MAX_VALUE")
-jfloat.min <- invoke_static(sc, "java.lang.Float", "MIN_VALUE")
-jfloat.max <- invoke_static(sc, "java.lang.Float", "MAX_VALUE")
-
-test_rds_output <- "/tmp/test.rds"
+# Java numeric bounds used by the spark_write_rds() round-trip tests. Wrapped in
+# a helper so that no Spark calls run at file-load time (i.e. outside test_that).
+java_numeric_bounds <- function(sc) {
+  list(
+    double_min = invoke_static(sc, "java.lang.Double", "MIN_VALUE"),
+    double_max = invoke_static(sc, "java.lang.Double", "MAX_VALUE"),
+    float_min = invoke_static(sc, "java.lang.Float", "MIN_VALUE"),
+    float_max = invoke_static(sc, "java.lang.Float", "MAX_VALUE")
+  )
+}
 
 test_that("spark_write_rds() works as expected with non-array columns", {
-  test_requires_version("2.4.0")
+  test_requires_version("3.0.0")
   skip_on_arrow()
   skip_databricks_connect()
+
+  bounds <- java_numeric_bounds(sc)
+  jdouble.min <- bounds$double_min
+  jdouble.max <- bounds$double_max
+  jfloat.min <- bounds$float_min
+  jfloat.max <- bounds$float_max
+  test_rds_output <- tempfile(fileext = ".rds")
 
   test_lgl_vals <- c(TRUE, NA, FALSE, NA, TRUE, NA, FALSE, NA)
   test_int_vals <- c(
@@ -171,9 +181,14 @@ test_that("spark_write_rds() works as expected with non-array columns", {
 })
 
 test_that("spark_write_rds() works as expected with array columns", {
-  test_requires_version("2.4.0")
+  test_requires_version("3.0.0")
   skip_on_arrow()
   skip_databricks_connect()
+
+  bounds <- java_numeric_bounds(sc)
+  jfloat.min <- bounds$float_min
+  jfloat.max <- bounds$float_max
+  test_rds_output <- tempfile(fileext = ".rds")
 
   test_lgl_arr <- list(
     TRUE,
@@ -319,7 +334,7 @@ test_that("spark_write_rds() works as expected with array columns", {
 })
 
 test_that("spark_write_rds() works as expected with multiple Spark dataframe partitions", {
-  test_requires_version("2.0.0")
+  test_requires_version("3.0.0")
   skip_on_arrow()
   skip_databricks_connect()
 
@@ -350,6 +365,102 @@ test_that("spark_write_rds() works as expected with multiple Spark dataframe par
   # ignore timezone attributes in expect_equivalent() comparison
   attributes(flights_df$time_hour) <- attributes(actual_df$time_hour)
   expect_equivalent(actual_df, flights_df)
+})
+
+# ---- Coverage tests for R/sdf_interface.R ------------------------------------
+
+test_that("sdf_sort() sorts by one and by multiple columns", {
+  df <- sdf_copy_to(
+    sc,
+    data.frame(a = c(3L, 1L, 2L), b = c("z", "y", "x"), stringsAsFactors = FALSE),
+    name = random_string("test_sdf_sort_"),
+    overwrite = TRUE
+  )
+
+  one <- sdf_sort(df, "a") %>% dplyr::collect()
+  expect_equal(one$a, c(1L, 2L, 3L))
+
+  multi <- sdf_sort(df, c("a", "b")) %>% dplyr::collect()
+  expect_equal(multi$a, c(1L, 2L, 3L))
+})
+
+test_that("sdf_sort() errors when no columns are supplied", {
+  df <- sdf_copy_to(
+    sc, data.frame(a = 1:3),
+    name = random_string("test_sdf_sort_err_"), overwrite = TRUE
+  )
+  expect_error(sdf_sort(df, character(0)), "one or more column names")
+})
+
+test_that("sdf_sample() with a seed is reproducible", {
+  df <- sdf_copy_to(
+    sc, data.frame(id = 1:100),
+    name = random_string("test_sdf_sample_"), overwrite = TRUE
+  )
+  s1 <- sdf_sample(df, fraction = 0.5, replacement = FALSE, seed = 42L) %>%
+    dplyr::collect()
+  s2 <- sdf_sample(df, fraction = 0.5, replacement = FALSE, seed = 42L) %>%
+    dplyr::collect()
+  expect_equal(sort(s1$id), sort(s2$id))
+})
+
+test_that("sdf_weighted_sample() draws the requested number of rows", {
+  df <- sdf_copy_to(
+    sc, data.frame(id = 1:100, w = runif(100)),
+    name = random_string("test_sdf_wsample_"), overwrite = TRUE
+  )
+  res <- sdf_weighted_sample(df, weight_col = "w", k = 10, replacement = FALSE) %>%
+    dplyr::collect()
+  expect_equal(nrow(res), 10)
+})
+
+test_that("sdf_persist() forces computation and returns a tbl_spark", {
+  df <- sdf_copy_to(
+    sc, data.frame(id = 1:10),
+    name = random_string("test_sdf_persist_"), overwrite = TRUE
+  )
+  persisted <- sdf_persist(df, storage.level = "MEMORY_ONLY")
+  expect_s3_class(persisted, "tbl_spark")
+  expect_equal(sdf_nrow(persisted), 10)
+})
+
+test_that("sdf_broadcast() returns an equivalent tbl_spark", {
+  df <- sdf_copy_to(
+    sc, data.frame(id = 1:10),
+    name = random_string("test_sdf_broadcast_"), overwrite = TRUE
+  )
+  b <- sdf_broadcast(df)
+  expect_s3_class(b, "tbl_spark")
+  expect_equal(sdf_nrow(b), 10)
+})
+
+test_that("sdf_drop_duplicates() removes duplicate rows (all cols and subset)", {
+  df <- sdf_copy_to(
+    sc,
+    data.frame(a = c(1L, 1L, 2L), b = c("x", "x", "y"), stringsAsFactors = FALSE),
+    name = random_string("test_sdf_dedup_"), overwrite = TRUE
+  )
+  expect_equal(nrow(sdf_drop_duplicates(df) %>% dplyr::collect()), 2)
+  expect_equal(nrow(sdf_drop_duplicates(df, cols = "a") %>% dplyr::collect()), 2)
+})
+
+test_that("sdf_drop_duplicates() errors on unknown columns", {
+  df <- sdf_copy_to(
+    sc, data.frame(a = 1:3),
+    name = random_string("test_sdf_dedup_err_"), overwrite = TRUE
+  )
+  expect_error(sdf_drop_duplicates(df, cols = "nope"), "not in the data frame")
+})
+
+test_that("sdf_register() registers a Spark jobj under a given name", {
+  df <- sdf_copy_to(
+    sc, data.frame(id = 1:5),
+    name = random_string("test_sdf_register_"), overwrite = TRUE
+  )
+  nm <- random_string("sdf_reg_")
+  registered <- sdf_register(spark_dataframe(df), name = nm)
+  expect_s3_class(registered, "tbl_spark")
+  expect_true(nm %in% src_tbls(sc))
 })
 
 test_clear_cache()
