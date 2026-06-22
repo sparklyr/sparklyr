@@ -2,7 +2,9 @@
 # These exercise pure-R validation paths and need no Spark connection.
 
 test_that("spark_read_compat_param() requires a path", {
-  # data_interface.R:17-18 — both name and path NULL
+  # data_interface.R:17-18 — both name and path NULL.
+  # `sc` is intentionally NULL here: this branch errors before `sc` is ever
+  # used (only the gen_sdf_name() branches read sc$config).
   expect_error(
     spark_read_compat_param(NULL, name = NULL, path = NULL),
     "The 'path' parameter must be specified"
