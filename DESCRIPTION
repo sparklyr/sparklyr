@@ -117,12 +117,11 @@ Suggests:
 Encoding: UTF-8
 SystemRequirements: Spark: 2.x, or 3.x, or 4.x
 Collate:
-    'spark_data_build_types.R'
-    'arrow_data.R'
     'spark_invoke.R'
     'browse_url.R'
     'spark_connection.R'
-    'avro_utils.R'
+    'spark_data_build_types.R'
+    'arrow.R'
     'config_settings.R'
     'config_spark.R'
     'connection_instances.R'

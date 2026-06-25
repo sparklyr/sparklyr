@@ -1,4 +1,4 @@
-#' @include avro_utils.R
+#' @include arrow.R
 #' @include sdf_interface.R
 #' @include spark_apply.R
 

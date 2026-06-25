@@ -2,7 +2,7 @@
 #'
 #' Read Spark Configuration
 #'
-#' @include avro_utils.R
+#' @include arrow.R
 
 #' Read Spark Configuration
 #'
