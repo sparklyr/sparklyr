@@ -1,5 +1,5 @@
 #' @include connection_spark.R
-#' @include sql_utils.R
+#' @include dplyr_sql.R
 #' @include tbl_spark.R
 NULL
 

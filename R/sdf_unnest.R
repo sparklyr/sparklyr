@@ -1,4 +1,4 @@
-#' @include mutation.R
+#' @include dplyr_verbs.R
 #' @include sdf_wrapper.R
 #' @include tidyr_utils.R
 NULL
