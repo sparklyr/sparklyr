@@ -1,4 +1,4 @@
-#' @include spark_data_build_types.R
+#' @include spark_data.R
 NULL
 
 #' Read files created by the stream

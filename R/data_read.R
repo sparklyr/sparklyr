@@ -1,7 +1,7 @@
 #' @include arrow.R
 #' @include sdf_interface.R
 #' @include spark_apply.R
-#' @include spark_data_build_types.R
+#' @include spark_data.R
 
 gen_sdf_name <- function(path, config) {
   path %>%

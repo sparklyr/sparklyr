@@ -40,7 +40,7 @@
 #'
 #' @name spark-api
 #'
-#' @include browse_url.R
+#' @include spark_ide.R
 NULL
 
 #' @name spark-api

@@ -1,6 +1,6 @@
-#' @include spark_data_build_types.R
+#' @include spark_data.R
 #' @include spark_connection.R
-#' @include spark_invoke.R
+#' @include core_invoke.R
 NULL
 
 arrow_enabled <- function(sc, object) {

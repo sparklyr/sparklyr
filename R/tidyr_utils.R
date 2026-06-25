@@ -1,5 +1,5 @@
 #' @include dplyr_spark.R
-#' @include spark_data_build_types.R
+#' @include spark_data.R
 #' @include dplyr_sql.R
 #' @include utils.R
 NULL

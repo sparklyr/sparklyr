@@ -4,7 +4,7 @@
 #'
 #' @name spark_connection-class
 #' @exportClass spark_connection
-#' @include spark_version.R
+#' @include spark_context.R
 NULL
 
 methods::setOldClass(c("livy_connection", "spark_connection"))

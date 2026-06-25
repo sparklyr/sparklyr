@@ -1,6 +1,6 @@
 # nocov start
 
-#' @include browse_url.R
+#' @include spark_ide.R
 NULL
 
 connection_progress_update <- function(jobName, progressUnits, url) {

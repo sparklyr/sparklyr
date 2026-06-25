@@ -1,4 +1,4 @@
-#' @include spark_dataframe.R
+#' @include spark_data.R
 #' @include spark_sql.R
 #' @include tbl_spark.R
 #' @include utils.R
