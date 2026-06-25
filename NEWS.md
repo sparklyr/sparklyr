@@ -1,5 +1,12 @@
 # Sparklyr (dev)
 
+- Internal reorganization of the package's R source files, consolidating
+related functions into a smaller, more cohesive set of scripts. No exported
+functions, behavior, or APIs change.
+
+- Reorganized the test suite to follow a strict 1:1 correspondence between each
+test file and its R source file. No tests were added, removed, or altered.
+
 # Sparklyr 1.9.5
 
 - Restores compatibility with dbplyr (>= 2.6.0), which changed the Hive
