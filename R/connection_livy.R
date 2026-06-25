@@ -1,5 +1,5 @@
 # nocov start
-#' @include shell_connection.R
+#' @include connection_shell.R
 
 #' @export
 create_hive_context.livy_connection <- function(sc) {

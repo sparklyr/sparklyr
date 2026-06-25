@@ -363,3 +363,119 @@ spark_yarn_cluster_get_gateway <- function(config, start_time) {
 
   strsplit(amHostHttpAddress, ":")[[1]][[1]]
 }
+
+spark_yarn_get_conf_property <- function(property, fails = TRUE) {
+  confDir <- Sys.getenv("YARN_CONF_DIR")
+  if (nchar(confDir) == 0) {
+    # some systems don't set YARN_CONF_DIR but do set HADOOP_CONF_DIR
+    confDir <- Sys.getenv("HADOOP_CONF_DIR")
+    if (nchar(confDir) == 0) {
+      if (fails) {
+        stop(
+          "Yarn Cluster mode requires YARN_CONF_DIR or HADOOP_CONF_DIR to be set."
+        )
+      } else {
+        return(NULL)
+      }
+    }
+  }
+
+  yarnSite <- file.path(confDir, "yarn-site.xml")
+  if (!file.exists(yarnSite)) {
+    if (fails) {
+      stop(
+        "Yarn Cluster mode requires yarn-site.xml to exist under YARN_CONF_DIR"
+      )
+    } else {
+      return(NULL)
+    }
+  }
+
+  yarnSiteXml <- xml2::read_xml(yarnSite)
+
+  yarnPropertyValue <- xml2::xml_text(xml2::xml_find_all(
+    yarnSiteXml,
+    paste0("//name[.='", property, "']/parent::property/value")
+  ))
+
+  get_variables_in_value_strings <- function(strings) {
+    var.regex <- "\\$\\{([^$]+)\\}"
+    parsed <- gregexpr(var.regex, strings, perl = TRUE)
+    lapply(seq_along(parsed), function(j) {
+      p <- parsed[[j]]
+      unlist(sapply(seq_along(p), function(i) {
+        if (p[i] == -1) {
+          return(NULL)
+        }
+        st <- attr(p, "capture.start")[i, ]
+        substring(strings[j], st, st + attr(p, "capture.length")[i, ] - 1)
+      }))
+    })
+  }
+
+  while (
+    length(vars <- get_variables_in_value_strings(yarnPropertyValue)) &&
+      length(vars[[1]])
+  ) {
+    for (var in vars[[1]]) {
+      value <- xml2::xml_text(xml2::xml_find_all(
+        yarnSiteXml,
+        paste0("//name[.='", var, "']/parent::property/value")
+      ))
+
+      yarnPropertyValue <- gsub(
+        paste0("${", var, "}"),
+        value,
+        yarnPropertyValue,
+        fixed = TRUE
+      )
+    }
+  }
+
+  yarnPropertyValue
+}
+
+spark_connection_yarn_ui <- function(sc) {
+  yarnui_url <- spark_config_value(sc$config, "sparklyr.web.yarn")
+  if (!is.null(yarnui_url)) {
+    yarnui_url
+  } else {
+    spark_ui <- spark_web(sc)
+
+    domain_protocol <- regmatches(
+      spark_ui,
+      regexec("^http://|^https://", spark_ui)
+    )[[1]]
+
+    domain_port <- strsplit(gsub("^http://|^https://", "", spark_ui), "/")[[1]][
+      1
+    ]
+    domain <- gsub(":[0-9]+$", "", domain_port)
+
+    port <- "8088"
+    webapp_address <- paste0(domain_protocol, domain, ":", port)
+
+    rm_hostname <- spark_yarn_get_conf_property(
+      "yarn.resourcemanager.hostname",
+      fails = FALSE
+    )
+    if (length(rm_hostname)) {
+      webapp_address <- paste0(domain_protocol, rm_hostname, port)
+    }
+
+    rm_address <- spark_yarn_get_conf_property(
+      "yarn.resourcemanager.address",
+      fails = FALSE
+    )
+    if (length(rm_address)) {
+      webapp_address <- paste0(
+        domain_protocol,
+        gsub(":[0-9]+$", "", rm_address),
+        ":",
+        port
+      )
+    }
+
+    webapp_address
+  }
+}

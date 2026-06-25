@@ -1,4 +1,4 @@
-#' @include connection_spark.R
+#' @include connection.R
 #' @include dplyr_sql.R
 #' @include tbl_spark.R
 NULL

@@ -283,3 +283,142 @@ livy_home_dir <- function(version = NULL) {
 }
 
 # nocov end
+
+# nocov start
+
+livy_invoke_serialize <- function(sc, static, object, method, ...) {
+  if (is.null(sc)) {
+    stop("The connection is no longer valid.")
+  }
+
+  if (inherits(object, "livy_jobj")) {
+    object <- object$id
+  }
+
+  rc <- rawConnection(raw(), "r+")
+  writeString(rc, object)
+  writeBoolean(rc, static)
+  writeBoolean(rc, FALSE) # return_jobj_ref
+  writeString(rc, method)
+
+  args <- list(...)
+  writeInt(rc, length(args))
+  writeArgs(rc, args)
+  bytes <- rawConnectionValue(rc)
+  close(rc)
+
+  base64 <- base64_encode(bytes)
+  base64
+}
+
+livy_invoke_deserialize <- function(sc, base64) {
+  rv <- base64_decode(base64)
+
+  rc <- rawConnection(rv, "r+")
+
+  returnStatus <- readInt(rc)
+  if (length(returnStatus) == 0) {
+    stop("No status is returned. Livy backend might have failed.")
+  }
+  if (returnStatus != 0) {
+    msg <- readString(rc)
+    withr::with_options(
+      list(
+        warning.length = 8000
+      ),
+      {
+        close(rc)
+        stop(msg, call. = FALSE)
+      }
+    )
+  }
+
+  conn <- structure(list(rc = rc, state = sc$state), class = c("livy_backend"))
+
+  object <- readObject(conn)
+  close(rc)
+
+  attach_connection(object, sc)
+}
+
+#' @export
+jobj_subclass.livy_backend <- function(con) {
+  "livy_jobj"
+}
+
+# nocov end
+
+# nocov start
+
+#' Start Livy
+#'
+#' Starts the livy service.
+#'
+#' @param version The version of \samp{livy} to use.
+#' @param spark_version The version of \samp{spark} to connect to.
+#' @param stdout,stderr where output to 'stdout' or 'stderr' should
+#'   be sent. Same options as \code{system2}.
+#' @param ... Optional arguments; currently unused.
+#'
+#' @rdname livy_service
+#' @export
+livy_service_start <- function(
+  version = NULL,
+  spark_version = NULL,
+  stdout = "",
+  stderr = "",
+  ...
+) {
+  env <- unlist(list(
+    "SPARK_HOME" = spark_home_dir(version = spark_version)
+  ))
+
+  if (identical(version, NULL)) {
+    version <- livy_install_find() %>%
+      `[[`("livy")
+  }
+
+  # warn if the user attempts to use livy 0.2.0 with Spark >= 2.0.0
+  if (!identical(spark_version, NULL)) {
+    spark_version <- cast_string(spark_version)
+    if (
+      version == "0.2.0" &&
+        numeric_version(spark_version) >= "2.0.0"
+    ) {
+      stopf("livy %s is not compatible with Spark (>= %s)", version, "2.0.0")
+    }
+  }
+
+  livyStart <- file.path(livy_home_dir(version = version), "bin/livy-server")
+
+  withr::with_envvar(env, {
+    system2(
+      livyStart,
+      wait = FALSE,
+      stdout = stdout,
+      stderr = stderr
+    )
+  })
+}
+
+#' Stops Livy
+#'
+#' Stops the running instances of the livy service.
+#'
+#' @rdname livy_service
+#' @export
+livy_service_stop <- function() {
+  if (.Platform$OS.type != "unix") {
+    stop("Unsupported command in this platform")
+  }
+
+  if (any(grepl(".*LivyServer", system2("jps", stdout = TRUE)))) {
+    system2(
+      "kill",
+      c("-9", "`jps | grep \"LivyServer\" | cut -d \" \" -f 1`"),
+      wait = TRUE
+    )
+  }
+}
+
+# nocov end

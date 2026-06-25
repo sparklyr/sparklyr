@@ -1,5 +1,5 @@
 #' @include spark_data.R
-#' @include spark_connection.R
+#' @include connection_spark.R
 #' @include core_invoke.R
 NULL
 

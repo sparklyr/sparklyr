@@ -206,7 +206,7 @@ spark_connect_gateway <- function(
   }
 }
 
-#' @include shell_connection.R
+#' @include connection_shell.R
 
 master_is_gateway <- function(master) {
   length(grep("^(sparklyr://)?[^:]+:[0-9]+(/[0-9]+)?$", master)) > 0
