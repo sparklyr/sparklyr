@@ -1,5 +1,5 @@
 #' @include sdf_interface.R
-#' @include sdf_sql.R
+#' @include sdf_io.R
 #' @include stratified_sample.R
 #' @include utils.R
 NULL

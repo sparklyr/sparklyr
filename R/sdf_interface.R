@@ -1,6 +1,6 @@
 #' @include arrow.R
 #' @include dplyr_spark.R
-#' @include tables_spark.R
+#' @include tbl_spark.R
 #' @include utils.R
 NULL
 
