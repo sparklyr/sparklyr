@@ -106,6 +106,215 @@ test_that("make_version_filter('master') resolves duplicates to the newest", {
   expect_identical(filter(files), "java/spark-4.0.0/A.scala")
 })
 
+test_that("find_scalac() resolves a discovered compiler and skips dirs without one", {
+  loc <- withr::local_tempdir()
+  # a matching install that lacks the bin/scalac binary -> skipped -> errors
+  dir.create(file.path(loc, "scala-2.12.0"))
+  expect_error(find_scalac("2.12", locations = loc), "failed to discover scala")
+
+  # a matching install with the binary present -> returned
+  dir.create(file.path(loc, "scala-2.12.5", "bin"), recursive = TRUE)
+  scalac <- file.path(loc, "scala-2.12.5", "bin", "scalac")
+  file.create(scalac)
+  expect_identical(find_scalac("2.12", locations = loc), scalac)
+})
+
+test_that("scalac_default_locations() returns a single path on Windows", {
+  with_mocked_bindings(
+    os_is_windows = function() TRUE,
+    .package = "sparklyr",
+    expect_identical(scalac_default_locations(), path.expand("~/scala"))
+  )
+})
+
+test_that("get_scalac_version() parses the version out of scalac -version", {
+  with_mocked_bindings(
+    system = function(...) "Scala compiler version 2.12.20 -- Copyright",
+    .package = "base",
+    expect_identical(get_scalac_version("scalac"), "2.12.20")
+  )
+})
+
+test_that("find_jar() falls back to `which jar` when not under JAVA_HOME", {
+  fake_home <- withr::local_tempdir() # no bin/jar inside
+  with_mocked_bindings(
+    system2 = function(...) "/usr/bin/jar",
+    .package = "base",
+    withr::with_envvar(list(JAVA_HOME = fake_home), {
+      expect_identical(find_jar(), "/usr/bin/jar")
+    })
+  )
+})
+
+test_that("list_sparklyr_jars() finds the shipped sparklyr jars", {
+  jars <- list_sparklyr_jars()
+  expect_true(length(jars) > 0)
+  expect_true(all(grepl("sparklyr-.+\\.jar$", basename(jars))))
+})
+
+test_that("spark_gen_embedded_sources() writes the worker bootstrap line", {
+  out <- withr::local_tempfile(fileext = ".R")
+  spark_gen_embedded_sources(output = out)
+  lines <- readLines(out)
+  expect_match(
+    lines[[length(lines)]],
+    "do.call\\(spark_worker_main"
+  )
+})
+
+test_that("sparklyr_jar_verify_spark() reports installed and missing versions", {
+  # all specs already installed -> "Ok"
+  with_mocked_bindings(
+    spark_installed_versions = function() {
+      data.frame(spark = c("2.4.8", "3.0.3", "3.5.4", "4.0.0"))
+    },
+    .package = "sparklyr",
+    expect_message(sparklyr_jar_verify_spark(), "Ok")
+  )
+
+  # nothing installed, install = FALSE -> "Not found" without installing
+  with_mocked_bindings(
+    spark_installed_versions = function() data.frame(spark = character()),
+    .package = "sparklyr",
+    expect_message(sparklyr_jar_verify_spark(install = FALSE), "Not found")
+  )
+
+  # nothing installed, install = TRUE -> spark_install is invoked
+  installed <- character()
+  with_mocked_bindings(
+    spark_installed_versions = function() data.frame(spark = character()),
+    spark_install = function(version, ...) installed <<- c(installed, version),
+    .package = "sparklyr",
+    suppressMessages(sparklyr_jar_verify_spark(install = TRUE))
+  )
+  expect_setequal(installed, c("2.4.8", "3.0.3", "3.5.4", "4.0.0"))
+})
+
+test_that("spark_default_compilation_spec() builds one spec per jar target", {
+  with_mocked_bindings(
+    find_scalac = function(version, locations) "/path/to/scalac",
+    find_jar = function() "/path/to/jar",
+    spark_home_dir = function(version, ...) "/path/to/home",
+    .package = "sparklyr",
+    {
+      specs <- spark_default_compilation_spec(pkg = "sparklyr")
+      expect_length(specs, 4)
+      expect_setequal(
+        vapply(specs, function(x) x$spark_version, character(1)),
+        c("2.4.8", "3.0.3", "3.5.4", "4.0.0")
+      )
+      # the 4.0.0 spec carries the explicit jar name from the spec list
+      v4 <- Filter(function(x) x$spark_version == "4.0.0", specs)[[1]]
+      expect_identical(v4$jar_name, "sparklyr-master-2.13.jar")
+    }
+  )
+})
+
+test_that("compile_package_jars() handles explicit, master, and download specs", {
+  compiled <- list()
+  capture <- function(jar_name, spark_home, ...) {
+    compiled[[length(compiled) + 1]] <<- list(
+      jar_name = jar_name,
+      spark_home = spark_home
+    )
+    TRUE
+  }
+
+  # explicit spark_home -> straight to spark_compile, no install
+  with_mocked_bindings(
+    spark_compile = capture,
+    .package = "sparklyr",
+    compile_package_jars(
+      spec = list(spark_home = "/explicit", jar_name = "explicit.jar")
+    )
+  )
+  expect_identical(compiled[[1]]$spark_home, "/explicit")
+
+  # spark_version == "master" -> resolves home from spark_install_find
+  compiled <- list()
+  with_mocked_bindings(
+    spark_compile = capture,
+    spark_install_find = function(...) {
+      list(sparkVersion = "3.5.4", sparkVersionDir = "/installed/home")
+    },
+    .package = "sparklyr",
+    compile_package_jars(
+      spec = list(spark_version = "master", jar_name = "master.jar")
+    )
+  )
+  expect_identical(compiled[[1]]$spark_home, "/installed/home")
+
+  # spark_version set -> downloads + resolves home via spark_home_dir
+  compiled <- list()
+  with_mocked_bindings(
+    spark_compile = capture,
+    spark_install = function(...) invisible(NULL),
+    spark_home_dir = function(version, ...) "/downloaded/home",
+    .package = "sparklyr",
+    suppressMessages(compile_package_jars(
+      spec = list(spark_version = "3.5.4", jar_name = "dl.jar")
+    ))
+  )
+  expect_identical(compiled[[1]]$spark_home, "/downloaded/home")
+
+  # no args -> falls back to spark_default_compilation_spec
+  compiled <- list()
+  with_mocked_bindings(
+    spark_compile = capture,
+    spark_default_compilation_spec = function(...) {
+      list(list(spark_home = "/default", jar_name = "default.jar"))
+    },
+    .package = "sparklyr",
+    compile_package_jars()
+  )
+  expect_identical(compiled[[1]]$jar_name, "default.jar")
+})
+
+test_that("download_scalac() downloads + extracts, and skips existing files", {
+  # tgz path (non-Windows): downloads and untars each compiler
+  dest <- withr::local_tempdir()
+  downloaded <- character()
+  with_mocked_bindings(
+    download_file = function(url, destfile, ...) {
+      downloaded <<- c(downloaded, basename(destfile))
+      file.create(destfile)
+      0L
+    },
+    untar = function(...) 0L,
+    .package = "sparklyr",
+    suppressMessages(download_scalac(dest_path = dest))
+  )
+  expect_length(downloaded, 3)
+
+  # second run with files already present -> nothing re-downloaded
+  downloaded <- character()
+  with_mocked_bindings(
+    download_file = function(url, destfile, ...) {
+      downloaded <<- c(downloaded, basename(destfile))
+      0L
+    },
+    untar = function(...) 0L,
+    .package = "sparklyr",
+    suppressMessages(download_scalac(dest_path = dest))
+  )
+  expect_length(downloaded, 0)
+
+  # zip path (Windows): unzip instead of untar
+  dest_win <- withr::local_tempdir()
+  unzipped <- 0
+  with_mocked_bindings(
+    os_is_windows = function() TRUE,
+    download_file = function(url, destfile, ...) {
+      file.create(destfile)
+      0L
+    },
+    unzip = function(...) unzipped <<- unzipped + 1,
+    .package = "sparklyr",
+    suppressMessages(download_scalac(dest_path = dest_win))
+  )
+  expect_equal(unzipped, 3)
+})
+
 # ---- End-to-end jar build (intentionally skipped: too slow for CI) -----------
 
 test_that("jar file is created", {
