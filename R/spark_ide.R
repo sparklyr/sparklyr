@@ -1,5 +1,3 @@
-# nocov start
-
 #' Set of functions to provide integration with the RStudio IDE
 #' @details These function are meant for downstream packages, that provide additional
 #' backends to `sparklyr`, to override the opening, closing, update, and preview
@@ -476,8 +474,6 @@ external_viewer <- function() {
     viewer
   }
 }
-
-# nocov end
 
 browse_url <- function(url) {
   if (url != "") {
