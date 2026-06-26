@@ -5,9 +5,9 @@
 # before merging so the Spark integration tests run on main again.
 on:
   push:
-    branches: paused
+    branches: main
   pull_request:
-    branches: paused
+    branches: main
 
 name: Spark-Tests
 
