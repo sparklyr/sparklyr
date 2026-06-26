@@ -10,14 +10,17 @@ spark_integ_test_skip <- function(sc, test_name) {
   UseMethod("spark_integ_test_skip")
 }
 
+
 #' @export
 spark_integ_test_skip.default <- function(sc, test_name) {
   FALSE
 }
 
+
 is.installed <- function(package) {
   is.element(package, installed.packages()[, 1])
 }
+
 
 utils_starts_with <- function(lhs, rhs) {
   if (nchar(lhs) < nchar(rhs)) {
@@ -25,6 +28,7 @@ utils_starts_with <- function(lhs, rhs) {
   }
   identical(substring(lhs, 1, nchar(rhs)), rhs)
 }
+
 
 aliased_path <- function(path) {
   home <- path.expand("~/")
@@ -34,9 +38,11 @@ aliased_path <- function(path) {
   path
 }
 
+
 transpose_list <- function(list) {
   do.call(Map, c(c, list, USE.NAMES = FALSE))
 }
+
 
 #' Random string generation
 #'
@@ -47,6 +53,7 @@ transpose_list <- function(list) {
 random_string <- function(prefix = "table") {
   paste0(prefix, "_", gsub("-", "_", uuid::UUIDgenerate()))
 }
+
 
 #' Instantiate a Java array with a specific element type.
 #'
@@ -83,6 +90,7 @@ jarray <- function(sc, x, element_type) {
   )
 }
 
+
 #' Instantiate a Java float type.
 #'
 #' Instantiate a \code{java.lang.Float} object with the value specified.
@@ -105,6 +113,7 @@ jarray <- function(sc, x, element_type) {
 jfloat <- function(sc, x) {
   j_invoke_new(sc, "java.lang.Float", as.numeric(x))
 }
+
 
 #' Instantiate an Array[Float].
 #'
@@ -129,58 +138,11 @@ jfloat_array <- function(sc, x) {
   jarray(sc, vals, "java.lang.Float")
 }
 
+
 printf <- function(fmt, ...) {
   cat(sprintf(fmt, ...))
 }
 
-spark_require_version <- function(
-  sc,
-  required,
-  module = NULL,
-  required_max = NULL
-) {
-  # guess module based on calling function
-  if (is.null(module)) {
-    call <- sys.call(sys.parent())
-    module <- tryCatch(as.character(call[[1]]), error = function(ex) "")
-  }
-
-  # check and report version requirements
-  version <- spark_version(sc)
-  if (version < required) {
-    fmt <- "%s requires Spark %s or higher."
-    msg <- sprintf(fmt, module, required, version)
-    stop(msg, call. = FALSE)
-  } else if (!is.null(required_max)) {
-    if (version >= required_max) {
-      fmt <- "%s is removed in Spark %s."
-      msg <- sprintf(fmt, module, required_max, version)
-      stop(msg, call. = FALSE)
-    }
-  }
-
-  TRUE
-}
-
-is_required_spark <- function(x, required_version) {
-  UseMethod("is_required_spark")
-}
-
-#' @export
-is_required_spark.spark_connection <- function(x, required_version) {
-  version <- spark_version(x)
-  version >= required_version
-}
-
-#' @export
-is_required_spark.spark_jobj <- function(x, required_version) {
-  sc <- spark_connection(x)
-  is_required_spark(sc, required_version)
-}
-
-spark_param_deprecated <- function(param, version = "3.x") {
-  warning("The '", param, "' parameter is deprecated in Spark ", version)
-}
 
 regex_replace <- function(string, ...) {
   dots <- list(...)
@@ -190,6 +152,7 @@ regex_replace <- function(string, ...) {
   }
   string
 }
+
 
 spark_sanitize_names <- function(names, config) {
   # Spark 1.6.X has a number of issues with '.'s in column names, e.g.
@@ -284,6 +247,7 @@ spark_sanitize_names <- function(names, config) {
   newNames
 }
 
+
 # normalizes a path that we are going to send to spark but avoids
 # normalizing remote identifiers like hdfs:// or s3n://. note
 # that this will take care of path.expand ("~") as well as converting
@@ -299,20 +263,11 @@ spark_normalize_single_path <- function(path) {
   }
 }
 
+
 spark_normalize_path <- function(paths) {
   unname(sapply(paths, spark_normalize_single_path))
 }
 
-stopf <- function(fmt, ..., call. = TRUE, domain = NULL) {
-  stop(simpleError(
-    sprintf(fmt, ...),
-    if (call.) sys.call(sys.parent())
-  ))
-}
-
-warnf <- function(fmt, ..., call. = TRUE, immediate. = FALSE) {
-  warning(sprintf(fmt, ...), call. = call., immediate. = immediate.)
-}
 
 enumerate <- function(object, f, ...) {
   nm <- names(object)
@@ -323,6 +278,7 @@ enumerate <- function(object, f, ...) {
   result
 }
 
+
 path_program <- function(program, fmt = NULL) {
   fmt <- fmt %||% "program '%s' is required but not available on the path"
   path <- Sys.which(program)
@@ -332,11 +288,13 @@ path_program <- function(program, fmt = NULL) {
   path
 }
 
+
 infer_active_package_name <- function() {
   root <- package_root()
   dcf <- read.dcf(file.path(root, "DESCRIPTION"), all = TRUE)
   dcf$Package
 }
+
 
 split_chunks <- function(x, chunk_size) {
   # return early when chunk_size > length of vector
@@ -361,6 +319,7 @@ split_chunks <- function(x, chunk_size) {
   )
 }
 
+
 remove_class <- function(object, class) {
   classes <- attr(object, "class")
   newClasses <- classes[!classes %in% c(class)]
@@ -369,9 +328,11 @@ remove_class <- function(object, class) {
   object
 }
 
+
 trim_whitespace <- function(strings) {
   gsub("^[[:space:]]*|[[:space:]]*$", "", strings)
 }
+
 
 split_separator <- function(sc) {
   if (inherits(sc, "livy_connection")) {
@@ -381,13 +342,16 @@ split_separator <- function(sc) {
   }
 }
 
+
 resolve_fn <- function(fn, ...) {
   if (is.function(fn)) fn(...) else fn
 }
 
+
 is.tbl_spark <- function(x) {
   inherits(x, "tbl_spark")
 }
+
 
 `%<-%` <- function(x, value) {
   dest <- as.character(as.list(substitute(x))[-1])
@@ -402,9 +366,11 @@ is.tbl_spark <- function(x) {
   invisible(NULL)
 }
 
+
 sort_named_list <- function(lst, ...) {
   lst[order(names(lst), ...)]
 }
+
 
 # syntax sugar for calling dplyr methods with do.call and a non-trivial variable
 # list of args
@@ -416,13 +382,16 @@ sort_named_list <- function(lst, ...) {
   fn_call
 }
 
+
 `%@%` <- function(fn, largs) fn(largs)
+
 
 # syntax sugar for executing a chain of method calls with each call operating on
 # the JVM object returned from the previous call
 `%>|%` <- function(x, invocations) {
   do.call(invoke, append(list(x, "%>%"), invocations))
 }
+
 
 pcre_to_java <- function(regex) {
   regex %>%
@@ -487,6 +456,7 @@ pcre_to_java <- function(regex) {
     gsub("\\[:xdigit:\\]", "0-9a-fA-F", .)
 }
 
+
 # helper method returning a minimal R dataframe containing the same set of
 # column names as `sdf` does
 replicate_colnames <- function(sdf) {
@@ -501,39 +471,6 @@ replicate_colnames <- function(sdf) {
   do.call(data.frame, columns)
 }
 
-translate_spark_column_types <- function(sdf) {
-  type_map <- list(
-    BooleanType = "logical",
-    ByteType = "integer",
-    ShortType = "integer",
-    IntegerType = "integer",
-    FloatType = "numeric",
-    DoubleType = "numeric",
-    LongType = "numeric",
-    StringType = "character",
-    BinaryType = "raw",
-    TimestampType = "POSIXct",
-    DateType = "Date",
-    CalendarIntervalType = "character",
-    NullType = "NULL"
-  )
-
-  sdf %>%
-    sdf_schema() %>%
-    lapply(
-      function(e) {
-        if (e$type %in% names(type_map)) {
-          type_map[[e$type]]
-        } else if (grepl("^(Array|Struct|Map)Type\\(.*\\)$", e$type)) {
-          "list"
-        } else if (grepl("^DecimalType\\(.*\\)$", e$type)) {
-          "numeric"
-        } else {
-          "unknown"
-        }
-      }
-    )
-}
 
 simulate_vars_spark <- function(x, drop_groups = FALSE) {
   col_types <- translate_spark_column_types(x)
@@ -566,6 +503,7 @@ simulate_vars_spark <- function(x, drop_groups = FALSE) {
     dplyr::as_tibble()
 }
 
+
 #' @importFrom tidyselect tidyselect_data_proxy tidyselect_data_has_predicates
 #' @export
 tidyselect_data_proxy.tbl_spark <- function(x) {
@@ -576,6 +514,7 @@ tidyselect_data_proxy.tbl_spark <- function(x) {
   }
 }
 
+
 #' @export
 tidyselect_data_has_predicates.tbl_spark <- function(x) {
   supported <- unlist(options("sparklyr.support.predicates"))
@@ -585,6 +524,7 @@ tidyselect_data_has_predicates.tbl_spark <- function(x) {
   }
   out
 }
+
 
 # wrapper for download.file()
 download_file <- function(...) {
@@ -601,6 +541,7 @@ download_file <- function(...) {
 
   download.file(...)
 }
+
 
 # Infer all R packages that may be required for executing `fn`
 infer_required_r_packages <- function(fn) {
@@ -662,6 +603,7 @@ infer_required_r_packages <- function(fn) {
   ls(deps)
 }
 
+
 get_os <- function() {
   if (.Platform$OS.type == "windows") {
     "win"
@@ -672,126 +614,11 @@ get_os <- function() {
   }
 }
 
+
 os_is_windows <- function() {
   get_os() == "win"
 }
 
-cast_string <- function(x) {
-  vctrs::vec_check_size(
-    x,
-    1,
-    arg = rlang::caller_arg(x),
-    call = rlang::caller_env()
-  )
-  vctrs::vec_cast(x, character())
-}
-
-cast_scalar_logical <- function(x) {
-  vctrs::vec_check_size(
-    x,
-    1,
-    arg = rlang::caller_arg(x),
-    call = rlang::caller_env()
-  )
-  vctrs::vec_cast(x, logical())
-}
-
-cast_scalar_double <- function(x) {
-  vctrs::vec_check_size(
-    x,
-    1,
-    arg = rlang::caller_arg(x),
-    call = rlang::caller_env()
-  )
-  vctrs::vec_cast(x, numeric())
-}
-
-cast_scalar_integer <- function(x) {
-  vctrs::vec_check_size(
-    x,
-    1,
-    arg = rlang::caller_arg(x),
-    call = rlang::caller_env()
-  )
-  vctrs::vec_cast(x, integer())
-}
-
-cast_nullable_string <- function(x) {
-  if (is.null(x)) {
-    return(NULL)
-  }
-
-  cast_string(x)
-}
-
-cast_nullable_scalar_double <- function(x) {
-  if (is.null(x)) {
-    return(NULL)
-  }
-
-  cast_scalar_double(x)
-}
-
-cast_nullable_scalar_integer <- function(x) {
-  if (is.null(x)) {
-    return(NULL)
-  }
-
-  cast_scalar_integer(x)
-}
-
-
-cast_double <- function(x) {
-  vctrs::vec_cast(x, numeric())
-}
-
-cast_integer <- function(x) {
-  vctrs::vec_cast(x, integer())
-}
-
-cast_list <- function(x, ptype, allow_null = FALSE) {
-  if (is.null(x)) {
-    if (allow_null) {
-      return(NULL)
-    } else {
-      rlang::abort("{.arg x} must not be `NULL`.")
-    }
-  }
-
-  if (is.list(x)) {
-    x <- vctrs::list_unchop(x)
-  }
-  x <- vctrs::vec_cast(x, to = ptype)
-  vctrs::vec_chop(x)
-}
-
-cast_string_list <- function(x, allow_null = FALSE) {
-  cast_list(x, character(), allow_null = allow_null)
-}
-
-cast_integer_list <- function(x, allow_null = FALSE) {
-  cast_list(x, integer(), allow_null = allow_null)
-}
-
-cast_double_list <- function(x, allow_null = FALSE) {
-  cast_list(x, numeric(), allow_null = allow_null)
-}
-
-cast_choice <- function(
-  x,
-  choices,
-  error_arg = rlang::caller_arg(x),
-  error_call = rlang::caller_env()
-) {
-  rlang::arg_match(x, choices, error_arg = error_arg, error_call = error_call)
-}
-
-package_version2 <- function(x) {
-  if (inherits(x, "numeric_version")) {
-    x <- as.character(x)
-  }
-  package_version(x)
-}
 
 update_jars <- function() {
   # Downloads Scala compilers

@@ -1,3 +1,7 @@
+#' @include precondition.R
+#' @include utils.R
+NULL
+
 sparklyr_jar_spec_list <- function() {
   list(
     list(spark = "2.4.8", scala = "2.11"),
@@ -566,4 +570,97 @@ package_root <- function() {
   rlang::check_installed("rprojroot")
   root <- get("find_package_root_file", envir = asNamespace("rprojroot"))
   root()
+}
+
+spark_gen_embedded_sources <- function(
+  output = file.path("java", "embedded_sources.R")
+) {
+  worker_files <- sort(dir("R", full.names = TRUE, pattern = "worker|core"))
+  lines <- c(
+    unlist(lapply(worker_files, function(e) readLines(e))),
+    "do.call(spark_worker_main, as.list(commandArgs(trailingOnly = TRUE)))"
+  )
+  writeLines(lines, output)
+}
+
+
+spark_update_embedded_sources <- function(jars_to_skip = c()) {
+  pkg_root <- normalizePath(".")
+  on.exit(setwd(pkg_root))
+
+  parent_dir <- tempdir()
+  srcs_dir <- file.path(parent_dir, "sparklyr")
+  ensure_directory(srcs_dir)
+  srcs <- file.path(srcs_dir, "embedded_sources.R")
+  spark_gen_embedded_sources(output = srcs)
+  # apply the same update to all copies in sparklyr-*.jar and also to the copy
+  # inside java/ to avoid confusion
+  file.copy(from = srcs, to = file.path(pkg_root, "java"), overwrite = TRUE)
+
+  sparklyr_jars <- list_sparklyr_jars()
+
+  setwd(parent_dir)
+
+  for (sparklyr_jar in sparklyr_jars) {
+    if (!basename(sparklyr_jar) %in% jars_to_skip) {
+      rlang::inform(c(
+        "*" = "Updating embedded sources in '",
+        sparklyr_jar,
+        "'"
+      ))
+      system2(
+        "jar",
+        args = c(
+          "uf",
+          sparklyr_jar,
+          file.path("sparklyr", "embedded_sources.R")
+        )
+      )
+    }
+  }
+}
+
+
+spark_verify_embedded_sources <- function() {
+  expected <- tempfile(pattern = "spark_embedded_sources_", fileext = ".R")
+  spark_gen_embedded_sources(output = expected)
+  jar <- find_jar() %||%
+    path_program("jar", fmt = "Unable to locate '%s' binary")
+
+  pkg_root <- normalizePath(".")
+  on.exit(setwd(pkg_root))
+
+  sparklyr_jars <- list_sparklyr_jars()
+
+  for (sparklyr_jar in sparklyr_jars) {
+    wd <- tempdir()
+    ensure_directory(wd)
+    setwd(wd)
+
+    system2(
+      "jar",
+      args = c("xf", sparklyr_jar, file.path("sparklyr", "embedded_sources.R"))
+    )
+    embedded_srcs <- dir(file.path(".", "sparklyr"), "^embedded_sources\\.R$")
+
+    if (length(embedded_srcs) > 0) {
+      message("verifying embedded sources from '", sparklyr_jar, "'")
+      actual <- file.path(".", "sparklyr", embedded_srcs[[1]])
+      diff <- diffobj::diffFile(expected, actual)
+      if (any(diff)) {
+        print(diff)
+        stop(c(
+          "Embedded sources from '",
+          sparklyr_jar,
+          "' is not up-to-date!\n\n",
+          "Please run 'Rscript update_embedded_sources.R' to fix this error ",
+          "(also see ",
+          "https://github.com/sparklyr/sparklyr/wiki/Development#updating-embedded-sources",
+          " for mode detail)"
+        ))
+      }
+    } else {
+      message("no embedded source found within '", sparklyr_jar, "'")
+    }
+  }
 }

@@ -58,8 +58,11 @@ tests/testthat/orc-in/
 tests/testthat/parquet-in/
 tests/testthat/iris-in/
 tests/testthat/iris-out/
+tests/testthat/foobar/
 .Rproj.user
 \.*\.swp
 .Renviron
 .claude/*.json
 
+# roborev snapshots
+/.roborev/

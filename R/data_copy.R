@@ -1,5 +1,5 @@
-#' @include spark_data_build_types.R
-#' @include sql_utils.R
+#' @include spark_data.R
+#' @include dplyr_sql.R
 #' @include utils.R
 
 spark_serialize_rds <- function(sc, df, columns, repartition) {

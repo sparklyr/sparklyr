@@ -1,5 +1,8 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+# NOTE: temporarily parked on the non-existent `paused` branch while the
+# test-coverage effort is in progress. Restore `main` for push/pull_request
+# before merging so the Spark integration tests run on main again.
 on:
   push:
     branches: main
