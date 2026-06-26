@@ -4,22 +4,29 @@
 # the functions at will:
 #
 #   source("utils/coverage/coverage.R")
-#   coverage_lines("dplyr_verbs")     # opens the HTML report AND prints the
-#                                     #   covered/uncovered text annotation, both
-#                                     #   from the same run (browse = FALSE for
-#                                     #   text only)
-#   coverage_report("dplyr_verbs")    # interactive HTML report only
+#   coverage_lines("dplyr_verbs")     # runs coverage, writes a MATCHED PAIR of
+#                                     #   report files, and prints the text
+#                                     #   annotation. Both files come from the
+#                                     #   same run:
+#                                     #     reports/<file>-<stamp>.html  (for humans)
+#                                     #     reports/<file>-<stamp>.txt   (for Claude)
+#   coverage_report("dplyr_verbs")    # HTML report only
 #   coverage_summary("dplyr_verbs")   # one-line % summary
 #
-# All share an in-session cache, so the (slow) instrumentation runs only once per
-# file. Pass `refresh = TRUE` to force a re-run, or `spark_version=` to test
-# against a different Spark.
+# Each call re-runs the (slow ~5 min) instrumentation, because the point of this
+# tool is to *improve* coverage: you edit the paired test, re-run, and compare.
+# Re-using a stale snapshot would defeat that, so there is no persistent cache —
+# only an in-session memo so a single call doesn't compute twice. The persisted
+# artifacts are the timestamped report files themselves: keep the .txt + .html
+# from a run and you can both look at the exact same information later.
 #
 # Why this dance: `covr::file_coverage()` is faster but does not load the
 # testthat helper-*/setup-* files, so tests that need `testthat_spark_connection()`
 # etc. fail. `covr::package_coverage()` with `load_package = "installed"` runs the
 # real test harness against an instrumented install, which is the only reliable
-# path for this package.
+# path for this package. Note the number is coverage attributable to the *paired*
+# test file alone (filter = the file's base name) — by design, so a script's
+# coverage never depends on unrelated test files.
 
 library(covr)
 library(withr)
@@ -27,17 +34,26 @@ library(here)   # non-package util, so here::here() is fair game for path resolu
 
 # ---------------------- Internal ----------------
 
-# In-session cache: file base name -> coverage object
-.coverage_cache <- new.env(parent = emptyenv())
+# In-session memo: file base name -> coverage object. Prevents a single
+# coverage_lines() call (which needs the object for both text and HTML) from
+# instrumenting twice. NOT a persistent cache; cleared when the session ends.
+.coverage_memo <- new.env(parent = emptyenv())
 
-## -------- Run (or fetch cached) coverage for one R script
+.coverage_base <- function(file) sub("[.]R$", "", basename(file))
+
+.coverage_reports_dir <- function() {
+  dir <- here::here("utils", "coverage", "reports")
+  dir.create(dir, showWarnings = FALSE, recursive = TRUE)
+  dir
+}
+
+## -------- Run coverage for one R script (memoized within the session only)
 coverage_run <- function(file,
                          spark_version = "4.1.0",
                          refresh = FALSE) {
-  file <- sub("[.]R$", "", basename(file))      # accept "dplyr_verbs" or "R/dplyr_verbs.R"
-
-  if (!refresh && !is.null(.coverage_cache[[file]])) {
-    return(.coverage_cache[[file]])
+  base <- .coverage_base(file)
+  if (!refresh && !is.null(.coverage_memo[[base]])) {
+    return(.coverage_memo[[base]])
   }
 
   test_dir <- here::here("tests", "testthat")
@@ -46,7 +62,7 @@ coverage_run <- function(file,
     "library(sparklyr)",
     sprintf(
       'testthat::test_dir("%s", filter = "%s", package = "sparklyr", load_package = "installed")',
-      test_dir, file
+      test_dir, base
     )
   )
 
@@ -55,16 +71,57 @@ coverage_run <- function(file,
     covr::package_coverage(type = "none", code = code)
   )
 
-  .coverage_cache[[file]] <- cov
+  .coverage_memo[[base]] <- cov
   cov
 }
 
 ## -------- Per-line table (line, hits) for just the target file
 .coverage_table <- function(file, cov) {
   tc <- covr::tally_coverage(cov)
-  pat <- paste0(sub("[.]R$", "", basename(file)), "[.]R$")
+  pat <- paste0(.coverage_base(file), "[.]R$")
   dv <- tc[grepl(pat, tc$filename), c("line", "value")]
   dv[order(dv$line), ]
+}
+
+## -------- Build the text annotation as a character vector (so it can be both
+##          printed and written to a file verbatim).
+.coverage_annotation <- function(file, cov, show, context) {
+  base <- .coverage_base(file)
+  dv <- .coverage_table(file, cov)
+  status <- setNames(dv$value, dv$line)
+  src <- readLines(here::here("R", paste0(base, ".R")))
+  covered <- sum(dv$value > 0)
+
+  mark <- function(i) {
+    s <- status[as.character(i)]
+    if (is.na(s)) "    " else if (s == 0) "  x " else "  . "  # x = uncovered, . = covered
+  }
+  line_at <- function(i) sprintf("%4d%s| %s", i, mark(i), src[i])
+
+  out <- c(
+    sprintf("R/%s.R   (x = uncovered, . = covered, blank = non-executable)", base),
+    sprintf(
+      "R/%s.R: %.1f%% | %d executable lines | %d covered | %d NOT covered",
+      base, 100 * covered / nrow(dv), nrow(dv), covered, nrow(dv) - covered
+    ),
+    ""
+  )
+
+  if (show == "all") {
+    return(c(out, vapply(seq_along(src), line_at, character(1))))
+  }
+
+  unc <- sort(as.integer(names(status)[status == 0]))
+  if (!length(unc)) {
+    return(c(out, "No uncovered lines."))
+  }
+  blocks <- split(unc, cumsum(c(1, diff(unc) != 1)))   # group consecutive lines
+  for (b in blocks) {
+    lo <- max(1, b[1] - context)
+    hi <- min(length(src), b[length(b)] + context)
+    out <- c(out, vapply(lo:hi, line_at, character(1)), "")
+  }
+  out
 }
 
 # ---------------------- Public ----------------
@@ -76,77 +133,62 @@ coverage_summary <- function(file, spark_version = "4.1.0", refresh = FALSE) {
   covered <- sum(dv$value > 0)
   cat(sprintf(
     "R/%s.R: %.1f%% | %d executable lines | %d covered | %d NOT covered\n",
-    sub("[.]R$", "", basename(file)),
-    100 * covered / nrow(dv), nrow(dv), covered, nrow(dv) - covered
+    .coverage_base(file), 100 * covered / nrow(dv), nrow(dv), covered, nrow(dv) - covered
   ))
   invisible(dv)
 }
 
-## -------- Text annotation of covered/uncovered lines (easy to read in a terminal/log)
-##   show = "uncovered" (default) prints only uncovered blocks with `context` lines
-##          around them; show = "all" prints the whole file annotated.
-##   browse = TRUE also opens the interactive HTML report in the browser, so the
-##          text output and the visual report come from the same (cached) run.
+## -------- Text annotation of covered/uncovered lines.
+##   Writes a MATCHED PAIR of report files (same stem) so the .txt Claude reads
+##   and the .html a human opens come from the exact same run, then prints the
+##   text to the console.
+##   show = "uncovered" (default) prints only uncovered blocks with `context`
+##          lines around them; show = "all" annotates the whole file.
+##   html = FALSE skips the HTML half (text artifact only).
 coverage_lines <- function(file,
                            show = c("uncovered", "all"),
                            context = 1,
-                           browse = TRUE,
+                           html = TRUE,
                            spark_version = "4.1.0",
                            refresh = FALSE) {
   show <- match.arg(show)
   cov <- coverage_run(file, spark_version, refresh)
-  html <- if (browse) coverage_report(file, spark_version) else NULL
-  dv <- .coverage_table(file, cov)
-  status <- setNames(dv$value, dv$line)
 
-  base <- sub("[.]R$", "", basename(file))
-  src <- readLines(here::here("R", paste0(base, ".R")))
-
-  mark <- function(i) {
-    s <- status[as.character(i)]
-    if (is.na(s)) "    " else if (s == 0) "  x " else "  . "  # x = uncovered, . = covered
-  }
-  emit <- function(i) cat(sprintf("%4d%s| %s\n", i, mark(i), src[i]))
-
-  cat(sprintf("R/%s.R   (x = uncovered, . = covered, blank = non-executable)\n\n", base))
-  coverage_summary(file, spark_version)
-  if (!is.null(html)) cat(sprintf("HTML report: %s\n", html))
-  cat("\n")
-
-  if (show == "all") {
-    for (i in seq_along(src)) emit(i)
-    return(invisible(dv))
-  }
-
-  unc <- sort(as.integer(names(status)[status == 0]))
-  if (!length(unc)) {
-    cat("No uncovered lines.\n")
-    return(invisible(dv))
-  }
-  blocks <- split(unc, cumsum(c(1, diff(unc) != 1)))   # group consecutive lines
-  for (b in blocks) {
-    lo <- max(1, b[1] - context)
-    hi <- min(length(src), b[length(b)] + context)
-    for (i in lo:hi) emit(i)
-    cat("\n")
-  }
-  invisible(dv)
-}
-
-## -------- Interactive HTML report written to a timestamped file.
-##   Returns the path (does NOT open a browser) so the report can be shared and
-##   re-opened without re-running. Files land in utils/coverage/reports/ .
-coverage_report <- function(file, spark_version = "4.1.0", refresh = FALSE) {
-  cov <- coverage_run(file, spark_version, refresh)
-
-  base <- sub("[.]R$", "", basename(file))
-  out_dir <- here::here("utils", "coverage", "reports")
-  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
-  out <- file.path(
-    out_dir,
-    sprintf("%s-%s.html", base, format(Sys.time(), "%Y%m%d-%H%M%S"))
+  base <- .coverage_base(file)
+  stem <- file.path(
+    .coverage_reports_dir(),
+    sprintf("%s-%s", base, format(Sys.time(), "%Y%m%d-%H%M%S"))
   )
 
+  txt <- .coverage_annotation(file, cov, show, context)
+  html_path <- NULL
+  if (html) {
+    html_path <- paste0(stem, ".html")
+    covr::report(cov, file = html_path, browse = FALSE)
+  }
+
+  # Footer pointing each reader at the matching artifact.
+  txt <- c(
+    txt,
+    "---",
+    sprintf("text report: %s", paste0(stem, ".txt")),
+    if (!is.null(html_path)) sprintf("html report: %s", html_path)
+  )
+  writeLines(txt, paste0(stem, ".txt"))
+
+  cat(txt, sep = "\n")
+  cat("\n")
+  invisible(list(txt = paste0(stem, ".txt"), html = html_path))
+}
+
+## -------- HTML report only, written to a timestamped file. Returns the path
+##   (does NOT open a browser) so it can be shared / re-opened without re-running.
+coverage_report <- function(file, spark_version = "4.1.0", refresh = FALSE) {
+  cov <- coverage_run(file, spark_version, refresh)
+  out <- file.path(
+    .coverage_reports_dir(),
+    sprintf("%s-%s.html", .coverage_base(file), format(Sys.time(), "%Y%m%d-%H%M%S"))
+  )
   covr::report(cov, file = out, browse = FALSE)
   invisible(out)
 }
