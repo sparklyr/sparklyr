@@ -55,7 +55,6 @@ arrays_df <- dplyr::tibble(
 arrays_sdf <- copy_to(sc, arrays_df, overwrite = TRUE)
 
 
-
 df1a <- data.frame(a = 1:3, b = letters[1:3], stringsAsFactors = FALSE)
 df2a <- data.frame(
   c = letters[1:3],
@@ -67,12 +66,10 @@ df4a <- data.frame(b = letters[4:6], a = 4:6, stringsAsFactors = FALSE)
 
 # sdf helper functions -------------------------------------------------------
 
-
 register_test_spark_connection <- function() {
   sc <- testthat_spark_connection()
   registerDoSpark(sc)
 }
-
 
 
 u <- 1234

@@ -36,7 +36,12 @@ training <- data.frame(
   V2 = c(-0.605, 2.158, 0.231, 1.151, -0.226)
 )
 
-training_tbl <- sdf_copy_to(sc, training, name = "aft_training", overwrite = TRUE)
+training_tbl <- sdf_copy_to(
+  sc,
+  training,
+  name = "aft_training",
+  overwrite = TRUE
+)
 
 test_that("ml_aft_survival_regression() works properly", {
   training_va <- ft_vector_assembler(
