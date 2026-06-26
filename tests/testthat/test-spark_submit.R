@@ -5,7 +5,6 @@ skip_on_arrow_devel()
 sc <- testthat_spark_connection()
 
 test_that("spark_submit() can submit batch jobs", {
-  skip_on_ci()
   skip_if_dbplyr_dev()
   skip_databricks_connect()
   if (.Platform$OS.type == "windows") {

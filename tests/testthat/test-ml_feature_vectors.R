@@ -3,7 +3,6 @@ skip_on_livy()
 skip_on_arrow_devel()
 
 test_that("ft_pca() param setting", {
-  skip_on_ci()
   skip_databricks_connect()
   test_requires_version("3.0.0")
   sc <- testthat_spark_connection()
@@ -16,7 +15,6 @@ test_that("ft_pca() param setting", {
 })
 
 test_that("ft_pca() works", {
-  skip_on_ci()
   skip_databricks_connect()
   sc <- testthat_spark_connection()
   mat <- dplyr::tibble(
@@ -47,7 +45,6 @@ test_that("ft_pca() works", {
 # Backwards compat
 
 test_that("ml_pca() agrees with Scala result", {
-  skip_on_ci()
   skip_databricks_connect()
   # import org.apache.spark.ml.feature.PCA
   # import org.apache.spark.ml.linalg.Vectors
@@ -91,7 +88,6 @@ test_that("ml_pca() agrees with Scala result", {
 })
 
 test_that("sdf_project() returns correct number of columns", {
-  skip_on_ci()
   skip_databricks_connect()
   mat_tbl <- testthat_tbl("mat")
 
@@ -109,7 +105,6 @@ test_that("sdf_project() returns correct number of columns", {
 })
 
 test_that("sdf_project() takes newdata argument", {
-  skip_on_ci()
   skip_databricks_connect()
   mat_tbl <- testthat_tbl("mat")
 

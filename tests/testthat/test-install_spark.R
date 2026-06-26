@@ -1,4 +1,4 @@
-skip("to expedite tests")
+skip("Skips due to how long it takes")
 skip_connection("install_spark")
 skip_on_livy()
 skip_on_arrow_devel()
@@ -137,7 +137,6 @@ test_that("Installation and uninstallation of Spark work", {
 
 test_that("Finding invalid Spark version fails", {
   skip_on_windows()
-  skip_on_ci()
   expect_warning(
     spark_install_find(version = "1.1")
   )

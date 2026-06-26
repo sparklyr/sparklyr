@@ -368,7 +368,11 @@ test_that("sdf_sort() sorts by one and by multiple columns", {
   # `a` has a tie (two 2L rows) so the secondary `b` key is actually exercised
   df <- sdf_copy_to(
     sc,
-    data.frame(a = c(2L, 1L, 2L), b = c("z", "y", "x"), stringsAsFactors = FALSE),
+    data.frame(
+      a = c(2L, 1L, 2L),
+      b = c("z", "y", "x"),
+      stringsAsFactors = FALSE
+    ),
     name = random_string("test_sdf_sort_"),
     overwrite = TRUE
   )
@@ -384,16 +388,20 @@ test_that("sdf_sort() sorts by one and by multiple columns", {
 
 test_that("sdf_sort() errors when no columns are supplied", {
   df <- sdf_copy_to(
-    sc, data.frame(a = 1:3),
-    name = random_string("test_sdf_sort_err_"), overwrite = TRUE
+    sc,
+    data.frame(a = 1:3),
+    name = random_string("test_sdf_sort_err_"),
+    overwrite = TRUE
   )
   expect_error(sdf_sort(df, character(0)), "one or more column names")
 })
 
 test_that("sdf_sample() with a seed is reproducible", {
   df <- sdf_copy_to(
-    sc, data.frame(id = 1:100),
-    name = random_string("test_sdf_sample_"), overwrite = TRUE
+    sc,
+    data.frame(id = 1:100),
+    name = random_string("test_sdf_sample_"),
+    overwrite = TRUE
   )
   s1 <- sdf_sample(df, fraction = 0.5, replacement = FALSE, seed = 42L) %>%
     dplyr::collect()
@@ -404,18 +412,27 @@ test_that("sdf_sample() with a seed is reproducible", {
 
 test_that("sdf_weighted_sample() draws the requested number of rows", {
   df <- sdf_copy_to(
-    sc, data.frame(id = 1:100, w = runif(100)),
-    name = random_string("test_sdf_wsample_"), overwrite = TRUE
+    sc,
+    data.frame(id = 1:100, w = runif(100)),
+    name = random_string("test_sdf_wsample_"),
+    overwrite = TRUE
   )
-  res <- sdf_weighted_sample(df, weight_col = "w", k = 10, replacement = FALSE) %>%
+  res <- sdf_weighted_sample(
+    df,
+    weight_col = "w",
+    k = 10,
+    replacement = FALSE
+  ) %>%
     dplyr::collect()
   expect_equal(nrow(res), 10)
 })
 
 test_that("sdf_persist() forces computation and returns a tbl_spark", {
   df <- sdf_copy_to(
-    sc, data.frame(id = 1:10),
-    name = random_string("test_sdf_persist_"), overwrite = TRUE
+    sc,
+    data.frame(id = 1:10),
+    name = random_string("test_sdf_persist_"),
+    overwrite = TRUE
   )
   persisted <- sdf_persist(df, storage.level = "MEMORY_ONLY")
   expect_s3_class(persisted, "tbl_spark")
@@ -424,8 +441,10 @@ test_that("sdf_persist() forces computation and returns a tbl_spark", {
 
 test_that("sdf_broadcast() returns an equivalent tbl_spark", {
   df <- sdf_copy_to(
-    sc, data.frame(id = 1:10),
-    name = random_string("test_sdf_broadcast_"), overwrite = TRUE
+    sc,
+    data.frame(id = 1:10),
+    name = random_string("test_sdf_broadcast_"),
+    overwrite = TRUE
   )
   b <- sdf_broadcast(df)
   expect_s3_class(b, "tbl_spark")
@@ -435,25 +454,37 @@ test_that("sdf_broadcast() returns an equivalent tbl_spark", {
 test_that("sdf_drop_duplicates() removes duplicate rows (all cols and subset)", {
   df <- sdf_copy_to(
     sc,
-    data.frame(a = c(1L, 1L, 2L), b = c("x", "x", "y"), stringsAsFactors = FALSE),
-    name = random_string("test_sdf_dedup_"), overwrite = TRUE
+    data.frame(
+      a = c(1L, 1L, 2L),
+      b = c("x", "x", "y"),
+      stringsAsFactors = FALSE
+    ),
+    name = random_string("test_sdf_dedup_"),
+    overwrite = TRUE
   )
   expect_equal(nrow(sdf_drop_duplicates(df) %>% dplyr::collect()), 2)
-  expect_equal(nrow(sdf_drop_duplicates(df, cols = "a") %>% dplyr::collect()), 2)
+  expect_equal(
+    nrow(sdf_drop_duplicates(df, cols = "a") %>% dplyr::collect()),
+    2
+  )
 })
 
 test_that("sdf_drop_duplicates() errors on unknown columns", {
   df <- sdf_copy_to(
-    sc, data.frame(a = 1:3),
-    name = random_string("test_sdf_dedup_err_"), overwrite = TRUE
+    sc,
+    data.frame(a = 1:3),
+    name = random_string("test_sdf_dedup_err_"),
+    overwrite = TRUE
   )
   expect_error(sdf_drop_duplicates(df, cols = "nope"), "not in the data frame")
 })
 
 test_that("sdf_register() registers a Spark jobj under a given name", {
   df <- sdf_copy_to(
-    sc, data.frame(id = 1:5),
-    name = random_string("test_sdf_register_"), overwrite = TRUE
+    sc,
+    data.frame(id = 1:5),
+    name = random_string("test_sdf_register_"),
+    overwrite = TRUE
   )
   nm <- random_string("sdf_reg_")
   registered <- sdf_register(spark_dataframe(df), name = nm)
@@ -650,7 +681,6 @@ test_that("'sdf_coalesce' works as expected", {
 })
 
 test_that("sdf_expand_grid works with R vectors", {
-  skip_on_ci()
   test_requires_version("2.0.0")
 
   expect_equivalent(
@@ -676,7 +706,6 @@ test_that("sdf_expand_grid works with R vectors", {
 })
 
 test_that("sdf_expand_grid works Spark dataframes", {
-  skip_on_ci()
   test_requires_version("2.0.0")
 
   df1 <- dplyr::tibble(x = var1, y = var2)
@@ -694,7 +723,6 @@ test_that("sdf_expand_grid works Spark dataframes", {
 })
 
 test_that("sdf_expand_grid works with a mixture of R vectors and Spark dataframes", {
-  skip_on_ci()
   test_requires_version("2.0.0")
 
   df1 <- dplyr::tibble(y = var1, z = var2)
@@ -713,7 +741,6 @@ test_that("sdf_expand_grid works with a mixture of R vectors and Spark dataframe
 })
 
 test_that("sdf_expand_grid works with broadcast joins", {
-  skip_on_ci()
   test_requires_version("2.0.0")
 
   df1 <- dplyr::tibble(y = var1, z = var2)
@@ -751,170 +778,166 @@ test_that("sdf_expand_grid works with broadcast joins", {
 })
 
 local({
+  sample_space_sz <- 100L
+  num_zeroes <- 50L
 
-sample_space_sz <- 100L
-num_zeroes <- 50L
-
-weighted_sampling_test_data <- data.frame(
-  id = seq(sample_space_sz + num_zeroes),
-  weight = c(
-    rep(1, 50),
-    rep(2, 25),
-    rep(4, 10),
-    rep(8, 10),
-    rep(16, 5),
-    rep(0, num_zeroes)
+  weighted_sampling_test_data <- data.frame(
+    id = seq(sample_space_sz + num_zeroes),
+    weight = c(
+      rep(1, 50),
+      rep(2, 25),
+      rep(4, 10),
+      rep(8, 10),
+      rep(16, 5),
+      rep(0, num_zeroes)
+    )
   )
-)
-sdf <- testthat_tbl(
-  name = "weighted_sampling_test_data",
-  repartition = 5L
-)
-
-sample_sz <- 20L
-num_sampling_iters <- 50L
-alpha <- 0.05
-
-verify_distribution <- function(replacement) {
-  expected_dist <- rep(0L, sample_space_sz)
-  actual_dist <- rep(0L, sample_space_sz)
-
-  for (x in seq(num_sampling_iters)) {
-    seed <- 142857L + x
-    set.seed(seed)
-
-    sample <- weighted_sampling_test_data %>%
-      dplyr::slice_sample(
-        n = sample_sz,
-        weight_by = weight,
-        replace = replacement
-      )
-    for (id in sample$id) {
-      expected_dist[[id]] <- expected_dist[[id]] + 1L
-    }
-
-    sample <- sdf %>%
-      sdf_weighted_sample(
-        k = sample_sz,
-        weight_col = "weight",
-        replacement = replacement,
-        seed = seed + x
-      ) %>%
-      collect()
-    for (id in sample$id) {
-      actual_dist[[id]] <- actual_dist[[id]] + 1L
-    }
-  }
-
-  expect_warning(
-    res <- ks.test(x = actual_dist, y = expected_dist)
+  sdf <- testthat_tbl(
+    name = "weighted_sampling_test_data",
+    repartition = 5L
   )
 
-  expect_gte(res$p.value, alpha)
-}
+  sample_sz <- 20L
+  num_sampling_iters <- 50L
+  alpha <- 0.05
 
-test_that("sdf_weighted_sample without replacement works as expected", {
-  verify_distribution(replacement = FALSE)
-})
+  verify_distribution <- function(replacement) {
+    expected_dist <- rep(0L, sample_space_sz)
+    actual_dist <- rep(0L, sample_space_sz)
 
-test_that("sdf_weighted_sample with replacement works as expected", {
-  verify_distribution(replacement = TRUE)
-})
+    for (x in seq(num_sampling_iters)) {
+      seed <- 142857L + x
+      set.seed(seed)
 
-test_that("sdf_weighted_sample returns repeatable results from a fixed PRNG seed", {
-  seed <- 142857L
-  for (replacement in c(TRUE, FALSE)) {
-    samples <- lapply(
-      seq(2),
-      function(x) {
-        sdf %>%
-          sdf_weighted_sample(
-            weight_col = "weight",
-            k = sample_sz,
-            replacement = replacement,
-            seed = seed
-          ) %>%
-          collect()
+      sample <- weighted_sampling_test_data %>%
+        dplyr::slice_sample(
+          n = sample_sz,
+          weight_by = weight,
+          replace = replacement
+        )
+      for (id in sample$id) {
+        expected_dist[[id]] <- expected_dist[[id]] + 1L
       }
+
+      sample <- sdf %>%
+        sdf_weighted_sample(
+          k = sample_sz,
+          weight_col = "weight",
+          replacement = replacement,
+          seed = seed + x
+        ) %>%
+        collect()
+      for (id in sample$id) {
+        actual_dist[[id]] <- actual_dist[[id]] + 1L
+      }
+    }
+
+    expect_warning(
+      res <- ks.test(x = actual_dist, y = expected_dist)
     )
 
-    expect_equivalent(
-      samples[[1]] %>% dplyr::arrange(id),
-      samples[[2]] %>% dplyr::arrange(id)
-    )
+    expect_gte(res$p.value, alpha)
   }
-})
 
+  test_that("sdf_weighted_sample without replacement works as expected", {
+    verify_distribution(replacement = FALSE)
+  })
+
+  test_that("sdf_weighted_sample with replacement works as expected", {
+    verify_distribution(replacement = TRUE)
+  })
+
+  test_that("sdf_weighted_sample returns repeatable results from a fixed PRNG seed", {
+    seed <- 142857L
+    for (replacement in c(TRUE, FALSE)) {
+      samples <- lapply(
+        seq(2),
+        function(x) {
+          sdf %>%
+            sdf_weighted_sample(
+              weight_col = "weight",
+              k = sample_sz,
+              replacement = replacement,
+              seed = seed
+            ) %>%
+            collect()
+        }
+      )
+
+      expect_equivalent(
+        samples[[1]] %>% dplyr::arrange(id),
+        samples[[2]] %>% dplyr::arrange(id)
+      )
+    }
+  })
 })
 
 local({
-
-weighted_sampling_octal_test_data <- data.frame(
-  x = rep(seq(0L, 7L), 100L),
-  weight = 1L + (seq(800L) * 7L + 11L) %% 17L
-)
-
-sdf <- testthat_tbl(
-  name = "weighted_sampling_octal_test_data",
-  repartition = 4L
-)
-
-num_sampling_iters <- 100L
-alpha <- 0.05
-
-sample_sz <- 3L
-
-# map each possible outcome to an octal value
-to_oct <- function(sample) {
-  sum(8L^seq(0L, sample_sz - 1L) * sample$x)
-}
-
-max_possible_outcome <- to_oct(list(x = rep(7, sample_sz)))
-
-verify_distribution <- function(replacement) {
-  expected_dist <- rep(0L, max_possible_outcome + 1L)
-  actual_dist <- rep(0L, max_possible_outcome + 1L)
-
-  for (x in seq(num_sampling_iters)) {
-    seed <- x * 97L
-    set.seed(seed)
-
-    sample <- weighted_sampling_octal_test_data %>%
-      dplyr::slice_sample(
-        n = sample_sz,
-        weight_by = weight,
-        replace = replacement
-      ) %>%
-      to_oct()
-    expected_dist[[sample + 1L]] <- expected_dist[[sample + 1L]] + 1L
-
-    sample <- sdf %>%
-      sdf_weighted_sample(
-        k = sample_sz,
-        weight_col = "weight",
-        replacement = replacement,
-        seed = seed
-      ) %>%
-      collect() %>%
-      to_oct()
-    actual_dist[[sample + 1L]] <- actual_dist[[sample + 1L]] + 1L
-  }
-
-  expect_warning(
-    res <- ks.test(x = actual_dist, y = expected_dist)
+  weighted_sampling_octal_test_data <- data.frame(
+    x = rep(seq(0L, 7L), 100L),
+    weight = 1L + (seq(800L) * 7L + 11L) %% 17L
   )
 
-  expect_gte(res$p.value, alpha)
-}
+  sdf <- testthat_tbl(
+    name = "weighted_sampling_octal_test_data",
+    repartition = 4L
+  )
 
-test_that("sdf_weighted_sample without replacement works as expected", {
-  verify_distribution(replacement = FALSE)
-})
+  num_sampling_iters <- 100L
+  alpha <- 0.05
 
-test_that("sdf_weighted_sample with replacement works as expected", {
-  verify_distribution(replacement = TRUE)
-})
+  sample_sz <- 3L
 
+  # map each possible outcome to an octal value
+  to_oct <- function(sample) {
+    sum(8L^seq(0L, sample_sz - 1L) * sample$x)
+  }
+
+  max_possible_outcome <- to_oct(list(x = rep(7, sample_sz)))
+
+  verify_distribution <- function(replacement) {
+    expected_dist <- rep(0L, max_possible_outcome + 1L)
+    actual_dist <- rep(0L, max_possible_outcome + 1L)
+
+    for (x in seq(num_sampling_iters)) {
+      seed <- x * 97L
+      set.seed(seed)
+
+      sample <- weighted_sampling_octal_test_data %>%
+        dplyr::slice_sample(
+          n = sample_sz,
+          weight_by = weight,
+          replace = replacement
+        ) %>%
+        to_oct()
+      expected_dist[[sample + 1L]] <- expected_dist[[sample + 1L]] + 1L
+
+      sample <- sdf %>%
+        sdf_weighted_sample(
+          k = sample_sz,
+          weight_col = "weight",
+          replacement = replacement,
+          seed = seed
+        ) %>%
+        collect() %>%
+        to_oct()
+      actual_dist[[sample + 1L]] <- actual_dist[[sample + 1L]] + 1L
+    }
+
+    expect_warning(
+      res <- ks.test(x = actual_dist, y = expected_dist)
+    )
+
+    expect_gte(res$p.value, alpha)
+  }
+
+  test_that("sdf_weighted_sample without replacement works as expected", {
+    verify_distribution(replacement = FALSE)
+  })
+
+  test_that("sdf_weighted_sample with replacement works as expected", {
+    verify_distribution(replacement = TRUE)
+  })
 })
 
 test_clear_cache()
