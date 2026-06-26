@@ -25,17 +25,18 @@ test_that("ft_pca() works", {
     V5 = c(0, 5, 7)
   )
 
+  # PC3 is in the null space of this rank-2 (3-row) dataset, so its sign and
+  # magnitude are arbitrary and BLAS-dependent; only assert on PC1/PC2.
   s <- dplyr::tibble(
     PC1 = c(1.6485728230883807, -4.645104331781534, -6.428880535676489),
-    PC2 = c(-4.013282700516296, -1.1167972663619026, -5.337951427775355),
-    PC3 = c(-5.524543751369388, -5.524543751369387, -5.524543751369389)
+    PC2 = c(-4.013282700516296, -1.1167972663619026, -5.337951427775355)
   )
   mat_tbl <- testthat_tbl("mat")
 
   r <- mat_tbl %>%
     ft_vector_assembler(paste0("V", 1:5), "v") %>%
-    ft_pca("v", "pc", k = 3) %>%
-    sdf_separate_column("pc", into = paste0("PC", 1:3)) %>%
+    ft_pca("v", "pc", k = 2) %>%
+    sdf_separate_column("pc", into = paste0("PC", 1:2)) %>%
     select(starts_with("PC", ignore.case = FALSE)) %>%
     collect()
 
@@ -69,16 +70,17 @@ test_that("ml_pca() agrees with Scala result", {
   #         [[-4.645104331781534,-1.1167972663619026,-5.524543751369387]],
   #         [[-6.428880535676489,-5.337951427775355,-5.524543751369389]])
 
+  # PC3 is in the null space of this rank-2 (3-row) dataset, so its sign and
+  # magnitude are arbitrary and BLAS-dependent; only assert on PC1/PC2.
   s <- data.frame(
     PC1 = c(1.6485728230883807, -4.645104331781534, -6.428880535676489),
-    PC2 = c(-4.013282700516296, -1.1167972663619026, -5.337951427775355),
-    PC3 = c(-5.524543751369388, -5.524543751369387, -5.524543751369389)
+    PC2 = c(-4.013282700516296, -1.1167972663619026, -5.337951427775355)
   )
 
   mat_tbl <- testthat_tbl("mat")
 
   r <- mat_tbl %>%
-    ml_pca(k = 3) %>%
+    ml_pca(k = 2) %>%
     sdf_project() %>%
     select(dplyr::starts_with("PC")) %>%
     collect() %>%

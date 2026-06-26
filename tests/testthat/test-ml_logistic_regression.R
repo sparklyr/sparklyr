@@ -53,8 +53,8 @@ test_that("ml_logistic_regression.tbl_spark() works properly", {
     id = 4:7L,
     text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
   )
-  training_tbl <- testthat_tbl("training")
-  test_tbl <- testthat_tbl("test")
+  training_tbl <- testthat_tbl("lr_training", data = training)
+  test_tbl <- testthat_tbl("lr_test", data = test)
 
   pipeline <- ml_pipeline(sc) %>%
     ft_tokenizer("text", "words") %>%

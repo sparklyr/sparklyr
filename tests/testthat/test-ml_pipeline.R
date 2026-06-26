@@ -16,13 +16,13 @@ training <- dplyr::tibble(
   label = c(1, 0, 1, 0)
 )
 
-training_tbl <- testthat_tbl("training")
+training_tbl <- testthat_tbl("lr_training", data = training)
 
 test <- dplyr::tibble(
   id = 4:7L,
   text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
 )
-test_tbl <- testthat_tbl("test")
+test_tbl <- testthat_tbl("lr_test", data = test)
 
 test_that("ml_pipeline() returns a c('ml_pipeline', 'ml_estimator', 'ml_pipeline_stage')", {
   p <- ml_pipeline(sc)

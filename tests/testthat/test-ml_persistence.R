@@ -17,13 +17,13 @@ training <- tibble(
   label = c(1, 0, 1, 0)
 )
 
-training_tbl <- testthat_tbl("training")
+training_tbl <- testthat_tbl("lr_training", data = training)
 
 test <- tibble(
   id = 4:7L,
   text = c("spark i j k", "l m n", "spark hadoop spark", "apache hadoop")
 )
-test_tbl <- testthat_tbl("test")
+test_tbl <- testthat_tbl("lr_test", data = test)
 
 test_that("ml_load prefers Spark JSON glob and loads the model", {
   test_requires_version("3.0.0")

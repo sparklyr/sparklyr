@@ -1,4 +1,3 @@
-skip("Testing if CI goest through without it")
 skip_connection("ml_naive_bayes")
 skip_on_livy()
 skip_on_arrow_devel()
