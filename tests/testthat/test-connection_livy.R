@@ -37,7 +37,10 @@ test_that("livy_config() sets proxy, default headers, and rejects bad params", {
   expect_equal(config$sparklyr.livy.proxy, httr::use_proxy("localhost", 9999))
 
   # default custom header
-  expect_equal(config$sparklyr.livy.headers, list("X-Requested-By" = "sparklyr"))
+  expect_equal(
+    config$sparklyr.livy.headers,
+    list("X-Requested-By" = "sparklyr")
+  )
 
   expect_error(
     livy_config(not_a_real_param = 1),
@@ -50,7 +53,10 @@ test_that("livy_get_httr_config() merges headers, proxy, and curl opts", {
     proxy = httr::use_proxy("localhost", 9999),
     curl_opts = list(verbose = 1)
   )
-  httr_config <- livy_get_httr_config(config, list("Content-Type" = "application/json"))
+  httr_config <- livy_get_httr_config(
+    config,
+    list("Content-Type" = "application/json")
+  )
   expect_true(!is.null(httr_config$options))
 })
 
@@ -62,7 +68,23 @@ test_that("livy_config_get() filters spark.* but not spark.sql.*", {
 })
 
 test_that("livy_config_get_prefix() returns NULL when nothing matches", {
-  expect_null(livy_config_get_prefix("local", list(), "spark.", c("spark.sql.")))
+  expect_null(livy_config_get_prefix(
+    "local",
+    list(),
+    "spark.",
+    c("spark.sql.")
+  ))
+})
+
+test_that("livy_config_get_prefix() unboxes scalars but keeps vectors", {
+  out <- livy_config_get_prefix(
+    "local",
+    list("spark.scalar" = "x", "spark.vector" = c("a", "b")),
+    "spark.",
+    c("spark.sql.")
+  )
+  expect_s3_class(out[["spark.scalar"]], "scalar")
+  expect_equal(as.character(out[["spark.vector"]]), c("a", "b"))
 })
 
 test_that("livy_available_jars() returns version strings", {
@@ -72,7 +94,10 @@ test_that("livy_available_jars() returns version strings", {
 })
 
 test_that("livy_serialized_chunks() splits a string into n-sized chunks", {
-  expect_equal(livy_serialized_chunks("abcdefghij", 3), c("abc", "def", "ghi", "j"))
+  expect_equal(
+    livy_serialized_chunks("abcdefghij", 3),
+    c("abc", "def", "ghi", "j")
+  )
   expect_equal(livy_serialized_chunks("abc", 10), "abc")
 })
 
@@ -188,7 +213,10 @@ test_that("livy_get_json() issues a GET and returns parsed content", {
     http_error = function(...) FALSE,
     content = function(...) list(foo = "bar"),
     .package = "sparklyr",
-    expect_equal(livy_get_json("http://host/sessions", list()), list(foo = "bar"))
+    expect_equal(
+      livy_get_json("http://host/sessions", list()),
+      list(foo = "bar")
+    )
   )
 })
 
@@ -266,7 +294,9 @@ test_that("livy_post_statement() polls until a statement is available", {
 test_that("livy_invoke_statement() converts supported data types", {
   sc <- list()
   with_mocked_bindings(
-    livy_post_statement = function(sc, code) list("application/json" = list(a = 1)),
+    livy_post_statement = function(sc, code) {
+      list("application/json" = list(a = 1))
+    },
     .package = "sparklyr",
     expect_equal(livy_invoke_statement(sc, list(code = "x"))$a, 1)
   )
@@ -308,6 +338,253 @@ test_that("livy_validate_master() succeeds when sessions are reachable", {
     .package = "sparklyr",
     expect_null(livy_validate_master("http://host", list()))
   )
+})
+
+test_that("livy_validate_master() stops after exhausting retries", {
+  with_mocked_bindings(
+    Sys.sleep = function(...) invisible(NULL),
+    .package = "base",
+    with_mocked_bindings(
+      livy_get_sessions = function(...) stop("no service"),
+      .package = "sparklyr",
+      expect_error(
+        livy_validate_master("http://host", list()),
+        "Failed to connect to Livy service"
+      )
+    )
+  )
+})
+
+test_that("create_hive_context.livy_connection() builds a HiveContext", {
+  with_mocked_bindings(
+    invoke_new = function(sc, class, ...) list(class = class),
+    spark_context = function(sc) "ctx",
+    .package = "sparklyr",
+    expect_equal(
+      create_hive_context.livy_connection("sc")$class,
+      "org.apache.spark.sql.hive.HiveContext"
+    )
+  )
+})
+
+test_that("livy_create_session() appends session params when present", {
+  with_mocked_bindings(
+    POST = function(...) "req",
+    http_error = function(...) FALSE,
+    content = function(...) list(id = 1, state = "idle", kind = "spark"),
+    .package = "sparklyr",
+    {
+      session <- livy_create_session("http://host", list("livy.foo" = "bar"))
+      expect_equal(session$state, "idle")
+    }
+  )
+})
+
+test_that("livy_post_statement() polls, then surfaces bad states and errors", {
+  sc <- list(
+    master = "http://host",
+    sessionId = 1,
+    config = list(),
+    log = tempfile(fileext = ".log")
+  )
+
+  # poll: running -> available
+  with_mocked_bindings(
+    POST = function(...) "req",
+    http_error = function(...) FALSE,
+    content = function(...) list(id = 1, state = "running"),
+    livy_get_statement = function(...) {
+      list(
+        id = 1,
+        state = "available",
+        output = list(
+          status = "ok",
+          data = list("application/json" = list(x = 1))
+        )
+      )
+    },
+    .package = "sparklyr",
+    {
+      data <- livy_post_statement(sc, "1 + 1")
+      expect_equal(data[["application/json"]]$x, 1)
+    }
+  )
+
+  # non-available terminal state
+  with_mocked_bindings(
+    POST = function(...) "req",
+    http_error = function(...) FALSE,
+    content = function(...) list(id = 1, state = "dead"),
+    .package = "sparklyr",
+    expect_error(livy_post_statement(sc, "x"), "state dead")
+  )
+
+  # output error with an evalue
+  with_mocked_bindings(
+    POST = function(...) "req",
+    http_error = function(...) FALSE,
+    content = function(...) {
+      list(
+        id = 1,
+        state = "available",
+        output = list(
+          status = "error",
+          evalue = "kaboom",
+          traceback = list("at X")
+        )
+      )
+    },
+    .package = "sparklyr",
+    expect_error(livy_post_statement(sc, "x"), "kaboom")
+  )
+
+  # output error without an evalue (falls back to the JSON dump)
+  with_mocked_bindings(
+    POST = function(...) "req",
+    http_error = function(...) FALSE,
+    content = function(...) {
+      list(
+        id = 1,
+        state = "available",
+        output = list(status = "error", evalue = NULL, traceback = list())
+      )
+    },
+    .package = "sparklyr",
+    expect_error(
+      livy_post_statement(sc, "x"),
+      "Failed to execute Livy statement"
+    )
+  )
+})
+
+test_that("livy_invoke_statement_fetch() returns, retries on truncation, and validates type", {
+  sc <- list(code = new.env())
+  lobj <- structure(list(varName = "v"), class = c("spark_jobj", "livy_jobj"))
+
+  # normal path
+  with_mocked_bindings(
+    livy_statement_compose = function(...) list(code = "c", lobj = lobj),
+    livy_invoke_statement = function(...) "result",
+    livy_invoke_deserialize = function(sc, res) res,
+    .package = "sparklyr",
+    expect_equal(
+      livy_invoke_statement_fetch(sc, TRUE, "Class", "m", FALSE),
+      "result"
+    )
+  )
+
+  # non-character result -> error
+  with_mocked_bindings(
+    livy_statement_compose = function(...) list(code = "c", lobj = lobj),
+    livy_invoke_statement = function(...) list(),
+    .package = "sparklyr",
+    expect_error(
+      livy_invoke_statement_fetch(sc, TRUE, "Class", "m", FALSE),
+      "character result expected"
+    )
+  )
+
+  # truncated result -> retried with magic
+  n <- 0
+  with_mocked_bindings(
+    livy_statement_compose = function(...) list(code = "c", lobj = lobj),
+    livy_invoke_statement = function(...) {
+      n <<- n + 1
+      if (n == 1) "truncated..." else "full"
+    },
+    livy_invoke_deserialize = function(sc, res) res,
+    .package = "sparklyr",
+    expect_equal(
+      livy_invoke_statement_fetch(sc, TRUE, "Class", "m", FALSE),
+      "full"
+    )
+  )
+})
+
+test_that("livy invoke dispatch methods delegate to the fetch helper", {
+  jobj <- structure(list(), class = c("spark_jobj", "livy_jobj"))
+  with_mocked_bindings(
+    livy_invoke_statement_fetch = function(sc, static, jobj, method, ref, ...) {
+      list(static = static, ref = ref)
+    },
+    spark_connection = function(x) "sc",
+    .package = "sparklyr",
+    {
+      expect_false(invoke.livy_jobj(jobj, "m")$static)
+      expect_true(j_invoke.livy_jobj(jobj, "m")$ref)
+      expect_true(invoke_static.livy_connection("sc", "Class", "m")$static)
+      expect_true(j_invoke_static.livy_connection("sc", "Class", "m")$ref)
+      expect_true(invoke_new.livy_connection("sc", "Class")$static)
+      expect_true(j_invoke_new.livy_connection("sc", "Class")$ref)
+    }
+  )
+
+  with_mocked_bindings(
+    livy_post_statement = function(sc, code) code,
+    .package = "sparklyr",
+    expect_equal(invoke_raw("sc", "code"), "code")
+  )
+})
+
+test_that("livy_try_get_session() swallows errors", {
+  with_mocked_bindings(
+    livy_get_session = function(sc) list(state = "idle"),
+    .package = "sparklyr",
+    expect_equal(livy_try_get_session("sc")$state, "idle")
+  )
+  with_mocked_bindings(
+    livy_get_session = function(sc) stop("boom"),
+    .package = "sparklyr",
+    expect_null(livy_try_get_session("sc"))
+  )
+})
+
+test_that("connection_is_open.livy_connection() reflects session state", {
+  with_mocked_bindings(
+    livy_try_get_session = function(sc) NULL,
+    .package = "sparklyr",
+    expect_false(connection_is_open.livy_connection("sc"))
+  )
+  with_mocked_bindings(
+    livy_try_get_session = function(sc) list(state = "idle"),
+    .package = "sparklyr",
+    expect_true(connection_is_open.livy_connection("sc"))
+  )
+})
+
+test_that("spark_disconnect.livy_connection() destroys unless terminate is FALSE", {
+  destroyed <- FALSE
+  with_mocked_bindings(
+    livy_destroy_session = function(sc) {
+      destroyed <<- TRUE
+      NULL
+    },
+    .package = "sparklyr",
+    {
+      spark_disconnect.livy_connection("sc")
+      expect_true(destroyed)
+
+      destroyed <- FALSE
+      spark_disconnect.livy_connection("sc", terminate = FALSE)
+      expect_false(destroyed)
+    }
+  )
+})
+
+test_that("livy_connection_jars() honors a scala version", {
+  jars <- livy_connection_jars(list(), "3.4", "2.12")
+  expect_match(jars, "github.com/sparklyr")
+})
+
+test_that("livy_connection() requires an explicit Spark version", {
+  expect_error(
+    livy_connection("local", list(), "app", NULL, NULL, list()),
+    "require the Spark version"
+  )
+})
+
+test_that("assert_that() aborts on a false condition", {
+  expect_error(assert_that(1 == 2))
 })
 
 # ---------------------------------------------------------------------------
