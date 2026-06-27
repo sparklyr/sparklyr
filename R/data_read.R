@@ -698,12 +698,6 @@ spark_read_orc.spark_connection <- function(
   name <- target$name
   path <- target$path
 
-  if (length(path) != 1L && (spark_version(sc) < "2.0.0")) {
-    stop(
-      "spark_read_orc is only suppored with path of length 1 for spark versions < 2.0.0"
-    )
-  }
-
   df <- spark_data_read_generic(
     sc,
     as.list(spark_normalize_path(path)),

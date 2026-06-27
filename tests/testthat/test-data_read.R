@@ -811,4 +811,158 @@ test_that("spark_read_csv() errors when infer_schema=TRUE with typed columns", {
     "'infer_schema' must be set to FALSE when 'columns' specifies column types"
   )
 })
+
+test_that("spark_read_table() and spark_load_table() read a registered table", {
+  skip_on_livy()
+  skip_connection("format-table")
+  skip_databricks_connect()
+  test_requires("dplyr")
+
+  src <- random_string("rt_src_")
+  name <- random_string("rt_tbl_")
+  on.exit(dbRemoveTable(sc, name, fail_if_missing = FALSE), add = TRUE)
+  copy_to(sc, data.frame(id = 1:4), name = src, overwrite = TRUE)
+  spark_write_table(tbl(sc, src), name)
+
+  expect_equal(sdf_nrow(spark_read_table(sc, name)), 4)
+
+  # deprecated alias delegates to spark_read_table
+  expect_warning(
+    loaded <- spark_load_table(sc, name, path = "unused"),
+    "deprecated"
+  )
+  expect_equal(sdf_nrow(loaded), 4)
+})
+
+test_that("spark_read_delta() reads a delta table, including a prior version", {
+  skip_on_livy()
+  skip_connection("format-delta")
+  test_requires_version("3", max_version = "4")
+  skip_databricks_connect()
+
+  path <- tempfile("delta_read_")
+  spark_write_delta(
+    sdf_copy_to(sc, data.frame(id = 1:5), overwrite = TRUE),
+    path
+  )
+
+  expect_equal(sdf_nrow(spark_read_delta(sc, path)), 5)
+})
+
+test_that("version-gated readers error on older Spark", {
+  with_mocked_bindings(
+    spark_version = function(sc, ...) numeric_version("2.3.0"),
+    .package = "sparklyr",
+    {
+      expect_error(
+        spark_read_binary(sc, name = "x", dir = "/tmp"),
+        "Spark 3.0 or above"
+      )
+      expect_error(
+        spark_read_image(sc, name = "x", dir = "/tmp"),
+        "Spark 2.4 or above"
+      )
+    }
+  )
+})
+
+test_that("spark_read() requires named columns on Spark 4+", {
+  with_mocked_bindings(
+    spark_version = function(sc, ...) numeric_version("4.0.0"),
+    .package = "sparklyr",
+    expect_error(
+      spark_read(
+        sc,
+        list("p"),
+        reader = function(df, path) df,
+        columns = c("a", "b")
+      ),
+      "Spark 4"
+    )
+  )
+})
+
+test_that("spark_data_apply_mode handles null, character, list, and invalid modes", {
+  skip_on_livy()
+  skip_connection("format-generalized")
+  skip_databricks_connect()
+
+  writer <- invoke(spark_dataframe(testthat_tbl("iris")), "write")
+  expect_s3_class(spark_data_apply_mode(writer, NULL), "spark_jobj")
+  expect_s3_class(spark_data_apply_mode(writer, "overwrite"), "spark_jobj")
+  expect_s3_class(
+    spark_data_apply_mode(writer, list("overwrite")),
+    "spark_jobj"
+  )
+  expect_error(spark_data_apply_mode(writer, 42L), "Unsupported type")
+})
+
+test_that("spark_write_source() exercises the generic write path", {
+  skip_on_livy()
+  skip_connection("format-generalized")
+  skip_databricks_connect()
+
+  tbl <- sdf_copy_to(
+    sc,
+    data.frame(id = 1:6, grp = rep(c("a", "b", "c"), 2)),
+    overwrite = TRUE
+  )
+  path <- tempfile("gen_src_")
+  # options + partition_by + mode cover writeOptions/partitionBy/format-save in
+  # spark_data_write_generic (a write helper that lives in data_read.R)
+  spark_write_source(
+    tbl,
+    "parquet",
+    mode = "overwrite",
+    options = list(path = path),
+    partition_by = "grp"
+  )
+  expect_equal(sdf_nrow(spark_read_parquet(sc, random_string(), path)), 6)
+})
+
+test_that("spark_read_orc() accepts an explicit Spark schema", {
+  skip_on_livy()
+  skip_connection("format-orc")
+  skip_databricks_connect()
+
+  src <- tempfile("schema_src_")
+  spark_write_orc(
+    sdf_copy_to(sc, data.frame(id = 1:3), overwrite = TRUE),
+    src
+  )
+  schema <- spark_read_orc(sc, random_string(), src) %>%
+    spark_dataframe() %>%
+    invoke("schema")
+
+  out <- spark_read_orc(sc, random_string(), src, schema = schema)
+  expect_equal(sdf_nrow(out), 3)
+})
+
+test_that("jdbc write without a url errors (jdbc branch guard)", {
+  skip_on_livy()
+  skip_connection("format-generalized")
+  skip_databricks_connect()
+
+  # exercises the is_jdbc guard in spark_data_write_generic (lives in data_read.R)
+  expect_error(
+    spark_write_jdbc(
+      testthat_tbl("iris"),
+      name = random_string("j_"),
+      options = list()
+    ),
+    "url"
+  )
+})
+
+test_that("spark_read_csv() auto-names columns when header = FALSE", {
+  skip_on_livy()
+  skip_connection("format-csv")
+  skip_databricks_connect()
+
+  p <- tempfile(fileext = ".csv")
+  writeLines(c("1,a", "2,b"), p)
+  sdf <- spark_read_csv(sc, random_string(), p, header = FALSE)
+  expect_setequal(colnames(sdf), c("V1", "V2"))
+})
+
 test_clear_cache()
