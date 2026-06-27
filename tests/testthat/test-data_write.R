@@ -16,6 +16,8 @@ test_avro_schema <- list(
 test_that("spark_write_delta() and spark_read_delta() work as expected", {
   skip_on_livy()
   skip_connection("format-delta")
+  # Capped at Spark 4.1+: no compatible delta-spark build exists yet — delta-spark
+  # 4.0.0 (the latest) throws NoSuchMethodError on Spark 4.1. Works on Spark 3.x/4.0.
   test_requires_version("3", max_version = "4")
   test_requires("nycflights13")
 
@@ -252,7 +254,7 @@ test_that("spark_write() works as expected", {
 test_that("spark_write_avro() works as expected", {
   skip_on_livy()
   skip_connection("format-avro")
-  test_requires_version("2.4.0", max_version = "4")
+  test_requires_version("2.4.0")
   skip_databricks_connect()
 
   df <- dplyr::tibble(
@@ -277,13 +279,15 @@ test_that("spark_write_avro() works as expected", {
 
 test_that("spark read/write methods avoid name collision on identical file names", {
   skip_on_livy()
-  skip_connection("format-avro")
-  test_requires_version("2.4.0", max_version = "4")
+  skip_connection("format-generalized")
 
+  # Package-free formats: these work on every supported Spark version, so they
+  # are intentionally NOT version-capped. (avro is exercised separately below,
+  # since it needs the avro package — see plan "Issues to open".)
   tbl_1 <- dplyr::tibble(name = c("foo_1", "bar_1"))
   tbl_2 <- dplyr::tibble(name = c("foo_2", "bar_2"))
-  sdf_1 <- copy_to(sc, tbl_1)
-  sdf_2 <- copy_to(sc, tbl_2)
+  sdf_1 <- copy_to(sc, tbl_1, overwrite = TRUE)
+  sdf_2 <- copy_to(sc, tbl_2, overwrite = TRUE)
 
   impls <- list(
     structure(c(read = spark_read_csv, write = spark_write_csv)),
@@ -293,12 +297,35 @@ test_that("spark read/write methods avoid name collision on identical file names
     structure(c(read = spark_read_orc, write = spark_write_orc))
   )
 
-  if (!is_testing_databricks_connect()) {
-    impls <- append(
-      impls,
-      list(structure(c(read = spark_read_avro, write = spark_write_avro)))
-    )
+  for (impl in impls) {
+    path1 <- tempfile()
+    path2 <- tempfile()
+
+    impl$write(sdf_1, path1)
+    impl$write(sdf_2, path2)
+
+    sdf_1 <- impl$read(sc, path1)
+    expect_equivalent(sdf_1 %>% collect(), tbl_1)
+    sdf_2 <- impl$read(sc, path2)
+    expect_equivalent(sdf_2 %>% collect(), tbl_2)
+    expect_equivalent(sdf_1 %>% collect(), tbl_1)
   }
+})
+
+test_that("avro read/write avoids name collision on identical file names", {
+  skip_on_livy()
+  skip_connection("format-avro")
+  skip_databricks_connect()
+  test_requires_version("2.4.0")
+
+  tbl_1 <- dplyr::tibble(name = c("foo_1", "bar_1"))
+  tbl_2 <- dplyr::tibble(name = c("foo_2", "bar_2"))
+  sdf_1 <- copy_to(sc, tbl_1, overwrite = TRUE)
+  sdf_2 <- copy_to(sc, tbl_2, overwrite = TRUE)
+
+  impls <- list(
+    structure(c(read = spark_read_avro, write = spark_write_avro))
+  )
 
   for (impl in impls) {
     path1 <- tempfile()
@@ -443,6 +470,84 @@ test_that("spark_write_rds() errors when URI count does not match partitions", {
     ),
     "Number of destination URI"
   )
+})
+
+test_that("spark_write_rds() writes one RDS file per partition", {
+  skip_on_livy()
+  skip_connection("format-generalized")
+  test_requires_version("3.0.0")
+  skip_on_arrow()
+  skip_databricks_connect()
+
+  sdf <- sdf_copy_to(
+    sc,
+    data.frame(id = 1:6),
+    overwrite = TRUE,
+    repartition = 2
+  )
+  out_dir <- withr::local_tempdir()
+  uri_template <- paste0(
+    "file://",
+    file.path(out_dir, "part_{partitionId}.rds")
+  )
+
+  res <- spark_write_rds(sdf, uri_template)
+
+  # returns a tibble of partition_id + uri, one row per partition
+  expect_s3_class(res, "tbl_df")
+  expect_equal(nrow(res), 2)
+  expect_setequal(res$partition_id, c(0, 1))
+
+  # the RDS files were actually written, one per partition
+  written <- list.files(out_dir, pattern = "part_.*\\.rds$")
+  expect_equal(length(written), 2)
+})
+
+test_that("spark_write_rds() requires Spark 3.0 or above", {
+  # reachable on the supported Spark 2.x line; exercise the guard with a mocked
+  # connection so it runs without an actual < 3.0 cluster
+  with_mocked_bindings(
+    spark_connection = function(x, ...) "fake_sc",
+    spark_version = function(sc, ...) numeric_version("2.4.0"),
+    .package = "sparklyr",
+    expect_error(
+      spark_write_rds("x", "file:///tmp/a.rds"),
+      "only supported in Spark 3.0 or above"
+    )
+  )
+})
+
+test_that("spark_write_table() dispatches on a spark_jobj", {
+  skip_on_livy()
+  skip_connection("format-table")
+  skip_databricks_connect()
+
+  df <- copy_to(
+    sc,
+    data.frame(id = 1:3),
+    name = random_string("jobj_tbl_"),
+    overwrite = TRUE
+  )
+  tbl_name <- random_string("written_jobj_")
+  on.exit(dbRemoveTable(sc, tbl_name, fail_if_missing = FALSE), add = TRUE)
+
+  spark_write_table(spark_dataframe(df), tbl_name)
+  expect_equal(sdf_nrow(tbl(sc, tbl_name)), 3)
+})
+
+test_that("spark_write.spark_jobj() accepts a Dataset jobj and dispatches", {
+  skip_on_livy()
+  skip_connection("format-generalized")
+  skip_databricks_connect()
+
+  iris_tbl <- testthat_tbl("iris")
+  jobj <- spark_dataframe(iris_tbl)
+  writer <- function(df, path) list(list(path = path))
+
+  expect_warning_on_arrow(
+    res <- spark_write(jobj, writer = writer, paths = "hdfs://iris_jobj")
+  )
+  expect_equal(lapply(res, function(e) e$path), list("hdfs://iris_jobj"))
 })
 
 test_clear_cache()

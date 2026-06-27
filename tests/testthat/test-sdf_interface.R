@@ -543,9 +543,7 @@ test_that("sdf_partition_sizes works as expected", {
 })
 
 test_that("to_avro and from_avro work properly", {
-  # Capped at Spark 4: avro works on 4.x, but the test harness only loads the
-  # avro package on Spark < 4.1 (helper-initialize.R). See plan "Issues to open".
-  test_requires_version("2.4.0", max_version = "4")
+  test_requires_version("2.4.0")
   skip_databricks_connect()
 
   df <- dplyr::tibble(

@@ -242,8 +242,8 @@ test_stream("Adds watermark step", {
 })
 
 test_stream("stream can read and write from Delta", {
-  # Capped at Spark 4: delta is not supported on Spark 4.x in sparklyr yet
-  # (DeltaCatalog class missing). See plan "Issues to open".
+  # Capped at Spark 4.1+: no compatible delta-spark build exists yet — delta-spark
+  # 4.0.0 (the latest) throws NoSuchMethodError on Spark 4.1. Works on Spark 3.x/4.0.
   test_requires_version("3.0.0", max_version = "4")
 
   delta_in <- file.path(base_dir, "delta-in")

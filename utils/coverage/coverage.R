@@ -49,7 +49,7 @@ library(here)   # non-package util, so here::here() is fair game for path resolu
 
 ## -------- Run coverage for one R script (memoized within the session only)
 coverage_run <- function(file,
-                         spark_version = "4.1.0",
+                         spark_version = "3.5.8",
                          refresh = FALSE) {
   base <- .coverage_base(file)
   if (!refresh && !is.null(.coverage_memo[[base]])) {
@@ -127,7 +127,7 @@ coverage_run <- function(file,
 # ---------------------- Public ----------------
 
 ## -------- One-line summary
-coverage_summary <- function(file, spark_version = "4.1.0", refresh = FALSE) {
+coverage_summary <- function(file, spark_version = "3.5.8", refresh = FALSE) {
   cov <- coverage_run(file, spark_version, refresh)
   dv <- .coverage_table(file, cov)
   covered <- sum(dv$value > 0)
@@ -149,7 +149,7 @@ coverage_lines <- function(file,
                            show = c("uncovered", "all"),
                            context = 1,
                            html = TRUE,
-                           spark_version = "4.1.0",
+                           spark_version = "3.5.8",
                            refresh = FALSE) {
   show <- match.arg(show)
   cov <- coverage_run(file, spark_version, refresh)
@@ -183,7 +183,7 @@ coverage_lines <- function(file,
 
 ## -------- HTML report only, written to a timestamped file. Returns the path
 ##   (does NOT open a browser) so it can be shared / re-opened without re-running.
-coverage_report <- function(file, spark_version = "4.1.0", refresh = FALSE) {
+coverage_report <- function(file, spark_version = "3.5.8", refresh = FALSE) {
   cov <- coverage_run(file, spark_version, refresh)
   out <- file.path(
     .coverage_reports_dir(),

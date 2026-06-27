@@ -1,5 +1,11 @@
 # Sparklyr (dev)
 
+- Fixed `spark_write()` and `spark_write_table()` when passed a `spark_jobj`:
+the internal JVM class check only accepted `org.apache.spark.sql.DataFrame`,
+which has not been the concrete class since Spark 2.0 (it is now
+`org.apache.spark.sql.Dataset`, or `org.apache.spark.sql.classic.Dataset` on
+Spark 4.x), so these methods always errored. The check is now version-agnostic.
+
 - Internal reorganization of the package's R source files, consolidating
 related functions into a smaller, more cohesive set of scripts. No exported
 functions, behavior, or APIs change.

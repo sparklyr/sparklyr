@@ -416,6 +416,17 @@ test_that("spark_config_packages() builds delta packages across versions", {
   )
 })
 
+test_that("spark_config_packages() errors for delta on an unsupported Spark version", {
+  with_mocked_bindings(
+    spark_version_latest = function(version = NULL) version,
+    expect_error(
+      spark_config_packages(list(), "delta", "4.1.0"),
+      "Delta Lake is not yet available for Spark 4.1.0"
+    ),
+    .package = "sparklyr"
+  )
+})
+
 test_that("spark_config_packages() errors on delta below 2.4.2", {
   with_mocked_bindings(
     spark_version_latest = function(version = NULL) version,
