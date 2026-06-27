@@ -321,6 +321,8 @@ test_that("spark_read() works as expected", {
 test_that("spark_read_avro() works as expected", {
   skip_on_livy()
   skip_connection("format-avro")
+  # Capped at Spark 4: avro works on 4.x, but the test harness only loads the
+  # avro package on Spark < 4.1 (helper-initialize.R). See plan "Issues to open".
   test_requires_version("2.4.0", max_version = "4")
   skip_databricks_connect()
 
