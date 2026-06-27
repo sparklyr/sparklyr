@@ -163,4 +163,112 @@ test_that("Misc tests", {
   )
 })
 
+test_that("shell_connection_validate_config warns on the deprecated jars config", {
+  expect_warning(
+    cfg <- shell_connection_validate_config(list(spark.jars.default = "x.jar")),
+    "deprecated"
+  )
+  expect_equal(cfg[["sparklyr.jars.default"]], "x.jar")
+  expect_silent(shell_connection_validate_config(list()))
+})
+
+test_that("abort_shell surfaces log/error file contents and parameters", {
+  out <- tempfile()
+  writeLines(c("out line 1", "out line 2"), out)
+  err <- tempfile()
+  writeLines("err line 1", err)
+
+  with_mocked_bindings(
+    Sys.sleep = function(...) invisible(NULL),
+    .package = "base",
+    expect_error(
+      abort_shell(
+        message = "boom",
+        spark_submit_path = "/bin/spark-submit",
+        shell_args = c("--a", "--b"),
+        output_file = out,
+        error_file = err
+      ),
+      "out line 2"
+    )
+  )
+})
+
+test_that("spark_log handles a filter and an unavailable log", {
+  f <- tempfile()
+  writeLines(c("INFO ok", "ERROR boom"), f)
+  sc_fake <- structure(
+    list(output_file = f),
+    class = c("spark_shell_connection", "spark_connection")
+  )
+
+  filtered <- spark_log.spark_shell_connection(sc_fake, filter = "ERROR")
+  expect_s3_class(filtered, "spark_log")
+  expect_true(all(grepl("ERROR", filtered)))
+
+  with_mocked_bindings(
+    file = function(...) stop("no log"),
+    .package = "base",
+    expect_equal(
+      as.character(spark_log.spark_shell_connection(sc_fake)),
+      "Spark log is not available."
+    )
+  )
+})
+
+test_that("print_jobj reports a detached jobj when the connection is closed", {
+  sc_fake <- structure(
+    list(),
+    class = c("spark_shell_connection", "spark_connection")
+  )
+  with_mocked_bindings(
+    connection_is_open = function(sc) FALSE,
+    .package = "sparklyr",
+    {
+      out <- capture.output(
+        print_jobj.spark_shell_connection(sc_fake, list(id = "7"))
+      )
+      expect_match(paste(out, collapse = " "), "detached")
+    }
+  )
+})
+
+test_that("shell j_invoke dispatch delegates to the core invoke helpers", {
+  sc_fake <- structure(
+    list(),
+    class = c("spark_shell_connection", "spark_connection")
+  )
+
+  # j_invoke_method passes jObject = TRUE through to core_invoke_method
+  with_mocked_bindings(
+    core_invoke_method = function(sc, static, object, method, jObject, ...) {
+      list(static = static, jObject = jObject, method = method)
+    },
+    .package = "sparklyr",
+    {
+      r <- j_invoke_method.spark_shell_connection(sc_fake, TRUE, "C", "m")
+      expect_true(r$jObject)
+    }
+  )
+
+  with_mocked_bindings(
+    j_invoke_method = function(sc, static, object, method, ...) {
+      list(static = static, method = method)
+    },
+    spark_connection = function(x) "sc",
+    .package = "sparklyr",
+    {
+      expect_false(j_invoke.shell_jobj(list(), "m")$static)
+      expect_equal(
+        j_invoke_static.spark_shell_connection("sc", "C", "m")$method,
+        "m"
+      )
+      expect_equal(
+        j_invoke_new.spark_shell_connection("sc", "C")$method,
+        "<init>"
+      )
+    }
+  )
+})
+
 test_clear_cache()
