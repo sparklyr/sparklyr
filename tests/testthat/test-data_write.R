@@ -370,4 +370,79 @@ test_that("spark_write_parquet() accepts a list of modes", {
   expect_equal(sdf_nrow(spark_read_parquet(sc, random_string(), path)), 3)
 })
 
+test_that("spark_write() validates its arguments", {
+  skip_on_livy()
+  skip_connection("format-generalized")
+
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_error(
+    spark_write(iris_tbl, writer = function(df, path) df, paths = list()),
+    "'paths' must contain at least 1 path"
+  )
+
+  expect_error(
+    spark_write(iris_tbl, writer = "not a function", paths = "hdfs://iris")
+  )
+})
+
+test_that("spark_write_csv() partitions output by the given columns", {
+  skip_on_livy()
+  skip_connection("format-csv")
+  skip_databricks_connect()
+
+  iris_tbl <- testthat_tbl("iris")
+  path <- tempfile(pattern = "test_write_csv_partition_")
+
+  spark_write_csv(iris_tbl, path, partition_by = "Species")
+
+  # Each distinct Species becomes a partition directory of the form
+  # `Species=<value>` written by Spark's partitionBy().
+  partition_dirs <- list.files(path, pattern = "^Species=")
+  expect_gt(length(partition_dirs), 0)
+})
+
+test_that("spark_write_source() writes a generic source", {
+  skip_on_livy()
+  skip_connection("format-generalized")
+  skip_databricks_connect()
+
+  sdf <- sdf_copy_to(sc, data.frame(id = 1:3), overwrite = TRUE)
+  path <- tempfile(pattern = "test_write_source_")
+
+  spark_write_source(
+    sdf,
+    source = "parquet",
+    options = list(path = path)
+  )
+
+  expect_equal(
+    sdf_nrow(spark_read_parquet(sc, random_string(), path)),
+    3
+  )
+})
+
+test_that("spark_write_rds() errors when URI count does not match partitions", {
+  skip_on_livy()
+  skip_connection("format-generalized")
+  test_requires_version("3.0.0")
+  skip_on_arrow()
+  skip_databricks_connect()
+
+  sdf <- sdf_copy_to(
+    sc,
+    data.frame(id = 1:6),
+    overwrite = TRUE,
+    repartition = 3
+  )
+
+  expect_error(
+    spark_write_rds(
+      sdf,
+      dest_uri = c("file:///tmp/only_one.rds", "file:///tmp/only_two.rds")
+    ),
+    "Number of destination URI"
+  )
+})
+
 test_clear_cache()

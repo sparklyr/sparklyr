@@ -728,4 +728,87 @@ test_that("avro_set_schema() attaches a character schema and passes through NULL
     "{\"type\":\"record\"}"
   )
 })
+
+test_that("spark_csv_options() emits boolean strings for header/inferSchema", {
+  # data_read.R:46-68 — TRUE branches map to "true", anything else to "false"
+  opts <- spark_csv_options(
+    header = TRUE,
+    inferSchema = TRUE,
+    delimiter = ",",
+    quote = "\"",
+    escape = "\\",
+    charset = "UTF-8",
+    nullValue = NULL,
+    options = list()
+  )
+
+  expect_equal(opts$header, "true")
+  expect_equal(opts$inferSchema, "true")
+  expect_equal(opts$delimiter, ",")
+  expect_equal(opts$quote, "\"")
+  expect_equal(opts$escape, "\\")
+  expect_equal(opts$charset, "UTF-8")
+  # toString(NULL) yields the empty string
+  expect_equal(opts$nullValue, "")
+})
+
+test_that("spark_csv_options() maps non-TRUE header/inferSchema to 'false'", {
+  # data_read.R:59-60 — the else branches of the header/inferSchema flags
+  opts <- spark_csv_options(
+    header = FALSE,
+    inferSchema = FALSE,
+    delimiter = ";",
+    quote = "'",
+    escape = "|",
+    charset = "latin1",
+    nullValue = "NA",
+    options = list()
+  )
+
+  expect_equal(opts$header, "false")
+  expect_equal(opts$inferSchema, "false")
+  expect_equal(opts$delimiter, ";")
+  expect_equal(opts$nullValue, "NA")
+})
+
+test_that("spark_csv_options() preserves caller-supplied options", {
+  # data_read.R:56-57 — user `options` are prepended and survive the merge
+  opts <- spark_csv_options(
+    header = TRUE,
+    inferSchema = FALSE,
+    delimiter = ",",
+    quote = "\"",
+    escape = "\\",
+    charset = "UTF-8",
+    nullValue = NULL,
+    options = list(maxColumns = "5", mode = "DROPMALFORMED")
+  )
+
+  expect_equal(opts$maxColumns, "5")
+  expect_equal(opts$mode, "DROPMALFORMED")
+  # built-in options are still present alongside the custom ones
+  expect_equal(opts$header, "true")
+  expect_equal(opts$inferSchema, "false")
+})
+
+test_that("spark_read_csv() errors when infer_schema=TRUE with typed columns", {
+  # data_read.R:158-162 — the mutually-exclusive guard between
+  # infer_schema and a typed `columns` specification.
+  skip_on_livy()
+  skip_connection("format-csv")
+
+  csvPath <- get_test_data_path(
+    "spark-read-csv-can-read-column-types.txt"
+  )
+  expect_error(
+    spark_read_csv(
+      sc,
+      name = "test_infer_schema_conflict",
+      path = csvPath,
+      columns = c(a = "byte", b = "integer", c = "double"),
+      infer_schema = TRUE
+    ),
+    "'infer_schema' must be set to FALSE when 'columns' specifies column types"
+  )
+})
 test_clear_cache()

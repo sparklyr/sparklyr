@@ -673,4 +673,93 @@ test_that("we can separate struct columns (#690)", {
   )
 })
 
+test_that("sdf_schema() works on a tbl_spark and a spark_jobj", {
+  iris_tbl <- testthat_tbl("iris")
+
+  schema_tbl <- sdf_schema(iris_tbl)
+  expect_setequal(
+    names(schema_tbl),
+    c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width", "Species")
+  )
+  expect_equal(schema_tbl$Species$name, "Species")
+  expect_equal(schema_tbl$Species$type, "StringType")
+  expect_equal(schema_tbl$Sepal_Length$type, "DoubleType")
+
+  # default method (operating on a spark_jobj) yields the same schema
+  schema_default <- sdf_schema(spark_dataframe(iris_tbl))
+  expect_equal(schema_default, schema_tbl)
+})
+
+test_that("sdf_read_column.spark_jobj reads a column from a Spark DataFrame", {
+  iris_tbl <- testthat_tbl("iris")
+  sdf <- spark_dataframe(iris_tbl)
+
+  species <- sdf_read_column(sdf, "Species")
+
+  expect_setequal(unique(species), c("setosa", "versicolor", "virginica"))
+  expect_equal(length(species), 150)
+})
+
+test_that("spark_dataframe.spark_connection runs SQL against the connection", {
+  iris_tbl <- testthat_tbl("iris")
+
+  sdf <- spark_dataframe(
+    sc,
+    sprintf("SELECT * FROM %s", dbplyr::remote_name(iris_tbl))
+  )
+
+  expect_true(inherits(sdf, "spark_jobj"))
+  expect_setequal(
+    as.character(invoke(sdf, "columns")),
+    c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width", "Species")
+  )
+})
+
+test_that("sdf_split() randomly splits a Spark DataFrame", {
+  mtcars_tbl <- testthat_tbl("mtcars")
+
+  splits <- sdf_split(mtcars_tbl, weights = c(0.6, 0.4), seed = 42L)
+
+  expect_equal(length(splits), 2)
+  total <- sum(vapply(splits, function(s) invoke(s, "count"), numeric(1)))
+  expect_equal(total, nrow(mtcars))
+})
+
+test_that("get_sdf_storage_level() returns a storage level jobj", {
+  mtcars_tbl <- testthat_tbl("mtcars")
+  sdf <- spark_dataframe(mtcars_tbl)
+
+  level <- get_sdf_storage_level(sdf)
+
+  expect_true(inherits(level, "spark_jobj"))
+})
+
+test_that("sdf_pivot() errors when a variable appears on both sides", {
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_error(
+    sdf_pivot(iris_tbl, Species ~ Species),
+    "both sides"
+  )
+})
+
+test_that("sdf_pivot() errors on missing variables", {
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_error(
+    sdf_pivot(iris_tbl, Species ~ NoSuchColumn),
+    "missing variables"
+  )
+})
+
+
+test_that("sdf_pivot() errors on an unsupported fun.aggregate type", {
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_error(
+    sdf_pivot(iris_tbl, Sepal_Length ~ Species, fun.aggregate = 1L),
+    "unsupported 'fun.aggregate' type"
+  )
+})
+
 test_clear_cache()

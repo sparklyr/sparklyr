@@ -1689,4 +1689,187 @@ test_that("doSpark works with 'qs' serializer", {
   )
 })
 
+# na.replace / replace_na -----------------------------------------------------
+
+test_that("na.replace.tbl_spark fills NA with a single value (unkeyed)", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3), y = c(NA, 2, 3))
+  sdf <- copy_to(sc, df, name = random_string("na_replace_"), overwrite = TRUE)
+
+  res <- sdf %>%
+    na.replace(0) %>%
+    collect()
+
+  expect_equivalent(res, dplyr::tibble(x = c(1, 0, 3), y = c(0, 2, 3)))
+})
+
+test_that("na.replace.tbl_spark fills NA by named column (keyed)", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3), y = c(NA, 2, 3))
+  sdf <- copy_to(sc, df, name = random_string("na_replace_"), overwrite = TRUE)
+
+  res <- sdf %>%
+    na.replace(x = -1) %>%
+    collect()
+
+  # only column 'x' should be filled; 'y' keeps its NA
+  expect_equivalent(res$x, c(1, -1, 3))
+  expect_true(is.na(res$y[[1]]))
+})
+
+test_that("replace_na.tbl_spark works as expected", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3))
+  sdf <- copy_to(sc, df, name = random_string("replace_na_"), overwrite = TRUE)
+
+  res <- sdf %>%
+    tidyr::replace_na(list(x = 0)) %>%
+    collect()
+
+  expect_equivalent(res, dplyr::tibble(x = c(1, 0, 3)))
+})
+
+test_that("na.replace / replace_na work on a spark_jobj directly", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3))
+  sdf <- copy_to(
+    sc,
+    df,
+    name = random_string("na_replace_jobj_"),
+    overwrite = TRUE
+  )
+  jobj <- spark_dataframe(sdf)
+
+  res1 <- na.replace(jobj, 0) %>% collect()
+  expect_equivalent(res1, dplyr::tibble(x = c(1, 0, 3)))
+
+  res2 <- tidyr::replace_na(jobj, list(x = 0)) %>% collect()
+  expect_equivalent(res2, dplyr::tibble(x = c(1, 0, 3)))
+})
+
+# na.omit ----------------------------------------------------------------------
+
+test_that("na.omit.tbl_spark drops NA rows and reports a message", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3), y = c(1, 2, 3))
+  sdf <- copy_to(sc, df, name = random_string("na_omit_"), overwrite = TRUE)
+
+  expect_message(
+    res <- na.omit(sdf) %>% collect(),
+    "Dropped"
+  )
+  expect_equivalent(res, dplyr::tibble(x = c(1, 3), y = c(1, 3)))
+})
+
+test_that("na.omit.tbl_spark reports when no rows are dropped", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, 2, 3), y = c(1, 2, 3))
+  sdf <- copy_to(
+    sc,
+    df,
+    name = random_string("na_omit_none_"),
+    overwrite = TRUE
+  )
+
+  expect_message(
+    res <- na.omit(sdf) %>% collect(),
+    "No rows dropped"
+  )
+  expect_equivalent(res, df)
+})
+
+# na.fail ----------------------------------------------------------------------
+
+test_that("na.fail.tbl_spark returns the object unchanged when no NA present", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, 2, 3))
+  sdf <- copy_to(sc, df, name = random_string("na_fail_"), overwrite = TRUE)
+
+  res <- na.fail(sdf)
+  expect_true(inherits(res, "spark_jobj"))
+})
+
+test_that("na.fail.tbl_spark errors when NA present", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3))
+  sdf <- copy_to(sc, df, name = random_string("na_fail_err_"), overwrite = TRUE)
+
+  expect_error(
+    na.fail(sdf),
+    "missing values"
+  )
+})
+
+# apply_na_action --------------------------------------------------------------
+
+test_that("apply_na_action returns x unchanged when na.action is NULL", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3))
+  sdf <- copy_to(sc, df, name = random_string("apply_na_"), overwrite = TRUE)
+
+  expect_identical(apply_na_action(sdf, na.action = NULL), sdf)
+})
+
+test_that("apply_na_action resolves a function passed by name", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3), y = c(1, 2, 3))
+  sdf <- copy_to(
+    sc,
+    df,
+    name = random_string("apply_na_name_"),
+    overwrite = TRUE
+  )
+
+  res <- apply_na_action(sdf, na.action = "na.omit") %>% collect()
+  expect_equal(nrow(res), 2)
+})
+
+test_that("apply_na_action errors for an unknown function name", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3))
+  sdf <- copy_to(
+    sc,
+    df,
+    name = random_string("apply_na_bad_"),
+    overwrite = TRUE
+  )
+
+  expect_error(
+    apply_na_action(sdf, na.action = "no_such_na_function_xyz"),
+    "no function with name"
+  )
+})
+
+test_that("apply_na_action errors when na.action is not a function", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3))
+  sdf <- copy_to(
+    sc,
+    df,
+    name = random_string("apply_na_notfn_"),
+    overwrite = TRUE
+  )
+
+  expect_error(
+    apply_na_action(sdf, na.action = 42),
+    "'na.action' is not a function"
+  )
+})
+
+# names<- ----------------------------------------------------------------------
+
+# single-input early returns ---------------------------------------------------
+
+test_that("rbind.tbl_spark returns the single input unchanged", {
+  skip_on_livy()
+  df1a_tbl <- testthat_tbl("df1a")
+  expect_identical(rbind(df1a_tbl), df1a_tbl)
+})
+
+test_that("sdf_bind_rows returns the single input unchanged", {
+  skip_on_livy()
+  df1a_tbl <- testthat_tbl("df1a")
+  expect_identical(sdf_bind_rows(df1a_tbl), df1a_tbl)
+})
+
 test_clear_cache()
