@@ -1,3 +1,91 @@
+# ---------------------------------------------------------------------------
+# Connection-free tests for spark_apply()'s pure helpers and the early guards
+# that run before any Spark interaction. Placed above the skip_connection() gate
+# so they run without a live session.
+# ---------------------------------------------------------------------------
+
+test_that("spark_apply() rejects a non-string partition_index_param", {
+  # This guard runs before spark_connection(x), so any x reaches it.
+  expect_error(
+    spark_apply(1, identity, partition_index_param = 1L),
+    "partition_index_param"
+  )
+})
+
+test_that("spark_apply_serializer() handles the qs and custom options", {
+  withr::local_options(sparklyr.spark_apply.serializer = "qs")
+  if (is.null(core_get_package_function("qs", "qserialize"))) {
+    expect_error(spark_apply_serializer(), "qs")
+  } else {
+    expect_type(spark_apply_serializer(), "closure")
+  }
+
+  # a non-qs, non-NULL option is wrapped as list(serializer = ...)
+  withr::local_options(sparklyr.spark_apply.serializer = "custom")
+  res <- spark_apply_serializer()
+  expect_true(is.list(res))
+  expect_equal(res$serializer, "custom")
+})
+
+test_that("spark_apply_deserializer() errors for qs when qs is unavailable", {
+  withr::local_options(sparklyr.spark_apply.serializer = "qs")
+  if (is.null(core_get_package_function("qs", "qdeserialize"))) {
+    expect_error(spark_apply_deserializer(), "qs")
+  } else {
+    expect_type(spark_apply_deserializer(), "closure")
+  }
+})
+
+test_that("spark_apply_packages() warns and returns TRUE when offline", {
+  withr::local_envvar(sparklyr.apply.packagesdb = "")
+  genv_set_avail_package_cache(NULL)
+  withr::defer(genv_set_avail_package_cache(NULL))
+
+  with_mocked_bindings(
+    available.packages = function(...) stop("offline"),
+    .package = "sparklyr",
+    {
+      expect_warning(res <- spark_apply_packages("purrr"), "Failed to run")
+      expect_true(res)
+    }
+  )
+})
+
+test_that("spark_apply_log() is a no-op outside a worker session", {
+  expect_silent(spark_apply_log("hello"))
+})
+
+test_that("get_spark_apply_bundle_path() returns a .tar bundle path as-is", {
+  fake_sc <- structure(list(sessionId = "s1"), class = "spark_connection")
+  expect_equal(
+    get_spark_apply_bundle_path(fake_sc, "/some/bundle.tar"),
+    "/some/bundle.tar"
+  )
+})
+
+test_that("get_spark_apply_bundle_path() adds a not-yet-added bundle to context", {
+  fake_sc <- structure(list(sessionId = "s1"), class = "spark_connection")
+  added <- NULL
+
+  with_mocked_bindings(
+    spark_apply_bundle = function(packages, base, sid) "/tmp/bundle-xyz.tar",
+    invoke_static = function(sc, class, method, name) {
+      "/nonexistent/sparkfile.tar"
+    },
+    spark_context = function(sc) "ctx",
+    invoke = function(jobj, method, path) {
+      added <<- path
+      NULL
+    },
+    .package = "sparklyr",
+    {
+      res <- get_spark_apply_bundle_path(fake_sc, TRUE)
+      expect_equal(res, "/tmp/bundle-xyz.tar")
+      expect_equal(added, "/tmp/bundle-xyz.tar")
+    }
+  )
+})
+
 skip_connection("spark_apply")
 skip_on_livy()
 test_requires("dplyr")
@@ -606,6 +694,58 @@ test_that("barrier-spark_apply works", {
     address$address[1],
     perl = TRUE
   ))
+})
+
+test_that("spark_apply() validates barrier and group_by arguments", {
+  # barrier mode requires explicit column names
+  expect_error(
+    spark_apply(iris_tbl, function(e) e, barrier = TRUE),
+    "Barrier execution requires explicit columns names"
+  )
+  # group_by must reference existing columns
+  expect_error(
+    spark_apply(iris_tbl, function(e) e, group_by = "NoSuchColumn"),
+    "Not all group_by columns found"
+  )
+})
+
+test_stream("spark_apply() rejects group_by on a streaming dataframe", {
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";")
+  expect_error(
+    spark_apply(
+      stream,
+      function(e) e,
+      group_by = "Species",
+      columns = c(Species = "character")
+    ),
+    "'group_by' is unsupported with streams"
+  )
+})
+
+test_that("spark_apply(schema = TRUE) returns the inferred columns", {
+  skip_if_dbplyr_dev()
+  inferred <- sdf_len(sc, 3) %>%
+    spark_apply(function(e) e, schema = TRUE)
+  expect_true(length(names(inferred)) > 0)
+})
+
+test_that("spark_apply() supports the RDD code path", {
+  skip_if_dbplyr_dev()
+  result <- sdf_len(sc, 3) %>%
+    spark_apply(function(e) e, rdd = TRUE) %>%
+    collect()
+  expect_equal(nrow(result), 3)
+})
+
+test_that("spark_apply_bundle() bundles a named package", {
+  with_mocked_bindings(
+    `available.packages` = available_packages_mock,
+    {
+      path <- spark_apply_bundle(packages = "R6", base_path = tempdir())
+      expect_true(file.exists(path))
+      unlink(path, recursive = TRUE)
+    }
+  )
 })
 
 test_clear_cache()
