@@ -328,84 +328,57 @@ sdf_collect_static <- function(object, impl, ...) {
 
   separator <- split_separator(sc)
 
-  # for some reason, we appear to receive invalid results when
-  # collecting Spark DataFrames with many columns. empirically,
-  # having more than 50 columns seems to trigger the buggy behavior
-  # collect the data set in chunks, and then join those chunks.
-  # note that this issue should be resolved with Spark >2.0.0
-  collected <- if (spark_version(sc) > "2.0.0") {
-    if (!identical(args$callback, NULL)) {
-      batch_size <- spark_config_value(
-        sc$config,
-        "sparklyr.collect.batch",
-        as.integer(10^5L)
-      )
-      ctx <- invoke_static(
+  collected <- if (!identical(args$callback, NULL)) {
+    batch_size <- spark_config_value(
+      sc$config,
+      "sparklyr.collect.batch",
+      as.integer(10^5L)
+    )
+    ctx <- invoke_static(
+      sc,
+      "sparklyr.DFCollectionUtils",
+      "prepareDataFrameForCollection",
+      sdf
+    )
+    sdf <- invoke(ctx, "_1")
+    dtypes <- invoke(ctx, "_2")
+    sdf_iter <- invoke(sdf, "toLocalIterator")
+
+    iter <- 1
+    while (invoke(sdf_iter, "hasNext")) {
+      raw_df <- invoke_static(
         sc,
-        "sparklyr.DFCollectionUtils",
-        "prepareDataFrameForCollection",
-        sdf
+        "sparklyr.Utils",
+        "collectIter",
+        invoke(sdf_iter, "underlying"),
+        dtypes,
+        batch_size,
+        separator$regexp
       )
-      sdf <- invoke(ctx, "_1")
-      dtypes <- invoke(ctx, "_2")
-      sdf_iter <- invoke(sdf, "toLocalIterator")
-
-      iter <- 1
-      while (invoke(sdf_iter, "hasNext")) {
-        raw_df <- invoke_static(
-          sc,
-          "sparklyr.Utils",
-          "collectIter",
-          invoke(sdf_iter, "underlying"),
-          dtypes,
-          batch_size,
-          separator$regexp
-        )
-        df <- sdf_collect_data_frame(sdf, raw_df)
-        cb <- args$callback
-        if (is.language(cb)) {
-          cb <- rlang::as_closure(cb)
-        }
-
-        if (length(formals(cb)) >= 2) {
-          cb(df, iter)
-        } else {
-          cb(df)
-        }
-        iter <- iter + 1
+      df <- sdf_collect_data_frame(sdf, raw_df)
+      cb <- args$callback
+      if (is.language(cb)) {
+        cb <- rlang::as_closure(cb)
       }
 
-      NULL
-    } else {
-      invoke_static(
-        sc,
-        "sparklyr.Utils",
-        "collect",
-        sdf,
-        separator$regexp,
-        impl
-      )
-    }
-  } else {
-    if (!identical(args$callback, NULL)) {
-      stop("Parameter 'callback' requires Spark 2.0+")
+      if (length(formals(cb)) >= 2) {
+        cb(df, iter)
+      } else {
+        cb(df)
+      }
+      iter <- iter + 1
     }
 
-    columns <- invoke(sdf, "columns") %>% as.character()
-    chunk_size <- getOption("sparklyr.collect.chunk.size", default = 50L)
-    chunks <- split_chunks(columns, as.integer(chunk_size))
-    pieces <- lapply(chunks, function(chunk) {
-      subset <- sdf %>% invoke("selectExpr", as.list(chunk))
-      invoke_static(
-        sc,
-        "sparklyr.Utils",
-        "collect",
-        subset,
-        separator$regexp,
-        impl
-      )
-    })
-    do.call(c, pieces)
+    NULL
+  } else {
+    invoke_static(
+      sc,
+      "sparklyr.Utils",
+      "collect",
+      sdf,
+      separator$regexp,
+      impl
+    )
   }
 
   sdf_collect_data_frame(sdf, collected)
@@ -471,7 +444,7 @@ sdf_pivot <- function(x, formula, fun.aggregate = "count") {
   }
 
   grouped_cols <- trim_whitespace(strsplit(splat[[1]], "[+*]")[[1]])
-  pivot_cols <- trim_whitespace(strsplit(splat[[2]], "[+*]", fixed = TRUE)[[1]])
+  pivot_cols <- trim_whitespace(strsplit(splat[[2]], "[+*]")[[1]])
 
   # ensure no duplication of variables on each side
   intersection <- intersect(grouped_cols, pivot_cols)

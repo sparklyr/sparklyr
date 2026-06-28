@@ -456,4 +456,179 @@ test_that("stream_register() stores the stream when jobs API is unavailable", {
   )
 })
 
+test_that("stream_register() wires up the RStudio jobs API when available", {
+  # When the jobs API is available, register attaches a job handle, records
+  # initial progress, and builds the info/stop job actions. We mock the jobs API
+  # (its helpers live behind `# nocov` in jobs_api.R) and then invoke the
+  # captured actions to cover their bodies.
+  state_env <- new.env()
+  fake_sc <- structure(
+    list(
+      state = state_env,
+      config = list(),
+      method = "shell",
+      master = "local",
+      app_name = "sparklyr"
+    ),
+    class = "spark_connection"
+  )
+  fake_stream <- structure(list(), class = "spark_stream")
+
+  captured_actions <- NULL
+  progress <- list()
+  console <- NULL
+
+  with_mocked_bindings(
+    spark_connection = function(x, ...) fake_sc,
+    spark_jobj_id = function(x) "jobj-job",
+    spark_config_logical = function(config, name, default) TRUE,
+    rstudio_jobs_api_available = function() TRUE,
+    rstudio_jobs_api = function() {
+      list(
+        add_job_progress = function(job, units) {
+          progress[[length(progress) + 1]] <<- units
+        },
+        remove_job = function(job) NULL
+      )
+    },
+    rstudio_jobs_api_new = function(name, units, actions) {
+      captured_actions <<- actions
+      "job-handle"
+    },
+    stream_id = function(x) "stream-1",
+    stream_stop = function(stream) "stopped",
+    sendToConsole = function(...) console <<- paste0(...),
+    .package = "sparklyr",
+    {
+      result <- stream_register(fake_stream)
+      expect_equal(result$job, "job-handle")
+      expect_equal(progress[[1]], 10L)
+
+      # exercise the captured job actions; info() searches the global env for the
+      # connection, so make it findable there.
+      assign("the_sc", fake_sc, envir = .GlobalEnv)
+      withr::defer(rm("the_sc", envir = .GlobalEnv))
+      captured_actions$info("id")
+      expect_match(console, "stream_find")
+      expect_equal(captured_actions$stop("id"), "stopped")
+    }
+  )
+})
+
+test_that("stream_stop()/stream_unregister() drive the jobs API for a job-backed stream", {
+  state_env <- new.env()
+  state_env$streams <- new.env()
+  fake_sc <- structure(list(state = state_env), class = "spark_connection")
+  fake_stream <- structure(list(job = "job-handle"), class = "spark_stream")
+  state_env$streams[["jobj-j"]] <- fake_stream
+
+  removed <- FALSE
+  progress <- NULL
+
+  with_mocked_bindings(
+    spark_connection = function(x, ...) fake_sc,
+    spark_jobj_id = function(x) "jobj-j",
+    rstudio_jobs_api = function() {
+      list(
+        add_job_progress = function(job, units) progress <<- units,
+        remove_job = function(job) removed <<- TRUE
+      )
+    },
+    invoke = function(jobj, method, ...) {
+      if (method == "stop") "stopped" else NULL
+    },
+    .package = "sparklyr",
+    {
+      result <- stream_stop(fake_stream)
+      expect_equal(result, "stopped")
+      expect_equal(progress, 100L) # add_job_progress(job, 100L)
+      expect_true(removed) # stream_unregister() -> remove_job
+      expect_null(state_env$streams[["jobj-j"]])
+    }
+  )
+})
+
+test_that("stream_validate() returns the stream when there is no exception", {
+  fake_sc <- structure(list(config = list()), class = "spark_connection")
+  fake_stream <- structure(list(), class = "spark_stream")
+
+  with_mocked_bindings(
+    spark_connection = function(x, ...) fake_sc,
+    spark_config_value = function(config, name, default) 0,
+    stream_status = function(stream) list(message = "waiting for data"),
+    invoke = function(jobj, method, ...) {
+      if (method == "isEmpty") TRUE else "jobj"
+    },
+    .package = "sparklyr",
+    expect_identical(stream_validate(fake_stream), fake_stream)
+  )
+})
+
+test_that("stream_validate() raises the exception cause (getMessage then toString)", {
+  fake_sc <- structure(list(config = list()), class = "spark_connection")
+  fake_stream <- structure(list(), class = "spark_stream")
+
+  make_invoke <- function(message_value) {
+    function(jobj, method, ...) {
+      switch(
+        method,
+        isEmpty = FALSE,
+        getMessage = message_value,
+        toString = "boom-tostring",
+        "jobj"
+      )
+    }
+  }
+
+  # cause has a message -> getMessage path
+  with_mocked_bindings(
+    spark_connection = function(x, ...) fake_sc,
+    spark_config_value = function(config, name, default) 0,
+    stream_status = function(stream) list(message = "waiting"),
+    invoke = make_invoke("boom-message"),
+    .package = "sparklyr",
+    expect_error(stream_validate(fake_stream), "boom-message")
+  )
+
+  # cause message is NULL -> toString fallback
+  with_mocked_bindings(
+    spark_connection = function(x, ...) fake_sc,
+    spark_config_value = function(config, name, default) 0,
+    stream_status = function(stream) list(message = "waiting"),
+    invoke = make_invoke(NULL),
+    .package = "sparklyr",
+    expect_error(stream_validate(fake_stream), "boom-tostring")
+  )
+})
+
+test_that("stream_generate_test() iterates and reschedules through later", {
+  out <- withr::local_tempdir()
+
+  # Run the scheduled work synchronously so the recursive generator drains in
+  # one call. The generator fetches `later` via get(asNamespace("later")), which
+  # picks up this mocked binding.
+  with_mocked_bindings(
+    later = function(fn, delay = 0) fn(),
+    .package = "later",
+    stream_generate_test(
+      df = data.frame(x = 1:2),
+      path = out,
+      distribution = c(5, 1),
+      iterations = 3,
+      interval = 0
+    )
+  )
+
+  expect_true(all(file.exists(file.path(out, paste0("stream_", 1:3, ".csv")))))
+})
+
+test_that("stream_lag() errors on a non-streaming dataframe", {
+  mtcars_tbl <- testthat_tbl("mtcars")
+
+  expect_error(
+    stream_lag(mtcars_tbl, cols = c(prev = mpg ~ 1)),
+    "expected a streaming dataframe"
+  )
+})
+
 test_clear_cache()

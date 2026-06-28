@@ -142,8 +142,9 @@ stream_stop <- function(stream) {
 }
 
 stream_validate <- function(stream) {
+  sc <- spark_connection(stream)
   waitSeconds <- cast_scalar_integer(spark_config_value(
-    config,
+    sc$config,
     "sparklyr.stream.validate.timeout",
     3
   )) %>%
@@ -275,7 +276,7 @@ sdf_collect_stream <- function(x, ...) {
   data <- data.frame()
 
   waitSeconds <- cast_scalar_integer(spark_config_value(
-    config,
+    sc$config,
     "sparklyr.stream.collect.timeout",
     5
   ))

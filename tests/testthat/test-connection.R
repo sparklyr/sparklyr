@@ -295,6 +295,294 @@ test_that("spark_connection_is_open() delegates to connection_is_open()", {
   expect_false(spark_connection_is_open(fake_scon(open = FALSE)))
 })
 
+test_that("requireNamespace2() forwards to base requireNamespace", {
+  expect_true(requireNamespace2("stats", quietly = TRUE))
+  expect_false(requireNamespace2("nonexistentpkgxyz123", quietly = TRUE))
+})
+
+test_that("spark_connect() aborts for pysparklyr methods when it is missing", {
+  # The databricks_connect / spark_connect methods are provided by pysparklyr;
+  # with the package "absent" spark_connect must abort before doing any work.
+  with_mocked_bindings(
+    requireNamespace2 = function(...) FALSE,
+    .package = "sparklyr",
+    {
+      expect_error(
+        spark_connect(master = "local", method = "spark_connect"),
+        "pysparklyr"
+      )
+      expect_error(
+        spark_connect(master = "local", method = "databricks_connect"),
+        "pysparklyr"
+      )
+    }
+  )
+})
+
+# ---------------------------------------------------------------------------
+# spark_connect() orchestration. The real body negotiates master/method,
+# short-circuits on a re-used connection, and otherwise hands off to
+# spark_connect_method(). We drive the *resolution logic* with all the live
+# machinery stubbed out: spark_connect_method captures the master/method it is
+# handed, and the post-connect helpers are neutralized so nothing touches a real
+# JVM. This covers the branch selection without a live session.
+# ---------------------------------------------------------------------------
+
+# Build a spark_connect() caller that stubs the connection machinery and returns
+# the (master, method) that spark_connect resolved and passed downstream.
+make_connect_capture <- function(captured_env) {
+  function(...) {
+    captured_env$value <- NULL
+    with_mocked_bindings(
+      spark_connect_method = function(x, method, master, ...) {
+        captured_env$value <- list(master = master, method = method)
+        structure(
+          list(
+            master = master,
+            method = method,
+            # open = FALSE so the real reg.finalizer registered by spark_connect()
+            # sees a closed connection at exit and skips its Sys.sleep() guard.
+            state = list(open = FALSE),
+            extensions = list()
+          ),
+          class = c("test_connection", "spark_connection")
+        )
+      },
+      initialize_connection = function(scon) scon,
+      initialize_method = function(method, scon) scon,
+      register_mapping_tables = function() invisible(NULL),
+      spark_web = function(scon, ...) NULL,
+      spark_ide_connection_open = function(...) invisible(NULL),
+      spark_connections_add = function(sc) invisible(NULL),
+      .package = "sparklyr",
+      spark_connect(...)
+    )
+    captured_env$value
+  }
+}
+
+test_that("spark_connect() resolves master/method then routes downstream", {
+  old <- sparkConnectionsEnv$instances
+  withr::defer(sparkConnectionsEnv$instances <- old)
+  sparkConnectionsEnv$instances <- list()
+
+  cap <- new.env()
+  do_connect <- make_connect_capture(cap)
+
+  # master overridden via config$sparklyr.connect.master
+  res <- do_connect(
+    master = "local",
+    method = "test",
+    config = list(sparklyr.connect.master = "local[7]")
+  )
+  expect_equal(res$master, "local[7]")
+
+  # qubole with a missing master defaults master + spark_home
+  res <- do_connect(method = "qubole", config = list())
+  expect_equal(res$master, "yarn-client")
+  expect_equal(res$method, "qubole")
+
+  # missing master with no spark.master leaves master NULL (default shell)
+  res <- do_connect(config = list())
+  expect_null(res$master)
+  expect_equal(res$method, "shell")
+
+  # the documentation example master switches to the in-memory test method
+  res <- do_connect(master = "spark://HOST:PORT", config = list())
+  expect_equal(res$method, "test")
+
+  # on a Databricks cluster (a DATABRICKS_GUID exists) method = "databricks" is
+  # NOT remapped to databricks-connect, so a missing master defaults to
+  # "databricks".
+  withr::defer({
+    if (exists("DATABRICKS_GUID", envir = .GlobalEnv)) {
+      rm("DATABRICKS_GUID", envir = .GlobalEnv)
+    }
+  })
+  assign("DATABRICKS_GUID", "abc", envir = .GlobalEnv)
+  res <- do_connect(method = "databricks", config = list())
+  expect_equal(res$master, "databricks")
+  expect_equal(res$method, "databricks")
+})
+
+test_that("spark_connect() maps databricks -> databricks-connect off-cluster", {
+  # No DATABRICKS_GUID in the global env means method = "databricks" refers to
+  # Databricks Connect, so master is forced local and the client-type property
+  # is set after connecting.
+  if (exists("DATABRICKS_GUID", envir = .GlobalEnv)) {
+    rm("DATABRICKS_GUID", envir = .GlobalEnv)
+  }
+
+  old <- sparkConnectionsEnv$instances
+  withr::defer(sparkConnectionsEnv$instances <- old)
+  sparkConnectionsEnv$instances <- list()
+
+  captured <- NULL
+  prop <- NULL
+  with_mocked_bindings(
+    spark_connect_method = function(x, method, master, ...) {
+      captured <<- list(master = master, method = method)
+      structure(
+        list(
+          master = master,
+          method = method,
+          state = list(open = FALSE),
+          extensions = list()
+        ),
+        class = c("test_connection", "spark_connection")
+      )
+    },
+    initialize_connection = function(scon) scon,
+    initialize_method = function(method, scon) scon,
+    register_mapping_tables = function() invisible(NULL),
+    spark_web = function(scon, ...) NULL,
+    spark_ide_connection_open = function(...) invisible(NULL),
+    spark_connections_add = function(sc) invisible(NULL),
+    spark_context = function(scon) "ctx",
+    invoke = function(jobj, method, ...) {
+      prop <<- method
+      NULL
+    },
+    .package = "sparklyr",
+    spark_connect(method = "databricks", config = list())
+  )
+  expect_equal(captured$method, "databricks-connect")
+  expect_equal(captured$master, "local")
+  expect_equal(prop, "setLocalProperty")
+})
+
+test_that("spark_connect() clears the apply bundle and runs initializers", {
+  old <- sparkConnectionsEnv$instances
+  withr::defer(sparkConnectionsEnv$instances <- old)
+  sparkConnectionsEnv$instances <- list()
+
+  bundle <- withr::local_tempdir()
+  ran <- FALSE
+  scon_obj <- structure(
+    list(
+      master = "local",
+      method = "shell",
+      state = list(open = FALSE),
+      extensions = list(initializers = list(function(scon) ran <<- TRUE))
+    ),
+    class = c("test_connection", "spark_connection")
+  )
+
+  with_mocked_bindings(
+    spark_apply_bundle_path = function() bundle,
+    spark_connect_method = function(...) scon_obj,
+    initialize_connection = function(scon) scon,
+    initialize_method = function(method, scon) scon,
+    register_mapping_tables = function() invisible(NULL),
+    spark_web = function(scon, ...) NULL,
+    spark_ide_connection_open = function(...) invisible(NULL),
+    spark_connections_add = function(sc) invisible(NULL),
+    .package = "sparklyr",
+    spark_connect(master = "local", method = "test", config = list())
+  )
+
+  expect_false(dir.exists(bundle)) # pre-existing bundle was unlinked
+  expect_true(ran) # extension initializer was invoked
+})
+
+test_that("spark_connect() re-uses an open connection with matching params", {
+  old <- sparkConnectionsEnv$instances
+  withr::defer(sparkConnectionsEnv$instances <- old)
+  sparkConnectionsEnv$instances <- list()
+
+  existing <- fake_scon(
+    master = "local",
+    app_name = "sparklyr",
+    method = "shell"
+  )
+  spark_connections_add(existing)
+
+  expect_message(
+    reused <- spark_connect(
+      master = "local",
+      app_name = "sparklyr",
+      method = "shell",
+      config = list()
+    ),
+    "Re-using existing"
+  )
+  expect_identical(reused, existing)
+})
+
+test_that("spark_connect_method.default() routes each method to its constructor", {
+  fake <- structure(
+    list(state = list(), extensions = list()),
+    class = c("test_connection", "spark_connection")
+  )
+  base_args <- list(
+    master = "local",
+    spark_home = "",
+    config = list(),
+    app_name = "sparklyr",
+    version = NULL,
+    extensions = list(),
+    scala_version = NULL
+  )
+
+  with_mocked_bindings(
+    spark_config_shell_args = function(config, master) list(),
+    shell_connection = function(...) fake,
+    livy_connection = function(...) "livy",
+    databricks_connection = function(...) "dbx",
+    synapse_connection = function(...) "syn",
+    .package = "sparklyr",
+    {
+      # qubole goes through shell_connection and is tagged with its method
+      q <- do.call(
+        spark_connect_method,
+        c(list(x = as_spark_method("qubole"), method = "qubole"), base_args)
+      )
+      expect_equal(q$method, "qubole")
+
+      expect_equal(
+        do.call(
+          spark_connect_method,
+          c(list(x = as_spark_method("livy"), method = "livy"), base_args)
+        ),
+        "livy"
+      )
+      expect_equal(
+        do.call(
+          spark_connect_method,
+          c(
+            list(x = as_spark_method("databricks"), method = "databricks"),
+            base_args
+          )
+        ),
+        "dbx"
+      )
+      expect_equal(
+        do.call(
+          spark_connect_method,
+          c(list(x = as_spark_method("synapse"), method = "synapse"), base_args)
+        ),
+        "syn"
+      )
+    }
+  )
+})
+
+test_that("spark_inspect() returns the jobj when the connection is closed", {
+  fake_jobj <- structure(list(), class = "spark_jobj")
+  with_mocked_bindings(
+    print = function(x, ...) invisible(x),
+    .package = "base",
+    {
+      result <- with_mocked_bindings(
+        spark_connection = function(x, ...) fake_scon(open = FALSE),
+        .package = "sparklyr",
+        spark_inspect(fake_jobj)
+      )
+      expect_identical(result, fake_jobj)
+    }
+  )
+})
+
 skip_connection("connection")
 skip_on_livy()
 skip_on_arrow_devel()
@@ -304,6 +592,13 @@ sc <- testthat_spark_connection()
 call_sparkr <- function(method, ...) {
   get(method, envir = asNamespace("SparkR"))(...)
 }
+
+test_that("sparklyr_get_backend_port() returns the live backend port", {
+  port <- sparklyr_get_backend_port(sc)
+  expect_true(is.numeric(port))
+  expect_length(port, 1)
+  expect_gt(port, 0)
+})
 
 test_that("gateway connection fails with invalid session", {
   expect_error(

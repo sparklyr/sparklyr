@@ -1,5 +1,17 @@
 # Sparklyr (dev)
 
+- Fixed the `sparklyr.stream.collect.timeout` and
+`sparklyr.stream.validate.timeout` configuration options being silently ignored.
+The internal code referenced a bare `config` that resolved to an unrelated
+imported function instead of the connection's configuration, so the timeouts
+always fell back to their defaults; they now read from the active connection.
+
+- Fixed `sdf_pivot()` so a multi-column pivot specification (the right-hand side
+of the formula, e.g. `a ~ b + c`) is now correctly rejected with a clear
+"pivot column is not length one" error. Previously the right-hand side was not
+split on `+`/`*` (an errant `fixed = TRUE`), so such a formula failed later with
+a confusing "missing variables in dataset" error instead.
+
 - Fixed `spark_write()` and `spark_write_table()` when passed a `spark_jobj`:
 the internal JVM class check only accepted `org.apache.spark.sql.DataFrame`,
 which has not been the concrete class since Spark 2.0 (it is now
