@@ -1,3 +1,21 @@
+# Connection-free: the weighted-quantile-discretizer Spark < 3.0 guard can't run
+# live on CI (Spark 3.5/4.1), so cover it by mocking the version check.
+test_that("ft_quantile_discretizer() rejects weight_column on Spark < 3.0", {
+  with_mocked_bindings(
+    spark_version = function(x) numeric_version("2.4.0"),
+    .package = "sparklyr",
+    expect_error(
+      ft_quantile_discretizer.spark_connection(
+        structure(list(), class = "spark_connection"),
+        input_col = "x",
+        output_col = "y",
+        weight_column = "w"
+      ),
+      "only supported in Spark 3.0"
+    )
+  )
+})
+
 skip_connection("ml_feature_selectors")
 skip_on_livy()
 skip_on_arrow_devel()

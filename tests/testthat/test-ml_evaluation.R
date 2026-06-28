@@ -1,3 +1,20 @@
+# Connection-free: the clustering silhouette path errors on Spark < 2.3, which
+# CI can't exercise (Spark 3.5/4.1), so cover the guard by mocking the version.
+test_that("ml_evaluate(clustering) requires Spark 2.3+ for silhouette", {
+  fake_model <- structure(list(model = "<m>"), class = "ml_model_clustering")
+  with_mocked_bindings(
+    spark_connection = function(x, ...) {
+      structure(list(), class = "spark_connection")
+    },
+    spark_version = function(x) numeric_version("2.2.0"),
+    .package = "sparklyr",
+    expect_error(
+      ml_evaluate(fake_model, "<dataset>"),
+      "Silhouette is only available"
+    )
+  )
+})
+
 skip_connection("ml_evaluation")
 skip_on_livy()
 skip_on_arrow_devel()

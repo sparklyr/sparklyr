@@ -253,27 +253,12 @@ ml_supervised_pipeline <- function(
 ml_clustering_pipeline <- function(predictor, dataset, formula, features_col) {
   sc <- spark_connection(predictor)
 
-  pipeline <- if (spark_version(sc) < "2.0.0") {
-    rdf <- sdf_schema(dataset) %>%
-      lapply(`[[`, "name") %>%
-      as.data.frame(stringsAsFactors = FALSE)
-    features <- stats::terms(as.formula(formula), data = rdf) %>%
-      attr("term.labels")
-
-    vector_assembler <- ft_vector_assembler(
-      sc,
-      input_cols = features,
-      output_col = features_col
-    )
-    ml_pipeline(vector_assembler, predictor)
-  } else {
-    r_formula <- ft_r_formula(
-      sc,
-      formula = formula,
-      features_col = features_col
-    )
-    ml_pipeline(r_formula, predictor)
-  }
+  r_formula <- ft_r_formula(
+    sc,
+    formula = formula,
+    features_col = features_col
+  )
+  pipeline <- ml_pipeline(r_formula, predictor)
 
   pipeline %>% ml_fit(dataset)
 }

@@ -1,3 +1,35 @@
+# Connection-free: the Spark < 2.2 GBTClassifier stage build (which omits the
+# probability/raw-prediction columns) can't run on CI (Spark 3.5/4.1). Mock the
+# version check + the JVM layer and confirm the reduced stage is built.
+test_that("ml_gbt_classifier() builds the Spark < 2.2 stage without probability cols", {
+  captured <- NULL
+  with_mocked_bindings(
+    spark_version = function(x) numeric_version("2.1.0"),
+    spark_pipeline_stage = function(sc, class, uid, ...) {
+      captured <<- list(class = class, params = list(...))
+      "<stage>"
+    },
+    jobj_set_param_helper = function(...) NULL,
+    invoke = function(jobj, method, ...) "<jobj>",
+    new_ml_gbt_classifier = function(jobj) "<model>",
+    .package = "sparklyr",
+    {
+      res <- ml_gbt_classifier(
+        structure(list(), class = "spark_connection"),
+        uid = "gbt_1"
+      )
+      expect_equal(res, "<model>")
+    }
+  )
+  expect_equal(
+    captured$class,
+    "org.apache.spark.ml.classification.GBTClassifier"
+  )
+  # the < 2.2 branch omits probability_col / raw_prediction_col
+  expect_true("prediction_col" %in% names(captured$params))
+  expect_false("probability_col" %in% names(captured$params))
+})
+
 skip_connection("ml_gbt")
 skip_on_livy()
 skip_on_arrow_devel()

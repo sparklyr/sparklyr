@@ -1,3 +1,16 @@
+# Connection-free: the Spark < 2.4 guard can't run live (CI is on 3.5/4.1), so
+# cover it by mocking the version check.
+test_that("ml_power_iteration() requires Spark 2.4+", {
+  with_mocked_bindings(
+    spark_version = function(x) numeric_version("2.2.0"),
+    .package = "sparklyr",
+    expect_error(
+      ml_power_iteration(structure(list(), class = "spark_connection")),
+      "only supported in Spark 2.4"
+    )
+  )
+})
+
 skip_connection("ml_power_iteration")
 skip_on_livy()
 skip_on_arrow_devel()

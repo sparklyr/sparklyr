@@ -470,22 +470,14 @@ ml_multiclass_classification_evaluator.spark_connection <- function(
   ) %>%
     validator_ml_multiclass_classification_evaluator()
 
-  spark_metric <- list(
-    "1.6" = c(
-      "f1",
-      "precision",
-      "recall",
-      "weightedPrecision",
-      "weightedRecall"
-    ),
-    "2.0" = c("f1", "weightedPrecision", "weightedRecall", "accuracy")
+  supported_metrics <- c(
+    "f1",
+    "weightedPrecision",
+    "weightedRecall",
+    "accuracy"
   )
 
-  if (
-    spark_version(x) >= "2.0.0" &&
-      !metric_name %in% spark_metric[["2.0"]] ||
-      spark_version(x) < "2.0.0" && !metric_name %in% spark_metric[["1.6"]]
-  ) {
+  if (!metric_name %in% supported_metrics) {
     stop(
       "Metric `",
       metric_name,
