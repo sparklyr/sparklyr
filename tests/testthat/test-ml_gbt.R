@@ -297,6 +297,11 @@ test_that("ml_gbt_classifier() fits without a formula and exposes trees()", {
     dplyr::mutate(label = ifelse(Species == "setosa", 1, 0)) %>%
     ft_vector_assembler(c("Petal_Length", "Petal_Width"), "features")
   m <- ml_gbt_classifier(binlab, features_col = "features", label_col = "label")
+  # NB: on the CI Spark matrix (>= 3.0) this exercises the `>= 2.2.0` branch of
+  # new_ml_gbt_classification_model(), which always had the correct class. The
+  # copy-paste fix was in the `< 2.2.0` branch, which cannot run here (Spark
+  # < 2.2 is not in the test matrix) -- so this guards the class label on the
+  # reachable branch only.
   expect_s3_class(m, "ml_gbt_classification_model")
   expect_gt(length(m$trees()), 0)
 })
