@@ -411,7 +411,11 @@ test_that("start_shell aborts after exhausting gateway connect attempts", {
 test_that("start_shell aborts when the backend socket cannot be opened", {
   # routing gateway returns a live-looking gatewayInfo, so we skip the launch
   # block and go straight to the socket setup, which we force to fail.
-  gw <- list(backendPort = 9999, gateway = textConnection("x"))
+  gw_con <- textConnection("x")
+  # start_shell's error handler closes the gateway; defer a guarded close so the
+  # fixture is cleaned up regardless (tryCatch swallows the already-closed case).
+  withr::defer(tryCatch(close(gw_con), error = function(e) NULL))
+  gw <- list(backendPort = 9999, gateway = gw_con)
   with_mocked_bindings(
     spark_connect_gateway = function(...) gw,
     .package = "sparklyr",
