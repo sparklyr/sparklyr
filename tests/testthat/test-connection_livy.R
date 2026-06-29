@@ -587,6 +587,94 @@ test_that("assert_that() aborts on a false condition", {
   expect_error(assert_that(1 == 2))
 })
 
+# ---- livy_connection() orchestration, Livy HTTP layer mocked ----------------
+# The version-NULL guard is covered above. These drive the rest of the body
+# (master normalization, jars/packages/repositories config assembly, the
+# create-session retry loop, the wait-for-start loop, and the session-state
+# guards) without a live Livy server -- only the HTTP boundary is mocked.
+
+livy_connect_mocked <- function(create,
+                                get = function(sc) list(id = "s1", state = "idle"),
+                                config = list(),
+                                master = "local") {
+  with_mocked_bindings(
+    livy_validate_master = function(...) invisible(TRUE),
+    spark_dependencies_from_extensions = function(...) {
+      list(catalog_jars = character(), packages = "org.x:y:1", repositories = "https://r")
+    },
+    livy_create_session = create,
+    livy_get_session = get,
+    .package = "sparklyr",
+    with_mocked_bindings(
+      Sys.sleep = function(...) invisible(NULL),
+      .package = "base",
+      suppressWarnings(livy_connection(
+        master = master, config = config, app_name = "sparklyr",
+        version = "3.5.0", hadoop_version = NULL, extensions = list(),
+        scala_version = NULL
+      ))
+    )
+  )
+}
+
+test_that("livy_connection() assembles config and connects to an idle session", {
+  sc <- livy_connect_mocked(create = function(...) list(id = "s1", state = "idle"))
+  expect_s3_class(sc, "livy_connection")
+  expect_equal(sc$master, "http://localhost:8998") # local -> http normalized
+  expect_match(sc$config[["spark.jars.packages"]], "org.x:y:1")
+  expect_match(sc$config[["spark.jars.repositories"]], "https://r")
+  expect_true(length(sc$config[["livy.jars"]]) > 0)
+})
+
+test_that("livy_connection() trims a trailing slash from the master URL", {
+  sc <- livy_connect_mocked(
+    create = function(...) list(id = "s1", state = "idle"),
+    master = "http://example.com:8998/"
+  )
+  expect_equal(sc$master, "http://example.com:8998")
+})
+
+test_that("livy_connection() waits for a starting session to become idle", {
+  sc <- livy_connect_mocked(
+    create = function(...) list(id = "s1", state = "starting"),
+    get = function(sc) list(id = "s1", state = "idle")
+  )
+  expect_s3_class(sc, "livy_connection")
+})
+
+test_that("livy_connection() errors when the session never leaves starting", {
+  expect_error(
+    livy_connect_mocked(
+      create = function(...) list(id = "s1", state = "starting"),
+      get = function(sc) list(id = "s1", state = "starting"),
+      config = list(sparklyr.connect.timeout = 0)
+    ),
+    "still starting"
+  )
+})
+
+test_that("livy_connection() errors on a non-idle session state", {
+  expect_error(
+    livy_connect_mocked(create = function(...) list(id = "s1", state = "dead")),
+    "session status is dead"
+  )
+})
+
+test_that("livy_connection() retries session creation before failing", {
+  attempts <- 0L
+  expect_error(
+    livy_connect_mocked(
+      create = function(...) {
+        attempts <<- attempts + 1L
+        stop("boom")
+      },
+      config = list(sparklyr.livy_create_session.retries = 1L)
+    ),
+    "boom"
+  )
+  expect_equal(attempts, 2L) # initial attempt + one retry
+})
+
 # ---------------------------------------------------------------------------
 # Live Livy integration. Skipped unless a Livy server is available. We are not
 # investing further in live Livy coverage (legacy technology).
