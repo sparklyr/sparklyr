@@ -737,6 +737,23 @@ test_that("spark_apply() supports the RDD code path", {
   expect_equal(nrow(result), 3)
 })
 
+test_that("spark_apply() supports the RDD code path with group_by", {
+  skip_if_dbplyr_dev()
+  skip_on_arrow_devel()
+  # group_by + rdd = TRUE exercises ApplyUtils.groupBy on the RDD (the grouped
+  # branch of the RDD path), which the ungrouped RDD/barrier tests don't reach.
+  result <- spark_apply(
+    iris_tbl,
+    function(e) nrow(e),
+    names = "n",
+    group_by = "Species",
+    rdd = TRUE
+  ) %>%
+    collect()
+  expect_equal(nrow(result), 3) # one row per species
+  expect_equal(sum(result$n), 150) # all rows accounted for
+})
+
 test_that("spark_apply_bundle() bundles a named package", {
   with_mocked_bindings(
     `available.packages` = available_packages_mock,
