@@ -1,3 +1,74 @@
+# ---------------------------------------------------------------------------
+# Connection-free tests for the tuning helpers, validators, and print/summary
+# code. The live CV/TVS fits are skip_slow (excluded from coverage), so cover the
+# pure logic, the error branches, and the model print/summary here (mocking the
+# JVM-facing bits).
+# ---------------------------------------------------------------------------
+
+test_that("ml_validate_params() errors on ambiguous / missing stage names", {
+  expect_error(
+    ml_validate_params(
+      list(foo = list(list(p = 1))),
+      list(foo1 = NULL, foo2 = NULL),
+      list()
+    ),
+    "matches more than one stage"
+  )
+  expect_error(
+    ml_validate_params(
+      list(bar = list(list(p = 1))),
+      list(foo1 = NULL),
+      list()
+    ),
+    "matches no stages"
+  )
+})
+
+test_that("validate_args_tuning() rejects bad estimator/param_maps/evaluator", {
+  base <- list(collect_sub_models = FALSE, parallelism = 1, seed = NULL)
+  expect_error(
+    validate_args_tuning(c(base, list(estimator = structure(1, class = "x")))),
+    "must be an .ml_estimator"
+  )
+  expect_error(
+    validate_args_tuning(c(base, list(estimator_param_maps = 5))),
+    "must be a list"
+  )
+  expect_error(
+    validate_args_tuning(c(base, list(evaluator = structure(1, class = "x")))),
+    "must be an .ml_evaluator"
+  )
+})
+
+test_that("ml_validation_metrics() dispatches by model class", {
+  expect_equal(
+    ml_validation_metrics(
+      structure(list(avg_metrics_df = "A"), class = "ml_cross_validator_model")
+    ),
+    "A"
+  )
+  expect_equal(
+    ml_validation_metrics(
+      structure(
+        list(validation_metrics_df = "B"),
+        class = "ml_train_validation_split_model"
+      )
+    ),
+    "B"
+  )
+  expect_error(
+    ml_validation_metrics(structure(list(), class = "other")),
+    "must be called on"
+  )
+})
+
+test_that("ml_sub_models() errors when sub-models were not collected", {
+  expect_error(
+    ml_sub_models(structure(list(), class = "ml_cross_validator_model")),
+    "collect_sub_models"
+  )
+})
+
 skip_connection("ml_tuning")
 skip_on_livy()
 skip_on_arrow_devel()
@@ -365,6 +436,35 @@ test_that("train validation split print methods", {
     output_file("print/tvs3.txt"),
     print = TRUE
   )
+})
+
+test_that("ml_cross_validator(tbl_spark) fits, prints, and reports metrics", {
+  test_requires_version("2.3.0")
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
+
+  pipeline <- ml_pipeline(sc) %>%
+    ft_r_formula(Species ~ Petal_Width, uid = "rf_cv") %>%
+    ml_logistic_regression(uid = "lr_cv")
+
+  # small grid + 2 folds keeps this quick enough to run during measurement, and
+  # the tbl_spark entry point fits the model directly (exercises new_*_model,
+  # print/summary, ml_validation_metrics and ml_sub_models for real).
+  model <- ml_cross_validator(
+    iris_tbl,
+    estimator = pipeline,
+    estimator_param_maps = list(lr_cv = list(reg_param = c(0, 0.1))),
+    evaluator = ml_multiclass_classification_evaluator(sc),
+    num_folds = 2,
+    collect_sub_models = TRUE,
+    seed = 1
+  )
+
+  expect_s3_class(model, "ml_cross_validator_model")
+  expect_output(print(model), "Best Model")
+  expect_output(summary(model), "Summary for")
+  expect_equal(nrow(ml_validation_metrics(model)), 2)
+  expect_length(ml_sub_models(model), 2)
 })
 
 test_clear_cache()
