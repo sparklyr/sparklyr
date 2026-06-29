@@ -315,67 +315,98 @@ test_that("download_scalac() downloads + extracts, and skips existing files", {
   expect_equal(unzipped, 3)
 })
 
-# ---- End-to-end jar build (intentionally skipped: too slow for CI) -----------
+# ---- End-to-end build -> update -> verify (real toolchain) ------------------
+# One real build covers the shell-out core of three functions instead of mocking
+# them away (which would assert nothing about whether they work):
+#   * spark_compile()                  -- real scalac + jar, ONE spec only
+#   * spark_update_embedded_sources()  -- real `jar uf` to refresh embedded srcs
+#   * spark_verify_embedded_sources()  -- real `jar xf` + diffobj, BOTH branches
+# We only fake *scope* -- sparklyr_jar_spec_list() (build one spec, not four) and
+# list_sparklyr_jars() (point at the throwaway jar, never inst/java) -- never the
+# work. CI installs Scala via download_scalac() and a Spark version for the
+# suite, so the toolchain is present; locally it skips unless a matching scalac
+# is installed. The repo is left byte-identical (jar in a tempdir, working dir
+# and java/embedded_sources.R restored). It can't assert the jar loads into a
+# JVM -- that's covered downstream by the suite running against the built jars.
+# No skip_on_cran(): the find_scalac() guard already skips when the toolchain is
+# absent (as on CRAN), and skip_on_cran() would also hide this from local covr.
 
-test_that("jar file is created", {
-  skip(
-    "This test takes too long to run, and is not necessary for daily operations"
+test_that("compile, then update + verify embedded sources (real build)", {
+  skip_on_livy()
+  skip_on_arrow_devel()
+
+  installed <- spark_installed_versions()
+  skip_if(nrow(installed) == 0, "no Spark installed")
+
+  # Prefer a 3.x install (Scala 2.12, the canonical build target); otherwise
+  # take the first install and pair Scala by Spark major version.
+  prefer <- grep("^3[.]", installed$spark)
+  sv <- installed$spark[[if (length(prefer)) prefer[[1]] else 1L]]
+  major <- as.integer(strsplit(sv, "[.]")[[1]][[1]])
+  scala_v <- switch(as.character(major), "2" = "2.11", "3" = "2.12", "2.13")
+
+  scalac <- tryCatch(find_scalac(scala_v), error = function(e) NULL)
+  skip_if(is.null(scalac), sprintf("scala %s compiler not installed", scala_v))
+
+  # spark_gen_embedded_sources() reads dir("R"), and update() rewrites
+  # java/embedded_sources.R -- run from the package root and restore that file so
+  # the repo is left untouched.
+  root <- rprojroot::find_package_root_file()
+  withr::local_dir(root)
+  embedded_src <- file.path("java", "embedded_sources.R")
+  original_embedded <- readLines(embedded_src)
+  withr::defer(writeLines(original_embedded, embedded_src))
+
+  # Build the jar into a tempdir, NOT the package's inst/java.
+  withr::local_envvar(R_SPARKINSTALL_COMPILE_JAR_PATH = withr::local_tempdir())
+
+  # 1. Build one jar for real (mock only the spec list, down to one entry).
+  with_mocked_bindings(
+    sparklyr_jar_spec_list = function() list(list(spark = sv, scala = scala_v)),
+    {
+      spec <- spark_default_compilation_spec()
+      expect_length(spec, 1)
+      suppressMessages(compile_package_jars(spec = spec))
+    },
+    .package = "sparklyr"
   )
-  skip_connection("spark_compile")
+  built <- normalizePath(list.files(
+    Sys.getenv("R_SPARKINSTALL_COMPILE_JAR_PATH"),
+    pattern = "[.]jar$",
+    full.names = TRUE
+  ))
+  expect_length(built, 1)
 
-  number_of_jars <- 4
-
-  jar_folder <- path.expand("~/testjar")
-
-  s_version <- testthat_spark_env_version()
-
-  major_v <- strsplit(s_version, "\\.")[[1]][[1]]
-
-  if (major_v >= 1) {
-    scala_v <- "2.10"
-  }
-  if (major_v >= 2) {
-    scala_v <- "2.11"
-  }
-  if (major_v >= 3) {
-    scala_v <- "2.12"
-  }
-
-  jar_name <- sprintf("%s-%s-test.jar", s_version, scala_v)
-
-  scs <- spark_compilation_spec(
-    spark_version = s_version,
-    scalac_path = find_scalac(scala_v),
-    jar_name = jar_name,
-    jar_path = find_jar(),
-    scala_filter = make_version_filter(s_version)
+  # 2. update() refreshes the jar's embedded sources; 3. verify() then finds them
+  #    in sync. Mock list_sparklyr_jars() so both touch ONLY the throwaway jar.
+  with_mocked_bindings(
+    list_sparklyr_jars = function() built,
+    {
+      suppressMessages(spark_update_embedded_sources())
+      expect_no_error(suppressMessages(spark_verify_embedded_sources()))
+    },
+    .package = "sparklyr"
   )
 
-  Sys.setenv("R_SPARKINSTALL_COMPILE_JAR_PATH" = jar_folder)
-
-  compile_package_jars(scs)
-
-  expect_true(
-    file.exists(file.path(jar_folder, jar_name))
+  # 4. verify()'s failure branch, made deterministic by tampering a copy (rather
+  #    than relying on the shipped jars being stale): splice bogus sources in and
+  #    confirm verify stops.
+  tampered <- file.path(withr::local_tempdir(), basename(built))
+  file.copy(built, tampered)
+  bad_dir <- withr::local_tempdir()
+  dir.create(file.path(bad_dir, "sparklyr"))
+  writeLines(
+    "# not the real embedded sources",
+    file.path(bad_dir, "sparklyr", "embedded_sources.R")
   )
-
-  expect_message(
-    sparklyr_jar_verify_spark(),
-    "- Spark version"
+  withr::with_dir(
+    bad_dir,
+    system2("jar", c("uf", tampered, file.path("sparklyr", "embedded_sources.R")))
   )
-
-  expect_length(
-    sparklyr_jar_spec_list(),
-    number_of_jars
-  )
-
-  expect_silent(
-    download_scalac()
-  )
-
-  expect_is(
-    make_version_filter(s_version),
-    "function"
+  with_mocked_bindings(
+    list_sparklyr_jars = function() tampered,
+    expect_error(suppressMessages(spark_verify_embedded_sources())),
+    .package = "sparklyr"
   )
 })
 
