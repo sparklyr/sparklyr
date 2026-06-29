@@ -1,5 +1,9 @@
 # Sparklyr (dev)
 
+- Fixed `ml_gbt_classifier()` on Spark < 2.2 so a fitted classification model is
+classed `ml_gbt_classification_model` (it was mislabeled
+`ml_multilayer_perceptron_classification_model` due to a copy-paste error).
+
 - Fixed `ft_robust_scaler()` so a fitted model is now wrapped as an
 `ml_robust_scaler_model` object. `RobustScaler`/`RobustScalerModel` were missing
 from the JVM-class mapping, so a fitted robust scaler fell back to a generic

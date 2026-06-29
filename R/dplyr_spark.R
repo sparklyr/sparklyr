@@ -334,11 +334,7 @@ spark_partition_register_df <- function(sc, df, name, repartition, memory) {
   }
 
   if (!name %in% dbListTables(sc)) {
-    if (spark_version(sc) < "2.0.0") {
-      invoke(df, "registerTempTable", name)
-    } else {
-      invoke(df, "createOrReplaceTempView", name)
-    }
+    invoke(df, "createOrReplaceTempView", name)
   }
 
   if (memory) {
@@ -412,12 +408,6 @@ sample_n.tbl_spark <- function(
   .env = parent.frame(),
   ...
 ) {
-  if (spark_version(spark_connection(tbl)) < "2.0.0") {
-    stop(
-      "sample_n() is not supported until Spark 2.0 or later. Use sdf_sample instead."
-    )
-  }
-
   args <- list(
     size = size,
     replace = replace,
@@ -442,10 +432,6 @@ sample_frac.tbl_spark <- function(
   .env = parent.frame(),
   ...
 ) {
-  if (spark_version(spark_connection(tbl)) < "2.0.0") {
-    stop("sample_frac() is not supported until Spark 2.0 or later.")
-  }
-
   args <- list(
     size = size,
     replace = replace,

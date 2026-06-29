@@ -325,7 +325,7 @@ new_ml_gbt_classification_model <- function(jobj) {
         invoke(jobj, "trees") %>%
           purrr::map(new_ml_decision_tree_regression_model)
       },
-      class = "ml_multilayer_perceptron_classification_model"
+      class = "ml_gbt_classification_model"
     )
   } else {
     new_ml_probabilistic_classification_model(

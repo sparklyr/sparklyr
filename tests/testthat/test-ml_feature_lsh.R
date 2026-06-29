@@ -181,4 +181,24 @@ test_that("ft_bucketed_random_projection_lsh() works properly", {
   )
 })
 
+test_that("ft_bucketed_random_projection_lsh() fits + transforms via tbl_spark", {
+  skip_databricks_connect()
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  hashed <- testthat_tbl("iris") %>%
+    ft_vector_assembler(c("Petal_Length", "Petal_Width"), "features") %>%
+    ft_bucketed_random_projection_lsh("features", "hashes", bucket_length = 2)
+  expect_true("hashes" %in% colnames(hashed))
+})
+
+test_that("ft_minhash_lsh() fits + transforms via tbl_spark", {
+  skip_databricks_connect()
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  hashed <- testthat_tbl("iris") %>%
+    ft_vector_assembler(c("Petal_Length", "Petal_Width"), "features") %>%
+    ft_minhash_lsh("features", "hashes", num_hash_tables = 1L)
+  expect_true("hashes" %in% colnames(hashed))
+})
+
 test_clear_cache()
