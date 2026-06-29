@@ -228,4 +228,17 @@ test_that("ml_transform take list of transformers (#1444)", {
   expect_equal(transformed1, transformed2)
 })
 
+test_that("pipeline printing, column metadata, and stage-adding", {
+  iris_tbl <- testthat_tbl("iris")
+  expect_gt(length(capture.output(print(ml_pipeline(sc)))), 0)
+
+  feat <- iris_tbl %>%
+    ft_vector_assembler(c("Petal_Length", "Petal_Width"), "features")
+  expect_false(is.null(ml_column_metadata(feat, "features")))
+
+  p <- ml_pipeline(sc) %>%
+    ml_add_stage(ft_binarizer(sc, "Petal_Length", "b", threshold = 2))
+  expect_s3_class(p, "ml_pipeline")
+})
+
 test_clear_cache()
