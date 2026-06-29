@@ -848,87 +848,15 @@ initialize_connection.spark_shell_connection <- function(sc) {
           invoke(session, "sparkContext")
       }
 
+      # sparklyr requires Spark 2.0+, so always create a SparkSession (which also
+      # sets sc$state$hive_context). The spark context may already be available
+      # in submit_batch, in which case we only need the SparkSession.
       if (is.null(spark_context(sc))) {
-        # create the spark context and assign the connection to it
-        # use spark home version since spark context is not yet initialized in shell connection
-        # but spark_home might not be initialized in submit_batch while spark context is available
-        if (
-          (!identical(sc$home_version, NULL) && sc$home_version >= "2.0") ||
-            (!identical(spark_context(sc), NULL) && spark_version(sc) >= "2.0")
-        ) {
-          init_hive_ctx_for_spark_2_plus()
-        } else {
-          sc$state$spark_context <- invoke_static(
-            sc,
-            "org.apache.spark.SparkContext",
-            "getOrCreate",
-            conf
-          )
-          # we might not be aware of the actual version of Spark that is running yet until now
-          actual_spark_version <- tryCatch(
-            invoke(sc$state$spark_context, "version"),
-            error = function(e) {
-              warning(paste(
-                "Failed to get version from SparkContext:",
-                e
-              ))
-              NULL
-            }
-          )
-          if (
-            !identical(actual_spark_version, NULL) &&
-              actual_spark_version >= "2.0"
-          ) {
-            init_hive_ctx_for_spark_2_plus()
-          }
-        }
-
+        init_hive_ctx_for_spark_2_plus()
         invoke(backend, "setSparkContext", spark_context(sc))
-      } else if (is.null(sc$state$hive_context) && spark_version(sc) >= "2.0") {
+      } else if (is.null(sc$state$hive_context)) {
         init_hive_ctx_for_spark_2_plus()
       }
-
-      # If Spark version is 2.0.0 or above, hive_context should be initialized by now.
-      # So if that's not the case, then attempt to initialize it assuming Spark version is below 2.0.0
-      sc$state$hive_context <- sc$state$hive_context %||%
-        tryCatch(
-          invoke_new(
-            sc,
-            if (identical(sc$state$hive_support_enabled, TRUE)) {
-              "org.apache.spark.sql.hive.HiveContext"
-            } else {
-              "org.apache.spark.sql.SQLContext"
-            },
-            sc$state$spark_context
-          ),
-          error = function(e) {
-            warning(e$message)
-            warning(
-              "Failed to create Hive context, falling back to SQL. Some operations, ",
-              "like window-functions, will not work"
-            )
-
-            jsc <- invoke_static(
-              sc,
-              "org.apache.spark.api.java.JavaSparkContext",
-              "fromSparkContext",
-              sc$state$spark_context
-            )
-
-            hive_context <- invoke_static(
-              sc,
-              "org.apache.spark.sql.api.r.SQLUtils",
-              "createSQLContext",
-              jsc
-            )
-
-            params <- connection_config(sc, "spark.sql.")
-            apply_config(hive_context, params, "setConf", "spark.sql.")
-
-            # return hive_context
-            hive_context
-          }
-        )
 
       # create the java spark context and assign the connection to it
       sc$state$java_context <- invoke_static(
