@@ -66,3 +66,6 @@ tests/testthat/foobar/
 
 # roborev snapshots
 /.roborev/
+
+# Compiled coverage estimates (regenerated locally)
+utils/coverage/compiled/
