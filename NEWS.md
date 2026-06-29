@@ -1,5 +1,12 @@
 # Sparklyr (dev)
 
+- Fixed `ft_robust_scaler()` so a fitted model is now wrapped as an
+`ml_robust_scaler_model` object. `RobustScaler`/`RobustScalerModel` were missing
+from the JVM-class mapping, so a fitted robust scaler fell back to a generic
+`ml_transformer` (and the model constructor carried the estimator's class by
+mistake). Transformation worked, but the model's class was inconsistent with the
+other scalers.
+
 - Fixed the `sparklyr.stream.collect.timeout` and
 `sparklyr.stream.validate.timeout` configuration options being silently ignored.
 The internal code referenced a bare `config` that resolved to an unrelated

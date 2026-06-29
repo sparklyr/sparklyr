@@ -570,7 +570,7 @@ new_ml_robust_scaler <- function(jobj) {
 }
 
 new_ml_robust_scaler_model <- function(jobj) {
-  new_ml_transformer(jobj, class = "ml_robust_scaler")
+  new_ml_transformer(jobj, class = "ml_robust_scaler_model")
 }
 
 validator_ml_robust_scaler <- function(.args) {

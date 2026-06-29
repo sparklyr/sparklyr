@@ -179,4 +179,48 @@ test_that("ft_standard_scaler() works properly", {
   )
 })
 
+test_that("ft_standard_scaler() works via the tbl_spark interface", {
+  skip_databricks_connect()
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  df <- data.frame(id = 0:2, V1 = c(1, 2, 4), V2 = c(0.1, 1, 10))
+  scaled <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
+    ft_vector_assembler(c("V1", "V2"), "features") %>%
+    ft_standard_scaler("features", "scaled")
+  expect_true(inherits(scaled, "tbl_spark"))
+  expect_true("scaled" %in% colnames(scaled))
+})
+
+test_that("fitted scaler models carry their typed model classes", {
+  skip_databricks_connect()
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  df <- data.frame(id = 0:2, V1 = c(1, 2, 4), V2 = c(0.1, 1, 10))
+  tbl <- sdf_copy_to(sc, df, overwrite = TRUE) %>%
+    ft_vector_assembler(c("V1", "V2"), "features")
+
+  expect_s3_class(
+    ml_fit(ft_min_max_scaler(sc, "features", "s"), tbl),
+    "ml_min_max_scaler_model"
+  )
+  expect_s3_class(
+    ml_fit(ft_max_abs_scaler(sc, "features", "s"), tbl),
+    "ml_max_abs_scaler_model"
+  )
+  # RobustScaler was missing from class_mapping.json; this asserts the fix so a
+  # fitted robust model is typed (not a generic ml_transformer).
+  expect_s3_class(
+    ml_fit(ft_robust_scaler(sc, "features", "s"), tbl),
+    "ml_robust_scaler_model"
+  )
+})
+
+test_that("ft_robust_scaler() adds a stage to an ml_pipeline", {
+  skip_databricks_connect()
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  pipeline <- ml_pipeline(sc) %>% ft_robust_scaler("features", "scaled")
+  expect_true(inherits(pipeline, "ml_pipeline"))
+})
+
 test_clear_cache()
