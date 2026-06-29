@@ -113,9 +113,14 @@ test_that("spark_get_java handles invalid and unset JAVA_HOME", {
   expect_error(spark_get_java(throws = TRUE), "does not point to a valid")
   expect_identical(spark_get_java(throws = FALSE), "")
 
-  # JAVA_HOME unset -> falls back to Sys.which("java")
+  # JAVA_HOME unset -> falls back to Sys.which("java"); mock Sys.which so this
+  # doesn't depend on the host PATH
   withr::local_envvar(JAVA_HOME = NA)
-  expect_match(spark_get_java(), "java")
+  with_mocked_bindings(
+    Sys.which = function(...) c(java = "/usr/bin/java"),
+    .package = "base",
+    expect_identical(spark_get_java(), c(java = "/usr/bin/java"))
+  )
 })
 
 test_that("java_is_x64 returns a logical (and FALSE when java is absent)", {
