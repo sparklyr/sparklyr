@@ -172,11 +172,7 @@ sdf_register.spark_jobj <- function(x, name = NULL) {
     paste0("sparklyr_tmp_", gsub("-", "_", uuid::UUIDgenerate()))
   sc <- spark_connection(x)
 
-  if (spark_version(sc) < "2.0.0") {
-    invoke(x, "registerTempTable", name)
-  } else {
-    invoke(x, "createOrReplaceTempView", name)
-  }
+  invoke(x, "createOrReplaceTempView", name)
 
   on_connection_updated(sc, name)
   tbl(sc, name)
@@ -552,29 +548,18 @@ sdf_repartition <- function(x, partitions = NULL, partition_by = NULL) {
 
   partitions <- partitions %||% 0L %>% cast_scalar_integer()
 
-  if (spark_version(sc) >= "2.0.0") {
-    partition_by <- cast_string_list(partition_by, allow_null = TRUE) %||%
-      list()
+  partition_by <- cast_string_list(partition_by, allow_null = TRUE) %||%
+    list()
 
-    return(
-      invoke_static(
-        sc,
-        "sparklyr.Repartition",
-        "repartition",
-        sdf,
-        partitions,
-        partition_by
-      ) %>%
-        sdf_register()
-    )
-  } else {
-    if (!is.null(partition_by)) {
-      stop("partitioning by columns only supported for Spark 2.0.0 and later")
-    }
-
-    invoke(sdf, "repartition", partitions) %>%
-      sdf_register()
-  }
+  invoke_static(
+    sc,
+    "sparklyr.Repartition",
+    "repartition",
+    sdf,
+    partitions,
+    partition_by
+  ) %>%
+    sdf_register()
 }
 
 #' Gets number of partitions of a Spark DataFrame
@@ -774,10 +759,6 @@ sdf_expand_grid <- function(
   repartition = NULL,
   partition_by = NULL
 ) {
-  if (spark_version(sc) < "2.0.0") {
-    stop("`sdf_expand_grid()` requires Spark 2.0.0 or above")
-  }
-
   vars <- list(...)
   if (length(vars) == 0) {
     invoke(spark_session(sc), "emptyDataFrame") %>% sdf_register()

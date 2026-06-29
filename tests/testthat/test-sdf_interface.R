@@ -953,4 +953,99 @@ local({
   })
 })
 
+# ---- additional coverage for previously-untested sdf_* helpers --------------
+
+test_that("sdf_with_unique_id / sdf_with_sequential_id add id columns", {
+  tbl <- sdf_copy_to(sc, data.frame(x = 1:5), "t_ids", overwrite = TRUE)
+  uniq <- tbl %>% sdf_with_unique_id("uid") %>% collect()
+  expect_true("uid" %in% names(uniq))
+  expect_equal(length(unique(uniq$uid)), 5)
+
+  seqd <- tbl %>% sdf_with_sequential_id("sid", from = 1L) %>% collect()
+  expect_setequal(seqd$sid, 1:5)
+})
+
+test_that("sdf_last_index returns the final id", {
+  expect_equal(sdf_len(sc, 7) %>% sdf_last_index("id"), 7)
+})
+
+test_that("sdf_quantile computes basic, multi-column, and weighted quantiles", {
+  tbl <- sdf_copy_to(
+    sc, data.frame(x = 1:5, y = 5:1, w = rep(1, 5)), "t_q", overwrite = TRUE
+  )
+  q <- sdf_quantile(tbl, "x", probabilities = c(0, 0.5, 1))
+  expect_named(q, c("0%", "50%", "100%"))
+  expect_equal(unname(q[["0%"]]), 1)
+  expect_equal(unname(q[["100%"]]), 5)
+
+  qm <- sdf_quantile(tbl, c("x", "y"), probabilities = c(0, 1))
+  expect_true(is.list(qm))
+  expect_named(qm, c("x", "y"))
+
+  qw <- sdf_quantile(tbl, "x", probabilities = 0.5, weight.column = "w")
+  expect_length(qw, 1)
+})
+
+test_that("sdf_checkpoint forces computation", {
+  invoke(spark_context(sc), "setCheckpointDir", tempfile("ckpt"))
+  res <- sdf_len(sc, 3) %>% sdf_checkpoint() %>% collect()
+  expect_equal(nrow(res), 3)
+})
+
+test_that("`[.tbl_spark` selects, drops, indexes, and empties columns", {
+  tbl <- sdf_copy_to(sc, data.frame(x = 1:3, y = 4:6), "t_sub", overwrite = TRUE)
+  expect_equal(colnames(tbl["x"]), "x")
+  expect_setequal(colnames(tbl[c("x", "y")]), c("x", "y"))
+  expect_equal(colnames(tbl[1]), "x")
+  expect_equal(ncol(collect(tbl[NULL])), 0)
+  expect_true(inherits(tbl[], "tbl_spark"))
+})
+
+test_that("sdf_import errors when the table already exists", {
+  sdf_copy_to(sc, data.frame(x = 1), "t_exists", overwrite = TRUE)
+  expect_error(
+    sdf_copy_to(sc, data.frame(x = 2), "t_exists", overwrite = FALSE),
+    "already exists"
+  )
+})
+
+test_that("sdf_sample works without a seed", {
+  tbl <- sdf_copy_to(sc, data.frame(x = 1:100), "t_samp", overwrite = TRUE)
+  expect_s3_class(sdf_sample(tbl, fraction = 0.5, seed = NULL), "tbl_spark")
+})
+
+test_that("sdf_coalesce rejects a non-positive partition count", {
+  tbl <- sdf_copy_to(sc, data.frame(x = 1:3), "t_coal", overwrite = TRUE)
+  expect_error(sdf_coalesce(tbl, 0), "must be positive")
+})
+
+test_that("sdf_register accepts a tbl_spark and a named list of jobjs", {
+  tbl <- sdf_copy_to(sc, data.frame(x = 1:3), "t_reg1", overwrite = TRUE)
+  expect_s3_class(sdf_register(tbl, "t_reg_named"), "tbl_spark")
+
+  jobjs <- list(spark_dataframe(tbl), spark_dataframe(tbl))
+  registered <- sdf_register(jobjs, c("reg_a", "reg_b"))
+  expect_named(registered, c("reg_a", "reg_b"))
+  expect_true(all(c("reg_a", "reg_b") %in% src_tbls(sc)))
+})
+
+test_that("sdf_expand_grid handles empty input and warns on unknown broadcast vars", {
+  expect_equal(nrow(collect(sdf_expand_grid(sc))), 0)
+  expect_warning(
+    sdf_expand_grid(sc, a = 1:2, b = c("p", "q"), broadcast_vars = c(nope)),
+    "not among the list"
+  )
+})
+
+test_that("sdf_to_avro passes through columns outside the requested subset", {
+  test_requires_version("2.4.0")
+  skip_databricks_connect()
+  sdf <- sdf_copy_to(
+    sc, data.frame(a = 1:3, b = letters[1:3]), "t_avro_sub", overwrite = TRUE
+  )
+  out <- sdf_to_avro(sdf, cols = "a") %>% sdf_collect()
+  expect_setequal(colnames(out), c("a", "b"))
+  expect_equal(out$b, letters[1:3]) # b untouched -> transform_sdf else branch
+})
+
 test_clear_cache()
