@@ -246,4 +246,22 @@ test_that("we can fit a pipeline saved then loaded from ml_model", {
   )
 })
 
+test_that("ml_save.default overwrites an existing path", {
+  bin <- ft_binarizer(sc, "in", "out", threshold = 0.5)
+  path <- tempfile("ftbin_ow")
+  ml_save(bin, path)
+  expect_message(
+    ml_save(bin, path, overwrite = TRUE),
+    "successfully saved"
+  )
+  reloaded <- ml_load(sc, path)
+  expect_equal(ml_param_map(bin), ml_param_map(reloaded))
+})
+
+test_that("ml_load errors when metadata cannot be read", {
+  dir <- tempfile("empty_ml_")
+  dir.create(dir)
+  expect_error(ml_load(sc, dir), "ML could not be loaded")
+})
+
 test_clear_cache()

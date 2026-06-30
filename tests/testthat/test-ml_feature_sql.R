@@ -303,4 +303,43 @@ test_that("ft_sql_transformer() works", {
   )
 })
 
+test_that("ft_r_formula fits an RFormula model", {
+  skip_on_arrow_devel()
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
+
+  est <- ft_r_formula(sc, "Sepal_Length ~ Petal_Width")
+  model <- ml_fit(est, iris_tbl)
+  expect_s3_class(model, "ml_r_formula_model")
+  expect_true(inherits(ml_transform(model, iris_tbl), "tbl_spark"))
+})
+
+test_that("ft_dplyr_transformer rejects non-Spark tables and supports pipelines", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_error(
+    ft_dplyr_transformer(sc, tbl = data.frame(a = 1)),
+    "'tbl' must be a Spark table"
+  )
+
+  transformed <- iris_tbl %>% dplyr::mutate(pw2 = Petal_Width * 2)
+  pipe <- ml_pipeline(sc) %>% ft_dplyr_transformer(transformed)
+  expect_s3_class(pipe, "ml_pipeline")
+})
+
+test_that("ft_dplyr_transformer handles nested dplyr queries", {
+  sc <- testthat_spark_connection()
+  iris_tbl <- testthat_tbl("iris")
+
+  # filtering on a freshly-computed column can't collapse into one SELECT, so
+  # dbplyr nests the query, exercising get_base_name()'s recursion
+  transformed <- iris_tbl %>%
+    dplyr::mutate(pw2 = Petal_Width * 2) %>%
+    dplyr::filter(pw2 > 1)
+
+  stmt <- ft_dplyr_transformer(sc, transformed) %>% ml_param("statement")
+  expect_true(grepl("__THIS__", stmt))
+})
+
 test_clear_cache()

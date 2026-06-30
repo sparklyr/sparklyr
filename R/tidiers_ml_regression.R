@@ -198,12 +198,19 @@ augment.ml_model_generalized_linear_regression <- function(
   # order to guarantee row order presevation.
   residuals <- sdf_residuals(x, type = type.residuals)
   # 'ml_predict()' only carries the model's training-schema columns through, so
-  # the 'residuals' column added by 'sdf_residuals()' is dropped; re-attach it
-  # positionally (both frames derive from 'residuals', preserving row order).
+  # the 'residuals' column added by 'sdf_residuals()' is dropped; re-attach it.
+  # 'sdf_bind_cols()' aligns the two frames via a sequential-id join, which is
+  # correct here because 'predictions' is a narrow transform of 'residuals' and
+  # preserves its row order. The residuals column is given a unique intermediate
+  # name so it can't collide with a same-named column carried through from data.
   predictions <- ml_predict(x, newdata = residuals) %>%
     dplyr::rename(fitted = !!"prediction")
-  sdf_bind_cols(predictions, dplyr::select(residuals, !!"residuals")) %>%
-    dplyr::rename(resid = !!"residuals")
+  resid_col <- random_string("sparklyr_resid_")
+  sdf_bind_cols(
+    predictions,
+    dplyr::transmute(residuals, !!resid_col := !!rlang::sym("residuals"))
+  ) %>%
+    dplyr::rename(resid = !!rlang::sym(resid_col))
 }
 
 #' @rdname ml_glm_tidiers
