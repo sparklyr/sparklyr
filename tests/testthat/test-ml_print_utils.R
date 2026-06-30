@@ -16,7 +16,10 @@ test_that("ml_print helpers render estimators, model summaries, and transformers
   iris_tbl <- testthat_tbl("iris")
 
   # estimator -> class + (column) params
-  expect_true(any(grepl("Parameters", capture.output(print(ml_kmeans(sc, k = 2))))))
+  expect_true(any(grepl(
+    "Parameters",
+    capture.output(print(ml_kmeans(sc, k = 2)))
+  )))
 
   # regression model summary -> residuals + detailed coefficients
   m <- iris_tbl %>%

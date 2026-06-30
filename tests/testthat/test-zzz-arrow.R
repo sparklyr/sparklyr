@@ -47,14 +47,22 @@ test_that("arrow_collect honors n and a per-batch callback", {
 
   # formula callback -> coerced via rlang::as_closure + the cb(batch, iter) arm
   seen2 <- 0L
-  sdf_collect(sdf_len(sc, 6), callback = ~ {
-    seen2 <<- seen2 + nrow(.x)
-  })
+  sdf_collect(
+    sdf_len(sc, 6),
+    callback = ~ {
+      seen2 <<- seen2 + nrow(.x)
+    }
+  )
   expect_equal(seen2, 6)
 })
 
 test_that("arrow_enabled_object disables arrow for vector (VectorUDT) columns", {
-  v <- sdf_copy_to(sc, data.frame(a = 1:3, b = 4:6), "zav", overwrite = TRUE) %>%
+  v <- sdf_copy_to(
+    sc,
+    data.frame(a = 1:3, b = 4:6),
+    "zav",
+    overwrite = TRUE
+  ) %>%
     ft_vector_assembler(c("a", "b"), "features")
   expect_warning(
     enabled <- arrow_enabled_object(spark_dataframe(v)),

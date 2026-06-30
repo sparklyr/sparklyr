@@ -329,15 +329,19 @@ test_that("ml_gradient_boosted_trees() auto-detects classification + validates l
 
   expect_error(
     ml_gradient_boosted_trees(
-      tbl, Sepal_Length ~ Petal_Length,
-      type = "regression", loss_type = "logistic"
+      tbl,
+      Sepal_Length ~ Petal_Length,
+      type = "regression",
+      loss_type = "logistic"
     ),
     "squared"
   )
   expect_error(
     ml_gradient_boosted_trees(
-      tbl, lab ~ Petal_Length,
-      type = "classification", loss_type = "squared"
+      tbl,
+      lab ~ Petal_Length,
+      type = "classification",
+      loss_type = "squared"
     ),
     "logistic"
   )
@@ -345,15 +349,19 @@ test_that("ml_gradient_boosted_trees() auto-detects classification + validates l
   # valid explicit loss_type passthroughs (not the "auto" default)
   expect_s3_class(
     ml_gradient_boosted_trees(
-      tbl, Sepal_Length ~ Petal_Length,
-      type = "regression", loss_type = "absolute"
+      tbl,
+      Sepal_Length ~ Petal_Length,
+      type = "regression",
+      loss_type = "absolute"
     ),
     "ml_model_gbt_regression"
   )
   expect_s3_class(
     ml_gradient_boosted_trees(
-      tbl, lab ~ Petal_Length,
-      type = "classification", loss_type = "logistic"
+      tbl,
+      lab ~ Petal_Length,
+      type = "classification",
+      loss_type = "logistic"
     ),
     "ml_model_gbt_classification"
   )

@@ -76,7 +76,10 @@ test_that("broom_augment_supervised renames the classification predicted_label",
   iris_tbl <- testthat_tbl("iris")
   # a classifier's predictions carry a `predicted_label` column, exercising the
   # `predicted_label` -> `.predicted_label` rename branch
-  clf <- ml_decision_tree_classifier(iris_tbl, Species ~ Sepal_Length + Sepal_Width)
+  clf <- ml_decision_tree_classifier(
+    iris_tbl,
+    Species ~ Sepal_Length + Sepal_Width
+  )
   aug <- broom_augment_supervised(clf)
   expect_true(".predicted_label" %in% colnames(aug))
 })

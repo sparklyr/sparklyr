@@ -134,7 +134,13 @@ test_that("sdf_copy_to coerces Date/POSIXt/factor/character columns", {
 
 test_that("sdf_copy_to rejects a non-integer repartition", {
   expect_error(
-    sdf_copy_to(sc, data.frame(x = 1:3), "dc_rp", overwrite = TRUE, repartition = "bad"),
+    sdf_copy_to(
+      sc,
+      data.frame(x = 1:3),
+      "dc_rp",
+      overwrite = TRUE,
+      repartition = "bad"
+    ),
     "must be an integer"
   )
 })

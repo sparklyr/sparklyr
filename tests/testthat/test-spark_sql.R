@@ -14,7 +14,12 @@ test_that("spark_db_desc / spark_sql_query_explain describe and explain", {
 })
 
 test_that("spark_sql_query_save builds a CREATE OR REPLACE VIEW statement", {
-  saved <- spark_sql_query_save(sc, dbplyr::sql("SELECT 1"), "v_tmp_sql", temporary = TRUE)
+  saved <- spark_sql_query_save(
+    sc,
+    dbplyr::sql("SELECT 1"),
+    "v_tmp_sql",
+    temporary = TRUE
+  )
   expect_match(as.character(saved), "CREATE OR REPLACE")
   expect_match(as.character(saved), "VIEW")
 })
@@ -28,7 +33,12 @@ test_that("apply_config sets prefixed key/value pairs on a Spark object", {
 })
 
 test_that("spark_db_query_fields / spark_sql_query_fields read column names", {
-  tbl <- sdf_copy_to(sc, data.frame(a = 1:3, b = c("x", "y", "z")), "sql_flds", overwrite = TRUE)
+  tbl <- sdf_copy_to(
+    sc,
+    data.frame(a = 1:3, b = c("x", "y", "z")),
+    "sql_flds",
+    overwrite = TRUE
+  )
   flds <- spark_db_query_fields(sc, dbplyr::sql("SELECT * FROM sql_flds"))
   expect_setequal(flds, c("a", "b"))
 

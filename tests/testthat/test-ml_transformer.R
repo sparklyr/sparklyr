@@ -130,7 +130,10 @@ test_that("transform/fit methods reject the wrong object types", {
   iris_tbl <- testthat_tbl("iris")
   transformer <- ft_binarizer(sc, "x", "y")
 
-  expect_error(ml_fit(transformer, iris_tbl), "only applicable to 'ml_estimator'")
+  expect_error(
+    ml_fit(transformer, iris_tbl),
+    "only applicable to 'ml_estimator'"
+  )
   expect_error(
     ml_fit_and_transform(transformer, iris_tbl),
     "only applicable to 'ml_estimator'"

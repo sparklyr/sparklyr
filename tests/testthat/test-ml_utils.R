@@ -15,7 +15,10 @@ test_that("possibly_null swallows errors and otherwise returns the value", {
 })
 
 test_that("residuals / ml_feature_importances reject unsupported models", {
-  expect_error(residuals(structure(list(), class = "ml_model")), "not supported")
+  expect_error(
+    residuals(structure(list(), class = "ml_model")),
+    "not supported"
+  )
   expect_error(
     ml_feature_importances(
       structure(list(), class = c("ml_foo_model", "ml_prediction_model"))
@@ -88,18 +91,27 @@ test_that("predict/fitted/ml_model_data and the post_ml_obj dispatchers work", {
   expect_s3_class(ml_model_data(fm_reg), "tbl_spark")
   expect_s3_class(ml_tree_feature_importance(fm_reg), "data.frame")
 
-  bin <- iris_tbl %>% dplyr::mutate(lab = ifelse(Species == "setosa", "yes", "no"))
+  bin <- iris_tbl %>%
+    dplyr::mutate(lab = ifelse(Species == "setosa", "yes", "no"))
   fm_cls <- bin %>% ml_gbt_classifier(lab ~ Petal_Length + Petal_Width)
   expect_length(predict(fm_cls), 150) # predict.ml_model_classification
 
   # post_ml_obj dispatchers: ml_pipeline (add stage) and tbl_spark (no formula -> fit)
   expect_s3_class(
-    ml_gbt_regressor(ml_pipeline(testthat_spark_connection()), Sepal_Length ~ Petal_Length),
+    ml_gbt_regressor(
+      ml_pipeline(testthat_spark_connection()),
+      Sepal_Length ~ Petal_Length
+    ),
     "ml_pipeline"
   )
-  feat <- iris_tbl %>% ft_vector_assembler(c("Petal_Length", "Petal_Width"), "features")
+  feat <- iris_tbl %>%
+    ft_vector_assembler(c("Petal_Length", "Petal_Width"), "features")
   expect_s3_class(
-    ml_gbt_regressor(feat, features_col = "features", label_col = "Sepal_Length"),
+    ml_gbt_regressor(
+      feat,
+      features_col = "features",
+      label_col = "Sepal_Length"
+    ),
     "ml_gbt_regression_model"
   )
 })

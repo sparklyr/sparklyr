@@ -624,7 +624,9 @@ mutate_names <- function(x, value) {
   # a derived tbl (e.g. a renamed `select()` result); collapse the resulting
   # `character(0)` back to NULL so `sdf_register()` falls back to a temp name.
   name <- as.character(dbplyr::remote_name(x))
-  if (length(name) == 0) name <- NULL
+  if (length(name) == 0) {
+    name <- NULL
+  }
   sdf_register(renamed, name = name)
 }
 

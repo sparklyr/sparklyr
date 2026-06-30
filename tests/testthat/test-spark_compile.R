@@ -401,7 +401,10 @@ test_that("compile, then update + verify embedded sources (real build)", {
   )
   withr::with_dir(
     bad_dir,
-    system2("jar", c("uf", tampered, file.path("sparklyr", "embedded_sources.R")))
+    system2(
+      "jar",
+      c("uf", tampered, file.path("sparklyr", "embedded_sources.R"))
+    )
   )
   with_mocked_bindings(
     list_sparklyr_jars = function() tampered,

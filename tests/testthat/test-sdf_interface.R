@@ -971,7 +971,10 @@ test_that("sdf_last_index returns the final id", {
 
 test_that("sdf_quantile computes basic, multi-column, and weighted quantiles", {
   tbl <- sdf_copy_to(
-    sc, data.frame(x = 1:5, y = 5:1, w = rep(1, 5)), "t_q", overwrite = TRUE
+    sc,
+    data.frame(x = 1:5, y = 5:1, w = rep(1, 5)),
+    "t_q",
+    overwrite = TRUE
   )
   q <- sdf_quantile(tbl, "x", probabilities = c(0, 0.5, 1))
   expect_named(q, c("0%", "50%", "100%"))
@@ -993,7 +996,12 @@ test_that("sdf_checkpoint forces computation", {
 })
 
 test_that("`[.tbl_spark` selects, drops, indexes, and empties columns", {
-  tbl <- sdf_copy_to(sc, data.frame(x = 1:3, y = 4:6), "t_sub", overwrite = TRUE)
+  tbl <- sdf_copy_to(
+    sc,
+    data.frame(x = 1:3, y = 4:6),
+    "t_sub",
+    overwrite = TRUE
+  )
   expect_equal(colnames(tbl["x"]), "x")
   expect_setequal(colnames(tbl[c("x", "y")]), c("x", "y"))
   expect_equal(colnames(tbl[1]), "x")
@@ -1041,7 +1049,10 @@ test_that("sdf_to_avro passes through columns outside the requested subset", {
   test_requires_version("2.4.0")
   skip_databricks_connect()
   sdf <- sdf_copy_to(
-    sc, data.frame(a = 1:3, b = letters[1:3]), "t_avro_sub", overwrite = TRUE
+    sc,
+    data.frame(a = 1:3, b = letters[1:3]),
+    "t_avro_sub",
+    overwrite = TRUE
   )
   out <- sdf_to_avro(sdf, cols = "a") %>% sdf_collect()
   expect_setequal(colnames(out), c("a", "b"))

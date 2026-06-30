@@ -29,7 +29,8 @@ test_that("wait_connect_gateway returns NULL when the socket never connects", {
     .package = "base",
     expect_null(
       wait_connect_gateway(
-        "localhost", 9999,
+        "localhost",
+        9999,
         list(sparklyr.gateway.timeout = 0.05),
         isStarting = FALSE
       )
@@ -227,11 +228,13 @@ test_that("spark_connect_gateway surfaces a failing port query", {
 
 test_that("gateway_connection parses the master and aborts when connect fails", {
   with_mocked_bindings(
-    spark_connect_gateway = function(gatewayAddress,
-                                     gatewayPort,
-                                     sessionId,
-                                     config,
-                                     ...) {
+    spark_connect_gateway = function(
+      gatewayAddress,
+      gatewayPort,
+      sessionId,
+      config,
+      ...
+    ) {
       # the master URL is split into address / port / session id
       expect_equal(gatewayAddress, "10.0.0.5")
       expect_equal(gatewayPort, 8880L)
@@ -249,7 +252,9 @@ test_that("gateway_connection parses the master and aborts when connect fails", 
 test_that("gateway_connection builds a connection on success", {
   fake_sc <- structure(list(), class = "spark_gateway_connection")
   with_mocked_bindings(
-    spark_connect_gateway = function(...) list(gateway = "gw", backendPort = 9001L),
+    spark_connect_gateway = function(...) {
+      list(gateway = "gw", backendPort = 9001L)
+    },
     spark_gateway_connection = function(...) fake_sc,
     .package = "sparklyr",
     expect_identical(

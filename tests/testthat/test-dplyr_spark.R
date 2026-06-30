@@ -195,7 +195,10 @@ test_that("src_spark connection/describe/same_src/tbl helpers work", {
 
 test_that("connection glue methods (explain / tbl_vars / src_tbls) are wired up", {
   skip_databricks_connect()
-  expect_type(dbplyr::sql_query_explain(sc, dbplyr::sql("SELECT 1")), "character")
+  expect_type(
+    dbplyr::sql_query_explain(sc, dbplyr::sql("SELECT 1")),
+    "character"
+  )
   # call the .spark_jobj method directly (the dplyr generic post-processes with
   # group_vars, which isn't defined for a bare jobj)
   expect_equal(length(tbl_vars.spark_jobj(spark_dataframe(iris_tbl))), 5)
@@ -209,8 +212,11 @@ test_that("process_tbl_name rejects names with more than 3 components", {
 test_that("spark_partition_register_df registers a table; remove_if_exists drops it", {
   skip_databricks_connect()
   spark_partition_register_df(
-    sc, spark_dataframe(iris_tbl), "reg_part_tbl",
-    repartition = 2L, memory = TRUE
+    sc,
+    spark_dataframe(iris_tbl),
+    "reg_part_tbl",
+    repartition = 2L,
+    memory = TRUE
   )
   expect_true("reg_part_tbl" %in% src_tbls(sc))
   spark_remove_table_if_exists(sc, "reg_part_tbl")

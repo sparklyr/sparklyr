@@ -96,7 +96,11 @@ compile_coverage_estimates <- function(
   info <- data.frame(
     path = htmls,
     base = sub(pattern, "", basename(htmls)),
-    stamp = sub(paste0("^.*-([0-9]{8}-[0-9]{6})[.]html$"), "\\1", basename(htmls)),
+    stamp = sub(
+      paste0("^.*-([0-9]{8}-[0-9]{6})[.]html$"),
+      "\\1",
+      basename(htmls)
+    ),
     stringsAsFactors = FALSE
   )
   # dedup by script, keeping the most recent report
@@ -137,7 +141,11 @@ compile_coverage_estimates <- function(
 
   writeLines(
     c(
-      paste0("# Coverage compiled ", stamp, " (covr canonical figures, read from HTML)"),
+      paste0(
+        "# Coverage compiled ",
+        stamp,
+        " (covr canonical figures, read from HTML)"
+      ),
       paste0("# ", nrow(result), " scripts, most recent report each"),
       "",
       utils::capture.output(print(result, row.names = FALSE)),

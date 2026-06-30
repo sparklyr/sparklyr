@@ -291,7 +291,11 @@ test_that("start_shell assembles --jars/--packages/--repositories args", {
       f
     },
     spark_dependencies_from_extensions = function(...) {
-      list(jars = character(), packages = "org.example:lib:1.0", repositories = "https://repo")
+      list(
+        jars = character(),
+        packages = "org.example:lib:1.0",
+        repositories = "https://repo"
+      )
     },
     .package = "sparklyr",
     with_mocked_bindings(
@@ -324,16 +328,23 @@ test_that("start_shell assembles --jars/--packages/--repositories args", {
 })
 
 test_that("start_shell errors on bad spark_home / missing spark-submit / version", {
-  run <- function(spark_home, config = list(sparklyr.connect.app.jar = "x.jar"),
-                  app_jar_mock = function(...) "irrelevant.jar") {
+  run <- function(
+    spark_home,
+    config = list(sparklyr.connect.app.jar = "x.jar"),
+    app_jar_mock = function(...) "irrelevant.jar"
+  ) {
     with_mocked_bindings(
       spark_connect_gateway = function(...) NULL,
       spark_version_from_home = function(...) "3.5.0",
       spark_default_app_jar = app_jar_mock,
       .package = "sparklyr",
       start_shell(
-        master = "local", spark_home = spark_home, spark_version = "3.5.0",
-        app_name = "t", config = config, extensions = list(),
+        master = "local",
+        spark_home = spark_home,
+        spark_version = "3.5.0",
+        app_name = "t",
+        config = config,
+        extensions = list(),
         environment = new.env()
       )
     )
@@ -361,10 +372,18 @@ test_that("shell_connection errors when SPARK_HOME is not set", {
     .package = "sparklyr",
     expect_error(
       shell_connection(
-        master = "spark://host:7077", spark_home = "", method = "",
-        app_name = "t", version = NULL, hadoop_version = NULL,
-        shell_args = NULL, config = list(), service = FALSE,
-        remote = FALSE, extensions = list(), batch = NULL
+        master = "spark://host:7077",
+        spark_home = "",
+        method = "",
+        app_name = "t",
+        version = NULL,
+        hadoop_version = NULL,
+        shell_args = NULL,
+        config = list(),
+        service = FALSE,
+        remote = FALSE,
+        extensions = list(),
+        batch = NULL
       ),
       "SPARK_HOME is not set"
     )
@@ -389,7 +408,11 @@ test_that("start_shell aborts after exhausting gateway connect attempts", {
       f
     },
     spark_dependencies_from_extensions = function(...) {
-      list(jars = character(), packages = character(), repositories = character())
+      list(
+        jars = character(),
+        packages = character(),
+        repositories = character()
+      )
     },
     .package = "sparklyr",
     with_mocked_bindings(
@@ -398,9 +421,14 @@ test_that("start_shell aborts after exhausting gateway connect attempts", {
       .package = "base",
       expect_error(
         start_shell(
-          master = "local", spark_home = home, spark_version = "3.5.0",
-          app_name = "t", config = list(), extensions = list(),
-          environment = new.env(), gateway_connect_attempts = 1
+          master = "local",
+          spark_home = home,
+          spark_version = "3.5.0",
+          app_name = "t",
+          config = list(),
+          extensions = list(),
+          environment = new.env(),
+          gateway_connect_attempts = 1
         ),
         "Failed while connecting to sparklyr"
       )
@@ -425,8 +453,12 @@ test_that("start_shell aborts when the backend socket cannot be opened", {
       .package = "base",
       expect_error(
         start_shell(
-          master = "local", spark_home = "/x", spark_version = "3.5.0",
-          app_name = "t", config = list(), extensions = list(),
+          master = "local",
+          spark_home = "/x",
+          spark_version = "3.5.0",
+          app_name = "t",
+          config = list(),
+          extensions = list(),
           environment = new.env()
         ),
         "Failed to open connection to backend"
@@ -437,8 +469,13 @@ test_that("start_shell aborts when the backend socket cannot be opened", {
 
 test_that("initialize_connection aborts when backend setup fails", {
   sc <- structure(
-    list(state = new.env(), output_file = tempfile(), app_name = "t",
-         master = "local", config = list()),
+    list(
+      state = new.env(),
+      output_file = tempfile(),
+      app_name = "t",
+      master = "local",
+      config = list()
+    ),
     class = c("spark_shell_connection", "spark_connection")
   )
   with_mocked_bindings(

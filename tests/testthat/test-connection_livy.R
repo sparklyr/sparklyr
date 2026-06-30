@@ -593,14 +593,20 @@ test_that("assert_that() aborts on a false condition", {
 # create-session retry loop, the wait-for-start loop, and the session-state
 # guards) without a live Livy server -- only the HTTP boundary is mocked.
 
-livy_connect_mocked <- function(create,
-                                get = function(sc) list(id = "s1", state = "idle"),
-                                config = list(),
-                                master = "local") {
+livy_connect_mocked <- function(
+  create,
+  get = function(sc) list(id = "s1", state = "idle"),
+  config = list(),
+  master = "local"
+) {
   with_mocked_bindings(
     livy_validate_master = function(...) invisible(TRUE),
     spark_dependencies_from_extensions = function(...) {
-      list(catalog_jars = character(), packages = "org.x:y:1", repositories = "https://r")
+      list(
+        catalog_jars = character(),
+        packages = "org.x:y:1",
+        repositories = "https://r"
+      )
     },
     livy_create_session = create,
     livy_get_session = get,
@@ -609,8 +615,12 @@ livy_connect_mocked <- function(create,
       Sys.sleep = function(...) invisible(NULL),
       .package = "base",
       suppressWarnings(livy_connection(
-        master = master, config = config, app_name = "sparklyr",
-        version = "3.5.0", hadoop_version = NULL, extensions = list(),
+        master = master,
+        config = config,
+        app_name = "sparklyr",
+        version = "3.5.0",
+        hadoop_version = NULL,
+        extensions = list(),
         scala_version = NULL
       ))
     )
@@ -618,7 +628,9 @@ livy_connect_mocked <- function(create,
 }
 
 test_that("livy_connection() assembles config and connects to an idle session", {
-  sc <- livy_connect_mocked(create = function(...) list(id = "s1", state = "idle"))
+  sc <- livy_connect_mocked(create = function(...) {
+    list(id = "s1", state = "idle")
+  })
   expect_s3_class(sc, "livy_connection")
   expect_equal(sc$master, "http://localhost:8998") # local -> http normalized
   expect_match(sc$config[["spark.jars.packages"]], "org.x:y:1")

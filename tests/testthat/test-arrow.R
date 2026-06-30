@@ -26,7 +26,10 @@ test_that("arrow_enabled short-circuits when disabled via config", {
   # CI jobs attach it at session init): sparklyr.arrow = FALSE makes
   # spark_config_value() return FALSE, short-circuiting arrow_enabled().
   expect_false(
-    arrow_enabled(list(config = list(sparklyr.arrow = FALSE)), data.frame(a = 1))
+    arrow_enabled(
+      list(config = list(sparklyr.arrow = FALSE)),
+      data.frame(a = 1)
+    )
   )
 })
 
