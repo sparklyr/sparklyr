@@ -618,7 +618,10 @@ sdf_bind_cols <- function(...) {
 mutate_names <- function(x, value) {
   sdf <- spark_dataframe(x)
   renamed <- invoke(sdf, "toDF", as.list(value))
-  sdf_register(renamed, name = as.character(x$lazy_query$x))
+  # `remote_name()` yields the bare table name; `x$lazy_query$x` is a dbplyr
+  # `table_path` whose `as.character()` adds back ticks that `sdf_register()`
+  # rejects ("Can't escape back tick from string").
+  sdf_register(renamed, name = as.character(dbplyr::remote_name(x)))
 }
 
 #' @export

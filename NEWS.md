@@ -1,5 +1,10 @@
 # Sparklyr (dev)
 
+- Fixed `names<-()` on a `tbl_spark` (e.g. `names(tbl) <- value`), which errored
+with "Can't escape back tick from string" on recent `dbplyr`. The replacement
+view is now re-registered using the bare remote table name instead of the
+back tick-quoted `table_path`.
+
 - Fixed `ml_gbt_classifier()` on Spark < 2.2 so a fitted classification model is
 classed `ml_gbt_classification_model` (it was mislabeled
 `ml_multilayer_perceptron_classification_model` due to a copy-paste error).

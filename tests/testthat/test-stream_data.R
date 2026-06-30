@@ -163,4 +163,22 @@ test_stream("stream_write_*() rejects a non-streaming DataFrame", {
   )
 })
 
+test_stream("stream_read_socket creates a streaming source", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+  # the socket source is created lazily (no server is contacted until start)
+  s <- stream_read_socket(
+    sc,
+    options = list(host = "localhost", port = "9999")
+  )
+  expect_true(inherits(s, "tbl_spark"))
+})
+
+test_stream("stream_write_table + stream_read_table round-trip a table", {
+  test_requires_version("2.0.0", "Spark streaming requires Spark 2.0 or above")
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";") %>%
+    stream_write_table("sd_stream_tbl", format = "parquet")
+  stream_stop(stream)
+  expect_true(inherits(stream_read_table(sc, "sd_stream_tbl"), "tbl_spark"))
+})
+
 test_clear_cache()

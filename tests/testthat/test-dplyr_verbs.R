@@ -1311,6 +1311,21 @@ test_that("'cbind' works as expected", {
   )
 })
 
+test_that("'cbind' returns the single input unchanged", {
+  skip_on_livy()
+  df1a_tbl <- testthat_tbl("df1a")
+  expect_identical(cbind(df1a_tbl), df1a_tbl)
+})
+
+test_that("'sdf_bind_cols' err for non-tbl_spark", {
+  skip_on_livy()
+  df1a_tbl <- testthat_tbl("df1a")
+  expect_error(
+    sdf_bind_cols(df1a_tbl, df1a),
+    "all inputs must be tbl_spark"
+  )
+})
+
 test_that("'sdf_bind_cols' agrees with 'cbind'", {
   skip_on_livy()
   df1a_tbl <- testthat_tbl("df1a")
@@ -1689,6 +1704,68 @@ test_that("doSpark works with 'qs' serializer", {
   )
 })
 
+# filter .preserve ------------------------------------------------------------
+
+test_that("filter.tbl_spark rejects .preserve = TRUE", {
+  skip_on_livy()
+  expect_error(
+    iris_tbl %>% dplyr::filter(Sepal_Length > 0, .preserve = TRUE),
+    "`.preserve` is not supported"
+  )
+})
+
+# registerDoSpark option handling ---------------------------------------------
+
+test_that("registerDoSpark warns on unnamed and unrecognized options", {
+  skip_on_livy()
+  test_requires("foreach")
+  w <- capture_warnings(
+    registerDoSpark(sc, "an_unnamed_value", bogus_option = 1)
+  )
+  expect_match(w, "unnamed argument", all = FALSE)
+  expect_match(w, "unrecognized doSpark package option", all = FALSE)
+})
+
+test_that("registerDoSpark backend reports its name and version", {
+  skip_on_livy()
+  test_requires("foreach")
+  register_test_spark_connection()
+  expect_equal(foreach::getDoParName(), "doSpark")
+  # `getDoParVersion()` runs the `.info()` version branch; there is no installed
+  # package literally named "doSpark", so the lookup yields NA.
+  expect_true(is.na(suppressWarnings(foreach::getDoParVersion())))
+})
+
+test_that("registerDoSpark falls back to 0 workers when parallelism is unknown", {
+  skip_on_livy()
+  test_requires("foreach")
+  # spark_context() throwing exercises the tryCatch that returns 0 workers
+  with_mocked_bindings(
+    spark_context = function(...) stop("no context"),
+    .package = "sparklyr",
+    {
+      registerDoSpark(sc)
+      expect_equal(foreach::getDoParWorkers(), 0L)
+    }
+  )
+  # restore a healthy backend for any later use
+  register_test_spark_connection()
+})
+
+test_that("doSpark honors nocompile = TRUE", {
+  skip_on_livy()
+  skip_on_arrow_devel()
+  test_requires("foreach")
+  test_requires("iterators")
+  test_requires_package_version("dbplyr", 2)
+  registerDoSpark(sc, nocompile = TRUE)
+  expect_warning_on_arrow(
+    rs <- foreach(x = 1:5) %dopar% (x * x)
+  )
+  expect_equal(unlist(rs), (1:5)^2)
+  register_test_spark_connection()
+})
+
 # na.replace / replace_na -----------------------------------------------------
 
 test_that("na.replace.tbl_spark fills NA with a single value (unkeyed)", {
@@ -1857,6 +1934,35 @@ test_that("apply_na_action errors when na.action is not a function", {
 })
 
 # names<- ----------------------------------------------------------------------
+
+test_that("names<-.tbl_spark renames the columns", {
+  skip_on_livy()
+  sdf <- copy_to(
+    sc,
+    data.frame(a = 1:3, b = 4:6),
+    name = random_string("rename_"),
+    overwrite = TRUE
+  )
+  names(sdf) <- c("x", "y")
+  expect_setequal(colnames(sdf), c("x", "y"))
+  # the renamed view is usable (regression: dbplyr table_path quoting #mutate_names)
+  expect_equal(nrow(collect(sdf)), 3)
+})
+
+# sdf_na_omit ------------------------------------------------------------------
+
+test_that("sdf_na_omit drops NA only in the named columns", {
+  skip_on_livy()
+  df <- dplyr::tibble(x = c(1, NA, 3), y = c(NA, 2, 3))
+  sdf <- copy_to(sc, df, name = random_string("na_cols_"), overwrite = TRUE)
+
+  # restricting to column 'x' keeps the row whose only NA is in 'y'
+  res <- sdf_na_omit(spark_dataframe(sdf), columns = "x") %>%
+    sdf_register() %>%
+    collect()
+  expect_equal(nrow(res), 2)
+  expect_equal(res$x, c(1, 3))
+})
 
 # single-input early returns ---------------------------------------------------
 
