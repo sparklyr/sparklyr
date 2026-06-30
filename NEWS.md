@@ -1,5 +1,11 @@
 # Sparklyr (dev)
 
+- Fixed `augment()` on a linear / generalized-linear-regression model when
+`type.residuals` is not `"working"` (e.g. `"deviance"`, `"pearson"`,
+`"response"`) and no `newdata` is supplied. It errored with "Can't rename
+columns that don't exist" because `ml_predict()` drops the residuals column;
+the residuals are now re-attached to the predictions.
+
 - Fixed `names<-()` on a `tbl_spark` (e.g. `names(tbl) <- value`), which errored
 with "Can't escape back tick from string" on recent `dbplyr`. The replacement
 view is now re-registered using the bare remote table name instead of the

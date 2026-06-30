@@ -197,9 +197,12 @@ augment.ml_model_generalized_linear_regression <- function(
   # training data. We call 'sdf_residuals()' first and then 'ml_predict()' in
   # order to guarantee row order presevation.
   residuals <- sdf_residuals(x, type = type.residuals)
-  ml_predict(x, newdata = residuals) %>%
-    # Two calls to 'rename': https://github.com/sparklyr/sparklyr/issues/678
-    dplyr::rename(fitted = !!"prediction") %>%
+  # 'ml_predict()' only carries the model's training-schema columns through, so
+  # the 'residuals' column added by 'sdf_residuals()' is dropped; re-attach it
+  # positionally (both frames derive from 'residuals', preserving row order).
+  predictions <- ml_predict(x, newdata = residuals) %>%
+    dplyr::rename(fitted = !!"prediction")
+  sdf_bind_cols(predictions, dplyr::select(residuals, !!"residuals")) %>%
     dplyr::rename(resid = !!"residuals")
 }
 
