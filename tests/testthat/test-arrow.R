@@ -30,4 +30,25 @@ test_that("arrow_enabled short-circuits when disabled via config", {
   )
 })
 
+test_that("spark_avro_package_name maps versions and rejects unsupported", {
+  expect_equal(
+    spark_avro_package_name("3.5.0"),
+    "org.apache.spark:spark-avro_2.12:3.5.0"
+  )
+  expect_equal(
+    spark_avro_package_name("4.0.0"),
+    "org.apache.spark:spark-avro_2.13:4.0.0"
+  )
+  expect_equal(
+    spark_avro_package_name("2.4.8"),
+    "org.apache.spark:spark-avro_2.11:2.4.8"
+  )
+  expect_match(
+    spark_avro_package_name("4.1.0-preview1"),
+    "spark-avro_2.13:4.1.0-preview1"
+  )
+  expect_error(spark_avro_package_name(NULL), "requires Spark version")
+  expect_error(spark_avro_package_name("2.3.0"), "2.4.0 or newer")
+})
+
 test_clear_cache()
