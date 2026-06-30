@@ -6,10 +6,29 @@
 # add the edge branches the fast local path never hits.
 # ---------------------------------------------------------------------------
 
+# The read* functions parse the Scala -> R wire format, where a string is a
+# byte-count length followed by the raw bytes (no terminating nul). R's
+# writeString() targets the opposite direction (the Scala *reader*): it writes
+# length + 1 and a nul terminator that the Scala side expects and drops. Feeding
+# writeString()'s output straight back into readString() would therefore trip
+# the (legitimate) embedded-nul guard, so when round-tripping we emit strings the
+# way the Scala backend does.
+scala_write_string <- function(con, value) {
+  bytes <- charToRaw(enc2utf8(as.character(value)))
+  writeInt(con, length(bytes))
+  if (length(bytes) > 0) {
+    writeBin(bytes, con, endian = "big")
+  }
+}
+
 # Run a writer `fn` into a raw connection, then read it back with readObject().
 serde_read_back <- function(fn) {
   wc <- rawConnection(raw(0), "wb")
-  fn(wc)
+  with_mocked_bindings(
+    writeString = scala_write_string,
+    .package = "sparklyr",
+    fn(wc)
+  )
   bytes <- rawConnectionValue(wc)
   close(wc)
   rc <- rawConnection(bytes, "rb")
