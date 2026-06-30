@@ -1719,8 +1719,10 @@ test_that("filter.tbl_spark rejects .preserve = TRUE", {
 test_that("registerDoSpark warns on unnamed and unrecognized options", {
   skip_on_livy()
   test_requires("foreach")
+  # pass `parallelism` explicitly so the extra args land in `...` (the first
+  # positional arg would otherwise bind to `parallelism`)
   w <- capture_warnings(
-    registerDoSpark(sc, "an_unnamed_value", bogus_option = 1)
+    registerDoSpark(sc, parallelism = 1, "an_unnamed_value", bogus_option = 1)
   )
   expect_match(w, "unnamed argument", all = FALSE)
   expect_match(w, "unrecognized doSpark package option", all = FALSE)
@@ -1947,6 +1949,13 @@ test_that("names<-.tbl_spark renames the columns", {
   expect_setequal(colnames(sdf), c("x", "y"))
   # the renamed view is usable (regression: dbplyr table_path quoting #mutate_names)
   expect_equal(nrow(collect(sdf)), 3)
+
+  # a derived tbl has no remote_name(); mutate_names must fall back to a temp
+  # name rather than passing character(0) to createOrReplaceTempView
+  derived <- sdf %>% dplyr::select(x)
+  names(derived) <- "z"
+  expect_setequal(colnames(derived), "z")
+  expect_equal(nrow(collect(derived)), 3)
 })
 
 # sdf_na_omit ------------------------------------------------------------------

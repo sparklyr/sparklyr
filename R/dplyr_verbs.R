@@ -620,8 +620,12 @@ mutate_names <- function(x, value) {
   renamed <- invoke(sdf, "toDF", as.list(value))
   # `remote_name()` yields the bare table name; `x$lazy_query$x` is a dbplyr
   # `table_path` whose `as.character()` adds back ticks that `sdf_register()`
-  # rejects ("Can't escape back tick from string").
-  sdf_register(renamed, name = as.character(dbplyr::remote_name(x)))
+  # rejects ("Can't escape back tick from string"). `remote_name()` is NULL for
+  # a derived tbl (e.g. a renamed `select()` result); collapse the resulting
+  # `character(0)` back to NULL so `sdf_register()` falls back to a temp name.
+  name <- as.character(dbplyr::remote_name(x))
+  if (length(name) == 0) name <- NULL
+  sdf_register(renamed, name = name)
 }
 
 #' @export
