@@ -5,9 +5,9 @@
 # before merging so R CMD check runs on main again.
 on:
   push:
-    branches: pause
+    branches: main
   pull_request:
-    branches: pause
+    branches: main
 
 name: R-CMD-check
 
