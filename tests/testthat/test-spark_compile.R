@@ -147,6 +147,14 @@ test_that("find_jar() falls back to `which jar` when not under JAVA_HOME", {
 })
 
 test_that("list_sparklyr_jars() finds the shipped sparklyr jars", {
+  # list_sparklyr_jars() looks in <root>/inst/java, which only exists in a
+  # source checkout -- on an installed package inst/java is relocated to
+  # <pkg>/java. This (build-time) function is only ever called from source, so
+  # skip when the source layout isn't present (installed-package test run).
+  skip_if(
+    !dir.exists(file.path(rprojroot::find_package_root_file(), "inst", "java")),
+    "package source tree not available (installed-package test run)"
+  )
   jars <- list_sparklyr_jars()
   expect_true(length(jars) > 0)
   expect_true(all(grepl("sparklyr-.+\\.jar$", basename(jars))))
@@ -348,10 +356,22 @@ test_that("compile, then update + verify embedded sources (real build)", {
   scalac <- tryCatch(find_scalac(scala_v), error = function(e) NULL)
   skip_if(is.null(scalac), sprintf("scala %s compiler not installed", scala_v))
 
+  # This test compiles from and rewrites the package *source* tree
+  # (java/*.scala, R/worker*.R, java/embedded_sources.R). Those files are not
+  # present when the suite runs against an *installed* package (covr::codecov,
+  # R CMD check), so skip there. It still runs from a source checkout -- e.g.
+  # local `coverage_lines()`, which measures from the repo root even though it
+  # sets CODE_COVERAGE=true (so skip_covr() would wrongly skip it there too).
+  root <- rprojroot::find_package_root_file()
+  embedded_src <- file.path(root, "java", "embedded_sources.R")
+  skip_if(
+    !file.exists(embedded_src),
+    "package source tree not available (installed-package test run)"
+  )
+
   # spark_gen_embedded_sources() reads dir("R"), and update() rewrites
   # java/embedded_sources.R -- run from the package root and restore that file so
   # the repo is left untouched.
-  root <- rprojroot::find_package_root_file()
   withr::local_dir(root)
   embedded_src <- file.path("java", "embedded_sources.R")
   original_embedded <- readLines(embedded_src)
