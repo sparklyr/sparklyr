@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      CODE_COVERAGE: 'true'
 
     steps:
       - uses: actions/checkout@v3
@@ -35,6 +34,7 @@ jobs:
               any::reshape2
               any::nycflights13
               any::covr
+              any::xml2
 
       - name: Cache Spark
         id: cache-spark
@@ -66,6 +66,20 @@ jobs:
 
       - name: Test coverage
         run: |
-          identical(Sys.getenv("CODE_COVERAGE"), "true")
-          covr::codecov(quiet = FALSE)
+          cov <- covr::package_coverage(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
+          )
+          print(cov)
+          covr::to_cobertura(cov)
         shell: Rscript {0}
+
+      - uses: codecov/codecov-action@v5
+        with:
+          # Fail if error if not on PR, or if on PR and token is given
+          fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN }}
+          files: ./cobertura.xml
+          plugins: noop
+          disable_search: true
+          token: ${{ secrets.CODECOV_TOKEN }}
