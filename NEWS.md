@@ -1,5 +1,9 @@
 # Sparklyr (dev)
 
+- Fixed a spurious "one argument not used by format" warning raised alongside the
+error from `spark_require_version()` when a Spark version requirement isn't met
+(the error message passed an extra argument to `sprintf()`).
+
 - Fixed a spurious "NAs introduced by coercion to integer range" warning emitted
 when collecting with Arrow and `n = Inf` (e.g. `collect()` of all rows, or
 printing a large `tbl_spark`). The `Inf`/out-of-range row limit is handled
