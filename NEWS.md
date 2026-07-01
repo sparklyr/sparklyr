@@ -1,5 +1,10 @@
 # Sparklyr (dev)
 
+- Fixed a spurious "NAs introduced by coercion to integer range" warning emitted
+when collecting with Arrow and `n = Inf` (e.g. `collect()` of all rows, or
+printing a large `tbl_spark`). The `Inf`/out-of-range row limit is handled
+correctly; only the warning was leaking.
+
 - Fixed `augment()` on a linear / generalized-linear-regression model when
 `type.residuals` is not `"working"` (e.g. `"deviance"`, `"pearson"`,
 `"response"`) and no `newdata` is supplied. It errored with "Can't rename
