@@ -1,406 +1,3 @@
-# Changing this file requires running update_embedded_sources.R to rebuild sources and jars.
-
-arrow_write_record_batch <- function(df, spark_version_number = NULL) {
-  arrow_env_vars <- list()
-  if (!is.null(spark_version_number) && spark_version_number < "3.0") {
-    # Spark < 3 uses an old version of Arrow, so send data in the legacy format
-    arrow_env_vars$ARROW_PRE_0_15_IPC_FORMAT <- 1
-  }
-
-  withr::with_envvar(arrow_env_vars, {
-    # Set the local timezone to any POSIXt columns that don't have one set
-    # https://github.com/sparklyr/sparklyr/issues/2439
-    df[] <- lapply(df, function(x) {
-      if (inherits(x, "POSIXt") && is.null(attr(x, "tzone"))) {
-        attr(x, "tzone") <- Sys.timezone()
-      }
-      x
-    })
-    arrow::write_to_raw(df, format = "stream")
-  })
-}
-
-arrow_record_stream_reader <- function(stream) {
-  arrow::RecordBatchStreamReader$create(stream)
-}
-
-arrow_read_record_batch <- function(reader) reader$read_next_batch()
-
-arrow_as_tibble <- function(record) as.data.frame(record)
-#' A helper function to retrieve values from \code{spark_config()}
-#'
-#' @param config The configuration list from \code{spark_config()}
-#' @param name The name of the configuration entry
-#' @param default The default value to use when entry is not present
-#'
-#' @keywords internal
-#' @export
-spark_config_value <- function(config, name, default = NULL) {
-  if (
-    getOption("sparklyr.test.enforce.config", FALSE) &&
-      any(grepl("^sparklyr.", name))
-  ) {
-    settings <- get("spark_config_settings")()
-    if (
-      !any(name %in% settings$name) &&
-        !grepl("^sparklyr\\.shell\\.", name)
-    ) {
-      stop(
-        "Config value '",
-        name[[1]],
-        "' not described in spark_config_settings()"
-      )
-    }
-  }
-
-  name_exists <- name %in% names(config)
-  if (!any(name_exists)) {
-    name_exists <- name %in% names(options())
-    if (!any(name_exists)) {
-      value <- default
-    } else {
-      name_primary <- name[name_exists][[1]]
-      value <- getOption(name_primary)
-    }
-  } else {
-    name_primary <- name[name_exists][[1]]
-    value <- config[[name_primary]]
-  }
-
-  if (is.language(value)) {
-    value <- rlang::as_closure(value)
-  }
-  if (is.function(value)) {
-    value <- value()
-  }
-  value
-}
-
-spark_config_integer <- function(config, name, default = NULL) {
-  as.integer(spark_config_value(config, name, default))
-}
-
-spark_config_logical <- function(config, name, default = NULL) {
-  as.logical(spark_config_value(config, name, default))
-}
-#' Check whether the connection is open
-#'
-#' @param sc \code{spark_connection}
-#'
-#' @keywords internal
-#'
-#' @export
-connection_is_open <- function(sc) {
-  UseMethod("connection_is_open")
-}
-read_bin <- function(con, what, n, endian = NULL) {
-  UseMethod("read_bin")
-}
-
-#' @export
-read_bin.default <- function(con, what, n, endian = NULL) {
-  if (is.null(endian)) {
-    readBin(con, what, n)
-  } else {
-    readBin(con, what, n, endian = endian)
-  }
-}
-
-read_bin_wait <- function(con, what, n, endian = NULL) {
-  sc <- con
-  con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) {
-    sc$monitoring
-  } else {
-    sc$backend
-  }
-
-  timeout <- spark_config_value(
-    sc$config,
-    "sparklyr.backend.timeout",
-    30 * 24 * 60 * 60
-  )
-  progressInterval <- spark_config_value(
-    sc$config,
-    "sparklyr.progress.interval",
-    3
-  )
-
-  result <- if (is.null(endian)) {
-    readBin(con, what, n)
-  } else {
-    readBin(con, what, n, endian = endian)
-  }
-
-  progressTimeout <- Sys.time() + progressInterval
-  if (is.null(sc$state$progress)) {
-    sc$state$progress <- new.env()
-  }
-  progressUpdated <- FALSE
-
-  waitInterval <- 0
-  commandStart <- Sys.time()
-  while (length(result) == 0 && commandStart + timeout > Sys.time()) {
-    Sys.sleep(waitInterval)
-    waitInterval <- min(0.1, waitInterval + 0.01)
-
-    result <- if (is.null(endian)) {
-      readBin(con, what, n)
-    } else {
-      readBin(con, what, n, endian = endian)
-    }
-
-    if (Sys.time() > progressTimeout) {
-      progressTimeout <- Sys.time() + progressInterval
-      if (exists("connection_progress")) {
-        connection_progress(sc)
-        progressUpdated <- TRUE
-      }
-    }
-  }
-
-  if (progressUpdated) {
-    connection_progress_terminated(sc)
-  }
-
-  if (commandStart + timeout <= Sys.time()) {
-    stop(
-      "Operation timed out, increase config option sparklyr.backend.timeout if needed."
-    )
-  }
-
-  result
-}
-
-read_bin.spark_connection <- function(con, what, n, endian = NULL) {
-  read_bin_wait(con, what, n, endian)
-}
-
-#' @export
-read_bin.spark_worker_connection <- function(con, what, n, endian = NULL) {
-  read_bin_wait(con, what, n, endian)
-}
-
-#' @export
-read_bin.livy_backend <- function(con, what, n, endian = NULL) {
-  read_bin.default(con$rc, what, n, endian)
-}
-
-readObject <- function(con) {
-  # Read type first
-  type <- readType(con)
-  readTypedObject(con, type)
-}
-
-readTypedObject <- function(con, type) {
-  switch(
-    type,
-    "i" = readInt(con),
-    "c" = readString(con),
-    "b" = readBoolean(con),
-    "d" = readDouble(con),
-    "r" = readRaw(con),
-    "D" = readDate(con),
-    "t" = readTime(con),
-    "a" = readArray(con),
-    "l" = readList(con),
-    "e" = readMap(con),
-    "s" = readStruct(con),
-    "f" = readStringArray(con),
-    "n" = NULL,
-    "j" = getJobj(con, readString(con)),
-    "J" = jsonlite::fromJSON(
-      readString(con),
-      simplifyDataFrame = FALSE,
-      simplifyMatrix = FALSE
-    ),
-    stop(paste("Unsupported type for deserialization", type))
-  )
-}
-
-readString <- function(con) {
-  stringLen <- readInt(con)
-
-  string <- (if (stringLen > 0) {
-    raw <- read_bin(con, raw(), stringLen, endian = "big")
-    if (is.element("00", raw)) {
-      warning("Input contains embedded nuls, removing.")
-      raw <- raw[raw != "00"]
-    }
-    rawToChar(raw)
-  } else if (stringLen == 0) {
-    ""
-  } else {
-    NA_character_
-  })
-
-  Encoding(string) <- "UTF-8"
-  string
-}
-
-readStringArray <- function(con) {
-  joined <- readString(con)
-  arr <- as.list(strsplit(joined, "\u0019")[[1]])
-  lapply(
-    arr,
-    function(x) {
-      if (x == "<NA>") NA_character_ else x
-    }
-  )
-}
-
-readDateArray <- function(con, n = 1) {
-  if (n == 0) {
-    as.Date(NA)
-  } else {
-    do.call(c, lapply(seq(n), function(x) readDate(con)))
-  }
-}
-
-readInt <- function(con, n = 1) {
-  if (n == 0) {
-    integer(0)
-  } else {
-    read_bin(con, integer(), n = n, endian = "big")
-  }
-}
-
-readDouble <- function(con, n = 1) {
-  if (n == 0) {
-    double(0)
-  } else {
-    read_bin(con, double(), n = n, endian = "big")
-  }
-}
-
-readBoolean <- function(con, n = 1) {
-  if (n == 0) {
-    logical(0)
-  } else {
-    as.logical(readInt(con, n = n))
-  }
-}
-
-readType <- function(con) {
-  rawToChar(read_bin(con, "raw", n = 1L))
-}
-
-readDate <- function(con) {
-  n <- readInt(con)
-  if (is.na(n)) {
-    as.Date(NA)
-  } else {
-    d <- as.Date(n, origin = "1970-01-01")
-    if (getOption("sparklyr.collect.datechars", FALSE)) {
-      as.character(d)
-    } else {
-      d
-    }
-  }
-}
-
-readTime <- function(con, n = 1) {
-  if (identical(n, 0)) {
-    as.POSIXct(character(0))
-  } else {
-    t <- readDouble(con, n)
-
-    r <- as.POSIXct(t, origin = "1970-01-01")
-    if (getOption("sparklyr.collect.datechars", FALSE)) {
-      as.character(r)
-    } else {
-      r
-    }
-  }
-}
-
-readArray <- function(con) {
-  type <- readType(con)
-  len <- readInt(con)
-
-  if (type == "d") {
-    return(readDouble(con, n = len))
-  } else if (type == "i") {
-    return(readInt(con, n = len))
-  } else if (type == "b") {
-    return(readBoolean(con, n = len))
-  } else if (type == "t") {
-    return(readTime(con, n = len))
-  } else if (type == "D") {
-    return(readDateArray(con, n = len))
-  }
-
-  if (len > 0) {
-    l <- vector("list", len)
-    for (i in seq_len(len)) {
-      l[[i]] <- readTypedObject(con, type)
-    }
-    l
-  } else {
-    list()
-  }
-}
-
-# Read a list. Types of each element may be different.
-# Null objects are read as NA.
-readList <- function(con) {
-  len <- readInt(con)
-  if (len > 0) {
-    l <- vector("list", len)
-    for (i in seq_len(len)) {
-      elem <- readObject(con)
-      if (is.null(elem)) {
-        elem <- NA
-      }
-      l[[i]] <- elem
-    }
-    l
-  } else {
-    list()
-  }
-}
-
-readMap <- function(con) {
-  map <- list()
-  len <- readInt(con)
-  if (len > 0) {
-    for (i in seq_len(len)) {
-      key <- readString(con)
-      value <- readObject(con)
-      map[[key]] <- value
-    }
-  }
-
-  map
-}
-
-# Convert a named list to struct so that
-# SerDe won't confuse between a normal named list and struct
-listToStruct <- function(list) {
-  stopifnot(class(list) == "list")
-  stopifnot(!is.null(names(list)))
-  class(list) <- "struct"
-  list
-}
-
-# Read a field of StructType from DataFrame
-# into a named list in R whose class is "struct"
-readStruct <- function(con) {
-  names <- readObject(con)
-  fields <- readObject(con)
-  names(fields) <- names
-  listToStruct(fields)
-}
-
-readRaw <- function(con) {
-  dataLen <- readInt(con)
-  if (dataLen == -1) {
-    NA
-  } else if (dataLen == 0) {
-    raw()
-  } else {
-    read_bin(con, raw(), as.integer(dataLen), endian = "big")
-  }
-}
 sparklyr_gateway_trouble_shooting_msg <- function() {
   c(
     "\n\n\nTry running `options(sparklyr.log.console = TRUE)` followed by ",
@@ -608,6 +205,147 @@ spark_connect_gateway <- function(
     }
   }
 }
+
+#' @include connection_shell.R
+
+master_is_gateway <- function(master) {
+  length(grep("^(sparklyr://)?[^:]+:[0-9]+(/[0-9]+)?$", master)) > 0
+}
+
+gateway_connection <- function(master, config) {
+  if (!master_is_gateway(master)) {
+    stop(
+      "sparklyr gateway master expected to be formatted as sparklyr://address:port"
+    )
+  }
+
+  protocol <- strsplit(master, "//")[[1]]
+  components <- strsplit(protocol[[2]], ":")[[1]]
+  gatewayAddress <- components[[1]]
+  portAndSesssion <- strsplit(components[[2]], "/")[[1]]
+  gatewayPort <- as.integer(portAndSesssion[[1]])
+  sessionId <- if (length(portAndSesssion) > 1) {
+    as.integer(portAndSesssion[[2]])
+  } else {
+    0
+  }
+
+  gatewayInfo <- spark_connect_gateway(
+    gatewayAddress = gatewayAddress,
+    gatewayPort = gatewayPort,
+    sessionId = sessionId,
+    config = config
+  )
+
+  if (is.null(gatewayInfo)) {
+    stop("Failed to connect to gateway: ", master)
+  }
+
+  sc <- spark_gateway_connection(master, config, gatewayInfo, gatewayAddress)
+
+  if (is.null(gatewayInfo)) {
+    stop("Failed to open connection from gateway: ", master)
+  }
+
+  sc
+}
+
+spark_gateway_connection <- function(
+  master,
+  config,
+  gatewayInfo,
+  gatewayAddress
+) {
+  tryCatch(
+    {
+      interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
+
+      backend <- socketConnection(
+        host = gatewayAddress,
+        port = gatewayInfo$backendPort,
+        server = FALSE,
+        blocking = interval > 0,
+        open = "wb",
+        timeout = interval
+      )
+      class(backend) <- c(class(backend), "shell_backend")
+
+      monitoring <- socketConnection(
+        host = gatewayAddress,
+        port = gatewayInfo$backendPort,
+        server = FALSE,
+        blocking = interval > 0,
+        open = "wb",
+        timeout = interval
+      )
+      class(monitoring) <- c(class(monitoring), "shell_backend")
+    },
+    error = function(err) {
+      close(gatewayInfo$gateway)
+      stop("Failed to open connection to backend:", err$message)
+    }
+  )
+
+  # create the shell connection
+  sc <- new_spark_gateway_connection(list(
+    # spark_connection
+    master = master,
+    method = "gateway",
+    app_name = "sparklyr",
+    config = config,
+    state = new.env(),
+    # spark_gateway_connection : spark_shell_connection
+    spark_home = NULL,
+    backend = backend,
+    monitoring = monitoring,
+    gateway = gatewayInfo$gateway,
+    output_file = NULL
+  ))
+
+  # stop shell on R exit
+  reg.finalizer(
+    baseenv(),
+    function(x) {
+      if (connection_is_open(sc)) {
+        stop_shell(sc)
+      }
+    },
+    onexit = TRUE
+  )
+
+  sc
+}
+
+#' @export
+connection_is_open.spark_gateway_connection <- connection_is_open.spark_shell_connection
+
+#' @export
+spark_log.spark_gateway_connection <- function(
+  sc,
+  n = 100,
+  filter = NULL,
+  ...
+) {
+  stop(
+    "spark_log is not available while connecting through an sparklyr gateway"
+  )
+}
+
+#' @export
+spark_web.spark_gateway_connection <- function(sc, ...) {
+  stop(
+    "spark_web is not available while connecting through an sparklyr gateway"
+  )
+}
+
+#' @export
+invoke_method.spark_gateway_connection <- invoke_method.spark_shell_connection
+
+#' @export
+j_invoke_method.spark_gateway_connection <- j_invoke_method.spark_shell_connection
+
+#' @export
+print_jobj.spark_gateway_connection <- print_jobj.spark_shell_connection
 core_invoke_sync_socket <- function(sc) {
   flush <- c(1)
   while (length(flush) > 0) {
@@ -1009,6 +747,146 @@ spark_last_error <- function() {
     rlang::inform(last_error)
   } else {
     rlang::inform("No error found")
+  }
+}
+
+#' Invoke a Method on a JVM Object
+#'
+#' Invoke methods on Java object references. These functions provide a
+#' mechanism for invoking various Java object methods directly from \R.
+#'
+#' Use each of these functions in the following scenarios:
+#'
+#' \tabular{lll}{
+#' \code{invoke} \tab Execute a method on a Java object reference (typically, a \code{spark_jobj}). \cr
+#' \code{invoke_static} \tab Execute a static method associated with a Java class. \cr
+#' \code{invoke_new} \tab Invoke a constructor associated with a Java class. \cr
+#' }
+#'
+#' @param sc A \code{spark_connection}.
+#' @param jobj An \R object acting as a Java object reference (typically, a \code{spark_jobj}).
+#' @param class The name of the Java class whose methods should be invoked.
+#' @param method The name of the method to be invoked.
+#' @param ... Optional arguments, currently unused.
+#'
+#' @name invoke
+NULL
+
+#' @name invoke
+#' @export
+invoke <- function(jobj, method, ...) {
+  invoke_trace(spark_connection(jobj), "Invoking", method)
+  UseMethod("invoke")
+}
+
+#' Invoke a Java function.
+#'
+#' Invoke a Java function and force return value of the call to be retrieved
+#' as a Java object reference.
+#'
+#' @inheritParams invoke
+#'
+#' @name j_invoke
+NULL
+
+#' @name j_invoke
+#' @export
+j_invoke <- function(jobj, method, ...) {
+  invoke_trace(spark_connection(jobj), "Invoking", method)
+  UseMethod("j_invoke")
+}
+
+#' @name invoke
+#' @export
+invoke_static <- function(sc, class, method, ...) {
+  invoke_trace(sc, "Invoking", class, method)
+  UseMethod("invoke_static")
+}
+
+#' @name j_invoke
+#' @export
+j_invoke_static <- function(sc, class, method, ...) {
+  UseMethod("j_invoke_static")
+}
+
+#' @name invoke
+#' @export
+invoke_new <- function(sc, class, ...) {
+  invoke_trace(sc, "Invoking", class)
+  UseMethod("invoke_new")
+}
+
+#' @name j_invoke
+#' @export
+j_invoke_new <- function(sc, class, ...) {
+  UseMethod("j_invoke_new")
+}
+
+#' Generic Call Interface
+#'
+#' @param sc \code{spark_connection}
+#' @param static Is this a static method call (including a constructor). If so
+#'   then the \code{object} parameter should be the name of a class (otherwise
+#'   it should be a spark_jobj instance).
+#' @param object Object instance or name of class (for \code{static})
+#' @param method Name of method
+#' @param ... Call parameters
+#'
+#' @name generic_call_interface
+NULL
+
+#' Generic Call Interface
+#'
+#' @inheritParams generic_call_interface
+#'
+#' @keywords internal
+#'
+#' @export
+invoke_method <- function(sc, static, object, method, ...) {
+  UseMethod("invoke_method")
+}
+
+#' Generic Call Interface
+#'
+#' Call a Java method and retrieve the return value through a JVM object
+#' reference.
+#'
+#' @inheritParams generic_call_interface
+#'
+#' @keywords internal
+#'
+#' @export
+j_invoke_method <- function(sc, static, object, method, ...) {
+  UseMethod("j_invoke_method")
+}
+
+invoke_trace <- function(sc, ...) {
+  invoke_config <- spark_config_value(sc$config, "sparklyr.log.invoke", FALSE)
+  if (invoke_config %in% c(TRUE, "callstack", "cat")) {
+    args <- list(...)
+    trace_message <- paste(args, collapse = " ")
+
+    if (identical(invoke_config, "cat")) {
+      cat(paste0(trace_message, "\n"))
+    } else {
+      message(trace_message)
+    }
+
+    if (identical(invoke_config, "callstack")) {
+      frame_names <- list()
+      for (i in 1:sys.nframe()) {
+        current_call <- sys.call(i)
+        frame_names[[i]] <- paste(
+          i,
+          ": ",
+          paste(head(deparse(current_call), 5), collapse = "\n"),
+          sep = ""
+        )
+      }
+
+      message(paste(frame_names, collapse = "\n"))
+      message()
+    }
   }
 }
 #' Retrieve a Spark JVM Object Reference
@@ -1431,6 +1309,315 @@ writeArgs <- function(con, args) {
     }
   }
 }
+
+read_bin <- function(con, what, n, endian = NULL) {
+  UseMethod("read_bin")
+}
+
+#' @export
+read_bin.default <- function(con, what, n, endian = NULL) {
+  if (is.null(endian)) {
+    readBin(con, what, n)
+  } else {
+    readBin(con, what, n, endian = endian)
+  }
+}
+
+read_bin_wait <- function(con, what, n, endian = NULL) {
+  sc <- con
+  con <- if (!is.null(sc$state) && identical(sc$state$use_monitoring, TRUE)) {
+    sc$monitoring
+  } else {
+    sc$backend
+  }
+
+  timeout <- spark_config_value(
+    sc$config,
+    "sparklyr.backend.timeout",
+    30 * 24 * 60 * 60
+  )
+  progressInterval <- spark_config_value(
+    sc$config,
+    "sparklyr.progress.interval",
+    3
+  )
+
+  result <- if (is.null(endian)) {
+    readBin(con, what, n)
+  } else {
+    readBin(con, what, n, endian = endian)
+  }
+
+  progressTimeout <- Sys.time() + progressInterval
+  if (is.null(sc$state$progress)) {
+    sc$state$progress <- new.env()
+  }
+  progressUpdated <- FALSE
+
+  waitInterval <- 0
+  commandStart <- Sys.time()
+  while (length(result) == 0 && commandStart + timeout > Sys.time()) {
+    Sys.sleep(waitInterval)
+    waitInterval <- min(0.1, waitInterval + 0.01)
+
+    result <- if (is.null(endian)) {
+      readBin(con, what, n)
+    } else {
+      readBin(con, what, n, endian = endian)
+    }
+
+    if (Sys.time() > progressTimeout) {
+      progressTimeout <- Sys.time() + progressInterval
+      if (exists("connection_progress")) {
+        connection_progress(sc)
+        progressUpdated <- TRUE
+      }
+    }
+  }
+
+  if (progressUpdated) {
+    connection_progress_terminated(sc)
+  }
+
+  if (commandStart + timeout <= Sys.time()) {
+    stop(
+      "Operation timed out, increase config option sparklyr.backend.timeout if needed."
+    )
+  }
+
+  result
+}
+
+read_bin.spark_connection <- function(con, what, n, endian = NULL) {
+  read_bin_wait(con, what, n, endian)
+}
+
+#' @export
+read_bin.spark_worker_connection <- function(con, what, n, endian = NULL) {
+  read_bin_wait(con, what, n, endian)
+}
+
+#' @export
+read_bin.livy_backend <- function(con, what, n, endian = NULL) {
+  read_bin.default(con$rc, what, n, endian)
+}
+
+readObject <- function(con) {
+  # Read type first
+  type <- readType(con)
+  readTypedObject(con, type)
+}
+
+readTypedObject <- function(con, type) {
+  switch(
+    type,
+    "i" = readInt(con),
+    "c" = readString(con),
+    "b" = readBoolean(con),
+    "d" = readDouble(con),
+    "r" = readRaw(con),
+    "D" = readDate(con),
+    "t" = readTime(con),
+    "a" = readArray(con),
+    "l" = readList(con),
+    "e" = readMap(con),
+    "s" = readStruct(con),
+    "f" = readStringArray(con),
+    "n" = NULL,
+    "j" = getJobj(con, readString(con)),
+    "J" = jsonlite::fromJSON(
+      readString(con),
+      simplifyDataFrame = FALSE,
+      simplifyMatrix = FALSE
+    ),
+    stop(paste("Unsupported type for deserialization", type))
+  )
+}
+
+readString <- function(con) {
+  stringLen <- readInt(con)
+
+  string <- (if (stringLen > 0) {
+    raw <- read_bin(con, raw(), stringLen, endian = "big")
+    if (is.element("00", raw)) {
+      warning("Input contains embedded nuls, removing.")
+      raw <- raw[raw != "00"]
+    }
+    rawToChar(raw)
+  } else if (stringLen == 0) {
+    ""
+  } else {
+    NA_character_
+  })
+
+  Encoding(string) <- "UTF-8"
+  string
+}
+
+readStringArray <- function(con) {
+  joined <- readString(con)
+  arr <- as.list(strsplit(joined, "\u0019")[[1]])
+  lapply(
+    arr,
+    function(x) {
+      if (x == "<NA>") NA_character_ else x
+    }
+  )
+}
+
+readDateArray <- function(con, n = 1) {
+  if (n == 0) {
+    as.Date(NA)
+  } else {
+    do.call(c, lapply(seq(n), function(x) readDate(con)))
+  }
+}
+
+readInt <- function(con, n = 1) {
+  if (n == 0) {
+    integer(0)
+  } else {
+    read_bin(con, integer(), n = n, endian = "big")
+  }
+}
+
+readDouble <- function(con, n = 1) {
+  if (n == 0) {
+    double(0)
+  } else {
+    read_bin(con, double(), n = n, endian = "big")
+  }
+}
+
+readBoolean <- function(con, n = 1) {
+  if (n == 0) {
+    logical(0)
+  } else {
+    as.logical(readInt(con, n = n))
+  }
+}
+
+readType <- function(con) {
+  rawToChar(read_bin(con, "raw", n = 1L))
+}
+
+readDate <- function(con) {
+  n <- readInt(con)
+  if (is.na(n)) {
+    as.Date(NA)
+  } else {
+    d <- as.Date(n, origin = "1970-01-01")
+    if (getOption("sparklyr.collect.datechars", FALSE)) {
+      as.character(d)
+    } else {
+      d
+    }
+  }
+}
+
+readTime <- function(con, n = 1) {
+  if (identical(n, 0)) {
+    as.POSIXct(character(0))
+  } else {
+    t <- readDouble(con, n)
+
+    r <- as.POSIXct(t, origin = "1970-01-01")
+    if (getOption("sparklyr.collect.datechars", FALSE)) {
+      as.character(r)
+    } else {
+      r
+    }
+  }
+}
+
+readArray <- function(con) {
+  type <- readType(con)
+  len <- readInt(con)
+
+  if (type == "d") {
+    return(readDouble(con, n = len))
+  } else if (type == "i") {
+    return(readInt(con, n = len))
+  } else if (type == "b") {
+    return(readBoolean(con, n = len))
+  } else if (type == "t") {
+    return(readTime(con, n = len))
+  } else if (type == "D") {
+    return(readDateArray(con, n = len))
+  }
+
+  if (len > 0) {
+    l <- vector("list", len)
+    for (i in seq_len(len)) {
+      l[[i]] <- readTypedObject(con, type)
+    }
+    l
+  } else {
+    list()
+  }
+}
+
+# Read a list. Types of each element may be different.
+# Null objects are read as NA.
+readList <- function(con) {
+  len <- readInt(con)
+  if (len > 0) {
+    l <- vector("list", len)
+    for (i in seq_len(len)) {
+      elem <- readObject(con)
+      if (is.null(elem)) {
+        elem <- NA
+      }
+      l[[i]] <- elem
+    }
+    l
+  } else {
+    list()
+  }
+}
+
+readMap <- function(con) {
+  map <- list()
+  len <- readInt(con)
+  if (len > 0) {
+    for (i in seq_len(len)) {
+      key <- readString(con)
+      value <- readObject(con)
+      map[[key]] <- value
+    }
+  }
+
+  map
+}
+
+# Convert a named list to struct so that
+# SerDe won't confuse between a normal named list and struct
+listToStruct <- function(list) {
+  stopifnot(class(list) == "list")
+  stopifnot(!is.null(names(list)))
+  class(list) <- "struct"
+  list
+}
+
+# Read a field of StructType from DataFrame
+# into a named list in R whose class is "struct"
+readStruct <- function(con) {
+  names <- readObject(con)
+  fields <- readObject(con)
+  names(fields) <- names
+  listToStruct(fields)
+}
+
+readRaw <- function(con) {
+  dataLen <- readInt(con)
+  if (dataLen == -1) {
+    NA
+  } else if (dataLen == 0) {
+    raw()
+  } else {
+    read_bin(con, raw(), as.integer(dataLen), endian = "big")
+  }
+}
 core_get_package_function <- function(packageName, functionName) {
   if (
     packageName %in%
@@ -1442,36 +1629,186 @@ core_get_package_function <- function(packageName, functionName) {
     NULL
   }
 }
-worker_config_serialize <- function(config) {
-  paste(
-    if (isTRUE(config$debug)) "TRUE" else "FALSE",
-    spark_config_value(config, "sparklyr.worker.gateway.port", "8880"),
-    spark_config_value(config, "sparklyr.worker.gateway.address", "localhost"),
-    if (isTRUE(config$profile)) "TRUE" else "FALSE",
-    if (isTRUE(config$schema)) "TRUE" else "FALSE",
-    if (isTRUE(config$arrow)) "TRUE" else "FALSE",
-    if (isTRUE(config$fetch_result_as_sdf)) "TRUE" else "FALSE",
-    if (isTRUE(config$single_binary_column)) "TRUE" else "FALSE",
-    if (isTRUE(config$spark_read)) "TRUE" else "FALSE",
-    config$spark_version,
-    sep = ";"
-  )
+
+# Changing this file requires running update_embedded_sources.R to rebuild sources and jars.
+
+arrow_write_record_batch <- function(df, spark_version_number = NULL) {
+  arrow_env_vars <- list()
+  if (!is.null(spark_version_number) && spark_version_number < "3.0") {
+    # Spark < 3 uses an old version of Arrow, so send data in the legacy format
+    arrow_env_vars$ARROW_PRE_0_15_IPC_FORMAT <- 1
+  }
+
+  withr::with_envvar(arrow_env_vars, {
+    # Set the local timezone to any POSIXt columns that don't have one set
+    # https://github.com/sparklyr/sparklyr/issues/2439
+    df[] <- lapply(df, function(x) {
+      if (inherits(x, "POSIXt") && is.null(attr(x, "tzone"))) {
+        attr(x, "tzone") <- Sys.timezone()
+      }
+      x
+    })
+    arrow::write_to_raw(df, format = "stream")
+  })
 }
 
-worker_config_deserialize <- function(raw) {
-  parts <- strsplit(raw, ";")[[1]]
-  list(
-    debug = as.logical(parts[[1]]),
-    sparklyr.gateway.port = as.integer(parts[[2]]),
-    sparklyr.gateway.address = parts[[3]],
-    profile = as.logical(parts[[4]]),
-    schema = as.logical(parts[[5]]),
-    arrow = as.logical(parts[[6]]),
-    fetch_result_as_sdf = as.logical(parts[[7]]),
-    single_binary_column = as.logical(parts[[8]]),
-    spark_read = as.logical(parts[[9]]),
-    spark_version = parts[[10]]
+arrow_record_stream_reader <- function(stream) {
+  arrow::RecordBatchStreamReader$create(stream)
+}
+
+arrow_read_record_batch <- function(reader) reader$read_next_batch()
+
+arrow_as_tibble <- function(record) as.data.frame(record)
+
+#' Find path to Java
+#'
+#' Finds the path to \code{JAVA_HOME}.
+#'
+#' @param throws Throw an error when path not found?
+#'
+#' @export
+#' @keywords internal
+spark_get_java <- function(throws = FALSE) {
+  java_home <- Sys.getenv("JAVA_HOME", unset = NA)
+  if (!is.na(java_home)) {
+    java <- file.path(java_home, "bin", "java")
+    if (identical(.Platform$OS.type, "windows")) {
+      java <- paste0(java, ".exe")
+    }
+    if (!file.exists(java)) {
+      if (throws) {
+        stop(
+          "Java is required to connect to Spark. ",
+          "JAVA_HOME is set to '",
+          java_home,
+          "' but does not point to a valid version. ",
+          "Please fix JAVA_HOME or reinstall from: ",
+          java_install_url()
+        )
+      }
+      java <- ""
+    }
+  } else {
+    java <- Sys.which("java")
+  }
+  java
+}
+
+validate_java_version <- function(master, spark_home) {
+  # if someone sets SPARK_HOME and we are not in local more, assume Java
+  # is available since some systems.
+  # (e.g. CDH) use versions of java not discoverable through JAVA_HOME.
+  if (
+    !spark_master_is_local(master) &&
+      !is.null(spark_home) &&
+      nchar(spark_home) > 0
+  ) {
+    return(TRUE)
+  }
+
+  # find the active java executable
+  java <- spark_get_java(throws = TRUE)
+  if (!nzchar(java)) {
+    stop(
+      "Java is required to connect to Spark. Please download and install Java from ",
+      java_install_url()
+    )
+  }
+
+  # query its version
+  version <- system2(java, "-version", stderr = TRUE, stdout = TRUE)
+  java_version <- validate_java_version_line(master, version)
+
+  spark_version <- spark_version_from_home(spark_home)
+  if (
+    compareVersion(java_version, "11") >= 0 &&
+      compareVersion(spark_version, "3.0.0") < 0
+  ) {
+    stop("Java 11 is only supported for Spark 3.0.0+", call. = FALSE)
+  }
+
+  TRUE
+}
+
+java_is_x64 <- function() {
+  java <- spark_get_java(throws = TRUE)
+  if (!nzchar(java)) {
+    return(FALSE)
+  }
+
+  version <- system2(java, "-version", stderr = TRUE, stdout = TRUE)
+  any(grepl("64-Bit", version))
+}
+
+java_install_url <- function() {
+  "https://www.java.com/en/"
+}
+
+validate_java_version_line <- function(master, version) {
+  if (length(version) < 1) {
+    stop(
+      "Java version not detected. Please download and install Java from ",
+      java_install_url()
+    )
+  }
+
+  # find line with version info
+  versionLine <- version[grepl("version", version)]
+  if (length(versionLine) != 1) {
+    stop(
+      "Java version detected but couldn't parse version from ",
+      paste(version, collapse = " - ")
+    )
+  }
+
+  splatVersion <- if (grepl("openjdk version", versionLine)) {
+    strsplit(versionLine, "\"")[[1]][[2]]
+  } else {
+    splat <- strsplit(versionLine, "\\s+", perl = TRUE)[[1]]
+    #Getting rid of dates when present before parsing version from 'java -version'
+    splat <- splat[!grepl("[0-9]{4}-[0-9]{2}-[0-9]{2}", splat)]
+    splat[grepl("[0-9]{1,2}(\\.[0-9]+\\.[0-9]+)?", splat)]
+  }
+
+  if (length(splatVersion) != 1) {
+    stop("Java version detected but couldn't parse version from: ", versionLine)
+  }
+
+  parsedVersion <- regex_replace(
+    splatVersion,
+    "^\"|\"$" = "",
+    "_" = ".",
+    "[^0-9.]+" = ""
   )
+
+  if (!is.character(parsedVersion) || nchar(parsedVersion) < 1) {
+    stop("Java version detected but couldn't parse version from: ", versionLine)
+  }
+
+  # ensure Java 1.7 or higher
+  if (compareVersion(parsedVersion, "1.7") == -1) {
+    stop(
+      "Java version",
+      parsedVersion,
+      " detected but 1.7+ is required. Please download and install Java from ",
+      java_install_url()
+    )
+  }
+
+  if (
+    compareVersion(parsedVersion, "1.9") >= 0 &&
+      compareVersion(parsedVersion, "11") == -1 &&
+      spark_master_is_local(master) &&
+      !getOption("sparklyr.java9", FALSE)
+  ) {
+    stop(
+      "Java 9 is currently unsupported in Spark distributions unless you manually install Hadoop 2.8 ",
+      "and manually configure Spark. Please consider uninstalling Java 9 and reinstalling Java 8. ",
+      "To override this failure set 'options(sparklyr.java9 = TRUE)'."
+    )
+  }
+
+  parsedVersion
 }
 # nocov start
 
@@ -2097,197 +2434,6 @@ worker_spark_apply_unbundle <- function(bundle_path, base_path, bundle_name) {
 # nocov end
 # nocov start
 
-spark_worker_connect <- function(
-  sessionId,
-  backendPort = 8880,
-  config = list()
-) {
-  gatewayPort <- spark_config_value(
-    config,
-    "sparklyr.worker.gateway.port",
-    backendPort
-  )
-
-  gatewayAddress <- spark_config_value(
-    config,
-    "sparklyr.worker.gateway.address",
-    "localhost"
-  )
-  config <- list()
-
-  worker_log("is connecting to backend using port ", gatewayPort)
-
-  gatewayInfo <- spark_connect_gateway(
-    gatewayAddress,
-    gatewayPort,
-    sessionId,
-    config = config,
-    isStarting = TRUE
-  )
-
-  worker_log("is connected to backend")
-  worker_log("is connecting to backend session")
-
-  tryCatch(
-    {
-      interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
-
-      backend <- socketConnection(
-        host = "localhost",
-        port = gatewayInfo$backendPort,
-        server = FALSE,
-        blocking = interval > 0,
-        open = "wb",
-        timeout = interval
-      )
-
-      class(backend) <- c(class(backend), "shell_backend")
-    },
-    error = function(err) {
-      close(gatewayInfo$gateway)
-
-      stop(
-        "Failed to open connection to backend:",
-        err$message
-      )
-    }
-  )
-
-  worker_log("is connected to backend session")
-
-  sc <- structure(
-    class = c("spark_worker_connection"),
-    list(
-      # spark_connection
-      master = "",
-      method = "shell",
-      app_name = NULL,
-      config = NULL,
-      state = new.env(),
-      # spark_shell_connection
-      spark_home = NULL,
-      backend = backend,
-      gateway = gatewayInfo$gateway,
-      output_file = NULL
-    )
-  )
-
-  worker_log("created connection")
-
-  sc
-}
-
-# nocov end
-# nocov start
-#' @export
-connection_is_open.spark_worker_connection <- function(sc) {
-  bothOpen <- FALSE
-  if (!identical(sc, NULL)) {
-    tryCatch(
-      {
-        bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
-      },
-      error = function(e) {}
-    )
-  }
-  bothOpen
-}
-
-worker_connection <- function(x, ...) {
-  UseMethod("worker_connection")
-}
-
-worker_connection.spark_jobj <- function(x, ...) {
-  x$connection
-}
-
-# nocov end
-# nocov start
-
-worker_invoke_method <- function(sc, static, object, method, ...) {
-  core_invoke_method(sc, static, object, method, FALSE, ...)
-}
-
-worker_invoke <- function(jobj, method, ...) {
-  UseMethod("worker_invoke")
-}
-
-#' @export
-worker_invoke.shell_jobj <- function(jobj, method, ...) {
-  worker_invoke_method(worker_connection(jobj), FALSE, jobj, method, ...)
-}
-
-worker_invoke_static <- function(sc, class, method, ...) {
-  worker_invoke_method(sc, TRUE, class, method, ...)
-}
-
-worker_invoke_new <- function(sc, class, ...) {
-  worker_invoke_method(sc, TRUE, class, "<init>", ...)
-}
-
-# nocov end
-# nocov start
-
-worker_log_env <- new.env()
-
-worker_log_session <- function(sessionId) {
-  assign("sessionId", sessionId, envir = worker_log_env)
-}
-
-worker_log_format <- function(
-  message,
-  session,
-  level = "INFO",
-  component = "RScript"
-) {
-  paste(
-    format(Sys.time(), "%y/%m/%d %H:%M:%S"),
-    " ",
-    level,
-    " sparklyr: ",
-    component,
-    " (",
-    session,
-    ") ",
-    message,
-    sep = ""
-  )
-}
-
-worker_log_level <- function(..., level, component = "RScript") {
-  if (is.null(worker_log_env$sessionId)) {
-    worker_log_env <- get0("worker_log_env", envir = .GlobalEnv)
-    if (is.null(worker_log_env$sessionId)) {
-      return()
-    }
-  }
-
-  args <- list(...)
-  message <- paste(args, sep = "", collapse = "")
-  formatted <- worker_log_format(
-    message,
-    worker_log_env$sessionId,
-    level = level,
-    component = component
-  )
-  cat(formatted, "\n")
-}
-
-worker_log <- function(...) {
-  worker_log_level(..., level = "INFO")
-}
-
-worker_log_warning <- function(...) {
-  worker_log_level(..., level = "WARN")
-}
-
-worker_log_error <- function(...) {
-  worker_log_level(..., level = "ERROR")
-}
-
-# nocov end
-# nocov start
-
 .worker_globals <- new.env(parent = emptyenv())
 
 spark_worker_main <- function(
@@ -2389,6 +2535,201 @@ spark_worker_hooks <- function() {
     as.environment("package:base")
   )
   lock("stop", as.environment("package:base"))
+}
+
+# nocov end
+
+# nocov start
+
+worker_log_env <- new.env()
+
+worker_log_session <- function(sessionId) {
+  assign("sessionId", sessionId, envir = worker_log_env)
+}
+
+worker_log_format <- function(
+  message,
+  session,
+  level = "INFO",
+  component = "RScript"
+) {
+  paste(
+    format(Sys.time(), "%y/%m/%d %H:%M:%S"),
+    " ",
+    level,
+    " sparklyr: ",
+    component,
+    " (",
+    session,
+    ") ",
+    message,
+    sep = ""
+  )
+}
+
+worker_log_level <- function(..., level, component = "RScript") {
+  if (is.null(worker_log_env$sessionId)) {
+    worker_log_env <- get0("worker_log_env", envir = .GlobalEnv)
+    if (is.null(worker_log_env$sessionId)) {
+      return()
+    }
+  }
+
+  args <- list(...)
+  message <- paste(args, sep = "", collapse = "")
+  formatted <- worker_log_format(
+    message,
+    worker_log_env$sessionId,
+    level = level,
+    component = component
+  )
+  cat(formatted, "\n")
+}
+
+worker_log <- function(...) {
+  worker_log_level(..., level = "INFO")
+}
+
+worker_log_warning <- function(...) {
+  worker_log_level(..., level = "WARN")
+}
+
+worker_log_error <- function(...) {
+  worker_log_level(..., level = "ERROR")
+}
+
+# nocov end
+
+# nocov start
+#' @export
+connection_is_open.spark_worker_connection <- function(sc) {
+  bothOpen <- FALSE
+  if (!identical(sc, NULL)) {
+    tryCatch(
+      {
+        bothOpen <- isOpen(sc$backend) && isOpen(sc$gateway)
+      },
+      error = function(e) {}
+    )
+  }
+  bothOpen
+}
+
+worker_connection <- function(x, ...) {
+  UseMethod("worker_connection")
+}
+
+worker_connection.spark_jobj <- function(x, ...) {
+  x$connection
+}
+
+# nocov end
+
+# nocov start
+
+spark_worker_connect <- function(
+  sessionId,
+  backendPort = 8880,
+  config = list()
+) {
+  gatewayPort <- spark_config_value(
+    config,
+    "sparklyr.worker.gateway.port",
+    backendPort
+  )
+
+  gatewayAddress <- spark_config_value(
+    config,
+    "sparklyr.worker.gateway.address",
+    "localhost"
+  )
+  config <- list()
+
+  worker_log("is connecting to backend using port ", gatewayPort)
+
+  gatewayInfo <- spark_connect_gateway(
+    gatewayAddress,
+    gatewayPort,
+    sessionId,
+    config = config,
+    isStarting = TRUE
+  )
+
+  worker_log("is connected to backend")
+  worker_log("is connecting to backend session")
+
+  tryCatch(
+    {
+      interval <- spark_config_value(config, "sparklyr.backend.interval", 1)
+
+      backend <- socketConnection(
+        host = "localhost",
+        port = gatewayInfo$backendPort,
+        server = FALSE,
+        blocking = interval > 0,
+        open = "wb",
+        timeout = interval
+      )
+
+      class(backend) <- c(class(backend), "shell_backend")
+    },
+    error = function(err) {
+      close(gatewayInfo$gateway)
+
+      stop(
+        "Failed to open connection to backend:",
+        err$message
+      )
+    }
+  )
+
+  worker_log("is connected to backend session")
+
+  sc <- structure(
+    class = c("spark_worker_connection"),
+    list(
+      # spark_connection
+      master = "",
+      method = "shell",
+      app_name = NULL,
+      config = NULL,
+      state = new.env(),
+      # spark_shell_connection
+      spark_home = NULL,
+      backend = backend,
+      gateway = gatewayInfo$gateway,
+      output_file = NULL
+    )
+  )
+
+  worker_log("created connection")
+
+  sc
+}
+
+# nocov end
+
+# nocov start
+
+worker_invoke_method <- function(sc, static, object, method, ...) {
+  core_invoke_method(sc, static, object, method, FALSE, ...)
+}
+
+worker_invoke <- function(jobj, method, ...) {
+  UseMethod("worker_invoke")
+}
+
+#' @export
+worker_invoke.shell_jobj <- function(jobj, method, ...) {
+  worker_invoke_method(worker_connection(jobj), FALSE, jobj, method, ...)
+}
+
+worker_invoke_static <- function(sc, class, method, ...) {
+  worker_invoke_method(sc, TRUE, class, method, ...)
+}
+
+worker_invoke_new <- function(sc, class, ...) {
+  worker_invoke_method(sc, TRUE, class, "<init>", ...)
 }
 
 # nocov end

@@ -50,7 +50,9 @@ test_that("spark_db_analyze runs ANALYZE on a non-temporary table", {
   # persisted table so SHOW TABLES reports isTemporary = FALSE
   DBI::dbExecute(sc, "CREATE TABLE IF NOT EXISTS anz_tbl AS SELECT 1 AS a")
   on.exit(DBI::dbExecute(sc, "DROP TABLE IF EXISTS anz_tbl"), add = TRUE)
-  expect_error(spark_db_analyze(sc, "anz_tbl"), NA)
+  # dbplyr's sql_table_analyze() hook passes the table as an identifier; a bare
+  # string would be escaped as a string literal ('anz_tbl') and fail to parse.
+  expect_error(spark_db_analyze(sc, dbplyr::ident("anz_tbl")), NA)
 })
 
 test_clear_cache()

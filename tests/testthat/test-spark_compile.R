@@ -7,10 +7,24 @@
 #   3. The end-to-end jar build test, which is intentionally skipped: it is too
 #      slow for routine/CI runs. Retained for manual/local use, not deleted.
 
+# The build/download helpers are intentionally chatty (scalac download progress,
+# `cat()` status lines, and the full diffobj diff on a verify mismatch). None of
+# that is useful as test output, so run those calls through here to swallow
+# stdout, stderr, and messages while still letting errors propagate.
+quiet_run <- function(expr) {
+  invisible(utils::capture.output(
+    utils::capture.output(
+      suppressMessages(suppressWarnings(expr)),
+      type = "message"
+    ),
+    type = "output"
+  ))
+}
+
 test_that("'find_scalac' can find scala version", {
   skip_on_livy()
   skip_on_arrow_devel()
-  ensure_download_scalac(scalac_download_path)
+  quiet_run(ensure_download_scalac(scalac_download_path))
   expect_true(scalac_is_available("2.11", scalac_download_path))
   expect_true(scalac_is_available("2.12", scalac_download_path))
 })
@@ -18,7 +32,7 @@ test_that("'find_scalac' can find scala version", {
 test_that("'spark_default_compilation_spec' can create default specification", {
   skip_on_livy()
   skip_on_arrow_devel()
-  ensure_download_scalac(scalac_download_path)
+  quiet_run(ensure_download_scalac(scalac_download_path))
   dp <- list.files(scalac_download_path)
   expect_gte(length(dp), 3)
 })
@@ -290,7 +304,7 @@ test_that("download_scalac() downloads + extracts, and skips existing files", {
     },
     untar = function(...) 0L,
     .package = "sparklyr",
-    suppressMessages(download_scalac(dest_path = dest))
+    quiet_run(download_scalac(dest_path = dest))
   )
   expect_length(downloaded, 3)
 
@@ -303,7 +317,7 @@ test_that("download_scalac() downloads + extracts, and skips existing files", {
     },
     untar = function(...) 0L,
     .package = "sparklyr",
-    suppressMessages(download_scalac(dest_path = dest))
+    quiet_run(download_scalac(dest_path = dest))
   )
   expect_length(downloaded, 0)
 
@@ -318,7 +332,7 @@ test_that("download_scalac() downloads + extracts, and skips existing files", {
     },
     unzip = function(...) unzipped <<- unzipped + 1,
     .package = "sparklyr",
-    suppressMessages(download_scalac(dest_path = dest_win))
+    quiet_run(download_scalac(dest_path = dest_win))
   )
   expect_equal(unzipped, 3)
 })
@@ -386,7 +400,7 @@ test_that("compile, then update + verify embedded sources (real build)", {
     {
       spec <- spark_default_compilation_spec()
       expect_length(spec, 1)
-      suppressMessages(compile_package_jars(spec = spec))
+      quiet_run(compile_package_jars(spec = spec))
     },
     .package = "sparklyr"
   )
@@ -402,8 +416,8 @@ test_that("compile, then update + verify embedded sources (real build)", {
   with_mocked_bindings(
     list_sparklyr_jars = function() built,
     {
-      suppressMessages(spark_update_embedded_sources())
-      expect_no_error(suppressMessages(spark_verify_embedded_sources()))
+      quiet_run(spark_update_embedded_sources())
+      expect_no_error(quiet_run(spark_verify_embedded_sources()))
     },
     .package = "sparklyr"
   )
@@ -428,7 +442,7 @@ test_that("compile, then update + verify embedded sources (real build)", {
   )
   with_mocked_bindings(
     list_sparklyr_jars = function() tampered,
-    expect_error(suppressMessages(spark_verify_embedded_sources())),
+    expect_error(quiet_run(spark_verify_embedded_sources())),
     .package = "sparklyr"
   )
 })

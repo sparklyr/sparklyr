@@ -731,6 +731,15 @@ test_that("spark_apply(schema = TRUE) returns the inferred columns", {
 
 test_that("spark_apply() supports the RDD code path", {
   skip_if_dbplyr_dev()
+  # The legacy RDD code path (rdd = TRUE) is broken on Spark 4.x regardless of
+  # arrow: the non-arrow collect fails to encode the createDataFrame rows
+  # (EXPRESSION_ENCODING_FAILED) and the arrow path can't deserialize the RDD
+  # schema-inference sample. It works on Spark 3.x, which the coverage runs use.
+  skip_on_arrow()
+  skip_if(
+    spark_version(sc) >= "4.0.0",
+    "spark_apply(rdd = TRUE) is unsupported on Spark 4.x"
+  )
   result <- sdf_len(sc, 3) %>%
     spark_apply(function(e) e, rdd = TRUE) %>%
     collect()
@@ -739,7 +748,13 @@ test_that("spark_apply() supports the RDD code path", {
 
 test_that("spark_apply() supports the RDD code path with group_by", {
   skip_if_dbplyr_dev()
-  skip_on_arrow_devel()
+  # see the ungrouped RDD test above: rdd = TRUE is unsupported on Spark 4.x
+  # (encoding failure) and under arrow (schema-inference sample can't be read).
+  skip_on_arrow()
+  skip_if(
+    spark_version(sc) >= "4.0.0",
+    "spark_apply(rdd = TRUE) is unsupported on Spark 4.x"
+  )
   # group_by + rdd = TRUE exercises ApplyUtils.groupBy on the RDD (the grouped
   # branch of the RDD path), which the ungrouped RDD/barrier tests don't reach.
   result <- spark_apply(

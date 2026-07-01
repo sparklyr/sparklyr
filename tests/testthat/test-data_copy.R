@@ -80,7 +80,8 @@ test_that("sdf_copy_to can preserve list columns", {
     c(sapply(sparklyr.nested::sdf_select(sdf, b.d) %>% sdf_collect(), c)),
     c("a", "b", "c")
   )
-  res <- sdf_collect(sdf)
+  # collecting a struct column disables arrow (with a warning) and falls back
+  expect_warning_on_arrow(res <- sdf_collect(sdf))
   expect_equivalent(df$a, res$a)
 })
 
