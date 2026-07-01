@@ -147,7 +147,9 @@ arrow_collect <- function(tbl, ...) {
   sc <- spark_connection(tbl)
   sdf <- spark_dataframe(tbl)
   if (!is.null(n)) {
-    n <- as.integer(n)
+    # `n` is often Inf (collect-all) or otherwise outside integer range; the
+    # resulting NA is handled below, so suppress the spurious coercion warning.
+    n <- suppressWarnings(as.integer(n))
     if (!is.na(n)) {
       # If n is Inf or any value outside of integer range, then ignore it
       sdf <- sdf %>% invoke("limit", n)

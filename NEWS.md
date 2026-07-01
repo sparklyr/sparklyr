@@ -1,5 +1,54 @@
 # Sparklyr (dev)
 
+- Fixed a spurious "one argument not used by format" warning raised alongside the
+error from `spark_require_version()` when a Spark version requirement isn't met
+(the error message passed an extra argument to `sprintf()`).
+
+- Fixed a spurious "NAs introduced by coercion to integer range" warning emitted
+when collecting with Arrow and `n = Inf` (e.g. `collect()` of all rows, or
+printing a large `tbl_spark`). The `Inf`/out-of-range row limit is handled
+correctly; only the warning was leaking.
+
+- Fixed `augment()` on a linear / generalized-linear-regression model when
+`type.residuals` is not `"working"` (e.g. `"deviance"`, `"pearson"`,
+`"response"`) and no `newdata` is supplied. It errored with "Can't rename
+columns that don't exist" because `ml_predict()` drops the residuals column;
+the residuals are now re-attached to the predictions.
+
+- Fixed `names<-()` on a `tbl_spark` (e.g. `names(tbl) <- value`), which errored
+with "Can't escape back tick from string" on recent `dbplyr`. The replacement
+view is now re-registered using the bare remote table name instead of the
+back tick-quoted `table_path`.
+
+- Fixed `ml_gbt_classifier()` on Spark < 2.2 so a fitted classification model is
+classed `ml_gbt_classification_model` (it was mislabeled
+`ml_multilayer_perceptron_classification_model` due to a copy-paste error).
+
+- Fixed `ft_robust_scaler()` so a fitted model is now wrapped as an
+`ml_robust_scaler_model` object. `RobustScaler`/`RobustScalerModel` were missing
+from the JVM-class mapping, so a fitted robust scaler fell back to a generic
+`ml_transformer` (and the model constructor carried the estimator's class by
+mistake). Transformation worked, but the model's class was inconsistent with the
+other scalers.
+
+- Fixed the `sparklyr.stream.collect.timeout` and
+`sparklyr.stream.validate.timeout` configuration options being silently ignored.
+The internal code referenced a bare `config` that resolved to an unrelated
+imported function instead of the connection's configuration, so the timeouts
+always fell back to their defaults; they now read from the active connection.
+
+- Fixed `sdf_pivot()` so a multi-column pivot specification (the right-hand side
+of the formula, e.g. `a ~ b + c`) is now correctly rejected with a clear
+"pivot column is not length one" error. Previously the right-hand side was not
+split on `+`/`*` (an errant `fixed = TRUE`), so such a formula failed later with
+a confusing "missing variables in dataset" error instead.
+
+- Fixed `spark_write()` and `spark_write_table()` when passed a `spark_jobj`:
+the internal JVM class check only accepted `org.apache.spark.sql.DataFrame`,
+which has not been the concrete class since Spark 2.0 (it is now
+`org.apache.spark.sql.Dataset`, or `org.apache.spark.sql.classic.Dataset` on
+Spark 4.x), so these methods always errored. The check is now version-agnostic.
+
 - Internal reorganization of the package's R source files, consolidating
 related functions into a smaller, more cohesive set of scripts. No exported
 functions, behavior, or APIs change.

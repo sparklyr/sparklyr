@@ -80,7 +80,8 @@ test_that("sdf_copy_to can preserve list columns", {
     c(sapply(sparklyr.nested::sdf_select(sdf, b.d) %>% sdf_collect(), c)),
     c("a", "b", "c")
   )
-  res <- sdf_collect(sdf)
+  # collecting a struct column disables arrow (with a warning) and falls back
+  expect_warning_on_arrow(res <- sdf_collect(sdf))
   expect_equivalent(df$a, res$a)
 })
 
@@ -117,6 +118,42 @@ test_that("sdf_copy_to preserves NA_real_ correctly", {
     sdf %>% dplyr::mutate(x = is.na(x)) %>% dplyr::pull(x),
     c(TRUE, FALSE, FALSE)
   )
+})
+
+test_that("sdf_copy_to coerces Date/POSIXt/factor/character columns", {
+  df <- data.frame(
+    d = as.Date("2020-01-01") + 0:2,
+    t = as.POSIXct("2020-01-01 00:00:00") + 0:2,
+    f = factor(c("a", "b", "a")),
+    s = c("x", "y", "z"),
+    stringsAsFactors = FALSE
+  )
+  out <- sdf_copy_to(sc, df, "dc_types", overwrite = TRUE) %>% collect()
+  expect_equal(nrow(out), 3)
+  expect_equal(out$s, c("x", "y", "z"))
+})
+
+test_that("sdf_copy_to rejects a non-integer repartition", {
+  expect_error(
+    sdf_copy_to(
+      sc,
+      data.frame(x = 1:3),
+      "dc_rp",
+      overwrite = TRUE,
+      repartition = "bad"
+    ),
+    "must be an integer"
+  )
+})
+
+test_that("sdf_copy_to handles temporal (Date) array columns on Spark 3.0+", {
+  skip_if(spark_version(sc) < "3.0.0")
+  df <- dplyr::tibble(
+    id = 1:2,
+    darr = list(as.Date(c("2020-01-01", "2020-01-02")), as.Date("2020-02-01"))
+  )
+  out <- sdf_copy_to(sc, df, "dc_darr", overwrite = TRUE) %>% collect()
+  expect_equal(nrow(out), 2)
 })
 
 test_clear_cache()

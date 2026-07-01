@@ -7,4 +7,3 @@
 #' appended to it. If a \code{tbl_spark}, it will return a \code{tbl_spark} with
 #' the predictions added to it.
 
-

@@ -181,4 +181,69 @@ test_that("Connection functions work", {
   #
 })
 
+# ---- additional coverage for dplyr/dbplyr glue + helpers --------------------
+
+test_that("src_spark connection/describe/same_src/tbl helpers work", {
+  skip_databricks_connect()
+  src <- structure(list(con = sc), class = c("src_spark", "src_sql", "src"))
+  expect_true(inherits(spark_connection(src), "spark_connection"))
+  expect_type(dbplyr::db_connection_describe(src), "character")
+  expect_true(dplyr::same_src(src, src))
+  expect_false(dplyr::same_src(src, 42))
+  expect_true(inherits(dplyr::tbl(src, "iris"), "tbl_spark"))
+})
+
+test_that("connection glue methods (explain / tbl_vars / src_tbls) are wired up", {
+  skip_databricks_connect()
+  expect_type(
+    dbplyr::sql_query_explain(sc, dbplyr::sql("SELECT 1")),
+    "character"
+  )
+  # call the .spark_jobj method directly (the dplyr generic post-processes with
+  # group_vars, which isn't defined for a bare jobj)
+  expect_equal(length(tbl_vars.spark_jobj(spark_dataframe(iris_tbl))), 5)
+  expect_type(src_tbls(sc, database = "default"), "character")
+})
+
+test_that("process_tbl_name rejects names with more than 3 components", {
+  expect_error(process_tbl_name("a.b.c.d"), "expected input to be")
+})
+
+test_that("spark_partition_register_df registers a table; remove_if_exists drops it", {
+  skip_databricks_connect()
+  spark_partition_register_df(
+    sc,
+    spark_dataframe(iris_tbl),
+    "reg_part_tbl",
+    repartition = 2L,
+    memory = TRUE
+  )
+  expect_true("reg_part_tbl" %in% src_tbls(sc))
+  spark_remove_table_if_exists(sc, "reg_part_tbl")
+  expect_false("reg_part_tbl" %in% src_tbls(sc))
+})
+
+test_that("spark_sqlresult_from_dplyr renders and runs a Spark SQL query", {
+  skip_databricks_connect()
+  res <- spark_sqlresult_from_dplyr(iris_tbl %>% filter(Petal_Width > 1))
+  expect_true(inherits(res, "spark_jobj"))
+})
+
+test_that("sample_n / sample_frac draw rows", {
+  skip_databricks_connect()
+  expect_equal(nrow(collect(sample_n(iris_tbl, 10))), 10)
+  expect_gt(nrow(collect(sample_frac(iris_tbl, 0.1))), 0)
+})
+
+test_that("sdf_remote_name.default is NULL; slice_ is unsupported; tbl_ptype simulates", {
+  expect_null(sdf_remote_name(42))
+  expect_error(slice_.tbl_spark(iris_tbl), "Slice is not supported")
+  expect_s3_class(dplyr::tbl_ptype(iris_tbl), "data.frame")
+})
+
+test_that("gen_prng_seed returns an integer when a PRNG seed exists", {
+  set.seed(1)
+  expect_type(gen_prng_seed(), "integer")
+})
+
 test_clear_cache()

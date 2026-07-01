@@ -76,7 +76,9 @@ test_that("ml_prefixspan() works as expected", {
     max_pattern_length = 5,
     max_local_proj_db_size = 32000000
   )
-  res <- prefix_span_model$frequent_sequential_patterns(sdf) %>%
+  # go through the exported ml_freq_seq_patterns() accessor (returns the
+  # frequent_sequential_patterns closure) rather than reaching into the model
+  res <- ml_freq_seq_patterns(prefix_span_model)(sdf) %>%
     collect()
 
   expect_equal(nrow(res), 5)

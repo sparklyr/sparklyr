@@ -72,15 +72,10 @@ ml_set_param <- function(x, param, value, ...) {
 
 ml_get_param_map <- function(jobj) {
   sc <- spark_connection(jobj)
-  object <- if (spark_version(sc) < "2.0.0") {
-    "sparklyr.MLUtils"
-  } else {
-    "sparklyr.MLUtils2"
-  }
 
   invoke_static(
     sc,
-    object,
+    "sparklyr.MLUtils2",
     "getParamMap",
     jobj
   ) %>%

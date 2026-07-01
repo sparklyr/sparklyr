@@ -72,11 +72,14 @@ testthat_shell_connection <- function(method = "shell") {
     }
     config$`sparklyr.sdf_collect.persistence_level` <- "NONE"
     packages <- NULL
-    if (spark_version < "4.1.0") {
-      if (spark_version >= "2.4.0") {
-        packages <- "avro"
-      }
-      if (spark_version >= "2.4.2") packages <- c(packages, "delta")
+    if (spark_version >= "2.4.0") {
+      packages <- "avro"
+    }
+    # Delta has no Spark 4.1+ compatible release yet: delta-spark 4.0.0 (the
+    # latest) throws NoSuchMethodError on Spark 4.1, so only load it where a
+    # compatible build exists (Spark 2.4.2 .. 4.0.x).
+    if (spark_version >= "2.4.2" && spark_version < "4.1.0") {
+      packages <- c(packages, "delta")
     }
     sc <- spark_connect(
       master = "local",

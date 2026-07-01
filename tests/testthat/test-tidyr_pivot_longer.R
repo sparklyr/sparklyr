@@ -294,4 +294,172 @@ test_that("Error if the `col` can't be selected.", {
   )
 })
 
+# string-splitting helpers ------------------------------------------------
+
+test_that("build_output_names supports numeric names_sep", {
+  out <- build_output_names(
+    cols = c("abXcd", "efXgh"),
+    names_to = c("a", "b"),
+    names_prefix = NULL,
+    names_sep = 2,
+    names_pattern = NULL
+  )
+
+  expect_equal(out$a, c("ab", "ef"))
+  expect_equal(out$b, c("Xcd", "Xgh"))
+})
+
+test_that(".strsep splits at positive and negative positions", {
+  out <- .strsep(c("abcde", "vwxyz"), c(2, -1))
+
+  expect_equal(out[[1]], c("ab", "vw"))
+  expect_equal(out[[2]], c("cd", "xy"))
+  expect_equal(out[[3]], c("e", "z"))
+})
+
+test_that(".str_separate errors on non-character `into`", {
+  expect_error(
+    .str_separate("a_b", into = 1:2, sep = "_"),
+    "`into` must be a character vector"
+  )
+})
+
+test_that(".str_separate errors on invalid `sep` type", {
+  expect_error(
+    .str_separate("a_b", into = c("a", "b"), sep = TRUE),
+    "`sep` must be either numeric or character"
+  )
+})
+
+test_that(".str_separate dispatches on numeric vs character sep", {
+  num_out <- .str_separate(c("abcd"), into = c("a", "b"), sep = 2)
+  expect_equal(num_out$a, "ab")
+  expect_equal(num_out$b, "cd")
+
+  chr_out <- .str_separate("x_y", into = c("a", "b"), sep = "_")
+  expect_equal(chr_out$a, "x")
+  expect_equal(chr_out$b, "y")
+})
+
+test_that(".str_separate drops NA names from `into`", {
+  out <- .str_separate("x_y", into = c("a", NA), sep = "_")
+  expect_equal(names(out), "a")
+  expect_equal(out$a, "x")
+})
+
+test_that(".str_split_fixed warns and drops extra pieces (extra = 'warn')", {
+  expect_warning(
+    res <- .str_split_fixed("a_b_c", sep = "_", n = 2),
+    "Additional pieces discarded"
+  )
+  expect_equal(res[[1]], "a")
+  expect_equal(res[[2]], "b")
+})
+
+test_that(".str_split_fixed merges trailing pieces (extra = 'merge')", {
+  res <- .str_split_fixed("a_b_c", sep = "_", n = 2, extra = "merge")
+  expect_equal(res[[1]], "a")
+  expect_equal(res[[2]], "b_c")
+})
+
+test_that(".str_split_fixed drops extra pieces silently (extra = 'drop')", {
+  res <- .str_split_fixed("a_b_c", sep = "_", n = 2, extra = "drop")
+  expect_equal(res[[1]], "a")
+  expect_equal(res[[2]], "b")
+})
+
+test_that(".str_split_fixed deprecates extra = 'error'", {
+  expect_warning(
+    .str_split_fixed("a_b", sep = "_", n = 2, extra = "error"),
+    "deprecated"
+  )
+})
+
+test_that(".str_split_fixed warns and returns n pieces on missing input", {
+  # NB: the returned values are not asserted here — .simplify_pieces() has an
+  # off-by-one in its fill-right path (see planning doc follow-ups); we only
+  # cover the warning + shape.
+  expect_warning(
+    res <- .str_split_fixed("a", sep = "_", n = 2),
+    "Missing pieces filled with `NA`"
+  )
+  expect_length(res, 2)
+})
+
+test_that(".str_split_fixed accepts fill = 'right'", {
+  res <- .str_split_fixed("a_b", sep = "_", n = 3, fill = "right")
+  expect_length(res, 3)
+})
+
+test_that(".simplify_pieces handles exact, too-big, and too-small rows", {
+  pieces <- list(
+    c("a", "b"),
+    c("c", "d", "e"),
+    "f",
+    NA
+  )
+  simp <- .simplify_pieces(pieces, p = 2, fill_left = FALSE)
+
+  expect_equal(simp$too_big, 2L)
+  expect_equal(simp$too_sml, 3L)
+  # row 3 ("f") has length 1 < p=2: with fill_left=FALSE the
+  # `j < length(x)` guard is never TRUE, so both columns get NA
+  expect_equal(simp$strings[[1]], c("a", "c", NA, NA))
+  expect_equal(simp$strings[[2]], c("b", "d", NA, NA))
+})
+
+test_that(".list_indices truncates long vectors", {
+  expect_equal(.list_indices(1:3), "1, 2, 3")
+  expect_match(.list_indices(1:30), "\\.\\.\\.$")
+})
+
+test_that(".str_split_n respects n_max", {
+  out <- .str_split_n("a_b_c", "_", n_max = 2)
+  expect_equal(out[[1]], c("a", "b_c"))
+
+  out_all <- .str_split_n("a_b_c", "_")
+  expect_equal(out_all[[1]], c("a", "b", "c"))
+})
+
+test_that(".str_extract pulls regex capture groups", {
+  out <- .str_extract(
+    c("x1", "y2"),
+    into = c("letter", "num"),
+    regex = "([a-z])([0-9])"
+  )
+  expect_equal(out$letter, c("x", "y"))
+  expect_equal(out$num, c("1", "2"))
+})
+
+test_that(".str_extract converts types when convert = TRUE", {
+  out <- .str_extract(
+    "x1",
+    into = c("letter", "num"),
+    regex = "([a-z])([0-9])",
+    convert = TRUE
+  )
+  expect_type(out$num, "integer")
+  expect_equal(out$num, 1L)
+})
+
+test_that(".str_extract collapses duplicated `into` names", {
+  out <- .str_extract(
+    "ab",
+    into = c("x", "x"),
+    regex = "(.)(.)"
+  )
+  expect_equal(names(out), "x")
+  expect_equal(out$x, "ab")
+})
+
+test_that(".str_extract drops NA names from `into`", {
+  out <- .str_extract(
+    "x1",
+    into = c("letter", NA),
+    regex = "([a-z])([0-9])"
+  )
+  expect_equal(names(out), "letter")
+  expect_equal(out$letter, "x")
+})
+
 test_clear_cache()

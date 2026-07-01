@@ -158,4 +158,25 @@ test_that("ml_compute_silhouette_measure() for kmeans", {
   )
 })
 
+test_that("ml_kmeans() fits without a formula (tbl_spark estimator path)", {
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  m <- testthat_tbl("iris") %>%
+    ft_vector_assembler(c("Petal_Length", "Petal_Width"), "features") %>%
+    ml_kmeans(k = 2)
+  expect_s3_class(m, "ml_kmeans_model")
+})
+
+test_that("print.ml_model_kmeans prints the cluster summary", {
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  m <- ml_kmeans(
+    testthat_tbl("iris"),
+    Species ~ Petal_Length + Petal_Width,
+    k = 2
+  )
+  out <- capture.output(print(m))
+  expect_true(any(grepl("K-means clustering", out)))
+})
+
 test_clear_cache()

@@ -229,4 +229,48 @@ test_that("isotonic_regression.tidy() works", {
   check_tidy(gl1, exp.row = 1, exp.names = c("isotonic", "num_boundaries"))
 })
 
+test_that("glm tidiers cover the remaining branches", {
+  sc <- testthat_spark_connection()
+  test_requires("broom")
+  test_requires_version("2.0.0")
+  mtcars_tbl <- testthat_tbl("mtcars")
+
+  glmfit1 <- ml_generalized_linear_regression(
+    mtcars_tbl,
+    response = "mpg",
+    features = "wt"
+  )
+  lmfit1 <- ml_linear_regression(mtcars_tbl, "mpg ~ wt")
+
+  # exponentiate with an explicit, non-log/logit link warns (the `link` is set
+  # branch, vs. the family-based branch the existing tests cover)
+  glm_link <- ml_generalized_linear_regression(
+    mtcars_tbl,
+    response = "mpg",
+    features = c("wt", "disp"),
+    family = "gaussian",
+    link = "identity"
+  )
+  expect_warning(tidy(glm_link, exponentiate = TRUE), "Exponentiating")
+
+  # augment on training data with a non-"working" residual type takes the
+  # sdf_residuals() + ml_predict() path (regression: ml_predict drops the
+  # residuals column, so it must be re-attached)
+  au_resp <- augment(glmfit1, type.residuals = "response") %>% collect()
+  expect_true(all(c("fitted", "resid") %in% colnames(au_resp)))
+  # `response` residual == observed - fitted, which verifies row alignment
+  expect_equal(au_resp$mpg - au_resp$fitted, au_resp$resid, tolerance = 1e-6)
+
+  au_dev <- augment(glmfit1, type.residuals = "deviance") %>% collect()
+  expect_true(all(c("fitted", "resid") %in% colnames(au_dev)))
+
+  # the parsnip-style wrapper delegates to augment() on the underlying $fit
+  wrapped <- structure(
+    list(fit = lmfit1),
+    class = "_ml_model_linear_regression"
+  )
+  au_w <- augment(wrapped) %>% collect()
+  expect_true(all(c("fitted", "resid") %in% colnames(au_w)))
+})
+
 test_clear_cache()

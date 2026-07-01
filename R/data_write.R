@@ -177,7 +177,12 @@ spark_write_json.spark_jobj <- spark_write_json.tbl_spark
 
 spark_expect_jobj_class <- function(jobj, expectedClassName) {
   className <- invoke(jobj, "%>%", list("getClass"), list("getName"))
-  if (!identical(className, expectedClassName)) {
+  # A Spark DataFrame is `Dataset[Row]`; the concrete JVM class is
+  # `org.apache.spark.sql.Dataset` on Spark 2.x/3.x and
+  # `org.apache.spark.sql.classic.Dataset` on Spark 4.x. Compare on the simple
+  # class name so the check is version-agnostic.
+  simple_name <- function(x) sub(".*\\.", "", x)
+  if (!simple_name(className) %in% simple_name(expectedClassName)) {
     stop(
       "This operation is only supported on ",
       expectedClassName,
@@ -193,7 +198,7 @@ spark_writable_dataframe <- function(x) {
   if (inherits(x, "tbl_spark")) {
     spark_sqlresult_from_dplyr(x)
   } else {
-    spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+    spark_expect_jobj_class(x, "org.apache.spark.sql.Dataset")
     x
   }
 }
@@ -243,16 +248,6 @@ spark_write_table.tbl_spark <- function(
   ...
 ) {
   df <- spark_writable_dataframe(x)
-  sc <- spark_connection(x)
-
-  if (spark_version(sc) < "2.0.0" && spark_master_is_local(sc$master)) {
-    stop(
-      "spark_write_table is not supported in local clusters for Spark ",
-      spark_version(sc),
-      ". ",
-      "Upgrade to Spark 2.X or use this function in a non-local Spark cluster."
-    )
-  }
 
   fileMethod <- if (identical(mode, "append")) "insertInto" else "saveAsTable"
 
@@ -774,7 +769,7 @@ spark_write.tbl_spark <- function(x, writer, paths, packages = NULL) {
 
 #' @export
 spark_write.spark_jobj <- function(x, writer, paths, packages = NULL) {
-  spark_expect_jobj_class(x, "org.apache.spark.sql.DataFrame")
+  spark_expect_jobj_class(x, "org.apache.spark.sql.Dataset")
   x %>%
     sdf_register() %>%
     spark_write(writer, paths, packages)

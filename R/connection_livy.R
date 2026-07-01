@@ -1,4 +1,3 @@
-# nocov start
 #' @include connection_shell.R
 
 #' @export
@@ -1064,8 +1063,6 @@ initialize_connection.livy_connection <- function(sc) {
     }
   )
 }
-
-# nocov end
 
 #' @importFrom rlang as_label abort
 assert_that <- function(x) {

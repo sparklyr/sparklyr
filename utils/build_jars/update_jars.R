@@ -14,6 +14,3 @@ compile_package_jars()
 # are all the R scripts in /R with a name containing "worker" or "core".
 # Embedded sources are the key to how spark_apply() works.
 spark_update_embedded_sources()
-
-
-

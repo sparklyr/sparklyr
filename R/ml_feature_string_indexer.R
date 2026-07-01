@@ -115,29 +115,10 @@ ft_string_indexer.tbl_spark <- function(
     uid = uid,
     ...
   )
-  # backwards compatibility for params argument
-  dots <- rlang::dots_list(...)
-  if (rlang::has_name(dots, "params") && is.environment(dots$params)) {
-    warning(
-      "`params` has been deprecated and will be removed in a future release.",
-      call. = FALSE
-    )
-    transformer <- if (is_ml_transformer(stage)) {
-      stage
-    } else {
-      ml_fit(stage, x)
-    }
-    dots$params$labels <- spark_jobj(transformer) %>%
-      invoke("labels") %>%
-      as.character()
-    transformer %>%
-      ml_transform(x)
+  if (is_ml_transformer(stage)) {
+    ml_transform(stage, x)
   } else {
-    if (is_ml_transformer(stage)) {
-      ml_transform(stage, x)
-    } else {
-      ml_fit_and_transform(stage, x)
-    }
+    ml_fit_and_transform(stage, x)
   }
 }
 

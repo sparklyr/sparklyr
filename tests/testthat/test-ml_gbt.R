@@ -1,3 +1,35 @@
+# Connection-free: the Spark < 2.2 GBTClassifier stage build (which omits the
+# probability/raw-prediction columns) can't run on CI (Spark 3.5/4.1). Mock the
+# version check + the JVM layer and confirm the reduced stage is built.
+test_that("ml_gbt_classifier() builds the Spark < 2.2 stage without probability cols", {
+  captured <- NULL
+  with_mocked_bindings(
+    spark_version = function(x) numeric_version("2.1.0"),
+    spark_pipeline_stage = function(sc, class, uid, ...) {
+      captured <<- list(class = class, params = list(...))
+      "<stage>"
+    },
+    jobj_set_param_helper = function(...) NULL,
+    invoke = function(jobj, method, ...) "<jobj>",
+    new_ml_gbt_classifier = function(jobj) "<model>",
+    .package = "sparklyr",
+    {
+      res <- ml_gbt_classifier(
+        structure(list(), class = "spark_connection"),
+        uid = "gbt_1"
+      )
+      expect_equal(res, "<model>")
+    }
+  )
+  expect_equal(
+    captured$class,
+    "org.apache.spark.ml.classification.GBTClassifier"
+  )
+  # the < 2.2 branch omits probability_col / raw_prediction_col
+  expect_true("prediction_col" %in% names(captured$params))
+  expect_false("probability_col" %in% names(captured$params))
+})
+
 skip_connection("ml_gbt")
 skip_on_livy()
 skip_on_arrow_devel()
@@ -255,6 +287,83 @@ test_that("ml_gradient_boosted_trees() supports response-features syntax", {
       features = c("Sepal_Width", "Petal_Length")
     ),
     NA
+  )
+})
+
+test_that("ml_gbt_classifier() fits without a formula and exposes trees()", {
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  binlab <- testthat_tbl("iris") %>%
+    dplyr::mutate(label = ifelse(Species == "setosa", 1, 0)) %>%
+    ft_vector_assembler(c("Petal_Length", "Petal_Width"), "features")
+  m <- ml_gbt_classifier(binlab, features_col = "features", label_col = "label")
+  # NB: on the CI Spark matrix (>= 3.0) this exercises the `>= 2.2.0` branch of
+  # new_ml_gbt_classification_model(), which always had the correct class. The
+  # copy-paste fix was in the `< 2.2.0` branch, which cannot run here (Spark
+  # < 2.2 is not in the test matrix) -- so this guards the class label on the
+  # reachable branch only.
+  expect_s3_class(m, "ml_gbt_classification_model")
+  expect_gt(length(m$trees()), 0)
+})
+
+test_that("ml_gbt_regressor() model exposes trees()", {
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  feat <- testthat_tbl("iris") %>%
+    ft_vector_assembler(c("Petal_Length", "Petal_Width"), "features")
+  m <- ml_fit(
+    ml_gbt_regressor(sc, features_col = "features", label_col = "Sepal_Length"),
+    feat
+  )
+  expect_gt(length(m$trees()), 0)
+})
+
+test_that("ml_gradient_boosted_trees() auto-detects classification + validates loss_type", {
+  test_requires_version("3.0.0")
+  sc <- testthat_spark_connection()
+  tbl <- testthat_tbl("iris") %>%
+    dplyr::mutate(lab = ifelse(Species == "setosa", "yes", "no"))
+  # a string response triggers the auto classification branch
+  m <- ml_gradient_boosted_trees(tbl, lab ~ Petal_Length + Petal_Width)
+  expect_s3_class(m, "ml_model_gbt_classification")
+
+  expect_error(
+    ml_gradient_boosted_trees(
+      tbl,
+      Sepal_Length ~ Petal_Length,
+      type = "regression",
+      loss_type = "logistic"
+    ),
+    "squared"
+  )
+  expect_error(
+    ml_gradient_boosted_trees(
+      tbl,
+      lab ~ Petal_Length,
+      type = "classification",
+      loss_type = "squared"
+    ),
+    "logistic"
+  )
+
+  # valid explicit loss_type passthroughs (not the "auto" default)
+  expect_s3_class(
+    ml_gradient_boosted_trees(
+      tbl,
+      Sepal_Length ~ Petal_Length,
+      type = "regression",
+      loss_type = "absolute"
+    ),
+    "ml_model_gbt_regression"
+  )
+  expect_s3_class(
+    ml_gradient_boosted_trees(
+      tbl,
+      lab ~ Petal_Length,
+      type = "classification",
+      loss_type = "logistic"
+    ),
+    "ml_model_gbt_classification"
   )
 })
 

@@ -314,6 +314,14 @@ spark_config_packages <- function(
       head(1) %>%
       unlist()
 
+    if (length(delta) == 0) {
+      stop(
+        "Delta Lake is not yet available for Spark ",
+        version,
+        "; the latest delta-spark release targets Spark 4.0."
+      )
+    }
+
     delta_version <- delta[2]
 
     if (version >= "3.5") {

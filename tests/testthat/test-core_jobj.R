@@ -38,4 +38,26 @@ test_that("print supports spark context", {
   )
 })
 
+test_that("spark_jobj helpers: id accessor, default error, passthrough", {
+  expect_equal(spark_jobj_id(list(id = "7")), "7")
+  expect_error(spark_jobj(42), "Unable to retrieve")
+  fake <- structure(list(id = "x"), class = "spark_jobj")
+  expect_identical(spark_jobj(fake), fake)
+})
+
+test_that("jobj_create rejects non-character ids; jobj_info rejects non-jobj", {
+  expect_error(jobj_create(sc, 42), "must be a character")
+  expect_error(jobj_info(42), "non-jobj")
+})
+
+test_that("attach_connection recurses into environments", {
+  out <- attach_connection(as.environment(list(a = 1, b = 2)), sc)
+  expect_true(is.list(out))
+})
+
+test_that("jobj_inspect prints fields and methods of a live jobj", {
+  out <- capture.output(suppressWarnings(jobj_inspect(spark_context(sc))))
+  expect_true(any(grepl("Fields:|Methods:", out)))
+})
+
 test_clear_cache()

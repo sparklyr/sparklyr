@@ -143,4 +143,193 @@ test_that("NaN is handled correctly", {
   expect_equal(invoke_static(sc, "sparklyr.Test", "readFloat", jflt), NaN)
 })
 
+test_that("j_invoke variants return JVM object references", {
+  # j_invoke_* force the return value to be retrieved as a JVM object reference
+  obj <- j_invoke_new(sc, "java.lang.Object")
+  expect_true(inherits(obj, "spark_jobj"))
+
+  str_ref <- j_invoke(obj, "toString")
+  expect_true(inherits(str_ref, "spark_jobj"))
+
+  props <- j_invoke_static(sc, "java.lang.System", "getProperties")
+  expect_true(inherits(props, "spark_jobj"))
+})
+
+# ---- Socket / dispatch helpers (no live backend needed) -------------------
+
+test_that("core_invoke_socket picks backend or monitoring by state", {
+  sc_b <- list(
+    state = list(use_monitoring = FALSE),
+    backend = "B",
+    monitoring = "M"
+  )
+  expect_equal(core_invoke_socket(sc_b), "B")
+  expect_equal(core_invoke_socket_name(sc_b), "backend")
+
+  sc_m <- list(
+    state = list(use_monitoring = TRUE),
+    backend = "B",
+    monitoring = "M"
+  )
+  expect_equal(core_invoke_socket(sc_m), "M")
+  expect_equal(core_invoke_socket_name(sc_m), "monitoring")
+})
+
+test_that("jobj_subclass methods all resolve to shell_jobj", {
+  expect_equal(jobj_subclass.shell_backend(NULL), "shell_jobj")
+  expect_equal(jobj_subclass.spark_connection(NULL), "shell_jobj")
+  expect_equal(jobj_subclass.spark_worker_connection(NULL), "shell_jobj")
+})
+
+test_that("invoke entry points reject a NULL connection", {
+  expect_error(core_invoke_synced(NULL), "no longer valid")
+  expect_error(
+    core_invoke_method_impl(NULL, TRUE, FALSE, "obj", "m", FALSE),
+    "no longer valid"
+  )
+})
+
+# ---- Job cancellation -----------------------------------------------------
+
+test_that("core_invoke_cancel_running short-circuits on guard conditions", {
+  # no spark context
+  expect_null(core_invoke_cancel_running(list(state = list())))
+  # monitoring connection
+  expect_null(core_invoke_cancel_running(
+    list(state = list(spark_context = "x", use_monitoring = TRUE))
+  ))
+  # already cancelling
+  expect_null(core_invoke_cancel_running(
+    list(state = list(spark_context = "x", cancelling_all_jobs = TRUE))
+  ))
+})
+
+test_that("core_invoke_cancel_running cancels jobs on the active context", {
+  cancelled <- FALSE
+  with_mocked_bindings(
+    invoke = function(jobj, method, ...) {
+      cancelled <<- identical(method, "cancelAllJobs")
+      NULL
+    },
+    .package = "sparklyr",
+    {
+      sc_fake <- list(
+        state = list(spark_context = "ctx"),
+        config = list(sparklyr.progress = FALSE)
+      )
+      core_invoke_cancel_running(sc_fake)
+    }
+  )
+  expect_true(cancelled)
+})
+
+# ---- Error handling + reporting -------------------------------------------
+
+test_that("core_handle_known_errors warns on the tachyon/localhost failure", {
+  expect_warning(
+    core_handle_known_errors(
+      list(master = "local"),
+      "java.util.ServiceConfigurationError: tachyon could not be loaded"
+    ),
+    "validate that the hostname"
+  )
+})
+
+test_that("core_handle_known_errors aborts on local worker failures", {
+  sc_fake <- list(
+    master = "local",
+    output_file = tempfile(),
+    error_file = tempfile()
+  )
+  with_mocked_bindings(
+    abort_shell = function(...) stop("aborted by mock"),
+    .package = "sparklyr",
+    expect_error(
+      core_handle_known_errors(sc_fake, "please check worker logs for details"),
+      "aborted by mock"
+    )
+  )
+})
+
+test_that("core_read_spark_log_error reads logs or falls back to a default", {
+  log <- tempfile()
+  writeLines(c("2024-01-01 INFO starting", "2024-01-01 ERROR boom"), log)
+  msg <- core_read_spark_log_error(list(output_file = log))
+  expect_match(msg, "failed to invoke spark command")
+  expect_match(msg, "ERROR boom")
+
+  # a missing log file falls back to the unknown-reason message (readLines
+  # warns before erroring; the try() only silences the error)
+  expect_equal(
+    suppressWarnings(core_read_spark_log_error(list(output_file = tempfile()))),
+    "failed to invoke spark command (unknown reason)"
+  )
+})
+
+test_that("spark_error honors the simple-errors option", {
+  withr::local_options(sparklyr.simple.errors = TRUE)
+  expect_error(spark_error("simple boom"), "simple boom")
+})
+
+test_that("spark_error formats a rich, hyperlinked message", {
+  withr::local_options(sparklyr.simple.errors = NULL)
+
+  # color terminal -> builds the OSC 8 hyperlink (x-r-run scheme, not RStudio)
+  withr::local_envvar(TERM = "xterm-256color")
+  expect_error(
+    spark_error("boom\n\tat some.scala.Frame"),
+    "see the full Spark error"
+  )
+
+  # non-color terminal -> plain backticked function reference
+  withr::local_envvar(TERM = "dumb")
+  expect_error(
+    spark_error("boom\n\tat some.scala.Frame"),
+    "see the full Spark error"
+  )
+})
+
+test_that("spark_last_error reports the stored error or its absence", {
+  orig <- genv_get_last_error()
+  withr::defer(genv_set_last_error(orig))
+
+  genv_set_last_error("previous failure")
+  expect_message(spark_last_error(), "previous failure")
+
+  genv_set_last_error(NULL)
+  expect_message(spark_last_error(), "No error found")
+})
+
+# ---- invoke_trace ---------------------------------------------------------
+
+test_that("invoke_trace honors the sparklyr.log.invoke setting", {
+  expect_output(
+    invoke_trace(
+      list(config = list(sparklyr.log.invoke = "cat")),
+      "Invoking",
+      "m"
+    ),
+    "Invoking m"
+  )
+  expect_message(
+    invoke_trace(
+      list(config = list(sparklyr.log.invoke = TRUE)),
+      "Invoking",
+      "m"
+    ),
+    "Invoking m"
+  )
+  expect_message(
+    invoke_trace(
+      list(config = list(sparklyr.log.invoke = "callstack")),
+      "Invoking",
+      "m"
+    )
+  )
+  # default (FALSE) emits nothing
+  expect_silent(
+    invoke_trace(list(config = list()), "Invoking", "m")
+  )
+})
+
 test_clear_cache()

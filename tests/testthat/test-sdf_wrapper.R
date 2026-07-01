@@ -1,3 +1,37 @@
+# ---------------------------------------------------------------------------
+# Connection-free unit test for collect_from_rds(). It deserializes the RDS
+# layout that spark_write_rds() produces (a length-5 list: column names, then
+# the timestamp / date / struct column indices, then the column data), so it can
+# be exercised with a hand-built fixture and no live Spark session. Placed above
+# the skip_connection() gate so it runs regardless.
+# ---------------------------------------------------------------------------
+test_that("collect_from_rds() restores timestamp, date, and struct columns", {
+  path <- withr::local_tempfile(fileext = ".rds")
+
+  col_data <- list(
+    ts = c(0, 86400), # seconds since epoch -> POSIXct
+    dt = c(0, 1), # days since epoch -> Date
+    st = list('{"a":1}', '{"a":2}'), # JSON strings (list column) -> parsed
+    plain = c(1, 2) # left untouched
+  )
+  # data[[1]] names; data[[2..4]] the 1-based timestamp/date/struct col indices.
+  saveRDS(
+    list(c("ts", "dt", "st", "plain"), 1L, 2L, 3L, col_data),
+    path
+  )
+
+  result <- collect_from_rds(path)
+
+  expect_s3_class(result$ts, "POSIXct")
+  expect_s3_class(result$dt, "Date")
+  expect_equal(result$dt, as.Date(c("1970-01-01", "1970-01-02")))
+  # struct column is a list column, each element parsed from JSON
+  expect_type(result$st, "list")
+  expect_equal(result$st[[1]][[1]]$a, 1L)
+  # non-special column passes through unchanged
+  expect_equal(result$plain, c(1, 2))
+})
+
 skip_connection("sdf_wrapper")
 skip_on_livy()
 
@@ -433,6 +467,12 @@ test_that("sdf_collect() preserves NA_real_", {
   expect_equal(sdf %>% collect(), df)
 })
 
+test_stream("sdf_collect() routes a streaming DataFrame to the stream collector", {
+  stream <- stream_read_csv(sc, iris_in, delimiter = ";")
+  collected <- sdf_collect(stream)
+  expect_s3_class(collected, "data.frame")
+})
+
 test_that("`[.tbl_spark` works as expected", {
   skip_on_arrow_devel()
   df <- dplyr::tibble(
@@ -670,6 +710,154 @@ test_that("we can separate struct columns (#690)", {
       head(1) %>%
       as.Date(),
     as.Date("2013-01-15 UTC")
+  )
+})
+
+test_that("sdf_schema() works on a tbl_spark and a spark_jobj", {
+  iris_tbl <- testthat_tbl("iris")
+
+  schema_tbl <- sdf_schema(iris_tbl)
+  expect_setequal(
+    names(schema_tbl),
+    c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width", "Species")
+  )
+  expect_equal(schema_tbl$Species$name, "Species")
+  expect_equal(schema_tbl$Species$type, "StringType")
+  expect_equal(schema_tbl$Sepal_Length$type, "DoubleType")
+
+  # default method (operating on a spark_jobj) yields the same schema
+  schema_default <- sdf_schema(spark_dataframe(iris_tbl))
+  expect_equal(schema_default, schema_tbl)
+})
+
+test_that("sdf_schema() recurses into nested struct and array columns", {
+  # `s` is a struct; `arr` is an array-of-structs. With both expand flags on,
+  # the struct is described as nested fields (the recursion branch) and the
+  # array-of-structs as type "array" carrying an `element_type` attribute.
+  sdf <- dplyr::tbl(
+    sc,
+    dplyr::sql(
+      "SELECT named_struct('x', 1, 'y', 'a') AS s,
+              array(named_struct('a', 1, 'b', 2)) AS arr"
+    )
+  )
+
+  schema <- sdf_schema(
+    sdf,
+    expand_nested_cols = TRUE,
+    expand_struct_cols = TRUE
+  )
+
+  # struct column -> nested list of its fields (recursion)
+  expect_true(is.list(schema$s$type))
+  expect_setequal(names(schema$s$type), c("x", "y"))
+
+  # array-of-structs column -> type "array" with the element struct attached
+  expect_equal(as.character(schema$arr$type), "array")
+  element_type <- attr(schema$arr$type, "element_type")
+  expect_setequal(names(element_type), c("a", "b"))
+})
+
+test_that("sdf_read_column.spark_jobj reads a column from a Spark DataFrame", {
+  iris_tbl <- testthat_tbl("iris")
+  sdf <- spark_dataframe(iris_tbl)
+
+  species <- sdf_read_column(sdf, "Species")
+
+  expect_setequal(unique(species), c("setosa", "versicolor", "virginica"))
+  expect_equal(length(species), 150)
+})
+
+test_that("spark_dataframe.spark_connection runs SQL against the connection", {
+  iris_tbl <- testthat_tbl("iris")
+
+  sdf <- spark_dataframe(
+    sc,
+    sprintf("SELECT * FROM %s", dbplyr::remote_name(iris_tbl))
+  )
+
+  expect_true(inherits(sdf, "spark_jobj"))
+  expect_setequal(
+    as.character(invoke(sdf, "columns")),
+    c("Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width", "Species")
+  )
+})
+
+test_that("sdf_split() randomly splits a Spark DataFrame", {
+  mtcars_tbl <- testthat_tbl("mtcars")
+
+  splits <- sdf_split(mtcars_tbl, weights = c(0.6, 0.4), seed = 42L)
+
+  expect_equal(length(splits), 2)
+  total <- sum(vapply(splits, function(s) invoke(s, "count"), numeric(1)))
+  expect_equal(total, nrow(mtcars))
+})
+
+test_that("get_sdf_storage_level() returns a storage level jobj", {
+  mtcars_tbl <- testthat_tbl("mtcars")
+  sdf <- spark_dataframe(mtcars_tbl)
+
+  level <- get_sdf_storage_level(sdf)
+
+  expect_true(inherits(level, "spark_jobj"))
+})
+
+test_that("sdf_pivot() errors on a formula that is not two-sided", {
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_error(
+    sdf_pivot(iris_tbl, Sepal_Length ~ Sepal_Width ~ Species),
+    "two-sided formula"
+  )
+})
+
+test_that("sdf_pivot() errors when a variable appears on both sides", {
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_error(
+    sdf_pivot(iris_tbl, Species ~ Species),
+    "both sides"
+  )
+})
+
+test_that("sdf_pivot() errors when the pivot side has more than one column", {
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_error(
+    sdf_pivot(iris_tbl, Species ~ Sepal_Length + Sepal_Width),
+    "pivot column is not length one"
+  )
+})
+
+test_that("sdf_pivot() supports a multi-element character fun.aggregate", {
+  iris_tbl <- testthat_tbl("iris")
+
+  result <- iris_tbl %>%
+    sdf_pivot(
+      Species ~ Petal_Width,
+      fun.aggregate = c("sum", "Sepal_Length")
+    ) %>%
+    collect()
+
+  expect_gt(nrow(result), 0)
+})
+
+test_that("sdf_pivot() errors on missing variables", {
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_error(
+    sdf_pivot(iris_tbl, Species ~ NoSuchColumn),
+    "missing variables"
+  )
+})
+
+
+test_that("sdf_pivot() errors on an unsupported fun.aggregate type", {
+  iris_tbl <- testthat_tbl("iris")
+
+  expect_error(
+    sdf_pivot(iris_tbl, Sepal_Length ~ Species, fun.aggregate = 1L),
+    "unsupported 'fun.aggregate' type"
   )
 })
 

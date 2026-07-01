@@ -296,30 +296,6 @@ infer_active_package_name <- function() {
 }
 
 
-split_chunks <- function(x, chunk_size) {
-  # return early when chunk_size > length of vector
-  n <- length(x)
-  if (n <= chunk_size) {
-    return(list(x))
-  }
-
-  # compute ranges for subsetting
-  starts <- seq(1, n, by = chunk_size)
-  ends <- c(seq(chunk_size, n - 1, by = chunk_size), n)
-
-  # apply our subsetter
-  mapply(
-    function(start, end) {
-      x[start:end]
-    },
-    starts,
-    ends,
-    SIMPLIFY = FALSE,
-    USE.NAMES = FALSE
-  )
-}
-
-
 remove_class <- function(object, class) {
   classes <- attr(object, "class")
   newClasses <- classes[!classes %in% c(class)]

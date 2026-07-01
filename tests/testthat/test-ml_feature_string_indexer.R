@@ -115,4 +115,16 @@ test_that("ft_string_indexer_model works", {
   )
 })
 
+test_that("ft_string_indexer_model(ml_pipeline) appends the stage", {
+  sc <- testthat_spark_connection()
+  pipeline <- ml_pipeline(sc) %>%
+    ft_string_indexer_model("string", "indexed", labels = c("foo", "bar"))
+
+  expect_true(inherits(pipeline, "ml_pipeline"))
+  expect_identical(
+    ml_stage(pipeline, 1) %>% ml_param("input_col"),
+    "string"
+  )
+})
+
 test_clear_cache()

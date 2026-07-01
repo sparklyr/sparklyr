@@ -84,4 +84,35 @@ test_that("ml_corr() errors on bad column specification", {
   )
 })
 
+test_that("ml_corr single-column guard + ml_chisquare_test input variants", {
+  iris_tbl <- testthat_tbl("iris")
+  # a single column must be a vector column
+  expect_error(
+    ml_corr(iris_tbl, columns = "Petal_Length"),
+    "must be a column of Vectors"
+  )
+  expect_s3_class(
+    ml_corr(iris_tbl, columns = c("Petal_Length", "Petal_Width")),
+    "data.frame"
+  )
+
+  # assembled features + numeric label
+  feat <- iris_tbl %>%
+    ft_vector_assembler(c("Petal_Length", "Petal_Width"), "features") %>%
+    dplyr::mutate(lbl = as.numeric(Petal_Length > 2))
+  expect_s3_class(
+    ml_chisquare_test(feat, features = "features", label = "lbl"),
+    "data.frame"
+  )
+  # non-assembled features + string label (string-indexed + r_formula path)
+  expect_s3_class(
+    ml_chisquare_test(
+      iris_tbl,
+      features = c("Petal_Length", "Petal_Width"),
+      label = "Species"
+    ),
+    "data.frame"
+  )
+})
+
 test_clear_cache()
