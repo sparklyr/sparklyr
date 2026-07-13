@@ -178,7 +178,7 @@ param_min_version <- function(x, value, min_version = NULL, default = NULL) {
       sc <- spark_connection(x)
       ver <- spark_version(sc)
       if (ver < min_version) {
-        if (value != default) {
+        if (!identical(value, default)) {
           stop(paste0(
             "Parameter `",
             deparse(substitute(value)),
