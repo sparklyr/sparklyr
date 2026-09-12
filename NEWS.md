@@ -1,5 +1,13 @@
 # Sparklyr (dev)
 
+- Fixed the Spark 4 (Scala 2.13) backend returning `java.util.List` results that
+wrap a Scala `Seq`, such as the output of `JavaRDD.take()` or
+`JavaRDD.collect()` reached through `invoke()`, as a single Java object
+reference. They are now unwrapped into an R list, as they are on the Spark 3
+backend, which had a `SeqWrapper` case that the Scala 2.13 port dropped
+(Scala 2.13 keeps its wrapper classes `private[collection]`, so the backend
+now recognises them by name).
+
 - Fixed a spurious "one argument not used by format" warning raised alongside the
 error from `spark_require_version()` when a Spark version requirement isn't met
 (the error message passed an extra argument to `sprintf()`).
