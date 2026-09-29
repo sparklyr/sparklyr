@@ -8,6 +8,11 @@ backend, which had a `SeqWrapper` case that the Scala 2.13 port dropped
 (Scala 2.13 keeps its wrapper classes `private[collection]`, so the backend
 now recognises them by name).
 
+- Fixed `download_scalac()`, which failed because Lightbend no longer hosts the
+Scala downloads. It now downloads the compilers from the Scala GitHub releases.
+Adds a `urls` argument, so users can point to a different location if the files
+move again (#3532).
+
 - Fixed a spurious "one argument not used by format" warning raised alongside the
 error from `spark_require_version()` when a Spark version requirement isn't met
 (the error message passed an extra argument to `sprintf()`).
