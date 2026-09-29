@@ -1,5 +1,10 @@
 # Sparklyr (dev)
 
+- Fixed `download_scalac()`, which failed because Lightbend no longer hosts the
+Scala downloads. It now downloads the compilers from the Scala GitHub releases.
+Adds a `urls` argument, so users can point to a different location if the files
+move again (#3532).
+
 - Fixed a spurious "one argument not used by format" warning raised alongside the
 error from `spark_require_version()` when a Spark version requirement isn't met
 (the error message passed an extra argument to `sprintf()`).
