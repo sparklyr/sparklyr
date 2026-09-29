@@ -1,5 +1,8 @@
 # Sparklyr (dev)
 
+- `spark_read_jdbc()` is now an S3 generic, so extension packages such as
+`pysparklyr` can provide their own method.
+
 - Fixed a spurious "one argument not used by format" warning raised alongside the
 error from `spark_require_version()` when a Spark version requirement isn't met
 (the error message passed an extra argument to `sprintf()`).
