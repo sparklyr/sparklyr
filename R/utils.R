@@ -504,7 +504,7 @@ tidyselect_data_has_predicates.tbl_spark <- function(x) {
 
 # wrapper for download.file()
 download_file <- function(...) {
-  min_timeout_s <- 300
+  min_timeout_s <- 1200
 
   # Temporarily set download.file() timeout to 300 seconds if it was
   # previously less than that, and restore the previous timeout setting
