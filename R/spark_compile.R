@@ -391,9 +391,20 @@ spark_default_compilation_spec <- function(
 #'
 #' @param dest_path The destination path where scalac will be
 #'   downloaded to.
+#' @param urls The URLs of the Scala distributions to download, without
+#'   the file extension. The function adds \code{.zip} on Windows, and
+#'   \code{.tgz} on other platforms. Each archive must expand to a
+#'   \code{scala-<version>} folder that contains \code{bin/scalac}.
 #'
 #' @export
-download_scalac <- function(dest_path = NULL) {
+download_scalac <- function(
+  dest_path = NULL,
+  urls = c(
+    "https://github.com/scala/scala/releases/download/v2.13.15/scala-2.13.15",
+    "https://github.com/scala/scala/releases/download/v2.12.20/scala-2.12.20",
+    "https://github.com/scala/scala/releases/download/v2.11.12/scala-2.11.12"
+  )
+) {
   if (is.null(dest_path)) {
     dest_path <- scalac_default_locations()[[1]]
   }
@@ -401,15 +412,7 @@ download_scalac <- function(dest_path = NULL) {
     dir.create(dest_path, recursive = TRUE)
   }
   ext <- ifelse(os_is_windows(), "zip", "tgz")
-  download_urls <- paste0(
-    c(
-      "https://downloads.lightbend.com/scala/2.13.15/scala-2.13.15",
-      "https://downloads.lightbend.com/scala/2.12.20/scala-2.12.20",
-      "https://downloads.lightbend.com/scala/2.11.12/scala-2.11.12"
-    ),
-    ".",
-    ext
-  )
+  download_urls <- paste0(urls, ".", ext)
 
   for (download_url in download_urls) {
     dest_file <- file.path(dest_path, basename(download_url))
