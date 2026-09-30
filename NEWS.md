@@ -1,5 +1,12 @@
 # Sparklyr (dev)
 
+- Fixed `spark_apply()` and other R worker code failing with "object not found"
+or "could not find function" errors after the JARs were rebuilt. The recent
+reorganization of the R scripts moved functions the worker needs, such as
+`spark_config_value()` and `worker_config_deserialize()`, out of the files that
+are embedded in the JARs. They are now back in `core_utils.R`. The JARs are
+rebuilt against Spark 3.5.9 and 4.0.4.
+
 - Fixed `download_scalac()`, which failed because Lightbend no longer hosts the
 Scala downloads. It now downloads the compilers from the Scala GitHub releases.
 Adds a `urls` argument, so users can point to a different location if the files
