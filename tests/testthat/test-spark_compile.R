@@ -44,10 +44,10 @@ test_that("sparklyr_jar_spec_list() returns the expected build specs", {
   expect_length(specs, 4)
   expect_setequal(
     vapply(specs, function(x) x$spark, character(1)),
-    c("2.4.8", "3.0.3", "3.5.4", "4.0.0")
+    c("2.4.8", "3.0.3", "3.5.9", "4.0.4")
   )
-  # the 4.0.0 spec carries an explicit jar_name
-  v4 <- Filter(function(x) x$spark == "4.0.0", specs)[[1]]
+  # the 4.0.4 spec carries an explicit jar_name
+  v4 <- Filter(function(x) x$spark == "4.0.4", specs)[[1]]
   expect_identical(v4$jar_name, "sparklyr-master-2.13.jar")
 })
 
@@ -188,7 +188,7 @@ test_that("sparklyr_jar_verify_spark() reports installed and missing versions", 
   # all specs already installed -> "Ok"
   with_mocked_bindings(
     spark_installed_versions = function() {
-      data.frame(spark = c("2.4.8", "3.0.3", "3.5.4", "4.0.0"))
+      data.frame(spark = c("2.4.8", "3.0.3", "3.5.9", "4.0.4"))
     },
     .package = "sparklyr",
     expect_message(sparklyr_jar_verify_spark(), "Ok")
@@ -209,7 +209,7 @@ test_that("sparklyr_jar_verify_spark() reports installed and missing versions", 
     .package = "sparklyr",
     suppressMessages(sparklyr_jar_verify_spark(install = TRUE))
   )
-  expect_setequal(installed, c("2.4.8", "3.0.3", "3.5.4", "4.0.0"))
+  expect_setequal(installed, c("2.4.8", "3.0.3", "3.5.9", "4.0.4"))
 })
 
 test_that("spark_default_compilation_spec() builds one spec per jar target", {
@@ -223,10 +223,10 @@ test_that("spark_default_compilation_spec() builds one spec per jar target", {
       expect_length(specs, 4)
       expect_setequal(
         vapply(specs, function(x) x$spark_version, character(1)),
-        c("2.4.8", "3.0.3", "3.5.4", "4.0.0")
+        c("2.4.8", "3.0.3", "3.5.9", "4.0.4")
       )
-      # the 4.0.0 spec carries the explicit jar name from the spec list
-      v4 <- Filter(function(x) x$spark_version == "4.0.0", specs)[[1]]
+      # the 4.0.4 spec carries the explicit jar name from the spec list
+      v4 <- Filter(function(x) x$spark_version == "4.0.4", specs)[[1]]
       expect_identical(v4$jar_name, "sparklyr-master-2.13.jar")
     }
   )
