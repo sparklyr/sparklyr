@@ -190,3 +190,103 @@ validate_java_version_line <- function(master, version) {
 
   parsedVersion
 }
+
+#' Check whether the connection is open
+#'
+#' @param sc \code{spark_connection}
+#'
+#' @keywords internal
+#'
+#' @export
+connection_is_open <- function(sc) {
+  UseMethod("connection_is_open")
+}
+
+#' A helper function to retrieve values from \code{spark_config()}
+#'
+#' @param config The configuration list from \code{spark_config()}
+#' @param name The name of the configuration entry
+#' @param default The default value to use when entry is not present
+#'
+#' @keywords internal
+#' @export
+spark_config_value <- function(config, name, default = NULL) {
+  if (
+    getOption("sparklyr.test.enforce.config", FALSE) &&
+      any(grepl("^sparklyr.", name))
+  ) {
+    settings <- get("spark_config_settings")()
+    if (
+      !any(name %in% settings$name) &&
+        !grepl("^sparklyr\\.shell\\.", name)
+    ) {
+      stop(
+        "Config value '",
+        name[[1]],
+        "' not described in spark_config_settings()"
+      )
+    }
+  }
+
+  name_exists <- name %in% names(config)
+  if (!any(name_exists)) {
+    name_exists <- name %in% names(options())
+    if (!any(name_exists)) {
+      value <- default
+    } else {
+      name_primary <- name[name_exists][[1]]
+      value <- getOption(name_primary)
+    }
+  } else {
+    name_primary <- name[name_exists][[1]]
+    value <- config[[name_primary]]
+  }
+
+  if (is.language(value)) {
+    value <- rlang::as_closure(value)
+  }
+  if (is.function(value)) {
+    value <- value()
+  }
+  value
+}
+
+spark_config_integer <- function(config, name, default = NULL) {
+  as.integer(spark_config_value(config, name, default))
+}
+
+spark_config_logical <- function(config, name, default = NULL) {
+  as.logical(spark_config_value(config, name, default))
+}
+
+worker_config_serialize <- function(config) {
+  paste(
+    if (isTRUE(config$debug)) "TRUE" else "FALSE",
+    spark_config_value(config, "sparklyr.worker.gateway.port", "8880"),
+    spark_config_value(config, "sparklyr.worker.gateway.address", "localhost"),
+    if (isTRUE(config$profile)) "TRUE" else "FALSE",
+    if (isTRUE(config$schema)) "TRUE" else "FALSE",
+    if (isTRUE(config$arrow)) "TRUE" else "FALSE",
+    if (isTRUE(config$fetch_result_as_sdf)) "TRUE" else "FALSE",
+    if (isTRUE(config$single_binary_column)) "TRUE" else "FALSE",
+    if (isTRUE(config$spark_read)) "TRUE" else "FALSE",
+    config$spark_version,
+    sep = ";"
+  )
+}
+
+worker_config_deserialize <- function(raw) {
+  parts <- strsplit(raw, ";")[[1]]
+  list(
+    debug = as.logical(parts[[1]]),
+    sparklyr.gateway.port = as.integer(parts[[2]]),
+    sparklyr.gateway.address = parts[[3]],
+    profile = as.logical(parts[[4]]),
+    schema = as.logical(parts[[5]]),
+    arrow = as.logical(parts[[6]]),
+    fetch_result_as_sdf = as.logical(parts[[7]]),
+    single_binary_column = as.logical(parts[[8]]),
+    spark_read = as.logical(parts[[9]]),
+    spark_version = parts[[10]]
+  )
+}

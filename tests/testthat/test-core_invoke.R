@@ -126,6 +126,7 @@ test_that("numeric to Long out of range error", {
 })
 
 test_that("integer to Short out of range error", {
+  withr::local_options(cli.width = 200)
   big_number <- invoke_static(sc, "scala.Short", "MaxValue") * 2
   expect_error(
     invoke_new(sc, "java.lang.Short", as.integer(big_number)),

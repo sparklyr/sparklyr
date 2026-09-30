@@ -317,7 +317,9 @@ spark_gateway_connection <- function(
 }
 
 #' @export
-connection_is_open.spark_gateway_connection <- connection_is_open.spark_shell_connection
+connection_is_open.spark_gateway_connection <- function(sc) {
+  connection_is_open.spark_shell_connection(sc)
+}
 
 #' @export
 spark_log.spark_gateway_connection <- function(
@@ -339,10 +341,16 @@ spark_web.spark_gateway_connection <- function(sc, ...) {
 }
 
 #' @export
-invoke_method.spark_gateway_connection <- invoke_method.spark_shell_connection
+invoke_method.spark_gateway_connection <- function(sc, ...) {
+  invoke_method.spark_shell_connection(sc, ...)
+}
 
 #' @export
-j_invoke_method.spark_gateway_connection <- j_invoke_method.spark_shell_connection
+j_invoke_method.spark_gateway_connection <- function(sc, ...) {
+  j_invoke_method.spark_shell_connection(sc, ...)
+}
 
 #' @export
-print_jobj.spark_gateway_connection <- print_jobj.spark_shell_connection
+print_jobj.spark_gateway_connection <- function(sc, ...) {
+  print_jobj.spark_shell_connection(sc, ...)
+}
