@@ -4,11 +4,21 @@
 \alias{download_scalac}
 \title{Downloads default Scala Compilers}
 \usage{
-download_scalac(dest_path = NULL)
+download_scalac(
+  dest_path = NULL,
+  urls = c("https://github.com/scala/scala/releases/download/v2.13.15/scala-2.13.15",
+    "https://github.com/scala/scala/releases/download/v2.12.20/scala-2.12.20",
+    "https://github.com/scala/scala/releases/download/v2.11.12/scala-2.11.12")
+)
 }
 \arguments{
 \item{dest_path}{The destination path where scalac will be
 downloaded to.}
+
+\item{urls}{The URLs of the Scala distributions to download, without
+the file extension. The function adds \code{.zip} on Windows, and
+\code{.tgz} on other platforms. Each archive must expand to a
+\code{scala-<version>} folder that contains \code{bin/scalac}.}
 }
 \description{
 \code{compile_package_jars} requires several versions of the
