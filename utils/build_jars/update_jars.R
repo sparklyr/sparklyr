@@ -7,10 +7,12 @@ download_scalac()
 sparklyr_jar_verify_spark()
 
 # Updates jar's
-compile_package_jars()
+spec <- spark_default_compilation_spec()
+compile_package_jars(spec = spec[4])
 
 # Embedded sources are the R functions that will be copied into the JARs.
 # They are all placed inside the java/embedded_sources.R file. The source
 # are all the R scripts in /R with a name containing "worker" or "core".
 # Embedded sources are the key to how spark_apply() works.
+
 spark_update_embedded_sources()
