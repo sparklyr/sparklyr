@@ -372,7 +372,9 @@ spark_config_packages <- function(
     config$sparklyr.shell.packages <- c(
       config$sparklyr.shell.packages,
       (if (
-        isTRUE(additional_configs$method %in% c("databricks", "databricks-connect"))
+        isTRUE(
+          additional_configs$method %in% c("databricks", "databricks-connect")
+        )
       ) {
         "com.nvidia:rapids-4-spark_2.12:0.1.0-databricks"
       } else {
