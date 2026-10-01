@@ -26,7 +26,11 @@ rebuilt against Spark 3.5.9 and 4.0.4.
 Scala downloads. It now downloads the compilers from the Scala GitHub releases.
 Adds a `urls` argument, so users can point to a different location if the files
 move again (#3532).
->>>>>>> main
+
+- Fixed "argument is of length zero" errors in two places. `spark_config_packages()`
+failed for `"rapids"` when `method` was not given. ML functions failed on older
+Spark versions when a version-gated argument with a `NULL` default, such as
+`variance_col` or `offset_col`, was set (@sims1253 / #3528).
 
 - Fixed a spurious "one argument not used by format" warning raised alongside the
 error from `spark_require_version()` when a Spark version requirement isn't met

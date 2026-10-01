@@ -504,6 +504,20 @@ test_that("spark_config_packages() supports rapids in both methods", {
   )
 })
 
+test_that("spark_config_packages() supports rapids without method", {
+  with_mocked_bindings(
+    spark_version_latest = function(version = NULL) version,
+    {
+      cfg <- spark_config_packages(list(), "rapids", "3.0.0")
+      expect_true(
+        "com.nvidia:rapids-4-spark_2.12:0.1.0" %in%
+          cfg$sparklyr.shell.packages
+      )
+    },
+    .package = "sparklyr"
+  )
+})
+
 test_that("spark_config_packages() errors on rapids below 3.0", {
   with_mocked_bindings(
     spark_version_latest = function(version = NULL) version,

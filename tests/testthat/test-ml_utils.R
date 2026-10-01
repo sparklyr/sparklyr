@@ -42,6 +42,13 @@ test_that("param_min_version errors below min, nulls a default, passes otherwise
   expect_equal(param_min_version(sc, "x", NULL), "x")
 })
 
+test_that("param_min_version errors below min when default is NULL", {
+  expect_error(
+    param_min_version(sc, "x", "99.0.0"),
+    "only available for Spark"
+  )
+})
+
 test_that("spark linalg helpers round-trip vectors/matrices and build columns", {
   v <- spark_dense_vector(sc, c(1, 2, 3))
   expect_equal(as.numeric(invoke(v, "toArray")), c(1, 2, 3))
