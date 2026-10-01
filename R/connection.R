@@ -690,14 +690,3 @@ sparklyr_get_backend_port <- function(sc) {
   invoke_static(sc, "sparklyr.Shell", "getBackend") %>%
     invoke("getPort")
 }
-
-#' Check whether the connection is open
-#'
-#' @param sc \code{spark_connection}
-#'
-#' @keywords internal
-#'
-#' @export
-connection_is_open <- function(sc) {
-  UseMethod("connection_is_open")
-}

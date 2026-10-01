@@ -488,6 +488,20 @@ spark_read_jdbc <- function(
   columns = NULL,
   ...
 ) {
+  UseMethod("spark_read_jdbc")
+}
+
+#' @export
+spark_read_jdbc.spark_connection <- function(
+  sc,
+  name,
+  options = list(),
+  repartition = 0,
+  memory = TRUE,
+  overwrite = TRUE,
+  columns = NULL,
+  ...
+) {
   if (overwrite) {
     spark_remove_table_if_exists(sc, name)
   }

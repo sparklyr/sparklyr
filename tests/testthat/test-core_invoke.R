@@ -126,6 +126,7 @@ test_that("numeric to Long out of range error", {
 })
 
 test_that("integer to Short out of range error", {
+  withr::local_options(cli.width = 200)
   big_number <- invoke_static(sc, "scala.Short", "MaxValue") * 2
   expect_error(
     invoke_new(sc, "java.lang.Short", as.integer(big_number)),
@@ -330,6 +331,26 @@ test_that("invoke_trace honors the sparklyr.log.invoke setting", {
   expect_silent(
     invoke_trace(list(config = list()), "Invoking", "m")
   )
+})
+
+
+test_that("java.util.List results that wrap a Scala Seq come back as R lists", {
+  # JavaRDD.take() and JavaRDD.collect() return a Scala Seq wrapped as a
+  # java.util.List. The backend unwraps it so R sees a list of object
+  # references, on every Spark version.
+  jrdd <- sdf_len(sc, 3) %>% spark_dataframe() %>% invoke("javaRDD")
+
+  taken <- invoke(jrdd, "take", 2L)
+  expect_false(inherits(taken, "spark_jobj"))
+  expect_type(taken, "list")
+  expect_length(taken, 2)
+  # each element is a Row, which the backend serialises as a list of its values
+  expect_equal(unlist(taken), c(1, 2))
+
+  collected <- invoke(jrdd, "collect")
+  expect_false(inherits(collected, "spark_jobj"))
+  expect_length(collected, 3)
+  expect_equal(unlist(collected), c(1, 2, 3))
 })
 
 test_clear_cache()
