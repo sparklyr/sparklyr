@@ -1,5 +1,8 @@
 # Sparklyr (dev)
 
+- `spark_read_jdbc()` is now an S3 generic, so extension packages such as
+`pysparklyr` can provide their own method.
+
 - Fixed the Spark 4 (Scala 2.13) backend returning `java.util.List` results that
 wrap a Scala `Seq`, such as the output of `JavaRDD.take()` or
 `JavaRDD.collect()` reached through `invoke()`, as a single Java object
@@ -19,6 +22,7 @@ rebuilt against Spark 3.5.9 and 4.0.4.
 Scala downloads. It now downloads the compilers from the Scala GitHub releases.
 Adds a `urls` argument, so users can point to a different location if the files
 move again (#3532).
+>>>>>>> main
 
 - Fixed a spurious "one argument not used by format" warning raised alongside the
 error from `spark_require_version()` when a Spark version requirement isn't met
