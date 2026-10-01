@@ -1,5 +1,9 @@
 # Sparklyr (dev)
 
+- Corrects docs in ml_generalized_linear_regression() for Binomial, switching
+LogLog to CLogLog (https://spark.apache.org/docs/latest/ml-classification-regression.htm)
+(@000wahab000 / #3530)
+
 - `spark_read_jdbc()` is now an S3 generic, so extension packages such as
 `pysparklyr` can provide their own method.
 
