@@ -370,6 +370,14 @@ class Serializer(tracker: JVMObjectTracker) {
     writeObject(dos, value)
   }
 
+  // Scala 2.13 keeps its Java collection wrappers private[collection], so the
+  // SeqWrapper / MutableSeqWrapper / MutableBufferWrapper classes cannot be
+  // matched by type here; recognise them by name instead.
+  private[this] def isScalaSeqWrappedAsJavaList(obj: Object): Boolean = {
+    obj.isInstanceOf[java.util.List[_]] &&
+      obj.getClass.getName.startsWith("scala.collection.convert.JavaCollectionWrappers$")
+  }
+
   def writeObject(dos: DataOutputStream, obj: Object): Unit = {
     if (obj == null) {
       Serializer.writeType(dos, "void")
@@ -383,6 +391,11 @@ class Serializer(tracker: JVMObjectTracker) {
           obj
         } else if (obj.isInstanceOf[Seq[_]]) {
           obj.asInstanceOf[Seq[_]].mkString(",")
+        } else if (isScalaSeqWrappedAsJavaList(obj)) {
+          // A Scala Seq handed out as a java.util.List, e.g. the result of
+          // JavaRDD.take() or JavaRDD.collect(). Unwrap it to an array so it
+          // reaches R as a list, as the Spark 3 backend does for SeqWrapper.
+          obj.asInstanceOf[java.util.List[_]].toArray
         } else {
           obj
         }
