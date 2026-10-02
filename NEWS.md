@@ -1,11 +1,17 @@
 # Sparklyr (dev)
 
-- Corrects docs in ml_generalized_linear_regression() for Binomial, switching
-LogLog to CLogLog (https://spark.apache.org/docs/latest/ml-classification-regression.htm)
-(@000wahab000 / #3530)
+## New
 
 - `spark_read_jdbc()` is now an S3 generic, so extension packages such as
 `pysparklyr` can provide their own method.
+
+- The JARs are rebuilt against Spark 3.5.9 and 4.0.4.
+
+## Fixes
+
+- Corrects docs in ml_generalized_linear_regression() for Binomial, switching
+LogLog to CLogLog (https://spark.apache.org/docs/latest/ml-classification-regression.htm)
+(@000wahab000 / #3530)
 
 - Fixed the Spark 4 (Scala 2.13) backend returning `java.util.List` results that
 wrap a Scala `Seq`, such as the output of `JavaRDD.take()` or
@@ -13,77 +19,55 @@ wrap a Scala `Seq`, such as the output of `JavaRDD.take()` or
 reference. They are now unwrapped into an R list, as they are on the Spark 3
 backend, which had a `SeqWrapper` case that the Scala 2.13 port dropped
 (Scala 2.13 keeps its wrapper classes `private[collection]`, so the backend
-now recognises them by name).
-
-- Fixed `spark_apply()` and other R worker code failing with "object not found"
-or "could not find function" errors after the JARs were rebuilt. The recent
-reorganization of the R scripts moved functions the worker needs, such as
-`spark_config_value()` and `worker_config_deserialize()`, out of the files that
-are embedded in the JARs. They are now back in `core_utils.R`. The JARs are
-rebuilt against Spark 3.5.9 and 4.0.4.
+now recognises them by name) (@jiayuasu / #3531).
 
 - Fixed `download_scalac()`, which failed because Lightbend no longer hosts the
-Scala downloads. It now downloads the compilers from the Scala GitHub releases.
-Adds a `urls` argument, so users can point to a different location if the files
-move again (#3532).
+Scala downloads. It now uses the Scala GitHub releases, and a new `urls`
+argument lets users point to a different location (#3532).
 
 - Fixed "argument is of length zero" errors in two places. `spark_config_packages()`
 failed for `"rapids"` when `method` was not given. ML functions failed on older
 Spark versions when a version-gated argument with a `NULL` default, such as
 `variance_col` or `offset_col`, was set (@sims1253 / #3528).
 
-- Fixed a spurious "one argument not used by format" warning raised alongside the
-error from `spark_require_version()` when a Spark version requirement isn't met
-(the error message passed an extra argument to `sprintf()`).
+- Fixed a spurious "one argument not used by format" warning from
+`spark_require_version()` when a Spark version requirement isn't met.
 
-- Fixed a spurious "NAs introduced by coercion to integer range" warning emitted
-when collecting with Arrow and `n = Inf` (e.g. `collect()` of all rows, or
-printing a large `tbl_spark`). The `Inf`/out-of-range row limit is handled
-correctly; only the warning was leaking.
+- Fixed a spurious "NAs introduced by coercion to integer range" warning when
+collecting with Arrow and `n = Inf`, such as `collect()` of all rows or printing
+a large `tbl_spark`.
 
-- Fixed `augment()` on a linear / generalized-linear-regression model when
-`type.residuals` is not `"working"` (e.g. `"deviance"`, `"pearson"`,
-`"response"`) and no `newdata` is supplied. It errored with "Can't rename
-columns that don't exist" because `ml_predict()` drops the residuals column;
-the residuals are now re-attached to the predictions.
+- Fixed `augment()` on linear and generalized linear regression models, which
+errored with "Can't rename columns that don't exist" when `type.residuals` is
+not `"working"` and no `newdata` is supplied.
 
-- Fixed `names<-()` on a `tbl_spark` (e.g. `names(tbl) <- value`), which errored
-with "Can't escape back tick from string" on recent `dbplyr`. The replacement
-view is now re-registered using the bare remote table name instead of the
-back tick-quoted `table_path`.
+- Fixed `names<-()` on a `tbl_spark`, which errored with "Can't escape back
+tick from string" on recent `dbplyr`.
 
-- Fixed `ml_gbt_classifier()` on Spark < 2.2 so a fitted classification model is
-classed `ml_gbt_classification_model` (it was mislabeled
-`ml_multilayer_perceptron_classification_model` due to a copy-paste error).
+- Fixed `ml_gbt_classifier()` on Spark < 2.2, which classed fitted models as
+`ml_multilayer_perceptron_classification_model` instead of
+`ml_gbt_classification_model`.
 
-- Fixed `ft_robust_scaler()` so a fitted model is now wrapped as an
-`ml_robust_scaler_model` object. `RobustScaler`/`RobustScalerModel` were missing
-from the JVM-class mapping, so a fitted robust scaler fell back to a generic
-`ml_transformer` (and the model constructor carried the estimator's class by
-mistake). Transformation worked, but the model's class was inconsistent with the
-other scalers.
+- Fixed `ft_robust_scaler()`, which returned a generic `ml_transformer` instead
+of an `ml_robust_scaler_model` when fitted.
 
 - Fixed the `sparklyr.stream.collect.timeout` and
-`sparklyr.stream.validate.timeout` configuration options being silently ignored.
-The internal code referenced a bare `config` that resolved to an unrelated
-imported function instead of the connection's configuration, so the timeouts
-always fell back to their defaults; they now read from the active connection.
+`sparklyr.stream.validate.timeout` options, which were silently ignored.
 
-- Fixed `sdf_pivot()` so a multi-column pivot specification (the right-hand side
-of the formula, e.g. `a ~ b + c`) is now correctly rejected with a clear
-"pivot column is not length one" error. Previously the right-hand side was not
-split on `+`/`*` (an errant `fixed = TRUE`), so such a formula failed later with
-a confusing "missing variables in dataset" error instead.
+- Fixed `sdf_pivot()` so a multi-column pivot, such as `a ~ b + c`, fails with a
+clear "pivot column is not length one" error instead of a confusing "missing
+variables in dataset" error.
 
-- Fixed `spark_write()` and `spark_write_table()` when passed a `spark_jobj`:
-the internal JVM class check only accepted `org.apache.spark.sql.DataFrame`,
-which has not been the concrete class since Spark 2.0 (it is now
-`org.apache.spark.sql.Dataset`, or `org.apache.spark.sql.classic.Dataset` on
-Spark 4.x), so these methods always errored. The check is now version-agnostic.
+- Fixed `spark_write()` and `spark_write_table()`, which always errored when
+passed a `spark_jobj`.
+
+## Internal
 
 - Internal reorganization of the package's R source files, consolidating
 related functions into a smaller, more cohesive set of scripts. No exported
-functions, behavior, or APIs change.
+functions, behavior, or APIs change. Functions that the R worker code needs,
+such as those used by `spark_apply()`, stay in the files embedded in the JARs,
+so the worker continues to run.
 
 - Reorganized the test suite to follow a strict 1:1 correspondence between each
 test file and its R source file. No tests were added, removed, or altered.
