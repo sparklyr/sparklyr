@@ -57,6 +57,11 @@ variables in dataset" error.
 - Fixed `spark_write()` and `spark_write_table()`, which always errored when
 passed a `spark_jobj`.
 
+- `spark_connect()` now loads `pysparklyr` for `method = "snowpark_connect"`
+and `method = "sail"`, as it already did for `"spark_connect"` and
+`"databricks_connect"`. It errors with a clear message if `pysparklyr` is not
+installed.
+
 - Internal reorganization of the package's R source files, consolidating
 related functions into a smaller, more cohesive set of scripts. No exported
 functions, behavior, or APIs change. Functions that the R worker code needs,

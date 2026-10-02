@@ -215,11 +215,15 @@ spark_connect <- function(
   method <- method[[1L]]
 
   # pysparklyr provides S3 methods/support for
-  # `method = "databricks_connect"` and `method = "spark_connect"`
+  # `method = "databricks_connect"`, `method = "spark_connect"`,
+  # `method = "snowpark_connect"`, and `method = "sail"`
   # load pysparklyr to make sure methods are available.
   # Note: databricks_connect != databricks-connect !!
   # databricks-connect will eventually be deprecated and removed.
-  if (method %in% c("databricks_connect", "spark_connect")) {
+  if (
+    method %in%
+      c("databricks_connect", "spark_connect", "snowpark_connect", "sail")
+  ) {
     if (!requireNamespace2("pysparklyr", quietly = TRUE)) {
       rlang::abort(glue::glue(
         "Please install {{pysparklyr}} for method = '{method}'"

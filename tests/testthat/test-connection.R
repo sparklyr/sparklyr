@@ -301,7 +301,8 @@ test_that("requireNamespace2() forwards to base requireNamespace", {
 })
 
 test_that("spark_connect() aborts for pysparklyr methods when it is missing", {
-  # The databricks_connect / spark_connect methods are provided by pysparklyr;
+  # The databricks_connect / spark_connect / snowpark_connect / sail methods
+  # are provided by pysparklyr;
   # with the package "absent" spark_connect must abort before doing any work.
   with_mocked_bindings(
     requireNamespace2 = function(...) FALSE,
@@ -313,6 +314,14 @@ test_that("spark_connect() aborts for pysparklyr methods when it is missing", {
       )
       expect_error(
         spark_connect(master = "local", method = "databricks_connect"),
+        "pysparklyr"
+      )
+      expect_error(
+        spark_connect(master = "local", method = "snowpark_connect"),
+        "pysparklyr"
+      )
+      expect_error(
+        spark_connect(master = "local", method = "sail"),
         "pysparklyr"
       )
     }
