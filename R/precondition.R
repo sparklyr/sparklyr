@@ -14,23 +14,6 @@ ensure_not_null <- function(object) {
   object %||% stop(sprintf("'%s' is NULL", deparse(substitute(object))))
 }
 
-#' Enforce Specific Structure for R Objects
-#'
-#' These routines are useful when preparing to pass objects to
-#' a Spark routine, as it is often necessary to ensure certain
-#' parameters are scalar integers, or scalar doubles, and so on.
-#'
-#' @param object An \R object.
-#' @param allow.na Are \code{NA} values permitted for this object?
-#' @param allow.null Are \code{NULL} values permitted for this object?
-#' @param default If \code{object} is \code{NULL}, what value should
-#'   be used in its place? If \code{default} is specified, \code{allow.null}
-#'   is ignored (and assumed to be \code{TRUE}).
-#'
-#' @name ensure
-#' @rdname ensure
-NULL
-
 require_file_exists <- function(path, fmt = NULL) {
   fmt <- fmt %||% "no file at path '%s'"
   if (!file.exists(path)) {

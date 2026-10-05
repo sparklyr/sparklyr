@@ -86,3 +86,15 @@ devtools::submit_cran()
 - **Undocumented exported functions**: add a roxygen title + `@keywords internal` to stub methods
 - **Broken URLs in docs**: R CMD check on win-builder validates URLs; fix dead links before submission
 - **revdep previous run exists**: always call `revdep_reset()` before `revdep_check()`
+- **Rd files with `\arguments` but no `\usage`**: CRAN's Debian r-devel
+  pre-test flags these with a NOTE. Local `devtools::check()` and
+  `check_win_devel()` do not catch it. It comes from parameter-only roxygen
+  blocks (`@param ... @name foo` + `NULL`) used through `@inheritParams foo`.
+  Do not fix it with `@noRd`, because that breaks inheritance. Move the
+  `@param`s onto a real exported function and inherit from that function.
+  Before submitting, run this check. It must print `character(0)`:
+  ```r
+  db <- tools::Rd_db(dir = ".")
+  tags <- lapply(db, function(rd) unlist(lapply(rd, attr, "Rd_tag")))
+  names(Filter(function(t) "\\arguments" %in% t && !"\\usage" %in% t, tags))
+  ```

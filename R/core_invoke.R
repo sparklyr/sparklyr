@@ -484,13 +484,6 @@ j_invoke_new <- function(sc, class, ...) {
 #' @param method Name of method
 #' @param ... Call parameters
 #'
-#' @name generic_call_interface
-NULL
-
-#' Generic Call Interface
-#'
-#' @inheritParams generic_call_interface
-#'
 #' @keywords internal
 #'
 #' @export
@@ -503,7 +496,7 @@ invoke_method <- function(sc, static, object, method, ...) {
 #' Call a Java method and retrieve the return value through a JVM object
 #' reference.
 #'
-#' @inheritParams generic_call_interface
+#' @inheritParams invoke_method
 #'
 #' @keywords internal
 #'

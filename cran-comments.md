@@ -1,3 +1,12 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+- Fixed the "Rd files without \usage" NOTE from the Debian r-devel pre-test.
+Removed the parameter-only Rd topics `ensure`, `generic_call_interface`,
+`ml_kmeans_cluster_eval`, and `spark_statistical_routines`. Their parameters
+are now documented on exported functions that have a `\usage` section.
+
 ## Submission
 
 - `spark_read_jdbc()` is now an S3 generic, so extension packages such as

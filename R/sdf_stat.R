@@ -17,21 +17,6 @@ sdf_crosstab <- function(x, col1, col2) {
     sdf_register()
 }
 
-#' Generate random samples from some distribution
-#'
-#' Generator methods for creating single-column Spark dataframes comprised of
-#' i.i.d. samples from some distribution.
-#'
-#' @param sc A Spark connection.
-#' @param n Sample Size (default: 1000).
-#' @param num_partitions Number of partitions in the resulting Spark dataframe
-#'   (default: default parallelism of the Spark cluster).
-#' @param seed Random seed (default: a random long integer).
-#' @param output_col Name of the output column containing sample values (default: "x").
-#'
-#' @name spark_statistical_routines
-NULL
-
 gen_samples_sdf <- function(
   sc,
   method,
@@ -75,7 +60,12 @@ gen_samples_sdf <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a Betal distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @param sc A Spark connection.
+#' @param n Sample Size (default: 1000).
+#' @param num_partitions Number of partitions in the resulting Spark dataframe
+#'   (default: default parallelism of the Spark cluster).
+#' @param seed Random seed (default: a random long integer).
+#' @param output_col Name of the output column containing sample values (default: "x").
 #' @param shape1 Non-negative parameter (alpha) of the Beta distribution.
 #' @param shape2 Non-negative parameter (beta) of the Beta distribution.
 #'
@@ -107,7 +97,7 @@ sdf_rbeta <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a binomial distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param size Number of trials (zero or more).
 #' @param prob Probability of success on each trial.
 #'
@@ -140,7 +130,7 @@ sdf_rbinom <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a Cauchy distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param location Location parameter of the distribution.
 #' @param scale Scale parameter of the distribution.
 #'
@@ -172,7 +162,7 @@ sdf_rcauchy <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a chi-squared distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param df Degrees of freedom (non-negative, but can be non-integer).
 #'
 #' @family Spark statistical routines
@@ -202,7 +192,7 @@ sdf_rchisq <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from an exponential distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param rate Rate of the exponential distribution (default: 1). The exponential
 #'   distribution with rate lambda has mean 1 / lambda and density f(x) = lambda e ^ - lambda x.
 #'
@@ -232,7 +222,7 @@ sdf_rexp <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a Gamma distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param shape Shape parameter (greater than 0) for the Gamma distribution.
 #' @param rate Rate parameter (greater than 0) for the Gamma distribution (scale is 1/rate).
 #'
@@ -263,7 +253,7 @@ sdf_rgamma <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a geometric distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param prob Probability of success in each trial.
 #'
 #' @family Spark statistical routines
@@ -294,7 +284,7 @@ sdf_rgeom <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a hypergeometric distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param nn Sample Size.
 #' @param m The number of successes among the population.
 #' @param n The number of failures among the population.
@@ -334,7 +324,7 @@ sdf_rhyper <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a log normal distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param meanlog The mean of the normally distributed natural logarithm of this distribution.
 #' @param sdlog The Standard deviation of the normally distributed natural logarithm of this distribution.
 #'
@@ -365,7 +355,7 @@ sdf_rlnorm <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from the standard normal distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param mean The mean value of the normal distribution.
 #' @param sd The standard deviation of the normal distribution.
 #'
@@ -404,7 +394,7 @@ sdf_rnorm <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a Poisson distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param lambda Mean, or lambda, of the Poisson distribution.
 #'
 #' @family Spark statistical routines
@@ -433,7 +423,7 @@ sdf_rpois <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a t-distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param df Degrees of freedom (> 0, maybe non-integer).
 #'
 #' @family Spark statistical routines
@@ -463,7 +453,7 @@ sdf_rt <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from a Weibull distribution.
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param shape The shape of the Weibull distribution.
 #' @param scale The scale of the Weibull distribution (default: 1).
 #'
@@ -495,7 +485,7 @@ sdf_rweibull <- function(
 #' Generator method for creating a single-column Spark dataframes comprised of
 #' i.i.d. samples from the uniform distribution U(0, 1).
 #'
-#' @inheritParams spark_statistical_routines
+#' @inheritParams sdf_rbeta
 #' @param min The lower limit of the distribution.
 #' @param max The upper limit of the distribution.
 #'

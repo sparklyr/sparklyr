@@ -312,16 +312,9 @@ print.ml_model_kmeans <- function(x, ...) {
   )
 }
 
-#' Evaluate a K-mean clustering
-#'
+#' @rdname ml_kmeans
 #' @param model A fitted K-means model returned by \code{ml_kmeans()}
 #' @param dataset Dataset on which to calculate K-means cost
-#'
-#' @name ml_kmeans_cluster_eval
-NULL
-
-#' @rdname ml_kmeans
-#' @inheritParams ml_kmeans_cluster_eval
 #' @return \code{ml_compute_cost()} returns the K-means cost (sum of
 #'   squared distances of points to their nearest center) for the model
 #'   on the given data.
@@ -340,7 +333,6 @@ ml_compute_cost <- function(model, dataset) {
 }
 
 #' @rdname ml_kmeans
-#' @inheritParams ml_kmeans_cluster_eval
 #' @param distance_measure Distance measure to apply when computing the Silhouette measure.
 #' @return \code{ml_compute_silhouette_measure()} returns the Silhouette measure
 #'   of the clustering on the given data.
