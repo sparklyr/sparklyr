@@ -357,7 +357,7 @@ hof_exists <- function(x, pred, expr = NULL, dest_col = NULL, ...) {
 #' library(sparklyr)
 #' sc <- spark_connect(master = "local")
 #' # compute element-wise products of 2 arrays from each row of `left` and `right`
-#' # and store the resuling array in `res`
+#' # and store the resulting array in `res`
 #' copy_to(
 #'   sc,
 #'   dplyr::tibble(

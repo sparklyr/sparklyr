@@ -619,7 +619,7 @@ spark_read_text.spark_connection <- function(
   if (identical(whole, TRUE)) {
     if (length(path) != 1L) {
       stop(
-        "spark_read_text is only suppored with path of length 1 if whole=TRUE."
+        "spark_read_text is only supported with path of length 1 if whole=TRUE."
       )
     }
     path_field <- invoke_static(

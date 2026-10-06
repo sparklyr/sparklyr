@@ -369,7 +369,7 @@ stream_generate_test_entry <- function(
 #'   distribution if needed.
 #' @param iterations Number of iterations to execute before stopping, defaults
 #'   to fifty.
-#' @param interval The inverval in seconds use to write the stream, defaults
+#' @param interval The interval in seconds use to write the stream, defaults
 #'   to one second.
 #'
 #' @details This function requires the \code{callr} package to be installed.
@@ -430,7 +430,7 @@ stream_find <- function(sc, id) {
 #' Ensures a stream has a watermark defined, which is required for some
 #' operations over streams.
 #'
-#' @param x An object coercable to a Spark Streaming DataFrame.
+#' @param x An object coercible to a Spark Streaming DataFrame.
 #' @param column The name of the column that contains the event time of the row,
 #'   if the column is missing, a column with the current time will be added.
 #' @param threshold The minimum delay to wait to data to arrive late, defaults
@@ -513,7 +513,7 @@ to_milliseconds <- function(dur) {
 #' streaming dataframe that contains all columns in the input and column(s) that
 #' are shifted behind by the offset(s) specified in `...` (see example)
 #'
-#' @param x An object coercable to a Spark Streaming DataFrame.
+#' @param x An object coercible to a Spark Streaming DataFrame.
 #' @param cols A list of expressions for a single or multiple variables to create
 #' that will contain the value of a previous entry.
 #' @param thresholds Optional named list of timestamp column(s) and
@@ -527,7 +527,7 @@ to_milliseconds <- function(dur) {
 #'   UNIX timestamps) or time duration strings such as "5s", "5sec", "5min",
 #'   "5hour", etc.
 #'   Any timestamp column in `x` that is not of timestamp of date Spark SQL
-#'   types will be interepreted as number of milliseconds since the UNIX epoch.
+#'   types will be interpreted as number of milliseconds since the UNIX epoch.
 #'
 #' @examples
 #' \dontrun{

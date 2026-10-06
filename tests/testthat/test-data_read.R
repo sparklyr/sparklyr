@@ -665,7 +665,7 @@ test_that(
       reader = spark_read_text,
       whole = TRUE
     ),
-    "spark_read_text is only suppored with path of length 1 if whole=TRUE"
+    "spark_read_text is only supported with path of length 1 if whole=TRUE"
   )
 )
 

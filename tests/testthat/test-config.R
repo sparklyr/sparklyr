@@ -165,7 +165,7 @@ test_that("spark_config_packages() does not change config", {
   )
 })
 
-test_that("spark_config_packages() defaults to latest veresion", {
+test_that("spark_config_packages() defaults to latest version", {
   expect_equal(
     3L,
     strsplit(
