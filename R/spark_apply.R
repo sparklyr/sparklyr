@@ -35,7 +35,7 @@ spark_apply_worker_config <- function(
 #'
 #' Applies an R function to a Spark object (typically, a Spark DataFrame).
 #'
-#' @param x An object (usually a \code{spark_tbl}) coercable to a Spark DataFrame.
+#' @param x An object (usually a \code{spark_tbl}) coercible to a Spark DataFrame.
 #' @param f A function that transforms a data frame partition into a data frame.
 #'   The function \code{f} has signature \code{f(df, context, group1, group2, ...)} where
 #'   \code{df} is a data frame with the data to be processed, \code{context}

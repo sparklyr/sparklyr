@@ -165,7 +165,7 @@ spark_compile <- function(
     )
   )
 
-  rlang::inform(c("*" = paste("Ouput:", temp_out)))
+  rlang::inform(c("*" = paste("Output:", temp_out)))
 
   if (status) {
     rlang::abort("Failed to compile Scala source files")

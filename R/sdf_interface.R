@@ -184,7 +184,7 @@ sdf_register.spark_jobj <- function(x, name = NULL) {
 #' from a Spark DataFrame.
 #'
 #'
-#' @param x An object coercable to a Spark DataFrame.
+#' @param x An object coercible to a Spark DataFrame.
 #' @param fraction The fraction to sample.
 #' @param replacement Boolean; sample with replacement?
 #' @param seed An (optional) integer seed.
@@ -221,7 +221,7 @@ sdf_sample <- function(x, fraction = 1, replacement = TRUE, seed = NULL) {
 #' weights of all rows that are not in the sample set yet in that step.
 #'
 #'
-#' @param x An object coercable to a Spark DataFrame.
+#' @param x An object coercible to a Spark DataFrame.
 #' @param weight_col Name of the weight column
 #' @param k Sample set size
 #' @param replacement Whether to sample with replacement
@@ -263,7 +263,7 @@ sdf_weighted_sample <- function(
 #'
 
 #'
-#' @param x An object coercable to a Spark DataFrame.
+#' @param x An object coercible to a Spark DataFrame.
 #' @param columns The column(s) to sort by.
 #'
 #' @family Spark data frames

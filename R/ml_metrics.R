@@ -60,7 +60,7 @@ ml_metrics_regression <- function(
 #' Defaults to `rawPrediction`, since its type and expected values will match `truth`.
 #' @param metrics A character vector with the metrics to calculate. For binary models
 #' the possible values are: `roc_auc` (Area under the Receiver Operator curve),
-#' `pr_auc` (Area under the Precesion Recall curve).
+#' `pr_auc` (Area under the Precision Recall curve).
 #'  Defaults to: `roc_auc`, `pr_auc`
 #' @inherit ml_metrics_regression
 #' @examples
@@ -109,7 +109,7 @@ ml_metrics_binary <- function(
 #' `weightedFMeasure`, `truePositiveRateByLabel`, `falsePositiveRateByLabel`,
 #' `precisionByLabel`, `recallByLabel`, `fMeasureByLabel`, `logLoss`, `hammingLoss`
 #' @param beta Numerical value used for precision and recall. Defaults to NULL, but
-#' if the Spark session's verion is 3.0 and above, then NULL is changed to 1,
+#' if the Spark session's version is 3.0 and above, then NULL is changed to 1,
 #' unless something different is supplied in this argument.
 #' @examples
 #' \dontrun{

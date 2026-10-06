@@ -450,7 +450,7 @@ sdf_pivot <- function(x, formula, fun.aggregate = "count") {
   intersection <- intersect(grouped_cols, pivot_cols)
   if (length(intersection)) {
     stop(
-      "variables on both sides of forumla: ",
+      "variables on both sides of formula: ",
       paste(deparse(intersection), collapse = " ")
     )
   }
