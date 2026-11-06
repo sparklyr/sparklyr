@@ -141,9 +141,12 @@ test_that("spark_config warns() if non-existent file is passed", {
 })
 
 test_that("spark_config_packages() supports kafka", {
-  expect_equal(
-    "org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.0",
-    spark_config_packages(list(), "kafka", "2.4.0")$sparklyr.shell.packages
+  with_mocked_bindings(
+    spark_version_latest = function(version = NULL) version,
+    expect_equal(
+      "org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.0",
+      spark_config_packages(list(), "kafka", "2.4.0")$sparklyr.shell.packages
+    )
   )
 })
 
