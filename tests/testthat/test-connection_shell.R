@@ -436,6 +436,205 @@ test_that("start_shell aborts after exhausting gateway connect attempts", {
   )
 })
 
+# Shared fixture for start_shell() tests: a fake SPARK_HOME with bin/spark-submit
+# plus the mocks needed to reach the spark-submit/gateway code paths.
+local_fake_spark_home <- function(env = parent.frame()) {
+  home <- withr::local_tempdir(.local_envir = env)
+  dir.create(file.path(home, "bin"))
+  invisible(file.create(file.path(home, "bin", "spark-submit")))
+  home
+}
+
+fake_app_jar <- function(...) {
+  f <- tempfile(fileext = ".jar")
+  file.create(f)
+  f
+}
+
+no_extension_deps <- function(...) {
+  list(jars = character(), packages = character(), repositories = character())
+}
+
+capture_shell_connection_args <- function(master, config = list()) {
+  captured <- NULL
+  with_mocked_bindings(
+    validate_java_version = function(...) invisible(TRUE),
+    start_shell = function(..., shell_args) {
+      captured <<- shell_args
+      NULL
+    },
+    .package = "sparklyr",
+    shell_connection(
+      master = master,
+      spark_home = "/opt/spark",
+      method = "",
+      app_name = "t",
+      version = NULL,
+      hadoop_version = NULL,
+      shell_args = NULL,
+      config = config,
+      service = FALSE,
+      remote = FALSE,
+      extensions = list(),
+      batch = NULL
+    )
+  )
+  captured
+}
+
+test_that("shell_connection runs the gateway in client mode on kubernetes (#3506)", {
+  master <- "k8s://https://kubernetes.default.svc:443"
+  args <- capture_shell_connection_args(master)
+
+  # spark-submit must not fall back to spark.submit.deployMode from
+  # spark-defaults.conf, which is "cluster" on e.g. EMR on EKS images
+  expect_equal(
+    args[which(args == "--deploy-mode") + 1],
+    "client"
+  )
+  expect_equal(args[which(args == "--master") + 1], master)
+})
+
+test_that("shell_connection respects explicit deploy-mode/master on kubernetes", {
+  # spark_config_kubernetes() sets cluster mode explicitly; these flags are
+  # then emitted by spark_config_shell_args(), so none must be added here
+  args <- capture_shell_connection_args(
+    "k8s://https://host:443",
+    config = list(
+      "sparklyr.shell.deploy-mode" = "cluster",
+      "sparklyr.shell.master" = "k8s://https://host:443"
+    )
+  )
+  expect_false("--deploy-mode" %in% args)
+  expect_false("--master" %in% args)
+})
+
+test_that("shell_connection leaves non-kubernetes masters unchanged", {
+  args <- capture_shell_connection_args("spark://host:7077")
+  expect_false("--deploy-mode" %in% args)
+  expect_false("--master" %in% args)
+})
+
+test_that("start_shell retries a transient gateway failure", {
+  home <- local_fake_spark_home()
+  attempts <- 0
+  gw_con <- textConnection("x")
+  withr::defer(tryCatch(close(gw_con), error = function(e) NULL))
+
+  with_mocked_bindings(
+    spark_connect_gateway = function(..., isStarting = FALSE) {
+      if (!isStarting) {
+        return(NULL)
+      }
+      attempts <<- attempts + 1
+      if (attempts == 1) stop("connection refused")
+      list(backendPort = 9999, gateway = gw_con)
+    },
+    spark_version_from_home = function(...) "3.5.0",
+    spark_default_app_jar = fake_app_jar,
+    spark_dependencies_from_extensions = no_extension_deps,
+    .package = "sparklyr",
+    with_mocked_bindings(
+      system2 = function(...) 0L,
+      Sys.sleep = function(...) invisible(NULL),
+      # fail right after the gateway step, proving the retry loop was passed
+      socketConnection = function(...) stop("refused"),
+      .package = "base",
+      expect_error(
+        start_shell(
+          master = "local",
+          spark_home = home,
+          spark_version = "3.5.0",
+          app_name = "t",
+          config = list(),
+          extensions = list(),
+          environment = new.env()
+        ),
+        "Failed to open connection to backend"
+      )
+    )
+  )
+  expect_equal(attempts, 2)
+})
+
+test_that("start_shell surfaces the spark-submit log when the gateway never starts", {
+  # Previously the first gateway error escaped the retry loop, so abort_shell()
+  # never ran and the spark-submit error was hidden from the user (#3506).
+  home <- local_fake_spark_home()
+  log_file <- withr::local_tempfile()
+  writeLines(
+    "org.apache.spark.SparkException: Must specify the driver container image",
+    log_file
+  )
+  withr::local_envvar(SPARKLYR_LOG_FILE = log_file)
+  attempts <- 0
+
+  with_mocked_bindings(
+    spark_connect_gateway = function(..., isStarting = FALSE) {
+      if (!isStarting) {
+        return(NULL)
+      }
+      attempts <<- attempts + 1
+      stop("Gateway in localhost:8880 did not respond.")
+    },
+    spark_version_from_home = function(...) "3.5.0",
+    spark_default_app_jar = fake_app_jar,
+    spark_dependencies_from_extensions = no_extension_deps,
+    .package = "sparklyr",
+    with_mocked_bindings(
+      system2 = function(...) 0L,
+      Sys.sleep = function(...) invisible(NULL),
+      .package = "base",
+      expect_error(
+        start_shell(
+          master = "local",
+          spark_home = home,
+          spark_version = "3.5.0",
+          app_name = "t",
+          config = list(),
+          extensions = list(),
+          environment = new.env()
+        ),
+        "Failed while connecting to sparklyr.*Must specify the driver container image"
+      )
+    )
+  )
+  expect_equal(attempts, 5)
+})
+
+test_that("start_shell honours options(sparklyr.log.console = TRUE)", {
+  home <- local_fake_spark_home()
+  withr::local_options(sparklyr.log.console = TRUE)
+  stdout_arg <- NULL
+
+  with_mocked_bindings(
+    spark_connect_gateway = function(...) NULL,
+    spark_version_from_home = function(...) "3.5.0",
+    spark_default_app_jar = fake_app_jar,
+    spark_dependencies_from_extensions = no_extension_deps,
+    .package = "sparklyr",
+    with_mocked_bindings(
+      system2 = function(command, args, stdout, ...) {
+        stdout_arg <<- stdout
+        0L
+      },
+      .package = "base",
+      start_shell(
+        master = "local",
+        spark_home = home,
+        spark_version = "3.5.0",
+        app_name = "t",
+        config = list(),
+        extensions = list(),
+        environment = new.env(),
+        batch = TRUE
+      )
+    )
+  )
+  # "" means system2() writes to the R console instead of the log file
+  expect_identical(stdout_arg, "")
+})
+
 test_that("start_shell aborts when the backend socket cannot be opened", {
   # routing gateway returns a live-looking gatewayInfo, so we skip the launch
   # block and go straight to the socket setup, which we force to fail.

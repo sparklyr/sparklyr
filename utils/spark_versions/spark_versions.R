@@ -101,8 +101,8 @@ if (file_exists(versions_rds)) {
 
 if (!file_exists(versions_rds)) {
   c(
-    "https://dlcdn.apache.org/spark/",
-    "https://archive.apache.org/dist/spark/"
+    "https://dlcdn.apache.org/spark/" #,
+    #"https://archive.apache.org/dist/spark/"
   ) %>%
     map(
       ~ get_main_page(.x) %>%

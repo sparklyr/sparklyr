@@ -18,6 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
@@ -41,14 +46,14 @@ jobs:
         id: cache-spark
         uses: actions/cache@v3
         with:
-          path: /home/runner/spark/spark-3.5.8-bin-hadoop3
-          key: sparklyr-spark-3.5.8-bin-hadoop3
+          path: /home/runner/spark/spark-3.5.9-bin-hadoop3
+          key: sparklyr-spark-3.5.9-bin-hadoop3
 
       - name: Install Spark (via sparklyr)
         if: steps.cache-spark.outputs.cache-hit != 'true'
         run: |
           devtools::load_all()
-          spark_install(version = "3.5.8")
+          spark_install(version = "3.5.9")
         shell: Rscript {0}
 
       - name: Cache Scala

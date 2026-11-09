@@ -1,3 +1,17 @@
+# Sparklyr (dev)
+
+## Fixes
+
+- Fixed `spark_connect()` failing on Kubernetes (`k8s://`) masters when
+`spark-defaults.conf` sets `spark.submit.deployMode cluster`, due to the gateway
+inheriting that deploy mode and launching in a separate driver pod instead of
+locally. The gateway is now started in client mode unless
+`sparklyr.shell.deploy-mode` or `sparklyr.shell.master` is set, as
+`spark_config_kubernetes()` does. Connection failures are also easier to
+diagnose: the gateway connection loop now actually retries and includes the
+spark-submit log in the final error, and `options(sparklyr.log.console = TRUE)`,
+which that error recommends, now works (@grantmcdermott / #3541).
+
 # Sparklyr 1.9.6
 
 ## New

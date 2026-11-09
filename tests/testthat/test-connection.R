@@ -47,6 +47,15 @@ test_that("spark_master_is_gateway() detects the sparklyr:// scheme", {
   expect_false(spark_master_is_gateway("yarn"))
 })
 
+test_that("spark_master_is_kubernetes() detects the k8s:// scheme", {
+  expect_true(spark_master_is_kubernetes("k8s://https://host:443"))
+  expect_true(spark_master_is_kubernetes("K8S://https://host:443"))
+  expect_false(spark_master_is_kubernetes("local"))
+  expect_false(spark_master_is_kubernetes("yarn"))
+  expect_false(spark_master_is_kubernetes("spark://host:7077"))
+  expect_false(spark_master_is_kubernetes(NULL))
+})
+
 test_that("spark_master_is_yarn_cluster() honors master and deploy-mode", {
   expect_true(spark_master_is_yarn_cluster("yarn-cluster", list()))
   expect_true(spark_master_is_yarn_cluster("YARN-CLUSTER", list()))

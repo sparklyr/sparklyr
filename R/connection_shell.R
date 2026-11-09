@@ -53,6 +53,20 @@ shell_connection <- function(
     }
   }
 
+  # for kubernetes, run the gateway as the driver in this process (client mode)
+  # unless the deploy mode is set explicitly, as spark_config_kubernetes() does.
+  # Otherwise spark-submit falls back to spark-defaults.conf, which may say
+  # "cluster" (e.g. EMR on EKS images), and the gateway never starts locally.
+  if (spark_master_is_kubernetes(master)) {
+    if (is.null(config[["sparklyr.shell.deploy-mode"]])) {
+      shell_args <- c(shell_args, "--deploy-mode", "client")
+    }
+
+    if (is.null(config[["sparklyr.shell.master"]])) {
+      shell_args <- c(shell_args, "--master", master)
+    }
+  }
+
   # start with blank environment variables
   environment <- new.env()
 
@@ -467,7 +481,12 @@ start_shell <- function(
       tempfile(fileext = "_spark.err")
     )
 
-    console_log <- spark_config_exists(config, "sparklyr.log.console", FALSE)
+    # also honour options(sparklyr.log.console = TRUE), as the troubleshooting
+    # message suggests; spark_config_exists() only looked in `config`
+    console_log <- !identical(
+      spark_config_value(config, "sparklyr.log.console", FALSE),
+      FALSE
+    )
 
     stdout_param <- if (console_log) "" else output_file
     stderr_param <- if (console_log) "" else output_file
@@ -530,52 +549,71 @@ start_shell <- function(
       gatewayConfigRetries
     )
 
-    while (gateway_connect_attempts > 0) {
+    # Retry quick failures (e.g. connection refused while the JVM is still
+    # binding) within the overall sparklyr.connect.timeout budget. Each attempt
+    # already waits up to that timeout, so a gateway that never comes up fails
+    # after ~one timeout. Errors are caught with tryCatch(): the previous
+    # withCallingHandlers() let the first error escape, so retries never
+    # happened and abort_shell() never surfaced the spark-submit log.
+    connect_deadline <- Sys.time() +
+      spark_config_value(config, "sparklyr.connect.timeout", 60)
+    gatewayInfo <- NULL
+    gateway_error <- NULL
+    while (is.null(gatewayInfo) && gateway_connect_attempts > 0) {
       gateway_connect_attempts <- gateway_connect_attempts - 1
-      withCallingHandlers(
-        {
-          # connect and wait for the service to start
-          gatewayInfo <- spark_connect_gateway(
-            gatewayAddress,
-            gatewayPort,
-            sessionId,
-            config = config,
-            isStarting = TRUE
-          )
-          break
-        },
+      # connect and wait for the service to start
+      gatewayInfo <- tryCatch(
+        spark_connect_gateway(
+          gatewayAddress,
+          gatewayPort,
+          sessionId,
+          config = config,
+          isStarting = TRUE
+        ),
         error = function(e) {
-          if (gateway_connect_attempts > 0) {
-            Sys.sleep(gateway_connect_retry_interval_s)
-            gateway_connect_retry_interval_s <-
-              gateway_connect_retry_interval_s *
-              gateway_connect_retry_interval_multiplier
-          } else {
-            abort_shell(
-              paste(
-                "Failed while connecting to sparklyr to port (",
-                gatewayPort,
-                if (spark_master_is_yarn_cluster(master, config)) {
-                  paste0(
-                    ") and address (",
-                    gatewayAddress
-                  )
-                } else {
-                  ""
-                },
-                ") for sessionid (",
-                sessionId,
-                "): ",
-                e$message,
-                sep = ""
-              ),
-              spark_submit_path,
-              shell_args,
-              output_file,
-              error_file
-            )
-          }
+          gateway_error <<- e
+          NULL
         }
+      )
+
+      if (is.null(gatewayInfo)) {
+        if (gateway_connect_attempts == 0 || Sys.time() >= connect_deadline) {
+          break
+        }
+        Sys.sleep(gateway_connect_retry_interval_s)
+        gateway_connect_retry_interval_s <-
+          gateway_connect_retry_interval_s *
+          gateway_connect_retry_interval_multiplier
+      }
+    }
+
+    if (is.null(gatewayInfo)) {
+      abort_shell(
+        paste(
+          "Failed while connecting to sparklyr to port (",
+          gatewayPort,
+          if (spark_master_is_yarn_cluster(master, config)) {
+            paste0(
+              ") and address (",
+              gatewayAddress
+            )
+          } else {
+            ""
+          },
+          ") for sessionid (",
+          sessionId,
+          "): ",
+          if (is.null(gateway_error)) {
+            "Gateway did not respond."
+          } else {
+            conditionMessage(gateway_error)
+          },
+          sep = ""
+        ),
+        spark_submit_path,
+        shell_args,
+        output_file,
+        error_file
       )
     }
   }

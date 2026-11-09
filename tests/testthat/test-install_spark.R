@@ -49,7 +49,7 @@ fake_spark_download <- make_fake_download("v2")
 
 test_that("spark_install downloads, untars, and configures (mocked download)", {
   skip_on_windows()
-  test_version <- "3.4.4"
+  test_version <- "3.5.9"
   test_hadoop <- "3"
   component <- sprintf("spark-%s-bin-hadoop%s", test_version, test_hadoop)
 
@@ -225,7 +225,7 @@ test_that("spark_install_tar validates and extracts a tarball", {
 
 test_that("spark_uninstall removes an install and reports when absent", {
   skip_on_windows()
-  test_version <- "3.4.4"
+  test_version <- "3.5.9"
   test_hadoop <- "3"
   component <- sprintf("spark-%s-bin-hadoop%s", test_version, test_hadoop)
 
@@ -266,11 +266,11 @@ test_that("spark_install is verbose and detects an existing install", {
         .package = "sparklyr",
         {
           expect_message(
-            spark_install("3.4.4", "3", verbose = TRUE),
+            spark_install("3.5.9", "3", verbose = TRUE),
             "Installing Spark"
           )
           expect_message(
-            spark_install("3.4.4", "3", verbose = TRUE),
+            spark_install("3.5.9", "3", verbose = TRUE),
             "already installed"
           )
         }
@@ -280,7 +280,7 @@ test_that("spark_install is verbose and detects an existing install", {
 })
 
 test_that("spark_install applies Windows-specific configuration", {
-  test_version <- "3.4.4"
+  test_version <- "3.5.9"
   test_hadoop <- "3"
   component <- sprintf("spark-%s-bin-hadoop%s", test_version, test_hadoop)
 
@@ -312,9 +312,9 @@ test_that("spark_install handles the log4j v1 template on Windows", {
         os_is_windows = function() TRUE,
         download_file = make_fake_download("v1"),
         .package = "sparklyr",
-        spark_install("3.4.4", "3", verbose = FALSE)
+        spark_install("3.5.9", "3", verbose = FALSE)
       )
-      conf <- file.path(install_dir, "spark-3.4.4-bin-hadoop3", "conf")
+      conf <- file.path(install_dir, "spark-3.5.9-bin-hadoop3", "conf")
       expect_true(file.exists(file.path(conf, "log4j.properties")))
     }
   )
