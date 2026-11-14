@@ -338,7 +338,7 @@ setMethod(
     }
 
     if (append && overwrite) {
-      stop("append and overwrite parameters cannot both be setted to TRUE.")
+      stop("append and overwrite parameters cannot both be set to TRUE.")
     }
 
     temp_name <- if (identical(temporary, FALSE)) {

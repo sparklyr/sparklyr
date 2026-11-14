@@ -3,7 +3,7 @@
 #' Given a spark object, returns a reactive data source for the contents
 #' of the spark object. This function is most useful to read Spark streams.
 #'
-#' @param x An object coercable to a Spark DataFrame.
+#' @param x An object coercible to a Spark DataFrame.
 #' @param intervalMillis Approximate number of milliseconds to wait to retrieve
 #'   updated data frame. This can be a numeric value, or a function that returns
 #'   a numeric value.

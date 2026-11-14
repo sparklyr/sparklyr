@@ -476,7 +476,7 @@ new_ml_gbt_regression_model <- function(jobj) {
 #' @template roxlate-ml-decision-trees-base-params
 #' @template roxlate-ml-formula-params
 #' @template roxlate-ml-feature-subset-strategy
-#' @param max_iter Maxmimum number of iterations.
+#' @param max_iter Maximum number of iterations.
 #' @param step_size Step size (a.k.a. learning rate) in interval (0, 1] for shrinking the contribution of each estimator. (default = 0.1)
 #' @param subsampling_rate Fraction of the training data used for learning each decision tree, in range (0, 1]. (default = 1.0)
 #' @param loss_type Loss function which GBT tries to minimize. Supported: \code{"squared"} (L2) and \code{"absolute"} (L1) (default = squared) for regression and \code{"logistic"} (default) for classification. For \code{ml_gradient_boosted_trees}, setting \code{"auto"}

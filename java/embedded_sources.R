@@ -1989,7 +1989,7 @@ spark_worker_execute_closure <- function(
   partition_index
 ) {
   if (nrow(df) == 0) {
-    worker_log("found that source has no rows to be proceesed")
+    worker_log("found that source has no rows to be processed")
     return(NULL)
   }
 

@@ -24,7 +24,7 @@
 #' the classpath.
 #'
 #' Starting with Spark >= 2.0.0, the \strong{Hive Context} class has been
-#' deprecated -- it is superceded by the \strong{Spark Session} class, and
+#' deprecated -- it is superseded by the \strong{Spark Session} class, and
 #' \code{hive_context} will return a \strong{Spark Session} object instead.
 #' Note that both classes share a SQL interface, and therefore one can invoke
 #' SQL through these objects.

@@ -534,7 +534,7 @@ sdf_runif <- function(
 #' of equal size.
 #'
 #'
-#' @param x An object coercable to a Spark DataFrame.
+#' @param x An object coercible to a Spark DataFrame.
 #' @param ... Named parameters, mapping table names to weights. The weights
 #'   will be normalized such that they sum to 1.
 #' @param weights An alternate mechanism for supplying weights -- when

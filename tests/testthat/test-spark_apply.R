@@ -618,7 +618,7 @@ test_that("can infer R package dependencies", {
   )
 })
 
-test_that("'spark_apply' can pass environemnt variables from config", {
+test_that("'spark_apply' can pass environment variables from config", {
   expect_equal(
     sdf_len(sc, 1) %>%
       spark_apply(function(e) Sys.getenv("foo")) %>%

@@ -304,7 +304,7 @@ print.ml_model_generalized_linear_regression <-
 
     cat(
       sprintf(
-        "Degress of Freedom:  %s Total (i.e. Null);  %s Residual",
+        "Degrees of Freedom:  %s Total (i.e. Null);  %s Residual",
         x$summary$residual_degree_of_freedom_null(),
         x$summary$residual_degree_of_freedom()
       ),

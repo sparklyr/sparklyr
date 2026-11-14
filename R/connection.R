@@ -580,7 +580,7 @@ spark_disconnect.character <- function(sc, ...) {
 spark_log_file <- function(sc) {
   scon <- sc
   if (!connection_is_open(scon)) {
-    stop("The Spark conneciton is not open anymmore, log is not available")
+    stop("The Spark connection is not open anymmore, log is not available")
   }
 
   lines <- spark_log(sc, n = NULL)

@@ -165,7 +165,7 @@ synapse_connection <- function(
       )
 
       if (verbose) {
-        message("[Synapse] Sucessfully connect to spark")
+        message("[Synapse] Successfully connect to spark")
       }
     },
     error = function(err) {
